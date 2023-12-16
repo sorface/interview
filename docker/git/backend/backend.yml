@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  
+  backend:
+    container_name: "csharp"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development

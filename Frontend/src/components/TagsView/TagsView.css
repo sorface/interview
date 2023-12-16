@@ -1,0 +1,16 @@
+.tags-view {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.tags-view .tag-item {
+  border: 1px solid;
+  border-radius: 1rem;
+  padding: 0rem 0.5rem;
+  margin-left: 0.5rem;
+}
+
+.tags-view .tag-item:first-child  {
+  margin-left: 0rem;
+}

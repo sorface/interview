@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  postgres:
+    container_name: "psql"
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - '5432:5432'
+    volumes:
+      - database-drive:/var/lib/postgresql/data
+    networks:
+      - local.network
+
+  redis_image:
+    container_name: cache
+    image: redis/redis-stack-server
+    restart: always
+    ports:
+      - '6379:6379'
+    networks:
+      - local.network
+
+  backend:
+    container_name: "backend"
+    build:
+      context: ../../Backend/.
+      dockerfile: Interview.Backend/Dockerfile
+      args:
+        Database: ${DATABASE}
+        ConnectionString: ${CONNECTION_STRING}
+        ClientId: ${CLIENT_ID}
+        ClientSecret: ${CLIENT_SECRET}
+        SwaggerPrefix: ""
+        RedisConnectionString: ${REDIS_CONNECTION_STRING}
+        UseRedis: ${USE_REDIS}
+    ports:
+      - '8800:8800'
+    environment:
+      - ASPNETCORE_URLS=http://+:8800
+      - ASPNETCORE_ENVIRONMENT=${CSHARP_ENVIRONMENT}
+    volumes:
+      - backend-drive:/app/
+    depends_on:
+      - 'postgres'
+      - 'redis_image'
+    networks:
+      - local.network
+    links:
+      - 'redis_image'
+  
+  frontend:
+    container_name: "frontend"
+    build:
+      context: ../../Frontend/.
+      dockerfile: Dockerfile.dev
+    expose:
+      - "3000"
+    ports:
+      - '3000:3000'
+    volumes:
+      - frontend-drive:/app/
+    links:
+      - backend
+    networks:
+      - local.network
+
+networks:
+  local.network:
+    driver: bridge
+    
+volumes:
+  backend-drive:
+  frontend-drive:
+  database-drive:

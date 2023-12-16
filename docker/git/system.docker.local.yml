@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    extends:
+      file: database/postgres.yml
+      service: postgres
+    volumes:
+      - database-drive:/var/lib/postgresql/data
+    networks:
+      - local.network
+
+  backend:
+    extends:
+      file: backend/backend.yml
+      service: backend
+    volumes:
+      - backend-drive:/app/
+    depends_on:
+      - postgres
+    networks:
+      - local.network
+
+  nginx:
+    extends:
+      file: nginx/nginx.yml
+      service: nginx
+    depends_on:
+      - backend
+    networks:
+      - local.network
+
+networks:
+  local.network:
+    driver: bridge
+    
+volumes:
+  backend-drive:
+  database-drive:

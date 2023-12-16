@@ -1,0 +1,14 @@
+.reactions-list {
+  display: flex;
+}
+
+.reactions-list .switch-button {
+  z-index: 1;
+}
+
+.reactions-list .reaction-feed-item {
+  position: absolute;
+  padding-left: 0.55rem;
+  padding-top: 0.55rem;
+  animation: var(--fadeOutUp-animation);
+}

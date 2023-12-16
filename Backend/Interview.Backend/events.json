@@ -1,0 +1,16 @@
+﻿{
+  "InitialEvents": [
+    {
+      "Type": "CodeEditor",
+      "Stateful": true,
+      "Roles": [
+        "User",
+        "Admin"
+      ],
+      "ParticipantTypes": [
+        "Expert",
+        "Examinee"
+      ]
+    }
+  ]
+}

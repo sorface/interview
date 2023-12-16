@@ -1,0 +1,11 @@
+.code-editor {
+  height: 100%;
+}
+
+.code-editor .code-editor-tools {
+  text-align: left;
+}
+
+.code-editor .code-editor-tools-select {
+  margin-right: 0.75rem;
+}

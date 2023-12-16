@@ -1,0 +1,9 @@
+.paginator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.paginator button {
+  margin: 0px 1rem;
+}

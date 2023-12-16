@@ -1,0 +1,30 @@
+.tabs {
+  display: flex;
+}
+
+.tabs::after {
+  position: absolute;
+  display: block;
+  content: '';
+  width: var(--chat-width);
+  padding-top: calc(2rem - 0.35rem);
+  border-bottom: 1px solid var(--tab-border-color);
+}
+
+.tabs .tabs-tab {
+  cursor: pointer;
+  padding: 0rem 1rem;
+  flex: 1;
+  padding-bottom: 0.05rem;
+  text-align: center;
+  z-index: 1;
+}
+
+.tabs .tabs-tab:last-child {
+  margin-right: 0rem;
+}
+
+.tabs .tabs-tab-active {
+  color: var(--active-tab-color);
+  border-bottom: 1px solid var(--active-tab-color);
+}

@@ -1,0 +1,33 @@
+.messages-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  animation: var(--fadeIn-animation-fast);
+}
+
+.messages-chat .tabs {
+  margin-bottom: 0.5rem;
+}
+
+.messages-chat .message-input-box {
+  display: flex;
+}
+
+.messages-chat .message-input-box input {
+  margin-right: 0.5rem;
+}
+
+.message-input-box .message-input-wrapper {
+  flex: 1;
+  padding-right: 1rem;
+}
+
+.message-input-box .message-input-wrapper input {
+  width: 100%;
+}
+
+.messages-chat .videochat-transcripts {
+  text-align: left;
+  overflow: auto;
+  flex: 1;
+}

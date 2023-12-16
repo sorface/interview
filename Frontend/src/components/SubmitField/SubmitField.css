@@ -1,0 +1,18 @@
+.submit-field {
+  transition-duration: 0.4s;
+  -webkit-transition-duration: 0.4s;
+  -moz-transition-duration: 0.4s;
+  -o-transition-duration: 0.4s;
+}
+
+.submit-field input {
+  font-size: 1rem;
+  background-color: unset;
+  color: var(--text);
+  border: none;
+  cursor: pointer;
+}
+
+.submit-field:hover {
+  background-color: var(--active);
+}

@@ -1,0 +1,44 @@
+.rooms-list {
+  padding: 0px;
+  list-style-type: none;
+  text-align: left;
+}
+
+.rooms-list .room-item {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 1rem;
+  margin: 0rem 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--list-border-color);
+}
+
+.rooms-list .room-link {
+  flex: 1;
+  align-self: flex-start;
+  font-size: var(--menu-font-size);
+}
+
+.rooms-list .room-status {
+  font-size: 0.75rem;
+}
+
+.rooms-list .room-tags {
+  flex: 1;
+  text-align: right;
+  margin-top: 0.5rem;
+}
+
+.rooms-list .room-edit-participants-link {
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
+.rooms-list .room-action-links {
+  display: flex;
+  flex-direction: column;
+}
+
+.rooms-list .rooms-list-no-data {
+  text-align: center;
+}

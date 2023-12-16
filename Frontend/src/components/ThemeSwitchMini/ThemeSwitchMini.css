@@ -1,0 +1,6 @@
+.theme-switch-mini {
+  cursor: pointer;
+  text-align: left;
+  user-select: none;
+  z-index: 10;
+}

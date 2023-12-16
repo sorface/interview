@@ -1,0 +1,149 @@
+.room-wrapper .fields-wrap {
+  margin: 0rem;
+}
+
+.room-wrapper .theme-switch-mini {
+  width: 1rem;
+  padding-left: 0.5rem;
+}
+
+.room-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.room-page .room-page-header {
+  display: flex;
+  padding-top: 0.5rem;
+  padding-bottom: 1rem;
+}
+
+.room-page .room-page-header-caption {
+  display: inline-block;
+  width: 270px;
+  text-align: left;
+}
+
+.room-page .room-page-header-caption-viewer {
+  width: 100%;
+}
+
+.room-page .room-page-header .reactions-field {
+  margin: 0rem 1rem;
+}
+
+.room-page .room-page-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding-bottom: 0.25rem;
+}
+
+.room-page .room-page-main-content {
+  flex: 1;
+  min-height: 0;
+}
+
+.room-page .room-tools-container {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 0.5rem;
+}
+
+.room-page .room-tools {
+  display: flex;
+}
+
+.room-page .room-tools .switch-button-container {
+  margin-right: 0.75rem;
+}
+
+.room-page .room-tools-left {
+  align-self: flex-start;
+}
+
+.room-page .room-tools-right {
+  height: 100%;
+  align-items: center;
+}
+
+.room-page .room-tools-right a {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  text-decoration: none;
+}
+
+.room-page .room-tools-right button {
+  height: calc(100% - 1rem);
+}
+
+.room-page .room-tools-center {
+  margin: auto;
+}
+
+.room-page .room-title {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  font-size: var(--menu-font-size);
+}
+
+.room-page .room-title h2 {
+  display: inline-block;
+}
+
+.room-page .room-title button {
+  display: inline-block;
+  position: absolute;
+  right: 1.5rem;
+}
+
+.room-page .copy-link-button {
+  position: absolute;
+  margin-left: 8rem;
+}
+
+.room-page .reactions-field {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.25rem;
+  flex: 1;
+}
+
+.room-page .actions-field {
+  display: inline-flex;
+  width: calc(var(--chat-width) + 1.5rem);
+  align-items: center;
+}
+
+.room-page .actions-field-viewer {
+  width: unset;
+  margin-left: auto;
+  padding-left: 0rem;
+}
+
+.room-page .start-room-review {
+  flex: 1;
+}
+
+.room-page .start-room-review button {
+  width: 100%;
+}
+
+.room-page .reactions-field .reaction-wrapper {
+  display: inline-block;
+  margin-left: 0.75rem;
+}
+
+.room-page .room-columns {
+  display: flex;
+  height: 100%;
+}
+

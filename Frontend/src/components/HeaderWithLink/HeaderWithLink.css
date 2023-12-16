@@ -1,0 +1,22 @@
+.header-with-link {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  font-size: var(--menu-font-size);
+  line-height: 1.6 !important;
+}
+
+.header-with-link .button-link {
+  position: absolute;
+  padding: 0.25rem 2rem;
+}
+
+.header-with-link .button-link.float-right {
+  right: 2rem;
+}
+
+.header-with-link .button-link.float-left {
+  left: 2rem;
+}

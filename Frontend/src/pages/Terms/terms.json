@@ -1,0 +1,17 @@
+{
+  "disclaimer": "By using our website, you accept these terms and conditiuons in full. If you disagree with these terms and conditions or any part of these terms and conditions, you must not use our website.",
+  "items": [
+    {
+      "title": "Conditions of Use",
+      "description": "You are solely responsible for the content of all data You share or receive through the [NAME] service and for all transmissions by You. Your use of the Service is subject to all applicable local, state, national and international laws and regulations. You will: (a) not use the Service for any illegal purposes; (b) not use the Service to share, upload, download or view any file, data, image or program that contains: (i) any illegal pictures, materials or information; (ii) any harassing, libelous, abusive, threatening, harmful, vulgar, pornographic, obscene or otherwise objectionable material of any kind or nature; (iii) any material that encourages conduct that could constitute a criminal offense, give rise to civil liability or otherwise violate any applicable local, state, national or international law or regulation; (iv) any code or material that violates the intellectual property rights of others; (c) not access or attempt to access any Service account for which You have no access authorization or duplicate, modify, distribute or display any of the data or files from any such account. [NAME] may use automated procedures to detect unacceptable level of usage and may immediately disable offending accounts, and the process of detection may vary from time to time, based on misuse detected."
+    },
+    {
+      "title": "Disclaimer of Warranties",
+      "description": "The transmission, sharing, viewing, uploading and downloading of data and files through the World Wide Web is subject to a variety of conditions that make such transmission, storage, viewing and retrieval potentially unreliable. ACCORDINGLY, YOUR USE OF THE SERVICE IS AT YOUR SOLE RISK. THE SERVICE IS PROVIDED TO YOU ON AN \"AS IS\" AND \"AS AVAILABLE\" BASIS. [NAME], ON BEHALF OF ITSELF AND ITS DISTRIBUTORS, DISCLAIMS ALL WARRANTIES AND CONDITIONS, EXPRESS OR IMPLIED, ARISING BY LAW OR OTHERWISE, WITH RESPECT TO YOUR THE SERVICE (INCLUDING, WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT). PLEASE NOTE THAT THE SERVICE MAY NOT MEET YOUR NEEDS. [NAME] MAKES NO REPRESENTATION OR WARRANTY: (A) THAT THE SERVICE WILL MEET YOUR NEEDS; (B) THAT ACCESS TO THE SERVICE WILL BE TIMELY, ERROR-FREE, UNINTERRUPTED, VIRUS-FREE OR SECURE; (C) THAT THE DATA AND FILES YOU UPLOAD/DOWNLOAD USING THE DRIVEWAY SERVICE WILL NOT BE LOST OR DAMAGED; (D) THAT THE DATA ON YOUR DESKTOP OR SERVER WILL NOT BE LOST OR DAMAGED; OR (E) THAT DEFECTS IN THE SERVICE WILL BE CORRECTED. YOU ACKNOWLEDGE THAT ANY MATERIAL OR DATA YOU UPLOAD/DOWNLOAD THROUGH THE USE OF THE SERVICE IS DONE AT YOUR CHOICE AND RISK AND THAT YOU WILL BE SOLELY RESPONSIBLE FOR ANY DAMAGE TO YOUR COMPUTER SYSTEM OR LOSS OF DATA THAT RESULTS FROM THE DOWNLOAD OF SUCH MATERIAL OR DATA."
+    },
+    {
+      "title": "Modifications to this Agreement",
+      "description": "The terms and conditions of this Agreement may be changed from time to time. Upon any such change, [NAME] will notify You of such change and post an updated version of this Agreement on the website located at [NAME URL]. Your use of any Services after such notification will constitute Your acceptance of such changed terms and conditions."
+    }
+  ]
+}

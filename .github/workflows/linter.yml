@@ -1,0 +1,24 @@
+name: Linter
+
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+      - 'Frontend'
+      - 'Frontend'
+      - '.github'
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.0.2
+      - name: Setup .NET SDK # detected from global.json
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+      - name: Add Problem Matcher for dotnet-format
+        uses: xt0rted/dotnet-format-problem-matcher@v1.2.0
+      - name: Lint
+        run: dotnet format Backend/Interview.Backend.sln --verify-no-changes --verbosity detailed

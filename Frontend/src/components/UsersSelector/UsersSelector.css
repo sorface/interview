@@ -1,0 +1,8 @@
+.users-selector {
+  padding: 0px;
+  list-style-type: none;
+}
+
+.users-selector label {
+  cursor: pointer;
+}

@@ -1,0 +1,119 @@
+import { ChangeEvent, FunctionComponent, useCallback, useEffect, useState } from 'react';
+import { GetQuestionsParams, questionsApiDeclaration } from '../../apiDeclarations';
+import { ProcessWrapper } from '../ProcessWrapper/ProcessWrapper';
+import { Paginator } from '../../components/Paginator/Paginator';
+import { useApiMethod } from '../../hooks/useApiMethod';
+import { Question } from '../../types/question';
+import { Tag } from '../../types/tag';
+import { QustionsSearch } from '../QustionsSearch/QustionsSearch';
+
+import './QuestionsSelector.css';
+
+const pageSize = 10;
+const initialPageNumber = 1;
+
+interface QuestionsSelectorProps {
+  selected: Question[];
+  onSelect: (question: Question) => void;
+  onUnselect: (question: Question) => void;
+}
+
+export const QuestionsSelector: FunctionComponent<QuestionsSelectorProps> = ({
+  selected,
+  onSelect,
+  onUnselect,
+}) => {
+  const [pageNumber, setPageNumber] = useState(initialPageNumber);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [searchValue, setSearchValue] = useState('');
+  const { apiMethodState, fetchData } = useApiMethod<Question[], GetQuestionsParams>(questionsApiDeclaration.getPage);
+  const { process: { loading, error }, data: questions } = apiMethodState;
+  const questionsSafe: Question[] = questions || [];
+
+  useEffect(() => {
+    fetchData({
+      PageNumber: pageNumber,
+      PageSize: pageSize,
+      value: searchValue,
+      tags: selectedTags.map(tag => tag.id),
+    });
+  }, [fetchData, pageNumber, searchValue, selectedTags]);
+
+  const handleCheckboxChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = event.target;
+    if (!questions) {
+      return;
+    }
+    const questionItem = questions.find(
+      question => question.id === value
+    );
+    if (!questionItem) {
+      throw new Error('Question item not found in state');
+    }
+    if (checked) {
+      onSelect(questionItem);
+    } else {
+      onUnselect(questionItem);
+    }
+  }, [questions, onSelect, onUnselect]);
+
+  const createQuestionItem = useCallback((question: Question) => (
+    <li key={question.id} className='questions-selector-item'>
+      <input
+        id={`input-${question.id}`}
+        type="checkbox"
+        value={question.id}
+        checked={selected.some(que => que.id === question.id)}
+        onChange={handleCheckboxChange}
+      />
+      <label htmlFor={`input-${question.id}`}>
+        {question.value} [
+        {question.tags.map(tag => (
+          <span
+            key={tag.id}
+            className='questions-selector-item-tag'
+            style={{ borderColor: `#${tag.hexValue}` }}
+          >
+            {tag.value}
+          </span>
+        ))}
+        ]
+      </label>
+    </li>
+  ), [selected, handleCheckboxChange]);
+
+  const handleNextPage = useCallback(() => {
+    setPageNumber(pageNumber + 1);
+  }, [pageNumber]);
+
+  const handlePrevPage = useCallback(() => {
+    setPageNumber(pageNumber - 1);
+  }, [pageNumber]);
+
+  return (
+    <>
+      <QustionsSearch
+        onSearchChange={setSearchValue}
+        onTagsChange={setSelectedTags}
+      />
+      <ProcessWrapper
+        loading={loading}
+        error={error}
+        loaders={Array.from({ length: pageSize + 1 }, () => ({ height: '0.25rem' }))}
+      >
+        <>
+          <ul className="questions-selector">
+            {questionsSafe.map(createQuestionItem)}
+          </ul>
+          <Paginator
+            pageNumber={pageNumber}
+            prevDisabled={pageNumber === initialPageNumber}
+            nextDisabled={questionsSafe.length !== pageSize}
+            onPrevClick={handlePrevPage}
+            onNextClick={handleNextPage}
+          />
+        </>
+      </ProcessWrapper>
+    </>
+  );
+};

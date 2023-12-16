@@ -1,0 +1,61 @@
+.nav-menu {
+  font-size: var(--menu-font-size);
+  margin: 0rem;
+}
+.nav-menu nav {
+  display: contents;
+}
+
+.nav-menu a {
+  text-decoration: none;
+}
+
+.nav-menu .fields-wrap {
+  display: flex;
+}
+
+.nav-menu .field-wrap {
+  display: inline-block;
+  width: 100%;
+  border-radius: 0px;
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+  border-bottom: 2px solid var(--wrap-bg);
+}
+
+.nav-menu .active {
+  border-bottom: 2px solid var(--active-nav-tab);
+}
+
+.nav-menu .field-wrap {
+  margin-right: 0px;
+  margin-left: 0px;
+}
+
+.nav-menu .field-wrap:first-child {
+  border-top-left-radius: var(--border-radius);
+  border-bottom-left-radius: var(--border-radius);
+}
+
+.nav-menu .field-wrap:last-child {
+  border-top-right-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+}
+
+.nav-menu .nav-menu-user-content {
+  display: flex;
+  flex-direction: row;
+}
+
+.nav-menu .user-avatar {
+  width: 2rem;
+  height: 2rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.nav-menu .theme-switch-mini {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+}

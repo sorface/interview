@@ -1,0 +1,44 @@
+.switch-button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.switch-button-disabled {
+  color: var(--disabled-icon);
+}
+
+.switch-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  padding: 0rem !important;
+  border-radius: 50%;
+}
+
+.switch-button-subcaption {
+  font-size: 0.75rem;
+}
+
+.switch-button-counter-wrapper {
+  position: fixed;
+  display: inline-block;
+  padding-left: 2rem;
+  padding-bottom: 2rem;
+}
+
+.switch-button-counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  width: 1rem;
+  height: 1rem;
+  background-color: antiquewhite;
+  border-radius: 50%;
+  color: var(--button-bg);
+  background-color: var(--text);
+  padding: 0.15rem;
+}

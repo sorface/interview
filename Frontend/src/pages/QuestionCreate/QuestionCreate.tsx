@@ -1,0 +1,209 @@
+import React, { ChangeEvent, FormEvent, FunctionComponent, useCallback, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useNavigate, useParams } from 'react-router-dom';
+import { CreateQuestionBody, CreateTagBody, GetTagsParams, UpdateQuestionBody, questionsApiDeclaration, tagsApiDeclaration } from '../../apiDeclarations';
+import { Field } from '../../components/FieldsBlock/Field';
+import { HeaderWithLink } from '../../components/HeaderWithLink/HeaderWithLink';
+import { Loader } from '../../components/Loader/Loader';
+import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
+import { SubmitField } from '../../components/SubmitField/SubmitField';
+import { pathnames, toastSuccessOptions } from '../../constants';
+import { useApiMethod } from '../../hooks/useApiMethod';
+import { Question } from '../../types/question';
+import { Tag } from '../../types/tag';
+import { TagsSelector } from '../../components/TagsSelector/TagsSelector';
+import { Localization } from '../../localization';
+
+import './QuestionCreate.css';
+
+const valueFieldName = 'qestionText';
+const pageNumber = 1;
+const pageSize = 30;
+
+export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) => {
+  const {
+    apiMethodState: questionState,
+    fetchData: fetchCreateQuestion,
+  } = useApiMethod<Question['id'], CreateQuestionBody>(questionsApiDeclaration.create);
+  const { process: { loading, error }, data: createdQuestionId } = questionState;
+
+  const { apiMethodState: updatingQuestionState, fetchData: fetchUpdateQuestion } = useApiMethod<Question, UpdateQuestionBody>(questionsApiDeclaration.update);
+  const {
+    process: { loading: updatingLoading, error: updatingError },
+    data: updatedQuestionId,
+  } = updatingQuestionState;
+
+  const {
+    apiMethodState: getQuestionState,
+    fetchData: fetchQuestion,
+  } = useApiMethod<Question, Question['id']>(questionsApiDeclaration.get);
+  const { process: { loading: questionLoading, error: questionError }, data: question } = getQuestionState;
+
+  const {
+    apiMethodState: tagsState,
+    fetchData: fetchTags,
+  } = useApiMethod<Tag[], GetTagsParams>(tagsApiDeclaration.getPage);
+  const { process: { loading: tagsLoading, error: tagsError }, data: tags } = tagsState;
+
+  const {
+    apiMethodState: tagCreateState,
+    fetchData: fetchCreateTag,
+  } = useApiMethod<Tag, CreateTagBody>(tagsApiDeclaration.createTag);
+  const { process: { loading: createTagLoading, error: createTagError }, data: createdQuestionTag } = tagCreateState;
+
+  const navigate = useNavigate();
+  let { id } = useParams();
+  const [questionValue, setQuestionValue] = useState('');
+  const [tagsSearchValue, setTagsSearchValue] = useState('');
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+
+  const totalLoading = loading || createTagLoading || updatingLoading || questionLoading;
+  const totalError = error || questionError || tagsError || updatingError || createTagError;
+
+  useEffect(() => {
+    if (!edit) {
+      return;
+    }
+    if (!id) {
+      throw new Error('Question id not found');
+    }
+    fetchQuestion(id);
+  }, [edit, id, fetchQuestion]);
+
+  useEffect(() => {
+    if (!question) {
+      return;
+    }
+    setQuestionValue(question.value);
+    setSelectedTags(question.tags);
+  }, [question]);
+
+  useEffect(() => {
+    fetchTags({
+      PageNumber: pageNumber,
+      PageSize: pageSize,
+      value: tagsSearchValue,
+    });
+  }, [createdQuestionTag, tagsSearchValue, fetchTags]);
+
+  useEffect(() => {
+    if (!createdQuestionTag) {
+      return;
+    }
+    fetchTags({
+      PageNumber: pageNumber,
+      PageSize: pageSize,
+      value: '',
+    });
+  }, [createdQuestionTag, fetchTags]);
+
+  useEffect(() => {
+    if (!createdQuestionId) {
+      return;
+    }
+    toast.success(Localization.QuestionCreatedSuccessfully, toastSuccessOptions);
+    navigate(pathnames.questions);
+  }, [createdQuestionId, navigate]);
+
+  useEffect(() => {
+    if (!updatedQuestionId) {
+      return;
+    }
+    toast.success(Localization.QuestionUpdatedSuccessfully, toastSuccessOptions);
+    navigate(pathnames.questions);
+  }, [updatedQuestionId, navigate]);
+
+  const handleSelect = (tag: Tag) => {
+    setSelectedTags([...selectedTags, tag]);
+  };
+
+  const handleUnselect = (tag: Tag) => {
+    const newSelectedTags = selectedTags.filter(tg => tg.id !== tag.id);
+    setSelectedTags(newSelectedTags);
+  };
+
+  const handleTagSearch = (value: string) => {
+    setTagsSearchValue(value);
+  };
+
+  const handleTagCreate = (tag: Omit<Tag, 'id'>) => {
+    fetchCreateTag(tag);
+  };
+
+  const handleQuestionValueChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setQuestionValue(event.target.value);
+  };
+
+  const handleSubmitCreate = useCallback(async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    fetchCreateQuestion({
+      value: questionValue,
+      tags: selectedTags.map(tag => tag.id),
+    });
+
+  }, [selectedTags, questionValue, fetchCreateQuestion]);
+
+  const handleSubmitEdit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!question) {
+      return;
+    }
+    fetchUpdateQuestion({
+      id: question.id,
+      value: questionValue,
+      tags: selectedTags.map(tag => tag.id),
+    });
+
+  }, [selectedTags, question, questionValue, fetchUpdateQuestion]);
+
+  const renderStatus = () => {
+    if (totalError) {
+      return (
+        <Field>
+          <div>{Localization.Error}: {totalError}</div>
+        </Field>
+      );
+    }
+    if (totalLoading) {
+      return (
+        <Field>
+          <Loader />
+        </Field>
+      );
+    }
+    return <></>;
+  };
+
+  return (
+    <MainContentWrapper className="question-create">
+      <HeaderWithLink
+        title={Localization.CreateQuestion}
+        linkVisible={true}
+        path={pathnames.questions}
+        linkCaption="<"
+        linkFloat="left"
+      />
+      {renderStatus()}
+      <form onSubmit={edit ? handleSubmitEdit : handleSubmitCreate}>
+        <Field>
+          <div><label htmlFor="qestionText">{Localization.QuestionText}:</label></div>
+          <input id="qestionText" name={valueFieldName} type="text" value={questionValue} onChange={handleQuestionValueChange} />
+        </Field>
+        <Field>
+          <TagsSelector
+            placeHolder={Localization.TagsPlaceholder}
+            loading={tagsLoading}
+            tags={tags || []}
+            selectedTags={selectedTags}
+            onSelect={handleSelect}
+            onUnselect={handleUnselect}
+            onSearch={handleTagSearch}
+            onCreate={handleTagCreate}
+          />
+        </Field>
+        <SubmitField caption={Localization.Create} />
+      </form>
+    </MainContentWrapper>
+  );
+};

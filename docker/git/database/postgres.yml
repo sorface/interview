@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  
+  postgres:
+    platform: linux/amd64
+    container_name: "database"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5432:5432"
+    environment:
+      TZ: 'GMT+3'
+      POSTGRES_USER: devpav
+      POSTGRES_PASSWORD: devpav

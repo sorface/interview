@@ -1,0 +1,81 @@
+.tagsSelector-container {
+  text-align: left;
+  border: 1px solid var(--form-bg);
+  position: relative;
+  cursor: pointer;
+}
+
+.tagsSelector-input {
+  height: 1rem;
+  padding: 0.25rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+}
+
+.tagsSelector-menu {
+  position: absolute;
+  transform: translateY(4px);
+  width: 100%;
+  border: 1px solid var(--form-bg);
+  border-radius: 5px;
+  overflow: auto;
+  max-height: 250px;
+  background-color: var(--wrap-bg);
+  z-index: 99;
+}
+
+.tagsSelector-menu .search-box {
+  display: flex;
+  position: sticky;
+  top: 0px;
+  background-color: inherit;
+}
+
+.tagsSelector-tools {
+  width: 1rem;
+  height: 1rem;
+  background-color: var(--button-bg);
+}
+
+.tagsSelector-items {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+.tagsSelector-item {
+  padding: 5px;
+  border: 1px solid;
+  width: fit-content;
+  border-radius: 1rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem;
+}
+
+.tagsSelector-item:hover {
+  background-color: var(--active);
+}
+
+.tagsSelector-container .search-box {
+  padding: 0.5rem;
+  padding-bottom: 0px;
+}
+
+.tagsSelector-container .search-box input {
+  height: 1.75rem;
+}
+
+.tagsSelector-container .search-box .color-select {
+  margin: 0rem 0.5rem;
+}
+
+.tagsSelector-container .search-box .tag-value {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px;
+}

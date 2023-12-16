@@ -1,0 +1,15 @@
+FROM node:18-alpine3.17
+
+WORKDIR /app
+
+COPY package.json .
+COPY package-lock.json .
+
+ENV WATCHPACK_POLLING=true
+ENV REACT_APP_PROXY_TARGET=http://backend:8800/
+
+RUN npm ci
+
+COPY . .
+
+CMD ["npm", "start"]
