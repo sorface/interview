@@ -152,7 +152,8 @@ public class ServiceConfigurator
             {
                 var storageSection = _configuration.GetSection("EventStorage");
                 var useRedis = storageSection?.GetValue<bool?>("UseRedis") ?? false;
-                if (useRedis || !_environment.IsDevelopment())
+
+                if (useRedis)
                 {
                     var connectionString = storageSection?.GetValue<string>("RedisConnectionString");
                     builder.UseRedis(connectionString ?? string.Empty);
