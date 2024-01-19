@@ -4,9 +4,9 @@ namespace Interview.Domain.Invitations;
 
 public class Invitation : Entity
 {
-    private Invitation()
+    public Invitation()
     {
     }
 
-    public string Hash { get; internal set; }
+    public string Hash { get; set; }
 }
