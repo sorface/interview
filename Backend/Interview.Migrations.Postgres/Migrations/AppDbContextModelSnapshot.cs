@@ -112,6 +112,33 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.ToTable("RoomEvents");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Invitations.Invitation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Hash")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("character varying(25)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("Invitation");
+                });
+
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1048,6 +1075,15 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Invitations.Invitation", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>

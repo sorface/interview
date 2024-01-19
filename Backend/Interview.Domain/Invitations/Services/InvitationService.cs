@@ -38,7 +38,7 @@ public class InvitationService : IInvitationService
 
     public async Task<InvitationItem?> Create(CancellationToken cancellationToken = default)
     {
-        var invitation = await _invitationRepository.CreateAsync(TokenUtils.GenerateToken(10), cancellationToken);
+        var invitation = await _invitationRepository.CreateAsync(TokenUtils.GenerateToken(25), cancellationToken);
 
         return MAPPERINVITATIONITEM.Map(invitation!);
     }
