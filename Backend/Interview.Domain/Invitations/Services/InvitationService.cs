@@ -43,10 +43,8 @@ public class InvitationService : IInvitationService
         return MAPPERINVITATIONITEM.Map(invitation!);
     }
 
-    public async Task<InvitationItem?> RegenerationAsync(Guid id, CancellationToken cancellationToken = default)
+    public Task<InvitationItem?> RegenerationAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var invitation = await _invitationRepository.RegenerationAsync(id, TokenUtils.GenerateToken(10), cancellationToken);
-
-        return MAPPERINVITATIONITEM.Map(invitation!);
+        return _invitationRepository.RegenerationAsync(id, TokenUtils.GenerateToken(25), MAPPERINVITATIONITEM, cancellationToken);
     }
 }

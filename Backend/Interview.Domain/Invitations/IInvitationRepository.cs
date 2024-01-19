@@ -7,5 +7,9 @@ public interface IInvitationRepository : IRepository<Invitation>
 {
     public Task<Invitation?> CreateAsync(string hash, CancellationToken cancellationToken = default);
 
-    public Task<Invitation?> RegenerationAsync(Guid id, string hash, CancellationToken cancellationToken = default);
+    public Task<InvitationItem?> RegenerationAsync(
+        Guid id,
+        string hash,
+        IMapper<Invitation, InvitationItem> mapper,
+        CancellationToken cancellationToken = default);
 }

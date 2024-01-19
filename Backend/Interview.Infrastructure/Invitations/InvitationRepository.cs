@@ -2,8 +2,10 @@ using System.Data;
 using Interview.Domain;
 using Interview.Domain.Invitations;
 using Interview.Domain.Invitations.Records.Response;
+using Interview.Domain.Repository;
 using Interview.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore.Storage;
+using NSpecifications;
 
 namespace Interview.Infrastructure.Invitations;
 
@@ -25,9 +27,10 @@ public class InvitationRepository : EfRepository<Invitation>, IInvitationReposit
         return invitation;
     }
 
-    public async Task<Invitation?> RegenerationAsync(
+    public async Task<InvitationItem?> RegenerationAsync(
         Guid id,
         string hash,
+        IMapper<Invitation, InvitationItem> mapper,
         CancellationToken cancellationToken = default)
     {
         var transaction = await Db.Database.BeginTransactionAsync(cancellationToken);
@@ -44,6 +47,6 @@ public class InvitationRepository : EfRepository<Invitation>, IInvitationReposit
 
         await transaction.CommitAsync(cancellationToken);
 
-        return invitation;
+        return mapper.Map(invitation);
     }
 }
