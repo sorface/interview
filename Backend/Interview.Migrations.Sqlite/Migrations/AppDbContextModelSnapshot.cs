@@ -29,7 +29,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("RolesId");
 
-                    b.ToTable("AppEventRole");
+                    b.ToTable("AppEventRole", (string)null);
                 });
 
             modelBuilder.Entity("Interview.Domain.Events.AppEvent", b =>
@@ -67,7 +67,7 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.HasIndex("Type")
                         .IsUnique();
 
-                    b.ToTable("AppEvent");
+                    b.ToTable("AppEvent", (string)null);
                 });
 
             modelBuilder.Entity("Interview.Domain.Events.DbRoomEvent", b =>
@@ -104,34 +104,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("RoomEvents");
-                });
-
-            modelBuilder.Entity("Interview.Domain.Invitations.Invitation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Hash")
-                        .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.ToTable("Invitation");
+                    b.ToTable("RoomEvents", (string)null);
                 });
 
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
@@ -163,7 +136,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.ToTable("Questions");
+                    b.ToTable("Questions", (string)null);
                 });
 
             modelBuilder.Entity("Interview.Domain.Reactions.Reaction", b =>
@@ -191,7 +164,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("Type");
 
-                    b.ToTable("Reactions");
+                    b.ToTable("Reactions", (string)null);
 
                     b.HasData(
                         new
@@ -232,7 +205,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.ToTable("RoomConfiguration");
+                    b.ToTable("RoomConfiguration", (string)null);
                 });
 
             modelBuilder.Entity("Interview.Domain.RoomParticipants.RoomParticipant", b =>
@@ -269,7 +242,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RoomParticipants");
+                    b.ToTable("RoomParticipants", (string)null);
                 });
 
             modelBuilder.Entity("Interview.Domain.RoomQuestionReactions.RoomQuestionReaction", b =>
@@ -309,7 +282,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("RoomQuestionReactions");
+                    b.ToTable("RoomQuestionReactions", (string)null);
                 });
 
             modelBuilder.Entity("Interview.Domain.RoomQuestions.RoomQuestion", b =>
@@ -346,7 +319,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("RoomQuestions");
+                    b.ToTable("RoomQuestions", (string)null);
                 });
 
             modelBuilder.Entity("Interview.Domain.RoomReviews.RoomReview", b =>
@@ -387,7 +360,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RoomReview");
+                    b.ToTable("RoomReview", (string)null);
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.QueuedRoomEvent", b =>
@@ -415,7 +388,7 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.HasIndex("RoomId")
                         .IsUnique();
 
-                    b.ToTable("QueuedRoomEvents");
+                    b.ToTable("QueuedRoomEvents", (string)null);
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>
@@ -452,7 +425,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.ToTable("Rooms");
+                    b.ToTable("Rooms", (string)null);
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.RoomState", b =>
@@ -488,7 +461,7 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.HasIndex("RoomId", "Type")
                         .IsUnique();
 
-                    b.ToTable("RoomStates");
+                    b.ToTable("RoomStates", (string)null);
                 });
 
             modelBuilder.Entity("Interview.Domain.Tags.Tag", b =>
@@ -522,7 +495,7 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.HasIndex("Value")
                         .IsUnique();
 
-                    b.ToTable("Tag");
+                    b.ToTable("Tag", (string)null);
                 });
 
             modelBuilder.Entity("Interview.Domain.Users.Permissions.Permission", b =>
@@ -552,7 +525,7 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.HasIndex("Type")
                         .IsUnique();
 
-                    b.ToTable("Permissions");
+                    b.ToTable("Permissions", (string)null);
 
                     b.HasData(
                         new
@@ -917,7 +890,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
 
                     b.HasData(
                         new
@@ -968,7 +941,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("PermissionUser", b =>
@@ -983,7 +956,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("PermissionUser");
+                    b.ToTable("PermissionUser", (string)null);
                 });
 
             modelBuilder.Entity("QuestionTag", b =>
@@ -998,7 +971,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("TagsId");
 
-                    b.ToTable("QuestionTag");
+                    b.ToTable("QuestionTag", (string)null);
                 });
 
             modelBuilder.Entity("RoleUser", b =>
@@ -1013,7 +986,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RoleUser");
+                    b.ToTable("RoleUser", (string)null);
                 });
 
             modelBuilder.Entity("RoomTag", b =>
@@ -1028,7 +1001,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("TagsId");
 
-                    b.ToTable("RoomTag");
+                    b.ToTable("RoomTag", (string)null);
                 });
 
             modelBuilder.Entity("AppEventRole", b =>
@@ -1070,15 +1043,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Room");
-                });
-
-            modelBuilder.Entity("Interview.Domain.Invitations.Invitation", b =>
-                {
-                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById");
-
-                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
