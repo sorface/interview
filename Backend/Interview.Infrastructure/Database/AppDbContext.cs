@@ -1,8 +1,10 @@
 using Interview.Domain.Events;
 using Interview.Domain.Events.ChangeEntityProcessors;
+using Interview.Domain.Invites;
 using Interview.Domain.Questions;
 using Interview.Domain.Reactions;
 using Interview.Domain.Repository;
+using Interview.Domain.RoomInvites;
 using Interview.Domain.RoomParticipants;
 using Interview.Domain.RoomQuestionReactions;
 using Interview.Domain.RoomQuestions;
@@ -58,6 +60,10 @@ public class AppDbContext : DbContext
     public DbSet<QueuedRoomEvent> QueuedRoomEvents { get; private set; } = null!;
 
     public DbSet<DbRoomEvent> RoomEvents { get; private set; } = null!;
+
+    public DbSet<Invite> Invites { get; private set; } = null!;
+
+    public DbSet<RoomInvite> RoomInvites { get; private set; } = null!;
 
     public override int SaveChanges()
     {

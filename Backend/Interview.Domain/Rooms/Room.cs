@@ -1,9 +1,7 @@
 using System.Runtime.CompilerServices;
-using Interview.Domain.Questions;
 using Interview.Domain.Repository;
 using Interview.Domain.RoomConfigurations;
 using Interview.Domain.RoomParticipants;
-using Interview.Domain.RoomQuestionReactions;
 using Interview.Domain.RoomQuestions;
 using Interview.Domain.Tags;
 
@@ -13,21 +11,24 @@ namespace Interview.Domain.Rooms;
 
 public class Room : Entity
 {
-    public Room(string name, string twitchChannel)
+    public Room(string name, string twitchChannel, SeRoomAcсessType acсessType)
     {
         Name = name;
         TwitchChannel = twitchChannel;
         Status = SERoomStatus.New;
+        AcсessType = acсessType;
     }
 
     private Room()
-        : this(string.Empty, string.Empty)
+        : this(string.Empty, string.Empty, SeRoomAcсessType.Public)
     {
     }
 
     public string Name { get; internal set; }
 
     public string TwitchChannel { get; internal set; }
+
+    public SeRoomAcсessType AcсessType { get; internal set; }
 
     public SERoomStatus Status { get; internal set; }
 

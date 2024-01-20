@@ -111,7 +111,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw new UserException("Twitch channel should not be empty");
         }
 
-        var room = new Room(name, twitchChannel)
+        var room = new Room(name, twitchChannel, SeRoomAcсessType.FromName(request.AccessType))
         {
             Tags = tags,
         };
