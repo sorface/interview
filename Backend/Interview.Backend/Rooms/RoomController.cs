@@ -204,6 +204,18 @@ public class RoomController : ControllerBase
         return Ok();
     }
 
+    [Authorize]
+    [HttpPost("invites")]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> ApplyInvite(Guid id)
+    {
+        await _roomService.StartReviewAsync(id, HttpContext.RequestAborted);
+
+        return Ok();
+    }
+
     /// <summary>
     /// Sending event to room.
     /// </summary>

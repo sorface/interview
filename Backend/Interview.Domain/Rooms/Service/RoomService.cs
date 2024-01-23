@@ -3,6 +3,7 @@ using Interview.Domain.Events.Storage;
 using Interview.Domain.Questions;
 using Interview.Domain.Reactions;
 using Interview.Domain.Repository;
+using Interview.Domain.RoomInvites;
 using Interview.Domain.RoomParticipants;
 using Interview.Domain.RoomQuestionReactions;
 using Interview.Domain.RoomQuestionReactions.Mappers;
@@ -37,6 +38,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     private readonly ITagRepository _tagRepository;
     private readonly IRoomParticipantRepository _roomParticipantRepository;
     private readonly IEventStorage _eventStorage;
+    private readonly IRoomInviteRepository _roomInviteRepository;
+    private readonly ICurrentUserAccessor _currentUserAccessor;
 
     public RoomService(
         IRoomRepository roomRepository,
@@ -49,7 +52,9 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         IRoomParticipantRepository roomParticipantRepository,
         IAppEventRepository eventRepository,
         IRoomStateRepository roomStateRepository,
-        IEventStorage eventStorage)
+        IEventStorage eventStorage,
+        IRoomInviteRepository roomInviteRepository,
+        ICurrentUserAccessor currentUserAccessor)
     {
         _roomRepository = roomRepository;
         _questionRepository = questionRepository;
@@ -62,6 +67,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         _roomStateRepository = roomStateRepository;
         _eventStorage = eventStorage;
         _roomQuestionRepository = roomQuestionRepository;
+        _roomInviteRepository = roomInviteRepository;
+        _currentUserAccessor = currentUserAccessor;
     }
 
     public Task<IPagedList<RoomPageDetail>> FindPageAsync(
@@ -435,6 +442,61 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         }
 
         return response;
+    }
+
+    public async Task<RoomInviteDetail> ApplyInvite(Guid invite, CancellationToken cancellationToken = default)
+    {
+        var roomInvite = await _roomInviteRepository.FindFirstByInviteId(invite, cancellationToken);
+
+        if (roomInvite?.Room is null)
+        {
+            throw new Exception("Invalid invite. Room not found");
+        }
+
+        var roomParticipant = roomInvite?.Room?.Participants?
+                                    .Where(participant => participant.User.Id == _currentUserAccessor.UserId)
+                                    .FirstOrDefault();
+
+        if (roomParticipant is not null && roomParticipant.Type == roomInvite?.ParticipantType)
+        {
+            return new RoomInviteDetail
+            {
+                ParticipantId = roomParticipant.Id,
+                RoomId = roomParticipant.Room.Id,
+                ParticipantType = roomParticipant.Type,
+            };
+        }
+
+        if (roomParticipant is not null && roomInvite?.ParticipantType is not null && roomParticipant.Type != roomInvite?.ParticipantType)
+        {
+            roomParticipant.Type = roomInvite?.ParticipantType!;
+
+            await _roomParticipantRepository.UpdateAsync(roomParticipant, cancellationToken);
+
+            return new RoomInviteDetail
+            {
+                ParticipantId = roomParticipant.Id,
+                RoomId = roomParticipant.Room.Id,
+                ParticipantType = roomParticipant.Type,
+            };
+        }
+
+        if (roomParticipant is null && _currentUserAccessor.UserId != null)
+        {
+            var currentUser = await _userRepository.FindByIdAsync(Guid.Empty, cancellationToken);
+            var newRoomParticipant = new RoomParticipant(currentUser!, roomInvite!.Room, roomInvite.ParticipantType!);
+
+            await _roomParticipantRepository.CreateAsync(newRoomParticipant, cancellationToken);
+
+            return new RoomInviteDetail
+            {
+                ParticipantId = newRoomParticipant.Id,
+                RoomId = newRoomParticipant.Room.Id,
+                ParticipantType = newRoomParticipant.Type,
+            };
+        }
+
+        throw new Exception("Invite invalid. Not found case for use the invite.");
     }
 
     private async Task<RoomParticipant?> EnsureParticipantTypeAsync(Guid roomId, Guid userId, CancellationToken cancellationToken)
