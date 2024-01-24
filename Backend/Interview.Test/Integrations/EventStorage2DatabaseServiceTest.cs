@@ -2,9 +2,7 @@ using FluentAssertions;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Storage;
 using Interview.Domain.Rooms;
-using Interview.Domain.Rooms.Service;
 using Interview.Infrastructure.Events;
-using Interview.Infrastructure.RoomQuestions;
 using Interview.Infrastructure.Rooms;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSpecifications;
@@ -20,11 +18,11 @@ public class EventStorage2DatabaseServiceTest
         var clock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(clock);
 
-        var room1 = new Room("Test 1", string.Empty) { Status = SERoomStatus.Close, };
+        var room1 = new Room("Test 1", string.Empty, SeRoomAcсessType.Public) { Status = SERoomStatus.Close, };
         appDbContext.Rooms.Add(room1);
-        appDbContext.Rooms.Add(new Room("Test 2", string.Empty) { Status = SERoomStatus.Close, });
-        appDbContext.Rooms.Add(new Room("Test 3", string.Empty) { Status = SERoomStatus.Close, });
-        appDbContext.Rooms.Add(new Room("Test 4", string.Empty) { Status = SERoomStatus.Close, });
+        appDbContext.Rooms.Add(new Room("Test 2", string.Empty, SeRoomAcсessType.Public) { Status = SERoomStatus.Close, });
+        appDbContext.Rooms.Add(new Room("Test 3", string.Empty, SeRoomAcсessType.Public) { Status = SERoomStatus.Close, });
+        appDbContext.Rooms.Add(new Room("Test 4", string.Empty, SeRoomAcсessType.Public) { Status = SERoomStatus.Close, });
         appDbContext.SaveChanges();
         var queuedRoomEvents = appDbContext.Rooms.Where(e => e.Id != room1.Id).Select(e => new QueuedRoomEvent { RoomId = e.Id, });
         appDbContext.QueuedRoomEvents.AddRange(queuedRoomEvents);

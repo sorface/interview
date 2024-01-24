@@ -13,6 +13,6 @@ public class RoomRepositoryTest : AbstractRepositoryTest<Room, RoomRepository>
 
     protected override Room GetInstance()
     {
-        return new Room("TEST_ROOM", "TEST_CHANNEL");
+        return new Room("TEST_ROOM", "TEST_CHANNEL", SeRoomAcсessType.Public);
     }
 }

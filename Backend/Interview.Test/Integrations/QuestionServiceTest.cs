@@ -71,7 +71,7 @@ public class QuestionServiceTest
         appDbContext.Users.Add(user);
         appDbContext.SaveChanges();
 
-        var room = new Room("room#1", "twitch");
+        var room = new Room("room#1", "twitch", SeRoomAcсessType.Public);
         appDbContext.Rooms.Add(room);
         appDbContext.SaveChanges();
 
