@@ -118,7 +118,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw new UserException("Twitch channel should not be empty");
         }
 
-        var room = new Room(name, twitchChannel, SeRoomAcсessType.FromName(request.AccessType)) { Tags = tags, };
+        var room = new Room(name, twitchChannel, SERoomAcсessType.FromName(request.AccessType)) { Tags = tags, };
         var roomQuestions = questions.Select(question =>
             new RoomQuestion { Room = room, Question = question, State = RoomQuestionState.Open });
 
@@ -457,7 +457,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 .ApplyInvite(invite.Value, _currentUserAccessor.UserId!.Value, cancellationToken);
         }
 
-        if (room.AcсessType == SeRoomAcсessType.Private)
+        if (room.AcсessType == SERoomAcсessType.Private)
         {
             throw AccessDeniedException.CreateForAction("private room");
         }

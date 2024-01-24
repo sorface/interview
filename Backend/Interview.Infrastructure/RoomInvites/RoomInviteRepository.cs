@@ -27,8 +27,6 @@ public class RoomInviteRepository : EfRepository<RoomInvite>, IRoomInviteReposit
 
         using var scope = new TransactionScope(TransactionScopeOption.Required, transactionOptions);
 
-        await using var transcription = await Db.Database.BeginTransactionAsync(cancellationToken);
-
         var invite = await Db.Invites.Where(invite => invite.Id == inviteId).FirstOrDefaultAsync(cancellationToken);
 
         if (invite is null)
@@ -77,6 +75,8 @@ public class RoomInviteRepository : EfRepository<RoomInvite>, IRoomInviteReposit
 
             await Db.SaveChangesAsync(cancellationToken);
 
+            scope.Complete();
+
             return new RoomInviteDetail
             {
                 ParticipantId = roomParticipant.Id,
@@ -87,7 +87,7 @@ public class RoomInviteRepository : EfRepository<RoomInvite>, IRoomInviteReposit
 
         await UpdateInviteLimit(roomInvite, cancellationToken);
 
-        await transcription.CommitAsync(cancellationToken);
+        scope.Complete();
 
         return new RoomInviteDetail
         {
