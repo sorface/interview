@@ -325,8 +325,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return roomState;
     }
 
-    public async Task UpsertRoomStateAsync(Guid roomId, string type, string payload,
-        CancellationToken cancellationToken = default)
+    public async Task UpsertRoomStateAsync(
+        Guid roomId, string type, string payload, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(type))
         {
@@ -405,7 +405,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return analytics;
     }
 
-    public async Task<Dictionary<string, List<IStorageEvent>>> GetTranscriptionAsync(TranscriptionRequest request,
+    public async Task<Dictionary<string, List<IStorageEvent>>> GetTranscriptionAsync(
+        TranscriptionRequest request,
         CancellationToken cancellationToken = default)
     {
         await EnsureParticipantTypeAsync(request.RoomId, request.UserId, cancellationToken);
@@ -490,7 +491,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     }
 
     private async Task<RoomParticipant?> EnsureParticipantTypeAsync(
-        Guid roomId, 
+        Guid roomId,
         Guid userId,
         CancellationToken cancellationToken)
     {

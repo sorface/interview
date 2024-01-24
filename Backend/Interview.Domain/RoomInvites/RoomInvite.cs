@@ -7,15 +7,15 @@ namespace Interview.Domain.RoomInvites;
 
 public class RoomInvite : Entity
 {
-    private RoomInvite()
-    {
-    }
-
     public RoomInvite(Invite invite, Room room, RoomParticipantType participantType)
     {
         Invite = invite;
         Room = room;
         ParticipantType = participantType;
+    }
+
+    private RoomInvite()
+    {
     }
 
     public Guid? InviteById { get; set; }
