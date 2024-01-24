@@ -76,7 +76,9 @@ public class RoomServiceTest
         appDbContext.Questions.AddRange(questions);
         var activeRoomQuestion = new RoomQuestion
         {
-            Room = savedRoom, State = RoomQuestionState.Active, Question = questions[2]
+            Room = savedRoom,
+            State = RoomQuestionState.Active,
+            Question = questions[2]
         };
         appDbContext.RoomQuestions.AddRange(
             new RoomQuestion { Room = savedRoom, State = RoomQuestionState.Open, Question = questions[0] },
