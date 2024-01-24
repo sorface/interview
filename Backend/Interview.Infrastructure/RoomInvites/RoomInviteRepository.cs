@@ -91,9 +91,7 @@ public class RoomInviteRepository : EfRepository<RoomInvite>, IRoomInviteReposit
 
         return new RoomInviteDetail
         {
-            ParticipantId = participant.Id,
-            ParticipantType = participant.Type,
-            RoomId = roomInvite.Room.Id,
+            ParticipantId = participant.Id, ParticipantType = participant.Type, RoomId = roomInvite.Room.Id,
         };
     }
 
@@ -105,7 +103,7 @@ public class RoomInviteRepository : EfRepository<RoomInvite>, IRoomInviteReposit
         {
             Db.Invites.Update(roomInvite.Invite);
         }
-        else if (roomInvite.Invite!.UsesCurrent >= roomInvite.Invite!.UsesMax)
+        else
         {
             var regenerateInvite = new Invite(5);
 
