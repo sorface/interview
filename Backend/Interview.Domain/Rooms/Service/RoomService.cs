@@ -118,10 +118,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw new UserException("Twitch channel should not be empty");
         }
 
-        var room = new Room(name, twitchChannel, SeRoomAcсessType.FromName(request.AccessType))
-        {
-            Tags = tags,
-        };
+        var room = new Room(name, twitchChannel, SeRoomAcсessType.FromName(request.AccessType)) { Tags = tags, };
         var roomQuestions = questions.Select(question =>
             new RoomQuestion { Room = room, Question = question, State = RoomQuestionState.Open });
 
@@ -182,12 +179,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         {
             Id = foundRoom.Id,
             Name = foundRoom.Name,
-            Tags = tags.Select(t => new TagItem
-            {
-                Id = t.Id,
-                Value = t.Value,
-                HexValue = t.HexColor,
-            }).ToList(),
+            Tags = tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
         };
     }
 
@@ -312,7 +304,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         Guid roomId,
         CancellationToken cancellationToken = default)
     {
-        var roomState = await _roomRepository.FindByIdDetailedAsync(roomId, ActualRoomStateResponse.Mapper, cancellationToken);
+        var roomState =
+            await _roomRepository.FindByIdDetailedAsync(roomId, ActualRoomStateResponse.Mapper, cancellationToken);
 
         if (roomState == null)
         {
@@ -332,7 +325,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return roomState;
     }
 
-    public async Task UpsertRoomStateAsync(Guid roomId, string type, string payload, CancellationToken cancellationToken = default)
+    public async Task UpsertRoomStateAsync(Guid roomId, string type, string payload,
+        CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(type))
         {
@@ -356,10 +350,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         state = new RoomState
         {
-            Payload = payload,
-            RoomId = roomId,
-            Type = type,
-            Room = null,
+            Payload = payload, RoomId = roomId, Type = type, Room = null,
         };
         await _roomStateRepository.CreateAsync(state, cancellationToken);
     }
@@ -414,7 +405,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return analytics;
     }
 
-    public async Task<Dictionary<string, List<IStorageEvent>>> GetTranscriptionAsync(TranscriptionRequest request, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<string, List<IStorageEvent>>> GetTranscriptionAsync(TranscriptionRequest request,
+        CancellationToken cancellationToken = default)
     {
         await EnsureParticipantTypeAsync(request.RoomId, request.UserId, cancellationToken);
         var response = new Dictionary<string, List<IStorageEvent>>();
@@ -444,62 +436,63 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return response;
     }
 
-    public async Task<RoomInviteDetail> ApplyInvite(Guid invite, CancellationToken cancellationToken = default)
+    public async Task<RoomInviteDetail> ApplyInvite(
+        Guid roomId,
+        Guid? invite,
+        CancellationToken cancellationToken = default)
     {
-        var roomInvite = await _roomInviteRepository.FindFirstByInviteId(invite, cancellationToken);
+        var roomSpec = new Spec<Room>(room => room.Id == roomId);
 
-        if (roomInvite?.Room is null)
+        var room = await _roomRepository.FindFirstOrDefaultAsync(roomSpec, cancellationToken);
+
+        if (room is null)
         {
-            throw new Exception("Invalid invite. Room not found");
+            throw NotFoundException.Create<Room>(roomId);
         }
 
-        var roomParticipant = roomInvite?.Room?.Participants?
-                                    .Where(participant => participant.User.Id == _currentUserAccessor.UserId)
-                                    .FirstOrDefault();
+        if (invite is not null)
+        {
+            return await _roomInviteRepository
+                .ApplyInvite(invite.Value, _currentUserAccessor.UserId!.Value, cancellationToken);
+        }
 
-        if (roomParticipant is not null && roomParticipant.Type == roomInvite?.ParticipantType)
+        if (room.AcсessType == SeRoomAcсessType.Private)
+        {
+            throw AccessDeniedException.CreateForAction("private room");
+        }
+
+        var participant = await _roomParticipantRepository.FindByRoomIdAndUserId(
+            roomId, _currentUserAccessor.UserId!.Value, cancellationToken);
+
+        if (participant is not null)
         {
             return new RoomInviteDetail
             {
-                ParticipantId = roomParticipant.Id,
-                RoomId = roomParticipant.Room.Id,
-                ParticipantType = roomParticipant.Type,
+                ParticipantType = participant.Type, RoomId = roomId, ParticipantId = participant.Id,
             };
         }
 
-        if (roomParticipant is not null && roomInvite?.ParticipantType is not null && roomParticipant.Type != roomInvite?.ParticipantType)
+        var user = await _userRepository.FindByIdAsync(_currentUserAccessor.UserId!.Value, cancellationToken);
+
+        if (user is null)
         {
-            roomParticipant.Type = roomInvite?.ParticipantType!;
-
-            await _roomParticipantRepository.UpdateAsync(roomParticipant, cancellationToken);
-
-            return new RoomInviteDetail
-            {
-                ParticipantId = roomParticipant.Id,
-                RoomId = roomParticipant.Room.Id,
-                ParticipantType = roomParticipant.Type,
-            };
+            throw new NotFoundException("Current user not found");
         }
 
-        if (roomParticipant is null && _currentUserAccessor.UserId != null)
+        participant = new RoomParticipant(user, room, RoomParticipantType.Viewer);
+
+        await _roomParticipantRepository.CreateAsync(participant, cancellationToken);
+
+        return new RoomInviteDetail
         {
-            var currentUser = await _userRepository.FindByIdAsync(Guid.Empty, cancellationToken);
-            var newRoomParticipant = new RoomParticipant(currentUser!, roomInvite!.Room, roomInvite.ParticipantType!);
-
-            await _roomParticipantRepository.CreateAsync(newRoomParticipant, cancellationToken);
-
-            return new RoomInviteDetail
-            {
-                ParticipantId = newRoomParticipant.Id,
-                RoomId = newRoomParticipant.Room.Id,
-                ParticipantType = newRoomParticipant.Type,
-            };
-        }
-
-        throw new Exception("Invite invalid. Not found case for use the invite.");
+            ParticipantType = participant.Type, RoomId = roomId, ParticipantId = participant.Id,
+        };
     }
 
-    private async Task<RoomParticipant?> EnsureParticipantTypeAsync(Guid roomId, Guid userId, CancellationToken cancellationToken)
+    private async Task<RoomParticipant?> EnsureParticipantTypeAsync(
+        Guid roomId, 
+        Guid userId,
+        CancellationToken cancellationToken)
     {
         var participantType = await _roomParticipantRepository.FindByRoomIdAndUserId(roomId, userId, cancellationToken);
         if (participantType is null)

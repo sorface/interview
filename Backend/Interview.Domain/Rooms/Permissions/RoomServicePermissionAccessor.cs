@@ -107,6 +107,16 @@ public class RoomServicePermissionAccessor : IRoomService, IServiceDecorator
         return _roomService.GetAnalyticsAsync(request, cancellationToken);
     }
 
+    public Task<RoomInviteDetail> ApplyInvite(Guid roomId, Guid? invite, CancellationToken cancellationToken = default)
+    {
+        if (_securityService.CurrentUser() is null)
+        {
+            throw AccessDeniedException.CreateForAction("use invite");
+        }
+
+        return _roomService.ApplyInvite(roomId, invite, cancellationToken);
+    }
+
     public Task<AnalyticsSummary> GetAnalyticsSummaryAsync(RoomAnalyticsRequest request, CancellationToken cancellationToken = default)
     {
         _securityService.EnsurePermission(SEPermission.RoomGetAnalyticsSummary);

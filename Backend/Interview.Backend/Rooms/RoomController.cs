@@ -205,15 +205,13 @@ public class RoomController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost("invites")]
+    [HttpPost("{id:guid}/invites")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> ApplyInvite(Guid id)
+    public Task<RoomInviteDetail> ApplyInvite([FromRoute(Name = "id")] Guid id, [FromQuery(Name = "id")] Guid invite)
     {
-        await _roomService.StartReviewAsync(id, HttpContext.RequestAborted);
-
-        return Ok();
+        return _roomService.ApplyInvite(id, invite, HttpContext.RequestAborted);
     }
 
     /// <summary>

@@ -55,7 +55,7 @@ public interface IRoomService : IService
         RoomAnalyticsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<RoomInviteDetail> ApplyInvite(Guid invite, CancellationToken cancellationToken = default);
+    Task<RoomInviteDetail> ApplyInvite(Guid room, Guid? invite, CancellationToken cancellationToken = default);
 
     Task<AnalyticsSummary> GetAnalyticsSummaryAsync(
         RoomAnalyticsRequest request, CancellationToken cancellationToken = default);
