@@ -19,7 +19,7 @@ using X.PagedList;
 namespace Interview.Backend.Rooms;
 
 [ApiController]
-[Route("rooms")]
+[Route("api/rooms")]
 public class RoomController : ControllerBase
 {
     private readonly IRoomService _roomService;

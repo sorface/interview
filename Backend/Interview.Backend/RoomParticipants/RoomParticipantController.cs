@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Interview.Backend.RoomParticipants;
 
 [ApiController]
-[Route("room-participants")]
+[Route("api/room-participants")]
 public class RoomParticipantController : ControllerBase
 {
     private readonly IRoomParticipantService _roomParticipantService;

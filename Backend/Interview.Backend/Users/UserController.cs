@@ -9,7 +9,7 @@ using X.PagedList;
 namespace Interview.Backend.Users;
 
 [ApiController]
-[Route("users")]
+[Route("api/users")]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;

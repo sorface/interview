@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Interview.Backend.Auth;
 
 [ApiController]
-[Route("oauth")]
+[Route("api/oauth")]
 public class AuthController : ControllerBase
 {
     private readonly OAuthServiceDispatcher _oAuthDispatcher;

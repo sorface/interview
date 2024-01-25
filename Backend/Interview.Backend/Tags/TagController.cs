@@ -1,4 +1,3 @@
-using Interview.Backend.Auth;
 using Interview.Backend.Responses;
 using Interview.Domain;
 using Interview.Domain.Tags;
@@ -7,10 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
 
-namespace Interview.Backend.Questions;
+namespace Interview.Backend.Tags;
 
 [ApiController]
-[Route("tags")]
+[Route("api/tags")]
 public class TagController : ControllerBase
 {
     private readonly ITagService _tagService;
