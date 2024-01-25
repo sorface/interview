@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Interview.Backend.RoomReactions;
 
 [ApiController]
-[Route("room-reactions")]
+[Route("api/room-reactions")]
 public class RoomReactionController : ControllerBase
 {
     private readonly IRoomQuestionReactionService _roomQuestionReactionService;

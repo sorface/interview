@@ -12,7 +12,7 @@ using X.PagedList;
 namespace Interview.Backend.AppEvents;
 
 [ApiController]
-[Route("event")]
+[Route("api/event")]
 public class EventController : ControllerBase
 {
     /// <summary>

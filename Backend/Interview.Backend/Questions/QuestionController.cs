@@ -11,7 +11,7 @@ using X.PagedList;
 namespace Interview.Backend.Questions;
 
 [ApiController]
-[Route("questions")]
+[Route("api/questions")]
 public class QuestionController : ControllerBase
 {
     private readonly IQuestionService _questionService;

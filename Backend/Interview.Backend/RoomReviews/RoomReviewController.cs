@@ -14,7 +14,7 @@ using X.PagedList;
 
 namespace Interview.Backend.RoomReviews;
 
-[Route("room-reviews")]
+[Route("api/room-reviews")]
 public class RoomReviewController : ControllerBase
 {
     private readonly IRoomReviewService _roomReviewService;

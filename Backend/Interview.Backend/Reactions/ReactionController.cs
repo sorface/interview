@@ -10,7 +10,7 @@ using X.PagedList;
 namespace Interview.Backend.Reactions;
 
 [ApiController]
-[Route("reactions")]
+[Route("api/reactions")]
 public class ReactionController : ControllerBase
 {
     private readonly IReactionService _reactionService;

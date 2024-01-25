@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Interview.Backend.RoomQuestions;
 
 [ApiController]
-[Route("room-questions")]
+[Route("api/room-questions")]
 public class RoomQuestionController : ControllerBase
 {
     private readonly IRoomQuestionService _roomQuestionService;
