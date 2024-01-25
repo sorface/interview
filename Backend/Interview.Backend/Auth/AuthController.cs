@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Interview.Backend.Auth;
 
 [ApiController]
-[Route("api/oauth")]
+[Route("/api")]
 public class AuthController : ControllerBase
 {
     private readonly OAuthServiceDispatcher _oAuthDispatcher;
@@ -16,7 +16,7 @@ public class AuthController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet("/login/{scheme}")]
+    [HttpGet("login/{scheme}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(typeof(string), 400)]
     public IResult SignIn(string scheme, [FromQuery] string redirectUri)
