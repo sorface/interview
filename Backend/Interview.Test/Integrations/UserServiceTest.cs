@@ -59,7 +59,6 @@ public class UserServiceTest
     {
         var clock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(clock);
-        appDbContext.Users.Count().Should().Be(0);
 
         var securityService = new SecurityService(
             new CurrentPermissionAccessor(appDbContext),
@@ -72,7 +71,7 @@ public class UserServiceTest
 
         var upsertUser = await userService.UpsertByTwitchIdentityAsync(user);
 
-        var savedUser = await appDbContext.Users.SingleAsync();
+        var savedUser = await appDbContext.Users.SingleAsync(e => e.Id == upsertUser.Id);
         upsertUser.Should().BeEquivalentTo(savedUser);
         upsertUser.Roles.Should().ContainSingle(role => role.Name == expectedRoleName);
     }
@@ -84,7 +83,6 @@ public class UserServiceTest
         await using var appDbContext = new TestAppDbContextFactory().Create(clock);
         appDbContext.Roles.RemoveRange(appDbContext.Roles);
         await appDbContext.SaveChangesAsync();
-        appDbContext.Users.Count().Should().Be(0);
         var securityService = new SecurityService(
             new CurrentPermissionAccessor(appDbContext),
             new CachedCurrentUserAccessor(new CurrentUserAccessor(), appDbContext)

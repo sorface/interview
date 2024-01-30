@@ -31,6 +31,9 @@ public class TestAppDbContextFactory
         };
 
         context.Database.EnsureCreated();
+        context.Users.Add(new User(Guid.Empty, "UnitTests", "UnitTestIdentity"));
+        context.SaveChanges();
+        context.ChangeTracker.Clear();
         return context;
     }
 }

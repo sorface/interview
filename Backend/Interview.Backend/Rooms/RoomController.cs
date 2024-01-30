@@ -245,7 +245,7 @@ public class RoomController : ControllerBase
         var request = new TranscriptionRequest
         {
             RoomId = roomId,
-            UserId = currentUserAccessor.UserId ?? throw new AccessDeniedException("User is unauthorized"),
+            UserId = currentUserAccessor.GetUserIdOrThrow(),
             TranscriptionTypeMap = options,
         };
         return _roomService.GetTranscriptionAsync(request, HttpContext.RequestAborted);

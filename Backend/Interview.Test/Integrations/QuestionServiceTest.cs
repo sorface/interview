@@ -3,11 +3,13 @@ using Interview.Domain;
 using Interview.Domain.Questions;
 using Interview.Domain.Questions.Services;
 using Interview.Domain.Reactions;
+using Interview.Domain.RoomParticipants;
 using Interview.Domain.RoomQuestionReactions;
 using Interview.Domain.RoomQuestions;
 using Interview.Domain.Rooms;
 using Interview.Domain.Users;
 using Interview.Infrastructure.Questions;
+using Interview.Infrastructure.RoomParticipants;
 using Interview.Infrastructure.Tags;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,7 +35,11 @@ public class QuestionServiceTest
         var questionArchiveRepository = new QuestionNonArchiveRepository(appDbContext);
         var archiveService = new ArchiveService<Question>(questionRepository);
         var tagRepository = new TagRepository(appDbContext);
-        var questionService = new QuestionService(questionRepository, questionArchiveRepository, archiveService, tagRepository);
+        var currentUser = new CurrentUserAccessor();
+        currentUser.SetUser(appDbContext.Users.First());
+        var roomMembershipChecker = new RoomMembershipChecker(currentUser, new RoomParticipantRepository(appDbContext));
+        var questionCreator = new QuestionCreator(tagRepository, questionRepository, roomMembershipChecker);
+        var questionService = new QuestionService(questionRepository, questionArchiveRepository, archiveService, tagRepository, roomMembershipChecker, questionCreator);
 
         var foundQuestion = await questionService.FindByIdAsync(question.Id);
 
@@ -52,7 +58,11 @@ public class QuestionServiceTest
         var questionArchiveRepository = new QuestionNonArchiveRepository(appDbContext);
         var archiveService = new ArchiveService<Question>(questionRepository);
         var tagRepository = new TagRepository(appDbContext);
-        var questionService = new QuestionService(questionRepository, questionArchiveRepository, archiveService, tagRepository);
+        var currentUser = new CurrentUserAccessor();
+        currentUser.SetUser(appDbContext.Users.First());
+        var roomMembershipChecker = new RoomMembershipChecker(currentUser, new RoomParticipantRepository(appDbContext));
+        var questionCreator = new QuestionCreator(tagRepository, questionRepository, roomMembershipChecker);
+        var questionService = new QuestionService(questionRepository, questionArchiveRepository, archiveService, tagRepository, roomMembershipChecker, questionCreator);
 
         var notFoundException =
             await Assert.ThrowsAsync<NotFoundException>(() => questionService.FindByIdAsync(Guid.NewGuid()));
@@ -102,7 +112,11 @@ public class QuestionServiceTest
         var questionArchiveRepository = new QuestionNonArchiveRepository(appDbContext);
         var archiveService = new ArchiveService<Question>(questionRepository);
         var tagRepository = new TagRepository(appDbContext);
-        var questionService = new QuestionService(questionRepository, questionArchiveRepository, archiveService, tagRepository);
+        var currentUser = new CurrentUserAccessor();
+        currentUser.SetUser(appDbContext.Users.First());
+        var roomMembershipChecker = new RoomMembershipChecker(currentUser, new RoomParticipantRepository(appDbContext));
+        var questionCreator = new QuestionCreator(tagRepository, questionRepository, roomMembershipChecker);
+        var questionService = new QuestionService(questionRepository, questionArchiveRepository, archiveService, tagRepository, roomMembershipChecker, questionCreator);
 
         var result = await questionService.DeletePermanentlyAsync(question.Id);
 

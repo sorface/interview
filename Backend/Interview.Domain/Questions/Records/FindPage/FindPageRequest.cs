@@ -6,5 +6,7 @@ public class FindPageRequest
 
     public string? Value { get; set; }
 
+    public Guid? RoomId { get; set; }
+
     public PageRequest Page { get; set; } = new PageRequest();
 }
