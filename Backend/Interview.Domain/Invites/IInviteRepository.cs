@@ -1,7 +1,6 @@
-using Interview.Domain.Invites;
 using Interview.Domain.Repository;
 
-namespace Interview.Domain.Invitations;
+namespace Interview.Domain.Invites;
 
 public interface IInviteRepository : IRepository<Invite>
 {

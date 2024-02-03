@@ -23,9 +23,7 @@ public class RoomInviteRepository : EfRepository<RoomInvite>, IRoomInviteReposit
         Guid userId,
         CancellationToken cancellationToken = default)
     {
-        var transactionOptions = new TransactionOptions { IsolationLevel = IsolationLevel.Serializable, };
-
-        using var scope = new TransactionScope(TransactionScopeOption.Required, transactionOptions);
+        var databaseContextTransaction = await Db.Database.BeginTransactionAsync(cancellationToken);
 
         var invite = await Db.Invites.Where(invite => invite.Id == inviteId).FirstOrDefaultAsync(cancellationToken);
 
@@ -75,7 +73,7 @@ public class RoomInviteRepository : EfRepository<RoomInvite>, IRoomInviteReposit
 
             await Db.SaveChangesAsync(cancellationToken);
 
-            scope.Complete();
+            await databaseContextTransaction.CommitAsync(cancellationToken);
 
             return new RoomInviteDetail
             {
@@ -85,15 +83,12 @@ public class RoomInviteRepository : EfRepository<RoomInvite>, IRoomInviteReposit
             };
         }
 
-        await UpdateInviteLimit(roomInvite, cancellationToken);
-
-        scope.Complete();
+        // await UpdateInviteLimit(roomInvite, cancellationToken);
+        await databaseContextTransaction.CommitAsync(cancellationToken);
 
         return new RoomInviteDetail
         {
-            ParticipantId = participant.Id,
-            ParticipantType = participant.Type,
-            RoomId = roomInvite.Room.Id,
+            ParticipantId = participant.Id, ParticipantType = participant.Type, RoomId = roomInvite.Room.Id,
         };
     }
 
@@ -104,19 +99,23 @@ public class RoomInviteRepository : EfRepository<RoomInvite>, IRoomInviteReposit
         if (roomInvite.Invite!.UsesCurrent < roomInvite.Invite!.UsesMax)
         {
             Db.Invites.Update(roomInvite.Invite);
+
+            await Db.SaveChangesAsync(cancellationToken);
+
+            return;
         }
-        else
-        {
-            var regenerateInvite = new Invite(5);
 
-            await Db.Invites.AddAsync(regenerateInvite, cancellationToken);
+        var regenerateInvite = new Invite(5);
 
-            var newRoomInvite = new RoomInvite(regenerateInvite, roomInvite.Room!, roomInvite.ParticipantType!);
+        Db.Invites.Remove(roomInvite.Invite);
 
-            await Db.RoomInvites.AddAsync(newRoomInvite, cancellationToken);
+        await Db.Invites.AddAsync(regenerateInvite, cancellationToken);
 
-            Db.RoomInvites.Remove(roomInvite);
-        }
+        var newRoomInvite = new RoomInvite(regenerateInvite, roomInvite.Room!, roomInvite.ParticipantType!);
+
+        await Db.RoomInvites.AddAsync(newRoomInvite, cancellationToken);
+
+        Db.RoomInvites.Remove(roomInvite);
 
         await Db.SaveChangesAsync(cancellationToken);
     }

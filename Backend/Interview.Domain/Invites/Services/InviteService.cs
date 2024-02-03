@@ -6,7 +6,7 @@ namespace Interview.Domain.Invites.Services;
 
 public class InviteService : IInviteService
 {
-    private static readonly Mapper<Invite, InvitationItem> MAPPERINVITATIONITEM = new(
+    private static readonly Mapper<Invite, InvitationItem> _MAPPERINVITATIONITEM = new(
         invitation => new InvitationItem
         {
             Id = invitation.Id,
@@ -27,6 +27,6 @@ public class InviteService : IInviteService
 
     public async Task<InvitationItem?> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await _inviteRepository.FindByIdDetailedAsync(id, MAPPERINVITATIONITEM, cancellationToken);
+        return await _inviteRepository.FindByIdDetailedAsync(id, _MAPPERINVITATIONITEM, cancellationToken);
     }
 }
