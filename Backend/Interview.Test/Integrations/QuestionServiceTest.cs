@@ -23,6 +23,33 @@ public class QuestionServiceTest
 {
     private const string DefaultQuestionValue = "TEST_QUESTION";
 
+    public static IEnumerable<object[]> FindPageAsyncShouldNotReturnRoomQuestionsData
+    {
+        get
+        {
+            var factory = new FakerFactory();
+            var roomFaker = factory.Room();
+            var questionFaker = factory.Question();
+            var faker = new Faker();
+            foreach (var i in Enumerable.Range(0, 30))
+            {
+                var rooms = roomFaker.GenerateForever().Take(faker.Random.Number(1, 10)).ToList();
+                var questions = questionFaker.GenerateForever()
+                    .Take(faker.Random.Number(1, faker.Random.Number(1, 300))).ToList();
+
+                foreach (var question in questions)
+                {
+                    if (faker.Random.Bool())
+                    {
+                        question.RoomId = faker.PickRandom(rooms).Id;
+                    }
+                }
+
+                yield return new object[] { rooms, questions, };
+            }
+        }
+    }
+
     [Fact(DisplayName = "Searching question by id")]
     public async Task FindByIdSuccessful()
     {
@@ -51,37 +78,6 @@ public class QuestionServiceTest
         var notFoundException =
             await Assert.ThrowsAsync<NotFoundException>(() => questionService.FindByIdAsync(Guid.NewGuid()));
         Assert.NotNull(notFoundException);
-    }
-
-    public static IEnumerable<object[]> FindPageAsyncShouldNotReturnRoomQuestionsData
-    {
-        get
-        {
-            var roomFaker = new Faker<Room>()
-                .CustomInstantiator(e => new Room(string.Empty, string.Empty))
-                .RuleFor(e => e.Name, f => f.Random.Word())
-                .RuleFor(e => e.Id, f => Guid.NewGuid());
-            var questionFaker = new Faker<Question>()
-                .CustomInstantiator(e => new Question(string.Empty))
-                .RuleFor(e => e.Value, e => e.Random.Word());
-            var faker = new Faker();
-            foreach (var i in Enumerable.Range(0, 30))
-            {
-                var rooms = roomFaker.GenerateForever().Take(faker.Random.Number(1, 10)).ToList();
-                var questions = questionFaker.GenerateForever()
-                    .Take(faker.Random.Number(1, faker.Random.Number(1, 300))).ToList();
-
-                foreach (var question in questions)
-                {
-                    if (faker.Random.Bool())
-                    {
-                        question.RoomId = faker.PickRandom(rooms).Id;
-                    }
-                }
-
-                yield return new object[] { rooms, questions, };
-            }
-        }
     }
 
     [MemberData(nameof(FindPageAsyncShouldNotReturnRoomQuestionsData))]
