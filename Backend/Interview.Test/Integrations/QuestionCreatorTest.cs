@@ -42,13 +42,14 @@ namespace Interview.Test.Integrations
 
             var roomMemberChecker = new Mock<IRoomMembershipChecker>();
             roomMemberChecker
-                .Setup(e => e.EnsureCurrentUserMemberOfRoomAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+                .Setup(e => e.EnsureCurrentUserMemberOfRoomAsync(room == null ? It.IsAny<Guid>() : room.Id, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             var creator = CreateQuestionCreate(appDbContext, roomMemberChecker.Object);
             var questionCreateRequest = new QuestionCreateRequest { Tags = new HashSet<Guid>(), Value = value };
             var question = await creator.CreateAsync(questionCreateRequest, room?.Id, CancellationToken.None);
             question.Should().NotBeNull().And.Match<Question>(e => e.Value == value);
+            roomMemberChecker.Verify(e => e.EnsureCurrentUserMemberOfRoomAsync(room == null ? It.IsAny<Guid>() : room.Id, It.IsAny<CancellationToken>()), room is not null ? Times.Once() : Times.Never());
         }
 
         [Fact(DisplayName = "Creation should not succeed if the room is not available")]
@@ -62,12 +63,13 @@ namespace Interview.Test.Integrations
 
             var roomMemberChecker = new Mock<IRoomMembershipChecker>();
             roomMemberChecker
-                .Setup(e => e.EnsureCurrentUserMemberOfRoomAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+                .Setup(e => e.EnsureCurrentUserMemberOfRoomAsync(room.Id, It.IsAny<CancellationToken>()))
                 .Throws<UnavailableException>();
 
             var creator = CreateQuestionCreate(appDbContext, roomMemberChecker.Object);
             var questionCreateRequest = new QuestionCreateRequest { Tags = new HashSet<Guid>(), Value = "Test" };
             await Assert.ThrowsAsync<UnavailableException>(() => creator.CreateAsync(questionCreateRequest, room.Id, CancellationToken.None));
+            roomMemberChecker.Verify(e => e.EnsureCurrentUserMemberOfRoomAsync(room.Id, It.IsAny<CancellationToken>()), Times.Once());
         }
 
         private static QuestionCreator CreateQuestionCreate(AppDbContext appDbContext, IRoomMembershipChecker roomMembershipChecker)
