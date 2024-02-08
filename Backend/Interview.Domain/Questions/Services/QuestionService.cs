@@ -47,7 +47,7 @@ public class QuestionService : IQuestionService
         var spec = Spec.Any<Question>();
         if (request.RoomId is not null)
         {
-            await _roomMembershipChecker.EnsureCurrentUserMemberOfRoom(request.RoomId.Value, cancellationToken);
+            await _roomMembershipChecker.EnsureCurrentUserMemberOfRoomAsync(request.RoomId.Value, cancellationToken);
             spec &= new Spec<Question>(e => e.RoomId == request.RoomId);
         }
         else

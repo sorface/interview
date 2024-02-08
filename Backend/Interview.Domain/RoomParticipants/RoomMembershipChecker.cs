@@ -13,7 +13,7 @@ namespace Interview.Domain.RoomParticipants
             _participantRepository = participantRepository;
         }
 
-        public async Task EnsureCurrentUserMemberOfRoom(Guid roomId, CancellationToken cancellationToken)
+        public async Task EnsureCurrentUserMemberOfRoomAsync(Guid roomId, CancellationToken cancellationToken)
         {
             var userId = _currentUserAccessor.GetUserIdOrThrow();
             var hasParticipant = await _participantRepository.IsExistsByRoomIdAndUserIdAsync(roomId, userId, cancellationToken);

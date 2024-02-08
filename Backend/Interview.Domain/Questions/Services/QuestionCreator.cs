@@ -28,7 +28,7 @@ public class QuestionCreator : IQuestionCreator
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
         if (roomId is not null)
         {
-            await _roomMembershipChecker.EnsureCurrentUserMemberOfRoom(roomId.Value, cancellationToken);
+            await _roomMembershipChecker.EnsureCurrentUserMemberOfRoomAsync(roomId.Value, cancellationToken);
         }
 
         var result = new Question(request.Value)
