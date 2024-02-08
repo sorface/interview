@@ -70,7 +70,7 @@ public class QuestionServiceTest
                 var rooms = roomFaker.GenerateForever().Take(faker.Random.Number(1, 10)).ToList();
                 var questions = questionFaker.GenerateForever()
                     .Take(faker.Random.Number(1, faker.Random.Number(1, 300))).ToList();
-                
+
                 foreach (var question in questions)
                 {
                     if (faker.Random.Bool())
@@ -83,7 +83,7 @@ public class QuestionServiceTest
             }
         }
     }
-    
+
     [MemberData(nameof(FindPageAsyncShouldNotReturnRoomQuestionsData))]
     [Theory(DisplayName = "Searching for questions should not return questions tied to the room")]
     public async Task FindPageAsyncShouldNotReturnRoomQuestions(List<Room> rooms, List<Question> questions)
@@ -104,7 +104,7 @@ public class QuestionServiceTest
             .IgnoreQueryFilters()
             .CountAsync();
         appDbContext.ChangeTracker.Clear();
-        
+
         var roomMemberChecker = new Mock<IRoomMembershipChecker>();
         roomMemberChecker
             .Setup(e => e.EnsureCurrentUserMemberOfRoomAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
