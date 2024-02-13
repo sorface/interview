@@ -100,7 +100,7 @@ public class ServiceConfigurator
 
     private void AddAppServices(IServiceCollection serviceCollection)
     {
-        var twitchService = new OAuthServiceDispatcher(_configuration).GetAuthService("twitch");
+        var sorfaceAuth = new OAuthServiceDispatcher(_configuration).GetAuthService("sorface");
 
         var adminUsers = _configuration.GetSection(nameof(AdminUsers))
             .Get<AdminUsers>() ?? throw new ArgumentException($"Not found \"{nameof(AdminUsers)}\" section");
@@ -144,8 +144,8 @@ public class ServiceConfigurator
             },
             TwitchTokenProviderOption = new TwitchTokenProviderOption
             {
-                ClientSecret = twitchService.ClientSecret,
-                ClientId = twitchService.ClientId,
+                ClientSecret = sorfaceAuth.ClientSecret,
+                ClientId = sorfaceAuth.ClientId,
             },
             AdminUsers = adminUsers,
             EventStorageConfigurator = builder =>
@@ -166,7 +166,7 @@ public class ServiceConfigurator
         };
 
         serviceCollection.AddAppServices(serviceOption);
-        serviceCollection.AddAppAuth(twitchService);
+        serviceCollection.AddAppAuth(sorfaceAuth);
     }
 
     private void AddRateLimiter(IServiceCollection serviceCollection)

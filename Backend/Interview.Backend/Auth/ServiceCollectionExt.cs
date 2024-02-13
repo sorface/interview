@@ -1,8 +1,10 @@
+using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Responses;
 using Interview.Backend.WebSocket.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Identity;
 
 namespace Interview.Backend.Auth;
 
@@ -18,19 +20,13 @@ public static class ServiceCollectionExt
                 options.Events.OnRedirectToAccessDenied = context =>
                 {
                     context.Response.StatusCode = 403;
-                    context.Response.WriteAsJsonAsync(new MessageResponse
-                    {
-                        Message = "Forbidden",
-                    });
+                    context.Response.WriteAsJsonAsync(new MessageResponse { Message = "Forbidden", });
                     return Task.CompletedTask;
                 };
                 options.Events.OnRedirectToLogin = context =>
                 {
                     context.Response.StatusCode = 401;
-                    context.Response.WriteAsJsonAsync(new MessageResponse
-                    {
-                        Message = "Unauthorized",
-                    });
+                    context.Response.WriteAsJsonAsync(new MessageResponse { Message = "Unauthorized", });
                     return Task.CompletedTask;
                 };
                 options.Cookie.HttpOnly = false;
@@ -38,7 +34,7 @@ public static class ServiceCollectionExt
                 options.ClaimsIssuer = authorizationService.ClaimsIssuer;
                 options.ExpireTimeSpan = TimeSpan.FromDays(10);
             })
-            .AddTwitch(authorizationService.Id, options =>
+            .AddSorface(authorizationService.Id, options =>
             {
                 options.ClientId = authorizationService.ClientId;
                 options.ClientSecret = authorizationService.ClientSecret;
