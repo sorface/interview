@@ -29,17 +29,11 @@ import { Devices, useUserStream } from './hooks/useUserStream';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useUnreadChatMessages } from './hooks/useUnreadChatMessages';
 import { Localization } from '../../localization';
+import { MessagePage } from '../../components/MessagePage/MessagePage';
 
 import './Room.css';
 
-const getWsStatusMessage = (readyState: number) => {
-  switch (readyState) {
-    case 0: return 'WS CONNECTING';
-    case 2: return 'WS CLOSING';
-    case 3: return 'WS CLOSED';
-    default: return null;
-  }
-};
+const connectingReadyState = 0;
 
 const enableDisableUserTrack = (stream: MediaStream, kind: string, enabled: boolean) => {
   const track = stream.getTracks().find(track => track.kind === kind);
@@ -56,6 +50,7 @@ export const Room: FunctionComponent = () => {
   let { id } = useParams();
   const socketUrl = `${REACT_APP_WS_URL}/ws?Authorization=${communist}&roomId=${id}`;
   const { lastMessage, readyState, sendMessage } = useWebSocket(socketUrl);
+  const wsClosed = readyState === 3 || readyState === 2;
   const [roomInReview, setRoomInReview] = useState(false);
   const [reactionsVisible, setReactionsVisible] = useState(false);
   const [currentQuestionId, setCurrentQuestionId] = useState<Question['id']>();
@@ -280,11 +275,21 @@ export const Room: FunctionComponent = () => {
     return <Navigate to={pathnames.roomAnalyticsSummary.replace(':id', id)} replace />;
   }
 
+  if (wsClosed) {
+    return (
+      <MessagePage title={Localization.ConnectionError} message={Localization.RoomConnectionError}>
+        <Link to={pathnames.rooms}>
+          <button>{Localization.Exit}</button>
+        </Link>
+      </MessagePage>
+    );
+  }
+
   return (
     <MainContentWrapper className="room-wrapper">
       <EnterVideoChatModal
         open={welcomeScreen}
-        loading={loading || roomParticipantLoading || roomParticipantWillLoaded}
+        loading={loading || roomParticipantLoading || roomParticipantWillLoaded || readyState === connectingReadyState}
         viewerMode={viewerMode}
         roomName={room?.name}
         userStream={userStream}
@@ -350,17 +355,15 @@ export const Room: FunctionComponent = () => {
             <div className="room-page-main-content">
               {loadingRoomState && <div>{Localization.LoadingRoomState}...</div>}
               {errorRoomState && <div>{Localization.ErrorLoadingRoomState}...</div>}
-              {getWsStatusMessage(readyState) || (
-                <VideoChat
-                  roomState={roomState}
-                  viewerMode={viewerMode}
-                  lastWsMessage={lastMessage}
-                  messagesChatEnabled={messagesChatEnabled}
-                  userStream={userStream}
-                  videoTrackEnabled={cameraEnabled}
-                  onSendWsMessage={sendMessage}
-                />
-              )}
+              <VideoChat
+                roomState={roomState}
+                viewerMode={viewerMode}
+                lastWsMessage={lastMessage}
+                messagesChatEnabled={messagesChatEnabled}
+                userStream={userStream}
+                videoTrackEnabled={cameraEnabled}
+                onSendWsMessage={sendMessage}
+              />
             </div>
           </div>
           <div className="room-tools-container">
