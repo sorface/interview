@@ -1,0 +1,24 @@
+.message-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.message-page ion-icon {
+  font-size: 2.75rem;
+}
+
+.message-page h3 {
+  margin-top: 0.75rem;
+}
+
+.message-page .message-page-message {
+  margin-top: 0.25rem;
+}
+
+.message-page .message-page-children {
+  margin-top: 1.75rem;
+  margin-bottom: 3rem;
+}

@@ -120,4 +120,6 @@ export const enum Localization {
   You = 'You',
   Participants = 'Participants',
   NoRecords = 'No records',
+  ConnectionError = 'Connection error',
+  RoomConnectionError = 'Connection to the room has been lost',
 };
