@@ -109,7 +109,6 @@ public class QuestionServiceTest
 
         var findPageRequest = new FindPageRequest
         {
-            RoomId = null,
             Page = new PageRequest
             {
                 PageNumber = 1,

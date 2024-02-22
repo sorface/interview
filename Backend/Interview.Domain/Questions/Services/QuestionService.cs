@@ -44,16 +44,7 @@ public class QuestionService : IQuestionService
 
     public async Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken)
     {
-        var spec = Spec.Any<Question>();
-        if (request.RoomId is not null)
-        {
-            await _roomMembershipChecker.EnsureCurrentUserMemberOfRoomAsync(request.RoomId.Value, cancellationToken);
-            spec &= new Spec<Question>(e => e.RoomId == request.RoomId);
-        }
-        else
-        {
-            spec &= new Spec<Question>(e => e.RoomId == null);
-        }
+        ASpec<Question> spec = new Spec<Question>(e => e.RoomId == null);
 
         if (request.Tags is not null && request.Tags.Count > 0)
         {

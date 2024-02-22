@@ -36,10 +36,10 @@ public class RoomQuestionServicePermissionAccessor : IRoomQuestionService, IServ
         return _roomQuestionService.CreateAsync(request, cancellationToken);
     }
 
-    public Task<List<Guid>> FindGuidsAsync(RoomQuestionsRequest request, CancellationToken cancellationToken = default)
+    public Task<List<RoomQuestionResponse>> FindQuestionsAsync(RoomQuestionsRequest request, CancellationToken cancellationToken = default)
     {
         _securityService.EnsurePermission(SEPermission.RoomQuestionFindGuids);
 
-        return _roomQuestionService.FindGuidsAsync(request, cancellationToken);
+        return _roomQuestionService.FindQuestionsAsync(request, cancellationToken);
     }
 }

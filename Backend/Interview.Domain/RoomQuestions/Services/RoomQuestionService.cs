@@ -132,7 +132,7 @@ public class RoomQuestionService : IRoomQuestionService
         };
     }
 
-    public async Task<List<Guid>> FindGuidsAsync(
+    public async Task<List<RoomQuestionResponse>> FindQuestionsAsync(
         RoomQuestionsRequest request, CancellationToken cancellationToken = default)
     {
         var hasRoom =
@@ -143,14 +143,17 @@ public class RoomQuestionService : IRoomQuestionService
             throw NotFoundException.Create<Room>(request.RoomId);
         }
 
-        var state = RoomQuestionState.FromValue((int)request.State);
+        var states = request.States.Select(e => RoomQuestionState.FromValue((int)e)).ToList();
 
-        var specification = new Spec<RoomQuestion>(rq => rq.Room.Id == request.RoomId && rq.State == state);
+        var specification = new Spec<RoomQuestion>(rq => rq.Room.Id == request.RoomId && states.Contains(rq.State));
 
-        var mapper = new Mapper<RoomQuestion, Guid>(rq => rq.Question.Id);
-
+        var mapper = Mapper<RoomQuestion>.Create(rq => new { Id = rq.Question.Id, State = rq.State, Value = rq.Question.Value, });
         var questions = await _roomQuestionRepository.FindAsync(specification, mapper, cancellationToken);
-
-        return questions;
+        return questions.ConvertAll(e => new RoomQuestionResponse
+        {
+            Id = e.Id,
+            State = e.State.EnumValue,
+            Value = e.Value,
+        });
     }
 }

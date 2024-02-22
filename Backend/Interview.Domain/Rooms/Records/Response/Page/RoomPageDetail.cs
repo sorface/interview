@@ -1,7 +1,7 @@
 using Interview.Domain.Rooms.Service.Records.Response.Detail;
 using Interview.Domain.Tags.Records.Response;
 
-namespace Interview.Domain.Rooms.Service.Records.Response.Page;
+namespace Interview.Domain.Rooms.Records.Response.Page;
 
 public class RoomPageDetail
 {
