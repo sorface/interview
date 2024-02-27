@@ -154,7 +154,6 @@ namespace Interview.Test.Integrations
             roomParticipant.Room.Id.Should().Be(room.Id);
         }
 
-
         [Fact(DisplayName = "using an invitation for a closed room that the user has previously been in")]
         public async Task AccessRoomPrivateByInviteWhenInvitationLimited()
         {
@@ -165,18 +164,18 @@ namespace Interview.Test.Integrations
             databaseContext.Users.Add(user);
             var invite = new Invite(5) { UsesCurrent = 4 };
             await databaseContext.SaveChangesAsync();
-            
+
             databaseContext.Invites.Add(invite);
             var room = new Room(name: "something", twitchChannel: "twitch channel", SERoomAcсessType.Private);
             await databaseContext.SaveChangesAsync();
-            
+
             databaseContext.Rooms.Add(room);
             var roomInvite = new RoomInvite(invite, room, RoomParticipantType.Expert);
             await databaseContext.SaveChangesAsync();
-            
+
             databaseContext.RoomInvites.Add(roomInvite);
             await databaseContext.SaveChangesAsync();
-            
+
             var roomRepository = new RoomRepository(databaseContext);
             var userAccessor = new CurrentUserAccessor();
             {
@@ -206,12 +205,12 @@ namespace Interview.Test.Integrations
             Assert.False(deletedRoom);
 
             var foundRoomInvite = await databaseContext.RoomInvites.FirstOrDefaultAsync(item => item.RoomById == room.Id);
-            
+
             Assert.NotNull(foundRoomInvite);
             foundRoomInvite.ParticipantType.Should().Be(RoomParticipantType.Expert);
 
             var generatedInvite = await databaseContext.Invites.FirstOrDefaultAsync(item => foundRoomInvite.InviteById == item.Id);
-            
+
             Assert.NotNull(generatedInvite);
 
             generatedInvite.UsesCurrent.Should().Be(0);
