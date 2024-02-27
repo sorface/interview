@@ -3,6 +3,7 @@ using Interview.Domain.Events.Storage;
 using Interview.Domain.Questions;
 using Interview.Domain.Reactions;
 using Interview.Domain.Repository;
+using Interview.Domain.RoomInvites;
 using Interview.Domain.RoomParticipants;
 using Interview.Domain.RoomQuestionReactions;
 using Interview.Domain.RoomQuestionReactions.Mappers;
@@ -37,6 +38,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     private readonly ITagRepository _tagRepository;
     private readonly IRoomParticipantRepository _roomParticipantRepository;
     private readonly IEventStorage _eventStorage;
+    private readonly IRoomInviteRepository _roomInviteRepository;
+    private readonly ICurrentUserAccessor _currentUserAccessor;
 
     public RoomService(
         IRoomRepository roomRepository,
@@ -49,7 +52,9 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         IRoomParticipantRepository roomParticipantRepository,
         IAppEventRepository eventRepository,
         IRoomStateRepository roomStateRepository,
-        IEventStorage eventStorage)
+        IEventStorage eventStorage,
+        IRoomInviteRepository roomInviteRepository,
+        ICurrentUserAccessor currentUserAccessor)
     {
         _roomRepository = roomRepository;
         _questionRepository = questionRepository;
@@ -62,6 +67,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         _roomStateRepository = roomStateRepository;
         _eventStorage = eventStorage;
         _roomQuestionRepository = roomQuestionRepository;
+        _roomInviteRepository = roomInviteRepository;
+        _currentUserAccessor = currentUserAccessor;
     }
 
     public Task<IPagedList<RoomPageDetail>> FindPageAsync(
@@ -111,10 +118,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw new UserException("Twitch channel should not be empty");
         }
 
-        var room = new Room(name, twitchChannel)
-        {
-            Tags = tags,
-        };
+        var room = new Room(name, twitchChannel, SERoomAcсessType.FromName(request.AccessType)) { Tags = tags, };
         var roomQuestions = questions.Select(question =>
             new RoomQuestion { Room = room, Question = question, State = RoomQuestionState.Open });
 
@@ -175,12 +179,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         {
             Id = foundRoom.Id,
             Name = foundRoom.Name,
-            Tags = tags.Select(t => new TagItem
-            {
-                Id = t.Id,
-                Value = t.Value,
-                HexValue = t.HexColor,
-            }).ToList(),
+            Tags = tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
         };
     }
 
@@ -305,7 +304,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         Guid roomId,
         CancellationToken cancellationToken = default)
     {
-        var roomState = await _roomRepository.FindByIdDetailedAsync(roomId, ActualRoomStateResponse.Mapper, cancellationToken);
+        var roomState =
+            await _roomRepository.FindByIdDetailedAsync(roomId, ActualRoomStateResponse.Mapper, cancellationToken);
 
         if (roomState == null)
         {
@@ -325,7 +325,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return roomState;
     }
 
-    public async Task UpsertRoomStateAsync(Guid roomId, string type, string payload, CancellationToken cancellationToken = default)
+    public async Task UpsertRoomStateAsync(
+        Guid roomId, string type, string payload, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(type))
         {
@@ -407,7 +408,9 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return analytics;
     }
 
-    public async Task<Dictionary<string, List<IStorageEvent>>> GetTranscriptionAsync(TranscriptionRequest request, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<string, List<IStorageEvent>>> GetTranscriptionAsync(
+        TranscriptionRequest request,
+        CancellationToken cancellationToken = default)
     {
         await EnsureParticipantTypeAsync(request.RoomId, request.UserId, cancellationToken);
         var response = new Dictionary<string, List<IStorageEvent>>();
@@ -437,7 +440,67 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return response;
     }
 
-    private async Task<RoomParticipant?> EnsureParticipantTypeAsync(Guid roomId, Guid userId, CancellationToken cancellationToken)
+    public async Task<RoomInviteDetail> ApplyInvite(
+        Guid roomId,
+        Guid? invite,
+        CancellationToken cancellationToken = default)
+    {
+        var roomSpec = new Spec<Room>(room => room.Id == roomId);
+
+        var room = await _roomRepository.FindFirstOrDefaultAsync(roomSpec, cancellationToken);
+
+        if (room is null)
+        {
+            throw NotFoundException.Create<Room>(roomId);
+        }
+
+        if (invite is not null)
+        {
+            return await _roomInviteRepository
+                .ApplyInvite(invite.Value, _currentUserAccessor.UserId!.Value, cancellationToken);
+        }
+
+        if (room.AcсessType == SERoomAcсessType.Private)
+        {
+            throw AccessDeniedException.CreateForAction("private room");
+        }
+
+        var participant = await _roomParticipantRepository.FindByRoomIdAndUserId(
+            roomId, _currentUserAccessor.UserId!.Value, cancellationToken);
+
+        if (participant is not null)
+        {
+            return new RoomInviteDetail
+            {
+                ParticipantType = participant.Type,
+                RoomId = roomId,
+                ParticipantId = participant.Id,
+            };
+        }
+
+        var user = await _userRepository.FindByIdAsync(_currentUserAccessor.UserId!.Value, cancellationToken);
+
+        if (user is null)
+        {
+            throw new NotFoundException("Current user not found");
+        }
+
+        participant = new RoomParticipant(user, room, RoomParticipantType.Viewer);
+
+        await _roomParticipantRepository.CreateAsync(participant, cancellationToken);
+
+        return new RoomInviteDetail
+        {
+            ParticipantType = participant.Type,
+            RoomId = roomId,
+            ParticipantId = participant.Id,
+        };
+    }
+
+    private async Task<RoomParticipant?> EnsureParticipantTypeAsync(
+        Guid roomId,
+        Guid userId,
+        CancellationToken cancellationToken)
     {
         var participantType = await _roomParticipantRepository.FindByRoomIdAndUserId(roomId, userId, cancellationToken);
         if (participantType is null)

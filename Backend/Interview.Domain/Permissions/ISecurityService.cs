@@ -1,5 +1,4 @@
 using Interview.Domain.Users;
-using Interview.Domain.Users.Records;
 using Interview.Domain.Users.Roles;
 
 namespace Interview.Domain.Permissions;
