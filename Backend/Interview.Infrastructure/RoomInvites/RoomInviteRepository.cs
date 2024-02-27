@@ -88,7 +88,9 @@ public class RoomInviteRepository : EfRepository<RoomInvite>, IRoomInviteReposit
 
         return new RoomInviteDetail
         {
-            ParticipantId = participant.Id, ParticipantType = participant.Type, RoomId = roomInvite.Room.Id,
+            ParticipantId = participant.Id,
+            ParticipantType = participant.Type,
+            RoomId = roomInvite.Room.Id,
         };
     }
 
