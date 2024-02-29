@@ -1,28 +1,28 @@
 using Interview.Domain.Events.Events;
 using Interview.Domain.Repository;
-using Interview.Domain.RoomQuestions;
+using Interview.Domain.Rooms.RoomQuestions;
 
-namespace Interview.Domain.Events.ChangeEntityProcessors
+namespace Interview.Domain.Events.ChangeEntityProcessors;
+
+public class RoomQuestionChangeEntityProcessor : IEntityPostProcessor
 {
-    public class RoomQuestionChangeEntityProcessor : IEntityPostProcessor
-    {
-        private readonly IRoomEventDispatcher _eventDispatcher;
+    private readonly IRoomEventDispatcher _eventDispatcher;
 
-        public RoomQuestionChangeEntityProcessor(IRoomEventDispatcher eventDispatcher)
-        {
+    public RoomQuestionChangeEntityProcessor(IRoomEventDispatcher eventDispatcher)
+    {
             _eventDispatcher = eventDispatcher;
         }
 
-        public async ValueTask ProcessAddedAsync(IReadOnlyCollection<Entity> entities, CancellationToken cancellationToken)
-        {
+    public async ValueTask ProcessAddedAsync(IReadOnlyCollection<Entity> entities, CancellationToken cancellationToken)
+    {
             foreach (var entity in entities.OfType<RoomQuestion>())
             {
                 await _eventDispatcher.WriteAsync(CreateAddEvent(entity), cancellationToken);
             }
         }
 
-        public async ValueTask ProcessModifiedAsync(IReadOnlyCollection<(Entity Original, Entity Current)> entities, CancellationToken cancellationToken)
-        {
+    public async ValueTask ProcessModifiedAsync(IReadOnlyCollection<(Entity Original, Entity Current)> entities, CancellationToken cancellationToken)
+    {
             foreach (var (originalEntity, currentEntity) in entities)
             {
                 if (originalEntity is not RoomQuestion original ||
@@ -36,8 +36,8 @@ namespace Interview.Domain.Events.ChangeEntityProcessors
             }
         }
 
-        private static IRoomEvent CreateChangeEvent(RoomQuestion current, RoomQuestion original)
-        {
+    private static IRoomEvent CreateChangeEvent(RoomQuestion current, RoomQuestion original)
+    {
             return new RoomEvent<ChangeEventPayload>(
                 current.Room!.Id,
                 EventType.ChangeRoomQuestionState,
@@ -45,8 +45,8 @@ namespace Interview.Domain.Events.ChangeEntityProcessors
                 false);
         }
 
-        private static IRoomEvent CreateAddEvent(RoomQuestion entity)
-        {
+    private static IRoomEvent CreateAddEvent(RoomQuestion entity)
+    {
             return new RoomEvent<AddEventPayload>(
                 entity.Room!.Id,
                 EventType.AddRoomQuestion,
@@ -54,8 +54,7 @@ namespace Interview.Domain.Events.ChangeEntityProcessors
                 false);
         }
 
-        public sealed record ChangeEventPayload(Guid QuestionId, RoomQuestionState OldState, RoomQuestionState NewState);
+    public sealed record ChangeEventPayload(Guid QuestionId, RoomQuestionState OldState, RoomQuestionState NewState);
 
-        public sealed record AddEventPayload(Guid QuestionId, RoomQuestionState State);
-    }
+    public sealed record AddEventPayload(Guid QuestionId, RoomQuestionState State);
 }

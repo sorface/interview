@@ -1,4 +1,4 @@
-using Interview.Domain.RoomConfigurations;
+using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,4 +1,4 @@
-using Interview.Domain.RoomParticipants;
+using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Users.Roles;
 
 namespace Interview.Domain.Events.Service.FindPage;

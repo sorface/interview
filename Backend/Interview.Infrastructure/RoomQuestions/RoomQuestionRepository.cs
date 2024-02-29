@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using Interview.Domain.RoomQuestions;
+using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 

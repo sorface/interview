@@ -1,6 +1,6 @@
 using System.Net.WebSockets;
-using Interview.Domain.RoomConfigurations;
-using Interview.Domain.RoomParticipants;
+using Interview.Domain.Rooms.RoomConfigurations;
+using Interview.Domain.Rooms.RoomParticipants;
 
 namespace Interview.Backend.WebSocket.Events.Handlers;
 

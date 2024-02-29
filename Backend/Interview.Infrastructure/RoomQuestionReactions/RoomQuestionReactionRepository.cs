@@ -1,4 +1,4 @@
-using Interview.Domain.RoomQuestionReactions;
+using Interview.Domain.Rooms.RoomQuestionReactions;
 using Interview.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 

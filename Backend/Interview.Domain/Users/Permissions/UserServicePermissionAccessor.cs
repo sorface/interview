@@ -1,6 +1,7 @@
 using Interview.Domain.Permissions;
 using Interview.Domain.Users.Records;
 using Interview.Domain.Users.Roles;
+using Interview.Domain.Users.Service;
 using X.PagedList;
 
 namespace Interview.Domain.Users.Permissions;

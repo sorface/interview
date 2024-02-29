@@ -2,10 +2,10 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Transactions;
 using Interview.Domain;
 using Interview.Domain.Invites;
-using Interview.Domain.RoomInvites;
-using Interview.Domain.RoomParticipants;
 using Interview.Domain.Rooms;
-using Interview.Domain.Rooms.Service.Records.Response.Detail;
+using Interview.Domain.Rooms.Records.Response.Detail;
+using Interview.Domain.Rooms.RoomInvites;
+using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 

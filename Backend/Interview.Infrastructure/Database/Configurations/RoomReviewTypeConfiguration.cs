@@ -1,5 +1,5 @@
-using Interview.Domain.RoomReviews;
 using Interview.Domain.Rooms;
+using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Users;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -1,6 +1,6 @@
 using Interview.Domain.Reactions;
-using Interview.Domain.RoomQuestionReactions;
-using Interview.Domain.RoomQuestions;
+using Interview.Domain.Rooms.RoomQuestionReactions;
+using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.Users;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

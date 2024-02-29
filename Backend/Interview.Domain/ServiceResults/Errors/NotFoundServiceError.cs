@@ -1,6 +1,4 @@
-using Interview.Domain.ServiceResults.Errors;
-
-namespace Interview.Domain.Errors;
+namespace Interview.Domain.ServiceResults.Errors;
 
 public sealed class NotFoundServiceError : ServiceError
 {

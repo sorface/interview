@@ -1,6 +1,6 @@
-using Interview.Domain.RoomParticipants;
+using Interview.Domain.Rooms.RoomParticipants;
 
-namespace Interview.Domain.Rooms.Service.Records.Response.Detail;
+namespace Interview.Domain.Rooms.Records.Response.Detail;
 
 public class RoomInviteDetail
 {

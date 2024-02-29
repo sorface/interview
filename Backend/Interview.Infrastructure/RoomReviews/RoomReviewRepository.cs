@@ -1,6 +1,6 @@
-using Interview.Domain.RoomReviews;
-using Interview.Domain.Rooms.Service.Records.Response.Detail;
-using Interview.Domain.Rooms.Service.Records.Response.Page;
+using Interview.Domain.Rooms.Records.Response.Detail;
+using Interview.Domain.Rooms.RoomReviews;
+using Interview.Domain.Rooms.RoomReviews.Response.Page;
 using Interview.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using NSpecifications;

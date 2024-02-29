@@ -3,7 +3,7 @@ using System.Net.WebSockets;
 using System.Text.Json;
 using Interview.Backend.WebSocket.Events.Handlers;
 using Interview.Domain.Events.Storage;
-using Interview.Domain.RoomParticipants;
+using Interview.Domain.Rooms.RoomParticipants;
 using Microsoft.IO;
 
 namespace Interview.Backend.WebSocket.Events;

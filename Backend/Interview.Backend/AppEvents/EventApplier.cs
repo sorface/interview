@@ -1,5 +1,5 @@
 using Interview.Domain.Events;
-using Interview.Domain.RoomParticipants;
+using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 

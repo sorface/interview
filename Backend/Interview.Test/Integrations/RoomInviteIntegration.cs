@@ -1,9 +1,9 @@
 using FluentAssertions;
 using Interview.Domain.Events.Storage;
 using Interview.Domain.Invites;
-using Interview.Domain.RoomInvites;
-using Interview.Domain.RoomParticipants;
 using Interview.Domain.Rooms;
+using Interview.Domain.Rooms.RoomInvites;
+using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.Service;
 using Interview.Domain.Users;
 using Interview.Infrastructure.Events;

@@ -1,5 +1,5 @@
 using Interview.Domain.Repository;
-using Interview.Domain.RoomParticipants;
+using Interview.Domain.Rooms.RoomParticipants;
 
 namespace Interview.Domain.Events.Service.FindPage;
 

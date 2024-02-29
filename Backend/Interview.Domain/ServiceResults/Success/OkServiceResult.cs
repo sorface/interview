@@ -1,6 +1,4 @@
-using Interview.Domain.ServiceResults.Success;
-
-namespace Interview.Domain.ServiceResults;
+namespace Interview.Domain.ServiceResults.Success;
 
 public sealed class OkServiceResult<T> : ServiceResult<T>
 {

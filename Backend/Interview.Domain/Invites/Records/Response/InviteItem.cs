@@ -1,4 +1,4 @@
-namespace Interview.Domain.Invitations.Records.Response;
+namespace Interview.Domain.Invites.Records.Response;
 
 public class InvitationItem
 {

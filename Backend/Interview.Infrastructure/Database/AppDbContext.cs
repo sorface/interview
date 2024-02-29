@@ -4,11 +4,11 @@ using Interview.Domain.Invites;
 using Interview.Domain.Questions;
 using Interview.Domain.Reactions;
 using Interview.Domain.Repository;
-using Interview.Domain.RoomInvites;
-using Interview.Domain.RoomParticipants;
-using Interview.Domain.RoomQuestionReactions;
-using Interview.Domain.RoomQuestions;
 using Interview.Domain.Rooms;
+using Interview.Domain.Rooms.RoomInvites;
+using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Rooms.RoomQuestionReactions;
+using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.Tags;
 using Interview.Domain.Users;
 using Interview.Domain.Users.Permissions;
@@ -16,7 +16,7 @@ using Interview.Domain.Users.Roles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Internal;
-using RoomConfiguration = Interview.Domain.RoomConfigurations.RoomConfiguration;
+using RoomConfiguration = Interview.Domain.Rooms.RoomConfigurations.RoomConfiguration;
 
 namespace Interview.Infrastructure.Database;
 
