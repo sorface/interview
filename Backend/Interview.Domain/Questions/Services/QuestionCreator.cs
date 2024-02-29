@@ -25,12 +25,12 @@ public class QuestionCreator : IQuestionCreator
     public async Task<Question> CreateAsync(
         QuestionCreateRequest request, Guid? roomId, CancellationToken cancellationToken = default)
     {
-        var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
         if (roomId is not null)
         {
             await _roomMembershipChecker.EnsureCurrentUserMemberOfRoomAsync(roomId.Value, cancellationToken);
         }
 
+        var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
         var result = new Question(request.Value)
         {
             Tags = tags,
