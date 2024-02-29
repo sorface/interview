@@ -67,14 +67,18 @@ public class SendingSignalWebSocketEventHandler : WebSocketEventHandlerBase<Send
     }
 }
 
+#pragma warning disable SA1402
 public class UserDetailResponse
+#pragma warning restore SA1402
 {
     public required UserDetail From { get; init; }
 
     public required string? Signal { get; init; }
 }
 
+#pragma warning disable SA1402
 public class UserDetail
+#pragma warning restore SA1402
 {
     public required Guid Id { get; init; }
 

@@ -6,5 +6,5 @@ public class RoomQuestionReactionCreateRequest
 
     public Guid RoomId { get; set; }
 
-    public string Payload { get; set; }
+    public string Payload { get; set; } = string.Empty;
 }

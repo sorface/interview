@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Interview.Domain.Events.Storage;
 using NSpecifications;
 
@@ -13,7 +14,7 @@ public sealed class InMemoryEventStorage : IEventStorage
         return ValueTask.CompletedTask;
     }
 
-    public async IAsyncEnumerable<IReadOnlyCollection<IStorageEvent>> GetBySpecAsync(ISpecification<IStorageEvent> spec, int chunkSize, CancellationToken cancellationToken)
+    public async IAsyncEnumerable<IReadOnlyCollection<IStorageEvent>> GetBySpecAsync(ISpecification<IStorageEvent> spec, int chunkSize, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         await foreach (var res in _storage.Where(spec.IsSatisfiedBy).Chunk(chunkSize).ToAsyncEnumerable().WithCancellation(cancellationToken))
         {
@@ -21,7 +22,7 @@ public sealed class InMemoryEventStorage : IEventStorage
         }
     }
 
-    public async IAsyncEnumerable<IReadOnlyCollection<IStorageEvent>> GetLatestBySpecAsync(ISpecification<IStorageEvent> spec, int chunkSize, CancellationToken cancellationToken)
+    public async IAsyncEnumerable<IReadOnlyCollection<IStorageEvent>> GetLatestBySpecAsync(ISpecification<IStorageEvent> spec, int chunkSize, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         await foreach (var res in _storage.Where(spec.IsSatisfiedBy).OrderByDescending(e => e.CreatedAt).Chunk(chunkSize).ToAsyncEnumerable().WithCancellation(cancellationToken))
         {

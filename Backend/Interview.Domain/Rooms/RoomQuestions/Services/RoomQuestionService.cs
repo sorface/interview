@@ -123,9 +123,9 @@ public class RoomQuestionService : IRoomQuestionService
 
         var state = RoomQuestionState.FromValue((int)request.State);
 
-        var specification = new Spec<RoomQuestion>(rq => rq.Room.Id == request.RoomId && rq.State == state);
+        var specification = new Spec<RoomQuestion>(rq => rq.Room!.Id == request.RoomId && rq.State == state);
 
-        var mapper = new Mapper<RoomQuestion, Guid>(rq => rq.Question.Id);
+        var mapper = new Mapper<RoomQuestion, Guid>(rq => rq.Question!.Id);
 
         var questions = await _roomQuestionRepository.FindAsync(specification, mapper, cancellationToken);
 

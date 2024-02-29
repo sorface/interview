@@ -56,7 +56,7 @@ async Task MigrateDbAsync(WebApplication webApplication)
         Avatar = null,
         Roles =
         {
-            appDbContext.Roles.Find(RoleName.User.Id) !,
+            appDbContext.Roles.Find(RoleName.User.Id)!,
         },
     });
     await appDbContext.SaveChangesAsync();

@@ -20,5 +20,7 @@ public class PermissionDetail
 
     public PermissionDetail()
     {
+        Description = string.Empty;
+        Code = string.Empty;
     }
 }

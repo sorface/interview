@@ -3,7 +3,9 @@ using Interview.Domain.Users.Roles;
 
 namespace Interview.Domain.Events.Service.FindPage;
 
+#pragma warning disable SA1402
 public class AppEventItem<TParticipantType>
+#pragma warning restore SA1402
 {
     public required Guid Id { get; set; }
 
@@ -16,7 +18,9 @@ public class AppEventItem<TParticipantType>
     public required ICollection<TParticipantType> ParticipantTypes { get; set; }
 }
 
+#pragma warning disable SA1402
 public sealed class AppEventItemParticipantType : AppEventItem<RoomParticipantType>
+#pragma warning restore SA1402
 {
     public AppEventItem ToAppEventItem()
     {

@@ -46,7 +46,7 @@ public class ExceptionMiddleware
                 AccessDeniedException => (HttpStatusCode.Forbidden, exception.Message),
                 NotFoundException => (HttpStatusCode.NotFound, exception.Message),
                 UserException => (HttpStatusCode.BadRequest, exception.Message),
-                _ => (HttpStatusCode.InternalServerError, "Internal Server Error.")
+                _ => (HttpStatusCode.InternalServerError, "Internal Server Error."),
             };
         }
     }

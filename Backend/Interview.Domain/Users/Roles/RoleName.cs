@@ -50,7 +50,8 @@ public sealed class RoleName : SmartEnum<RoleName>
 
     public static readonly RoleName Admin = new(
         Guid.Parse("ab45cf57-aa1c-11ed-970f-98dc442de35a"),
-        RoleNameConstants.Admin, RoleNameType.Admin,
+        RoleNameConstants.Admin,
+        RoleNameType.Admin,
         ImmutableHashSet<SEPermission>.Empty);
 
     private RoleName(Guid id, string name, RoleNameType value, IReadOnlySet<SEPermission> defaultPermissions)

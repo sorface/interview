@@ -1,4 +1,3 @@
-using Interview.Domain.Invitations;
 using Interview.Domain.Invites;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
