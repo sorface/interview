@@ -9,13 +9,6 @@ public class SorfaceAuthenticationOptions : OAuthOptions
 {
     public SorfaceAuthenticationOptions()
     {
-        ClaimsIssuer = SorfaceAuthenticationDefaults.Issuer;
-        CallbackPath = SorfaceAuthenticationDefaults.CallbackPath;
-
-        AuthorizationEndpoint = SorfaceAuthenticationDefaults.AuthorizationEndPoint;
-        TokenEndpoint = SorfaceAuthenticationDefaults.TokenEndpoint;
-        UserInformationEndpoint = SorfaceAuthenticationDefaults.UserInformationEndpoint;
-
         ClaimActions.MapCustomJson(ClaimTypes.NameIdentifier, user => GetData(user, "id"));
         ClaimActions.MapCustomJson(ClaimTypes.Name, user => GetData(user, "username"));
         ClaimActions.MapCustomJson(ClaimTypes.Email, user => GetData(user, "email"));

@@ -166,7 +166,7 @@ public class ServiceConfigurator
         };
 
         serviceCollection.AddAppServices(serviceOption);
-        serviceCollection.AddAppAuth(sorfaceAuth);
+        serviceCollection.AddAppAuth(sorfaceAuth, _configuration);
     }
 
     private void AddRateLimiter(IServiceCollection serviceCollection)

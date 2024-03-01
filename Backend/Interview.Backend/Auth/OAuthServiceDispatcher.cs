@@ -13,7 +13,7 @@ public class OAuthServiceDispatcher
             .ToList();
 
         _dictionaryService = configurationSections
-            .Select<IConfigurationSection, AuthorizationService>(configurator =>
+            .Select(configurator =>
             {
                 var service = new AuthorizationService();
                 configurator.Bind(service);

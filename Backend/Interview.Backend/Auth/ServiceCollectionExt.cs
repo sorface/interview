@@ -10,8 +10,12 @@ namespace Interview.Backend.Auth;
 
 public static class ServiceCollectionExt
 {
-    public static void AddAppAuth(this IServiceCollection self, AuthorizationService authorizationService)
+    public static void AddAppAuth(this IServiceCollection self, AuthorizationService authorizationService, IConfiguration configuration)
     {
+        var section = configuration
+            .GetRequiredSection(nameof(SorfaceAuthenticationOptions))
+            .Get<SorfaceAuthenticationFileOptions>() ?? throw new Exception("Unable parse SorfaceAuthenticationFileOptions");
+
         const string AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
         self.AddAuthentication(AuthenticationScheme)
@@ -36,6 +40,12 @@ public static class ServiceCollectionExt
             })
             .AddSorface(authorizationService.Id, options =>
             {
+                options.ClaimsIssuer = section.Issuer;
+                options.CallbackPath = section.CallbackPath;
+                options.AuthorizationEndpoint = section.AuthorizationEndPoint;
+                options.TokenEndpoint = section.TokenEndpoint;
+                options.UserInformationEndpoint = section.UserInformationEndpoint;
+
                 options.ClientId = authorizationService.ClientId;
                 options.ClientSecret = authorizationService.ClientSecret;
                 options.CallbackPath = authorizationService.CallbackPath;
@@ -66,5 +76,18 @@ public static class ServiceCollectionExt
                 policyBuilder.RequireAuthenticatedUser();
             });
         });
+    }
+
+    private sealed class SorfaceAuthenticationFileOptions
+    {
+        public string Issuer { get; set; } = string.Empty;
+
+        public string CallbackPath { get; set; } = string.Empty;
+
+        public string AuthorizationEndPoint { get; set; } = string.Empty;
+
+        public string TokenEndpoint { get; set; } = string.Empty;
+
+        public string UserInformationEndpoint { get; set; } = string.Empty;
     }
 }
