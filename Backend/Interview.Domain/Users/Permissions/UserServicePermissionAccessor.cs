@@ -21,21 +21,18 @@ public class UserServicePermissionAccessor : IUserService, IServiceDecorator
         int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
         _securityService.EnsurePermission(SEPermission.UserFindPage);
-
         return _userService.FindPageAsync(pageNumber, pageSize, cancellationToken);
     }
 
     public Task<UserDetail> FindByNicknameAsync(string nickname, CancellationToken cancellationToken = default)
     {
         _securityService.EnsurePermission(SEPermission.UserFindByNickname);
-
         return _userService.FindByNicknameAsync(nickname, cancellationToken);
     }
 
     public Task<User?> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         _securityService.EnsurePermission(SEPermission.UserFindById);
-
         return _userService.FindByIdAsync(id, cancellationToken);
     }
 
@@ -54,7 +51,6 @@ public class UserServicePermissionAccessor : IUserService, IServiceDecorator
         int pageNumber, int pageSize, RoleNameType roleNameType, CancellationToken cancellationToken = default)
     {
         _securityService.EnsurePermission(SEPermission.UserFindByRole);
-
         return _userService.FindByRoleAsync(pageNumber, pageSize, roleNameType, cancellationToken);
     }
 
@@ -62,7 +58,6 @@ public class UserServicePermissionAccessor : IUserService, IServiceDecorator
         Guid id, CancellationToken cancellationToken)
     {
         _securityService.EnsurePermission(SEPermission.UserGetPermissions);
-
         return _userService.GetPermissionsAsync(id, cancellationToken);
     }
 
@@ -70,7 +65,6 @@ public class UserServicePermissionAccessor : IUserService, IServiceDecorator
         Guid id, PermissionModifyRequest permissionModifyRequest, CancellationToken cancellationToken)
     {
         _securityService.EnsurePermission(SEPermission.UserChangePermission);
-
         return _userService.ChangePermissionAsync(id, permissionModifyRequest, cancellationToken);
     }
 }

@@ -1,3 +1,4 @@
+using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Users;
 using Interview.Domain.Users.Roles;
 
@@ -5,17 +6,31 @@ namespace Interview.Domain.Permissions;
 
 public interface ISecurityService : IService
 {
-    public void EnsurePermission(SEPermission action);
+    public void EnsureRoomPermission(Guid? roomId, SEPermission action)
+    {
+        if (roomId is null)
+        {
+            EnsurePermission(action);
+        }
+        else
+        {
+            EnsureRoomPermission(roomId.Value, action);
+        }
+    }
 
-    public User? CurrentUser();
+    void EnsureRoomPermission(Guid roomId, SEPermission action);
 
-    public Guid? CurrentUserId();
+    void EnsurePermission(SEPermission action);
 
-    public bool IsAdmin();
+    User? CurrentUser();
 
-    public bool HasRole(RoleName roleName);
+    Guid? CurrentUserId();
 
-    public bool HasPermission(SEPermission permission);
+    bool IsAdmin();
+
+    bool HasRole(RoleName roleName);
+
+    bool HasPermission(SEPermission permission);
 }
 
 public class SecurityService : ISecurityService
@@ -28,6 +43,11 @@ public class SecurityService : ISecurityService
     {
         _currentPermissionAccessor = currentPermissionAccessor;
         _currentUserAccessor = currentUserAccessor;
+    }
+
+    public void EnsureRoomPermission(Guid roomId, SEPermission action)
+    {
+        EnsurePermission(action);
     }
 
     public void EnsurePermission(SEPermission action)

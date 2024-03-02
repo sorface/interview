@@ -22,7 +22,7 @@ public class RoomQuestionServicePermissionAccessor : IRoomQuestionService, IServ
         RoomQuestionChangeActiveRequest request,
         CancellationToken cancellationToken = default)
     {
-        _securityService.EnsurePermission(SEPermission.RoomQuestionChangeActiveQuestion);
+        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomQuestionChangeActiveQuestion);
 
         return _roomQuestionService.ChangeActiveQuestionAsync(request, cancellationToken);
     }
@@ -31,14 +31,14 @@ public class RoomQuestionServicePermissionAccessor : IRoomQuestionService, IServ
         RoomQuestionCreateRequest request,
         CancellationToken cancellationToken)
     {
-        _securityService.EnsurePermission(SEPermission.RoomQuestionCreate);
+        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomQuestionCreate);
 
         return _roomQuestionService.CreateAsync(request, cancellationToken);
     }
 
     public Task<List<Guid>> FindGuidsAsync(RoomQuestionsRequest request, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsurePermission(SEPermission.RoomQuestionFindGuids);
+        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomQuestionFindGuids);
 
         return _roomQuestionService.FindGuidsAsync(request, cancellationToken);
     }

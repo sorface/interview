@@ -22,7 +22,7 @@ public class RoomParticipantServicePermissionAccessor : IRoomParticipantService,
         RoomParticipantGetRequest request,
         CancellationToken cancellationToken = default)
     {
-        _securityService.EnsurePermission(SEPermission.RoomParticipantFindByRoomIdAndUserId);
+        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomParticipantFindByRoomIdAndUserId);
 
         return _roomParticipantService.FindByRoomIdAndUserIdAsync(request, cancellationToken);
     }
@@ -31,7 +31,7 @@ public class RoomParticipantServicePermissionAccessor : IRoomParticipantService,
         RoomParticipantChangeStatusRequest request,
         CancellationToken cancellationToken = default)
     {
-        _securityService.EnsurePermission(SEPermission.RoomParticipantChangeStatus);
+        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomParticipantChangeStatus);
 
         return _roomParticipantService.ChangeStatusAsync(request, cancellationToken);
     }
@@ -40,7 +40,7 @@ public class RoomParticipantServicePermissionAccessor : IRoomParticipantService,
         RoomParticipantCreateRequest request,
         CancellationToken cancellationToken = default)
     {
-        _securityService.EnsurePermission(SEPermission.RoomParticipantCreate);
+        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomParticipantCreate);
 
         return _roomParticipantService.CreateAsync(request, cancellationToken);
     }

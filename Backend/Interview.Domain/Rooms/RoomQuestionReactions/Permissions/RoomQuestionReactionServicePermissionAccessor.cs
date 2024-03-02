@@ -23,7 +23,7 @@ public class RoomQuestionReactionServicePermissionAccessor : IRoomQuestionReacti
         Guid userId,
         CancellationToken cancellationToken)
     {
-        _securityService.EnsurePermission(SEPermission.RoomQuestionReactionCreate);
+        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomQuestionReactionCreate);
 
         return _roomQuestionReactionService.CreateAsync(request, userId, cancellationToken);
     }

@@ -20,7 +20,6 @@ public class ReactionServicePermissionAccessor : IReactionService, IServiceDecor
     public Task<IPagedList<ReactionDetail>> FindPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
         _securityService.EnsurePermission(SEPermission.ReactionFindPage);
-
         return _reactionService.FindPageAsync(pageNumber, pageSize, cancellationToken);
     }
 }

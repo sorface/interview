@@ -20,7 +20,6 @@ public class QuestionServicePermissionAccessor : IQuestionService, IServiceDecor
     public Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken)
     {
         _securityService.EnsurePermission(SEPermission.QuestionFindPage);
-
         return _questionService.FindPageAsync(request, cancellationToken);
     }
 
@@ -28,7 +27,6 @@ public class QuestionServicePermissionAccessor : IQuestionService, IServiceDecor
         int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
         _securityService.EnsurePermission(SEPermission.QuestionFindPageArchive);
-
         return _questionService.FindPageArchiveAsync(pageNumber, pageSize, cancellationToken);
     }
 
@@ -36,7 +34,6 @@ public class QuestionServicePermissionAccessor : IQuestionService, IServiceDecor
         QuestionCreateRequest request, CancellationToken cancellationToken = default)
     {
         _securityService.EnsurePermission(SEPermission.QuestionCreate);
-
         return _questionService.CreateAsync(request, cancellationToken);
     }
 
@@ -44,7 +41,6 @@ public class QuestionServicePermissionAccessor : IQuestionService, IServiceDecor
         Guid id, QuestionEditRequest request, CancellationToken cancellationToken = default)
     {
         _securityService.EnsurePermission(SEPermission.QuestionUpdate);
-
         return _questionService.UpdateAsync(id, request, cancellationToken);
     }
 
@@ -52,7 +48,6 @@ public class QuestionServicePermissionAccessor : IQuestionService, IServiceDecor
         Guid id, CancellationToken cancellationToken = default)
     {
         _securityService.EnsurePermission(SEPermission.QuestionFindById);
-
         return _questionService.FindByIdAsync(id, cancellationToken);
     }
 
@@ -60,7 +55,6 @@ public class QuestionServicePermissionAccessor : IQuestionService, IServiceDecor
         Guid id, CancellationToken cancellationToken = default)
     {
         _securityService.EnsurePermission(SEPermission.QuestionDeletePermanently);
-
         return _questionService.DeletePermanentlyAsync(id, cancellationToken);
     }
 
@@ -68,7 +62,6 @@ public class QuestionServicePermissionAccessor : IQuestionService, IServiceDecor
         Guid id, CancellationToken cancellationToken = default)
     {
         _securityService.EnsurePermission(SEPermission.QuestionArchive);
-
         return _questionService.ArchiveAsync(id, cancellationToken);
     }
 
@@ -77,7 +70,6 @@ public class QuestionServicePermissionAccessor : IQuestionService, IServiceDecor
         CancellationToken cancellationToken = default)
     {
         _securityService.EnsurePermission(SEPermission.QuestionUnarchive);
-
         return _questionService.UnarchiveAsync(id, cancellationToken);
     }
 }

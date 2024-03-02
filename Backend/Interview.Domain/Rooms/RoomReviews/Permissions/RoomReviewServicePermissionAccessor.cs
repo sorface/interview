@@ -10,31 +10,31 @@ public class RoomReviewServicePermissionAccessor : IRoomReviewService, IServiceD
 {
     private readonly IRoomReviewService _roomReviewService;
     private readonly ISecurityService _securityService;
+    private readonly IRoomReviewRepository _repository;
 
-    public RoomReviewServicePermissionAccessor(IRoomReviewService roomReviewService, ISecurityService securityService)
+    public RoomReviewServicePermissionAccessor(IRoomReviewService roomReviewService, ISecurityService securityService, IRoomReviewRepository repository)
     {
         _roomReviewService = roomReviewService;
         _securityService = securityService;
+        _repository = repository;
     }
 
     public Task<IPagedList<RoomReviewPageDetail>> FindPageAsync(RoomReviewPageRequest request, CancellationToken cancellationToken = default)
     {
         _securityService.EnsurePermission(SEPermission.RoomReviewFindPage);
-
         return _roomReviewService.FindPageAsync(request, cancellationToken);
     }
 
     public Task<RoomReviewDetail> CreateAsync(RoomReviewCreateRequest request, Guid userId, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsurePermission(SEPermission.RoomReviewCreate);
-
+        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomReviewCreate);
         return _roomReviewService.CreateAsync(request, userId, cancellationToken);
     }
 
-    public Task<RoomReviewDetail> UpdateAsync(Guid id, RoomReviewUpdateRequest request, CancellationToken cancellationToken = default)
+    public async Task<RoomReviewDetail> UpdateAsync(Guid id, RoomReviewUpdateRequest request, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsurePermission(SEPermission.RoomReviewUpdate);
-
-        return _roomReviewService.UpdateAsync(id, request, cancellationToken);
+        var entity = await _repository.FindByIdDetailedAsync(id, cancellationToken);
+        _securityService.EnsureRoomPermission(entity?.Room?.Id, SEPermission.RoomReviewUpdate);
+        return await _roomReviewService.UpdateAsync(id, request, cancellationToken);
     }
 }
