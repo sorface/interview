@@ -22,7 +22,7 @@ public class QuestionServiceTest
         var archiveService = new Mock<ArchiveService<Question>>(_questionRepository.Object);
         var questionTag = new Mock<ITagRepository>();
         var roomMembership = new Mock<IRoomMembershipChecker>();
-        
+
         _questionService = new QuestionService(_questionRepository.Object, _questionArchiveRepository.Object, archiveService.Object, questionTag.Object, roomMembership.Object);
     }
 
