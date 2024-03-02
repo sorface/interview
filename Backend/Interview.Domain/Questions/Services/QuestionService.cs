@@ -24,22 +24,18 @@ public class QuestionService : IQuestionService
 
     private readonly IRoomMembershipChecker _roomMembershipChecker;
 
-    private readonly IQuestionCreator _questionCreator;
-
     public QuestionService(
         IQuestionRepository questionRepository,
         IQuestionNonArchiveRepository questionNonArchiveRepository,
         ArchiveService<Question> archiveService,
         ITagRepository tagRepository,
-        IRoomMembershipChecker roomMembershipChecker,
-        IQuestionCreator questionCreator)
+        IRoomMembershipChecker roomMembershipChecker)
     {
         _questionRepository = questionRepository;
         _questionNonArchiveRepository = questionNonArchiveRepository;
         _archiveService = archiveService;
         _tagRepository = tagRepository;
         _roomMembershipChecker = roomMembershipChecker;
-        _questionCreator = questionCreator;
     }
 
     public async Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken)
@@ -88,9 +84,21 @@ public class QuestionService : IQuestionService
     }
 
     public async Task<QuestionItem> CreateAsync(
-        QuestionCreateRequest request, CancellationToken cancellationToken = default)
+        QuestionCreateRequest request, Guid? roomId, CancellationToken cancellationToken = default)
     {
-        var result = await _questionCreator.CreateAsync(request, null, cancellationToken);
+        if (roomId is not null)
+        {
+            await _roomMembershipChecker.EnsureCurrentUserMemberOfRoomAsync(roomId.Value, cancellationToken);
+        }
+
+        var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
+        var result = new Question(request.Value)
+        {
+            Tags = tags,
+            RoomId = roomId,
+        };
+
+        await _questionRepository.CreateAsync(result, cancellationToken);
         return new QuestionItem
         {
             Id = result.Id,

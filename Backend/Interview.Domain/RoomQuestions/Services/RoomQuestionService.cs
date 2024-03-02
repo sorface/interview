@@ -16,18 +16,18 @@ public class RoomQuestionService : IRoomQuestionService
 
     private readonly IRoomRepository _roomRepository;
 
-    private readonly IQuestionCreator _questionCreator;
+    private readonly IQuestionService _questionService;
 
     public RoomQuestionService(
         IRoomQuestionRepository roomQuestionRepository,
         IRoomRepository roomRepository,
         IQuestionRepository questionRepository,
-        IQuestionCreator questionCreator)
+        IQuestionService questionService)
     {
         _roomQuestionRepository = roomQuestionRepository;
         _roomRepository = roomRepository;
         _questionRepository = questionRepository;
-        _questionCreator = questionCreator;
+        _questionService = questionService;
     }
 
     public async Task<RoomQuestionDetail> ChangeActiveQuestionAsync(
@@ -101,7 +101,7 @@ public class RoomQuestionService : IRoomQuestionService
                 throw new UserException("The expectation was to get data to create a question");
             }
 
-            var createdQuestion = await _questionCreator.CreateAsync(request.Question, request.RoomId, cancellationToken);
+            var createdQuestion = await _questionService.CreateAsync(request.Question, request.RoomId, cancellationToken);
             questionId = createdQuestion.Id;
         }
 

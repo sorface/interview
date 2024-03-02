@@ -1,6 +1,8 @@
 using Bogus;
 using FluentAssertions;
+using Interview.Domain;
 using Interview.Domain.Questions;
+using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Questions.Services;
 using Interview.Domain.RoomParticipants;
 using Interview.Domain.Rooms;
@@ -48,7 +50,7 @@ namespace Interview.Test.Integrations
             var creator = CreateQuestionCreate(appDbContext, roomMemberChecker.Object);
             var questionCreateRequest = new QuestionCreateRequest { Tags = new HashSet<Guid>(), Value = value };
             var question = await creator.CreateAsync(questionCreateRequest, room?.Id, CancellationToken.None);
-            question.Should().NotBeNull().And.Match<Question>(e => e.Value == value);
+            question.Should().NotBeNull().And.Match<QuestionItem>(e => e.Value == value);
             roomMemberChecker.Verify(e => e.EnsureCurrentUserMemberOfRoomAsync(room == null ? It.IsAny<Guid>() : room.Id, It.IsAny<CancellationToken>()), room is not null ? Times.Once() : Times.Never());
         }
 
@@ -72,13 +74,18 @@ namespace Interview.Test.Integrations
             roomMemberChecker.Verify(e => e.EnsureCurrentUserMemberOfRoomAsync(room.Id, It.IsAny<CancellationToken>()), Times.Once());
         }
 
-        private static QuestionCreator CreateQuestionCreate(AppDbContext appDbContext, IRoomMembershipChecker roomMembershipChecker)
+        private static IQuestionService CreateQuestionCreate(AppDbContext appDbContext, IRoomMembershipChecker roomMembershipChecker)
         {
             var questionRepository = new QuestionRepository(appDbContext);
             var tagRepository = new TagRepository(appDbContext);
             var currentUser = new CurrentUserAccessor();
             currentUser.SetUser(appDbContext.Users.First());
-            return new QuestionCreator(tagRepository, questionRepository, roomMembershipChecker);
+            return new QuestionService(
+                questionRepository,
+                new QuestionNonArchiveRepository(appDbContext),
+                new ArchiveService<Question>(questionRepository),
+                tagRepository,
+                roomMembershipChecker);
         }
 
         private class UnavailableException : Exception

@@ -22,9 +22,8 @@ public class QuestionServiceTest
         var archiveService = new Mock<ArchiveService<Question>>(_questionRepository.Object);
         var questionTag = new Mock<ITagRepository>();
         var roomMembership = new Mock<IRoomMembershipChecker>();
-        var questionCreator = new Mock<IQuestionCreator>();
-
-        _questionService = new QuestionService(_questionRepository.Object, _questionArchiveRepository.Object, archiveService.Object, questionTag.Object, roomMembership.Object, questionCreator.Object);
+        
+        _questionService = new QuestionService(_questionRepository.Object, _questionArchiveRepository.Object, archiveService.Object, questionTag.Object, roomMembership.Object);
     }
 
     [Fact(DisplayName = "Searching question by id when question not found")]
