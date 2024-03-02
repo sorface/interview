@@ -23,76 +23,76 @@ public class RoomServicePermissionAccessor : IRoomService, IServiceDecorator
         _securityService = securityService;
     }
 
-    public Task<IPagedList<RoomPageDetail>> FindPageAsync(RoomPageDetailRequestFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<IPagedList<RoomPageDetail>> FindPageAsync(RoomPageDetailRequestFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsurePermission(SEPermission.RoomFindPage);
-        return _roomService.FindPageAsync(filter, pageNumber, pageSize, cancellationToken);
+        await _securityService.EnsurePermissionAsync(SEPermission.RoomFindPage, cancellationToken);
+        return await _roomService.FindPageAsync(filter, pageNumber, pageSize, cancellationToken);
     }
 
-    public Task<RoomDetail> FindByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<RoomDetail> FindByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        _securityService.EnsureRoomPermission(id, SEPermission.RoomFindById);
-        return _roomService.FindByIdAsync(id, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(id, SEPermission.RoomFindById, cancellationToken);
+        return await _roomService.FindByIdAsync(id, cancellationToken);
     }
 
-    public Task<Room> CreateAsync(RoomCreateRequest request, CancellationToken cancellationToken = default)
+    public async Task<Room> CreateAsync(RoomCreateRequest request, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsurePermission(SEPermission.RoomCreate);
-        return _roomService.CreateAsync(request, cancellationToken);
+        await _securityService.EnsurePermissionAsync(SEPermission.RoomCreate, cancellationToken);
+        return await _roomService.CreateAsync(request, cancellationToken);
     }
 
-    public Task<RoomItem> UpdateAsync(Guid roomId, RoomUpdateRequest? request, CancellationToken cancellationToken = default)
+    public async Task<RoomItem> UpdateAsync(Guid roomId, RoomUpdateRequest? request, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsureRoomPermission(roomId, SEPermission.RoomUpdate);
-        return _roomService.UpdateAsync(roomId, request, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(roomId, SEPermission.RoomUpdate, cancellationToken);
+        return await _roomService.UpdateAsync(roomId, request, cancellationToken);
     }
 
-    public Task<(Room, RoomParticipant)> AddParticipantAsync(Guid roomId, Guid userId, CancellationToken cancellationToken = default)
+    public async Task<(Room, RoomParticipant)> AddParticipantAsync(Guid roomId, Guid userId, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsureRoomPermission(roomId, SEPermission.RoomAddParticipant);
-        return _roomService.AddParticipantAsync(roomId, userId, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(roomId, SEPermission.RoomAddParticipant, cancellationToken);
+        return await _roomService.AddParticipantAsync(roomId, userId, cancellationToken);
     }
 
-    public Task SendEventRequestAsync(IEventRequest request, CancellationToken cancellationToken = default)
+    public async Task SendEventRequestAsync(IEventRequest request, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomSendEventRequest);
-        return _roomService.SendEventRequestAsync(request, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomSendEventRequest, cancellationToken);
+        await _roomService.SendEventRequestAsync(request, cancellationToken);
     }
 
-    public Task CloseAsync(Guid roomId, CancellationToken cancellationToken = default)
+    public async Task CloseAsync(Guid roomId, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsureRoomPermission(roomId, SEPermission.RoomClose);
-        return _roomService.CloseAsync(roomId, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(roomId, SEPermission.RoomClose, cancellationToken);
+        await _roomService.CloseAsync(roomId, cancellationToken);
     }
 
-    public Task StartReviewAsync(Guid roomId, CancellationToken cancellationToken)
+    public async Task StartReviewAsync(Guid roomId, CancellationToken cancellationToken)
     {
-        _securityService.EnsureRoomPermission(roomId, SEPermission.RoomStartReview);
-        return _roomService.StartReviewAsync(roomId, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(roomId, SEPermission.RoomStartReview, cancellationToken);
+        await _roomService.StartReviewAsync(roomId, cancellationToken);
     }
 
-    public Task<ActualRoomStateResponse> GetActualStateAsync(Guid roomId, CancellationToken cancellationToken = default)
+    public async Task<ActualRoomStateResponse> GetActualStateAsync(Guid roomId, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsureRoomPermission(roomId, SEPermission.RoomGetState);
-        return _roomService.GetActualStateAsync(roomId, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(roomId, SEPermission.RoomGetState, cancellationToken);
+        return await _roomService.GetActualStateAsync(roomId, cancellationToken);
     }
 
-    public Task UpsertRoomStateAsync(Guid roomId, string type, string payload, CancellationToken cancellationToken = default)
+    public async Task UpsertRoomStateAsync(Guid roomId, string type, string payload, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsureRoomPermission(roomId, SEPermission.UpsertRoomState);
-        return _roomService.UpsertRoomStateAsync(roomId, type, payload, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(roomId, SEPermission.UpsertRoomState, cancellationToken);
+        await _roomService.UpsertRoomStateAsync(roomId, type, payload, cancellationToken);
     }
 
-    public Task DeleteRoomStateAsync(Guid roomId, string type, CancellationToken cancellationToken = default)
+    public async Task DeleteRoomStateAsync(Guid roomId, string type, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsureRoomPermission(roomId, SEPermission.DeleteRoomState);
-        return _roomService.DeleteRoomStateAsync(roomId, type, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(roomId, SEPermission.DeleteRoomState, cancellationToken);
+        await _roomService.DeleteRoomStateAsync(roomId, type, cancellationToken);
     }
 
-    public Task<Analytics> GetAnalyticsAsync(RoomAnalyticsRequest request, CancellationToken cancellationToken = default)
+    public async Task<Analytics> GetAnalyticsAsync(RoomAnalyticsRequest request, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomGetAnalytics);
-        return _roomService.GetAnalyticsAsync(request, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomGetAnalytics, cancellationToken);
+        return await _roomService.GetAnalyticsAsync(request, cancellationToken);
     }
 
     public Task<RoomInviteDetail> ApplyInvite(Guid roomId, Guid? invite, CancellationToken cancellationToken = default)
@@ -105,15 +105,15 @@ public class RoomServicePermissionAccessor : IRoomService, IServiceDecorator
         return _roomService.ApplyInvite(roomId, invite, cancellationToken);
     }
 
-    public Task<AnalyticsSummary> GetAnalyticsSummaryAsync(RoomAnalyticsRequest request, CancellationToken cancellationToken = default)
+    public async Task<AnalyticsSummary> GetAnalyticsSummaryAsync(RoomAnalyticsRequest request, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomGetAnalyticsSummary);
-        return _roomService.GetAnalyticsSummaryAsync(request, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomGetAnalyticsSummary, cancellationToken);
+        return await _roomService.GetAnalyticsSummaryAsync(request, cancellationToken);
     }
 
-    public Task<Dictionary<string, List<IStorageEvent>>> GetTranscriptionAsync(TranscriptionRequest request, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<string, List<IStorageEvent>>> GetTranscriptionAsync(TranscriptionRequest request, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.TranscriptionGet);
-        return _roomService.GetTranscriptionAsync(request, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.TranscriptionGet, cancellationToken);
+        return await _roomService.GetTranscriptionAsync(request, cancellationToken);
     }
 }

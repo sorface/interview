@@ -5,28 +5,33 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Interview.Migrations.Sqlite.Migrations
+namespace Interview.Migrations.Postgres.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240302164053_Create_AvailableRoomPermission_Table")]
+    [Migration("20240302165640_Create_AvailableRoomPermission_Table")]
     partial class Create_AvailableRoomPermission_Table
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.10");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "7.0.10")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("AppEventRole", b =>
                 {
                     b.Property<Guid>("AppEventId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("RolesId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.HasKey("AppEventId", "RolesId");
 
@@ -39,29 +44,29 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("ParticipantTypes")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<bool>("Stateful")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(128)");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -77,29 +82,29 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Payload")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("RoomId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("Stateful")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -114,25 +119,25 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("UsesCurrent")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasDefaultValue(0);
 
                     b.Property<int>("UsesMax")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasDefaultValue(5);
 
                     b.HasKey("Id");
@@ -146,26 +151,26 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("IsArchived")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Value")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(128)");
 
                     b.HasKey("Id");
 
@@ -178,20 +183,20 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -222,19 +227,22 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("PermissionId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("RoomParticipantId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -242,162 +250,164 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("PermissionId");
 
+                    b.HasIndex("RoomParticipantId");
+
                     b.ToTable("AvailableRoomPermission");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("f7588d82-7257-4271-93ac-eda128da2350"),
+                            Id = new Guid("95d476a0-eb0e-470d-9c57-a0ec8a2e4cd6"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("220380d1-fd72-4004-aed4-22187e88b386"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9015)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("72e17454-7866-48af-97fd-f77f38989ae0"),
+                            Id = new Guid("38cd9540-27f5-4482-a261-2a08f6d8cf30"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("eac25c4b-28d5-4e22-93b2-5c3caf0f6922"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9018)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("1c3280a2-6c32-467f-81f7-30fb004b4064"),
+                            Id = new Guid("c68385ee-093a-457f-a03a-b1a53371c248"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("6938365f-752d-453e-b0be-93facac0c5b8"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9018)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("03fdab95-94f9-4199-b3b7-1b2a57883739"),
+                            Id = new Guid("aa3f81ec-9a87-493f-a7d5-fa4ca6e75bf7"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("b5c4eb71-50c8-4c13-a144-0496ce56e095"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9018)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("dc9ed7ed-55b3-498f-ae1f-4c13c091b19a"),
+                            Id = new Guid("d40a2c28-3a84-47f3-9981-88bdf50bb4ca"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("7c4d9ac2-72e7-466a-bcff-68f3ee0bc65e"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9018)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("c81d5a58-74a4-4645-a8db-41bd3ded060b"),
+                            Id = new Guid("48eb3b31-6632-4b4d-b36d-f61c68865c9d"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("882ffc55-3439-4d0b-8add-ba79e2a7df45"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9019)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("5f593115-4e43-40cd-aa3f-24d31d756cef"),
+                            Id = new Guid("ad9b444a-67b7-4b85-b592-8578e569b12a"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("5ac11db0-b079-40ab-b32b-a02243a451b3"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9019)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("4c317cad-e1c0-49fb-aba3-b819d21baada"),
+                            Id = new Guid("9acecc78-79ca-41b1-960e-a4eb9cf03a2c"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("7df4ea9b-ded5-4a1d-a8ea-e92e6bd85269"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9019)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("42c9ba6c-f1b9-4000-a196-a220587b8463"),
+                            Id = new Guid("3b1a04f3-8d35-4608-87fb-1d83d76cd99d"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("97b2411a-b9d4-49cb-9525-0e31b7d35496"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9019)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("333ce961-9c64-4be4-9c27-1469f79f6946"),
+                            Id = new Guid("8d3c4087-b34d-48f7-ba2a-b1a85f69fe95"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("9f020c9e-e0b4-4e6d-9fb3-38ba44cfa3f9"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9020)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("f65c1843-8221-41f1-920b-0611e26c5bd5"),
+                            Id = new Guid("6b3985bf-05dd-47e7-b894-781e28428596"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("b7ad620a-0614-494a-89ca-623e47b7415a"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9020)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("55e9a416-c592-452d-bdd7-c64437263b96"),
+                            Id = new Guid("6cf93811-c44a-4b86-86a1-18d72df7e1a0"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("a63b2ca5-304b-40a0-8e82-665a3327e407"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9020)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("caf3ff38-20f1-4adf-a36f-7289d8f643d1"),
+                            Id = new Guid("4dc0b8e6-4c1d-46e9-b181-5d2a31e7bdb5"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("1f6c85db-c2a0-4096-8ead-a292397ab4e5"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9020)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("8ab87264-77ea-42c4-abae-acd4f462ab42"),
+                            Id = new Guid("209a47f7-f1c5-439c-8de5-7792c08b7ce2"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("0827aeef-bcc1-4412-b584-0de4694422ce"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9021)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("8335db33-648e-46a2-adee-e016d0e3c187"),
+                            Id = new Guid("556d9330-9ff3-46a9-913b-28543fd213e4"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("d1916ab5-462e-41d7-ae46-f1ce27d514d4"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9021)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("8e2157a2-1727-45c9-abb0-b56164008cfb"),
+                            Id = new Guid("b9ad0f66-08c6-4f95-900c-94750f1ada6b"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("9ce5949f-a7b9-489c-8b04-bd6724aff687"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9021)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("652af334-a031-4791-a56b-6b58ebcc3945"),
+                            Id = new Guid("a1acbade-3835-4a9e-9729-56067af66d53"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("4c3386da-cbb2-4493-86e8-036e8802782d"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9021)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("769f615c-4245-448a-b1c0-72389233b9b7"),
+                            Id = new Guid("5efeace0-78ca-4616-aee0-9f08574132ce"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("1bb49aa7-1305-427c-9523-e9687392d385"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9022)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("9adbf882-db94-44ed-b3ee-37682159b616"),
+                            Id = new Guid("369f0b92-915c-4334-bdac-6e82fb3c0c74"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("150f05e3-8d73-45e9-8ecd-6187f7b96461"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9022)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("588e76b9-960f-4719-9f92-0ab367fca432"),
+                            Id = new Guid("4157604c-fde9-45cf-b79e-09b7fde71833"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("a115f072-638a-4472-8cc3-4cf04da67cfc"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9022)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("4d29ae35-7dc3-4b01-aad0-b46a69d8caed"),
+                            Id = new Guid("241f76f2-3746-4ee4-9191-a64ba3b3a86e"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("4f7a0200-9fe1-4d04-9bcc-6ed668d07828"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9022)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = new Guid("0d6ac765-c336-4afd-a28d-aee3e84905ce"),
+                            Id = new Guid("bd3496e3-6e57-447e-a7df-744efff03de5"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("5f088b45-704f-4f61-b4c5-05bd08b80303"),
-                            UpdateDate = new DateTime(2024, 3, 2, 16, 40, 53, 564, DateTimeKind.Utc).AddTicks(9023)
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -405,19 +415,19 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("RoomId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -433,36 +443,36 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("AcсessType")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasDefaultValue(0);
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(70)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(70)");
 
                     b.Property<char>("Status")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT")
+                        .HasColumnType("character(1)")
                         .HasDefaultValue('N');
 
                     b.Property<string>("TwitchChannel")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -475,19 +485,19 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("CodeEditorContent")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -500,29 +510,29 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("InviteById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("ParticipantType")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(10)
-                        .HasColumnType("TEXT")
+                        .HasColumnType("character varying(10)")
                         .HasDefaultValue("Viewer");
 
                     b.Property<Guid?>("RoomById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -539,27 +549,27 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("RoomId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(64)");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -576,28 +586,28 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Payload")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("ReactionId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("RoomQuestionId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("SenderId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -616,27 +626,27 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("QuestionId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("RoomId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("State")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(10)");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -653,31 +663,31 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Review")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("RoomId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("SeRoomReviewState")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(10)");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -694,27 +704,27 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Payload")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("RoomId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -730,25 +740,25 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("HexColor")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Value")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(128)");
 
                     b.HasKey("Id");
 
@@ -764,21 +774,21 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(128)");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -1132,21 +1142,21 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(64)");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -1175,29 +1185,29 @@ namespace Interview.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Avatar")
                         .HasMaxLength(250)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(250)");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Nickname")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("TwitchIdentity")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -1209,10 +1219,10 @@ namespace Interview.Migrations.Sqlite.Migrations
             modelBuilder.Entity("PermissionUser", b =>
                 {
                     b.Property<Guid>("PermissionsId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.HasKey("PermissionsId", "UserId");
 
@@ -1224,10 +1234,10 @@ namespace Interview.Migrations.Sqlite.Migrations
             modelBuilder.Entity("QuestionTag", b =>
                 {
                     b.Property<Guid>("QuestionId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("TagsId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.HasKey("QuestionId", "TagsId");
 
@@ -1239,10 +1249,10 @@ namespace Interview.Migrations.Sqlite.Migrations
             modelBuilder.Entity("RoleUser", b =>
                 {
                     b.Property<Guid>("RolesId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.HasKey("RolesId", "UserId");
 
@@ -1254,10 +1264,10 @@ namespace Interview.Migrations.Sqlite.Migrations
             modelBuilder.Entity("RoomTag", b =>
                 {
                     b.Property<Guid>("RoomId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("TagsId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.HasKey("RoomId", "TagsId");
 
@@ -1345,6 +1355,10 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Interview.Domain.Rooms.RoomParticipants.RoomParticipant", null)
+                        .WithMany("Permissions")
+                        .HasForeignKey("RoomParticipantId");
 
                     b.Navigation("CreatedBy");
 
@@ -1645,6 +1659,11 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Navigation("QueuedRoomEvent");
 
                     b.Navigation("RoomStates");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Rooms.RoomParticipants.RoomParticipant", b =>
+                {
+                    b.Navigation("Permissions");
                 });
 #pragma warning restore 612, 618
         }

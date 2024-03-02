@@ -21,5 +21,9 @@ public class RoomParticipantTypeConfiguration : EntityTypeConfigurationBase<Room
             .HasConversion(type => type.Name, name => RoomParticipantType.FromName(name, false))
             .HasMaxLength(64)
             .IsRequired();
+
+        builder
+            .HasMany(e => e.Permissions)
+            .WithOne();
     }
 }

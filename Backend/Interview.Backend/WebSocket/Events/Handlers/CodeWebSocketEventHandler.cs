@@ -16,7 +16,7 @@ public class CodeWebSocketEventHandler : WebSocketEventHandlerBase
     protected override async Task HandleEventAsync(SocketEventDetail detail, string payload, CancellationToken cancellationToken)
     {
         var participantRepository = detail.ScopedServiceProvider.GetRequiredService<IRoomParticipantRepository>();
-        var roomParticipant = await participantRepository.FindByRoomIdAndUserId(detail.RoomId, detail.UserId, cancellationToken);
+        var roomParticipant = await participantRepository.FindByRoomIdAndUserIdDetailedAsync(detail.RoomId, detail.UserId, cancellationToken);
         if (roomParticipant is null)
         {
             Logger.LogWarning("Not found room participant {RoomId} {UserId}", detail.RoomId, detail.UserId);

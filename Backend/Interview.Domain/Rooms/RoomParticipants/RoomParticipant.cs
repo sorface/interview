@@ -21,4 +21,6 @@ public class RoomParticipant : Entity
     public Room Room { get; set; } = null!;
 
     public RoomParticipantType Type { get; set; } = null!;
+
+    public List<AvailableRoomPermission> Permissions { get; set; } = new();
 }

@@ -1,4 +1,4 @@
-﻿using Interview.Domain.Repository;
+using Interview.Domain.Repository;
 
 namespace Interview.Domain.Rooms;
 

@@ -18,28 +18,25 @@ public class RoomQuestionServicePermissionAccessor : IRoomQuestionService, IServ
         _securityService = securityService;
     }
 
-    public Task<RoomQuestionDetail> ChangeActiveQuestionAsync(
+    public async Task<RoomQuestionDetail> ChangeActiveQuestionAsync(
         RoomQuestionChangeActiveRequest request,
         CancellationToken cancellationToken = default)
     {
-        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomQuestionChangeActiveQuestion);
-
-        return _roomQuestionService.ChangeActiveQuestionAsync(request, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomQuestionChangeActiveQuestion, cancellationToken);
+        return await _roomQuestionService.ChangeActiveQuestionAsync(request, cancellationToken);
     }
 
-    public Task<RoomQuestionDetail> CreateAsync(
+    public async Task<RoomQuestionDetail> CreateAsync(
         RoomQuestionCreateRequest request,
         CancellationToken cancellationToken)
     {
-        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomQuestionCreate);
-
-        return _roomQuestionService.CreateAsync(request, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomQuestionCreate, cancellationToken);
+        return await _roomQuestionService.CreateAsync(request, cancellationToken);
     }
 
-    public Task<List<Guid>> FindGuidsAsync(RoomQuestionsRequest request, CancellationToken cancellationToken = default)
+    public async Task<List<Guid>> FindGuidsAsync(RoomQuestionsRequest request, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomQuestionFindGuids);
-
-        return _roomQuestionService.FindGuidsAsync(request, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomQuestionFindGuids, cancellationToken);
+        return await _roomQuestionService.FindGuidsAsync(request, cancellationToken);
     }
 }

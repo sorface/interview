@@ -18,13 +18,12 @@ public class RoomQuestionReactionServicePermissionAccessor : IRoomQuestionReacti
         _securityService = securityService;
     }
 
-    public Task<RoomQuestionReactionDetail> CreateAsync(
+    public async Task<RoomQuestionReactionDetail> CreateAsync(
         RoomQuestionReactionCreateRequest request,
         Guid userId,
         CancellationToken cancellationToken)
     {
-        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomQuestionReactionCreate);
-
-        return _roomQuestionReactionService.CreateAsync(request, userId, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomQuestionReactionCreate, cancellationToken);
+        return await _roomQuestionReactionService.CreateAsync(request, userId, cancellationToken);
     }
 }

@@ -27,7 +27,7 @@ public class RoomParticipantService : IRoomParticipantService
         CancellationToken cancellationToken = default)
     {
         var participant =
-            await _roomParticipantRepository.FindByRoomIdAndUserId(request.RoomId, request.UserId, cancellationToken);
+            await _roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(request.RoomId, request.UserId, cancellationToken);
 
         if (participant is null)
         {
@@ -54,7 +54,7 @@ public class RoomParticipantService : IRoomParticipantService
         }
 
         var participant =
-            await _roomParticipantRepository.FindByRoomIdAndUserId(request.RoomId, request.UserId, cancellationToken);
+            await _roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(request.RoomId, request.UserId, cancellationToken);
 
         if (participant is null)
         {

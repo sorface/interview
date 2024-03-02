@@ -19,22 +19,22 @@ public class RoomReviewServicePermissionAccessor : IRoomReviewService, IServiceD
         _repository = repository;
     }
 
-    public Task<IPagedList<RoomReviewPageDetail>> FindPageAsync(RoomReviewPageRequest request, CancellationToken cancellationToken = default)
+    public async Task<IPagedList<RoomReviewPageDetail>> FindPageAsync(RoomReviewPageRequest request, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsurePermission(SEPermission.RoomReviewFindPage);
-        return _roomReviewService.FindPageAsync(request, cancellationToken);
+        await _securityService.EnsurePermissionAsync(SEPermission.RoomReviewFindPage, cancellationToken);
+        return await _roomReviewService.FindPageAsync(request, cancellationToken);
     }
 
-    public Task<RoomReviewDetail> CreateAsync(RoomReviewCreateRequest request, Guid userId, CancellationToken cancellationToken = default)
+    public async Task<RoomReviewDetail> CreateAsync(RoomReviewCreateRequest request, Guid userId, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomReviewCreate);
-        return _roomReviewService.CreateAsync(request, userId, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomReviewCreate, cancellationToken);
+        return await _roomReviewService.CreateAsync(request, userId, cancellationToken);
     }
 
     public async Task<RoomReviewDetail> UpdateAsync(Guid id, RoomReviewUpdateRequest request, CancellationToken cancellationToken = default)
     {
         var entity = await _repository.FindByIdDetailedAsync(id, cancellationToken);
-        _securityService.EnsureRoomPermission(entity?.Room?.Id, SEPermission.RoomReviewUpdate);
+        await _securityService.EnsureRoomPermissionAsync(entity?.Room?.Id, SEPermission.RoomReviewUpdate, cancellationToken);
         return await _roomReviewService.UpdateAsync(id, request, cancellationToken);
     }
 }

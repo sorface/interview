@@ -18,30 +18,27 @@ public class RoomParticipantServicePermissionAccessor : IRoomParticipantService,
         _roomParticipantService = roomParticipantService;
     }
 
-    public Task<RoomParticipantDetail> FindByRoomIdAndUserIdAsync(
+    public async Task<RoomParticipantDetail> FindByRoomIdAndUserIdAsync(
         RoomParticipantGetRequest request,
         CancellationToken cancellationToken = default)
     {
-        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomParticipantFindByRoomIdAndUserId);
-
-        return _roomParticipantService.FindByRoomIdAndUserIdAsync(request, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomParticipantFindByRoomIdAndUserId, cancellationToken);
+        return await _roomParticipantService.FindByRoomIdAndUserIdAsync(request, cancellationToken);
     }
 
-    public Task<RoomParticipantDetail> ChangeStatusAsync(
+    public async Task<RoomParticipantDetail> ChangeStatusAsync(
         RoomParticipantChangeStatusRequest request,
         CancellationToken cancellationToken = default)
     {
-        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomParticipantChangeStatus);
-
-        return _roomParticipantService.ChangeStatusAsync(request, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomParticipantChangeStatus, cancellationToken);
+        return await _roomParticipantService.ChangeStatusAsync(request, cancellationToken);
     }
 
-    public Task<RoomParticipantDetail> CreateAsync(
+    public async Task<RoomParticipantDetail> CreateAsync(
         RoomParticipantCreateRequest request,
         CancellationToken cancellationToken = default)
     {
-        _securityService.EnsureRoomPermission(request.RoomId, SEPermission.RoomParticipantCreate);
-
-        return _roomParticipantService.CreateAsync(request, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomParticipantCreate, cancellationToken);
+        return await _roomParticipantService.CreateAsync(request, cancellationToken);
     }
 }

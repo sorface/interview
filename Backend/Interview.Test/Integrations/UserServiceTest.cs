@@ -6,6 +6,7 @@ using Interview.Domain.Repository;
 using Interview.Domain.Users;
 using Interview.Domain.Users.Roles;
 using Interview.Domain.Users.Service;
+using Interview.Infrastructure.RoomParticipants;
 using Interview.Infrastructure.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,7 +38,8 @@ public class UserServiceTest
 
         var securityService = new SecurityService(
             new CurrentPermissionAccessor(appDbContext),
-            new CachedCurrentUserAccessor(new CurrentUserAccessor(), appDbContext)
+            new CachedCurrentUserAccessor(new CurrentUserAccessor(), appDbContext),
+            new RoomParticipantRepository(appDbContext)
         );
 
         var userService = new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext),
@@ -64,7 +66,8 @@ public class UserServiceTest
 
         var securityService = new SecurityService(
             new CurrentPermissionAccessor(appDbContext),
-            new CachedCurrentUserAccessor(new CurrentUserAccessor(), appDbContext)
+            new CachedCurrentUserAccessor(new CurrentUserAccessor(), appDbContext),
+            new RoomParticipantRepository(appDbContext)
         );
         var userService =
             new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext), adminUsers,
@@ -88,7 +91,8 @@ public class UserServiceTest
         appDbContext.Users.Count().Should().Be(0);
         var securityService = new SecurityService(
             new CurrentPermissionAccessor(appDbContext),
-            new CachedCurrentUserAccessor(new CurrentUserAccessor(), appDbContext)
+            new CachedCurrentUserAccessor(new CurrentUserAccessor(), appDbContext),
+            new RoomParticipantRepository(appDbContext)
         );
         var userService = new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext),
             new AdminUsers(), new PermissionRepository(appDbContext), securityService);

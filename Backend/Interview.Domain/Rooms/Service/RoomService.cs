@@ -465,7 +465,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw AccessDeniedException.CreateForAction("private room");
         }
 
-        var participant = await _roomParticipantRepository.FindByRoomIdAndUserId(
+        var participant = await _roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(
             roomId, _currentUserAccessor.UserId!.Value, cancellationToken);
 
         if (participant is not null)
@@ -502,7 +502,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         Guid userId,
         CancellationToken cancellationToken)
     {
-        var participantType = await _roomParticipantRepository.FindByRoomIdAndUserId(roomId, userId, cancellationToken);
+        var participantType = await _roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(roomId, userId, cancellationToken);
         if (participantType is null)
         {
             throw new NotFoundException($"Not found participant type by room id {roomId} and user id {userId}");
