@@ -6,7 +6,7 @@ namespace Interview.Domain.Rooms.RoomInvites;
 
 public class RoomInvite : Entity
 {
-    public RoomInvite(Invite invite, Room room, RoomParticipantType participantType)
+    public RoomInvite(Invite invite, Room room, SERoomParticipantType participantType)
     {
         Invite = invite;
         Room = room;
@@ -25,5 +25,5 @@ public class RoomInvite : Entity
 
     public Room? Room { get; set; }
 
-    public RoomParticipantType? ParticipantType { get; set; }
+    public SERoomParticipantType? ParticipantType { get; set; }
 }

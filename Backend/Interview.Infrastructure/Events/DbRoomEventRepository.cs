@@ -1,5 +1,5 @@
+using Interview.Domain.Database;
 using Interview.Domain.Events;
-using Interview.Infrastructure.Database;
 
 namespace Interview.Infrastructure.Events;
 

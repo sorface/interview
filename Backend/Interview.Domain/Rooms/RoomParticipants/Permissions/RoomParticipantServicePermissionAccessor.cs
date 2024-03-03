@@ -2,6 +2,7 @@ using Interview.Domain.Permissions;
 using Interview.Domain.Rooms.RoomParticipants.Records.Request;
 using Interview.Domain.Rooms.RoomParticipants.Records.Response;
 using Interview.Domain.Rooms.RoomParticipants.Service;
+using Interview.Domain.Users;
 
 namespace Interview.Domain.Rooms.RoomParticipants.Permissions;
 
@@ -40,5 +41,12 @@ public class RoomParticipantServicePermissionAccessor : IRoomParticipantService,
     {
         await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomParticipantCreate, cancellationToken);
         return await _roomParticipantService.CreateAsync(request, cancellationToken);
+    }
+
+    public Task<IReadOnlyCollection<RoomParticipant>> CreateAsync(
+        IReadOnlyCollection<(User User, Room Room, SERoomParticipantType Type)> participants,
+        CancellationToken cancellationToken = default)
+    {
+        return _roomParticipantService.CreateAsync(participants, cancellationToken);
     }
 }

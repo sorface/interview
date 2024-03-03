@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
+using Interview.Domain.Database;
 using Interview.Domain.Rooms.RoomQuestions;
-using Interview.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Infrastructure.RoomQuestions;

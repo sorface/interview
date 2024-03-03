@@ -5,7 +5,7 @@ namespace Interview.Domain.Rooms.RoomParticipants;
 
 public class RoomParticipant : Entity
 {
-    public RoomParticipant(User user, Room room, RoomParticipantType type)
+    public RoomParticipant(User user, Room room, SERoomParticipantType type)
     {
         User = user;
         Room = room;
@@ -20,7 +20,7 @@ public class RoomParticipant : Entity
 
     public Room Room { get; set; } = null!;
 
-    public RoomParticipantType Type { get; set; } = null!;
+    public SERoomParticipantType Type { get; set; } = null!;
 
     public List<AvailableRoomPermission> Permissions { get; set; } = new();
 }

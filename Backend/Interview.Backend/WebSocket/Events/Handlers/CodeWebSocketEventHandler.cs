@@ -23,8 +23,8 @@ public class CodeWebSocketEventHandler : WebSocketEventHandlerBase
             return;
         }
 
-        if (roomParticipant.Type != RoomParticipantType.Examinee &&
-            roomParticipant.Type != RoomParticipantType.Expert)
+        if (roomParticipant.Type != SERoomParticipantType.Examinee &&
+            roomParticipant.Type != SERoomParticipantType.Expert)
         {
             Logger.LogWarning("Not enough permissions to send an event {RoomId} {UserId}", detail.RoomId, detail.UserId);
             return;

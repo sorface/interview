@@ -1,6 +1,6 @@
+using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Rooms.RoomParticipants;
-using Interview.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Backend.AppEvents;
@@ -60,7 +60,7 @@ public class EventApplier
         foreach (var (type, existsEvent) in existsEvents)
         {
             existsEvent.Roles ??= new List<Role>();
-            existsEvent.ParticipantTypes ??= new List<RoomParticipantType>();
+            existsEvent.ParticipantTypes ??= new List<SERoomParticipantType>();
             var dbRoles = existsEvent.Roles.Select(e => e.Name.EnumValue).ToHashSet();
             var initialEvent = searchEvents[type];
             dbRoles.SymmetricExceptWith(initialEvent.Roles);

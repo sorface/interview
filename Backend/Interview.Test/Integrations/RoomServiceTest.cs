@@ -4,7 +4,9 @@ using Interview.Domain.Questions;
 using Interview.Domain.Reactions;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.Records.Request;
+using Interview.Domain.Rooms.RoomInvites;
 using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Rooms.RoomParticipants.Service;
 using Interview.Domain.Rooms.RoomQuestionReactions;
 using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.Rooms.Service;
@@ -12,7 +14,6 @@ using Interview.Domain.Users;
 using Interview.Domain.Users.Roles;
 using Interview.Infrastructure.Events;
 using Interview.Infrastructure.Questions;
-using Interview.Infrastructure.RoomInvites;
 using Interview.Infrastructure.RoomParticipants;
 using Interview.Infrastructure.RoomQuestionReactions;
 using Interview.Infrastructure.RoomQuestions;
@@ -39,6 +40,7 @@ public class RoomServiceTest
         await appDbContext.SaveChangesAsync();
 
         var roomRepository = new RoomRepository(appDbContext);
+        var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext));
         var roomService = new RoomService(
             roomRepository,
             new RoomQuestionRepository(appDbContext),
@@ -51,8 +53,9 @@ public class RoomServiceTest
             new AppEventRepository(appDbContext),
             new RoomStateRepository(appDbContext),
             new EmptyEventStorage(),
-            new RoomInviteRepository(appDbContext),
-            new CurrentUserAccessor());
+            new RoomInviteService(appDbContext, roomParticipantService),
+            new CurrentUserAccessor(),
+            roomParticipantService);
 
         var roomPatchUpdateRequest = new RoomUpdateRequest { Name = "New_Value_Name_Room", TwitchChannel = "TwitchCH" };
 
@@ -86,7 +89,7 @@ public class RoomServiceTest
             activeRoomQuestion);
 
         await appDbContext.SaveChangesAsync();
-
+        var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext));
         var roomRepository = new RoomRepository(appDbContext);
         var roomService = new RoomService(
             roomRepository,
@@ -100,8 +103,9 @@ public class RoomServiceTest
             new AppEventRepository(appDbContext),
             new RoomStateRepository(appDbContext),
             new EmptyEventStorage(),
-            new RoomInviteRepository(appDbContext),
-            new CurrentUserAccessor());
+            new RoomInviteService(appDbContext, roomParticipantService),
+            new CurrentUserAccessor(),
+            roomParticipantService);
 
         await roomService.CloseAsync(savedRoom.Id);
 
@@ -202,19 +206,19 @@ public class RoomServiceTest
 
         var roomParticipants = new RoomParticipant[]
         {
-            new(users[0], room1, RoomParticipantType.Examinee)
+            new(users[0], room1, SERoomParticipantType.Examinee)
             {
                 Id = Guid.Parse("C15AA6D4-FA7B-49CB-AFA2-EA4F900F2258")
             },
-            new(users[1], room1, RoomParticipantType.Expert)
+            new(users[1], room1, SERoomParticipantType.Expert)
             {
                 Id = Guid.Parse("C25AA6D4-FA7B-49CB-AFA2-EA4F900F2258")
             },
-            new(users[2], room1, RoomParticipantType.Viewer)
+            new(users[2], room1, SERoomParticipantType.Viewer)
             {
                 Id = Guid.Parse("C35AA6D4-FA7B-49CB-AFA2-EA4F900F2258")
             },
-            new(users[3], room1, RoomParticipantType.Viewer)
+            new(users[3], room1, SERoomParticipantType.Viewer)
             {
                 Id = Guid.Parse("C45AA6D4-FA7B-49CB-AFA2-EA4F900F2258")
             },
@@ -280,7 +284,7 @@ public class RoomServiceTest
         appDbContext.RoomQuestionReactions.AddRange(questionReactions);
         await appDbContext.SaveChangesAsync();
 
-        var roomRepository = new RoomRepository(appDbContext);
+        var roomRepository = new RoomRepository(appDbContext); var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext));
         var roomService = new RoomService(
             roomRepository,
             new RoomQuestionRepository(appDbContext),
@@ -293,8 +297,9 @@ public class RoomServiceTest
             new AppEventRepository(appDbContext),
             new RoomStateRepository(appDbContext),
             new EmptyEventStorage(),
-            new RoomInviteRepository(appDbContext),
-            new CurrentUserAccessor());
+            new RoomInviteService(appDbContext, roomParticipantService),
+            new CurrentUserAccessor(),
+            roomParticipantService);
 
         var expectAnalytics = new Analytics
         {
@@ -318,7 +323,7 @@ public class RoomServiceTest
                             Id = users[1].Id,
                             Nickname = users[1].Nickname,
                             Avatar = users[1].Avatar ?? string.Empty,
-                            ParticipantType = RoomParticipantType.Expert.Name,
+                            ParticipantType = SERoomParticipantType.Expert.Name,
                             Reactions = new List<Analytics.AnalyticsReaction>()
                             {
                                 new()
@@ -344,7 +349,7 @@ public class RoomServiceTest
                             Id = users[2].Id,
                             Nickname = users[2].Nickname,
                             Avatar = users[2].Avatar ?? string.Empty,
-                            ParticipantType = RoomParticipantType.Viewer.Name,
+                            ParticipantType = SERoomParticipantType.Viewer.Name,
                             Reactions = new List<Analytics.AnalyticsReaction>()
                             {
                                 new()
@@ -364,7 +369,7 @@ public class RoomServiceTest
                             Id = users[3].Id,
                             Nickname = users[3].Nickname,
                             Avatar = users[3].Avatar ?? string.Empty,
-                            ParticipantType = RoomParticipantType.Viewer.Name,
+                            ParticipantType = SERoomParticipantType.Viewer.Name,
                             Reactions = new List<Analytics.AnalyticsReaction>()
                             {
                                 new()
@@ -393,7 +398,7 @@ public class RoomServiceTest
                             Id = users[1].Id,
                             Nickname = users[1].Nickname,
                             Avatar = users[1].Avatar ?? string.Empty,
-                            ParticipantType = RoomParticipantType.Expert.Name,
+                            ParticipantType = SERoomParticipantType.Expert.Name,
                             Reactions = new List<Analytics.AnalyticsReaction>()
                             {
                                 new()
@@ -413,7 +418,7 @@ public class RoomServiceTest
                             Id = users[2].Id,
                             Nickname = users[2].Nickname,
                             Avatar = users[2].Avatar ?? string.Empty,
-                            ParticipantType = RoomParticipantType.Viewer.Name,
+                            ParticipantType = SERoomParticipantType.Viewer.Name,
                             Reactions = new List<Analytics.AnalyticsReaction>()
                             {
                                 new()
@@ -433,7 +438,7 @@ public class RoomServiceTest
                             Id = users[3].Id,
                             Nickname = users[3].Nickname,
                             Avatar = users[3].Avatar ?? string.Empty,
-                            ParticipantType = RoomParticipantType.Viewer.Name,
+                            ParticipantType = SERoomParticipantType.Viewer.Name,
                             Reactions = new List<Analytics.AnalyticsReaction>()
                             {
                                 new()
@@ -555,19 +560,19 @@ public class RoomServiceTest
 
         var roomParticipants = new RoomParticipant[]
         {
-            new(users[0], room1, RoomParticipantType.Examinee)
+            new(users[0], room1, SERoomParticipantType.Examinee)
             {
                 Id = Guid.Parse("C15AA6D4-FA7B-49CB-AFA2-EA4F900F2258")
             },
-            new(users[1], room1, RoomParticipantType.Expert)
+            new(users[1], room1, SERoomParticipantType.Expert)
             {
                 Id = Guid.Parse("C25AA6D4-FA7B-49CB-AFA2-EA4F900F2258")
             },
-            new(users[2], room1, RoomParticipantType.Viewer)
+            new(users[2], room1, SERoomParticipantType.Viewer)
             {
                 Id = Guid.Parse("C35AA6D4-FA7B-49CB-AFA2-EA4F900F2258")
             },
-            new(users[3], room1, RoomParticipantType.Viewer)
+            new(users[3], room1, SERoomParticipantType.Viewer)
             {
                 Id = Guid.Parse("C45AA6D4-FA7B-49CB-AFA2-EA4F900F2258")
             },
@@ -633,7 +638,7 @@ public class RoomServiceTest
         appDbContext.RoomQuestionReactions.AddRange(questionReactions);
         await appDbContext.SaveChangesAsync();
 
-        var roomRepository = new RoomRepository(appDbContext);
+        var roomRepository = new RoomRepository(appDbContext); var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext));
         var roomService = new RoomService(
             roomRepository,
             new RoomQuestionRepository(appDbContext),
@@ -646,8 +651,9 @@ public class RoomServiceTest
             new AppEventRepository(appDbContext),
             new RoomStateRepository(appDbContext),
             new EmptyEventStorage(),
-            new RoomInviteRepository(appDbContext),
-            new CurrentUserAccessor());
+            new RoomInviteService(appDbContext, roomParticipantService),
+            new CurrentUserAccessor(),
+            roomParticipantService);
 
         var expectAnalytics = new AnalyticsSummary
         {

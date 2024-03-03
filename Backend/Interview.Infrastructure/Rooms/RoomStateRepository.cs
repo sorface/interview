@@ -1,5 +1,5 @@
+using Interview.Domain.Database;
 using Interview.Domain.Rooms;
-using Interview.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Infrastructure.Rooms;

@@ -1,5 +1,6 @@
 using Interview.Domain.Rooms.RoomParticipants.Records.Request;
 using Interview.Domain.Rooms.RoomParticipants.Records.Response;
+using Interview.Domain.Users;
 
 namespace Interview.Domain.Rooms.RoomParticipants.Service;
 
@@ -21,5 +22,15 @@ public interface IRoomParticipantService : IService
     /// <returns>Data of the new room participant.</returns>
     Task<RoomParticipantDetail> CreateAsync(
         RoomParticipantCreateRequest request,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Creates new Participants without saving them to the database.
+    /// </summary>
+    /// <param name="participants">Data to create Participant.</param>
+    /// <param name="cancellationToken">Cancellation Token.</param>
+    /// <returns>Data of the new room participant.</returns>
+    Task<IReadOnlyCollection<RoomParticipant>> CreateAsync(
+        IReadOnlyCollection<(User User, Room Room, SERoomParticipantType Type)> participants,
         CancellationToken cancellationToken = default);
 }

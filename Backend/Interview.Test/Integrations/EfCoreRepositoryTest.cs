@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
+using Interview.Domain.Database;
 using Interview.Domain.Repository;
 using Interview.Domain.Users;
 using Interview.Domain.Users.Roles;
-using Interview.Infrastructure.Database;
 using Interview.Infrastructure.Users;
 using X.PagedList;
 

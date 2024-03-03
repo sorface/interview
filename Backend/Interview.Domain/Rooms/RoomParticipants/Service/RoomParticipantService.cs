@@ -1,25 +1,27 @@
 using Interview.Domain.Rooms.RoomParticipants.Records.Request;
 using Interview.Domain.Rooms.RoomParticipants.Records.Response;
 using Interview.Domain.Users;
+using NSpecifications;
 
 namespace Interview.Domain.Rooms.RoomParticipants.Service;
 
 public class RoomParticipantService : IRoomParticipantService
 {
     private readonly IRoomParticipantRepository _roomParticipantRepository;
-
     private readonly IRoomRepository _roomRepository;
-
     private readonly IUserRepository _userRepository;
+    private readonly IAvailableRoomPermissionRepository _availableRoomPermissionRepository;
 
     public RoomParticipantService(
         IRoomParticipantRepository roomParticipantRepository,
         IRoomRepository roomRepository,
-        IUserRepository userRepository)
+        IUserRepository userRepository,
+        IAvailableRoomPermissionRepository availableRoomPermissionRepository)
     {
         _roomParticipantRepository = roomParticipantRepository;
         _roomRepository = roomRepository;
         _userRepository = userRepository;
+        _availableRoomPermissionRepository = availableRoomPermissionRepository;
     }
 
     public async Task<RoomParticipantDetail> FindByRoomIdAndUserIdAsync(
@@ -48,7 +50,7 @@ public class RoomParticipantService : IRoomParticipantService
         RoomParticipantChangeStatusRequest request,
         CancellationToken cancellationToken = default)
     {
-        if (RoomParticipantType.TryFromName(request.UserType, out var participantType) is false)
+        if (SERoomParticipantType.TryFromName(request.UserType, out var participantType) is false)
         {
             throw new UserException("Type user not valid");
         }
@@ -62,7 +64,7 @@ public class RoomParticipantService : IRoomParticipantService
         }
 
         participant.Type = participantType;
-
+        await AddDefaultPermissionsAsync(new[] { participant }, cancellationToken);
         await _roomParticipantRepository.UpdateAsync(participant, cancellationToken);
 
         return new RoomParticipantDetail
@@ -84,7 +86,7 @@ public class RoomParticipantService : IRoomParticipantService
         RoomParticipantCreateRequest request,
         CancellationToken cancellationToken = default)
     {
-        if (RoomParticipantType.TryFromName(request.Type, out var participantType) is false)
+        if (SERoomParticipantType.TryFromName(request.Type, out var participantType) is false)
         {
             throw new UserException("Type user not valid");
         }
@@ -112,8 +114,8 @@ public class RoomParticipantService : IRoomParticipantService
             throw NotFoundException.Create<Room>(request.UserId);
         }
 
-        var roomParticipant = new RoomParticipant(user, room, participantType);
-
+        var roomParticipants = await CreateAsync(new[] { (user, room, participantType) }, cancellationToken);
+        var roomParticipant = roomParticipants.First();
         await _roomParticipantRepository.CreateAsync(roomParticipant, cancellationToken);
 
         return new RoomParticipantDetail
@@ -123,5 +125,44 @@ public class RoomParticipantService : IRoomParticipantService
             UserId = roomParticipant.User.Id,
             UserType = roomParticipant.Type.Name,
         };
+    }
+
+    public async Task<IReadOnlyCollection<RoomParticipant>> CreateAsync(
+        IReadOnlyCollection<(User User, Room Room, SERoomParticipantType Type)> participants,
+        CancellationToken cancellationToken = default)
+    {
+        var createdParticipants = participants.Select(e => new RoomParticipant(e.User, e.Room, e.Type)).ToList();
+        await AddDefaultPermissionsAsync(createdParticipants, cancellationToken);
+        return createdParticipants;
+    }
+
+    private async Task AddDefaultPermissionsAsync(
+        IReadOnlyCollection<RoomParticipant> participants,
+        CancellationToken cancellationToken)
+    {
+        var participantTypes = participants
+            .Select(e => e.Type)
+            .ToHashSet();
+        var requiredPermissions = participantTypes
+            .SelectMany(e => e.DefaultRoomPermission)
+            .Select(e => e.Id)
+            .ToHashSet();
+        var specification = new Spec<AvailableRoomPermission>(e => requiredPermissions.Contains(e.Id));
+        var availablePermissions = await _availableRoomPermissionRepository.FindAsync(specification, cancellationToken);
+        var availablePermissionMap = availablePermissions
+            .DistinctBy(e => e.PermissionId)
+            .ToDictionary(e => e.PermissionId);
+        var defaultPermissionsMap = participantTypes
+            .Select(e =>
+            {
+                var availableRoomPermissions = e.DefaultRoomPermission.Select(p => availablePermissionMap[p.Id]).ToList();
+                return (ParticipantType: e, DefaultPermissions: availableRoomPermissions);
+            })
+            .ToDictionary(e => e.ParticipantType, e => e.DefaultPermissions);
+        foreach (var roomParticipant in participants)
+        {
+            roomParticipant.Permissions.Clear();
+            roomParticipant.Permissions.AddRange(defaultPermissionsMap[roomParticipant.Type]);
+        }
     }
 }

@@ -19,7 +19,7 @@ public class AppEventItem<TParticipantType>
 }
 
 #pragma warning disable SA1402
-public sealed class AppEventItemParticipantType : AppEventItem<RoomParticipantType>
+public sealed class AppEventItemParticipantType : AppEventItem<SERoomParticipantType>
 #pragma warning restore SA1402
 {
     public AppEventItem ToAppEventItem()

@@ -11,11 +11,11 @@ using Interview.Domain.Rooms.Records.Response.Page;
 using Interview.Domain.Rooms.Records.Response.RoomStates;
 using Interview.Domain.Rooms.RoomInvites;
 using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Rooms.RoomParticipants.Service;
 using Interview.Domain.Rooms.RoomQuestionReactions;
 using Interview.Domain.Rooms.RoomQuestionReactions.Mappers;
 using Interview.Domain.Rooms.RoomQuestionReactions.Specifications;
 using Interview.Domain.Rooms.RoomQuestions;
-using Interview.Domain.ServiceResults.Errors;
 using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
 using Interview.Domain.Users;
@@ -38,8 +38,9 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     private readonly ITagRepository _tagRepository;
     private readonly IRoomParticipantRepository _roomParticipantRepository;
     private readonly IEventStorage _eventStorage;
-    private readonly IRoomInviteRepository _roomInviteRepository;
+    private readonly IRoomInviteService _roomInviteService;
     private readonly ICurrentUserAccessor _currentUserAccessor;
+    private readonly IRoomParticipantService _roomParticipantService;
 
     public RoomService(
         IRoomRepository roomRepository,
@@ -53,8 +54,9 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         IAppEventRepository eventRepository,
         IRoomStateRepository roomStateRepository,
         IEventStorage eventStorage,
-        IRoomInviteRepository roomInviteRepository,
-        ICurrentUserAccessor currentUserAccessor)
+        IRoomInviteService roomInviteService,
+        ICurrentUserAccessor currentUserAccessor,
+        IRoomParticipantService roomParticipantService)
     {
         _roomRepository = roomRepository;
         _questionRepository = questionRepository;
@@ -67,8 +69,9 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         _roomStateRepository = roomStateRepository;
         _eventStorage = eventStorage;
         _roomQuestionRepository = roomQuestionRepository;
-        _roomInviteRepository = roomInviteRepository;
+        _roomInviteService = roomInviteService;
         _currentUserAccessor = currentUserAccessor;
+        _roomParticipantService = roomParticipantService;
     }
 
     public Task<IPagedList<RoomPageDetail>> FindPageAsync(
@@ -124,19 +127,14 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         room.Questions.AddRange(roomQuestions);
 
-        var participantsExperts = experts
-            .Select(user => new RoomParticipant(user, room, RoomParticipantType.Expert))
+        var participants = experts
+            .Select(e => (e, room, SERoomParticipantType.Expert))
+            .Concat(examinees.Select(e => (e, room, SERoomParticipantType.Examinee)))
             .ToList();
 
-        var participantsExaminees = examinees
-            .Select(user => new RoomParticipant(user, room, RoomParticipantType.Examinee))
-            .ToList();
-
-        room.Participants.AddRange(participantsExperts);
-        room.Participants.AddRange(participantsExaminees);
-
+        var createdParticipants = await _roomParticipantService.CreateAsync(participants, cancellationToken);
+        room.Participants.AddRange(createdParticipants);
         await _roomRepository.CreateAsync(room, cancellationToken);
-
         return room;
     }
 
@@ -204,12 +202,12 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             return (currentRoom, participant);
         }
 
-        participant = new RoomParticipant(user, currentRoom, RoomParticipantType.Viewer);
-
+        var participants = await _roomParticipantService.CreateAsync(
+            new[] { (user, currentRoom, SERoomParticipantType.Viewer) },
+            cancellationToken);
+        participant = participants.First();
         currentRoom.Participants.Add(participant);
-
         await _roomRepository.UpdateAsync(currentRoom, cancellationToken);
-
         return (currentRoom, participant);
     }
 
@@ -456,7 +454,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         if (invite is not null)
         {
-            return await _roomInviteRepository
+            return await _roomInviteService
                 .ApplyInvite(invite.Value, _currentUserAccessor.UserId!.Value, cancellationToken);
         }
 
@@ -485,8 +483,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw new NotFoundException("Current user not found");
         }
 
-        participant = new RoomParticipant(user, room, RoomParticipantType.Viewer);
-
+        var participants = await _roomParticipantService.CreateAsync(
+            new[] { (user, room, SERoomParticipantType.Viewer) },
+            cancellationToken);
+        participant = participants.First();
         await _roomParticipantRepository.CreateAsync(participant, cancellationToken);
 
         return new RoomInviteDetail

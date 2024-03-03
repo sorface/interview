@@ -1,7 +1,7 @@
+using Interview.Domain.Database;
+using Interview.Domain.Database.Processors;
 using Interview.Domain.Events.ChangeEntityProcessors;
 using Interview.Domain.Users;
-using Interview.Infrastructure.Database;
-using Interview.Infrastructure.Database.Processors;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

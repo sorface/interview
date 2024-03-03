@@ -10,18 +10,18 @@ public class AppEvent : Entity
 
     public required List<Role>? Roles { get; set; }
 
-    public required List<RoomParticipantType>? ParticipantTypes { get; set; }
+    public required List<SERoomParticipantType>? ParticipantTypes { get; set; }
 
     public required bool Stateful { get; set; }
 
-    public static List<RoomParticipantType> ParseParticipantTypes(
+    public static List<SERoomParticipantType> ParseParticipantTypes(
         string eventType,
         IReadOnlyCollection<string> participantTypesStr)
     {
-        var participantTypes = new List<RoomParticipantType>(participantTypesStr.Count);
+        var participantTypes = new List<SERoomParticipantType>(participantTypesStr.Count);
         foreach (var participantName in participantTypesStr)
         {
-            if (!RoomParticipantType.TryFromName(participantName, out var participantType))
+            if (!SERoomParticipantType.TryFromName(participantName, out var participantType))
             {
                 throw new Exception($"Unknown participant type '{participantName}' for event '{eventType}'");
             }
