@@ -145,17 +145,16 @@ public class RoomParticipantService : IRoomParticipantService
             .ToHashSet();
         var requiredPermissions = participantTypes
             .SelectMany(e => e.DefaultRoomPermission)
-            .Select(e => e.Id)
+            .Select(e => e.Value)
             .ToHashSet();
         var specification = new Spec<AvailableRoomPermission>(e => requiredPermissions.Contains(e.Id));
         var availablePermissions = await _availableRoomPermissionRepository.FindAsync(specification, cancellationToken);
         var availablePermissionMap = availablePermissions
-            .DistinctBy(e => e.PermissionId)
-            .ToDictionary(e => e.PermissionId);
+            .ToDictionary(e => e.Id);
         var defaultPermissionsMap = participantTypes
             .Select(e =>
             {
-                var availableRoomPermissions = e.DefaultRoomPermission.Select(p => availablePermissionMap[p.Id]).ToList();
+                var availableRoomPermissions = e.DefaultRoomPermission.Select(p => availablePermissionMap[p.Value]).ToList();
                 return (ParticipantType: e, DefaultPermissions: availableRoomPermissions);
             })
             .ToDictionary(e => e.ParticipantType, e => e.DefaultPermissions);
