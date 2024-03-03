@@ -32,7 +32,9 @@ public class UserAccessorDbContextInterceptor : IPooledDbContextInterceptor<AppD
     }
 }
 
+#pragma warning disable SA1402
 public sealed class LazyPreProcessors
+#pragma warning restore SA1402
 {
     private readonly Lazy<List<IEntityPreProcessor>> _preProcessors;
 

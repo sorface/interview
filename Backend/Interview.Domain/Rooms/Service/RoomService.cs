@@ -497,7 +497,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         };
     }
 
-    private async Task<RoomParticipant?> EnsureParticipantTypeAsync(
+    private async Task<RoomParticipant> EnsureParticipantTypeAsync(
         Guid roomId,
         Guid userId,
         CancellationToken cancellationToken)

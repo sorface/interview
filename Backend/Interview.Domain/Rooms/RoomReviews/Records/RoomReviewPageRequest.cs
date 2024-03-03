@@ -15,7 +15,9 @@ public class RoomReviewPageRequest
     };
 }
 
+#pragma warning disable SA1402
 public class RoomReviewPageRequestFilter
+#pragma warning restore SA1402
 {
     public required Guid? RoomId { get; init; }
 

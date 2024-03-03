@@ -44,7 +44,8 @@ public class TagService : ITagService
             return ServiceError.Error("Tag should not be empty");
         }
 
-        if (!Tag.IsValidColor(request.HexValue))
+        var hexValue = request.HexValue ?? string.Empty;
+        if (!Tag.IsValidColor(hexValue))
         {
             return ServiceError.Error("Tag should contain valid hex value.");
         }
@@ -59,7 +60,7 @@ public class TagService : ITagService
         var tag = new Tag
         {
             Value = request.Value,
-            HexColor = request.HexValue,
+            HexColor = hexValue,
         };
         await _tagRepository.CreateAsync(tag, cancellationToken);
         return ServiceResult.Created(new TagItem
