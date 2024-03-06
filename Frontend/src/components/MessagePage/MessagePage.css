@@ -3,7 +3,13 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  padding-top: 5rem;
+}
+
+.message-page-content {
+  background-color: var(--wrap-bg);
+  padding: 3rem 2rem;
+  border-radius: var(--border-radius);
 }
 
 .message-page ion-icon {
@@ -20,5 +26,4 @@
 
 .message-page .message-page-children {
   margin-top: 1.75rem;
-  margin-bottom: 3rem;
 }
