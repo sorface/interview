@@ -17,10 +17,12 @@ export const MessagePage: FunctionComponent<MessagePageProps> = ({
 }) => {
   return (
     <div className='message-page'>
-      <ThemedIcon name={IconNames.None} />
-      <h3>{title}</h3>
-      <div className='message-page-message'>{message}</div>
-      <div className='message-page-children'>{children}</div>
+      <div className='message-page-content'>
+        <ThemedIcon name={IconNames.None} />
+        <h3>{title}</h3>
+        <div className='message-page-message'>{message}</div>
+        <div className='message-page-children'>{children}</div>
+      </div>
     </div>
   );
 };
