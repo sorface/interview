@@ -1,8 +1,8 @@
 import { ApiContractGet, ApiContractPatch, ApiContractPost, ApiContractPut } from './types/apiContracts';
-import { Question, QuestionState } from './types/question';
+import { Question } from './types/question';
 import { Tag } from './types/tag';
 import { Reaction } from './types/reaction';
-import { Room, RoomReview, RoomStateAdditionalStatefulPayload, RoomStatus } from './types/room';
+import { Room, RoomQuestionState, RoomReview, RoomStateAdditionalStatefulPayload, RoomStatus } from './types/room';
 import { User } from './types/user';
 
 export interface PaginationUrlParams {
@@ -106,15 +106,25 @@ export interface ChangeActiveQuestionBody {
   questionId: Question['id'];
 }
 
+export interface CreateRoomQuestionBody {
+  roomId: Room['id'];
+  question: CreateQuestionBody;
+}
+
 export interface GetRoomQuestionsBody {
   RoomId: Room['id'];
-  State: QuestionState;
+  States: RoomQuestionState[];
 }
 
 export const roomQuestionApiDeclaration = {
   changeActiveQuestion: (body: ChangeActiveQuestionBody): ApiContractPut => ({
     method: 'PUT',
     baseUrl: '/room-questions/active-question',
+    body,
+  }),
+  createQuestion: (body: CreateRoomQuestionBody): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: '/room-questions',
     body,
   }),
   getRoomQuestions: (params: GetRoomQuestionsBody): ApiContractGet => ({

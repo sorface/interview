@@ -47,6 +47,7 @@
 }
 
 .activeQuestionSelector-container .search-box {
+  display: flex;
   padding: 0.25rem;
 }
 
@@ -54,4 +55,9 @@
   width: 100%;
   box-sizing: border-box;
   padding: 0.25rem;
+}
+
+.activeQuestionSelector-container .search-box button {
+  margin-left: 0.5rem;
+  width: 12.5rem;
 }

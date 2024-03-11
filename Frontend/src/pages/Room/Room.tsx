@@ -14,12 +14,11 @@ import { IconNames, pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { useCommunist } from '../../hooks/useCommunist';
-import { RoomParticipant, RoomState, Room as RoomType } from '../../types/room';
+import { RoomParticipant, RoomQuestion, RoomState, Room as RoomType } from '../../types/room';
 import { ActionModal } from '../../components/ActionModal/ActionModal';
 import { Reactions } from './components/Reactions/Reactions';
 import { ActiveQuestion } from './components/ActiveQuestion/ActiveQuestion';
 import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
-import { Question } from '../../types/question';
 import { VideoChat } from './components/VideoChat/VideoChat';
 import { SwitchButton } from './components/VideoChat/SwitchButton';
 import { Link } from 'react-router-dom';
@@ -58,8 +57,8 @@ export const Room: FunctionComponent = () => {
   const { lastMessage, readyState, sendMessage } = useWebSocket(socketUrl);
   const [roomInReview, setRoomInReview] = useState(false);
   const [reactionsVisible, setReactionsVisible] = useState(false);
-  const [currentQuestionId, setCurrentQuestionId] = useState<Question['id']>();
-  const [currentQuestion, setCurrentQuestion] = useState<Question>();
+  const [currentQuestionId, setCurrentQuestionId] = useState<RoomQuestion['id']>();
+  const [currentQuestion, setCurrentQuestion] = useState<RoomQuestion>();
   const [messagesChatEnabled, setMessagesChatEnabled] = useState(false);
   const [welcomeScreen, setWelcomeScreen] = useState(true);
   const [micEnabled, setMicEnabled] = useState(true);
@@ -98,12 +97,12 @@ export const Room: FunctionComponent = () => {
   } = apiRoomStartReviewMethodState;
 
   const {
-    apiMethodState: apiOpenRoomQuestions,
-    fetchData: getRoomOpenQuestions,
-  } = useApiMethod<Array<Question['id']>, GetRoomQuestionsBody>(roomQuestionApiDeclaration.getRoomQuestions);
+    apiMethodState: apiRoomQuestions,
+    fetchData: getRoomQuestions,
+  } = useApiMethod<Array<RoomQuestion>, GetRoomQuestionsBody>(roomQuestionApiDeclaration.getRoomQuestions);
   const {
-    data: openRoomQuestions,
-  } = apiOpenRoomQuestions;
+    data: roomQuestions,
+  } = apiRoomQuestions;
 
   const {
     apiMethodState: apiRoomParticipantState,
@@ -128,6 +127,16 @@ export const Room: FunctionComponent = () => {
   const currentUserExaminee = roomParticipant?.userType === 'Examinee';
   const viewerMode = !(currentUserExpert || currentUserExaminee);
 
+  const updateQuestions = useCallback(() => {
+    if (!id) {
+      throw new Error('Room id not found');
+    }
+    getRoomQuestions({
+      RoomId: id,
+      States: ['Open', 'Closed', 'Active'],
+    });
+  }, [id, getRoomQuestions]);
+
   useEffect(() => {
     if (!auth?.id) {
       return;
@@ -137,15 +146,12 @@ export const Room: FunctionComponent = () => {
     }
     fetchData(id);
     fetchRoomState(id);
-    getRoomOpenQuestions({
-      RoomId: id,
-      State: 'Active',
-    });
+    updateQuestions();
     getRoomParticipant({
       RoomId: id,
       UserId: auth.id,
     });
-  }, [id, auth?.id, fetchData, fetchRoomState, getRoomOpenQuestions, getRoomParticipant]);
+  }, [id, auth?.id, fetchData, fetchRoomState, updateQuestions, getRoomParticipant]);
 
   useEffect(() => {
     if (!room) {
@@ -157,15 +163,15 @@ export const Room: FunctionComponent = () => {
   }, [room]);
 
   useEffect(() => {
-    if (!room || !openRoomQuestions || !openRoomQuestions[0]) {
+    if (!room || !roomQuestions) {
       return;
     }
-    const openQuestion = room.questions.find(roomQ => roomQ.id === openRoomQuestions[0])
-    if (!openQuestion) {
+    const activeQuestion = roomQuestions.find(question => question.state === 'Active');
+    if (!activeQuestion) {
       return;
     }
-    setCurrentQuestion(openQuestion);
-  }, [room, openRoomQuestions]);
+    setCurrentQuestion(activeQuestion);
+  }, [room, roomQuestions]);
 
   useEffect(() => {
     if (!id) {
@@ -203,19 +209,21 @@ export const Room: FunctionComponent = () => {
           }
           setCurrentQuestionId(parsedData.Value.QuestionId);
           break;
+        case 'AddRoomQuestion':
+          updateQuestions();
+          break;
         default:
           break;
       }
     } catch { }
-  }, [id, auth, lastMessage, getRoomOpenQuestions]);
+  }, [id, auth, lastMessage, updateQuestions]);
 
   useEffect(() => {
-    if (!currentQuestionId || !room?.questions) {
+    if (!currentQuestionId) {
       return;
     }
-    const newCurrentQuestion = room.questions.find(roomQ => roomQ.id === currentQuestionId);
-    setCurrentQuestion(newCurrentQuestion);
-  }, [currentQuestionId, room?.questions]);
+    updateQuestions();
+  }, [id, currentQuestionId, updateQuestions]);
 
   const handleStartReviewRoom = useCallback(() => {
     if (!id) {
@@ -324,6 +332,7 @@ export const Room: FunctionComponent = () => {
                 <div className="reactions-field">
                   <ActiveQuestion
                     room={room}
+                    roomQuestions={roomQuestions || []}
                     initialQuestionText={currentQuestion?.value}
                   />
                 </div>
