@@ -12,6 +12,6 @@ public interface IRoomQuestionService : IService
         RoomQuestionCreateRequest request,
         CancellationToken cancellationToken);
 
-    Task<List<Guid>> FindGuidsAsync(
+    Task<List<RoomQuestionResponse>> FindQuestionsAsync(
         RoomQuestionsRequest request, CancellationToken cancellationToken = default);
 }

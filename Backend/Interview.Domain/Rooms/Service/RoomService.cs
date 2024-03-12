@@ -11,6 +11,7 @@ using Interview.Domain.RoomQuestionReactions.Specifications;
 using Interview.Domain.RoomQuestions;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Request.Transcription;
+using Interview.Domain.Rooms.Records.Response.Page;
 using Interview.Domain.Rooms.Records.Response.RoomStates;
 using Interview.Domain.Rooms.Service.Records.Response;
 using Interview.Domain.Rooms.Service.Records.Response.Detail;

@@ -3,6 +3,7 @@ using System;
 using Interview.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Interview.Migrations.Sqlite.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240130154016_Question_Add_RoomId")]
+    partial class Question_Add_RoomId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.10");
@@ -105,38 +108,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.HasIndex("RoomId");
 
                     b.ToTable("RoomEvents");
-                });
-
-            modelBuilder.Entity("Interview.Domain.Invites.Invite", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("UsesCurrent")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(0);
-
-                    b.Property<int>("UsesMax")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(5);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.ToTable("Invites");
                 });
 
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
@@ -243,45 +214,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.HasIndex("CreatedById");
 
                     b.ToTable("RoomConfiguration");
-                });
-
-            modelBuilder.Entity("Interview.Domain.RoomInvites.RoomInvite", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("InviteById")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ParticipantType")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(10)
-                        .HasColumnType("TEXT")
-                        .HasDefaultValue("Viewer");
-
-                    b.Property<Guid?>("RoomById")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("InviteById");
-
-                    b.HasIndex("RoomById");
-
-                    b.ToTable("RoomInvites");
                 });
 
             modelBuilder.Entity("Interview.Domain.RoomParticipants.RoomParticipant", b =>
@@ -472,11 +404,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("AcсessType")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(0);
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("TEXT");
@@ -1126,15 +1053,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Navigation("Room");
                 });
 
-            modelBuilder.Entity("Interview.Domain.Invites.Invite", b =>
-                {
-                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById");
-
-                    b.Navigation("CreatedBy");
-                });
-
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
                 {
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
@@ -1174,27 +1092,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
-
-                    b.Navigation("Room");
-                });
-
-            modelBuilder.Entity("Interview.Domain.RoomInvites.RoomInvite", b =>
-                {
-                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById");
-
-                    b.HasOne("Interview.Domain.Invites.Invite", "Invite")
-                        .WithMany()
-                        .HasForeignKey("InviteById");
-
-                    b.HasOne("Interview.Domain.Rooms.Room", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomById");
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Invite");
 
                     b.Navigation("Room");
                 });

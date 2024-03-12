@@ -30,4 +30,6 @@ public sealed class RoomQuestionState : SmartEnum<RoomQuestionState>
         : base(name, value)
     {
     }
+
+    public RoomQuestionStateType EnumValue => (RoomQuestionStateType)Value;
 }

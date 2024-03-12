@@ -2,6 +2,7 @@ using Interview.Domain.Events.Storage;
 using Interview.Domain.RoomParticipants;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Request.Transcription;
+using Interview.Domain.Rooms.Records.Response.Page;
 using Interview.Domain.Rooms.Records.Response.RoomStates;
 using Interview.Domain.Rooms.Service.Records.Response;
 using Interview.Domain.Rooms.Service.Records.Response.Detail;

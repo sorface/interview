@@ -1,7 +1,9 @@
 using Interview.Domain.RoomParticipants;
 using Interview.Domain.RoomQuestionReactions;
+using Interview.Domain.RoomQuestions.Records;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.Records.Request;
+using Interview.Domain.Rooms.Records.Response.Page;
 using Interview.Domain.Rooms.Service.Records.Response.Detail;
 using Interview.Domain.Rooms.Service.Records.Response.Page;
 using Interview.Domain.Tags.Records.Response;
@@ -292,16 +294,12 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
     {
         return Set
             .Include(e => e.Participants)
-            .Include(e => e.Questions)
             .Include(e => e.Configuration)
             .Select(e => new RoomDetail
             {
                 Id = e.Id,
                 Name = e.Name,
                 TwitchChannel = e.TwitchChannel,
-                Questions = e.Questions.Select(question => question.Question)
-                    .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
-                    .ToList(),
                 Users = e.Participants.Select(participant =>
                         new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, })
                     .ToList(),

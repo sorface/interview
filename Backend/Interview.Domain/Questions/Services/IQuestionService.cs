@@ -11,7 +11,7 @@ public interface IQuestionService : IService
         int pageNumber, int pageSize, CancellationToken cancellationToken);
 
     Task<QuestionItem> CreateAsync(
-        QuestionCreateRequest request, CancellationToken cancellationToken = default);
+        QuestionCreateRequest request, Guid? roomId, CancellationToken cancellationToken = default);
 
     Task<QuestionItem> UpdateAsync(
         Guid id, QuestionEditRequest request, CancellationToken cancellationToken = default);

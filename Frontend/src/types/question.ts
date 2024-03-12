@@ -5,8 +5,3 @@ export interface Question {
   value: string;
   tags: Tag[];
 }
-
-export type QuestionState =
-  'Open' |
-  'Closed' |
-  'Active';
