@@ -20,5 +20,9 @@ public class RoomConfiguration : EntityTypeConfigurationBase<Room>
             .WithOne(e => e.Room)
             .HasForeignKey<Domain.RoomConfigurations.RoomConfiguration>(e => e.Id);
         builder.HasMany<Tag>(e => e.Tags).WithMany();
+        builder.Property(room => room.AcсessType)
+            .HasConversion(e => e.Value, e => SERoomAcсessType.FromValue(e))
+            .IsRequired()
+            .HasDefaultValue(SERoomAcсessType.Public);
     }
 }

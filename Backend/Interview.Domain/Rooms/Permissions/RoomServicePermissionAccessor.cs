@@ -3,6 +3,7 @@ using Interview.Domain.Permissions;
 using Interview.Domain.RoomParticipants;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Request.Transcription;
+using Interview.Domain.Rooms.Records.Response.Page;
 using Interview.Domain.Rooms.Records.Response.RoomStates;
 using Interview.Domain.Rooms.Service;
 using Interview.Domain.Rooms.Service.Records.Response;
@@ -105,6 +106,16 @@ public class RoomServicePermissionAccessor : IRoomService, IServiceDecorator
         _securityService.EnsurePermission(SEPermission.RoomGetAnalytics);
 
         return _roomService.GetAnalyticsAsync(request, cancellationToken);
+    }
+
+    public Task<RoomInviteDetail> ApplyInvite(Guid roomId, Guid? invite, CancellationToken cancellationToken = default)
+    {
+        if (_securityService.CurrentUser() is null)
+        {
+            throw AccessDeniedException.CreateForAction("use invite");
+        }
+
+        return _roomService.ApplyInvite(roomId, invite, cancellationToken);
     }
 
     public Task<AnalyticsSummary> GetAnalyticsSummaryAsync(RoomAnalyticsRequest request, CancellationToken cancellationToken = default)

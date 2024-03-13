@@ -1,7 +1,7 @@
 import React, { ChangeEventHandler, FunctionComponent, MouseEventHandler, useEffect, useRef, useState } from 'react';
-import { Question } from '../../types/question';
 import { OpenIcon } from '../OpenIcon/OpenIcon';
 import { Localization } from '../../localization';
+import { RoomQuestion } from '../../types/room';
 
 import './ActiveQuestionSelector.css';
 
@@ -9,10 +9,11 @@ export interface ActiveQuestionSelectorProps {
   initialQuestionText?: string;
   placeHolder: string;
   showClosedQuestions: boolean;
-  questions: Question[];
-  openQuestions: Array<Question['id']>;
-  onSelect: (question: Question) => void;
+  questions: RoomQuestion[];
+  openQuestions: Array<RoomQuestion['id']>;
+  onSelect: (question: RoomQuestion) => void;
   onShowClosedQuestions: MouseEventHandler<HTMLInputElement>;
+  onCreate: (value: RoomQuestion['value']) => void;
 }
 
 export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorProps> = ({
@@ -23,14 +24,15 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   openQuestions,
   onSelect,
   onShowClosedQuestions,
+  onCreate,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
-  const [selectedValue, setSelectedValue] = useState<Question | null>(null);
+  const [selectedValue, setSelectedValue] = useState<RoomQuestion | null>(null);
   const [searchValue, setSearchValue] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
 
-  const isOpened = (question: Question) => {
+  const isOpened = (question: RoomQuestion) => {
     return openQuestions.includes(question.id);
   }
 
@@ -88,9 +90,14 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
     return `${Localization.ActiveQuestion}: ${selectedValue?.value || initialQuestionText}`;
   };
 
-  const onItemClick = (option: Question) => {
+  const onItemClick = (option: RoomQuestion) => {
     setSelectedValue(option);
     onSelect(option);
+  };
+
+  const handleCreate = () => {
+    onCreate(searchValue);
+    setSearchValue('');
   };
 
   const onSearch: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -114,6 +121,9 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
             <input type="checkbox" onClick={onShowClosedQuestions} />
             <div className="search-box" >
               <input onChange={onSearch} value={searchValue} />
+              {searchValue && (
+                <button onClick={handleCreate}>{Localization.CreateQuestion}</button>
+              )}
             </div>
           </div>
           {options.length === 0 && (

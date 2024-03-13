@@ -33,11 +33,11 @@ public class QuestionServicePermissionAccessor : IQuestionService, IServiceDecor
     }
 
     public Task<QuestionItem> CreateAsync(
-        QuestionCreateRequest request, CancellationToken cancellationToken = default)
+        QuestionCreateRequest request, Guid? roomId, CancellationToken cancellationToken = default)
     {
         _securityService.EnsurePermission(SEPermission.QuestionCreate);
 
-        return _questionService.CreateAsync(request, cancellationToken);
+        return _questionService.CreateAsync(request, roomId, cancellationToken);
     }
 
     public Task<QuestionItem> UpdateAsync(

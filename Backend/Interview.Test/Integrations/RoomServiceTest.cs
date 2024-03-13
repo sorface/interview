@@ -12,6 +12,7 @@ using Interview.Domain.Users;
 using Interview.Domain.Users.Roles;
 using Interview.Infrastructure.Events;
 using Interview.Infrastructure.Questions;
+using Interview.Infrastructure.RoomInvites;
 using Interview.Infrastructure.RoomParticipants;
 using Interview.Infrastructure.RoomQuestionReactions;
 using Interview.Infrastructure.RoomQuestions;
@@ -31,7 +32,7 @@ public class RoomServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var savedRoom = new Room(DefaultRoomName, DefaultRoomName);
+        var savedRoom = new Room(DefaultRoomName, DefaultRoomName, SERoomAcсessType.Public);
 
         appDbContext.Rooms.Add(savedRoom);
 
@@ -49,7 +50,9 @@ public class RoomServiceTest
             new RoomParticipantRepository(appDbContext),
             new AppEventRepository(appDbContext),
             new RoomStateRepository(appDbContext),
-            new EmptyEventStorage());
+            new EmptyEventStorage(),
+            new RoomInviteRepository(appDbContext),
+            new CurrentUserAccessor());
 
         var roomPatchUpdateRequest = new RoomUpdateRequest { Name = "New_Value_Name_Room", TwitchChannel = "TwitchCH" };
 
@@ -66,7 +69,7 @@ public class RoomServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var savedRoom = new Room(DefaultRoomName, DefaultRoomName);
+        var savedRoom = new Room(DefaultRoomName, DefaultRoomName, SERoomAcсessType.Public);
 
         appDbContext.Rooms.Add(savedRoom);
         var questions = new[] { new Question("V1"), new Question("V2"), new Question("V3") };
@@ -77,18 +80,10 @@ public class RoomServiceTest
             State = RoomQuestionState.Active,
             Question = questions[2]
         };
-        appDbContext.RoomQuestions.AddRange(new RoomQuestion
-        {
-            Room = savedRoom,
-            State = RoomQuestionState.Open,
-            Question = questions[0]
-        },
-        new RoomQuestion
-        {
-            Room = savedRoom,
-            State = RoomQuestionState.Closed,
-            Question = questions[1]
-        }, activeRoomQuestion);
+        appDbContext.RoomQuestions.AddRange(
+            new RoomQuestion { Room = savedRoom, State = RoomQuestionState.Open, Question = questions[0] },
+            new RoomQuestion { Room = savedRoom, State = RoomQuestionState.Closed, Question = questions[1] },
+            activeRoomQuestion);
 
         await appDbContext.SaveChangesAsync();
 
@@ -104,7 +99,9 @@ public class RoomServiceTest
             new RoomParticipantRepository(appDbContext),
             new AppEventRepository(appDbContext),
             new RoomStateRepository(appDbContext),
-            new EmptyEventStorage());
+            new EmptyEventStorage(),
+            new RoomInviteRepository(appDbContext),
+            new CurrentUserAccessor());
 
         await roomService.CloseAsync(savedRoom.Id);
 
@@ -123,10 +120,10 @@ public class RoomServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var room1 = new Room(DefaultRoomName, DefaultRoomName);
+        var room1 = new Room(DefaultRoomName, DefaultRoomName, SERoomAcсessType.Public);
 
         appDbContext.Rooms.Add(room1);
-        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", DefaultRoomName + "2"));
+        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", DefaultRoomName + "2", SERoomAcсessType.Public));
 
         var questions = new Question[]
         {
@@ -141,30 +138,86 @@ public class RoomServiceTest
 
         var users = new User[]
         {
-            new("u1", "v1") { Id = Guid.Parse("587A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! } },
-            new("u2", "v2") { Id = Guid.Parse("597A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.Admin.Id)! } },
-            new("u3", "v3") { Id = Guid.Parse("5A7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! } },
-            new("u4", "v4") { Id = Guid.Parse("5B7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! } },
-            new("u5", "v5") { Id = Guid.Parse("5C7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! } },
+            new("u1", "v1")
+            {
+                Id = Guid.Parse("587A0279-4364-4940-BE4E-8DBEC08BA96C"),
+                Roles = { appDbContext.Roles.Find(RoleName.User.Id)! }
+            },
+            new("u2", "v2")
+            {
+                Id = Guid.Parse("597A0279-4364-4940-BE4E-8DBEC08BA96C"),
+                Roles = { appDbContext.Roles.Find(RoleName.Admin.Id)! }
+            },
+            new("u3", "v3")
+            {
+                Id = Guid.Parse("5A7A0279-4364-4940-BE4E-8DBEC08BA96C"),
+                Roles = { appDbContext.Roles.Find(RoleName.User.Id)! }
+            },
+            new("u4", "v4")
+            {
+                Id = Guid.Parse("5B7A0279-4364-4940-BE4E-8DBEC08BA96C"),
+                Roles = { appDbContext.Roles.Find(RoleName.User.Id)! }
+            },
+            new("u5", "v5")
+            {
+                Id = Guid.Parse("5C7A0279-4364-4940-BE4E-8DBEC08BA96C"),
+                Roles = { appDbContext.Roles.Find(RoleName.User.Id)! }
+            },
         };
         appDbContext.Users.AddRange(users);
         await appDbContext.SaveChangesAsync();
 
         var roomQuestion = new RoomQuestion[]
         {
-            new() { Id = Guid.Parse("B15AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), Question = questions[0], Room = room1, State = RoomQuestionState.Open },
-            new() { Id = Guid.Parse("B25AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), Question = questions[1], Room = room1, State = RoomQuestionState.Closed },
-            new() { Id = Guid.Parse("B35AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), Question = questions[2], Room = room1, State = RoomQuestionState.Closed },
-            new() { Id = Guid.Parse("B45AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), Question = questions[3], Room = room1, State = RoomQuestionState.Active },
+            new()
+            {
+                Id = Guid.Parse("B15AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
+                Question = questions[0],
+                Room = room1,
+                State = RoomQuestionState.Open
+            },
+            new()
+            {
+                Id = Guid.Parse("B25AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
+                Question = questions[1],
+                Room = room1,
+                State = RoomQuestionState.Closed
+            },
+            new()
+            {
+                Id = Guid.Parse("B35AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
+                Question = questions[2],
+                Room = room1,
+                State = RoomQuestionState.Closed
+            },
+            new()
+            {
+                Id = Guid.Parse("B45AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
+                Question = questions[3],
+                Room = room1,
+                State = RoomQuestionState.Active
+            },
         };
         appDbContext.RoomQuestions.AddRange(roomQuestion);
 
         var roomParticipants = new RoomParticipant[]
         {
-            new(users[0], room1, RoomParticipantType.Examinee) { Id = Guid.Parse("C15AA6D4-FA7B-49CB-AFA2-EA4F900F2258") },
-            new(users[1], room1, RoomParticipantType.Expert) { Id = Guid.Parse("C25AA6D4-FA7B-49CB-AFA2-EA4F900F2258") },
-            new(users[2], room1, RoomParticipantType.Viewer) { Id = Guid.Parse("C35AA6D4-FA7B-49CB-AFA2-EA4F900F2258") },
-            new(users[3], room1, RoomParticipantType.Viewer) { Id = Guid.Parse("C45AA6D4-FA7B-49CB-AFA2-EA4F900F2258") },
+            new(users[0], room1, RoomParticipantType.Examinee)
+            {
+                Id = Guid.Parse("C15AA6D4-FA7B-49CB-AFA2-EA4F900F2258")
+            },
+            new(users[1], room1, RoomParticipantType.Expert)
+            {
+                Id = Guid.Parse("C25AA6D4-FA7B-49CB-AFA2-EA4F900F2258")
+            },
+            new(users[2], room1, RoomParticipantType.Viewer)
+            {
+                Id = Guid.Parse("C35AA6D4-FA7B-49CB-AFA2-EA4F900F2258")
+            },
+            new(users[3], room1, RoomParticipantType.Viewer)
+            {
+                Id = Guid.Parse("C45AA6D4-FA7B-49CB-AFA2-EA4F900F2258")
+            },
         };
         appDbContext.RoomParticipants.AddRange(roomParticipants);
         await appDbContext.SaveChangesAsync();
@@ -202,7 +255,6 @@ public class RoomServiceTest
                 Reaction = dislike,
                 Sender = users[3],
             },
-
             new()
             {
                 Id = Guid.Parse("D55AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
@@ -240,21 +292,18 @@ public class RoomServiceTest
             new RoomParticipantRepository(appDbContext),
             new AppEventRepository(appDbContext),
             new RoomStateRepository(appDbContext),
-            new EmptyEventStorage());
+            new EmptyEventStorage(),
+            new RoomInviteRepository(appDbContext),
+            new CurrentUserAccessor());
 
         var expectAnalytics = new Analytics
         {
-            Reactions = new List<Analytics.AnalyticsReactionSummary>()
-            {
-                new()
+            Reactions =
+                new List<Analytics.AnalyticsReactionSummary>()
                 {
-                    Id = ReactionType.Like.Id, Type = ReactionType.Like.Name, Count = 4
+                    new() { Id = ReactionType.Like.Id, Type = ReactionType.Like.Name, Count = 4 },
+                    new() { Id = ReactionType.Dislike.Id, Type = ReactionType.Dislike.Name, Count = 3 },
                 },
-                new()
-                {
-                    Id = ReactionType.Dislike.Id, Type = ReactionType.Dislike.Name, Count = 3
-                },
-            },
             Questions = new List<Analytics.AnalyticsQuestion>()
             {
                 new()
@@ -272,17 +321,22 @@ public class RoomServiceTest
                             ParticipantType = RoomParticipantType.Expert.Name,
                             Reactions = new List<Analytics.AnalyticsReaction>()
                             {
-                                new() { Id = ReactionType.Like.Id, Type = ReactionType.Like.Name, CreatedAt = like.CreateDate },
-                                new() { Id = ReactionType.Like.Id, Type = ReactionType.Like.Name, CreatedAt = like.CreateDate },
-                            },
-                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
-                            {
                                 new()
                                 {
                                     Id = ReactionType.Like.Id,
                                     Type = ReactionType.Like.Name,
-                                    Count = 2,
-                                }
+                                    CreatedAt = like.CreateDate
+                                },
+                                new()
+                                {
+                                    Id = ReactionType.Like.Id,
+                                    Type = ReactionType.Like.Name,
+                                    CreatedAt = like.CreateDate
+                                },
+                            },
+                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
+                            {
+                                new() { Id = ReactionType.Like.Id, Type = ReactionType.Like.Name, Count = 2, }
                             },
                         },
                         new()
@@ -293,16 +347,16 @@ public class RoomServiceTest
                             ParticipantType = RoomParticipantType.Viewer.Name,
                             Reactions = new List<Analytics.AnalyticsReaction>()
                             {
-                                new() { Id = ReactionType.Like.Id, Type = ReactionType.Like.Name, CreatedAt = like.CreateDate },
-                            },
-                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
-                            {
                                 new()
                                 {
                                     Id = ReactionType.Like.Id,
                                     Type = ReactionType.Like.Name,
-                                    Count = 1,
-                                }
+                                    CreatedAt = like.CreateDate
+                                },
+                            },
+                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
+                            {
+                                new() { Id = ReactionType.Like.Id, Type = ReactionType.Like.Name, Count = 1, }
                             },
                         },
                         new()
@@ -313,16 +367,16 @@ public class RoomServiceTest
                             ParticipantType = RoomParticipantType.Viewer.Name,
                             Reactions = new List<Analytics.AnalyticsReaction>()
                             {
-                                new() { Id = ReactionType.Dislike.Id, Type = ReactionType.Dislike.Name, CreatedAt = dislike.CreateDate },
-                            },
-                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
-                            {
                                 new()
                                 {
                                     Id = ReactionType.Dislike.Id,
                                     Type = ReactionType.Dislike.Name,
-                                    Count = 1,
-                                }
+                                    CreatedAt = dislike.CreateDate
+                                },
+                            },
+                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
+                            {
+                                new() { Id = ReactionType.Dislike.Id, Type = ReactionType.Dislike.Name, Count = 1, }
                             },
                         },
                     }
@@ -342,16 +396,16 @@ public class RoomServiceTest
                             ParticipantType = RoomParticipantType.Expert.Name,
                             Reactions = new List<Analytics.AnalyticsReaction>()
                             {
-                                new() { Id = ReactionType.Dislike.Id, Type = ReactionType.Dislike.Name, CreatedAt = dislike.CreateDate },
-                            },
-                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
-                            {
                                 new()
                                 {
                                     Id = ReactionType.Dislike.Id,
                                     Type = ReactionType.Dislike.Name,
-                                    Count = 1,
-                                }
+                                    CreatedAt = dislike.CreateDate
+                                },
+                            },
+                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
+                            {
+                                new() { Id = ReactionType.Dislike.Id, Type = ReactionType.Dislike.Name, Count = 1, }
                             },
                         },
                         new()
@@ -362,16 +416,16 @@ public class RoomServiceTest
                             ParticipantType = RoomParticipantType.Viewer.Name,
                             Reactions = new List<Analytics.AnalyticsReaction>()
                             {
-                                new() { Id = ReactionType.Like.Id, Type = ReactionType.Like.Name, CreatedAt = like.CreateDate },
-                            },
-                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
-                            {
                                 new()
                                 {
                                     Id = ReactionType.Like.Id,
                                     Type = ReactionType.Like.Name,
-                                    Count = 1,
-                                }
+                                    CreatedAt = like.CreateDate
+                                },
+                            },
+                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
+                            {
+                                new() { Id = ReactionType.Like.Id, Type = ReactionType.Like.Name, Count = 1, }
                             },
                         },
                         new()
@@ -382,32 +436,22 @@ public class RoomServiceTest
                             ParticipantType = RoomParticipantType.Viewer.Name,
                             Reactions = new List<Analytics.AnalyticsReaction>()
                             {
-                                new() { Id = ReactionType.Dislike.Id, Type = ReactionType.Dislike.Name, CreatedAt = dislike.CreateDate },
-                            },
-                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
-                            {
                                 new()
                                 {
                                     Id = ReactionType.Dislike.Id,
                                     Type = ReactionType.Dislike.Name,
-                                    Count = 1,
-                                }
+                                    CreatedAt = dislike.CreateDate
+                                },
+                            },
+                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
+                            {
+                                new() { Id = ReactionType.Dislike.Id, Type = ReactionType.Dislike.Name, Count = 1, }
                             },
                         },
                     }
                 },
-                new()
-                {
-                    Id = questions[2].Id,
-                    Value = questions[2].Value,
-                    Status = RoomQuestionState.Closed.Name,
-                },
-                new()
-                {
-                    Id = questions[3].Id,
-                    Value = questions[3].Value,
-                    Status = RoomQuestionState.Active.Name,
-                }
+                new() { Id = questions[2].Id, Value = questions[2].Value, Status = RoomQuestionState.Closed.Name, },
+                new() { Id = questions[3].Id, Value = questions[3].Value, Status = RoomQuestionState.Active.Name, }
             }
         };
 
@@ -429,10 +473,10 @@ public class RoomServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var room1 = new Room(DefaultRoomName, DefaultRoomName);
+        var room1 = new Room(DefaultRoomName, DefaultRoomName, SERoomAcсessType.Public);
 
         appDbContext.Rooms.Add(room1);
-        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", DefaultRoomName + "2"));
+        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", DefaultRoomName + "2", SERoomAcсessType.Public));
 
         var questions = new Question[]
         {
@@ -447,30 +491,86 @@ public class RoomServiceTest
 
         var users = new User[]
         {
-            new("u1", "v1") { Id = Guid.Parse("587A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! } },
-            new("u2", "v2") { Id = Guid.Parse("597A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.Admin.Id)! } },
-            new("u3", "v3") { Id = Guid.Parse("5A7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! } },
-            new("u4", "v4") { Id = Guid.Parse("5B7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! } },
-            new("u5", "v5") { Id = Guid.Parse("5C7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! } },
+            new("u1", "v1")
+            {
+                Id = Guid.Parse("587A0279-4364-4940-BE4E-8DBEC08BA96C"),
+                Roles = { appDbContext.Roles.Find(RoleName.User.Id)! }
+            },
+            new("u2", "v2")
+            {
+                Id = Guid.Parse("597A0279-4364-4940-BE4E-8DBEC08BA96C"),
+                Roles = { appDbContext.Roles.Find(RoleName.Admin.Id)! }
+            },
+            new("u3", "v3")
+            {
+                Id = Guid.Parse("5A7A0279-4364-4940-BE4E-8DBEC08BA96C"),
+                Roles = { appDbContext.Roles.Find(RoleName.User.Id)! }
+            },
+            new("u4", "v4")
+            {
+                Id = Guid.Parse("5B7A0279-4364-4940-BE4E-8DBEC08BA96C"),
+                Roles = { appDbContext.Roles.Find(RoleName.User.Id)! }
+            },
+            new("u5", "v5")
+            {
+                Id = Guid.Parse("5C7A0279-4364-4940-BE4E-8DBEC08BA96C"),
+                Roles = { appDbContext.Roles.Find(RoleName.User.Id)! }
+            },
         };
         appDbContext.Users.AddRange(users);
         await appDbContext.SaveChangesAsync();
 
         var roomQuestion = new RoomQuestion[]
         {
-            new() { Id = Guid.Parse("B15AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), Question = questions[0], Room = room1, State = RoomQuestionState.Open },
-            new() { Id = Guid.Parse("B25AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), Question = questions[1], Room = room1, State = RoomQuestionState.Closed },
-            new() { Id = Guid.Parse("B35AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), Question = questions[2], Room = room1, State = RoomQuestionState.Closed },
-            new() { Id = Guid.Parse("B45AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), Question = questions[3], Room = room1, State = RoomQuestionState.Active },
+            new()
+            {
+                Id = Guid.Parse("B15AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
+                Question = questions[0],
+                Room = room1,
+                State = RoomQuestionState.Open
+            },
+            new()
+            {
+                Id = Guid.Parse("B25AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
+                Question = questions[1],
+                Room = room1,
+                State = RoomQuestionState.Closed
+            },
+            new()
+            {
+                Id = Guid.Parse("B35AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
+                Question = questions[2],
+                Room = room1,
+                State = RoomQuestionState.Closed
+            },
+            new()
+            {
+                Id = Guid.Parse("B45AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
+                Question = questions[3],
+                Room = room1,
+                State = RoomQuestionState.Active
+            },
         };
         appDbContext.RoomQuestions.AddRange(roomQuestion);
 
         var roomParticipants = new RoomParticipant[]
         {
-            new(users[0], room1, RoomParticipantType.Examinee) { Id = Guid.Parse("C15AA6D4-FA7B-49CB-AFA2-EA4F900F2258") },
-            new(users[1], room1, RoomParticipantType.Expert) { Id = Guid.Parse("C25AA6D4-FA7B-49CB-AFA2-EA4F900F2258") },
-            new(users[2], room1, RoomParticipantType.Viewer) { Id = Guid.Parse("C35AA6D4-FA7B-49CB-AFA2-EA4F900F2258") },
-            new(users[3], room1, RoomParticipantType.Viewer) { Id = Guid.Parse("C45AA6D4-FA7B-49CB-AFA2-EA4F900F2258") },
+            new(users[0], room1, RoomParticipantType.Examinee)
+            {
+                Id = Guid.Parse("C15AA6D4-FA7B-49CB-AFA2-EA4F900F2258")
+            },
+            new(users[1], room1, RoomParticipantType.Expert)
+            {
+                Id = Guid.Parse("C25AA6D4-FA7B-49CB-AFA2-EA4F900F2258")
+            },
+            new(users[2], room1, RoomParticipantType.Viewer)
+            {
+                Id = Guid.Parse("C35AA6D4-FA7B-49CB-AFA2-EA4F900F2258")
+            },
+            new(users[3], room1, RoomParticipantType.Viewer)
+            {
+                Id = Guid.Parse("C45AA6D4-FA7B-49CB-AFA2-EA4F900F2258")
+            },
         };
         appDbContext.RoomParticipants.AddRange(roomParticipants);
         await appDbContext.SaveChangesAsync();
@@ -508,7 +608,6 @@ public class RoomServiceTest
                 Reaction = dislike,
                 Sender = users[3],
             },
-
             new()
             {
                 Id = Guid.Parse("D55AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
@@ -546,7 +645,9 @@ public class RoomServiceTest
             new RoomParticipantRepository(appDbContext),
             new AppEventRepository(appDbContext),
             new RoomStateRepository(appDbContext),
-            new EmptyEventStorage());
+            new EmptyEventStorage(),
+            new RoomInviteRepository(appDbContext),
+            new CurrentUserAccessor());
 
         var expectAnalytics = new AnalyticsSummary
         {

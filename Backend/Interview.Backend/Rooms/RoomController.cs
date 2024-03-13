@@ -6,6 +6,7 @@ using Interview.Domain.Events.Storage;
 using Interview.Domain.RoomReviews.Records;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Request.Transcription;
+using Interview.Domain.Rooms.Records.Response.Page;
 using Interview.Domain.Rooms.Records.Response.RoomStates;
 using Interview.Domain.Rooms.Service;
 using Interview.Domain.Rooms.Service.Records.Response;
@@ -204,6 +205,16 @@ public class RoomController : ControllerBase
         return Ok();
     }
 
+    [Authorize]
+    [HttpPost("{id:guid}/invites")]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
+    public Task<RoomInviteDetail> ApplyInvite([FromRoute(Name = "id")] Guid id, [FromQuery(Name = "id")] Guid invite)
+    {
+        return _roomService.ApplyInvite(id, invite, HttpContext.RequestAborted);
+    }
+
     /// <summary>
     /// Sending event to room.
     /// </summary>
@@ -245,7 +256,7 @@ public class RoomController : ControllerBase
         var request = new TranscriptionRequest
         {
             RoomId = roomId,
-            UserId = currentUserAccessor.UserId ?? throw new AccessDeniedException("User is unauthorized"),
+            UserId = currentUserAccessor.GetUserIdOrThrow(),
             TranscriptionTypeMap = options,
         };
         return _roomService.GetTranscriptionAsync(request, HttpContext.RequestAborted);

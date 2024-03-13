@@ -112,6 +112,38 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.ToTable("RoomEvents");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Invites.Invite", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("UsesCurrent")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("UsesMax")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(5);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("Invites");
+                });
+
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
                 {
                     b.Property<Guid>("Id")
@@ -129,6 +161,9 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
+                    b.Property<Guid?>("RoomId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("timestamp without time zone");
 
@@ -140,6 +175,8 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("RoomId");
 
                     b.ToTable("Questions");
                 });
@@ -211,6 +248,45 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.HasIndex("CreatedById");
 
                     b.ToTable("RoomConfiguration");
+                });
+
+            modelBuilder.Entity("Interview.Domain.RoomInvites.RoomInvite", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("InviteById")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ParticipantType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("Viewer");
+
+                    b.Property<Guid?>("RoomById")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("InviteById");
+
+                    b.HasIndex("RoomById");
+
+                    b.ToTable("RoomInvites");
                 });
 
             modelBuilder.Entity("Interview.Domain.RoomParticipants.RoomParticipant", b =>
@@ -401,6 +477,11 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<int>("AcсessType")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
@@ -1050,13 +1131,30 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Navigation("Room");
                 });
 
-            modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
+            modelBuilder.Entity("Interview.Domain.Invites.Invite", b =>
                 {
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
                     b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Rooms.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("Interview.Domain.Reactions.Reaction", b =>
@@ -1081,6 +1179,27 @@ namespace Interview.Migrations.Postgres.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("Interview.Domain.RoomInvites.RoomInvite", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Invites.Invite", "Invite")
+                        .WithMany()
+                        .HasForeignKey("InviteById");
+
+                    b.HasOne("Interview.Domain.Rooms.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomById");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Invite");
 
                     b.Navigation("Room");
                 });

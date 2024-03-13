@@ -1,5 +1,4 @@
 using Interview.Domain.Repository;
-using Interview.Domain.Users.Permissions;
 
 namespace Interview.Domain;
 

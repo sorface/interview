@@ -8,7 +8,6 @@ export interface Room {
   id: string;
   name: string;
   twitchChannel: string;
-  questions: Question[];
   users: User[];
   tags: Tag[];
   roomStatus: RoomStatus;
@@ -48,4 +47,16 @@ export interface RoomParticipant {
   roomId: Room['id'];
   userId: User['id'];
   userType: UserType;
+}
+
+export type RoomQuestionState =
+  'Open' |
+  'Closed' |
+  'Active';
+
+
+export interface RoomQuestion {
+  id: string;
+  state: RoomQuestionState;
+  value: string;
 }
