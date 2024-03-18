@@ -12,5 +12,7 @@ public class QuestionTypeConfiguration : EntityTypeConfigurationBase<Question>
         builder.Property(question => question.Value).IsRequired().HasMaxLength(128);
         builder.Property(question => question.IsArchived).IsRequired().HasDefaultValue(false);
         builder.HasMany<Tag>(e => e.Tags).WithMany();
+        builder.Property(question => question.RoomId).IsRequired(false);
+        builder.HasOne(question => question.Room).WithMany().HasForeignKey(e => e.RoomId);
     }
 }

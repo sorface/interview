@@ -237,6 +237,7 @@ public class EfCoreRepositoryTest
     {
         var clock = new TestSystemClock();
         var appDbContext = new TestAppDbContextFactory().Create(clock);
+        appDbContext.Users.RemoveRange(appDbContext.Users);
         var dbRole = appDbContext.Roles.Find(RoleName.User.Id);
         appDbContext.Users.Add(CreateUserWithRoles(TestUserId, dbRole!));
         appDbContext.Users.Add(CreateUserWithRoles(TestUserId2, dbRole!));

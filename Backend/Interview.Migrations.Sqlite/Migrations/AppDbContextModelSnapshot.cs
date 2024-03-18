@@ -156,6 +156,9 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(false);
 
+                    b.Property<Guid?>("RoomId")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("TEXT");
 
@@ -167,6 +170,8 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("RoomId");
 
                     b.ToTable("Questions");
                 });
@@ -1324,7 +1329,15 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
+                    b.HasOne("Interview.Domain.Rooms.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("Interview.Domain.Reactions.Reaction", b =>

@@ -89,7 +89,7 @@ public class QuestionController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<QuestionItem>> Create(QuestionCreateRequest request)
     {
-        var question = await _questionService.CreateAsync(request, HttpContext.RequestAborted);
+        var question = await _questionService.CreateAsync(request, null, HttpContext.RequestAborted);
 
         return ServiceResult.Created(question).ToActionResult();
     }

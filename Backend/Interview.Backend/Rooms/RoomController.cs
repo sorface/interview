@@ -3,14 +3,15 @@ using Interview.Backend.Auth;
 using Interview.Backend.Responses;
 using Interview.Domain;
 using Interview.Domain.Events.Storage;
+using Interview.Domain.RoomReviews.Records;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Request.Transcription;
-using Interview.Domain.Rooms.Records.Response;
-using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.Records.Response.Page;
 using Interview.Domain.Rooms.Records.Response.RoomStates;
-using Interview.Domain.Rooms.RoomReviews.Records;
 using Interview.Domain.Rooms.Service;
+using Interview.Domain.Rooms.Service.Records.Response;
+using Interview.Domain.Rooms.Service.Records.Response.Detail;
+using Interview.Domain.Rooms.Service.Records.Response.Page;
 using Interview.Domain.ServiceResults.Success;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -255,7 +256,7 @@ public class RoomController : ControllerBase
         var request = new TranscriptionRequest
         {
             RoomId = roomId,
-            UserId = currentUserAccessor.UserId ?? throw new AccessDeniedException("User is unauthorized"),
+            UserId = currentUserAccessor.GetUserIdOrThrow(),
             TranscriptionTypeMap = options,
         };
         return _roomService.GetTranscriptionAsync(request, HttpContext.RequestAborted);

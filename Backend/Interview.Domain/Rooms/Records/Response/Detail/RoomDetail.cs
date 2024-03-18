@@ -1,4 +1,6 @@
-namespace Interview.Domain.Rooms.Records.Response.Detail;
+using Interview.Domain.RoomQuestions.Records;
+
+namespace Interview.Domain.Rooms.Service.Records.Response.Detail;
 
 public class RoomDetail
 {
@@ -7,8 +9,6 @@ public class RoomDetail
     public string? Name { get; set; }
 
     public string? TwitchChannel { get; set; }
-
-    public List<RoomQuestionDetail>? Questions { get; set; }
 
     public List<RoomUserDetail>? Users { get; set; }
 

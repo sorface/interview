@@ -66,13 +66,13 @@ public class RoomQuestionController : ControllerBase
     [Authorize]
     [HttpGet]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(List<Guid>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<RoomQuestionResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<List<Guid>> FindRoomQuestions([FromQuery] RoomQuestionsRequest request)
+    public Task<List<RoomQuestionResponse>> FindRoomQuestions([FromQuery] RoomQuestionsRequest request)
     {
-        return _roomQuestionService.FindGuidsAsync(request);
+        return _roomQuestionService.FindQuestionsAsync(request);
     }
 }

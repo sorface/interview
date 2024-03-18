@@ -1,10 +1,12 @@
 using Interview.Domain.Questions;
+using Interview.Domain.Questions.Services;
 using Interview.Domain.Repository;
-using Interview.Domain.Rooms.RoomQuestions.Records;
-using Interview.Domain.Rooms.RoomQuestions.Records.Response;
+using Interview.Domain.RoomQuestions.Records;
+using Interview.Domain.RoomQuestions.Records.Response;
+using Interview.Domain.Rooms;
 using NSpecifications;
 
-namespace Interview.Domain.Rooms.RoomQuestions.Services;
+namespace Interview.Domain.RoomQuestions.Services;
 
 public class RoomQuestionService : IRoomQuestionService
 {
@@ -14,14 +16,18 @@ public class RoomQuestionService : IRoomQuestionService
 
     private readonly IRoomRepository _roomRepository;
 
+    private readonly IQuestionService _questionService;
+
     public RoomQuestionService(
         IRoomQuestionRepository roomQuestionRepository,
         IRoomRepository roomRepository,
-        IQuestionRepository questionRepository)
+        IQuestionRepository questionRepository,
+        IQuestionService questionService)
     {
         _roomQuestionRepository = roomQuestionRepository;
         _roomRepository = roomRepository;
         _questionRepository = questionRepository;
+        _questionService = questionService;
     }
 
     public async Task<RoomQuestionDetail> ChangeActiveQuestionAsync(
@@ -75,12 +81,28 @@ public class RoomQuestionService : IRoomQuestionService
         RoomQuestionCreateRequest request,
         CancellationToken cancellationToken)
     {
-        var roomQuestion = await _roomQuestionRepository.FindFirstByQuestionIdAndRoomIdAsync(
-            request.QuestionId, request.RoomId, cancellationToken);
-
-        if (roomQuestion is not null)
+        Guid questionId;
+        if (request.QuestionId is not null)
         {
-            throw new UserException($"The room {request.RoomId} with question {request.QuestionId} already exists");
+            var roomQuestion = await _roomQuestionRepository.FindFirstByQuestionIdAndRoomIdAsync(
+                request.QuestionId.Value, request.RoomId, cancellationToken);
+
+            if (roomQuestion is not null)
+            {
+                throw new UserException($"The room {request.RoomId} with question {request.QuestionId} already exists");
+            }
+
+            questionId = request.QuestionId.Value;
+        }
+        else
+        {
+            if (request.Question is null)
+            {
+                throw new UserException("The expectation was to get data to create a question");
+            }
+
+            var createdQuestion = await _questionService.CreateAsync(request.Question, request.RoomId, cancellationToken);
+            questionId = createdQuestion.Id;
         }
 
         var room = await _roomRepository.FindByIdAsync(request.RoomId, cancellationToken);
@@ -90,11 +112,11 @@ public class RoomQuestionService : IRoomQuestionService
             throw NotFoundException.Create<Room>(request.RoomId);
         }
 
-        var question = await _questionRepository.FindByIdAsync(request.QuestionId, cancellationToken);
+        var question = await _questionRepository.FindByIdAsync(questionId, cancellationToken);
 
         if (question is null)
         {
-            throw NotFoundException.Create<Question>(request.QuestionId);
+            throw NotFoundException.Create<Question>(questionId);
         }
 
         var newRoomQuestion = new RoomQuestion { Room = room, Question = question, State = RoomQuestionState.Open };
@@ -110,7 +132,7 @@ public class RoomQuestionService : IRoomQuestionService
         };
     }
 
-    public async Task<List<Guid>> FindGuidsAsync(
+    public async Task<List<RoomQuestionResponse>> FindQuestionsAsync(
         RoomQuestionsRequest request, CancellationToken cancellationToken = default)
     {
         var hasRoom =
@@ -121,14 +143,17 @@ public class RoomQuestionService : IRoomQuestionService
             throw NotFoundException.Create<Room>(request.RoomId);
         }
 
-        var state = RoomQuestionState.FromValue((int)request.State);
+        var states = request.States.Select(e => RoomQuestionState.FromValue((int)e)).ToList();
 
-        var specification = new Spec<RoomQuestion>(rq => rq.Room!.Id == request.RoomId && rq.State == state);
+        var specification = new Spec<RoomQuestion>(rq => rq.Room.Id == request.RoomId && states.Contains(rq.State));
 
-        var mapper = new Mapper<RoomQuestion, Guid>(rq => rq.Question!.Id);
-
+        var mapper = Mapper<RoomQuestion>.Create(rq => new { Id = rq.Question.Id, State = rq.State, Value = rq.Question.Value, });
         var questions = await _roomQuestionRepository.FindAsync(specification, mapper, cancellationToken);
-
-        return questions;
+        return questions.ConvertAll(e => new RoomQuestionResponse
+        {
+            Id = e.Id,
+            State = e.State.EnumValue,
+            Value = e.Value,
+        });
     }
 }

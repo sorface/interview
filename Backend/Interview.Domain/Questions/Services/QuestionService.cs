@@ -1,10 +1,12 @@
 using CSharpFunctionalExtensions;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Repository;
+using Interview.Domain.RoomParticipants;
 using Interview.Domain.ServiceResults.Errors;
 using Interview.Domain.ServiceResults.Success;
 using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
+using Interview.Domain.Users;
 using NSpecifications;
 using X.PagedList;
 
@@ -20,20 +22,37 @@ public class QuestionService : IQuestionService
 
     private readonly ITagRepository _tagRepository;
 
+    private readonly IRoomMembershipChecker _roomMembershipChecker;
+
     public QuestionService(
         IQuestionRepository questionRepository,
         IQuestionNonArchiveRepository questionNonArchiveRepository,
         ArchiveService<Question> archiveService,
-        ITagRepository tagRepository)
+        ITagRepository tagRepository,
+        IRoomMembershipChecker roomMembershipChecker)
     {
         _questionRepository = questionRepository;
         _questionNonArchiveRepository = questionNonArchiveRepository;
         _archiveService = archiveService;
         _tagRepository = tagRepository;
+        _roomMembershipChecker = roomMembershipChecker;
     }
 
-    public Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken)
+    public async Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken)
     {
+        ASpec<Question> spec = new Spec<Question>(e => e.RoomId == null);
+
+        if (request.Tags is not null && request.Tags.Count > 0)
+        {
+            spec &= new Spec<Question>(e => e.Tags.Any(t => request.Tags.Contains(t.Id)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Value))
+        {
+            var questionValue = request.Value.Trim().ToLower();
+            spec &= new Spec<Question>(e => e.Value.ToLower().Contains(questionValue));
+        }
+
         var mapper =
             new Mapper<Question, QuestionItem>(
                 question => new QuestionItem
@@ -43,17 +62,7 @@ public class QuestionService : IQuestionService
                     Tags = question.Tags
                         .Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, }).ToList(),
                 });
-        var spec = request.Tags is null || request.Tags.Count == 0
-            ? Spec.Any<Question>()
-            : new Spec<Question>(e => e.Tags.Any(t => request.Tags.Contains(t.Id)));
-
-        if (!string.IsNullOrWhiteSpace(request.Value))
-        {
-            var questionValue = request.Value.Trim().ToLower();
-            spec &= new Spec<Question>(e => e.Value.ToLower().Contains(questionValue));
-        }
-
-        return _questionNonArchiveRepository.GetPageDetailedAsync(
+        return await _questionNonArchiveRepository.GetPageDetailedAsync(
             spec, mapper, request.Page.PageNumber, request.Page.PageSize, cancellationToken);
     }
 
@@ -75,14 +84,21 @@ public class QuestionService : IQuestionService
     }
 
     public async Task<QuestionItem> CreateAsync(
-        QuestionCreateRequest request, CancellationToken cancellationToken = default)
+        QuestionCreateRequest request, Guid? roomId, CancellationToken cancellationToken = default)
     {
-        var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
+        if (roomId is not null)
+        {
+            await _roomMembershipChecker.EnsureCurrentUserMemberOfRoomAsync(roomId.Value, cancellationToken);
+        }
 
-        var result = new Question(request.Value) { Tags = tags, };
+        var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
+        var result = new Question(request.Value)
+        {
+            Tags = tags,
+            RoomId = roomId,
+        };
 
         await _questionRepository.CreateAsync(result, cancellationToken);
-
         return new QuestionItem
         {
             Id = result.Id,
