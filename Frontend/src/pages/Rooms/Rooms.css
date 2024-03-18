@@ -4,6 +4,12 @@
   text-align: left;
 }
 
+.rooms-page .room-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.25rem;
+}
+
 .rooms-list .room-item {
   display: flex;
   justify-content: center;

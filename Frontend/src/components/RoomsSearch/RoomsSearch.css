@@ -1,5 +1,10 @@
 .rooms-search {
   display: flex;
   justify-content: center;
-  gap: 0.25rem;
+  align-items: stretch;
+  width: 100%;
+}
+
+.rooms-search .qustions-search-value {
+  width: calc(100% - 8px);  
 }

@@ -16,6 +16,7 @@ import { TagsView } from '../../components/TagsView/TagsView';
 import { QustionsSearch } from '../../components/QustionsSearch/QustionsSearch';
 import { ActionModal } from '../../components/ActionModal/ActionModal';
 import { Localization } from '../../localization';
+import { HeaderField } from '../../components/HeaderField/HeaderField';
 
 import './Questions.css';
 
@@ -82,7 +83,8 @@ export const Questions: FunctionComponent = () => {
   ), [archiveLoading, archiveError, archiveQuestion]);
 
   return (
-    <MainContentWrapper thin>
+    <MainContentWrapper>
+      <HeaderField />
       <HeaderWithLink
         linkVisible={admin}
         path={pathnames.questionsCreate}

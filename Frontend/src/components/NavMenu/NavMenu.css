@@ -2,6 +2,7 @@
   font-size: var(--menu-font-size);
   margin: 0rem;
 }
+
 .nav-menu nav {
   display: contents;
 }
@@ -15,36 +16,27 @@
 }
 
 .nav-menu .field-wrap {
-  display: inline-block;
-  width: 100%;
-  border-radius: 0px;
-  margin-bottom: 0.5rem;
   line-height: 1.6;
-  border-bottom: 2px solid var(--wrap-bg);
+  border-bottom: 0px solid var(--wrap-bg);
+  width: 14rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nav-menu .active {
   border-bottom: 2px solid var(--active-nav-tab);
 }
 
-.nav-menu .field-wrap {
-  margin-right: 0px;
-  margin-left: 0px;
-}
-
-.nav-menu .field-wrap:first-child {
-  border-top-left-radius: var(--border-radius);
-  border-bottom-left-radius: var(--border-radius);
-}
-
-.nav-menu .field-wrap:last-child {
-  border-top-right-radius: var(--border-radius);
-  border-bottom-right-radius: var(--border-radius);
-}
-
 .nav-menu .nav-menu-user-content {
   display: flex;
   flex-direction: row;
+}
+
+.nav-menu .nav-menu-user-nickname {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nav-menu .user-avatar {

@@ -1,9 +1,7 @@
 import React, { FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
-import { Tooltip } from 'react-tooltip'
 import { Link } from 'react-router-dom';
 import { GetRoomPageParams, roomsApiDeclaration } from '../../apiDeclarations';
 import { Field } from '../../components/FieldsBlock/Field';
-import { HeaderWithLink } from '../../components/HeaderWithLink/HeaderWithLink';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { Paginator } from '../../components/Paginator/Paginator';
 import { pathnames } from '../../constants';
@@ -15,10 +13,11 @@ import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
 import { TagsView } from '../../components/TagsView/TagsView';
 import { RoomsSearch } from '../../components/RoomsSearch/RoomsSearch';
 import { Localization } from '../../localization';
+import { ButtonLink } from '../../components/ButtonLink/ButtonLink';
+import { HeaderField } from '../../components/HeaderField/HeaderField';
+import { RoomsFilter } from '../../components/RoomsFilter/RoomsFilter';
 
 import './Rooms.css';
-
-const userTooltipId = 'user-tooltip';
 
 const roomStatusCaption: Record<Room['roomStatus'], string> = {
   New: Localization.RoomStatusNew,
@@ -68,7 +67,7 @@ export const Rooms: FunctionComponent = () => {
       room.roomStatus === 'Close';
     const roomLink = roomSummary ?
       pathnames.roomAnalyticsSummary.replace(':id', room.id) :
-      `${pathnames.rooms}/${room.id}`;
+      pathnames.room.replace(':id', room.id);
 
     return (
       <li key={room.id}>
@@ -109,23 +108,27 @@ export const Rooms: FunctionComponent = () => {
   }, [admin]);
 
   return (
-    <MainContentWrapper thin>
-      <HeaderWithLink
-        linkVisible={admin}
-        path={pathnames.roomsCreate}
-        linkCaption="+"
-        linkFloat="right"
-      >
+    <MainContentWrapper className='rooms-page'>
+      <HeaderField>
         <RoomsSearch
           searchValue={searchValue}
-          participating={participating}
-          closed={closed}
           onSearchChange={setSearchValue}
-          onParticipatingChange={setParticipating}
-          onClosedChange={setClosed}
         />
-      </HeaderWithLink>
-      <Tooltip id={userTooltipId} />
+      </HeaderField>
+      <Field>
+        <div className='room-actions'>
+          <RoomsFilter
+            participating={participating}
+            closed={closed}
+            onParticipatingChange={setParticipating}
+            onClosedChange={setClosed}
+          />
+          <ButtonLink
+            path={pathnames.roomsCreate}
+            caption="+"
+          />
+        </div>
+      </Field>
       <ProcessWrapper
         loading={loading}
         error={error}

@@ -4,16 +4,17 @@ import { FieldsBlock } from '../../components/FieldsBlock/FieldsBlock';
 import './MainContentWrapper.css';
 
 interface MainContentWrapperProps {
-  thin?: boolean;
   className?: string;
+  withMargin?: boolean;
   children: ReactNode;
 }
 
 export const MainContentWrapper: FunctionComponent<MainContentWrapperProps> =
-  ({ thin, className, children }) => {
+  ({ className, withMargin, children }) => {
     return (
       <FieldsBlock
-        className={`${className} ${thin ? 'thin-page-content-wrapper' : ''}`}
+        withMargin={withMargin}
+        className={className}
       >
         {children}
       </FieldsBlock>
