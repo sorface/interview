@@ -144,14 +144,14 @@ public class RoomQuestionService : IRoomQuestionService
 
         var states = request.States.Select(e => RoomQuestionState.FromValue((int)e)).ToList();
 
-        var specification = new Spec<RoomQuestion>(rq => rq.Room.Id == request.RoomId && states.Contains(rq.State));
+        var specification = new Spec<RoomQuestion>(rq => rq.Room!.Id == request.RoomId && states.Contains(rq.State!));
 
-        var mapper = Mapper<RoomQuestion>.Create(rq => new { Id = rq.Question.Id, State = rq.State, Value = rq.Question.Value, });
+        var mapper = Mapper<RoomQuestion>.Create(rq => new { Id = rq.Question!.Id, State = rq.State, Value = rq.Question.Value, });
         var questions = await _roomQuestionRepository.FindAsync(specification, mapper, cancellationToken);
         return questions.ConvertAll(e => new RoomQuestionResponse
         {
             Id = e.Id,
-            State = e.State.EnumValue,
+            State = e.State!.EnumValue,
             Value = e.Value,
         });
     }

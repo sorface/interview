@@ -97,7 +97,7 @@ public class TagService : ITagService
         }
 
         tag.Value = request.Value;
-        tag.HexColor = request.HexValue;
+        tag.HexColor = request.HexValue ?? string.Empty;
         await _tagRepository.UpdateAsync(tag, cancellationToken);
         return ServiceResult.Ok(new TagItem
         {
