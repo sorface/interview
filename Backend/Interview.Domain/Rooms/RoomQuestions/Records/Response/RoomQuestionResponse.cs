@@ -1,4 +1,4 @@
-namespace Interview.Domain.RoomQuestions.Records.Response;
+namespace Interview.Domain.Rooms.RoomQuestions.Records.Response;
 
 public class RoomQuestionResponse
 {

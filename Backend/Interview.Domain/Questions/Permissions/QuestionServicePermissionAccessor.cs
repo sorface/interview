@@ -31,10 +31,10 @@ public class QuestionServicePermissionAccessor : IQuestionService, IServiceDecor
     }
 
     public async Task<QuestionItem> CreateAsync(
-        QuestionCreateRequest request, CancellationToken cancellationToken = default)
+        QuestionCreateRequest request, Guid? roomId, CancellationToken cancellationToken = default)
     {
-        await _securityService.EnsurePermissionAsync(SEPermission.QuestionCreate, cancellationToken);
-        return await _questionService.CreateAsync(request, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(roomId, SEPermission.QuestionCreate, cancellationToken);
+        return await _questionService.CreateAsync(request, roomId, cancellationToken);
     }
 
     public async Task<QuestionItem> UpdateAsync(

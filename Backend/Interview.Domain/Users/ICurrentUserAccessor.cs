@@ -30,6 +30,14 @@ public interface IEditableCurrentUserAccessor : ICurrentUserAccessor
     void SetUser(User user);
 }
 
+public static class CurrentUserAccessorExt
+{
+    public static Guid GetUserIdOrThrow(this ICurrentUserAccessor self)
+    {
+        return self.UserId ?? throw new AccessDeniedException("User is unauthorized");
+    }
+}
+
 public sealed class CurrentUserAccessor : IEditableCurrentUserAccessor
 {
     private User? _currentUser;
@@ -49,12 +57,4 @@ public sealed class CurrentUserAccessor : IEditableCurrentUserAccessor
     public User? UserDetailed => _currentUser;
 
     public void SetUser(User user) => _currentUser = user;
-}
-
-public static class CurrentUserAccessorExt
-{
-    public static Guid GetUserIdOrThrow(this ICurrentUserAccessor self)
-    {
-        return self.UserId ?? throw new AccessDeniedException("User is unauthorized");
-    }
 }

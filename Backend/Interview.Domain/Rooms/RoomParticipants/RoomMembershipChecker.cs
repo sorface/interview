@@ -1,6 +1,7 @@
+using Interview.Domain.RoomParticipants;
 using Interview.Domain.Users;
 
-namespace Interview.Domain.RoomParticipants
+namespace Interview.Domain.Rooms.RoomParticipants
 {
     public class RoomMembershipChecker : IService, IRoomMembershipChecker
     {

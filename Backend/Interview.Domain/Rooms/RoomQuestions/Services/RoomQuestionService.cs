@@ -1,12 +1,11 @@
 using Interview.Domain.Questions;
 using Interview.Domain.Questions.Services;
 using Interview.Domain.Repository;
-using Interview.Domain.RoomQuestions.Records;
-using Interview.Domain.RoomQuestions.Records.Response;
-using Interview.Domain.Rooms;
+using Interview.Domain.Rooms.RoomQuestions.Records;
+using Interview.Domain.Rooms.RoomQuestions.Records.Response;
 using NSpecifications;
 
-namespace Interview.Domain.RoomQuestions.Services;
+namespace Interview.Domain.Rooms.RoomQuestions.Services;
 
 public class RoomQuestionService : IRoomQuestionService
 {
