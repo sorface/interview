@@ -13,6 +13,7 @@ import { Question } from '../../types/question';
 import { Tag } from '../../types/tag';
 import { TagsSelector } from '../../components/TagsSelector/TagsSelector';
 import { Localization } from '../../localization';
+import { HeaderField } from '../../components/HeaderField/HeaderField';
 
 import './QuestionCreate.css';
 
@@ -177,6 +178,7 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
 
   return (
     <MainContentWrapper className="question-create">
+      <HeaderField />
       <HeaderWithLink
         title={Localization.CreateQuestion}
         linkVisible={true}

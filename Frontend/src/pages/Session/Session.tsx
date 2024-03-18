@@ -5,6 +5,7 @@ import { MainContentWrapper } from '../../components/MainContentWrapper/MainCont
 import { useCommunist } from '../../hooks/useCommunist';
 import { ThemeSwitch } from '../../components/ThemeSwitch/ThemeSwitch';
 import { Localization } from '../../localization';
+import { HeaderField } from '../../components/HeaderField/HeaderField';
 
 import './Session.css';
 
@@ -27,7 +28,6 @@ export const Session: FunctionComponent = () => {
     return (
       <>
         <Field className="session-info">
-          <h2>{Localization.Settings}</h2>
           <ThemeSwitch />
         </Field>
         <Field>
@@ -39,6 +39,7 @@ export const Session: FunctionComponent = () => {
 
   return (
     <MainContentWrapper>
+      <HeaderField><h2>{Localization.Settings}</h2></HeaderField>
       {renderAuth()}
     </MainContentWrapper>
   );

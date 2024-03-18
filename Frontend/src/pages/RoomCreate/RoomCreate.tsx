@@ -1,5 +1,5 @@
 import React, { FormEvent, FunctionComponent, useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { CreateRoomBody, CreateTagBody, GetTagsParams, roomsApiDeclaration, tagsApiDeclaration } from '../../apiDeclarations';
 import { Field } from '../../components/FieldsBlock/Field';
@@ -16,6 +16,7 @@ import { User } from '../../types/user';
 import { TagsSelector } from '../../components/TagsSelector/TagsSelector';
 import { Tag } from '../../types/tag';
 import { Localization } from '../../localization';
+import { HeaderField } from '../../components/HeaderField/HeaderField';
 
 import './RoomCreate.css';
 
@@ -164,6 +165,7 @@ export const RoomCreate: FunctionComponent = () => {
 
   return (
     <MainContentWrapper className="question-create">
+      <HeaderField />
       <HeaderWithLink
         title={Localization.CreateRoom}
         linkVisible={true}
@@ -194,7 +196,7 @@ export const RoomCreate: FunctionComponent = () => {
           />
         </Field>
         <Field>
-          <div>Questions:</div>
+          <Link to={pathnames.questions}>{Localization.QuestionsPageName}:</Link>
           <div>{Localization.RoomQuestions}:</div>
           <div className="items-selected">
             {selectedQuestions.map(question => question.value).join(', ')}

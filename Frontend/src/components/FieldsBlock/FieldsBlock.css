@@ -1,8 +1,12 @@
 .fields-block {
   display: flex;
   flex-direction: column;
-  margin: var(--fields-block-margin);
+  margin: 0rem;
   color: var(--text);
+}
+
+.fields-block.with-margin {
+  margin: var(--fields-block-margin);
 }
 
 .fields-block .fields-wrap {
@@ -13,6 +17,8 @@
 .fields-block .field-wrap {
   background: var(--wrap-bg);
   margin: 1rem;
+  margin-left: 0rem;
+  margin-right: 0rem;
   height: auto;
   min-height: 2rem;
   padding: 0.75rem 0.75rem;

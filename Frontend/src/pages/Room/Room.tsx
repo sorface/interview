@@ -294,7 +294,7 @@ export const Room: FunctionComponent = () => {
   }
 
   return (
-    <MainContentWrapper className="room-wrapper">
+    <MainContentWrapper withMargin className="room-wrapper">
       <EnterVideoChatModal
         open={welcomeScreen}
         loading={loading || roomParticipantLoading || roomParticipantWillLoaded || readyState === connectingReadyState}

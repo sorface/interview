@@ -6,6 +6,7 @@ import { pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { HomeAction } from './components/HomeContent/HomeAction';
 import { Localization } from '../../localization';
+import { HeaderField } from '../../components/HeaderField/HeaderField';
 
 import './Home.css';
 
@@ -17,13 +18,17 @@ export const Home: FunctionComponent = () => {
     return <Navigate to={redirect} replace />;
   }
 
+  if (auth) {
+    return <Navigate to={pathnames.rooms} replace />;
+  }
+
   return (
-    <MainContentWrapper thin>
+    <MainContentWrapper>
+      <HeaderField/>
       <Field>
-        <h1>{Localization.AppName}</h1>
         <p>{Localization.AppDescription}</p>
         <div className="home-action">
-          <HomeAction auth={auth} />
+          <HomeAction />
         </div>
         <Link
           className="home-terms-link"
