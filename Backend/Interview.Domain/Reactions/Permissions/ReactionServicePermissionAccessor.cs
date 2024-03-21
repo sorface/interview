@@ -1,6 +1,7 @@
 using Interview.Domain.Permissions;
 using Interview.Domain.Questions.Permissions;
 using Interview.Domain.Reactions.Records;
+using Interview.Domain.Reactions.Services;
 using X.PagedList;
 
 namespace Interview.Domain.Reactions.Permissions;
@@ -16,10 +17,9 @@ public class ReactionServicePermissionAccessor : IReactionService, IServiceDecor
         _securityService = securityService;
     }
 
-    public Task<IPagedList<ReactionDetail>> FindPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<IPagedList<ReactionDetail>> FindPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsurePermission(SEPermission.ReactionFindPage);
-
-        return _reactionService.FindPageAsync(pageNumber, pageSize, cancellationToken);
+        await _securityService.EnsurePermissionAsync(SEPermission.ReactionFindPage, cancellationToken);
+        return await _reactionService.FindPageAsync(pageNumber, pageSize, cancellationToken);
     }
 }

@@ -1,7 +1,7 @@
 using Interview.Domain.Events.Events;
 using Interview.Domain.Reactions;
 using Interview.Domain.Repository;
-using Interview.Domain.RoomQuestionReactions;
+using Interview.Domain.Rooms.RoomQuestionReactions;
 
 namespace Interview.Domain.Events.ChangeEntityProcessors;
 

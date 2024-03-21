@@ -1,7 +1,7 @@
 using Interview.Domain.Reactions.Records;
 using X.PagedList;
 
-namespace Interview.Domain.Reactions;
+namespace Interview.Domain.Reactions.Services;
 
 public interface IReactionService : IService
 {

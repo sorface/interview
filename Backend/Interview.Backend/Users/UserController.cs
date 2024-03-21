@@ -2,6 +2,7 @@ using Interview.Backend.Auth;
 using Interview.Backend.Responses;
 using Interview.Domain;
 using Interview.Domain.Users.Records;
+using Interview.Domain.Users.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;

@@ -2,7 +2,9 @@ using System.Text.Json;
 
 namespace Interview.Backend.WebSocket.Events.Handlers;
 
+#pragma warning disable SA1402
 public abstract class WebSocketEventHandlerBase<TPayload> : IWebSocketEventHandler
+#pragma warning restore SA1402
 {
     protected readonly ILogger<WebSocketEventHandlerBase<TPayload>> Logger;
 
@@ -40,7 +42,7 @@ public abstract class WebSocketEventHandlerBase<TPayload> : IWebSocketEventHandl
 
     protected abstract Task HandleEventAsync(SocketEventDetail detail, TPayload payload, CancellationToken cancellationToken);
 
-    protected virtual TPayload? ParsePayload(WebSocketEvent @event) => @event.Value is null ? default : JsonSerializer.Deserialize<TPayload>(@event.Value);
+    protected virtual TPayload? ParsePayload(WebSocketEvent @event) => string.IsNullOrEmpty(@event.Value) ? default : JsonSerializer.Deserialize<TPayload>(@event.Value);
 }
 
 public abstract class WebSocketEventHandlerBase : WebSocketEventHandlerBase<string>

@@ -1,6 +1,5 @@
-using Interview.Domain.Invitations;
+using Interview.Domain.Database;
 using Interview.Domain.Invites;
-using Interview.Infrastructure.Database;
 
 namespace Interview.Infrastructure.Invites;
 

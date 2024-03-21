@@ -1,13 +1,11 @@
-using Interview.Domain.RoomParticipants;
-using Interview.Domain.RoomQuestionReactions;
-using Interview.Domain.RoomQuestions.Records;
+using Interview.Domain.Database;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.Records.Request;
+using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.Records.Response.Page;
-using Interview.Domain.Rooms.Service.Records.Response.Detail;
-using Interview.Domain.Rooms.Service.Records.Response.Page;
+using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Rooms.RoomQuestionReactions;
 using Interview.Domain.Tags.Records.Response;
-using Interview.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using X.PagedList;
 
@@ -51,7 +49,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                 .ToList();
 
             var viewers = reactionQuestions
-                .Where(e => participants[e.Sender!.Id] == RoomParticipantType.Viewer)
+                .Where(e => participants[e.Sender!.Id] == SERoomParticipantType.Viewer)
                 .GroupBy(e => participants[e.Sender!.Id])
                 .Select(e => new AnalyticsSummaryViewer
                 {
@@ -67,7 +65,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                 .ToList();
 
             var experts = reactionQuestions
-                .Where(e => participants[e.Sender!.Id] == RoomParticipantType.Expert)
+                .Where(e => participants[e.Sender!.Id] == SERoomParticipantType.Expert)
                 .GroupBy(e => (e.Sender!.Id, e.Sender!.Nickname))
                 .Select(e => new AnalyticsSummaryExpert
                 {

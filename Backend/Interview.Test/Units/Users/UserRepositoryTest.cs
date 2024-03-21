@@ -1,5 +1,5 @@
+using Interview.Domain.Database;
 using Interview.Domain.Users;
-using Interview.Infrastructure.Database;
 using Interview.Infrastructure.Users;
 
 namespace Interview.Test.Units.Users;

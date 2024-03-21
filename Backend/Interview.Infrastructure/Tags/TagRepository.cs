@@ -1,5 +1,5 @@
+using Interview.Domain.Database;
 using Interview.Domain.Tags;
-using Interview.Infrastructure.Database;
 
 namespace Interview.Infrastructure.Tags;
 

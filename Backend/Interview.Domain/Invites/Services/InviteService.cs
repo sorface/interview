@@ -1,5 +1,4 @@
-using Interview.Domain.Invitations;
-using Interview.Domain.Invitations.Records.Response;
+using Interview.Domain.Invites.Records.Response;
 using Interview.Domain.Repository;
 
 namespace Interview.Domain.Invites.Services;

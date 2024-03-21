@@ -1,6 +1,5 @@
 using Interview.Domain.Repository;
-using Interview.Domain.RoomQuestions;
-using Interview.Domain.Rooms.Service.Records.Response.RoomStates;
+using Interview.Domain.Rooms.RoomQuestions;
 
 namespace Interview.Domain.Rooms.Records.Response.RoomStates;
 

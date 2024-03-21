@@ -19,21 +19,21 @@ public class TagServicePermissionAccessor : ITagService, IServiceDecorator
         _securityService = securityService;
     }
 
-    public Task<IPagedList<TagItem>> FindTagsPageAsync(string? value, int pageNumber, int pageSize, CancellationToken cancellationToken)
+    public async Task<IPagedList<TagItem>> FindTagsPageAsync(string? value, int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
-        _securityService.EnsurePermission(SEPermission.TagFindPage);
-        return _service.FindTagsPageAsync(value, pageNumber, pageSize, cancellationToken);
+        await _securityService.EnsurePermissionAsync(SEPermission.TagFindPage, cancellationToken);
+        return await _service.FindTagsPageAsync(value, pageNumber, pageSize, cancellationToken);
     }
 
-    public Task<Result<ServiceResult<TagItem>, ServiceError>> CreateTagAsync(TagEditRequest request, CancellationToken cancellationToken)
+    public async Task<Result<ServiceResult<TagItem>, ServiceError>> CreateTagAsync(TagEditRequest request, CancellationToken cancellationToken)
     {
-        _securityService.EnsurePermission(SEPermission.TagCreate);
-        return _service.CreateTagAsync(request, cancellationToken);
+        await _securityService.EnsurePermissionAsync(SEPermission.TagCreate, cancellationToken);
+        return await _service.CreateTagAsync(request, cancellationToken);
     }
 
-    public Task<Result<ServiceResult<TagItem>, ServiceError>> UpdateTagAsync(Guid id, TagEditRequest request, CancellationToken cancellationToken)
+    public async Task<Result<ServiceResult<TagItem>, ServiceError>> UpdateTagAsync(Guid id, TagEditRequest request, CancellationToken cancellationToken)
     {
-        _securityService.EnsurePermission(SEPermission.TagUpdate);
-        return _service.UpdateTagAsync(id, request, cancellationToken);
+        await _securityService.EnsurePermissionAsync(SEPermission.TagUpdate, cancellationToken);
+        return await _service.UpdateTagAsync(id, request, cancellationToken);
     }
 }

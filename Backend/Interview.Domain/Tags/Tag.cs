@@ -11,7 +11,7 @@ public class Tag : Entity
 
     public string HexColor { get; internal set; } = string.Empty;
 
-    public static bool IsValidColor(string color) => int.TryParse(color, NumberStyles.HexNumber, null, out _);
+    public static bool IsValidColor(string? color) => int.TryParse(color, NumberStyles.HexNumber, null, out _);
 
     public static async Task<List<Tag>> EnsureValidTagsAsync(ITagRepository tagRepository, IReadOnlySet<Guid> tagsForCheck, CancellationToken cancellationToken)
     {

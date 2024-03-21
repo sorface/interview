@@ -1,6 +1,6 @@
 using Interview.Domain.Tags.Records.Response;
 
-namespace Interview.Domain.Rooms.Service.Records.Response;
+namespace Interview.Domain.Rooms.Records.Response;
 
 public class RoomItem
 {

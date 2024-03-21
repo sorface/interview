@@ -1,5 +1,3 @@
-using Interview.Domain.Errors;
-
 namespace Interview.Domain.ServiceResults.Errors;
 
 public sealed class ForbiddenError : ServiceError

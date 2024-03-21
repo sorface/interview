@@ -1,4 +1,4 @@
-using Interview.Domain.RoomParticipants;
+using Interview.Domain.Rooms.RoomParticipants;
 
 namespace Interview.Backend.WebSocket.Events.ConnectionListener;
 

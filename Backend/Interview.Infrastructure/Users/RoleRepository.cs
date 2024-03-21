@@ -1,5 +1,5 @@
+using Interview.Domain.Database;
 using Interview.Domain.Users.Roles;
-using Interview.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Infrastructure.Users;

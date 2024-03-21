@@ -1,9 +1,9 @@
+using Interview.Domain.Database;
 using Interview.Domain.Repository;
 using Interview.Domain.Users;
 using Interview.Domain.Users.Permissions;
 using Interview.Domain.Users.Records;
 using Interview.Domain.Users.Roles;
-using Interview.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using X.PagedList;
 

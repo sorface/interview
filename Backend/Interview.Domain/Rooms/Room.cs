@@ -1,8 +1,8 @@
 using System.Runtime.CompilerServices;
 using Interview.Domain.Repository;
-using Interview.Domain.RoomConfigurations;
-using Interview.Domain.RoomParticipants;
-using Interview.Domain.RoomQuestions;
+using Interview.Domain.Rooms.RoomConfigurations;
+using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.Tags;
 
 [assembly: InternalsVisibleTo("Interview.Test")]

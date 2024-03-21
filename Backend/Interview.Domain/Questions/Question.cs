@@ -23,5 +23,5 @@ public class Question : ArchiveEntity
 
     public Guid? RoomId { get; internal set; }
 
-    public Room Room { get; internal set; }
+    public Room? Room { get; internal set; }
 }

@@ -1,13 +1,12 @@
 using Interview.Domain.Events.Storage;
-using Interview.Domain.RoomParticipants;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Request.Transcription;
+using Interview.Domain.Rooms.Records.Response;
+using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.Records.Response.Page;
 using Interview.Domain.Rooms.Records.Response.RoomStates;
-using Interview.Domain.Rooms.Service.Records.Response;
-using Interview.Domain.Rooms.Service.Records.Response.Detail;
-using Interview.Domain.Rooms.Service.Records.Response.Page;
-using Interview.Domain.Rooms.Service.Records.Response.RoomStates;
+using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Users;
 using X.PagedList;
 
 namespace Interview.Domain.Rooms.Service;
@@ -25,7 +24,7 @@ public interface IRoomService : IService
     Task<RoomItem> UpdateAsync(
         Guid roomId, RoomUpdateRequest? request, CancellationToken cancellationToken = default);
 
-    Task<(Room, RoomParticipant)> AddParticipantAsync(
+    Task<(Room Room, RoomParticipant Participant)> AddParticipantAsync(
         Guid roomId, Guid userId, CancellationToken cancellationToken = default);
 
     Task SendEventRequestAsync(

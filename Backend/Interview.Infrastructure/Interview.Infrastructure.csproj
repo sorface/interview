@@ -15,7 +15,7 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.10" />
         <PackageReference Include="QuestPDF" Version="2022.12.1" />
         <PackageReference Include="Redis.OM" Version="0.5.4" />
-        <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+        <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

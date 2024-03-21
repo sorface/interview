@@ -1,5 +1,5 @@
-using Interview.Domain.RoomParticipants;
-using Interview.Infrastructure.Database;
+using Interview.Domain.Database;
+using Interview.Domain.Rooms.RoomParticipants;
 using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Infrastructure.RoomParticipants;
@@ -11,7 +11,7 @@ public class RoomParticipantRepository : EfRepository<RoomParticipant>, IRoomPar
     {
     }
 
-    public Task<RoomParticipant?> FindByRoomIdAndUserId(
+    public Task<RoomParticipant?> FindByRoomIdAndUserIdDetailedAsync(
         Guid roomId, Guid userId, CancellationToken cancellationToken = default)
     {
         return ApplyIncludes(Set)
@@ -28,5 +28,6 @@ public class RoomParticipantRepository : EfRepository<RoomParticipant>, IRoomPar
 
     protected override IQueryable<RoomParticipant> ApplyIncludes(DbSet<RoomParticipant> set) => set
         .Include(participant => participant.Room)
-        .Include(participant => participant.User);
+        .Include(participant => participant.User)
+        .Include(participant => participant.Permissions);
 }

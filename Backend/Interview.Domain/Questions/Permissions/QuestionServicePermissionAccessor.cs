@@ -17,67 +17,59 @@ public class QuestionServicePermissionAccessor : IQuestionService, IServiceDecor
         _securityService = securityService;
     }
 
-    public Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken)
+    public async Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken)
     {
-        _securityService.EnsurePermission(SEPermission.QuestionFindPage);
-
-        return _questionService.FindPageAsync(request, cancellationToken);
+        await _securityService.EnsurePermissionAsync(SEPermission.QuestionFindPage, cancellationToken);
+        return await _questionService.FindPageAsync(request, cancellationToken);
     }
 
-    public Task<IPagedList<QuestionItem>> FindPageArchiveAsync(
+    public async Task<IPagedList<QuestionItem>> FindPageArchiveAsync(
         int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
-        _securityService.EnsurePermission(SEPermission.QuestionFindPageArchive);
-
-        return _questionService.FindPageArchiveAsync(pageNumber, pageSize, cancellationToken);
+        await _securityService.EnsurePermissionAsync(SEPermission.QuestionFindPageArchive, cancellationToken);
+        return await _questionService.FindPageArchiveAsync(pageNumber, pageSize, cancellationToken);
     }
 
-    public Task<QuestionItem> CreateAsync(
+    public async Task<QuestionItem> CreateAsync(
         QuestionCreateRequest request, Guid? roomId, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsurePermission(SEPermission.QuestionCreate);
-
-        return _questionService.CreateAsync(request, roomId, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(roomId, SEPermission.QuestionCreate, cancellationToken);
+        return await _questionService.CreateAsync(request, roomId, cancellationToken);
     }
 
-    public Task<QuestionItem> UpdateAsync(
+    public async Task<QuestionItem> UpdateAsync(
         Guid id, QuestionEditRequest request, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsurePermission(SEPermission.QuestionUpdate);
-
-        return _questionService.UpdateAsync(id, request, cancellationToken);
+        await _securityService.EnsurePermissionAsync(SEPermission.QuestionUpdate, cancellationToken);
+        return await _questionService.UpdateAsync(id, request, cancellationToken);
     }
 
-    public Task<QuestionItem> FindByIdAsync(
+    public async Task<QuestionItem> FindByIdAsync(
         Guid id, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsurePermission(SEPermission.QuestionFindById);
-
-        return _questionService.FindByIdAsync(id, cancellationToken);
+        await _securityService.EnsurePermissionAsync(SEPermission.QuestionFindById, cancellationToken);
+        return await _questionService.FindByIdAsync(id, cancellationToken);
     }
 
-    public Task<QuestionItem> DeletePermanentlyAsync(
+    public async Task<QuestionItem> DeletePermanentlyAsync(
         Guid id, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsurePermission(SEPermission.QuestionDeletePermanently);
-
-        return _questionService.DeletePermanentlyAsync(id, cancellationToken);
+        await _securityService.EnsurePermissionAsync(SEPermission.QuestionDeletePermanently, cancellationToken);
+        return await _questionService.DeletePermanentlyAsync(id, cancellationToken);
     }
 
-    public Task<QuestionItem> ArchiveAsync(
+    public async Task<QuestionItem> ArchiveAsync(
         Guid id, CancellationToken cancellationToken = default)
     {
-        _securityService.EnsurePermission(SEPermission.QuestionArchive);
-
-        return _questionService.ArchiveAsync(id, cancellationToken);
+        await _securityService.EnsurePermissionAsync(SEPermission.QuestionArchive, cancellationToken);
+        return await _questionService.ArchiveAsync(id, cancellationToken);
     }
 
-    public Task<QuestionItem> UnarchiveAsync(
+    public async Task<QuestionItem> UnarchiveAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
-        _securityService.EnsurePermission(SEPermission.QuestionUnarchive);
-
-        return _questionService.UnarchiveAsync(id, cancellationToken);
+        await _securityService.EnsurePermissionAsync(SEPermission.QuestionUnarchive, cancellationToken);
+        return await _questionService.UnarchiveAsync(id, cancellationToken);
     }
 }

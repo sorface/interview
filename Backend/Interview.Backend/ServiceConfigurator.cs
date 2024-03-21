@@ -11,7 +11,7 @@ using Interview.Backend.WebSocket.Events;
 using Interview.Backend.WebSocket.Events.ConnectionListener;
 using Interview.Backend.WebSocket.Events.Handlers;
 using Interview.DependencyInjection;
-using Interview.Domain.RoomQuestions;
+using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Infrastructure.Chat;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
