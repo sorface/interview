@@ -15,8 +15,6 @@
   justify-content: center;
   padding-bottom: 1rem;
   margin: 0rem 1rem;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid var(--list-border-color);
 }
 
 .rooms-list .room-link {
@@ -47,4 +45,8 @@
 
 .rooms-list .rooms-list-no-data {
   text-align: center;
+}
+
+.rooms-list .field-wrap {
+  height: 4rem;
 }

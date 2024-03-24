@@ -9,7 +9,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Room, RoomStatus } from '../../types/room';
 import { checkAdmin } from '../../utils/checkAdmin';
-import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
+import { ProcessWrapper, skeletonTransitionMs } from '../../components/ProcessWrapper/ProcessWrapper';
 import { TagsView } from '../../components/TagsView/TagsView';
 import { RoomsSearch } from '../../components/RoomsSearch/RoomsSearch';
 import { Localization } from '../../localization';
@@ -28,6 +28,7 @@ const roomStatusCaption: Record<Room['roomStatus'], string> = {
 
 const pageSize = 10;
 const initialPageNumber = 1;
+const searchDebounceMs = 300;
 
 export const Rooms: FunctionComponent = () => {
   const auth = useContext(AuthContext);
@@ -35,10 +36,12 @@ export const Rooms: FunctionComponent = () => {
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const { apiMethodState, fetchData } = useApiMethod<Room[], GetRoomPageParams>(roomsApiDeclaration.getPage);
   const { process: { loading, error }, data: rooms } = apiMethodState;
+  const [searchValueInput, setSearchValueInput] = useState('');
   const [searchValue, setSearchValue] = useState('');
   const [participating, setParticipating] = useState(false);
   const [closed, setClosed] = useState(false);
-  const loaders = Array.from({ length: pageSize }, () => ({ height: '4.46rem' }));
+  const [loadersCount, setLoadersCount] = useState(0);
+  const loaders = Array.from({ length: loadersCount || 1 }, () => ({ height: '4rem' }));
   const roomsSafe = rooms || [];
 
   useEffect(() => {
@@ -52,6 +55,30 @@ export const Rooms: FunctionComponent = () => {
       Statuses: statuses,
     });
   }, [pageNumber, searchValue, auth?.id, participating, closed, fetchData]);
+
+  useEffect(() => {
+    if (loadersCount || !roomsSafe.length || loading) {
+      return;
+    }
+    const loadersCountTimeout = setTimeout(() => {
+      setLoadersCount(roomsSafe.length);
+    }, skeletonTransitionMs);
+
+    return () => {
+      clearTimeout(loadersCountTimeout);
+    };
+
+  }, [roomsSafe.length, loading, loadersCount]);
+
+  useEffect(() => {
+    const searchTimeout = setTimeout(() => {
+      setSearchValue(searchValueInput);
+    }, searchDebounceMs);
+
+    return () => {
+      clearTimeout(searchTimeout);
+    };
+  }, [searchValueInput]);
 
   const handleNextPage = useCallback(() => {
     setPageNumber(pageNumber + 1);
@@ -70,40 +97,42 @@ export const Rooms: FunctionComponent = () => {
       pathnames.room.replace(':id', room.id);
 
     return (
-      <li key={room.id}>
-        <div className='room-item'>
-          <div className='room-link'>
-            <Link to={roomLink} >
-              {room.name}
-            </Link>
-            <div className='room-status'>
-              {roomStatusCaption[room.roomStatus]}
+      <Field key={room.id}>
+        <li>
+          <div className='room-item'>
+            <div className='room-link'>
+              <Link to={roomLink} >
+                {room.name}
+              </Link>
+              <div className='room-status'>
+                {roomStatusCaption[room.roomStatus]}
+              </div>
+            </div>
+            <div className="room-tags">
+              <TagsView
+                placeHolder={Localization.NoTags}
+                tags={room.tags}
+              />
+            </div>
+            <div className='room-action-links'>
+              <Link
+                to={roomLink}
+                className='room-join-link'
+              >
+                {Localization.Join}
+              </Link>
+              {admin && (
+                <Link
+                  to={`${pathnames.roomsParticipants.replace(':id', room.id)}`}
+                  className='room-edit-participants-link'
+                >
+                  {Localization.EditParticipants}
+                </Link>
+              )}
             </div>
           </div>
-          <div className="room-tags">
-            <TagsView
-              placeHolder={Localization.NoTags}
-              tags={room.tags}
-            />
-          </div>
-          <div className='room-action-links'>
-            <Link
-              to={roomLink}
-              className='room-join-link'
-            >
-              {Localization.Join}
-            </Link>
-            {admin && (
-              <Link
-                to={`${pathnames.roomsParticipants.replace(':id', room.id)}`}
-                className='room-edit-participants-link'
-              >
-                {Localization.EditParticipants}
-              </Link>
-            )}
-          </div>
-        </div>
-      </li>
+        </li>
+      </Field>
     );
   }, [admin]);
 
@@ -111,8 +140,8 @@ export const Rooms: FunctionComponent = () => {
     <MainContentWrapper className='rooms-page'>
       <HeaderField>
         <RoomsSearch
-          searchValue={searchValue}
-          onSearchChange={setSearchValue}
+          searchValue={searchValueInput}
+          onSearchChange={setSearchValueInput}
         />
       </HeaderField>
       <Field>
@@ -135,24 +164,24 @@ export const Rooms: FunctionComponent = () => {
         loaders={loaders}
       >
         <>
-          <Field>
-            <ul className="rooms-list">
-              {roomsSafe.length === 0 ? (
+          <ul className="rooms-list">
+            {(rooms && !rooms.length) ? (
+              <Field>
                 <div className="rooms-list-no-data">{Localization.NoRecords}</div>
-              ) : (
-                roomsSafe.map(createRoomItem)
-              )}
-            </ul>
-          </Field>
-          <Paginator
-            pageNumber={pageNumber}
-            prevDisabled={pageNumber === initialPageNumber}
-            nextDisabled={roomsSafe.length !== pageSize}
-            onPrevClick={handlePrevPage}
-            onNextClick={handleNextPage}
-          />
+              </Field>
+            ) : (
+              roomsSafe.map(createRoomItem)
+            )}
+          </ul>
         </>
       </ProcessWrapper>
+      <Paginator
+        pageNumber={pageNumber}
+        prevDisabled={loading || (pageNumber === initialPageNumber)}
+        nextDisabled={loading || (roomsSafe.length !== pageSize)}
+        onPrevClick={handlePrevPage}
+        onNextClick={handleNextPage}
+      />
     </MainContentWrapper>
   );
 };

@@ -1,9 +1,11 @@
-import { FunctionComponent, ReactElement } from 'react';
+import { FunctionComponent, ReactElement, memo, useEffect, useState } from 'react';
 import { Field } from '../FieldsBlock/Field';
 import { Loader } from '../Loader/Loader';
 import { Localization } from '../../localization';
 
 import './ProcessWrapper.css';
+
+export const skeletonTransitionMs = 300;
 
 export interface LoaderStyle {
   height?: string;
@@ -18,7 +20,7 @@ export interface ProcessWrapperProps {
   children: ReactElement<any, any> | null;
 }
 
-export const ProcessWrapper: FunctionComponent<ProcessWrapperProps> = ({
+const ProcessWrapperComponent: FunctionComponent<ProcessWrapperProps> = ({
   loading,
   loadingPrefix,
   loaders,
@@ -26,6 +28,47 @@ export const ProcessWrapper: FunctionComponent<ProcessWrapperProps> = ({
   errorPrefix,
   children,
 }) => {
+  const [skeletonTransition, setSkeletonTransition] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
+  const [firstLoading, setFirstLoading] = useState(true);
+
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+    const loaderWrapper = document.querySelectorAll('.process-wrapper-loader');
+    loaderWrapper?.forEach(el => el.classList.add('fadeOut'));
+    setFirstLoading(false);
+    setSkeletonTransition(true);
+  }, [loading]);
+
+  useEffect(() => {
+    if (!skeletonTransition) {
+      return;
+    }
+    const transitionTimeout = setTimeout(() => {
+      setSkeletonTransition(false);
+    }, skeletonTransitionMs);
+
+    return () => {
+      clearTimeout(transitionTimeout);
+    };
+  }, [skeletonTransition]);
+
+  useEffect(() => {
+    if (!loading) {
+      return;
+    }
+    setShowLoading(true);
+  }, [loading]);
+
+  useEffect(() => {
+    if (skeletonTransition || firstLoading) {
+      return;
+    }
+    setShowLoading(false);
+  }, [skeletonTransition, firstLoading]);
+
   if (error) {
     return (
       <Field>
@@ -34,7 +77,7 @@ export const ProcessWrapper: FunctionComponent<ProcessWrapperProps> = ({
     );
   }
 
-  if (loading) {
+  if (showLoading || loading) {
     return (
       <>
         {
@@ -42,7 +85,7 @@ export const ProcessWrapper: FunctionComponent<ProcessWrapperProps> = ({
             <Field key={`loader${index}`}>
               <div
                 style={{ height: loader.height || '1.8rem' }}
-                className='process-wrapper-loader'
+                className="process-wrapper-loader"
               >
                 {!!loadingPrefix && index === 0 ? (
                   <div>{loadingPrefix}</div>
@@ -59,3 +102,5 @@ export const ProcessWrapper: FunctionComponent<ProcessWrapperProps> = ({
 
   return children;
 };
+
+export const ProcessWrapper = memo(ProcessWrapperComponent);
