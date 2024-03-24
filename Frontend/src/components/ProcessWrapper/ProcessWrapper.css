@@ -1,5 +1,33 @@
+.process-wrapper-loader-wrapper {
+  margin: 0rem 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--list-border-color);
+}
+
 .process-wrapper-loader {
+  width: 100%;
   display: flex;
   justify-content: center;
+}
+
+.process-wrapper-loader.fadeOut {
+  animation-duration: 0.4s;
+  animation-fill-mode: both;
+  animation-name: fadeOut;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.process-wrapper-loader .loader-wrapper {
+  height: 100%;
+  display: flex;
   align-items: center;
 }
