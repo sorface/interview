@@ -39,6 +39,7 @@ interface VideoChatProps {
   userStream: MediaStream | null;
   videoTrackEnabled: boolean;
   onSendWsMessage: SendMessage;
+  onUpdatePeersLength: (length: number) => void;
 };
 
 interface PeerMeta {
@@ -86,6 +87,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   userStream,
   videoTrackEnabled,
   onSendWsMessage,
+  onUpdatePeersLength,
 }) => {
   const auth = useContext(AuthContext);
   const {
@@ -110,6 +112,10 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   const { activeReactions } = useReactionsStatus({
     lastMessage: lastWsMessage,
   });
+
+  useEffect(() => {
+    onUpdatePeersLength(peers.length);
+  }, [peers, onUpdatePeersLength]);
 
   useEffect(() => {
     if (!roomState) {
@@ -469,7 +475,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     <div className='room-columns'>
       <Field className='videochat-field'>
         <div className='videochat'>
-          <div className='videochat-participants'>{Localization.Participants}: {peers.length + 1}</div>
           <VideochatParticipant
             order={viewerMode ? viewerOrder - 1 : videoOrder[auth?.id || '']}
             viewer={viewerMode}
