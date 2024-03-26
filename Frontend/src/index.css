@@ -106,6 +106,10 @@ button.active {
   color: var(--button-bg);
 }
 
+button.danger {
+  border-color: var(--active);
+}
+
 button:disabled,
 button[disabled] {
   opacity: 0.45;
