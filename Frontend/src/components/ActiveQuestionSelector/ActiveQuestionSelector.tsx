@@ -116,7 +116,7 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
       </div>
       {showMenu && (
         <div className="activeQuestionSelector-menu">
-          <div ref={searchRef}>
+          <div ref={searchRef} className="activeQuestionSelector-search-panel">
             <span>{Localization.ShowClosedQuestions}</span>
             <input type="checkbox" onClick={onShowClosedQuestions} />
             <div className="search-box" >
@@ -127,7 +127,7 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
             </div>
           </div>
           {options.length === 0 && (
-            <div>{Localization.NoQuestionsSelector}</div>
+            <div className='no-questions'>{Localization.NoQuestionsSelector}</div>
           )}
           {options.map((option) => (
             <div
