@@ -88,7 +88,7 @@ button {
   font-size: 0.9rem;
   border: 1px solid var(--button-border-color);
   padding: 0rem 2rem;
-  height: 1.75rem;
+  min-height: 1.75rem;
   text-align: center;
   text-decoration: none;
   display: inline-block;
