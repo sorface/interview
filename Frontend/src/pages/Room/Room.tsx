@@ -29,6 +29,7 @@ import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useUnreadChatMessages } from './hooks/useUnreadChatMessages';
 import { Localization } from '../../localization';
 import { MessagePage } from '../../components/MessagePage/MessagePage';
+import { ThemedIcon } from './components/ThemedIcon/ThemedIcon';
 
 import './Room.css';
 
@@ -60,6 +61,7 @@ export const Room: FunctionComponent = () => {
   const [cameraEnabled, setCameraEnabled] = useState(true);
   const [selectedDevices, setSelectedDevices] = useState<Devices | null>(null);
   const [recognitionEnabled, setRecognitionEnabled] = useState(false);
+  const [peersLength, setPeersLength] = useState(0);
   const { userStream } = useUserStream({
     selectedDevices,
   });
@@ -322,7 +324,8 @@ export const Room: FunctionComponent = () => {
                 <span
                   className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
                 >
-                  <div>{room?.name}</div>
+                  <h3>{room?.name}</h3>
+                  <span className='room-page-header-viewers'><ThemedIcon name={IconNames.People} /> {peersLength + 1}</span>
                   {viewerMode && (
                     <div
                       className="room-page-header-question-viewer"
@@ -372,6 +375,7 @@ export const Room: FunctionComponent = () => {
                 userStream={userStream}
                 videoTrackEnabled={cameraEnabled}
                 onSendWsMessage={sendMessage}
+                onUpdatePeersLength={setPeersLength}
               />
             </div>
           </div>
@@ -399,6 +403,7 @@ export const Room: FunctionComponent = () => {
                 ) : (
                   <SwitchButton
                     enabled={recognitionEnabled}
+                    htmlDisabled={!micEnabled}
                     iconEnabledName={IconNames.RecognitionOn}
                     iconDisabledName={IconNames.RecognitionOff}
                     subCaption={Localization.VoiceRecognition}

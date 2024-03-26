@@ -29,6 +29,7 @@ export const enum IconNames {
   CodeEditor = 'code-slash',
   ThemeSwitchLight = 'sunny',
   ThemeSwitchDark = 'moon',
+  People = 'people',
 }
 
 export const enum IconThemePostfix {
