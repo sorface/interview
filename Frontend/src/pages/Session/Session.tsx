@@ -31,7 +31,7 @@ export const Session: FunctionComponent = () => {
           <ThemeSwitch />
         </Field>
         <Field>
-          <button onClick={handleLogOut}>{Localization.LogOut}🚪</button>
+          <button className="danger" onClick={handleLogOut}>{Localization.LogOut}</button>
         </Field>
       </>
     );
