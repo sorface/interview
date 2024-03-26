@@ -403,6 +403,7 @@ export const Room: FunctionComponent = () => {
                 ) : (
                   <SwitchButton
                     enabled={recognitionEnabled}
+                    htmlDisabled={!micEnabled}
                     iconEnabledName={IconNames.RecognitionOn}
                     iconDisabledName={IconNames.RecognitionOff}
                     subCaption={Localization.VoiceRecognition}
