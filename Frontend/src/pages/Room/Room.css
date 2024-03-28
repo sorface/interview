@@ -19,6 +19,10 @@
   padding-bottom: 1rem;
 }
 
+.room-page .room-page-header-wrapper {
+  display: flex;
+}
+
 .room-page .room-page-header-caption {
   display: flex;
   width: 270px;
@@ -43,6 +47,7 @@
 
 .room-page .room-page-header-caption-viewer {
   width: 100%;
+  flex-direction: column;
 }
 
 .room-page .room-page-header .reactions-field {
