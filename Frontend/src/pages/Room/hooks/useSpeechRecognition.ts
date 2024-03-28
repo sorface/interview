@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Localization } from '../../../localization';
+import { LocalizationKey } from '../../../localization';
+import { useLocalizationCaptions } from '../../../hooks/useLocalizationCaptions';
 
 interface UseSpeechRecognitionParams {
   recognitionEnabled: boolean;
@@ -12,6 +13,7 @@ export const useSpeechRecognition = ({
   recognitionEnabled,
   onVoiceRecognition,
 }: UseSpeechRecognitionParams) => {
+  const localizationCaptions = useLocalizationCaptions();
   const recognition = useRef(SpeechRecognition ? new SpeechRecognition() : null);
   const [recognitionNotSupported, setRecognitionNotSupported] = useState(false);
 
@@ -33,7 +35,7 @@ export const useSpeechRecognition = ({
     if (!recog) {
       return;
     }
-    recog.lang = Localization.SpeechRecognitionLang;
+    recog.lang = localizationCaptions[LocalizationKey.SpeechRecognitionLang];
     recog.continuous = true;
     recog.onend = () => {
       if (recognitionEnabled) {
@@ -44,7 +46,7 @@ export const useSpeechRecognition = ({
     return () => {
       recog.onend = null;
     }
-  }, [recognitionEnabled]);
+  }, [recognitionEnabled, localizationCaptions]);
 
   useEffect(() => {
     const recog = recognition.current;

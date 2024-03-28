@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-import { Localization } from '../../localization';
+import { LocalizationKey } from '../../localization';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 
 import './Mark.css';
 
@@ -12,8 +13,9 @@ export const Mark: FunctionComponent<MarkProps> = ({
   likes,
   dislikes,
 }) => {
-  const [markWithComment, setMarkWithComment] = useState<string>(Localization.MarkNotCalculated);
-  const [markPostfix, setMarkPostfix] = useState<string>(Localization.MarkNotCalculated);
+  const localizationCaptions = useLocalizationCaptions();
+  const [markWithComment, setMarkWithComment] = useState<string>(localizationCaptions[LocalizationKey.MarkNotCalculated]);
+  const [markPostfix, setMarkPostfix] = useState<string>(localizationCaptions[LocalizationKey.MarkNotCalculated]);
 
   useEffect(() => {
     const getMarkWithComment = (mark: number) => {
@@ -21,22 +23,22 @@ export const Mark: FunctionComponent<MarkProps> = ({
       const markParts = mark.toString().split('.');
       const markFirstDecimal = markParts.length < 2 ? 0 : +markParts[1][0];
       if (markFirstDecimal >= 8) {
-        return `${markInt + 1} ${Localization.MarkWithMinus}.`;
+        return `${markInt + 1} ${localizationCaptions[LocalizationKey.MarkWithMinus]}.`;
       }
       if (markFirstDecimal > 5) {
-        return `${markInt} ${Localization.MarkWithPlus}.`;
+        return `${markInt} ${localizationCaptions[LocalizationKey.MarkWithPlus]}.`;
       }
-      return `${Localization.MarkAveragePrefix} ${markInt} ${Localization.MarkAverage}.`;
+      return `${localizationCaptions[LocalizationKey.MarkAveragePrefix]} ${markInt} ${localizationCaptions[LocalizationKey.MarkAverage]}.`;
     };
 
     const getMarkPostfix = (mark: number) => {
       if (mark > 4) {
-        return Localization.MarkPostfixCool;
+        return localizationCaptions[LocalizationKey.MarkPostfixCool];
       }
       if (mark >= 3) {
-        return Localization.MarkPostfixAverage;
+        return localizationCaptions[LocalizationKey.MarkPostfixAverage];
       }
-      return Localization.MarkPostfixBad;
+      return localizationCaptions[LocalizationKey.MarkPostfixBad];
     };
 
     const totalCount = likes + dislikes;
@@ -45,12 +47,12 @@ export const Mark: FunctionComponent<MarkProps> = ({
     const markPostfix = getMarkPostfix(mark);
     setMarkWithComment(newMarkWithComment);
     setMarkPostfix(markPostfix);
-  }, [likes, dislikes]);
+  }, [likes, dislikes, localizationCaptions]);
 
   return (
     <div className="mark">
       <div>{markWithComment}</div>
-      <div className="mark-postfix">{Localization.MarkSmmary}. {markPostfix}</div>
+      <div className="mark-postfix">{localizationCaptions[LocalizationKey.MarkSmmary]}. {markPostfix}</div>
     </div>
   );
 };

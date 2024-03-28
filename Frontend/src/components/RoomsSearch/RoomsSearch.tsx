@@ -1,5 +1,6 @@
 import { ChangeEventHandler, FunctionComponent } from 'react';
-import { Localization } from '../../localization';
+import { LocalizationKey } from '../../localization';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 
 import './RoomsSearch.css';
 
@@ -21,7 +22,7 @@ export const RoomsSearch: FunctionComponent<RoomsSearchProps> = ({
       <input
         type="text"
         className="qustions-search-value"
-        placeholder={Localization.SearchByName}
+        placeholder={useLocalizationCaptions()[LocalizationKey.SearchByName]}
         value={searchValue}
         onChange={handleSearchChange}
       />

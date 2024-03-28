@@ -1,7 +1,8 @@
 import React, { ChangeEventHandler, FunctionComponent, MouseEventHandler, useEffect, useRef, useState } from 'react';
 import { OpenIcon } from '../OpenIcon/OpenIcon';
-import { Localization } from '../../localization';
+import { LocalizationKey } from '../../localization';
 import { RoomQuestion } from '../../types/room';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 
 import './ActiveQuestionSelector.css';
 
@@ -31,6 +32,7 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   const [searchValue, setSearchValue] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
+  const localizationCaptions = useLocalizationCaptions();
 
   const isOpened = (question: RoomQuestion) => {
     return openQuestions.includes(question.id);
@@ -87,7 +89,7 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
     if (!selectedValue && !initialQuestionText) {
       return placeHolder;
     }
-    return `${Localization.ActiveQuestion}: ${selectedValue?.value || initialQuestionText}`;
+    return `${localizationCaptions[LocalizationKey.ActiveQuestion]}: ${selectedValue?.value || initialQuestionText}`;
   };
 
   const onItemClick = (option: RoomQuestion) => {
@@ -117,17 +119,17 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
       {showMenu && (
         <div className="activeQuestionSelector-menu">
           <div ref={searchRef} className="activeQuestionSelector-search-panel">
-            <span>{Localization.ShowClosedQuestions}</span>
+            <span>{localizationCaptions[LocalizationKey.ShowClosedQuestions]}</span>
             <input type="checkbox" onClick={onShowClosedQuestions} />
             <div className="search-box" >
               <input onChange={onSearch} value={searchValue} />
               {searchValue && (
-                <button onClick={handleCreate}>{Localization.CreateQuestion}</button>
+                <button onClick={handleCreate}>{localizationCaptions[LocalizationKey.CreateQuestion]}</button>
               )}
             </div>
           </div>
           {options.length === 0 && (
-            <div className='no-questions'>{Localization.NoQuestionsSelector}</div>
+            <div className='no-questions'>{localizationCaptions[LocalizationKey.NoQuestionsSelector]}</div>
           )}
           {options.map((option) => (
             <div

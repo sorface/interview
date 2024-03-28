@@ -14,13 +14,15 @@ import { RoomReviews } from './components/RoomReviews/RoomReviews';
 import { AuthContext } from '../../context/AuthContext';
 import { checkAdmin } from '../../utils/checkAdmin';
 import { ActionModal } from '../../components/ActionModal/ActionModal';
-import { Localization } from '../../localization';
+import { LocalizationKey } from '../../localization';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 
 import './RoomAnayticsSummary.css';
 
 export const RoomAnayticsSummary: FunctionComponent = () => {
   const auth = useContext(AuthContext);
   const admin = checkAdmin(auth);
+  const localizationCaptions = useLocalizationCaptions();
   let { id } = useParams();
   const { apiMethodState, fetchData } = useApiMethod<AnalyticsSummary, RoomType['id']>(roomsApiDeclaration.analyticsSummary);
   const { data, process: { loading, error } } = apiMethodState;
@@ -51,7 +53,7 @@ export const RoomAnayticsSummary: FunctionComponent = () => {
   } = apiRoomStartReviewMethodState;
 
   const displayedReactions = ['Like', 'Dislike'];
-  const displayedReactionsView = [Localization.LikeTable, Localization.DislikeTable];
+  const displayedReactionsView = [localizationCaptions[LocalizationKey.LikeTable], localizationCaptions[LocalizationKey.DislikeTable]];
   const [totalLikesDislikes, setTotalLikesDislikes] = useState({ likes: 0, dislikes: 0 });
   const [totalMarkError, setTotalMarkError] = useState('');
   const loaders = [
@@ -89,11 +91,11 @@ export const RoomAnayticsSummary: FunctionComponent = () => {
       }
     }, { likes: 0, dislikes: 0 });
     if (!expertReactionsSummary.likes || !expertReactionsSummary.dislikes) {
-      setTotalMarkError(Localization.FailedToCalculateMark);
+      setTotalMarkError(localizationCaptions[LocalizationKey.FailedToCalculateMark]);
       return;
     }
     setTotalLikesDislikes(expertReactionsSummary);
-  }, [data]);
+  }, [data, localizationCaptions]);
 
   const handleCloseRoom = useCallback(() => {
     if (!id) {
@@ -112,7 +114,7 @@ export const RoomAnayticsSummary: FunctionComponent = () => {
   return (
     <MainContentWrapper className="room-anaytics-summary">
       <HeaderWithLink
-        title={Localization.RoomAnayticsSummary}
+        title={localizationCaptions[LocalizationKey.RoomAnayticsSummary]}
         linkVisible={true}
         path={pathnames.rooms}
         linkCaption="<"
@@ -127,10 +129,10 @@ export const RoomAnayticsSummary: FunctionComponent = () => {
         {!!(admin && room?.roomStatus === 'Review') && (
             <Field>
               <ActionModal
-                title={Localization.CloseRoomModalTitle}
-                openButtonCaption={Localization.CloseRoom}
+                title={localizationCaptions[LocalizationKey.CloseRoomModalTitle]}
+                openButtonCaption={localizationCaptions[LocalizationKey.CloseRoom]}
                 loading={roomCloseLoading}
-                loadingCaption={Localization.CloseRoomLoading}
+                loadingCaption={localizationCaptions[LocalizationKey.CloseRoomLoading]}
                 error={roomCloseError}
                 onAction={handleCloseRoom}
               />
@@ -139,10 +141,10 @@ export const RoomAnayticsSummary: FunctionComponent = () => {
           {!!(admin && room?.roomStatus === 'Close') && (
             <Field>
               <ActionModal
-                title={Localization.StartReviewRoomModalTitle}
-                openButtonCaption={Localization.StartReviewRoom}
+                title={localizationCaptions[LocalizationKey.StartReviewRoomModalTitle]}
+                openButtonCaption={localizationCaptions[LocalizationKey.StartReviewRoom]}
                 loading={roomStartReviewLoading}
-                loadingCaption={Localization.CloseRoomLoading}
+                loadingCaption={localizationCaptions[LocalizationKey.CloseRoomLoading]}
                 error={roomStartReviewError}
                 onAction={handleStartReviewRoom}
               />
@@ -152,17 +154,17 @@ export const RoomAnayticsSummary: FunctionComponent = () => {
             <h3>{room?.name}</h3>
           </Field>
           <Field>
-            <h3>{Localization.MarkSmmary}:</h3>
+            <h3>{localizationCaptions[LocalizationKey.MarkSmmary]}:</h3>
             <div>
               {totalMarkError ? totalMarkError : (<Mark {...totalLikesDislikes} />)}
             </div>
           </Field>
           <Field>
-            <h3>{Localization.QuestionsSummary}:</h3>
+            <h3>{localizationCaptions[LocalizationKey.QuestionsSummary]}:</h3>
             <table className='anaytics-table'>
               <thead>
                 <tr>
-                  <th>{Localization.Question}</th>
+                  <th>{localizationCaptions[LocalizationKey.Question]}</th>
                   <th></th>
                   <th></th>
                 </tr>
@@ -192,7 +194,7 @@ export const RoomAnayticsSummary: FunctionComponent = () => {
                     ))}
                     {question.viewers && question.viewers.map(viewer => (
                       <tr key={`${question.id}-viewer`} className="user-row">
-                        <td>{Localization.Viewers}</td>
+                        <td>{localizationCaptions[LocalizationKey.Viewers]}</td>
                         {displayedReactions.map(displayedReaction => (
                           <td key={`viewer-${displayedReaction}`}>
                             {viewer.reactionsSummary.find(

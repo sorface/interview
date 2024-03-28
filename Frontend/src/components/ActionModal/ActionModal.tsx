@@ -1,6 +1,7 @@
 import { FunctionComponent, useCallback, useState } from 'react';
 import Modal from 'react-modal';
-import { Localization } from '../../localization';
+import { LocalizationKey } from '../../localization';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 
 import './ActionModal.css';
 
@@ -22,6 +23,7 @@ export const ActionModal: FunctionComponent<ActionModalProps> = ({
   onAction,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
+  const localizationCaptions = useLocalizationCaptions();
 
   const handleOpenModal = useCallback(() => {
     setModalOpen(true);
@@ -41,7 +43,7 @@ export const ActionModal: FunctionComponent<ActionModalProps> = ({
   }
 
   if (error) {
-    return (<div>{Localization.Error}: {error}</div>);
+    return (<div>{localizationCaptions[LocalizationKey.Error]}: {error}</div>);
   }
 
   return (
@@ -53,7 +55,7 @@ export const ActionModal: FunctionComponent<ActionModalProps> = ({
       </button>
       <Modal
         isOpen={modalOpen}
-        contentLabel={Localization.CloseRoom}
+        contentLabel={localizationCaptions[LocalizationKey.CloseRoom]}
         appElement={document.getElementById('root') || undefined}
         className="action-modal"
         onRequestClose={handleCloseModal}
@@ -68,8 +70,8 @@ export const ActionModal: FunctionComponent<ActionModalProps> = ({
           <button onClick={handleCloseModal}>X</button>
         </div>
         <div className="action-modal-content">
-          <button onClick={onCallAction}>{Localization.Yes}</button>
-          <button onClick={handleCloseModal}>{Localization.No}</button>
+          <button onClick={onCallAction}>{localizationCaptions[LocalizationKey.Yes]}</button>
+          <button onClick={handleCloseModal}>{localizationCaptions[LocalizationKey.No]}</button>
         </div>
       </Modal>
     </>

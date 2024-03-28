@@ -1,5 +1,6 @@
 import { ChangeEventHandler, FunctionComponent } from 'react';
-import { Localization } from '../../localization';
+import { LocalizationKey } from '../../localization';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 
 import './RoomsFilter.css';
 
@@ -16,7 +17,8 @@ export const RoomsFilter: FunctionComponent<RoomsFilterProps> = ({
   onParticipatingChange,
   onClosedChange,
 }) => {
-    const handleParticipatingChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+  const localizationCaptions = useLocalizationCaptions();
+  const handleParticipatingChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     onParticipatingChange(e.target.checked);
   };
 
@@ -32,14 +34,14 @@ export const RoomsFilter: FunctionComponent<RoomsFilterProps> = ({
         checked={participating}
         onChange={handleParticipatingChange}
       />
-      <label htmlFor="participating-rooms">{Localization.ParticipatingRooms}</label>
+      <label htmlFor="participating-rooms">{localizationCaptions[LocalizationKey.ParticipatingRooms]}</label>
       <input
         id="closed-rooms"
         type="checkbox"
         checked={closed}
         onChange={handleClosedChange}
       />
-      <label htmlFor="closed-rooms">{Localization.ClosedRooms}</label>
+      <label htmlFor="closed-rooms">{localizationCaptions[LocalizationKey.ClosedRooms]}</label>
     </div>
   );
 };

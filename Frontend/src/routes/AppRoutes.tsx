@@ -16,8 +16,9 @@ import { Terms } from '../pages/Terms/Terms';
 import { RoomAnayticsSummary } from '../pages/RoomAnayticsSummary/RoomAnayticsSummary';
 import { NavMenu } from '../components/NavMenu/NavMenu';
 import { REACT_APP_BUILD_HASH } from '../config';
-import { Localization } from '../localization';
 import { UserAvatar } from '../components/UserAvatar/UserAvatar';
+import { LocalizationCaption } from '../components/LocalizationCaption/LocalizationCaption';
+import { LocalizationKey } from '../localization';
 
 interface AppRoutesProps {
   user: User | null;
@@ -25,7 +26,7 @@ interface AppRoutesProps {
 
 const renderFooter = () => (
   <footer>
-    <div>{Localization.BuildHash}: {REACT_APP_BUILD_HASH}</div>
+    <div><LocalizationCaption captionKey={LocalizationKey.BuildHash} />: {REACT_APP_BUILD_HASH}</div>
   </footer>
 );
 
@@ -48,12 +49,12 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
         <span className='nav-menu-user-nickname'>{user.nickname}</span>
       </div>
     ) :
-    (Localization.UnauthorizedMessage);
+    (<LocalizationCaption captionKey={LocalizationKey.UnauthorizedMessage} />);
 
   return (
     <>
       <div className={`App-content-wrapper ${fullScreenPage ? 'full-screen-page' : ''}`}>
-        {!fullScreenPage && (<NavMenu item={{ path: pathnames.home.replace(':redirect?', ''), content: Localization.AppName }} />)}
+        {!fullScreenPage && (<NavMenu item={{ path: pathnames.home.replace(':redirect?', ''), content: <LocalizationCaption captionKey={LocalizationKey.AppName} /> }} />)}
         <div className="App-content">
           <Routes>
             <Route path={pathnames.home} element={<Home />} />

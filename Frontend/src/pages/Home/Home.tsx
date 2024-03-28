@@ -5,14 +5,16 @@ import { MainContentWrapper } from '../../components/MainContentWrapper/MainCont
 import { pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { HomeAction } from './components/HomeContent/HomeAction';
-import { Localization } from '../../localization';
+import { LocalizationKey } from '../../localization';
 import { HeaderField } from '../../components/HeaderField/HeaderField';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 
 import './Home.css';
 
 export const Home: FunctionComponent = () => {
   const auth = useContext(AuthContext);
   const { redirect } = useParams();
+  const localizationCaptions = useLocalizationCaptions();
 
   if (auth && redirect) {
     return <Navigate to={redirect} replace />;
@@ -26,7 +28,7 @@ export const Home: FunctionComponent = () => {
     <MainContentWrapper>
       <HeaderField/>
       <Field>
-        <p>{Localization.AppDescription}</p>
+        <p>{localizationCaptions[LocalizationKey.AppDescription]}</p>
         <div className="home-action">
           <HomeAction />
         </div>
@@ -34,7 +36,7 @@ export const Home: FunctionComponent = () => {
           className="home-terms-link"
           to={pathnames.terms}
         >
-          {Localization.TermsOfUsage}
+          {localizationCaptions[LocalizationKey.TermsOfUsage]}
         </Link>
       </Field>
     </MainContentWrapper>

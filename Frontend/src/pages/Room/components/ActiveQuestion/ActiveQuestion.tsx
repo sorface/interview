@@ -4,7 +4,8 @@ import { Room, RoomQuestion } from '../../../../types/room';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
 import { Question } from '../../../../types/question';
 import { ChangeActiveQuestionBody, CreateRoomQuestionBody, roomQuestionApiDeclaration } from '../../../../apiDeclarations';
-import { Localization } from '../../../../localization';
+import { LocalizationKey } from '../../../../localization';
+import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 
 import './ActiveQuestion.css';
 
@@ -20,6 +21,7 @@ export const ActiveQuestion: FunctionComponent<ActiveQuestionProps> = ({
   initialQuestionText,
 }) => {
   const [showClosedQuestions, setShowClosedQuestions] = useState(false);
+  const localizationCaptions = useLocalizationCaptions();
 
   const {
     apiMethodState: apiSendActiveQuestionState,
@@ -75,15 +77,15 @@ export const ActiveQuestion: FunctionComponent<ActiveQuestionProps> = ({
         questions={roomQuestions}
         openQuestions={openQuestionsIds}
         initialQuestionText={initialQuestionText}
-        placeHolder={Localization.SelectActiveQuestion}
+        placeHolder={localizationCaptions[LocalizationKey.SelectActiveQuestion]}
         onSelect={handleQuestionSelect}
         onShowClosedQuestions={handleShowClosedQuestions}
         onCreate={handleQuestionCreate}
       />
-      {loadingRoomActiveQuestion && <div>{Localization.SendingActiveQuestion}...</div>}
-      {errorRoomActiveQuestion && <div>{Localization.ErrorSendingActiveQuestion}...</div>}
-      {loadingCreateQuestion && <div>{Localization.CreatingRoomQuestion}...</div>}
-      {errorCreateQuestion && <div>{Localization.ErrorCreatingRoomQuestion}...</div>}
+      {loadingRoomActiveQuestion && <div>{localizationCaptions[LocalizationKey.SendingActiveQuestion]}...</div>}
+      {errorRoomActiveQuestion && <div>{localizationCaptions[LocalizationKey.ErrorSendingActiveQuestion]}...</div>}
+      {loadingCreateQuestion && <div>{localizationCaptions[LocalizationKey.CreatingRoomQuestion]}...</div>}
+      {errorCreateQuestion && <div>{localizationCaptions[LocalizationKey.ErrorCreatingRoomQuestion]}...</div>}
     </div>
   );
 };

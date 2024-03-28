@@ -19,7 +19,8 @@ import { EventsSearchParams, roomsApiDeclaration } from '../../../../apiDeclarat
 import { EventsSearch } from '../../../../types/event';
 import { UserType } from '../../../../types/user';
 import { useReactionsStatus } from '../../hooks/useReactionsStatus';
-import { Localization } from '../../../../localization';
+import { LocalizationKey } from '../../../../localization';
+import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 
 import './VideoChat.css';
 
@@ -90,6 +91,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   onUpdatePeersLength,
 }) => {
   const auth = useContext(AuthContext);
+  const localizationCaptions = useLocalizationCaptions();
   const {
     apiMethodState: apiRoomEventsSearchState,
     fetchData: fetchRoomEventsSearch,
@@ -134,13 +136,13 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       ...getChatMessageEvents(roomEventsSearch, 'ChatMessage', true),
       ...getChatMessageEvents(roomEventsSearch, 'VoiceRecognition', false),
       createTranscript({
-        userNickname: Localization.ChatWelcomeMessageNickname,
-        value: `${Localization.ChatWelcomeMessage}, ${auth?.nickname}.`,
+        userNickname: localizationCaptions[LocalizationKey.ChatWelcomeMessageNickname],
+        value: `${localizationCaptions[LocalizationKey.ChatWelcomeMessage]}, ${auth?.nickname}.`,
         fromChat: true
       }),
     ];
     setTranscripts(newTranscripts);
-  }, [roomEventsSearch, auth?.nickname]);
+  }, [roomEventsSearch, auth?.nickname, localizationCaptions]);
 
   useEffect(() => {
     const frequencyData = new Uint8Array(frequencyBinCount);
@@ -479,7 +481,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             order={viewerMode ? viewerOrder - 1 : videoOrder[auth?.id || '']}
             viewer={viewerMode}
             avatar={auth?.avatar}
-            nickname={`${auth?.nickname} (${Localization.You})`}
+            nickname={`${auth?.nickname} (${localizationCaptions[LocalizationKey.You]})`}
             videoTrackEnabled={videoTrackEnabled}
             reaction={activeReactions[auth?.id || '']}
           >
