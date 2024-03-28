@@ -56,16 +56,16 @@ public class SecurityService : ISecurityService
         }
 
         var participantPermission = await _roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(roomId, userId.Value, cancellationToken);
-        if (participantPermission is null)
-        {
-            throw AccessDeniedException.CreateForAction(action.Name);
-        }
 
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-        if (participantPermission.Permissions is not null &&
-            participantPermission.Permissions.Any(e => e.PermissionId == action.Id))
+        // The user may not yet be a member of the room.
+        if (participantPermission is not null)
         {
-            return;
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+            if (participantPermission.Permissions is not null &&
+                participantPermission.Permissions.Any(e => e.PermissionId == action.Id))
+            {
+                return;
+            }
         }
 
         await EnsurePermissionAsync(action, cancellationToken);
