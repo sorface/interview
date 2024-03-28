@@ -326,8 +326,10 @@ export const Room: FunctionComponent = () => {
                 <span
                   className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
                 >
-                  <h3>{room?.name}</h3>
-                  <span className='room-page-header-viewers'><ThemedIcon name={IconNames.People} /> {peersLength + 1}</span>
+                  <div className='room-page-header-wrapper'>
+                    <h3>{room?.name}</h3>
+                    <span className='room-page-header-viewers'><ThemedIcon name={IconNames.People} /> {peersLength + 1}</span>
+                  </div>
                   {viewerMode && (
                     <div
                       className="room-page-header-question-viewer"
