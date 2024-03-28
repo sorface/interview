@@ -66,6 +66,7 @@ public class RoomInviteService : IRoomInviteService
         if (participant is null)
         {
             var participants = await _roomParticipantService.CreateAsync(
+                roomInvite.Room.Id,
                 new[] { (user, roomInvite.Room, roomInvite.ParticipantType ?? SERoomParticipantType.Viewer) },
                 cancellationToken);
             var roomParticipant = participants.First();

@@ -315,6 +315,13 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
+                            Id = new Guid("07dea11a-65a4-4826-ab4f-9d2cdfaa72f3"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("b530321a-a51a-4a36-8afd-6e8a8dbae248"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
                             Id = new Guid("b9ad0f66-08c6-4f95-900c-94750f1ada6b"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("9ce5949f-a7b9-489c-8b04-bd6724aff687"),

@@ -132,7 +132,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             .Concat(examinees.Select(e => (e, room, SERoomParticipantType.Examinee)))
             .ToList();
 
-        var createdParticipants = await _roomParticipantService.CreateAsync(participants, cancellationToken);
+        var createdParticipants = await _roomParticipantService.CreateAsync(room.Id, participants, cancellationToken);
         room.Participants.AddRange(createdParticipants);
         await _roomRepository.CreateAsync(room, cancellationToken);
         return room;
@@ -203,6 +203,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         }
 
         var participants = await _roomParticipantService.CreateAsync(
+            roomId,
             new[] { (user, currentRoom, SERoomParticipantType.Viewer) },
             cancellationToken);
         participant = participants.First();
@@ -484,6 +485,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         }
 
         var participants = await _roomParticipantService.CreateAsync(
+            roomId,
             new[] { (user, room, SERoomParticipantType.Viewer) },
             cancellationToken);
         participant = participants.First();

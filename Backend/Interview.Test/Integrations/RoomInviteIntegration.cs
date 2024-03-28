@@ -51,7 +51,7 @@ namespace Interview.Test.Integrations
             {
                 userAccessor.SetUser(user);
             }
-            var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext));
+            var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext), userAccessor);
             var roomService = new RoomService(
                 roomRepository,
                 new RoomQuestionRepository(appDbContext),
@@ -119,7 +119,7 @@ namespace Interview.Test.Integrations
             {
                 userAccessor.SetUser(user);
             }
-            var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext));
+            var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext), userAccessor);
             var roomService = new RoomService(
                 roomRepository,
                 new RoomQuestionRepository(appDbContext),
@@ -183,7 +183,7 @@ namespace Interview.Test.Integrations
             {
                 userAccessor.SetUser(user);
             }
-            var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext));
+            var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext), userAccessor);
             var roomService = new RoomService(
                 roomRepository,
                 new RoomQuestionRepository(appDbContext),

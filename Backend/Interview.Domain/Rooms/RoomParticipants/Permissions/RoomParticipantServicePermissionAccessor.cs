@@ -44,9 +44,10 @@ public class RoomParticipantServicePermissionAccessor : IRoomParticipantService,
     }
 
     public Task<IReadOnlyCollection<RoomParticipant>> CreateAsync(
+        Guid roomId,
         IReadOnlyCollection<(User User, Room Room, SERoomParticipantType Type)> participants,
         CancellationToken cancellationToken = default)
     {
-        return _roomParticipantService.CreateAsync(participants, cancellationToken);
+        return _roomParticipantService.CreateAsync(roomId, participants, cancellationToken);
     }
 }

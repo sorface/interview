@@ -27,10 +27,12 @@ public interface IRoomParticipantService : IService
     /// <summary>
     /// Creates new Participants without saving them to the database.
     /// </summary>
+    /// <param name="roomId">Room Id.</param>
     /// <param name="participants">Data to create Participant.</param>
     /// <param name="cancellationToken">Cancellation Token.</param>
     /// <returns>Data of the new room participant.</returns>
     Task<IReadOnlyCollection<RoomParticipant>> CreateAsync(
+        Guid roomId,
         IReadOnlyCollection<(User User, Room Room, SERoomParticipantType Type)> participants,
         CancellationToken cancellationToken = default);
 }
