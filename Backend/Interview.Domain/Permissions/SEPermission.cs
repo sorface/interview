@@ -320,6 +320,13 @@ public class SEPermission : SmartEnum<SEPermission>
             "Getting a Room Transcription",
             EVPermission.TranscriptionGet);
 
+    public static readonly SEPermission RoomInviteGet =
+        new(
+            Guid.Parse("B530321A-A51A-4A36-8AFD-6E8A8DBAE248"),
+            "RoomInviteGet",
+            "Getting a Room Invites",
+            EVPermission.RoomInviteGet);
+
     public Guid Id { get; }
 
     public string Description { get; }

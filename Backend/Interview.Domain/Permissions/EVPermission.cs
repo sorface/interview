@@ -151,5 +151,8 @@ public enum EVPermission
 
     [Description("Getting a Room Transcription")]
     TranscriptionGet,
+
+    [Description("Getting a Room Invites")]
+    RoomInviteGet,
 #pragma warning restore SA1602
 }
