@@ -3,7 +3,8 @@ import Editor, { OnChange } from '@monaco-editor/react';
 import { SendMessage } from 'react-use-websocket';
 import { Theme, ThemeContext } from '../../../../context/ThemeContext';
 import { RoomState } from '../../../../types/room';
-import { Localization } from '../../../../localization';
+import { LocalizationKey } from '../../../../localization';
+import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 
 import './CodeEditor.css';
 
@@ -53,6 +54,7 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   onSendWsMessage,
 }) => {
   const { themeInUi } = useContext(ThemeContext);
+  const localizationCaptions = useLocalizationCaptions();
   const ignoreChangeRef = useRef(false);
   const [value, setValue] = useState<string>('');
   const [fontSize, setFontSize] = useState(22);
@@ -113,11 +115,11 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   return (
     <div className='code-editor'>
       <div className='code-editor-tools'>
-        <span>{Localization.Language}:</span>
+        <span>{localizationCaptions[LocalizationKey.Language]}:</span>
         <select className='code-editor-tools-select' value={language} onChange={handleLanguageChange}>
           {renderOptions(languageOptions)}
         </select>
-        <span>{Localization.FontSize}:</span>
+        <span>{localizationCaptions[LocalizationKey.FontSize]}:</span>
         <select className='code-editor-tools-select' value={fontSize} onChange={handleFontSizeChange}>
           {renderOptions(fontSizeOptions)}
         </select>

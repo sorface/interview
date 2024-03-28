@@ -1,6 +1,7 @@
 import React, { FunctionComponent, MouseEventHandler } from 'react';
 import { Field } from '../FieldsBlock/Field';
-import { Localization } from '../../localization';
+import { LocalizationKey } from '../../localization';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 
 import './Paginator.css';
 
@@ -28,7 +29,7 @@ export const Paginator: FunctionComponent<PaginatorProps> = ({
       >
         &#60;
       </button>
-      <span>{Localization.Page}: {pageNumber}</span>
+      <span>{useLocalizationCaptions()[LocalizationKey.Page]}: {pageNumber}</span>
       <button
         type="button"
         disabled={nextDisabled}

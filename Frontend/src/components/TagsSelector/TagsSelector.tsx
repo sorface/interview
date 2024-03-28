@@ -2,7 +2,8 @@ import React, { ChangeEventHandler, FunctionComponent, MouseEventHandler, useEff
 import { Tag } from '../../types/tag';
 import { OpenIcon } from '../OpenIcon/OpenIcon';
 import { TagsView } from '../TagsView/TagsView';
-import { Localization } from '../../localization';
+import { LocalizationKey } from '../../localization';
+import { LocalizationCaption } from '../LocalizationCaption/LocalizationCaption';
 
 import './TagsSelector.css';
 
@@ -89,7 +90,7 @@ export const TagsSelector: FunctionComponent<TagsSelectorProps> = ({
             {onCreate && (
               <>
                 <input type="color" className="color-select" value={color} onChange={handleColorChange} />
-                <button onClick={handleCreate}>{Localization.Create}</button>
+                <button onClick={handleCreate}>{<LocalizationCaption captionKey={LocalizationKey.Create} />}</button>
               </>
             )}
           </div>
@@ -106,10 +107,10 @@ export const TagsSelector: FunctionComponent<TagsSelectorProps> = ({
           ))}
           </div>
           {options.length === 0 && (
-            <div>{Localization.NoTags}</div>
+            <div>{<LocalizationCaption captionKey={LocalizationKey.NoTags} />}</div>
           )}
           {loading && (
-            <div>{Localization.TagsLoading}...</div>
+            <div><LocalizationCaption captionKey={LocalizationKey.TagsLoading} />...</div>
           )}
         </div>
       )}

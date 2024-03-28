@@ -1,7 +1,8 @@
 import { FunctionComponent, ReactElement, memo, useEffect, useState } from 'react';
 import { Field } from '../FieldsBlock/Field';
 import { Loader } from '../Loader/Loader';
-import { Localization } from '../../localization';
+import { LocalizationKey } from '../../localization';
+import { LocalizationCaption } from '../LocalizationCaption/LocalizationCaption';
 
 import './ProcessWrapper.css';
 
@@ -72,7 +73,7 @@ const ProcessWrapperComponent: FunctionComponent<ProcessWrapperProps> = ({
   if (error) {
     return (
       <Field>
-        <div>{errorPrefix || Localization.Error}: {error}</div>
+        <div>{errorPrefix || <LocalizationCaption captionKey={LocalizationKey.Error} />}: {error}</div>
       </Field>
     );
   }

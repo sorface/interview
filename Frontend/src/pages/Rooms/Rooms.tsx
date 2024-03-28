@@ -12,19 +12,13 @@ import { checkAdmin } from '../../utils/checkAdmin';
 import { ProcessWrapper, skeletonTransitionMs } from '../../components/ProcessWrapper/ProcessWrapper';
 import { TagsView } from '../../components/TagsView/TagsView';
 import { RoomsSearch } from '../../components/RoomsSearch/RoomsSearch';
-import { Localization } from '../../localization';
 import { ButtonLink } from '../../components/ButtonLink/ButtonLink';
 import { HeaderField } from '../../components/HeaderField/HeaderField';
 import { RoomsFilter } from '../../components/RoomsFilter/RoomsFilter';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { LocalizationKey } from '../../localization';
 
 import './Rooms.css';
-
-const roomStatusCaption: Record<Room['roomStatus'], string> = {
-  New: Localization.RoomStatusNew,
-  Active: Localization.RoomStatusActive,
-  Review: Localization.RoomStatusReview,
-  Close: Localization.RoomStatusClose,
-};
 
 const pageSize = 10;
 const initialPageNumber = 1;
@@ -33,6 +27,7 @@ const searchDebounceMs = 300;
 export const Rooms: FunctionComponent = () => {
   const auth = useContext(AuthContext);
   const admin = checkAdmin(auth);
+  const localizationCaptions = useLocalizationCaptions();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const { apiMethodState, fetchData } = useApiMethod<Room[], GetRoomPageParams>(roomsApiDeclaration.getPage);
   const { process: { loading, error }, data: rooms } = apiMethodState;
@@ -89,6 +84,13 @@ export const Rooms: FunctionComponent = () => {
   }, [pageNumber]);
 
   const createRoomItem = useCallback((room: Room) => {
+    const roomStatusCaption: Record<Room['roomStatus'], string> = {
+      New: localizationCaptions[LocalizationKey.RoomStatusNew],
+      Active: localizationCaptions[LocalizationKey.RoomStatusActive],
+      Review: localizationCaptions[LocalizationKey.RoomStatusReview],
+      Close: localizationCaptions[LocalizationKey.RoomStatusClose],
+    };
+
     const roomSummary =
       room.roomStatus === 'Review' ||
       room.roomStatus === 'Close';
@@ -110,7 +112,7 @@ export const Rooms: FunctionComponent = () => {
             </div>
             <div className="room-tags">
               <TagsView
-                placeHolder={Localization.NoTags}
+                placeHolder={localizationCaptions[LocalizationKey.NoTags]}
                 tags={room.tags}
               />
             </div>
@@ -119,14 +121,14 @@ export const Rooms: FunctionComponent = () => {
                 to={roomLink}
                 className='room-join-link'
               >
-                {Localization.Join}
+                {localizationCaptions[LocalizationKey.Join]}
               </Link>
               {admin && (
                 <Link
                   to={`${pathnames.roomsParticipants.replace(':id', room.id)}`}
                   className='room-edit-participants-link'
                 >
-                  {Localization.EditParticipants}
+                  {localizationCaptions[LocalizationKey.EditParticipants]}
                 </Link>
               )}
             </div>
@@ -134,7 +136,7 @@ export const Rooms: FunctionComponent = () => {
         </li>
       </Field>
     );
-  }, [admin]);
+  }, [admin, localizationCaptions]);
 
   return (
     <MainContentWrapper className='rooms-page'>
@@ -167,7 +169,7 @@ export const Rooms: FunctionComponent = () => {
           <ul className="rooms-list">
             {(rooms && !rooms.length) ? (
               <Field>
-                <div className="rooms-list-no-data">{Localization.NoRecords}</div>
+                <div className="rooms-list-no-data">{localizationCaptions[LocalizationKey.NoRecords]}</div>
               </Field>
             ) : (
               roomsSafe.map(createRoomItem)

@@ -1,5 +1,3 @@
-.session-info .theme-switch {
-  margin-left: auto;
-  margin-right: auto;
-  width: fit-content;
+.session-info .setting-switch {
+  text-align: left;
 }

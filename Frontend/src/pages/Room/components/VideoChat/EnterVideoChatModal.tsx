@@ -10,7 +10,8 @@ import { AuthContext } from '../../../../context/AuthContext';
 import { UserAvatar } from '../../../../components/UserAvatar/UserAvatar';
 import { Devices } from '../../hooks/useUserStream';
 import { Loader } from '../../../../components/Loader/Loader';
-import { Localization } from '../../../../localization';
+import { LocalizationKey } from '../../../../localization';
+import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 
 import './EnterVideoChatModal.css';
 
@@ -51,6 +52,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
   onCameraSwitch,
 }) => {
   const auth = useContext(AuthContext);
+  const localizationCaptions = useLocalizationCaptions();
   const [joiningScreen, setJoiningScreen] = useState(true);
   const [micDevices, setMicDevices] = useState<MediaDeviceInfo[]>([]);
   const [micId, setMicId] = useState<MediaDeviceInfo['deviceId']>();
@@ -142,7 +144,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
       handleUseCamera();
       setJoiningScreen(false);
     } catch {
-      alert(Localization.UserStreamError);
+      alert(localizationCaptions[LocalizationKey.UserStreamError]);
     }
   };
 
@@ -161,7 +163,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
   return (
     <Modal
       isOpen={open}
-      contentLabel={Localization.CloseRoom}
+      contentLabel={localizationCaptions[LocalizationKey.CloseRoom]}
       appElement={document.getElementById('root') || undefined}
       className="action-modal enter-videochat-modal"
       style={{
@@ -172,7 +174,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
       }}
     >
       <div className="action-modal-header">
-        <h3>{Localization.JoiningRoom} {roomName}</h3>
+        <h3>{localizationCaptions[LocalizationKey.JoiningRoom]} {roomName}</h3>
       </div>
       {joiningScreen ? (
         <div className="enter-videochat-info">
@@ -182,18 +184,18 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
               src={auth.avatar}
             />
           )}
-          <p>{Localization.JoinAs}: {auth?.nickname}</p>
+          <p>{localizationCaptions[LocalizationKey.JoinAs]}: {auth?.nickname}</p>
           <div className="enter-videochat-warning">
-            <div>{Localization.Warning}</div>
-            <div>{Localization.CallRecording}</div>
+            <div>{localizationCaptions[LocalizationKey.Warning]}</div>
+            <div>{localizationCaptions[LocalizationKey.CallRecording]}</div>
           </div>
           {loading ? (
             <Loader />
           ) : (
             viewerMode ? (
-              <button className="active" onClick={onClose}>{Localization.Join}</button>
+              <button className="active" onClick={onClose}>{localizationCaptions[LocalizationKey.Join]}</button>
             ) : (
-              <button onClick={handleUseAll}>{Localization.SetupDevices}</button>
+              <button onClick={handleUseAll}>{localizationCaptions[LocalizationKey.SetupDevices]}</button>
             )
           )}
         </div>
@@ -230,17 +232,17 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
                     onClick={handleSwitchSettings}
                   />
                 </div>
-                <progress max="50" value={micVolume}>{Localization.Microphone}: {micVolume}</progress>
+                <progress max="50" value={micVolume}>{localizationCaptions[LocalizationKey.Microphone]}: {micVolume}</progress>
               </div>
 
               <div className="enter-videochat-content-container" style={{ display: settingsEnabled ? 'block' : 'none' }}>
                 <div >
-                  <div>{Localization.Microphone}</div>
+                  <div>{localizationCaptions[LocalizationKey.Microphone]}</div>
                   <DeviceSelect
                     devices={micDevices}
                     onSelect={handleSelectMic}
                   />
-                  <div>{Localization.Camera}</div>
+                  <div>{localizationCaptions[LocalizationKey.Camera]}</div>
                   <DeviceSelect
                     devices={cameraDevices}
                     onSelect={handleSelectCamera}
@@ -250,11 +252,11 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
 
             </div>
           </div>
-          <button className="active" onClick={onClose}>{Localization.Join}</button>
+          <button className="active" onClick={onClose}>{localizationCaptions[LocalizationKey.Join]}</button>
         </div>
       )}
       <Link to={pathnames.rooms} className="enter-videochat-exit">
-        {Localization.Exit}
+        {localizationCaptions[LocalizationKey.Exit]}
       </Link>
     </Modal>
   );

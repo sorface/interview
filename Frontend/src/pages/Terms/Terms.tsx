@@ -4,7 +4,8 @@ import { pathnames } from '../../constants';
 import { FieldsBlock } from '../../components/FieldsBlock/FieldsBlock';
 import { Field } from '../../components/FieldsBlock/Field';
 import { HeaderWithLink } from '../../components/HeaderWithLink/HeaderWithLink';
-import { Localization } from '../../localization';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { LocalizationKey } from '../../localization';
 
 import './Terms.css';
 
@@ -14,6 +15,8 @@ interface Term {
 }
 
 export const Terms: FunctionComponent = () => {
+  const localizationCaptions = useLocalizationCaptions();
+
   const interpolate =
     (text: string, searchRegExp: RegExp, replaceWith: string) =>
       text.replace(searchRegExp, replaceWith);
@@ -34,7 +37,7 @@ export const Terms: FunctionComponent = () => {
         {interpolateAll(
           term.description,
           [/\[NAME\]/g, /\[NAME URL\]/g],
-          [Localization.AppName, termsUrl],
+          [localizationCaptions[LocalizationKey.AppName], termsUrl],
         )}
       </p>
     </Fragment>
@@ -43,14 +46,14 @@ export const Terms: FunctionComponent = () => {
   return (
     <FieldsBlock className="terms-of-use">
       <HeaderWithLink
-        title={Localization.TermsOfUsage}
+        title={localizationCaptions[LocalizationKey.TermsOfUsage]}
         linkVisible={true}
         path={pathnames.home.replace(':redirect?', '')}
         linkCaption="<"
         linkFloat="left"
       />
       <Field>
-        <h2>{Localization.TermsOfUsage}</h2>
+        <h2>{localizationCaptions[LocalizationKey.TermsOfUsage]}</h2>
         <p>{terms.disclaimer}</p>
         {terms.items.map(renderTerm)}
       </Field>

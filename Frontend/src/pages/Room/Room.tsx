@@ -27,9 +27,10 @@ import { EnterVideoChatModal } from './components/VideoChat/EnterVideoChatModal'
 import { Devices, useUserStream } from './hooks/useUserStream';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useUnreadChatMessages } from './hooks/useUnreadChatMessages';
-import { Localization } from '../../localization';
+import { LocalizationKey } from '../../localization';
 import { MessagePage } from '../../components/MessagePage/MessagePage';
 import { ThemedIcon } from './components/ThemedIcon/ThemedIcon';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 
 import './Room.css';
 
@@ -65,6 +66,7 @@ export const Room: FunctionComponent = () => {
   const { userStream } = useUserStream({
     selectedDevices,
   });
+  const localizationCaptions = useLocalizationCaptions();
 
   const handleVoiceRecognition = (transcript: string) => {
     sendMessage(JSON.stringify({
@@ -287,9 +289,9 @@ export const Room: FunctionComponent = () => {
 
   if (wsClosed) {
     return (
-      <MessagePage title={Localization.ConnectionError} message={Localization.RoomConnectionError}>
+      <MessagePage title={localizationCaptions[LocalizationKey.ConnectionError]} message={localizationCaptions[LocalizationKey.RoomConnectionError]}>
         <Link to={pathnames.rooms}>
-          <button>{Localization.Exit}</button>
+          <button>{localizationCaptions[LocalizationKey.Exit]}</button>
         </Link>
       </MessagePage>
     );
@@ -312,10 +314,10 @@ export const Room: FunctionComponent = () => {
       />
       <ProcessWrapper
         loading={loading}
-        loadingPrefix={Localization.LoadingRoom}
+        loadingPrefix={localizationCaptions[LocalizationKey.LoadingRoom]}
         loaders={loaders}
         error={error}
-        errorPrefix={Localization.ErrorLoadingRoom}
+        errorPrefix={localizationCaptions[LocalizationKey.ErrorLoadingRoom]}
       >
         <div className="room-page">
           <div className="room-page-main">
@@ -330,7 +332,7 @@ export const Room: FunctionComponent = () => {
                     <div
                       className="room-page-header-question-viewer"
                     >
-                      {Localization.ActiveQuestion}: {currentQuestion?.value}
+                      {localizationCaptions[LocalizationKey.ActiveQuestion]}: {currentQuestion?.value}
                     </div>
                   )}
                 </span>
@@ -346,16 +348,16 @@ export const Room: FunctionComponent = () => {
                 </div>
               )}
               {!reactionsVisible && (
-                <div>{Localization.WaitingRoom}</div>
+                <div>{localizationCaptions[LocalizationKey.WaitingRoom]}</div>
               )}
               <div className={`actions-field ${viewerMode ? 'actions-field-viewer' : ''}`}>
                 {!viewerMode && (
                   <div className='start-room-review'>
                     <ActionModal
-                      title={Localization.StartReviewRoomModalTitle}
-                      openButtonCaption={Localization.StartReviewRoom}
+                      title={localizationCaptions[LocalizationKey.StartReviewRoomModalTitle]}
+                      openButtonCaption={localizationCaptions[LocalizationKey.StartReviewRoom]}
                       loading={roomStartReviewLoading}
-                      loadingCaption={Localization.CloseRoomLoading}
+                      loadingCaption={localizationCaptions[LocalizationKey.CloseRoomLoading]}
                       error={roomStartReviewError}
                       onAction={handleStartReviewRoom}
                     />
@@ -365,8 +367,8 @@ export const Room: FunctionComponent = () => {
               </div>
             </div>
             <div className="room-page-main-content">
-              {loadingRoomState && <div>{Localization.LoadingRoomState}...</div>}
-              {errorRoomState && <div>{Localization.ErrorLoadingRoomState}...</div>}
+              {loadingRoomState && <div>{localizationCaptions[LocalizationKey.LoadingRoomState]}...</div>}
+              {errorRoomState && <div>{localizationCaptions[LocalizationKey.ErrorLoadingRoomState]}...</div>}
               <VideoChat
                 roomState={roomState}
                 viewerMode={viewerMode}
@@ -387,7 +389,7 @@ export const Room: FunctionComponent = () => {
                   iconEnabledName={IconNames.MicOn}
                   iconDisabledName={IconNames.MicOff}
                   disabledColor
-                  subCaption={Localization.Microphone}
+                  subCaption={localizationCaptions[LocalizationKey.Microphone]}
                   onClick={handleMicSwitch}
                 />
                 <SwitchButton
@@ -395,18 +397,18 @@ export const Room: FunctionComponent = () => {
                   iconEnabledName={IconNames.VideocamOn}
                   iconDisabledName={IconNames.VideocamOff}
                   disabledColor
-                  subCaption={Localization.Camera}
+                  subCaption={localizationCaptions[LocalizationKey.Camera]}
                   onClick={handleCameraSwitch}
                 />
                 {recognitionNotSupported ? (
-                  <div>{Localization.VoiceRecognitionNotSupported}</div>
+                  <div>{localizationCaptions[LocalizationKey.VoiceRecognitionNotSupported]}</div>
                 ) : (
                   <SwitchButton
                     enabled={recognitionEnabled}
                     htmlDisabled={!micEnabled}
                     iconEnabledName={IconNames.RecognitionOn}
                     iconDisabledName={IconNames.RecognitionOff}
-                    subCaption={Localization.VoiceRecognition}
+                    subCaption={localizationCaptions[LocalizationKey.VoiceRecognition]}
                     disabledColor
                     onClick={handleVoiceRecognitionSwitch}
                   />
@@ -419,7 +421,7 @@ export const Room: FunctionComponent = () => {
                 enabled={!messagesChatEnabled}
                 iconEnabledName={IconNames.Chat}
                 iconDisabledName={IconNames.Chat}
-                subCaption={Localization.Chat}
+                subCaption={localizationCaptions[LocalizationKey.Chat]}
                 onClick={handleMessagesChatSwitch}
               />
               {reactionsVisible && (
@@ -434,7 +436,7 @@ export const Room: FunctionComponent = () => {
             </div>
             <div className="room-tools room-tools-right">
               <Link to={pathnames.rooms}>
-                <button>{Localization.Exit}</button>
+                <button>{localizationCaptions[LocalizationKey.Exit]}</button>
               </Link>
             </div>
           </div>

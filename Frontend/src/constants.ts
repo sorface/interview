@@ -1,5 +1,3 @@
-import { Localization } from './localization';
-
 export const pathnames = {
   home: '/:redirect?',
   rooms: '/rooms',
@@ -47,7 +45,3 @@ export const toastSuccessOptions = {
   icon: '👌',
 };
 
-export const reactionLocalization: Record<string, string> = {
-  Like: Localization.Like,
-  Dislike: Localization.Dislike,
-}

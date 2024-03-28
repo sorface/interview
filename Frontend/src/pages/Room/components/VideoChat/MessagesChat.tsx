@@ -3,24 +3,10 @@ import { Transcript } from '../../../../types/transcript';
 import { stringToColor } from './utils/stringToColor';
 import { Tab, Tabs } from '../../../../components/Tabs/Tabs';
 import { ThemeContext } from '../../../../context/ThemeContext';
-import { Localization } from '../../../../localization';
+import { LocalizationKey } from '../../../../localization';
+import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 
 import './MessagesChat.css';
-
-const chatTab: Tab = {
-  id: 'chat-tab',
-  caption: Localization.ChatTab,
-};
-
-const recognitionTab: Tab = {
-  id: 'recognition-tab',
-  caption: Localization.RecognitionTab,
-};
-
-const tabs = [
-  chatTab,
-  recognitionTab,
-];
 
 interface MessagesChatProps {
   transcripts: Transcript[];
@@ -31,6 +17,22 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
   transcripts,
   onMessageSubmit,
 }) => {
+  const localizationCaptions = useLocalizationCaptions();
+  const chatTab: Tab = {
+    id: 'chat-tab',
+    caption: localizationCaptions[LocalizationKey.ChatTab],
+  };
+  
+  const recognitionTab: Tab = {
+    id: 'recognition-tab',
+    caption: localizationCaptions[LocalizationKey.RecognitionTab],
+  };
+  
+  const tabs = [
+    chatTab,
+    recognitionTab,
+  ];
+
   const { themeInUi } = useContext(ThemeContext);
   const messageInputRef = useRef<HTMLInputElement>(null);
   const videochatTranscriptsRef = useRef<HTMLDivElement>(null);
@@ -82,7 +84,7 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
             key={transcript.frontendId}
           >
             <span>
-              {!transcript.fromChat && `${Localization.Recognized} `}
+              {!transcript.fromChat && `${localizationCaptions[LocalizationKey.Recognized]} `}
             </span>
             <span
               style={{ color: stringToColor(transcript.userNickname, themeInUi) }}
@@ -99,13 +101,13 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
           <div className='message-input-wrapper'>
             <input
               type='text'
-              placeholder={Localization.ChatMessagePlaceholder}
+              placeholder={localizationCaptions[LocalizationKey.ChatMessagePlaceholder]}
               ref={messageInputRef}
               onKeyDown={handleInputKeyDown}
             />
           </div>
           <div>
-            <button onClick={handleChatMessageSubmit}>{Localization.SendToChat}</button>
+            <button onClick={handleChatMessageSubmit}>{localizationCaptions[LocalizationKey.SendToChat]}</button>
           </div>
         </div>
       )}
