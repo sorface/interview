@@ -25,77 +25,82 @@ public class RoomInviteService : IRoomInviteService
     {
         var databaseContextTransaction = await _db.Database.BeginTransactionAsync(cancellationToken);
 
-        var invite = await _db.Invites.Where(invite => invite.Id == inviteId).FirstOrDefaultAsync(cancellationToken);
-
-        if (invite is null)
+        try
         {
-            throw NotFoundException.Create<Invite>(inviteId);
-        }
+            var invite = await _db.Invites.Where(invite => invite.Id == inviteId)
+                .FirstOrDefaultAsync(cancellationToken);
 
-        if (invite.UsesCurrent >= invite.UsesMax)
-        {
-            throw new UserException("The invitation has already been used");
-        }
+            if (invite is null)
+            {
+                throw NotFoundException.Create<Invite>(inviteId);
+            }
 
-        var roomInvite = await _db.RoomInvites
-            .Where(roomInviteItem => roomInviteItem.InviteById == inviteId)
-            .FirstOrDefaultAsync(cancellationToken);
+            if (invite.UsesCurrent >= invite.UsesMax)
+            {
+                throw new UserException("The invitation has already been used");
+            }
 
-        if (roomInvite is null)
-        {
-            throw new NotFoundException("Invite not found for any rooms");
-        }
+            var roomInvite = await _db.RoomInvites
+                .Where(roomInviteItem => roomInviteItem.InviteById == inviteId)
+                .FirstOrDefaultAsync(cancellationToken);
 
-        if (roomInvite.Room is null)
-        {
-            throw new Exception("The invitation no longer belongs to the room");
-        }
+            if (roomInvite is null)
+            {
+                throw new NotFoundException("Invite not found for any rooms");
+            }
 
-        var user = await _db.Users.Where(user => user.Id == userId)
-            .FirstOrDefaultAsync(cancellationToken);
+            if (roomInvite.Room is null)
+            {
+                throw new Exception("The invitation no longer belongs to the room");
+            }
 
-        if (user is null)
-        {
-            throw new NotFoundException("The current user was not found");
-        }
+            var user = await _db.Users.Where(user => user.Id == userId)
+                .FirstOrDefaultAsync(cancellationToken);
 
-        var participant = await _db.RoomParticipants
-            .Where(participant => participant.User.Id == userId)
-            .FirstOrDefaultAsync(cancellationToken);
+            if (user is null)
+            {
+                throw new NotFoundException("The current user was not found");
+            }
 
-        if (participant is null)
-        {
-            var participants = await _roomParticipantService.CreateAsync(
-                roomInvite.Room.Id,
-                new[] { (user, roomInvite.Room, roomInvite.ParticipantType ?? SERoomParticipantType.Viewer) },
-                cancellationToken);
-            var roomParticipant = participants.First();
+            var participant = await _db.RoomParticipants
+                .Include(e => e.Room)
+                .Where(participant => participant.User.Id == userId && participant.Room.Id == roomInvite.RoomById)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            await UpdateInviteLimit(roomInvite, cancellationToken);
+            if (participant is null)
+            {
+                var participants = await _roomParticipantService.CreateAsync(
+                    roomInvite.Room.Id,
+                    new[] { (user, roomInvite.Room, roomInvite.ParticipantType ?? SERoomParticipantType.Viewer) },
+                    cancellationToken);
+                var roomParticipant = participants.First();
 
-            await _db.RoomParticipants.AddAsync(roomParticipant, cancellationToken);
+                await UpdateInviteLimit(roomInvite, cancellationToken);
+                await _db.RoomParticipants.AddAsync(roomParticipant, cancellationToken);
+                await _db.SaveChangesAsync(cancellationToken);
+                await databaseContextTransaction.CommitAsync(cancellationToken);
 
-            await _db.SaveChangesAsync(cancellationToken);
+                return new RoomInviteDetail
+                {
+                    ParticipantId = roomParticipant.Id,
+                    ParticipantType = roomParticipant.Type,
+                    RoomId = roomInvite.Room.Id,
+                };
+            }
 
+            // await UpdateInviteLimit(roomInvite, cancellationToken);
             await databaseContextTransaction.CommitAsync(cancellationToken);
 
             return new RoomInviteDetail
             {
-                ParticipantId = roomParticipant.Id,
-                ParticipantType = roomParticipant.Type,
-                RoomId = roomInvite.Room.Id,
+                ParticipantId = participant.Id, ParticipantType = participant.Type, RoomId = roomInvite.Room.Id,
             };
         }
-
-        // await UpdateInviteLimit(roomInvite, cancellationToken);
-        await databaseContextTransaction.CommitAsync(cancellationToken);
-
-        return new RoomInviteDetail
+        catch
         {
-            ParticipantId = participant.Id,
-            ParticipantType = participant.Type,
-            RoomId = roomInvite.Room.Id,
-        };
+            await databaseContextTransaction.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 
     private async Task UpdateInviteLimit(RoomInvite roomInvite, CancellationToken cancellationToken = default)
