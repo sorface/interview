@@ -6,7 +6,6 @@ using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.Records.Response.Page;
 using Interview.Domain.Rooms.Records.Response.RoomStates;
 using Interview.Domain.Rooms.RoomParticipants;
-using Interview.Domain.Users;
 using X.PagedList;
 
 namespace Interview.Domain.Rooms.Service;
@@ -56,6 +55,8 @@ public interface IRoomService : IService
         CancellationToken cancellationToken = default);
 
     Task<RoomInviteDetail> ApplyInvite(Guid room, Guid? invite, CancellationToken cancellationToken = default);
+
+    Task<List<RoomInviteResponse>> GetInvitesAsync(Guid roomId, CancellationToken cancellationToken = default);
 
     Task<AnalyticsSummary> GetAnalyticsSummaryAsync(
         RoomAnalyticsRequest request, CancellationToken cancellationToken = default);

@@ -51,7 +51,7 @@ namespace Interview.Test.Integrations
             {
                 userAccessor.SetUser(user);
             }
-            var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext));
+            var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext), userAccessor);
             var roomService = new RoomService(
                 roomRepository,
                 new RoomQuestionRepository(appDbContext),
@@ -66,7 +66,8 @@ namespace Interview.Test.Integrations
                 new EmptyEventStorage(),
                 new RoomInviteService(appDbContext, roomParticipantService),
                 userAccessor,
-                roomParticipantService
+                roomParticipantService,
+                appDbContext
             );
 
             await roomService.ApplyInvite(room.Id, invite.Id);
@@ -119,7 +120,7 @@ namespace Interview.Test.Integrations
             {
                 userAccessor.SetUser(user);
             }
-            var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext));
+            var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext), userAccessor);
             var roomService = new RoomService(
                 roomRepository,
                 new RoomQuestionRepository(appDbContext),
@@ -134,7 +135,8 @@ namespace Interview.Test.Integrations
                 new EmptyEventStorage(),
                 new RoomInviteService(appDbContext, roomParticipantService),
                 userAccessor,
-                roomParticipantService
+                roomParticipantService,
+                appDbContext
             );
 
             await roomService.ApplyInvite(room.Id, invite.Id);
@@ -183,7 +185,7 @@ namespace Interview.Test.Integrations
             {
                 userAccessor.SetUser(user);
             }
-            var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext));
+            var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext), userAccessor);
             var roomService = new RoomService(
                 roomRepository,
                 new RoomQuestionRepository(appDbContext),
@@ -198,7 +200,8 @@ namespace Interview.Test.Integrations
                 new EmptyEventStorage(),
                 new RoomInviteService(appDbContext, roomParticipantService),
                 userAccessor,
-                roomParticipantService
+                roomParticipantService,
+                appDbContext
             );
 
             await roomService.ApplyInvite(room.Id, invite.Id);

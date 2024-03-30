@@ -3,6 +3,7 @@ using System;
 using Interview.Domain.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Interview.Migrations.Sqlite.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240328165741_Permission_Add_RoomInviteGet")]
+    partial class Permission_Add_RoomInviteGet
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.10");
@@ -306,13 +309,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                             Id = new Guid("3b1a04f3-8d35-4608-87fb-1d83d76cd99d"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("97b2411a-b9d4-49cb-9525-0e31b7d35496"),
-                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("07dea11a-65a4-4826-ab4f-9d2cdfaa72f3"),
-                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            PermissionId = new Guid("b530321a-a51a-4a36-8afd-6e8a8dbae248"),
                             UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new

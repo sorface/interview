@@ -66,6 +66,22 @@ public class RoomController : ControllerBase
     }
 
     /// <summary>
+    /// Getting a Room invites by room id.
+    /// </summary>
+    /// <param name="roomId">Room id.</param>
+    /// <returns>Room Invites response.</returns>
+    [Authorize]
+    [HttpGet("{roomId:guid}/invites")]
+    [ProducesResponseType(typeof(List<RoomInviteResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
+    public Task<List<RoomInviteResponse>> GetRoomInvites(Guid roomId)
+    {
+        return _roomService.GetInvitesAsync(roomId, HttpContext.RequestAborted);
+    }
+
+    /// <summary>
     /// Getting a Room state by id.
     /// </summary>
     /// <param name="id">Room id.</param>

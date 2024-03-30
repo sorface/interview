@@ -1,3 +1,4 @@
+using Interview.Domain.Repository;
 using Interview.Domain.Rooms.RoomParticipants.Records.Request;
 using Interview.Domain.Rooms.RoomParticipants.Records.Response;
 using Interview.Domain.Users;
@@ -11,17 +12,20 @@ public class RoomParticipantService : IRoomParticipantService
     private readonly IRoomRepository _roomRepository;
     private readonly IUserRepository _userRepository;
     private readonly IAvailableRoomPermissionRepository _availableRoomPermissionRepository;
+    private readonly ICurrentUserAccessor _currentUserAccessor;
 
     public RoomParticipantService(
         IRoomParticipantRepository roomParticipantRepository,
         IRoomRepository roomRepository,
         IUserRepository userRepository,
-        IAvailableRoomPermissionRepository availableRoomPermissionRepository)
+        IAvailableRoomPermissionRepository availableRoomPermissionRepository,
+        ICurrentUserAccessor currentUserAccessor)
     {
         _roomParticipantRepository = roomParticipantRepository;
         _roomRepository = roomRepository;
         _userRepository = userRepository;
         _availableRoomPermissionRepository = availableRoomPermissionRepository;
+        _currentUserAccessor = currentUserAccessor;
     }
 
     public async Task<RoomParticipantDetail> FindByRoomIdAndUserIdAsync(
@@ -55,6 +59,7 @@ public class RoomParticipantService : IRoomParticipantService
             throw new UserException("Type user not valid");
         }
 
+        var roomCreatorId = await GetRoomCreatorIdAsync(request.RoomId, cancellationToken);
         var participant =
             await _roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(request.RoomId, request.UserId, cancellationToken);
 
@@ -64,7 +69,7 @@ public class RoomParticipantService : IRoomParticipantService
         }
 
         participant.Type = participantType;
-        await AddDefaultPermissionsAsync(new[] { participant }, cancellationToken);
+        await AddDefaultPermissionsAsync(roomCreatorId, new[] { participant }, cancellationToken);
         await _roomParticipantRepository.UpdateAsync(participant, cancellationToken);
 
         return new RoomParticipantDetail
@@ -114,7 +119,7 @@ public class RoomParticipantService : IRoomParticipantService
             throw NotFoundException.Create<Room>(request.UserId);
         }
 
-        var roomParticipants = await CreateAsync(new[] { (user, room, participantType) }, cancellationToken);
+        var roomParticipants = await CreateCoreAsync(room.CreatedById ?? _currentUserAccessor.UserId, new[] { (user, room, participantType) }, cancellationToken);
         var roomParticipant = roomParticipants.First();
         await _roomParticipantRepository.CreateAsync(roomParticipant, cancellationToken);
 
@@ -128,15 +133,32 @@ public class RoomParticipantService : IRoomParticipantService
     }
 
     public async Task<IReadOnlyCollection<RoomParticipant>> CreateAsync(
+        Guid roomId,
+        IReadOnlyCollection<(User User, Room Room, SERoomParticipantType Type)> participants,
+        CancellationToken cancellationToken = default)
+    {
+        var roomCreatorId = await GetRoomCreatorIdAsync(roomId, cancellationToken);
+        return await CreateCoreAsync(roomCreatorId, participants, cancellationToken);
+    }
+
+    private async Task<Guid?> GetRoomCreatorIdAsync(Guid roomId, CancellationToken cancellationToken)
+    {
+        var dbCreator = await _roomRepository.FindByIdAsync(roomId, Mapper<Room>.Create(e => e.CreatedById), cancellationToken);
+        return dbCreator ?? _currentUserAccessor.UserId;
+    }
+
+    private async Task<IReadOnlyCollection<RoomParticipant>> CreateCoreAsync(
+        Guid? roomCreatorId,
         IReadOnlyCollection<(User User, Room Room, SERoomParticipantType Type)> participants,
         CancellationToken cancellationToken = default)
     {
         var createdParticipants = participants.Select(e => new RoomParticipant(e.User, e.Room, e.Type)).ToList();
-        await AddDefaultPermissionsAsync(createdParticipants, cancellationToken);
+        await AddDefaultPermissionsAsync(roomCreatorId, createdParticipants, cancellationToken);
         return createdParticipants;
     }
 
     private async Task AddDefaultPermissionsAsync(
+        Guid? roomCreatorId,
         IReadOnlyCollection<RoomParticipant> participants,
         CancellationToken cancellationToken)
     {
@@ -146,6 +168,7 @@ public class RoomParticipantService : IRoomParticipantService
         var requiredPermissions = participantTypes
             .SelectMany(e => e.DefaultRoomPermission)
             .Select(e => e.Value)
+            .Concat(new[] { SEAvailableRoomPermission.RoomInviteGet.Value })
             .ToHashSet();
         var specification = new Spec<AvailableRoomPermission>(e => requiredPermissions.Contains(e.Id));
         var availablePermissions = await _availableRoomPermissionRepository.FindAsync(specification, cancellationToken);
@@ -162,6 +185,10 @@ public class RoomParticipantService : IRoomParticipantService
         {
             roomParticipant.Permissions.Clear();
             roomParticipant.Permissions.AddRange(defaultPermissionsMap[roomParticipant.Type]);
+            if (roomCreatorId == roomParticipant.User.Id)
+            {
+                roomParticipant.Permissions.Add(availablePermissionMap[SEAvailableRoomPermission.RoomInviteGet.Value]);
+            }
         }
     }
 }
