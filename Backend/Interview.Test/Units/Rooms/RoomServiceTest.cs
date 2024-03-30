@@ -1,4 +1,5 @@
 using Interview.Domain;
+using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Storage;
 using Interview.Domain.Questions;
@@ -12,6 +13,7 @@ using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.Rooms.Service;
 using Interview.Domain.Tags;
 using Interview.Domain.Users;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 
 namespace Interview.Test.Units.Rooms;
@@ -49,7 +51,8 @@ public class RoomServiceTest
             new EmptyEventStorage(),
             roomInviteRepository.Object,
             new CurrentUserAccessor(),
-            participantService.Object);
+            participantService.Object,
+            new AppDbContext(new DbContextOptionsBuilder<AppDbContext>().Options));
     }
 
     [Fact(DisplayName = "Patch update of room when request name is null")]

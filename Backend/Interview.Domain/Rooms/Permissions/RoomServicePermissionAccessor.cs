@@ -105,6 +105,12 @@ public class RoomServicePermissionAccessor : IRoomService, IServiceDecorator
         return _roomService.ApplyInvite(roomId, invite, cancellationToken);
     }
 
+    public async Task<List<RoomInviteResponse>> GetInvitesAsync(Guid roomId, CancellationToken cancellationToken = default)
+    {
+        await _securityService.EnsureRoomPermissionAsync(roomId, SEPermission.RoomInviteGet, cancellationToken);
+        return await _roomService.GetInvitesAsync(roomId, cancellationToken);
+    }
+
     public async Task<AnalyticsSummary> GetAnalyticsSummaryAsync(RoomAnalyticsRequest request, CancellationToken cancellationToken = default)
     {
         await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomGetAnalyticsSummary, cancellationToken);

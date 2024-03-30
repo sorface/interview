@@ -1,3 +1,4 @@
+using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Storage;
 using Interview.Domain.Questions;
@@ -19,6 +20,7 @@ using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
 using Interview.Domain.Users;
+using Microsoft.EntityFrameworkCore;
 using NSpecifications;
 using X.PagedList;
 using Entity = Interview.Domain.Repository.Entity;
@@ -41,6 +43,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     private readonly IRoomInviteService _roomInviteService;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly IRoomParticipantService _roomParticipantService;
+    private readonly AppDbContext _db;
 
     public RoomService(
         IRoomRepository roomRepository,
@@ -56,7 +59,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         IEventStorage eventStorage,
         IRoomInviteService roomInviteService,
         ICurrentUserAccessor currentUserAccessor,
-        IRoomParticipantService roomParticipantService)
+        IRoomParticipantService roomParticipantService,
+        AppDbContext db)
     {
         _roomRepository = roomRepository;
         _questionRepository = questionRepository;
@@ -72,6 +76,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         _roomInviteService = roomInviteService;
         _currentUserAccessor = currentUserAccessor;
         _roomParticipantService = roomParticipantService;
+        _db = db;
     }
 
     public Task<IPagedList<RoomPageDetail>> FindPageAsync(
@@ -392,6 +397,18 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         }
 
         return analytics;
+    }
+
+    public Task<List<RoomInviteResponse>> GetInvitesAsync(Guid roomId, CancellationToken cancellationToken = default)
+    {
+        return _db.RoomInvites.AsNoTracking()
+            .Where(e => e.RoomById == roomId && e.InviteById != null && e.ParticipantType != null)
+            .Select(e => new RoomInviteResponse
+            {
+                InviteId = e.InviteById!.Value,
+                ParticipantType = e.ParticipantType!.EnumValue,
+            })
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<AnalyticsSummary> GetAnalyticsSummaryAsync(

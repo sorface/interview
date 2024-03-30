@@ -66,7 +66,8 @@ namespace Interview.Test.Integrations
                 new EmptyEventStorage(),
                 new RoomInviteService(appDbContext, roomParticipantService),
                 userAccessor,
-                roomParticipantService
+                roomParticipantService,
+                appDbContext
             );
 
             await roomService.ApplyInvite(room.Id, invite.Id);
@@ -134,7 +135,8 @@ namespace Interview.Test.Integrations
                 new EmptyEventStorage(),
                 new RoomInviteService(appDbContext, roomParticipantService),
                 userAccessor,
-                roomParticipantService
+                roomParticipantService,
+                appDbContext
             );
 
             await roomService.ApplyInvite(room.Id, invite.Id);
@@ -198,7 +200,8 @@ namespace Interview.Test.Integrations
                 new EmptyEventStorage(),
                 new RoomInviteService(appDbContext, roomParticipantService),
                 userAccessor,
-                roomParticipantService
+                roomParticipantService,
+                appDbContext
             );
 
             await roomService.ApplyInvite(room.Id, invite.Id);
