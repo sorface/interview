@@ -93,7 +93,9 @@ public class RoomInviteService : IRoomInviteService
 
             return new RoomInviteDetail
             {
-                ParticipantId = participant.Id, ParticipantType = participant.Type, RoomId = roomInvite.Room.Id,
+                ParticipantId = participant.Id,
+                ParticipantType = participant.Type,
+                RoomId = roomInvite.Room.Id,
             };
         }
         catch
