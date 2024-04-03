@@ -13,13 +13,17 @@ namespace Interview.Backend.Auth.Sorface;
 
 public partial class SorfaceAuthenticationHandler : OAuthHandler<SorfaceAuthenticationOptions>
 {
+    private readonly SorfaceTokenValidateHandler _sorfaceTokenValidateHandler;
+
     public SorfaceAuthenticationHandler(
         IOptionsMonitor<SorfaceAuthenticationOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        ISystemClock clock)
+        ISystemClock clock,
+        SorfaceTokenValidateHandler sorfaceTokenValidateHandler)
         : base(options, logger, encoder, clock)
     {
+        _sorfaceTokenValidateHandler = sorfaceTokenValidateHandler;
     }
 
     protected override async Task<AuthenticationTicket> CreateTicketAsync(
@@ -27,37 +31,12 @@ public partial class SorfaceAuthenticationHandler : OAuthHandler<SorfaceAuthenti
         AuthenticationProperties properties,
         OAuthTokenResponse tokens)
     {
-        var form = new List<KeyValuePair<string, string>>
-        {
-            new("token", $"{tokens.AccessToken}"),
-        };
-
-        using var request = new HttpRequestMessage(HttpMethod.Post, Options.UserInformationEndpoint)
-        {
-            Content = new FormUrlEncodedContent(form),
-        };
-
-        var chars = $"{Options.ClientId}:{Options.ClientSecret}";
-
-        var bytes = Encoding.UTF8.GetBytes(chars);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(bytes));
-
-        using var response = await Backchannel
-            .SendAsync(request, HttpCompletionOption.ResponseContentRead, Context.RequestAborted);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new HttpRequestException("An error occurred while retrieving the user profile.");
-        }
-
-        var content = await response.Content.ReadAsStringAsync(Context.RequestAborted);
-
-        using var payload = JsonDocument.Parse(content);
+        using var document = await _sorfaceTokenValidateHandler.GetTokenPrincipalAsync(tokens.AccessToken, Context.RequestAborted);
 
         var principal = new ClaimsPrincipal(identity);
 
         var context = new OAuthCreatingTicketContext(
-            principal, properties, Context, Scheme, Options, Backchannel, tokens, payload.RootElement);
+            principal, properties, Context, Scheme, Options, Backchannel, tokens, document.RootElement);
 
         context.RunClaimActions();
 

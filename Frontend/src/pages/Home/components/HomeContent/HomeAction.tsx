@@ -22,7 +22,7 @@ export const HomeAction: FunctionComponent<HomeActionProps> = ({
     );
   }
   return (
-    <a href={`${REACT_APP_BACKEND_URL}/login/twitch?redirectUri=${encodeURIComponent(window.location.href)}`}>
+    <a href={`${REACT_APP_BACKEND_URL}/login/sorface?redirectUri=${encodeURIComponent(window.location.href)}`}>
       <button>{Localization.Login}</button>
     </a>
   );

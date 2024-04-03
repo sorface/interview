@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Ardalis.SmartEnum.SystemTextJson;
 using Interview.Backend.Auth;
+using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Swagger;
 using Interview.Backend.WebSocket;
 using Interview.Backend.WebSocket.Events;
@@ -86,7 +87,7 @@ public class ServiceConfigurator
         serviceCollection.AddSingleton<UserClaimService>();
 
         AddWebSocketServices(serviceCollection);
-
+        
         serviceCollection.Configure<ChatBotAccount>(_configuration.GetSection(nameof(ChatBotAccount)));
         serviceCollection.Configure<ForwardedHeadersOptions>(options =>
         {
@@ -102,6 +103,11 @@ public class ServiceConfigurator
     {
         var sorfaceAuth = new OAuthServiceDispatcher(_configuration).GetAuthService("sorface");
 
+        serviceCollection.AddSingleton(sorfaceAuth);
+
+        serviceCollection.AddHttpClient();
+        serviceCollection.AddSingleton<SorfaceTokenValidateHandler>();
+        
         var adminUsers = _configuration.GetSection(nameof(AdminUsers))
             .Get<AdminUsers>() ?? throw new ArgumentException($"Not found \"{nameof(AdminUsers)}\" section");
 
@@ -166,7 +172,7 @@ public class ServiceConfigurator
         };
 
         serviceCollection.AddAppServices(serviceOption);
-        serviceCollection.AddAppAuth(sorfaceAuth, _configuration);
+        serviceCollection.AddAppAuth(sorfaceAuth);
     }
 
     private void AddRateLimiter(IServiceCollection serviceCollection)
