@@ -172,6 +172,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         requestRef.current = requestAnimationFrame(updateAudioAnalyser);
         return;
       }
+      let somebodyIsSpeaking = false;
       let newLouderUserId = '';
       let louderVolume = -1;
       const result: Record<string, number> = {};
@@ -181,12 +182,16 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         if (averageVolume < audioVolumeThreshold) {
           continue;
         }
+        if (auth?.id && (userId !== auth.id)) {
+          somebodyIsSpeaking = true;
+        }
         if (averageVolume > louderVolume) {
           newLouderUserId = userId;
           louderVolume = averageVolume;
         }
         result[userId] = averageVolume;
       }
+      userAudioStream?.getAudioTracks().forEach(audioTrack => audioTrack.enabled = !somebodyIsSpeaking);
       if (newLouderUserId && newLouderUserId !== louderUserId.current) {
         updateAnalyserTimeout.current = updateLoudedUserTimeout;
         setVideoOrder({
@@ -207,7 +212,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       }
     };
 
-  }, [louderUserId]);
+  }, [auth, louderUserId, userAudioStream]);
 
   const createPeer = useCallback((to: string, forViewer?: boolean) => {
     if (viewerMode) {
