@@ -24,7 +24,7 @@ import { SwitchButton } from './components/VideoChat/SwitchButton';
 import { Link } from 'react-router-dom';
 import { ThemeSwitchMini } from '../../components/ThemeSwitchMini/ThemeSwitchMini';
 import { EnterVideoChatModal } from './components/VideoChat/EnterVideoChatModal';
-import { Devices, useUserStream } from './hooks/useUserStream';
+import { Devices, useUserStreams } from './hooks/useUserStreams';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useUnreadChatMessages } from './hooks/useUnreadChatMessages';
 import { LocalizationKey } from '../../localization';
@@ -63,7 +63,12 @@ export const Room: FunctionComponent = () => {
   const [selectedDevices, setSelectedDevices] = useState<Devices | null>(null);
   const [recognitionEnabled, setRecognitionEnabled] = useState(false);
   const [peersLength, setPeersLength] = useState(0);
-  const { userStream } = useUserStream({
+  const {
+    userAudioStream,
+    userVideoStream,
+    disableVideo,
+    enableVideo,
+  } = useUserStreams({
     selectedDevices,
   });
   const localizationCaptions = useLocalizationCaptions();
@@ -259,18 +264,20 @@ export const Room: FunctionComponent = () => {
   };
 
   const handleCameraSwitch = useCallback(() => {
-    if (userStream) {
-      enableDisableUserTrack(userStream, 'video', !cameraEnabled);
+    if (cameraEnabled) {
+      disableVideo();
+    } else {
+      enableVideo();
     }
     setCameraEnabled(!cameraEnabled);
-  }, [userStream, cameraEnabled]);
+  }, [cameraEnabled, disableVideo, enableVideo]);
 
   const handleMicSwitch = useCallback(() => {
-    if (userStream) {
-      enableDisableUserTrack(userStream, 'audio', !micEnabled);
+    if (userAudioStream) {
+      enableDisableUserTrack(userAudioStream, 'audio', !micEnabled);
     }
     setMicEnabled(!micEnabled);
-  }, [userStream, micEnabled]);
+  }, [userAudioStream, micEnabled]);
 
   useEffect(() => {
     if (welcomeScreen || viewerMode) {
@@ -304,7 +311,8 @@ export const Room: FunctionComponent = () => {
         loading={loading || roomParticipantLoading || roomParticipantWillLoaded || readyState === connectingReadyState}
         viewerMode={viewerMode}
         roomName={room?.name}
-        userStream={userStream}
+        userVideoStream={userVideoStream}
+        userAudioStream={userAudioStream}
         micEnabled={micEnabled}
         cameraEnabled={cameraEnabled}
         onSelect={handleMediaSelect}
@@ -376,7 +384,8 @@ export const Room: FunctionComponent = () => {
                 viewerMode={viewerMode}
                 lastWsMessage={lastMessage}
                 messagesChatEnabled={messagesChatEnabled}
-                userStream={userStream}
+                userVideoStream={userVideoStream}
+                userAudioStream={userAudioStream}
                 videoTrackEnabled={cameraEnabled}
                 onSendWsMessage={sendMessage}
                 onUpdatePeersLength={setPeersLength}
