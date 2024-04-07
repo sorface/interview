@@ -30,6 +30,7 @@ export const useUserStreams = ({
   selectedDevices,
 }: UseUserStreamParams) => {
   const [userAudioStream, setUserAudioStream] = useState<MediaStream | null>(null);
+  const [userAudioProcessedStream, setUserAudioProcessedStream] = useState<MediaStream | null>(null);
   const [userVideoStream, setUserVideoStream] = useState<MediaStream | null>(null);
 
   useEffect(() => {
@@ -51,6 +52,36 @@ export const useUserStreams = ({
     };
     updateUserAudioStream();
   }, [selectedDevices]);
+
+  useEffect(() => {
+    if (!userAudioStream) {
+      return;
+    }
+    const audioCtx = new AudioContext();
+    const source = audioCtx.createMediaStreamSource(userAudioStream);
+
+    const compressor = audioCtx.createDynamicsCompressor();
+    compressor.threshold.setValueAtTime(-50, audioCtx.currentTime);
+    compressor.knee.setValueAtTime(40, audioCtx.currentTime);
+    compressor.ratio.setValueAtTime(18, audioCtx.currentTime);
+    compressor.attack.setValueAtTime(0, audioCtx.currentTime);
+    compressor.release.setValueAtTime(0.25, audioCtx.currentTime);
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'highshelf';
+    filter.frequency.setValueAtTime(1600, audioCtx.currentTime);
+    filter.gain.setValueAtTime(6, audioCtx.currentTime);
+
+    const dest = audioCtx.createMediaStreamDestination();
+    source.connect(compressor);
+    compressor.connect(filter);
+    filter.connect(dest);
+    setUserAudioProcessedStream(dest.stream);
+
+    return () => {
+      source.disconnect(compressor);
+    };
+  }, [userAudioStream]);
 
   useEffect(() => {
     if (!selectedDevices) {
@@ -97,7 +128,7 @@ export const useUserStreams = ({
   }, [selectedDevices]);
 
   return {
-    userAudioStream,
+    userAudioStream: userAudioProcessedStream,
     userVideoStream,
     disableVideo,
     enableVideo,
