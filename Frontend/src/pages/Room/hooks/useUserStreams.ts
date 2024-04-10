@@ -23,7 +23,8 @@ const audioConstraints = {
   channelCount: 1,
   sampleRate: 16000,
   sampleSize: 16,
-  volume: 1
+  volume: 1,
+  noiseSuppression: true,
 };
 
 export const useUserStreams = ({
