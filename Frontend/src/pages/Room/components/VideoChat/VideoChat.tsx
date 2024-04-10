@@ -43,6 +43,7 @@ interface VideoChatProps {
   videoTrackEnabled: boolean;
   onSendWsMessage: SendMessage;
   onUpdatePeersLength: (length: number) => void;
+  onMuteMic: () => void;
 };
 
 interface PeerMeta {
@@ -92,6 +93,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   videoTrackEnabled,
   onSendWsMessage,
   onUpdatePeersLength,
+  onMuteMic,
 }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
@@ -112,7 +114,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   const [videoOrder, setVideoOrder] = useState<Record<string, number>>({
     [auth?.id || '']: 1,
   });
-  const updateAnalyserTimeout = useRef(0);
+  const updateLouderUserTimeout = useRef(0);
   const intervieweeFrameRef = useRef<HTMLIFrameElement>(null);
   const { activeReactions } = useReactionsStatus({
     lastMessage: lastWsMessage,
@@ -166,12 +168,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     const updateAudioAnalyser = () => {
       const time = performance.now();
       const delta = time - prevTime;
-      if (updateAnalyserTimeout.current > 0) {
-        updateAnalyserTimeout.current -= delta;
-        prevTime = time;
-        requestRef.current = requestAnimationFrame(updateAudioAnalyser);
-        return;
-      }
       let somebodyIsSpeaking = false;
       let newLouderUserId = '';
       let louderVolume = -1;
@@ -191,9 +187,20 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         }
         result[userId] = averageVolume;
       }
-      userAudioStream?.getAudioTracks().forEach(audioTrack => audioTrack.enabled = !somebodyIsSpeaking);
+
+      if (somebodyIsSpeaking && userAudioStream?.getAudioTracks().some(audioTrack => audioTrack.enabled)) {
+        onMuteMic();
+      }
+
+      if (updateLouderUserTimeout.current > 0) {
+        updateLouderUserTimeout.current -= delta;
+        prevTime = time;
+        requestRef.current = requestAnimationFrame(updateAudioAnalyser);
+        return;
+      }
+
       if (newLouderUserId && newLouderUserId !== louderUserId.current) {
-        updateAnalyserTimeout.current = updateLoudedUserTimeout;
+        updateLouderUserTimeout.current = updateLoudedUserTimeout;
         setVideoOrder({
           [newLouderUserId]: 1,
           [louderUserId.current]: 2,
@@ -212,7 +219,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       }
     };
 
-  }, [auth, louderUserId, userAudioStream]);
+  }, [auth, louderUserId, userAudioStream, onMuteMic]);
 
   const createPeer = useCallback((to: string, forViewer?: boolean) => {
     if (viewerMode) {

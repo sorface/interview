@@ -272,12 +272,16 @@ export const Room: FunctionComponent = () => {
     setCameraEnabled(!cameraEnabled);
   }, [cameraEnabled, disableVideo, enableVideo]);
 
-  const handleMicSwitch = useCallback(() => {
+  const enableDisableMic = useCallback((enabled: boolean) => {
     if (userAudioStream) {
-      enableDisableUserTrack(userAudioStream, 'audio', !micEnabled);
+      enableDisableUserTrack(userAudioStream, 'audio', enabled);
     }
-    setMicEnabled(!micEnabled);
-  }, [userAudioStream, micEnabled]);
+    setMicEnabled(enabled);
+  }, [userAudioStream]);
+
+  const handleMicSwitch = useCallback(() => {
+    enableDisableMic(!micEnabled);
+  }, [micEnabled, enableDisableMic]);
 
   useEffect(() => {
     if (welcomeScreen || viewerMode) {
@@ -285,6 +289,10 @@ export const Room: FunctionComponent = () => {
     }
     setRecognitionEnabled(micEnabled);
   }, [welcomeScreen, viewerMode, micEnabled]);
+
+  const muteMic = useCallback(() => {
+    enableDisableMic(false);
+  }, [enableDisableMic]);
 
   const handleVoiceRecognitionSwitch = useCallback(() => {
     setRecognitionEnabled(!recognitionEnabled);
@@ -389,6 +397,7 @@ export const Room: FunctionComponent = () => {
                 videoTrackEnabled={cameraEnabled}
                 onSendWsMessage={sendMessage}
                 onUpdatePeersLength={setPeersLength}
+                onMuteMic={muteMic}
               />
             </div>
           </div>
