@@ -41,9 +41,11 @@ interface VideoChatProps {
   userVideoStream: MediaStream | null;
   userAudioStream: MediaStream | null;
   videoTrackEnabled: boolean;
+  micDisabledAutomatically: React.MutableRefObject<boolean>;
   onSendWsMessage: SendMessage;
   onUpdatePeersLength: (length: number) => void;
   onMuteMic: () => void;
+  onUnmuteMic: () => void;
 };
 
 interface PeerMeta {
@@ -91,9 +93,11 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   userVideoStream,
   userAudioStream,
   videoTrackEnabled,
+  micDisabledAutomatically,
   onSendWsMessage,
   onUpdatePeersLength,
   onMuteMic,
+  onUnmuteMic,
 }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
@@ -188,8 +192,13 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         result[userId] = averageVolume;
       }
 
-      if (somebodyIsSpeaking && userAudioStream?.getAudioTracks().some(audioTrack => audioTrack.enabled)) {
+      const micEnabled = userAudioStream?.getAudioTracks().some(audioTrack => audioTrack.enabled);
+
+      if (somebodyIsSpeaking && micEnabled) {
+        micDisabledAutomatically.current = true;
         onMuteMic();
+      } else if (!somebodyIsSpeaking && !micEnabled && micDisabledAutomatically.current) {
+        onUnmuteMic();
       }
 
       if (updateLouderUserTimeout.current > 0) {
@@ -219,7 +228,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       }
     };
 
-  }, [auth, louderUserId, userAudioStream, onMuteMic]);
+  }, [auth, louderUserId, userAudioStream, micDisabledAutomatically, onMuteMic, onUnmuteMic]);
 
   const createPeer = useCallback((to: string, forViewer?: boolean) => {
     if (viewerMode) {

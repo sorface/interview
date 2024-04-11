@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
+import { FunctionComponent, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import useWebSocket from 'react-use-websocket';
 import toast from 'react-hot-toast';
@@ -59,6 +59,7 @@ export const Room: FunctionComponent = () => {
   const [messagesChatEnabled, setMessagesChatEnabled] = useState(false);
   const [welcomeScreen, setWelcomeScreen] = useState(true);
   const [micEnabled, setMicEnabled] = useState(true);
+  const micDisabledAutomatically = useRef(false);
   const [cameraEnabled, setCameraEnabled] = useState(true);
   const [selectedDevices, setSelectedDevices] = useState<Devices | null>(null);
   const [recognitionEnabled, setRecognitionEnabled] = useState(false);
@@ -280,6 +281,9 @@ export const Room: FunctionComponent = () => {
   }, [userAudioStream]);
 
   const handleMicSwitch = useCallback(() => {
+    if (micEnabled) {
+      micDisabledAutomatically.current = false;
+    }
     enableDisableMic(!micEnabled);
   }, [micEnabled, enableDisableMic]);
 
@@ -292,6 +296,10 @@ export const Room: FunctionComponent = () => {
 
   const muteMic = useCallback(() => {
     enableDisableMic(false);
+  }, [enableDisableMic]);
+
+  const unmuteMic = useCallback(() => {
+    enableDisableMic(true);
   }, [enableDisableMic]);
 
   const handleVoiceRecognitionSwitch = useCallback(() => {
@@ -395,9 +403,11 @@ export const Room: FunctionComponent = () => {
                 userVideoStream={userVideoStream}
                 userAudioStream={userAudioStream}
                 videoTrackEnabled={cameraEnabled}
+                micDisabledAutomatically={micDisabledAutomatically}
                 onSendWsMessage={sendMessage}
                 onUpdatePeersLength={setPeersLength}
                 onMuteMic={muteMic}
+                onUnmuteMic={unmuteMic}
               />
             </div>
           </div>
