@@ -25,6 +25,8 @@ const audioConstraints = {
   sampleSize: 16,
   volume: 1,
   noiseSuppression: true,
+  echoCancellation: true,
+  autoGainControl: true,
 };
 
 export const useUserStreams = ({
@@ -62,21 +64,27 @@ export const useUserStreams = ({
     const source = audioCtx.createMediaStreamSource(userAudioStream);
 
     const compressor = audioCtx.createDynamicsCompressor();
-    compressor.threshold.setValueAtTime(-50, audioCtx.currentTime);
-    compressor.knee.setValueAtTime(40, audioCtx.currentTime);
+    compressor.threshold.setValueAtTime(-15, audioCtx.currentTime);
+    compressor.knee.setValueAtTime(25, audioCtx.currentTime);
     compressor.ratio.setValueAtTime(18, audioCtx.currentTime);
     compressor.attack.setValueAtTime(0, audioCtx.currentTime);
     compressor.release.setValueAtTime(0.25, audioCtx.currentTime);
 
     const filter = audioCtx.createBiquadFilter();
-    filter.type = 'highshelf';
-    filter.frequency.setValueAtTime(1600, audioCtx.currentTime);
-    filter.gain.setValueAtTime(6, audioCtx.currentTime);
+    filter.type = 'peaking';
+    filter.frequency.setValueAtTime(2300, audioCtx.currentTime);
+    filter.Q.setValueAtTime(1, audioCtx.currentTime);
+
+    const filterHigh = audioCtx.createBiquadFilter();
+    filterHigh.type = 'lowpass';
+    filterHigh.frequency.setValueAtTime(7000, audioCtx.currentTime);
+    filterHigh.gain.setValueAtTime(6, audioCtx.currentTime);
 
     const dest = audioCtx.createMediaStreamDestination();
     source.connect(compressor);
     compressor.connect(filter);
-    filter.connect(dest);
+    filter.connect(filterHigh);
+    filterHigh.connect(dest);
     setUserAudioProcessedStream(dest.stream);
 
     return () => {
