@@ -8,7 +8,7 @@ import { getAverageVolume } from './utils/getAverageVolume';
 import { SwitchButton } from './SwitchButton';
 import { AuthContext } from '../../../../context/AuthContext';
 import { UserAvatar } from '../../../../components/UserAvatar/UserAvatar';
-import { Devices } from '../../hooks/useUserStream';
+import { Devices } from '../../hooks/useUserStreams';
 import { Loader } from '../../../../components/Loader/Loader';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
@@ -20,7 +20,8 @@ interface EnterVideoChatModalProps {
   viewerMode: boolean;
   loading: boolean;
   roomName?: string;
-  userStream: MediaStream | null;
+  userVideoStream: MediaStream | null;
+  userAudioStream: MediaStream | null;
   micEnabled: boolean;
   cameraEnabled: boolean;
   onClose: () => void;
@@ -43,7 +44,8 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
   loading,
   viewerMode,
   roomName,
-  userStream,
+  userVideoStream,
+  userAudioStream,
   micEnabled,
   cameraEnabled,
   onClose,
@@ -66,18 +68,24 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
   const audioAnalyser = useRef<AnalyserNode | null>(null);
 
   useEffect(() => {
-    if (!userStream) {
+    if (!userAudioStream) {
       return;
     }
     try {
-      audioAnalyser.current = createAudioAnalyser(userStream);
+      audioAnalyser.current = createAudioAnalyser(userAudioStream);
     } catch {
       console.warn('Failed to create audioAnalyser');
     }
-    if (userVideo.current) {
-      userVideo.current.srcObject = userStream;
+  }, [userAudioStream]);
+
+  useEffect(() => {
+    if (!userVideoStream) {
+      return;
     }
-  }, [userStream]);
+    if (userVideo.current) {
+      userVideo.current.srcObject = userVideoStream;
+    }
+  }, [userVideoStream]);
 
   useEffect(() => {
     if (!micId && !cameraId) {

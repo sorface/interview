@@ -8,12 +8,20 @@ interface VideoChatVideoProps {
 export const VideoChatVideo: FunctionComponent<VideoChatVideoProps> = ({
   peer,
 }) => {
-  const ref = useRef<HTMLVideoElement>(null);
+  const refVideo = useRef<HTMLVideoElement>(null);
+  const refAudio = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const handleStream = (stream: MediaStream) => {
-      if (ref.current) {
-        ref.current.srcObject = stream;
+      const audioStream = !!stream.getAudioTracks().length;
+      const videoStream = !!stream.getVideoTracks().length;
+
+      if (videoStream && refVideo.current) {
+        refVideo.current.srcObject = stream;
+      }
+
+      if (audioStream && refAudio.current) {
+        refAudio.current.srcObject = stream;
       }
     };
     peer.on('stream', handleStream);
@@ -24,6 +32,9 @@ export const VideoChatVideo: FunctionComponent<VideoChatVideoProps> = ({
   }, [peer]);
 
   return (
-    <video playsInline autoPlay ref={ref} className='videochat-video' />
+    <>
+      <video playsInline autoPlay ref={refVideo} className='videochat-video' />
+      <audio playsInline autoPlay ref={refAudio} />
+    </>
   );
 };

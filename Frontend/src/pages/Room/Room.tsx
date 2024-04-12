@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
+import { FunctionComponent, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import useWebSocket from 'react-use-websocket';
 import toast from 'react-hot-toast';
@@ -24,7 +24,7 @@ import { SwitchButton } from './components/VideoChat/SwitchButton';
 import { Link } from 'react-router-dom';
 import { ThemeSwitchMini } from '../../components/ThemeSwitchMini/ThemeSwitchMini';
 import { EnterVideoChatModal } from './components/VideoChat/EnterVideoChatModal';
-import { Devices, useUserStream } from './hooks/useUserStream';
+import { Devices, useUserStreams } from './hooks/useUserStreams';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useUnreadChatMessages } from './hooks/useUnreadChatMessages';
 import { LocalizationKey } from '../../localization';
@@ -59,11 +59,17 @@ export const Room: FunctionComponent = () => {
   const [messagesChatEnabled, setMessagesChatEnabled] = useState(false);
   const [welcomeScreen, setWelcomeScreen] = useState(true);
   const [micEnabled, setMicEnabled] = useState(true);
+  const micDisabledAutomatically = useRef(false);
   const [cameraEnabled, setCameraEnabled] = useState(true);
   const [selectedDevices, setSelectedDevices] = useState<Devices | null>(null);
   const [recognitionEnabled, setRecognitionEnabled] = useState(false);
   const [peersLength, setPeersLength] = useState(0);
-  const { userStream } = useUserStream({
+  const {
+    userAudioStream,
+    userVideoStream,
+    disableVideo,
+    enableVideo,
+  } = useUserStreams({
     selectedDevices,
   });
   const localizationCaptions = useLocalizationCaptions();
@@ -259,18 +265,27 @@ export const Room: FunctionComponent = () => {
   };
 
   const handleCameraSwitch = useCallback(() => {
-    if (userStream) {
-      enableDisableUserTrack(userStream, 'video', !cameraEnabled);
+    if (cameraEnabled) {
+      disableVideo();
+    } else {
+      enableVideo();
     }
     setCameraEnabled(!cameraEnabled);
-  }, [userStream, cameraEnabled]);
+  }, [cameraEnabled, disableVideo, enableVideo]);
+
+  const enableDisableMic = useCallback((enabled: boolean) => {
+    if (userAudioStream) {
+      enableDisableUserTrack(userAudioStream, 'audio', enabled);
+    }
+    setMicEnabled(enabled);
+  }, [userAudioStream]);
 
   const handleMicSwitch = useCallback(() => {
-    if (userStream) {
-      enableDisableUserTrack(userStream, 'audio', !micEnabled);
+    if (micEnabled) {
+      micDisabledAutomatically.current = false;
     }
-    setMicEnabled(!micEnabled);
-  }, [userStream, micEnabled]);
+    enableDisableMic(!micEnabled);
+  }, [micEnabled, enableDisableMic]);
 
   useEffect(() => {
     if (welcomeScreen || viewerMode) {
@@ -278,6 +293,14 @@ export const Room: FunctionComponent = () => {
     }
     setRecognitionEnabled(micEnabled);
   }, [welcomeScreen, viewerMode, micEnabled]);
+
+  const muteMic = useCallback(() => {
+    enableDisableMic(false);
+  }, [enableDisableMic]);
+
+  const unmuteMic = useCallback(() => {
+    enableDisableMic(true);
+  }, [enableDisableMic]);
 
   const handleVoiceRecognitionSwitch = useCallback(() => {
     setRecognitionEnabled(!recognitionEnabled);
@@ -304,7 +327,8 @@ export const Room: FunctionComponent = () => {
         loading={loading || roomParticipantLoading || roomParticipantWillLoaded || readyState === connectingReadyState}
         viewerMode={viewerMode}
         roomName={room?.name}
-        userStream={userStream}
+        userVideoStream={userVideoStream}
+        userAudioStream={userAudioStream}
         micEnabled={micEnabled}
         cameraEnabled={cameraEnabled}
         onSelect={handleMediaSelect}
@@ -376,10 +400,14 @@ export const Room: FunctionComponent = () => {
                 viewerMode={viewerMode}
                 lastWsMessage={lastMessage}
                 messagesChatEnabled={messagesChatEnabled}
-                userStream={userStream}
+                userVideoStream={userVideoStream}
+                userAudioStream={userAudioStream}
                 videoTrackEnabled={cameraEnabled}
+                micDisabledAutomatically={micDisabledAutomatically}
                 onSendWsMessage={sendMessage}
                 onUpdatePeersLength={setPeersLength}
+                onMuteMic={muteMic}
+                onUnmuteMic={unmuteMic}
               />
             </div>
           </div>

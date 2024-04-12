@@ -21,6 +21,7 @@ import { UserType } from '../../../../types/user';
 import { useReactionsStatus } from '../../hooks/useReactionsStatus';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
+import { checkIsAudioStream } from './utils/checkIsAudioStream';
 
 import './VideoChat.css';
 
@@ -37,10 +38,14 @@ interface VideoChatProps {
   viewerMode: boolean;
   lastWsMessage: MessageEvent<any> | null;
   messagesChatEnabled: boolean;
-  userStream: MediaStream | null;
+  userVideoStream: MediaStream | null;
+  userAudioStream: MediaStream | null;
   videoTrackEnabled: boolean;
+  micDisabledAutomatically: React.MutableRefObject<boolean>;
   onSendWsMessage: SendMessage;
   onUpdatePeersLength: (length: number) => void;
+  onMuteMic: () => void;
+  onUnmuteMic: () => void;
 };
 
 interface PeerMeta {
@@ -85,10 +90,14 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   viewerMode,
   lastWsMessage,
   messagesChatEnabled,
-  userStream,
+  userVideoStream,
+  userAudioStream,
   videoTrackEnabled,
+  micDisabledAutomatically,
   onSendWsMessage,
   onUpdatePeersLength,
+  onMuteMic,
+  onUnmuteMic,
 }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
@@ -109,11 +118,24 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   const [videoOrder, setVideoOrder] = useState<Record<string, number>>({
     [auth?.id || '']: 1,
   });
-  const updateAnalyserTimeout = useRef(0);
+  const updateLouderUserTimeout = useRef(0);
   const intervieweeFrameRef = useRef<HTMLIFrameElement>(null);
   const { activeReactions } = useReactionsStatus({
     lastMessage: lastWsMessage,
   });
+
+  useEffect(() => {
+    if (videoTrackEnabled && userVideoStream) {
+      try {
+        peers.forEach(peer => {
+          const videoTrack = userVideoStream.getVideoTracks()[0];
+          peer.peer.addTrack(videoTrack, userVideoStream);
+        });
+      } catch (e) {
+        console.error('add video track error: ', e);
+      }
+    }
+  }, [videoTrackEnabled, peers, userVideoStream]);
 
   useEffect(() => {
     onUpdatePeersLength(peers.length);
@@ -150,12 +172,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     const updateAudioAnalyser = () => {
       const time = performance.now();
       const delta = time - prevTime;
-      if (updateAnalyserTimeout.current > 0) {
-        updateAnalyserTimeout.current -= delta;
-        prevTime = time;
-        requestRef.current = requestAnimationFrame(updateAudioAnalyser);
-        return;
-      }
+      let somebodyIsSpeaking = false;
       let newLouderUserId = '';
       let louderVolume = -1;
       const result: Record<string, number> = {};
@@ -165,14 +182,34 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         if (averageVolume < audioVolumeThreshold) {
           continue;
         }
+        if (auth?.id && (userId !== auth.id)) {
+          somebodyIsSpeaking = true;
+        }
         if (averageVolume > louderVolume) {
           newLouderUserId = userId;
           louderVolume = averageVolume;
         }
         result[userId] = averageVolume;
       }
+
+      const micEnabled = userAudioStream?.getAudioTracks().some(audioTrack => audioTrack.enabled);
+
+      if (somebodyIsSpeaking && micEnabled) {
+        micDisabledAutomatically.current = true;
+        onMuteMic();
+      } else if (!somebodyIsSpeaking && !micEnabled && micDisabledAutomatically.current) {
+        onUnmuteMic();
+      }
+
+      if (updateLouderUserTimeout.current > 0) {
+        updateLouderUserTimeout.current -= delta;
+        prevTime = time;
+        requestRef.current = requestAnimationFrame(updateAudioAnalyser);
+        return;
+      }
+
       if (newLouderUserId && newLouderUserId !== louderUserId.current) {
-        updateAnalyserTimeout.current = updateLoudedUserTimeout;
+        updateLouderUserTimeout.current = updateLoudedUserTimeout;
         setVideoOrder({
           [newLouderUserId]: 1,
           [louderUserId.current]: 2,
@@ -191,7 +228,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       }
     };
 
-  }, [louderUserId]);
+  }, [auth, louderUserId, userAudioStream, micDisabledAutomatically, onMuteMic, onUnmuteMic]);
 
   const createPeer = useCallback((to: string, forViewer?: boolean) => {
     if (viewerMode) {
@@ -205,10 +242,14 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       return new Peer();
     }
 
+    const streams: MediaStream[] = [];
+    userAudioStream && streams.push(userAudioStream);
+    userVideoStream && streams.push(userVideoStream);
+
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      stream: userStream || undefined,
+      streams,
       ...(forViewer && {
         offerOptions: {
           offerToReceiveAudio: false,
@@ -228,13 +269,17 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     });
 
     return peer;
-  }, [userStream, viewerMode, onSendWsMessage]);
+  }, [userAudioStream, userVideoStream, viewerMode, onSendWsMessage]);
 
   const addPeer = useCallback((incomingSignal: Peer.SignalData, callerID: string) => {
+    const streams: MediaStream[] = [];
+    userAudioStream && streams.push(userAudioStream);
+    userVideoStream && streams.push(userVideoStream);
+
     const peer = new Peer({
       initiator: false,
       trickle: false,
-      stream: userStream || undefined,
+      streams,
     });
 
     peer.on('signal', signal => {
@@ -250,16 +295,25 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     peer.signal(incomingSignal);
 
     return peer;
-  }, [userStream, onSendWsMessage]);
+  }, [userAudioStream, userVideoStream, onSendWsMessage]);
 
   useEffect(() => {
     return () => {
-      if (!userStream) {
+      if (!userAudioStream) {
         return;
       }
-      userStream.getTracks().forEach(track => track.stop());
+      userAudioStream.getTracks().forEach(track => track.stop());
     };
-  }, [userStream]);
+  }, [userAudioStream]);
+
+  useEffect(() => {
+    return () => {
+      if (!userVideoStream) {
+        return;
+      }
+      userVideoStream.getTracks().forEach(track => track.stop());
+    };
+  }, [userVideoStream]);
 
   useEffect(() => {
     if (!lastWsMessage?.data || !intervieweeFrameRef.current) {
@@ -296,6 +350,10 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             };
 
             peer.on('stream', (stream) => {
+              const audioStream  = checkIsAudioStream(stream);
+              if (!audioStream) {
+                return;
+              }
               userIdToAudioAnalyser.current[newPeerMeta.targetUserId] = createAudioAnalyser(stream);
             });
 
@@ -317,6 +375,10 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             };
 
             peer.on('stream', (stream) => {
+              const audioStream  = checkIsAudioStream(stream);
+              if (!audioStream) {
+                return;
+              }
               userIdToAudioAnalyser.current[newPeerMeta.targetUserId] = createAudioAnalyser(stream);
             });
 
@@ -364,6 +426,10 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             peersRef.current.push(newPeerMeta);
 
             peer.on('stream', (stream) => {
+              const audioStream  = checkIsAudioStream(stream);
+              if (!audioStream) {
+                return;
+              }
               userIdToAudioAnalyser.current[newPeerMeta.targetUserId] = createAudioAnalyser(stream);
             });
             setPeers([...peersRef.current]);
@@ -385,6 +451,10 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           peersRef.current.push(newPeerMeta);
 
           peer.on('stream', (stream) => {
+            const audioStream  = checkIsAudioStream(stream);
+              if (!audioStream) {
+                return;
+              }
             userIdToAudioAnalyser.current[newPeerMeta.targetUserId] = createAudioAnalyser(stream);
           });
           setPeers([...peersRef.current]);
@@ -455,16 +525,22 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   }, [lastWsMessage]);
 
   useEffect(() => {
-    if (!userStream || !auth?.id) {
+    if (!userAudioStream || !auth?.id) {
+      return;
+    }
+    try {
+      userIdToAudioAnalyser.current[auth.id] = createAudioAnalyser(userAudioStream);
+    } catch { }
+  }, [userAudioStream, auth?.id]);
+
+  useEffect(() => {
+    if (!userVideoStream) {
       return;
     }
     if (userVideo.current) {
-      userVideo.current.srcObject = userStream;
+      userVideo.current.srcObject = userVideoStream;
     }
-    try {
-      userIdToAudioAnalyser.current[auth.id] = createAudioAnalyser(userStream);
-    } catch { }
-  }, [userStream, auth?.id]);
+  }, [userVideoStream]);
 
   const handleTextMessageSubmit = (message: string) => {
     onSendWsMessage(JSON.stringify({
