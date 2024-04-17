@@ -1,0 +1,13 @@
+{
+  "metadata": {
+    "soundFile": "D:\\Programs\\Rhubarb-Lip-Sync-1.13.0-Windows\\song.ogg",
+    "duration": 0.78
+  },
+  "mouthCues": [
+    { "start": 0.00, "end": 0.08, "value": "X" },
+    { "start": 0.08, "end": 0.22, "value": "C" },
+    { "start": 0.22, "end": 0.29, "value": "B" },
+    { "start": 0.29, "end": 0.50, "value": "E" },
+    { "start": 0.50, "end": 0.78, "value": "X" }
+  ]
+}
