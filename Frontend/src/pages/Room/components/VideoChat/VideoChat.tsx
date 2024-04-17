@@ -22,6 +22,8 @@ import { useReactionsStatus } from '../../hooks/useReactionsStatus';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { checkIsAudioStream } from './utils/checkIsAudioStream';
+import { Canvas } from '@react-three/fiber';
+import { AiAssistantExperience } from '../AiAssistant/AiAssistantExperience';
 
 import './VideoChat.css';
 
@@ -350,7 +352,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             };
 
             peer.on('stream', (stream) => {
-              const audioStream  = checkIsAudioStream(stream);
+              const audioStream = checkIsAudioStream(stream);
               if (!audioStream) {
                 return;
               }
@@ -375,7 +377,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             };
 
             peer.on('stream', (stream) => {
-              const audioStream  = checkIsAudioStream(stream);
+              const audioStream = checkIsAudioStream(stream);
               if (!audioStream) {
                 return;
               }
@@ -426,7 +428,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             peersRef.current.push(newPeerMeta);
 
             peer.on('stream', (stream) => {
-              const audioStream  = checkIsAudioStream(stream);
+              const audioStream = checkIsAudioStream(stream);
               if (!audioStream) {
                 return;
               }
@@ -451,10 +453,10 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           peersRef.current.push(newPeerMeta);
 
           peer.on('stream', (stream) => {
-            const audioStream  = checkIsAudioStream(stream);
-              if (!audioStream) {
-                return;
-              }
+            const audioStream = checkIsAudioStream(stream);
+            if (!audioStream) {
+              return;
+            }
             userIdToAudioAnalyser.current[newPeerMeta.targetUserId] = createAudioAnalyser(stream);
           });
           setPeers([...peersRef.current]);
@@ -553,6 +555,18 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     <div className='room-columns'>
       <Field className='videochat-field'>
         <div className='videochat'>
+          <VideochatParticipant
+            order={3}
+            viewer={false}
+            nickname={localizationCaptions[LocalizationKey.AiAssistantName]}
+            videoTrackEnabled={true}
+          >
+            <div className='videochat-ai-assistant'>
+              <Canvas shadows camera={{ position: [0, 0.5, 6.5], fov: 38 }} className='videochat-video'>
+                <AiAssistantExperience lastTranscription={transcripts[transcripts.length - 1]} />
+              </Canvas>
+            </div>
+          </VideochatParticipant>
           <VideochatParticipant
             order={viewerMode ? viewerOrder - 1 : videoOrder[auth?.id || '']}
             viewer={viewerMode}

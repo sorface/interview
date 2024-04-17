@@ -127,6 +127,8 @@ export const enum LocalizationKey {
   RoomConnectionError,
   LocalizationLangEn,
   LocalizationLangRu,
+  AiAssistantName,
+  AiAssistantWelcomePrompt,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -257,6 +259,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.RoomConnectionError]: 'Connection to the room has been lost',
     [LocalizationKey.LocalizationLangEn]: 'English',
     [LocalizationKey.LocalizationLangRu]: 'Русский',
+    [LocalizationKey.AiAssistantName]: 'Michael (Alpha)',
+    [LocalizationKey.AiAssistantWelcomePrompt]: 'Hi Michael',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -385,5 +389,7 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.RoomConnectionError]: 'Соединение с комнатой потеряно',
     [LocalizationKey.LocalizationLangEn]: 'English',
     [LocalizationKey.LocalizationLangRu]: 'Русский',
+    [LocalizationKey.AiAssistantName]: 'Михаил (Альфа)',
+    [LocalizationKey.AiAssistantWelcomePrompt]: 'Привет Михаил',
   },
 }

@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "soundFile": "D:\\Programs\\Rhubarb-Lip-Sync-1.13.0-Windows\\song.ogg",
+    "duration": 1.48
+  },
+  "mouthCues": [
+    { "start": 0.00, "end": 0.09, "value": "X" },
+    { "start": 0.09, "end": 0.18, "value": "B" },
+    { "start": 0.18, "end": 0.43, "value": "C" },
+    { "start": 0.43, "end": 0.50, "value": "E" },
+    { "start": 0.50, "end": 0.74, "value": "F" },
+    { "start": 0.74, "end": 0.81, "value": "B" },
+    { "start": 0.81, "end": 1.02, "value": "C" },
+    { "start": 1.02, "end": 1.13, "value": "A" },
+    { "start": 1.13, "end": 1.21, "value": "B" },
+    { "start": 1.21, "end": 1.48, "value": "X" }
+  ]
+}

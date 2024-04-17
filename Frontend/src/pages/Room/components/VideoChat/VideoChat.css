@@ -32,6 +32,11 @@
   align-items: center;
 }
 
+.videochat-ai-assistant {
+  width: var(--videochat-video-size);
+  height: var(--videochat-video-size);
+}
+
 .videochat-participants {
   width: 100%;
   text-align: left;
@@ -90,7 +95,7 @@
 
 .videochat-overlay {
   position: absolute;
-  background-color: color-mix(in srgb, var(--form-bg), transparent 50%);
+  background-color: color-mix(in srgb, var(--form-bg), transparent 15%);
   z-index: 1;
 }
 
