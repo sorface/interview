@@ -16,4 +16,14 @@ public class RoomInviteResponse
     /// Gets or sets participant type.
     /// </summary>
     public required EVRoomParticipantType ParticipantType { get; set; }
+
+    /**
+     * Get max invite count
+     */
+    public required int Max { get; set; }
+
+    /**
+     * Get current invite count
+     */
+    public required int Used { get; set; }
 }

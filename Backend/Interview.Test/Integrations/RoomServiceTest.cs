@@ -7,6 +7,7 @@ using Interview.Domain.Reactions;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Response;
+using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.RoomInvites;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomParticipants.Service;
@@ -709,6 +710,8 @@ public class RoomServiceTest
             {
                 InviteId = e.InviteById!.Value,
                 ParticipantType = e.ParticipantType!.EnumValue,
+                Max = e.Invite!.UsesMax,
+                Used = e.Invite!.UsesCurrent,
             })
             .OrderBy(e => e.InviteId)
             .ToList();

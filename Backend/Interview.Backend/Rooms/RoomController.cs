@@ -43,9 +43,11 @@ public class RoomController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<IPagedList<RoomPageDetail>> GetPage([FromQuery] PageRequest request, [FromQuery] RoomPageDetailRequestFilter? filter)
+    public Task<IPagedList<RoomPageDetail>> GetPage([FromQuery] PageRequest request,
+        [FromQuery] RoomPageDetailRequestFilter? filter)
     {
-        return _roomService.FindPageAsync(filter ?? new RoomPageDetailRequestFilter(), request.PageNumber, request.PageSize, HttpContext.RequestAborted);
+        return _roomService.FindPageAsync(filter ?? new RoomPageDetailRequestFilter(), request.PageNumber,
+            request.PageSize, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -63,22 +65,6 @@ public class RoomController : ControllerBase
     public Task<RoomDetail> GetById(Guid id)
     {
         return _roomService.FindByIdAsync(id, HttpContext.RequestAborted);
-    }
-
-    /// <summary>
-    /// Getting a Room invites by room id.
-    /// </summary>
-    /// <param name="roomId">Room id.</param>
-    /// <returns>Room Invites response.</returns>
-    [Authorize]
-    [HttpGet("{roomId:guid}/invites")]
-    [ProducesResponseType(typeof(List<RoomInviteResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<List<RoomInviteResponse>> GetRoomInvites(Guid roomId)
-    {
-        return _roomService.GetInvitesAsync(roomId, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -196,6 +182,11 @@ public class RoomController : ControllerBase
         return _roomService.GetAnalyticsSummaryAsync(request, HttpContext.RequestAborted);
     }
 
+    /// <summary>
+    /// Closing the room.
+    /// </summary>
+    /// <param name="id">room id.</param>
+    /// <returns>result operation.</returns>
     [Authorize]
     [HttpPatch("{id:guid}/close")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
@@ -208,6 +199,11 @@ public class RoomController : ControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Moving the room to the review stage.
+    /// </summary>
+    /// <param name="id">room id.</param>
+    /// <returns>result operation.</returns>
     [Authorize]
     [HttpPatch("{id:guid}/startReview")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
@@ -219,17 +215,7 @@ public class RoomController : ControllerBase
 
         return Ok();
     }
-
-    [Authorize]
-    [HttpPost("{id:guid}/invites")]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
-    public Task<RoomInviteDetail> ApplyInvite([FromRoute(Name = "id")] Guid id, [FromQuery(Name = "id")] Guid invite)
-    {
-        return _roomService.ApplyInvite(id, invite, HttpContext.RequestAborted);
-    }
-
+    
     /// <summary>
     /// Sending event to room.
     /// </summary>
@@ -270,9 +256,7 @@ public class RoomController : ControllerBase
     {
         var request = new TranscriptionRequest
         {
-            RoomId = roomId,
-            UserId = currentUserAccessor.GetUserIdOrThrow(),
-            TranscriptionTypeMap = options,
+            RoomId = roomId, UserId = currentUserAccessor.GetUserIdOrThrow(), TranscriptionTypeMap = options,
         };
         return _roomService.GetTranscriptionAsync(request, HttpContext.RequestAborted);
     }

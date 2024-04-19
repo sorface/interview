@@ -315,6 +315,13 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
+                            Id = new Guid("95f1f088-6931-4914-92c1-c1f1d7d75a18"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("c1f43ca8-21f1-41e6-9794-e7d44156bf73"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
                             Id = new Guid("07dea11a-65a4-4826-ab4f-9d2cdfaa72f3"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("b530321a-a51a-4a36-8afd-6e8a8dbae248"),
@@ -972,6 +979,13 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
+                            Id = new Guid("c1f43ca8-21f1-41e6-9794-e7d44156bf73"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "RoomInviteGenerate",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
                             Id = new Guid("b530321a-a51a-4a36-8afd-6e8a8dbae248"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "RoomInviteGet",
@@ -1437,10 +1451,11 @@ namespace Interview.Migrations.Postgres.Migrations
 
                     b.HasOne("Interview.Domain.Invites.Invite", "Invite")
                         .WithMany()
-                        .HasForeignKey("InviteById");
+                        .HasForeignKey("InviteById")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Interview.Domain.Rooms.Room", "Room")
-                        .WithMany()
+                        .WithMany("Invites")
                         .HasForeignKey("RoomById");
 
                     b.Navigation("CreatedBy");
@@ -1674,6 +1689,8 @@ namespace Interview.Migrations.Postgres.Migrations
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>
                 {
                     b.Navigation("Configuration");
+
+                    b.Navigation("Invites");
 
                     b.Navigation("Participants");
 

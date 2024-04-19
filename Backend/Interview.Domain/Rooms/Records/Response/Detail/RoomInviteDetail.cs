@@ -8,5 +8,5 @@ public class RoomInviteDetail
 
     public Guid RoomId { get; set; }
 
-    public SERoomParticipantType? ParticipantType { get; set; }
+    public string? ParticipantType { get; set; }
 }

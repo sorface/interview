@@ -13,6 +13,13 @@ public class RoomInvite : Entity
         ParticipantType = participantType;
     }
 
+    public RoomInvite(Guid invite, Guid room, SERoomParticipantType participantType)
+    {
+        InviteById = invite;
+        RoomById = room;
+        ParticipantType = participantType;
+    }
+
     private RoomInvite()
     {
     }

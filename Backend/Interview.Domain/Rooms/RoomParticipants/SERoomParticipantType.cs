@@ -44,6 +44,7 @@ public sealed class SERoomParticipantType : SmartEnum<SERoomParticipantType>
         SEAvailableRoomPermission.RoomQuestionCreate,
         SEAvailableRoomPermission.RoomQuestionChangeActiveQuestion,
         SEAvailableRoomPermission.RoomReviewCreate,
+        SEAvailableRoomPermission.RoomInviteGenerate,
     });
 
     public static readonly SERoomParticipantType Examinee = new("Examinee", EVRoomParticipantType.Examinee, new HashSet<SEAvailableRoomPermission>
@@ -69,6 +70,9 @@ public sealed class SERoomParticipantType : SmartEnum<SERoomParticipantType>
     }
 
     public EVRoomParticipantType EnumValue => (EVRoomParticipantType)Value;
+
+    public static SERoomParticipantType FromEnum(EVRoomParticipantType participantType) =>
+        SERoomParticipantType.List.First(it => it.Value.Equals((int)participantType));
 
     public IReadOnlySet<SEAvailableRoomPermission> DefaultRoomPermission { get; }
 }

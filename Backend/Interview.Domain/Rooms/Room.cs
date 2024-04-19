@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms.RoomConfigurations;
+using Interview.Domain.Rooms.RoomInvites;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.Tags;
@@ -41,6 +42,8 @@ public class Room : Entity
     public List<RoomState> RoomStates { get; set; } = new();
 
     public List<Tag> Tags { get; set; } = new();
+
+    public List<RoomInvite> Invites { get; set; } = new();
 
     public QueuedRoomEvent? QueuedRoomEvent { get; set; }
 }

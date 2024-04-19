@@ -1,6 +1,7 @@
 using Interview.Domain.Database;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.Records.Request;
+using Interview.Domain.Rooms.Records.Response;
 using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.Records.Response.Page;
 using Interview.Domain.Rooms.RoomParticipants;
@@ -18,7 +19,9 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
     {
     }
 
-    public async Task<AnalyticsSummary?> GetAnalyticsSummaryAsync(RoomAnalyticsRequest request, CancellationToken cancellationToken = default)
+    public async Task<AnalyticsSummary?> GetAnalyticsSummaryAsync(
+        RoomAnalyticsRequest request,
+        CancellationToken cancellationToken = default)
     {
         var questions = await Db.RoomQuestions.AsNoTracking()
             .Include(e => e.Question)
@@ -56,9 +59,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                     ReactionsSummary = e.GroupBy(t => (t.Reaction!.Id, t.Reaction.Type))
                         .Select(t => new Analytics.AnalyticsReactionSummary
                         {
-                            Id = t.Key.Id,
-                            Type = t.Key.Type.Name,
-                            Count = t.Count(),
+                            Id = t.Key.Id, Type = t.Key.Type.Name, Count = t.Count(),
                         })
                         .ToList(),
                 })
@@ -73,9 +74,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                     ReactionsSummary = e.GroupBy(t => (t.Reaction!.Id, t.Reaction.Type))
                         .Select(t => new Analytics.AnalyticsReactionSummary
                         {
-                            Id = t.Key.Id,
-                            Type = t.Key.Type.Name,
-                            Count = t.Count(),
+                            Id = t.Key.Id, Type = t.Key.Type.Name, Count = t.Count(),
                         })
                         .ToList(),
                 })
@@ -89,17 +88,16 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
 
             summary.Questions.Add(new AnalyticsSummaryQuestion
             {
-                Id = question.Id,
-                Value = question.Value,
-                Experts = experts,
-                Viewers = viewers,
+                Id = question.Id, Value = question.Value, Experts = experts, Viewers = viewers,
             });
         }
 
         return summary;
     }
 
-    public async Task<Analytics?> GetAnalyticsAsync(RoomAnalyticsRequest request, CancellationToken cancellationToken = default)
+    public async Task<Analytics?> GetAnalyticsAsync(
+        RoomAnalyticsRequest request,
+        CancellationToken cancellationToken = default)
     {
         var analytics = await GetAnalyticsCoreAsync(request.RoomId, cancellationToken);
         if (analytics == null)
@@ -130,7 +128,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                 .Include(e => e.Sender)
                 .Include(e => e.Reaction)
                 .Include(e => e.RoomQuestion)
-                    .ThenInclude(e => e!.Question)
+                .ThenInclude(e => e!.Question)
                 .Where(e => e.RoomQuestion!.Room!.Id == roomId)
                 .ToListAsync(ct);
         }
@@ -146,9 +144,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                 {
                     Questions = e.Questions.Select(q => new Analytics.AnalyticsQuestion
                     {
-                        Id = q.Question!.Id,
-                        Status = q.State!.Name,
-                        Value = q.Question.Value,
+                        Id = q.Question!.Id, Status = q.State!.Name, Value = q.Question.Value,
                     }).ToList(),
                 })
                 .FirstOrDefaultAsync(ct);
@@ -161,9 +157,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                 .GroupBy(e => (e!.Id, e.Type))
                 .Select(e => new Analytics.AnalyticsReactionSummary
                 {
-                    Id = e.Key.Id,
-                    Count = e.Count(),
-                    Type = e.Key.Type.Name,
+                    Id = e.Key.Id, Count = e.Count(), Type = e.Key.Type.Name,
                 })
                 .ToList();
         }
@@ -205,9 +199,11 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
             }).ToList();
         }
 
-        static List<Analytics.AnalyticsReactionSummary> ToAnalyticsReactionSummary(IGrouping<Guid, RoomQuestionReaction> e)
+        static List<Analytics.AnalyticsReactionSummary> ToAnalyticsReactionSummary(
+            IGrouping<Guid, RoomQuestionReaction> e)
         {
-            return e.GroupBy(roomQuestionReaction => (roomQuestionReaction.Reaction!.Id, roomQuestionReaction.Reaction.Type))
+            return e.GroupBy(roomQuestionReaction =>
+                    (roomQuestionReaction.Reaction!.Id, roomQuestionReaction.Reaction.Type))
                 .Select(roomQuestionReactions => new Analytics.AnalyticsReactionSummary
                 {
                     Id = roomQuestionReactions.Key.Id,
@@ -226,12 +222,21 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                 cancellationToken);
     }
 
-    public Task<RoomParticipant?> FindParticipantOrDefaultAsync(Guid roomId, Guid userId, CancellationToken cancellationToken = default)
+    public Task<RoomParticipant?> FindParticipantOrDefaultAsync(
+        Guid roomId,
+        Guid userId,
+        CancellationToken cancellationToken = default)
     {
-        return Db.RoomParticipants.FirstOrDefaultAsync(e => e.Room.Id == roomId && e.User.Id == userId, cancellationToken);
+        return Db.RoomParticipants.FirstOrDefaultAsync(
+            roomParticipant => roomParticipant.Room.Id == roomId && roomParticipant.User.Id == userId,
+            cancellationToken);
     }
 
-    public Task<IPagedList<RoomPageDetail>> GetDetailedPageAsync(RoomPageDetailRequestFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public Task<IPagedList<RoomPageDetail>> GetDetailedPageAsync(
+        RoomPageDetailRequestFilter filter,
+        int pageNumber,
+        int pageSize,
+        CancellationToken cancellationToken = default)
     {
         IQueryable<Room> queryable = Set
             .Include(e => e.Participants)
@@ -275,15 +280,15 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                     .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
                     .ToList(),
                 Users = e.Participants.Select(participant =>
-                        new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar })
+                        new RoomUserDetail
+                        {
+                            Id = participant.User.Id,
+                            Nickname = participant.User.Nickname,
+                            Avatar = participant.User.Avatar,
+                        })
                     .ToList(),
                 RoomStatus = e.Status.EnumValue,
-                Tags = e.Tags.Select(t => new TagItem
-                {
-                    Id = t.Id,
-                    Value = t.Value,
-                    HexValue = t.HexColor,
-                }).ToList(),
+                Tags = e.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
             })
             .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
@@ -297,11 +302,24 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
             {
                 Id = e.Id,
                 Name = e.Name,
-                TwitchChannel = e.TwitchChannel,
-                Users = e.Participants.Select(participant =>
-                        new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, })
+                Owner = new RoomUserDetail { Id = e.CreatedBy!.Id, Nickname = e.CreatedBy!.Nickname, Avatar = e.CreatedBy!.Avatar, },
+                Participants = e.Participants.Select(participant =>
+                        new RoomUserDetail
+                        {
+                            Id = participant.User.Id,
+                            Nickname = participant.User.Nickname,
+                            Avatar = participant.User.Avatar,
+                        })
                     .ToList(),
-                RoomStatus = e.Status.EnumValue,
+                Status = e.Status.EnumValue,
+                Invites = e.Invites.Select(roomInvite => new RoomInviteResponse()
+                {
+                    InviteId = roomInvite.InviteById!.Value,
+                    ParticipantType = roomInvite.ParticipantType!.EnumValue,
+                    Max = roomInvite.Invite!.UsesMax,
+                    Used = roomInvite.Invite.UsesCurrent,
+                }).ToList(),
+                Type = e.AcсessType.EnumValue,
             })
             .FirstOrDefaultAsync(room => room.Id == roomId, cancellationToken: cancellationToken);
     }

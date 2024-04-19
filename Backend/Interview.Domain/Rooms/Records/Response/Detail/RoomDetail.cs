@@ -6,9 +6,13 @@ public class RoomDetail
 
     public string? Name { get; set; }
 
-    public string? TwitchChannel { get; set; }
+    public RoomUserDetail Owner { get; set; }
 
-    public List<RoomUserDetail>? Users { get; set; }
+    public List<RoomUserDetail>? Participants { get; set; }
 
-    public required EVRoomStatus RoomStatus { get; init; }
+    public required EVRoomStatus Status { get; init; }
+
+    public List<RoomInviteResponse> Invites { get; init; }
+
+    public EVRoomAccessType Type { get; init; }
 }
