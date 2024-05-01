@@ -48,6 +48,7 @@ public class SendingSignalWebSocketEventHandler : WebSocketEventHandlerBase<Send
                 ParticipantType = detail.ParticipantType,
             },
             Signal = payload.Signal,
+            ScreenShare = payload.ScreenShare,
         };
         var payloadStr = _serializer.SerializePayloadAsString(payloadForSerialization);
         var sendEvent = new RoomEvent(detail.RoomId, "user joined", payloadStr, false);
@@ -64,6 +65,8 @@ public class SendingSignalWebSocketEventHandler : WebSocketEventHandlerBase<Send
         public Guid To { get; set; }
 
         public string? Signal { get; set; }
+
+        public bool? ScreenShare { get; set; }
     }
 }
 
@@ -74,6 +77,8 @@ public class UserDetailResponse
     public required UserDetail From { get; init; }
 
     public required string? Signal { get; init; }
+
+    public required bool? ScreenShare { get; init; }
 }
 
 #pragma warning disable SA1402
