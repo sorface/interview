@@ -27,6 +27,7 @@ import { EnterVideoChatModal } from './components/VideoChat/EnterVideoChatModal'
 import { Devices, useUserStreams } from './hooks/useUserStreams';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useUnreadChatMessages } from './hooks/useUnreadChatMessages';
+import { useScreenStream } from './hooks/useScreenStream';
 import { LocalizationKey } from '../../localization';
 import { MessagePage } from '../../components/MessagePage/MessagePage';
 import { ThemedIcon } from './components/ThemedIcon/ThemedIcon';
@@ -72,6 +73,7 @@ export const Room: FunctionComponent = () => {
   } = useUserStreams({
     selectedDevices,
   });
+  const { screenStream, requestScreenStream } = useScreenStream();
   const localizationCaptions = useLocalizationCaptions();
 
   const handleVoiceRecognition = (transcript: string) => {
@@ -241,6 +243,10 @@ export const Room: FunctionComponent = () => {
     setMessagesChatEnabled(!messagesChatEnabled);
   };
 
+  const handleScreenShare = () => {
+    requestScreenStream();
+  };
+
   const loaders = [
     {},
     {},
@@ -402,6 +408,7 @@ export const Room: FunctionComponent = () => {
                 messagesChatEnabled={messagesChatEnabled}
                 userVideoStream={userVideoStream}
                 userAudioStream={userAudioStream}
+                screenStream={screenStream}
                 videoTrackEnabled={cameraEnabled}
                 micDisabledAutomatically={micDisabledAutomatically}
                 onSendWsMessage={sendMessage}
@@ -461,6 +468,15 @@ export const Room: FunctionComponent = () => {
                   roles={auth?.roles || []}
                   participantType={roomParticipant?.userType || null}
                   lastWsMessage={lastMessage}
+                />
+              )}
+              {!viewerMode && (
+                <SwitchButton
+                  enabled={true}
+                  iconEnabledName={IconNames.TV}
+                  iconDisabledName={IconNames.TV}
+                  subCaption={localizationCaptions[LocalizationKey.ScreenShare]}
+                  onClick={handleScreenShare}
                 />
               )}
             </div>
