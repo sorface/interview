@@ -197,6 +197,6 @@ public class QuestionServiceTest
         var currentUser = new CurrentUserAccessor();
         currentUser.SetUser(appDbContext.Users.First());
         var aRoomMembershipChecker = roomMembershipChecker ?? new RoomMembershipChecker(currentUser, new RoomParticipantRepository(appDbContext));
-        return new QuestionService(questionRepository, questionArchiveRepository, archiveService, tagRepository, aRoomMembershipChecker);
+        return new QuestionService(questionRepository, questionArchiveRepository, archiveService, tagRepository, aRoomMembershipChecker, currentUser);
     }
 }

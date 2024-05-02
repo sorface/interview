@@ -85,7 +85,8 @@ namespace Interview.Test.Integrations
                 new QuestionNonArchiveRepository(appDbContext),
                 new ArchiveService<Question>(questionRepository),
                 tagRepository,
-                roomMembershipChecker);
+                roomMembershipChecker,
+                currentUser);
         }
 
         private class UnavailableException : Exception

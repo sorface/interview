@@ -15,32 +15,32 @@ namespace Interview.Domain.Questions.Services;
 public class QuestionService : IQuestionService
 {
     private readonly IQuestionRepository _questionRepository;
-
     private readonly IQuestionNonArchiveRepository _questionNonArchiveRepository;
-
     private readonly ArchiveService<Question> _archiveService;
-
     private readonly ITagRepository _tagRepository;
-
     private readonly IRoomMembershipChecker _roomMembershipChecker;
+    private readonly ICurrentUserAccessor _currentUserAccessor;
 
     public QuestionService(
         IQuestionRepository questionRepository,
         IQuestionNonArchiveRepository questionNonArchiveRepository,
         ArchiveService<Question> archiveService,
         ITagRepository tagRepository,
-        IRoomMembershipChecker roomMembershipChecker)
+        IRoomMembershipChecker roomMembershipChecker,
+        ICurrentUserAccessor currentUserAccessor)
     {
         _questionRepository = questionRepository;
         _questionNonArchiveRepository = questionNonArchiveRepository;
         _archiveService = archiveService;
         _tagRepository = tagRepository;
         _roomMembershipChecker = roomMembershipChecker;
+        _currentUserAccessor = currentUserAccessor;
     }
 
     public async Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken)
     {
-        ASpec<Question> spec = new Spec<Question>(e => e.RoomId == null);
+        var currentUserId = _currentUserAccessor.UserId ?? Guid.Empty;
+        ASpec<Question> spec = new Spec<Question>(e => e.RoomId == null || e.CreatedById == currentUserId);
 
         if (request.Tags is not null && request.Tags.Count > 0)
         {

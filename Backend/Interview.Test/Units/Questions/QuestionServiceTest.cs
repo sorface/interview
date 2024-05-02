@@ -3,6 +3,7 @@ using Interview.Domain.Questions;
 using Interview.Domain.Questions.Services;
 using Interview.Domain.RoomParticipants;
 using Interview.Domain.Tags;
+using Interview.Domain.Users;
 using Moq;
 
 namespace Interview.Test.Units.Questions;
@@ -22,8 +23,9 @@ public class QuestionServiceTest
         var archiveService = new Mock<ArchiveService<Question>>(_questionRepository.Object);
         var questionTag = new Mock<ITagRepository>();
         var roomMembership = new Mock<IRoomMembershipChecker>();
+        var userAccessor = new Mock<ICurrentUserAccessor>();
 
-        _questionService = new QuestionService(_questionRepository.Object, _questionArchiveRepository.Object, archiveService.Object, questionTag.Object, roomMembership.Object);
+        _questionService = new QuestionService(_questionRepository.Object, _questionArchiveRepository.Object, archiveService.Object, questionTag.Object, roomMembership.Object, userAccessor.Object);
     }
 
     [Fact(DisplayName = "Searching question by id when question not found")]
