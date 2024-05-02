@@ -28,6 +28,7 @@ export const enum IconNames {
   ThemeSwitchLight = 'sunny',
   ThemeSwitchDark = 'moon',
   People = 'people',
+  TV = 'tv',
 }
 
 export const enum IconThemePostfix {
