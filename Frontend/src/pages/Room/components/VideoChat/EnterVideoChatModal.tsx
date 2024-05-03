@@ -20,6 +20,7 @@ interface EnterVideoChatModalProps {
   viewerMode: boolean;
   loading: boolean;
   roomName?: string;
+  error: string | null;
   userVideoStream: MediaStream | null;
   userAudioStream: MediaStream | null;
   micEnabled: boolean;
@@ -39,11 +40,18 @@ const updateAnalyserDelay = 1000 / 30;
 const getDevices = async () =>
   await navigator.mediaDevices.enumerateDevices();
 
+const enum Screen {
+  Joining,
+  SetupDevices,
+  Error,
+}
+
 export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = ({
   open,
   loading,
   viewerMode,
   roomName,
+  error,
   userVideoStream,
   userAudioStream,
   micEnabled,
@@ -55,7 +63,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
 }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
-  const [joiningScreen, setJoiningScreen] = useState(true);
+  const [screen, setScreen] = useState<Screen>(Screen.Joining);
   const [micDevices, setMicDevices] = useState<MediaDeviceInfo[]>([]);
   const [micId, setMicId] = useState<MediaDeviceInfo['deviceId']>();
   const [cameraDevices, setCameraDevices] = useState<MediaDeviceInfo[]>([]);
@@ -66,6 +74,13 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
   const requestRef = useRef<number>();
   const updateAnalyserTimeout = useRef(0);
   const audioAnalyser = useRef<AnalyserNode | null>(null);
+
+  useEffect(() => {
+    if (!error) {
+      return;
+    }
+    setScreen(Screen.Error);
+  }, [error]);
 
   useEffect(() => {
     if (!userAudioStream) {
@@ -150,7 +165,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
       await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
       handleUseMic();
       handleUseCamera();
-      setJoiningScreen(false);
+      setScreen(Screen.SetupDevices);
     } catch {
       alert(localizationCaptions[LocalizationKey.UserStreamError]);
     }
@@ -166,6 +181,92 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
 
   const handleSwitchSettings = () => {
     setSettingsEnabled(!settingsEnabled);
+  };
+
+  const screens: { [key in Screen]: JSX.Element } = {
+    [Screen.Joining]: (
+      <div className="enter-videochat-info">
+        {!!(auth?.nickname && auth?.avatar) && (
+          <UserAvatar
+            nickname={auth.nickname}
+            src={auth.avatar}
+          />
+        )}
+        <p>{localizationCaptions[LocalizationKey.JoinAs]}: {auth?.nickname}</p>
+        <div className="enter-videochat-warning">
+          <div>{localizationCaptions[LocalizationKey.Warning]}</div>
+          <div>{localizationCaptions[LocalizationKey.CallRecording]}</div>
+        </div>
+        {loading ? (
+          <Loader />
+        ) : (
+          viewerMode ? (
+            <button className="active" onClick={onClose}>{localizationCaptions[LocalizationKey.Join]}</button>
+          ) : (
+            <button onClick={handleUseAll}>{localizationCaptions[LocalizationKey.SetupDevices]}</button>
+          )
+        )}
+      </div>
+    ),
+    [Screen.SetupDevices]: (
+      <div>
+        <div className="enter-videochat-row">
+          <div className="enter-videochat-column">
+            <div className={settingsEnabled ? 'enter-videochat-content-container-mini' : 'enter-videochat-content-container'} >
+              <video
+                ref={userVideo}
+                muted
+                autoPlay
+                playsInline
+              >
+                Video not supported
+              </video>
+              <div className="enter-videochat-row switch-row">
+                <SwitchButton
+                  enabled={micEnabled}
+                  iconEnabledName={IconNames.MicOn}
+                  iconDisabledName={IconNames.MicOff}
+                  onClick={onMicSwitch}
+                />
+                <SwitchButton
+                  enabled={cameraEnabled}
+                  iconEnabledName={IconNames.VideocamOn}
+                  iconDisabledName={IconNames.VideocamOff}
+                  onClick={onCameraSwitch}
+                />
+                <SwitchButton
+                  enabled={!settingsEnabled}
+                  iconEnabledName={IconNames.Settings}
+                  iconDisabledName={IconNames.Settings}
+                  onClick={handleSwitchSettings}
+                />
+              </div>
+              <progress max="50" value={micVolume}>{localizationCaptions[LocalizationKey.Microphone]}: {micVolume}</progress>
+            </div >
+
+            <div className="enter-videochat-content-container" style={{ display: settingsEnabled ? 'block' : 'none' }}>
+              <div >
+                <div>{localizationCaptions[LocalizationKey.Microphone]}</div>
+                <DeviceSelect
+                  devices={micDevices}
+                  onSelect={handleSelectMic}
+                />
+                <div>{localizationCaptions[LocalizationKey.Camera]}</div>
+                <DeviceSelect
+                  devices={cameraDevices}
+                  onSelect={handleSelectCamera}
+                />
+              </div>
+            </div>
+
+          </div >
+        </div >
+        <button className="active" onClick={onClose}>{localizationCaptions[LocalizationKey.Join]}</button>
+      </div >
+    ),
+    [Screen.Error]: (
+      <div>{error}</div>
+    ),
   };
 
   return (
@@ -184,88 +285,10 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
       <div className="action-modal-header">
         <h3>{localizationCaptions[LocalizationKey.JoiningRoom]} {roomName}</h3>
       </div>
-      {joiningScreen ? (
-        <div className="enter-videochat-info">
-          {!!(auth?.nickname && auth?.avatar) && (
-            <UserAvatar
-              nickname={auth.nickname}
-              src={auth.avatar}
-            />
-          )}
-          <p>{localizationCaptions[LocalizationKey.JoinAs]}: {auth?.nickname}</p>
-          <div className="enter-videochat-warning">
-            <div>{localizationCaptions[LocalizationKey.Warning]}</div>
-            <div>{localizationCaptions[LocalizationKey.CallRecording]}</div>
-          </div>
-          {loading ? (
-            <Loader />
-          ) : (
-            viewerMode ? (
-              <button className="active" onClick={onClose}>{localizationCaptions[LocalizationKey.Join]}</button>
-            ) : (
-              <button onClick={handleUseAll}>{localizationCaptions[LocalizationKey.SetupDevices]}</button>
-            )
-          )}
-        </div>
-      ) : (
-        <div>
-          <div className="enter-videochat-row">
-            <div className="enter-videochat-column">
-              <div className={settingsEnabled ? 'enter-videochat-content-container-mini' : 'enter-videochat-content-container'} >
-                <video
-                  ref={userVideo}
-                  muted
-                  autoPlay
-                  playsInline
-                >
-                  Video not supported
-                </video>
-                <div className="enter-videochat-row switch-row">
-                  <SwitchButton
-                    enabled={micEnabled}
-                    iconEnabledName={IconNames.MicOn}
-                    iconDisabledName={IconNames.MicOff}
-                    onClick={onMicSwitch}
-                  />
-                  <SwitchButton
-                    enabled={cameraEnabled}
-                    iconEnabledName={IconNames.VideocamOn}
-                    iconDisabledName={IconNames.VideocamOff}
-                    onClick={onCameraSwitch}
-                  />
-                  <SwitchButton
-                    enabled={!settingsEnabled}
-                    iconEnabledName={IconNames.Settings}
-                    iconDisabledName={IconNames.Settings}
-                    onClick={handleSwitchSettings}
-                  />
-                </div>
-                <progress max="50" value={micVolume}>{localizationCaptions[LocalizationKey.Microphone]}: {micVolume}</progress>
-              </div>
-
-              <div className="enter-videochat-content-container" style={{ display: settingsEnabled ? 'block' : 'none' }}>
-                <div >
-                  <div>{localizationCaptions[LocalizationKey.Microphone]}</div>
-                  <DeviceSelect
-                    devices={micDevices}
-                    onSelect={handleSelectMic}
-                  />
-                  <div>{localizationCaptions[LocalizationKey.Camera]}</div>
-                  <DeviceSelect
-                    devices={cameraDevices}
-                    onSelect={handleSelectCamera}
-                  />
-                </div>
-              </div>
-
-            </div>
-          </div>
-          <button className="active" onClick={onClose}>{localizationCaptions[LocalizationKey.Join]}</button>
-        </div>
-      )}
+      {screens[screen]}
       <Link to={pathnames.rooms} className="enter-videochat-exit">
         {localizationCaptions[LocalizationKey.Exit]}
       </Link>
-    </Modal>
+    </Modal >
   );
 };

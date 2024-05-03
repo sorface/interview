@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, generatePath } from 'react-router-dom';
 import { GetRoomPageParams, roomsApiDeclaration } from '../../apiDeclarations';
 import { Field } from '../../components/FieldsBlock/Field';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
@@ -95,8 +95,8 @@ export const Rooms: FunctionComponent = () => {
       room.roomStatus === 'Review' ||
       room.roomStatus === 'Close';
     const roomLink = roomSummary ?
-      pathnames.roomAnalyticsSummary.replace(':id', room.id) :
-      pathnames.room.replace(':id', room.id);
+      generatePath(pathnames.roomAnalyticsSummary, { id: room.id }) :
+      generatePath(pathnames.room, { id: room.id });
 
     return (
       <Field key={room.id}>

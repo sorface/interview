@@ -1,0 +1,40 @@
+.invitations-open {
+  padding: 0.25rem;
+  margin-right: 0.25rem;
+}
+
+.invitations-modal-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0rem 1rem;
+  padding-bottom: 1.75rem;
+}
+
+.invitations-modal-item-link-field {
+  display: flex;
+}
+
+.invitations-modal-item-link {
+  width: 30rem;
+  border: none !important;
+  text-overflow: ellipsis;
+  margin-right: 1rem;
+}
+
+.invitations-modal-item-link-ations button {
+  padding: 0.25rem;
+}
+
+.invitations-modal-item-link-ations button ion-icon {
+  font-size: 1rem;
+}
+
+.invitations-modal-item-link-ations button:first-child {
+  margin-right: 0.25rem;
+}
+
+.invitations-modal-refresh-all {
+  margin-bottom: 1.25rem;
+}

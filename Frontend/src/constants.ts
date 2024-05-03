@@ -1,9 +1,11 @@
+export const inviteParamName = 'invite';
+
 export const pathnames = {
   home: '/:redirect?',
   rooms: '/rooms',
   roomsCreate: '/rooms/create',
   roomsParticipants: '/rooms/participants/:id',
-  room: '/room/:id',
+  room: `/room/:id/:${inviteParamName}?`,
   roomAnalyticsSummary: '/rooms/:id/analytics/summary',
   questions: '/questions',
   questionsCreate: '/questions/create',
@@ -28,6 +30,8 @@ export const enum IconNames {
   ThemeSwitchLight = 'sunny',
   ThemeSwitchDark = 'moon',
   People = 'people',
+  Clipboard = 'clipboard',
+  Refresh = 'refresh',
 }
 
 export const enum IconThemePostfix {
@@ -44,4 +48,3 @@ export const reactionIcon: Record<string, IconNames> = {
 export const toastSuccessOptions = {
   icon: '👌',
 };
-
