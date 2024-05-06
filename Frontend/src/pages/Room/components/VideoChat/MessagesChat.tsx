@@ -10,11 +10,13 @@ import './MessagesChat.css';
 
 interface MessagesChatProps {
   transcripts: Transcript[];
+  textMessages: Transcript[];
   onMessageSubmit: (message: string) => void;
 }
 
 export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
   transcripts,
+  textMessages,
   onMessageSubmit,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
@@ -37,9 +39,8 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
   const messageInputRef = useRef<HTMLInputElement>(null);
   const videochatTranscriptsRef = useRef<HTMLDivElement>(null);
   const [activeTabId, setActiveTabId] = useState(chatTab.id);
-  const transcriptsFiltered = transcripts.filter(transcript =>
-    activeTabId === chatTab.id ? transcript.fromChat : !transcript.fromChat
-  );
+  const chatTabActive = activeTabId === chatTab.id;
+  const messagesFiltered = chatTabActive ? textMessages : transcripts;
 
   useEffect(() => {
     const chatEl = videochatTranscriptsRef.current;
@@ -50,7 +51,7 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
     const height = chatEl.clientHeight;
     const maxScrollTop = scrollHeight - height;
     chatEl.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
-  }, [transcriptsFiltered]);
+  }, [messagesFiltered]);
 
   const handleChatMessageSubmit = () => {
     if (!messageInputRef.current) {
@@ -79,12 +80,12 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
         onTabClick={setActiveTabId}
       />
       <div className='videochat-transcripts' ref={videochatTranscriptsRef}>
-        {transcriptsFiltered.map(transcript => (
+        {messagesFiltered.map(transcript => (
           <div
             key={transcript.frontendId}
           >
             <span>
-              {!transcript.fromChat && `${localizationCaptions[LocalizationKey.Recognized]} `}
+              {!chatTabActive && `${localizationCaptions[LocalizationKey.Recognized]} `}
             </span>
             <span
               style={{ color: stringToColor(transcript.userNickname, themeInUi) }}

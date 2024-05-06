@@ -20,7 +20,6 @@ const AiAssistantExperienceComponent: FunctionComponent<AiAssistantExperiencePro
   const localizationCaptions = useLocalizationCaptions();
 
   const welcomeMessage =
-    !lastTranscription?.fromChat &&
     lastTranscription?.value.toLowerCase() === localizationCaptions[LocalizationKey.AiAssistantWelcomePrompt].toLocaleLowerCase();
 
   return (

@@ -61,7 +61,7 @@ interface PeerMeta {
   screenShare: boolean;
 }
 
-const createTranscript = (body: { userNickname: string; value: string; fromChat: boolean; }): Transcript => ({
+const createMessage = (body: { userNickname: string; value: string; }): Transcript => ({
   frontendId: randomId(),
   ...body,
 });
@@ -74,14 +74,12 @@ const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string, toCh
   return roomEvents.map(chatMessageEvent => {
     try {
       const chatMessageEventParsed = JSON.parse(chatMessageEvent?.payload);
-      return createTranscript({
-        fromChat: toChat,
+      return createMessage({
         userNickname: chatMessageEventParsed.Nickname || 'Nickname not found',
         value: chatMessageEventParsed.Message,
       });
     } catch {
-      return createTranscript({
-        fromChat: toChat,
+      return createMessage({
         userNickname: 'Message not found',
         value: '',
       });
@@ -119,6 +117,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     data: roomEventsSearch,
   } = apiRoomEventsSearchState;
   const [transcripts, setTranscripts] = useState<Transcript[]>([]);
+  const [textMessages, setTextMessages] = useState<Transcript[]>([]);
   const userVideo = useRef<HTMLVideoElement>(null);
   const [peers, setPeers] = useState<PeerMeta[]>([]);
   const screenSharePeer = peers.find(peer => peer.screenShare);
@@ -239,15 +238,15 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     if (!roomEventsSearch) {
       return;
     }
-    const newTranscripts = [
+    const newTranscripts = getChatMessageEvents(roomEventsSearch, 'VoiceRecognition', false);
+    const newTextMessages = [
       ...getChatMessageEvents(roomEventsSearch, 'ChatMessage', true),
-      ...getChatMessageEvents(roomEventsSearch, 'VoiceRecognition', false),
-      createTranscript({
+      createMessage({
         userNickname: localizationCaptions[LocalizationKey.ChatWelcomeMessageNickname],
         value: `${localizationCaptions[LocalizationKey.ChatWelcomeMessage]}, ${auth?.nickname}.`,
-        fromChat: true
       }),
     ];
+    setTextMessages(newTextMessages);
     setTranscripts(newTranscripts);
   }, [roomEventsSearch, auth?.nickname, localizationCaptions]);
 
@@ -534,13 +533,12 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       const parsedData = parseWsMessage(lastWsMessage?.data);
       switch (parsedData?.Type) {
         case 'ChatMessage':
-          setTranscripts(transcripts => limitLength(
+          setTextMessages(transcripts => limitLength(
             [
               ...transcripts,
-              createTranscript({
+              createMessage({
                 userNickname: parsedData.Value.Nickname,
                 value: parsedData.Value.Message,
-                fromChat: true,
               }),
             ],
             transcriptsMaxLength
@@ -550,10 +548,9 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           setTranscripts(transcripts => limitLength(
             [
               ...transcripts,
-              createTranscript({
+              createMessage({
                 userNickname: parsedData.Value.Nickname,
                 value: parsedData.Value.Message,
-                fromChat: false,
               }),
             ],
             transcriptsMaxLength
@@ -657,6 +654,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         <Field className='videochat-field videochat-field-chat'>
           <MessagesChat
             transcripts={transcripts}
+            textMessages={textMessages}
             onMessageSubmit={handleTextMessageSubmit}
           />
         </Field>
