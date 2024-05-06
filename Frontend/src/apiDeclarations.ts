@@ -308,8 +308,9 @@ export const roomInviteApiDeclaration = {
   }),
   apply: (body: ApplyRoomInviteBody): ApiContractPost => ({
     method: 'POST',
-    baseUrl: `/rooms/invites/${body.roomId}`,
-    body,
+    baseUrl: `/rooms/invites/${body.roomId}/apply`,
+    urlParams: { inviteId: body.inviteId },
+    body: {},
   }),
   generate: (body: GenerateRoomInviteBody): ApiContractPut => ({
     method: 'PUT',
