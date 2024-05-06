@@ -358,7 +358,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         state = new RoomState
         {
-            Payload = payload, RoomId = roomId, Type = type, Room = null,
+            Payload = payload,
+            RoomId = roomId,
+            Type = type,
+            Room = null,
         };
         await _roomStateRepository.CreateAsync(state, cancellationToken);
     }
@@ -517,7 +520,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         {
             return new RoomInviteResponse
             {
-                ParticipantType = participant.Type.EnumValue, InviteId = invite!.Value, Max = 0, Used = 0,
+                ParticipantType = participant.Type.EnumValue,
+                InviteId = invite!.Value,
+                Max = 0,
+                Used = 0,
             };
         }
 
@@ -537,7 +543,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         return new RoomInviteResponse
         {
-            ParticipantType = participant.Type.EnumValue, InviteId = invite!.Value, Max = 0, Used = 0,
+            ParticipantType = participant.Type.EnumValue,
+            InviteId = invite!.Value,
+            Max = 0,
+            Used = 0,
         };
     }
 

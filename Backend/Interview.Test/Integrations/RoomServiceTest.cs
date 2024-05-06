@@ -723,6 +723,38 @@ public class RoomServiceTest
         actualInvites.Should().HaveCount(expectInvites.Count).And.BeEquivalentTo(expectInvites);
     }
 
+    [Fact]
+    public async Task GetInvitesAsync()
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+
+        var generatedRooms = Enumerable.Range(0, 5)
+            .Select(i => new Room(DefaultRoomName + i, DefaultRoomName + i, SERoomAcсessType.Public)).ToList();
+        appDbContext.Rooms.AddRange(generatedRooms);
+        var roomInvites = generatedRooms.SelectMany(GenerateInvites).ToList();
+        appDbContext.RoomInvites.AddRange(roomInvites);
+        await appDbContext.SaveChangesAsync();
+
+        var checkRoom = appDbContext.Rooms.AsEnumerable().OrderBy(_ => Guid.NewGuid()).First();
+        var expectInvites = appDbContext.RoomInvites.Where(e => e.RoomById == checkRoom.Id)
+            .Select(e => new RoomInviteResponse
+            {
+                InviteId = e.InviteById!.Value,
+                ParticipantType = e.ParticipantType!.EnumValue,
+                Max = e.Invite!.UsesMax,
+                Used = e.Invite!.UsesCurrent,
+            })
+            .OrderBy(e => e.InviteId)
+            .ToList();
+        appDbContext.ChangeTracker.Clear();
+
+        var roomService = CreateRoomService(appDbContext);
+        var actualInvites = await roomService.GetInvitesAsync(checkRoom.Id);
+        actualInvites.Sort((i1, i2) => i1.InviteId.CompareTo(i2.InviteId));
+        actualInvites.Should().HaveCount(expectInvites.Count).And.BeEquivalentTo(expectInvites);
+    }
+
     private IEnumerable<RoomInvite> GenerateInvites(Room room)
     {
         foreach (var participantType in SERoomParticipantType.List)

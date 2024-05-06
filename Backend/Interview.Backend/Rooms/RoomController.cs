@@ -43,7 +43,8 @@ public class RoomController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<IPagedList<RoomPageDetail>> GetPage([FromQuery] PageRequest request,
+    public Task<IPagedList<RoomPageDetail>> GetPage(
+        [FromQuery] PageRequest request,
         [FromQuery] RoomPageDetailRequestFilter? filter)
     {
         return _roomService.FindPageAsync(filter ?? new RoomPageDetailRequestFilter(), request.PageNumber,
@@ -215,7 +216,7 @@ public class RoomController : ControllerBase
 
         return Ok();
     }
-    
+
     /// <summary>
     /// Sending event to room.
     /// </summary>
@@ -256,7 +257,9 @@ public class RoomController : ControllerBase
     {
         var request = new TranscriptionRequest
         {
-            RoomId = roomId, UserId = currentUserAccessor.GetUserIdOrThrow(), TranscriptionTypeMap = options,
+            RoomId = roomId,
+            UserId = currentUserAccessor.GetUserIdOrThrow(),
+            TranscriptionTypeMap = options,
         };
         return _roomService.GetTranscriptionAsync(request, HttpContext.RequestAborted);
     }

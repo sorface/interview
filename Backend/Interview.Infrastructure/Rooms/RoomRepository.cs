@@ -59,7 +59,9 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                     ReactionsSummary = e.GroupBy(t => (t.Reaction!.Id, t.Reaction.Type))
                         .Select(t => new Analytics.AnalyticsReactionSummary
                         {
-                            Id = t.Key.Id, Type = t.Key.Type.Name, Count = t.Count(),
+                            Id = t.Key.Id,
+                            Type = t.Key.Type.Name,
+                            Count = t.Count(),
                         })
                         .ToList(),
                 })
@@ -74,7 +76,9 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                     ReactionsSummary = e.GroupBy(t => (t.Reaction!.Id, t.Reaction.Type))
                         .Select(t => new Analytics.AnalyticsReactionSummary
                         {
-                            Id = t.Key.Id, Type = t.Key.Type.Name, Count = t.Count(),
+                            Id = t.Key.Id,
+                            Type = t.Key.Type.Name,
+                            Count = t.Count(),
                         })
                         .ToList(),
                 })
@@ -88,7 +92,10 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
 
             summary.Questions.Add(new AnalyticsSummaryQuestion
             {
-                Id = question.Id, Value = question.Value, Experts = experts, Viewers = viewers,
+                Id = question.Id,
+                Value = question.Value,
+                Experts = experts,
+                Viewers = viewers,
             });
         }
 
@@ -144,7 +151,9 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                 {
                     Questions = e.Questions.Select(q => new Analytics.AnalyticsQuestion
                     {
-                        Id = q.Question!.Id, Status = q.State!.Name, Value = q.Question.Value,
+                        Id = q.Question!.Id,
+                        Status = q.State!.Name,
+                        Value = q.Question.Value,
                     }).ToList(),
                 })
                 .FirstOrDefaultAsync(ct);
@@ -157,7 +166,9 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                 .GroupBy(e => (e!.Id, e.Type))
                 .Select(e => new Analytics.AnalyticsReactionSummary
                 {
-                    Id = e.Key.Id, Count = e.Count(), Type = e.Key.Type.Name,
+                    Id = e.Key.Id,
+                    Count = e.Count(),
+                    Type = e.Key.Type.Name,
                 })
                 .ToList();
         }

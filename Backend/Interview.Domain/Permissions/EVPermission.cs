@@ -154,7 +154,7 @@ public enum EVPermission
 
     [Description("Getting a Room Invites")]
     RoomInviteGet,
-    
+
     [Description("Generate a Room Invites")]
     RoomInviteGenerate,
 #pragma warning restore SA1602
