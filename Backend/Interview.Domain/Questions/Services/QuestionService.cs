@@ -44,7 +44,7 @@ public class QuestionService : IQuestionService
     public async Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken)
     {
         var currentUserId = _currentUserAccessor.UserId ?? Guid.Empty;
-        ASpec<Question> spec = new Spec<Question>(e => e.RoomId == null || e.CreatedById == currentUserId);
+        ASpec<Question> spec = new Spec<Question>(e => e.Type == SEQuestionType.Public || e.CreatedById == currentUserId);
 
         if (request.Tags is not null && request.Tags.Count > 0)
         {
@@ -99,13 +99,21 @@ public class QuestionService : IQuestionService
         var result = new Question(request.Value)
         {
             Tags = tags,
-            RoomId = roomId,
+            Type = roomId is null ? SEQuestionType.Public : SEQuestionType.Private,
         };
 
         await _questionRepository.CreateAsync(result, cancellationToken);
         if (roomId is not null)
         {
-            await _roomQuestionRepository.CreateAsync(new RoomQuestion { QuestionId = result.Id, RoomId = roomId.Value, }, cancellationToken);
+            var roomQuestion = new RoomQuestion
+            {
+                QuestionId = result.Id,
+                RoomId = roomId.Value,
+                Room = null,
+                Question = null,
+                State = RoomQuestionState.Open,
+            };
+            await _roomQuestionRepository.CreateAsync(roomQuestion, cancellationToken);
         }
 
         return new QuestionItem

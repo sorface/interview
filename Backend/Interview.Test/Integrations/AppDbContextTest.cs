@@ -25,6 +25,9 @@ public class AppDbContextTest
                 {
                     Question = new Question("Value 1"),
                     State = RoomQuestionState.Active,
+                    RoomId = default,
+                    QuestionId = default,
+                    Room = null,
                 }
             }
         };

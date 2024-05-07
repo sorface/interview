@@ -9,6 +9,7 @@ using Interview.Domain.RoomParticipants;
 using Interview.Domain.Rooms;
 using Interview.Domain.Users;
 using Interview.Infrastructure.Questions;
+using Interview.Infrastructure.RoomQuestions;
 using Interview.Infrastructure.Tags;
 using Moq;
 
@@ -79,6 +80,7 @@ namespace Interview.Test.Integrations
             var questionRepository = new QuestionRepository(appDbContext);
             var tagRepository = new TagRepository(appDbContext);
             var currentUser = new CurrentUserAccessor();
+            var roomQuestionRepository = new RoomQuestionRepository(appDbContext);
             currentUser.SetUser(appDbContext.Users.First());
             return new QuestionService(
                 questionRepository,
@@ -86,7 +88,8 @@ namespace Interview.Test.Integrations
                 new ArchiveService<Question>(questionRepository),
                 tagRepository,
                 roomMembershipChecker,
-                currentUser);
+                currentUser,
+                roomQuestionRepository);
         }
 
         private class UnavailableException : Exception

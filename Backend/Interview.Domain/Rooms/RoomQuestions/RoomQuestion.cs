@@ -9,13 +9,13 @@ public class RoomQuestion : Entity
     {
     }
 
-    public Guid RoomId { get; set; }
+    public required Guid RoomId { get; set; }
 
-    public Guid QuestionId { get; set; }
+    public required Guid QuestionId { get; set; }
 
-    public Room? Room { get; set; }
+    public required Room? Room { get; set; }
 
-    public Question? Question { get; set; }
+    public required Question? Question { get; set; }
 
-    public RoomQuestionState? State { get; set; }
+    public required RoomQuestionState State { get; set; }
 }
