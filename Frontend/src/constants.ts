@@ -1,5 +1,3 @@
-export const inviteParamName = 'invite';
-
 export const pathnames = {
   home: '/:redirect?',
   rooms: '/rooms',
@@ -32,6 +30,7 @@ export const enum IconNames {
   People = 'people',
   Clipboard = 'clipboard',
   Refresh = 'refresh',
+  TV = 'tv',
 }
 
 export const enum IconThemePostfix {

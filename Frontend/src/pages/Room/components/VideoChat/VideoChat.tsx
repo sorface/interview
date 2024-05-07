@@ -42,6 +42,7 @@ interface VideoChatProps {
   messagesChatEnabled: boolean;
   userVideoStream: MediaStream | null;
   userAudioStream: MediaStream | null;
+  screenStream: MediaStream | null;
   videoTrackEnabled: boolean;
   micDisabledAutomatically: React.MutableRefObject<boolean>;
   onSendWsMessage: SendMessage;
@@ -57,9 +58,10 @@ interface PeerMeta {
   peer: Peer.Instance;
   targetUserId: string;
   participantType: UserType;
+  screenShare: boolean;
 }
 
-const createTranscript = (body: { userNickname: string; value: string; fromChat: boolean; }): Transcript => ({
+const createMessage = (body: { userNickname: string; value: string; }): Transcript => ({
   frontendId: randomId(),
   ...body,
 });
@@ -72,20 +74,23 @@ const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string, toCh
   return roomEvents.map(chatMessageEvent => {
     try {
       const chatMessageEventParsed = JSON.parse(chatMessageEvent?.payload);
-      return createTranscript({
-        fromChat: toChat,
+      return createMessage({
         userNickname: chatMessageEventParsed.Nickname || 'Nickname not found',
         value: chatMessageEventParsed.Message,
       });
     } catch {
-      return createTranscript({
-        fromChat: toChat,
+      return createMessage({
         userNickname: 'Message not found',
         value: '',
       });
     };
   }).reverse();
 };
+
+const removeDuplicates = (peersRef: React.MutableRefObject<PeerMeta[]>, newPeerMeta: PeerMeta) =>
+  peersRef.current.filter(peer =>
+    peer.peerID !== newPeerMeta.peerID ? true : peer.screenShare !== newPeerMeta.screenShare
+  );
 
 export const VideoChat: FunctionComponent<VideoChatProps> = ({
   roomState,
@@ -94,6 +99,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   messagesChatEnabled,
   userVideoStream,
   userAudioStream,
+  screenStream,
   videoTrackEnabled,
   micDisabledAutomatically,
   onSendWsMessage,
@@ -111,8 +117,10 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     data: roomEventsSearch,
   } = apiRoomEventsSearchState;
   const [transcripts, setTranscripts] = useState<Transcript[]>([]);
+  const [textMessages, setTextMessages] = useState<Transcript[]>([]);
   const userVideo = useRef<HTMLVideoElement>(null);
   const [peers, setPeers] = useState<PeerMeta[]>([]);
+  const screenSharePeer = peers.find(peer => peer.screenShare);
   const peersRef = useRef<PeerMeta[]>([]);
   const userIdToAudioAnalyser = useRef<Record<string, AnalyserNode>>({});
   const requestRef = useRef<number>();
@@ -129,7 +137,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   useEffect(() => {
     if (videoTrackEnabled && userVideoStream) {
       try {
-        peers.forEach(peer => {
+        peers.filter(peer => !peer.screenShare).forEach(peer => {
           const videoTrack = userVideoStream.getVideoTracks()[0];
           peer.peer.addTrack(videoTrack, userVideoStream);
         });
@@ -139,8 +147,82 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     }
   }, [videoTrackEnabled, peers, userVideoStream]);
 
+  const createPeer = useCallback((to: string, forViewer?: boolean, screenShare?: boolean) => {
+    if (viewerMode) {
+      onSendWsMessage(JSON.stringify({
+        Type: 'sending signal',
+        Value: JSON.stringify({
+          To: to,
+          Signal: 'fake-viewer-signal',
+          ScreenShare: false,
+        }),
+      }));
+      return new Peer();
+    }
+
+    const streams: MediaStream[] = [];
+    userAudioStream && streams.push(userAudioStream);
+    if (screenShare) {
+      screenStream && streams.push(screenStream);
+    } else {
+      userVideoStream && streams.push(userVideoStream);
+    }
+
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      streams,
+      ...((forViewer || screenShare) && {
+        offerOptions: {
+          offerToReceiveAudio: false,
+          offerToReceiveVideo: false,
+        },
+      }),
+    });
+
+    peer.on('signal', signal => {
+      onSendWsMessage(JSON.stringify({
+        Type: 'sending signal',
+        Value: JSON.stringify({
+          To: to,
+          Signal: JSON.stringify(signal),
+          ScreenShare: screenShare,
+        }),
+      }));
+    });
+
+    return peer;
+  }, [userAudioStream, userVideoStream, screenStream, viewerMode, onSendWsMessage]);
+
   useEffect(() => {
-    onUpdatePeersLength(peers.length);
+    if (screenStream && auth?.id) {
+      try {
+        peersRef.current.forEach(peer => {
+          if (peer.targetUserId === auth.id) {
+            return;
+          }
+          const newPeer = createPeer(peer.targetUserId, false, true);
+          const newPeerMeta: PeerMeta = {
+            peerID: peer.targetUserId,
+            nickname: peer.nickname,
+            avatar: peer.avatar,
+            targetUserId: peer.targetUserId,
+            participantType: peer.participantType,
+            peer: newPeer,
+            screenShare: true,
+          };
+
+          peersRef.current.push(newPeerMeta);
+          setPeers([...peersRef.current]);
+        });
+      } catch (e) {
+        console.error('add screenStream error: ', e);
+      }
+    }
+  }, [auth, screenStream, createPeer]);
+
+  useEffect(() => {
+    onUpdatePeersLength(peers.filter(peer => !peer.screenShare).length);
   }, [peers, onUpdatePeersLength]);
 
   useEffect(() => {
@@ -156,15 +238,15 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     if (!roomEventsSearch) {
       return;
     }
-    const newTranscripts = [
+    const newTranscripts = getChatMessageEvents(roomEventsSearch, 'VoiceRecognition', false);
+    const newTextMessages = [
       ...getChatMessageEvents(roomEventsSearch, 'ChatMessage', true),
-      ...getChatMessageEvents(roomEventsSearch, 'VoiceRecognition', false),
-      createTranscript({
+      createMessage({
         userNickname: localizationCaptions[LocalizationKey.ChatWelcomeMessageNickname],
         value: `${localizationCaptions[LocalizationKey.ChatWelcomeMessage]}, ${auth?.nickname}.`,
-        fromChat: true
       }),
     ];
+    setTextMessages(newTextMessages);
     setTranscripts(newTranscripts);
   }, [roomEventsSearch, auth?.nickname, localizationCaptions]);
 
@@ -232,51 +314,12 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
 
   }, [auth, louderUserId, userAudioStream, micDisabledAutomatically, onMuteMic, onUnmuteMic]);
 
-  const createPeer = useCallback((to: string, forViewer?: boolean) => {
-    if (viewerMode) {
-      onSendWsMessage(JSON.stringify({
-        Type: 'sending signal',
-        Value: JSON.stringify({
-          To: to,
-          Signal: 'fake-viewer-signal',
-        }),
-      }));
-      return new Peer();
+  const addPeer = useCallback((incomingSignal: Peer.SignalData, callerID: string, screenShare?: boolean) => {
+    const streams: MediaStream[] = [];
+    if (!screenShare) {
+      userAudioStream && streams.push(userAudioStream);
+      userVideoStream && streams.push(userVideoStream);
     }
-
-    const streams: MediaStream[] = [];
-    userAudioStream && streams.push(userAudioStream);
-    userVideoStream && streams.push(userVideoStream);
-
-    const peer = new Peer({
-      initiator: true,
-      trickle: false,
-      streams,
-      ...(forViewer && {
-        offerOptions: {
-          offerToReceiveAudio: false,
-          offerToReceiveVideo: false,
-        },
-      }),
-    });
-
-    peer.on('signal', signal => {
-      onSendWsMessage(JSON.stringify({
-        Type: 'sending signal',
-        Value: JSON.stringify({
-          To: to,
-          Signal: JSON.stringify(signal),
-        }),
-      }));
-    });
-
-    return peer;
-  }, [userAudioStream, userVideoStream, viewerMode, onSendWsMessage]);
-
-  const addPeer = useCallback((incomingSignal: Peer.SignalData, callerID: string) => {
-    const streams: MediaStream[] = [];
-    userAudioStream && streams.push(userAudioStream);
-    userVideoStream && streams.push(userVideoStream);
 
     const peer = new Peer({
       initiator: false,
@@ -290,6 +333,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         Value: JSON.stringify({
           To: callerID,
           Signal: JSON.stringify(signal),
+          ScreenShare: screenShare,
         }),
       }));
     });
@@ -332,6 +376,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     try {
       const parsedMessage = parseWsMessage(lastWsMessage?.data);
       const parsedPayload = parsedMessage?.Value;
+      const screenShare = !!(parsedPayload?.ScreenShare);
       switch (parsedMessage?.Type) {
         case 'all users':
           if (!Array.isArray(parsedPayload)) {
@@ -342,13 +387,14 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
               return;
             }
             const peer = createPeer(userInChat.Id);
-            const newPeerMeta = {
+            const newPeerMeta: PeerMeta = {
               peerID: userInChat.Id,
               nickname: userInChat.Nickname,
               avatar: userInChat.Avatar,
               targetUserId: userInChat.Id,
               participantType: userInChat.ParticipantType,
               peer,
+              screenShare: false,
             };
 
             peer.on('stream', (stream) => {
@@ -367,13 +413,14 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           const fromUser = parsedPayload.From;
           if (!viewerMode && fromUser.ParticipantType === 'Viewer') {
             const peer = createPeer(fromUser.Id, true);
-            const newPeerMeta = {
+            const newPeerMeta: PeerMeta = {
               peerID: fromUser.Id,
               nickname: fromUser.Nickname,
               avatar: fromUser.Avatar,
               targetUserId: fromUser.Id,
               participantType: fromUser.ParticipantType,
               peer,
+              screenShare: false,
             };
 
             peer.on('stream', (stream) => {
@@ -384,10 +431,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
               userIdToAudioAnalyser.current[newPeerMeta.targetUserId] = createAudioAnalyser(stream);
             });
 
-            const peersRefFiltered = peersRef.current.filter(
-              peer => peer.peerID !== newPeerMeta.peerID
-            );
-            peersRef.current = peersRefFiltered;
+            peersRef.current = removeDuplicates(peersRef, newPeerMeta);
 
             peersRef.current.push(newPeerMeta);
             setPeers([...peersRef.current]);
@@ -395,41 +439,37 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           }
           if (viewerMode && fromUser.ParticipantType === 'Viewer') {
             const peer = new Peer();
-            const newPeerMeta = {
+            const newPeerMeta: PeerMeta = {
               peerID: fromUser.Id,
               nickname: fromUser.Nickname,
               avatar: fromUser.Avatar,
               targetUserId: fromUser.Id,
               participantType: fromUser.ParticipantType,
               peer,
+              screenShare: false,
             };
-            const peersRefFiltered = peersRef.current.filter(
-              peer => peer.peerID !== newPeerMeta.peerID
-            );
-            peersRef.current = peersRefFiltered;
+            peersRef.current = removeDuplicates(peersRef, newPeerMeta);
             peersRef.current.push(newPeerMeta);
             setPeers([...peersRef.current]);
             break;
           }
-          if (viewerMode) {
-            const peer = addPeer(JSON.parse(parsedPayload.Signal), fromUser.Id);
-            const newPeerMeta = {
+          if (viewerMode || screenShare) {
+            const peer = addPeer(JSON.parse(parsedPayload.Signal), fromUser.Id, screenShare);
+            const newPeerMeta: PeerMeta = {
               peerID: fromUser.Id,
               nickname: fromUser.Nickname,
               avatar: fromUser.Avatar,
               targetUserId: fromUser.Id,
               participantType: fromUser.ParticipantType,
               peer,
+              screenShare,
             };
-            const peersRefFiltered = peersRef.current.filter(
-              peer => peer.peerID !== newPeerMeta.peerID
-            );
-            peersRef.current = peersRefFiltered;
+            peersRef.current = removeDuplicates(peersRef, newPeerMeta);
             peersRef.current.push(newPeerMeta);
 
             peer.on('stream', (stream) => {
               const audioStream = checkIsAudioStream(stream);
-              if (!audioStream) {
+              if (!audioStream || screenShare) {
                 return;
               }
               userIdToAudioAnalyser.current[newPeerMeta.targetUserId] = createAudioAnalyser(stream);
@@ -438,23 +478,21 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             break;
           }
           const peer = addPeer(JSON.parse(parsedPayload.Signal), fromUser.Id);
-          const newPeerMeta = {
+          const newPeerMeta: PeerMeta = {
             peerID: fromUser.Id,
             nickname: fromUser.Nickname,
             avatar: fromUser.Avatar,
             targetUserId: fromUser.Id,
             participantType: fromUser.ParticipantType,
             peer,
+            screenShare,
           };
-          const peersRefFiltered = peersRef.current.filter(
-            peer => peer.peerID !== newPeerMeta.peerID
-          );
-          peersRef.current = peersRefFiltered;
+          peersRef.current = removeDuplicates(peersRef, newPeerMeta);
           peersRef.current.push(newPeerMeta);
 
           peer.on('stream', (stream) => {
             const audioStream = checkIsAudioStream(stream);
-            if (!audioStream) {
+            if (!audioStream || screenShare) {
               return;
             }
             userIdToAudioAnalyser.current[newPeerMeta.targetUserId] = createAudioAnalyser(stream);
@@ -472,7 +510,9 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           setPeers([...peersRef.current]);
           break;
         case 'receiving returned signal':
-          const item = peersRef.current.find(p => p.peerID === parsedPayload.From);
+          const item = peersRef.current.find(p => 
+            p.peerID === parsedPayload.From && (screenShare ? p.screenShare : true)
+          );
           if (item) {
             item.peer.signal(parsedPayload.Signal);
           }
@@ -493,13 +533,12 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       const parsedData = parseWsMessage(lastWsMessage?.data);
       switch (parsedData?.Type) {
         case 'ChatMessage':
-          setTranscripts(transcripts => limitLength(
+          setTextMessages(transcripts => limitLength(
             [
               ...transcripts,
-              createTranscript({
+              createMessage({
                 userNickname: parsedData.Value.Nickname,
                 value: parsedData.Value.Message,
-                fromChat: true,
               }),
             ],
             transcriptsMaxLength
@@ -509,10 +548,9 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           setTranscripts(transcripts => limitLength(
             [
               ...transcripts,
-              createTranscript({
+              createMessage({
                 userNickname: parsedData.Value.Nickname,
                 value: parsedData.Value.Message,
-                fromChat: false,
               }),
             ],
             transcriptsMaxLength
@@ -586,9 +624,9 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             </video>
           </VideochatParticipant>
 
-          {peers.map(peer => (
+          {peers.filter(peer => !peer.screenShare).map(peer => (
             <VideochatParticipant
-              key={peer.targetUserId}
+              key={peer.peerID}
               viewer={peer.participantType === 'Viewer'}
               order={peer.participantType === 'Viewer' ? viewerOrder : videoOrder[peer.targetUserId]}
               avatar={peer?.avatar}
@@ -601,17 +639,22 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         </div>
       </Field>
       <Field className='videochat-field videochat-field-main'>
-        <CodeEditor
-          roomState={roomState}
-          readOnly={viewerMode}
-          lastWsMessage={lastWsMessage}
-          onSendWsMessage={onSendWsMessage}
-        />
+        {screenSharePeer ? (
+          <VideoChatVideo peer={screenSharePeer.peer} />
+        ) : (
+          <CodeEditor
+            roomState={roomState}
+            readOnly={viewerMode}
+            lastWsMessage={lastWsMessage}
+            onSendWsMessage={onSendWsMessage}
+          />
+        )}
       </Field>
       {!!messagesChatEnabled && (
         <Field className='videochat-field videochat-field-chat'>
           <MessagesChat
             transcripts={transcripts}
+            textMessages={textMessages}
             onMessageSubmit={handleTextMessageSubmit}
           />
         </Field>
