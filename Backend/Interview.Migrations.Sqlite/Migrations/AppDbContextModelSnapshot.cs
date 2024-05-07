@@ -159,6 +159,12 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Property<Guid?>("RoomId")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Type")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(1)
+                        .HasComment("Available values: [Private: 2, Public: 1]");
+
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("TEXT");
 

@@ -14,5 +14,10 @@ public class QuestionTypeConfiguration : EntityTypeConfigurationBase<Question>
         builder.HasMany<Tag>(e => e.Tags).WithMany();
         builder.Property(question => question.RoomId).IsRequired(false);
         builder.HasOne(question => question.Room).WithMany().HasForeignKey(e => e.RoomId).OnDelete(DeleteBehavior.Cascade);
+        builder.Property(e => e.Type)
+            .HasConversion(e => e.Value, e => SEQuestionType.FromValue(e))
+            .HasComment($"Available values: [{string.Join(", ", SEQuestionType.List.Select(e => e.Name + ": " + e.Value))}]")
+            .IsRequired()
+            .HasDefaultValue(SEQuestionType.Public);
     }
 }

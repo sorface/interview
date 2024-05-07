@@ -9,6 +9,10 @@ public class RoomQuestion : Entity
     {
     }
 
+    public Guid RoomId { get; set; }
+
+    public Guid QuestionId { get; set; }
+
     public Room? Room { get; set; }
 
     public Question? Question { get; set; }

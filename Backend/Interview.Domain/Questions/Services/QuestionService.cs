@@ -2,6 +2,7 @@ using CSharpFunctionalExtensions;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Repository;
 using Interview.Domain.RoomParticipants;
+using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.ServiceResults.Errors;
 using Interview.Domain.ServiceResults.Success;
 using Interview.Domain.Tags;
@@ -15,6 +16,7 @@ namespace Interview.Domain.Questions.Services;
 public class QuestionService : IQuestionService
 {
     private readonly IQuestionRepository _questionRepository;
+    private readonly IRoomQuestionRepository _roomQuestionRepository;
     private readonly IQuestionNonArchiveRepository _questionNonArchiveRepository;
     private readonly ArchiveService<Question> _archiveService;
     private readonly ITagRepository _tagRepository;
@@ -27,7 +29,8 @@ public class QuestionService : IQuestionService
         ArchiveService<Question> archiveService,
         ITagRepository tagRepository,
         IRoomMembershipChecker roomMembershipChecker,
-        ICurrentUserAccessor currentUserAccessor)
+        ICurrentUserAccessor currentUserAccessor,
+        IRoomQuestionRepository roomQuestionRepository)
     {
         _questionRepository = questionRepository;
         _questionNonArchiveRepository = questionNonArchiveRepository;
@@ -35,6 +38,7 @@ public class QuestionService : IQuestionService
         _tagRepository = tagRepository;
         _roomMembershipChecker = roomMembershipChecker;
         _currentUserAccessor = currentUserAccessor;
+        _roomQuestionRepository = roomQuestionRepository;
     }
 
     public async Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken)
@@ -99,6 +103,11 @@ public class QuestionService : IQuestionService
         };
 
         await _questionRepository.CreateAsync(result, cancellationToken);
+        if (roomId is not null)
+        {
+            await _roomQuestionRepository.CreateAsync(new RoomQuestion { QuestionId = result.Id, RoomId = roomId.Value, }, cancellationToken);
+        }
+
         return new QuestionItem
         {
             Id = result.Id,
