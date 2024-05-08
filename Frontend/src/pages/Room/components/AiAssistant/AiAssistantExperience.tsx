@@ -12,6 +12,9 @@ export interface AiAssistantExperienceProps {
 
 const logoUrl = '/logo192.png';
 
+const cleanUpTranscription = (value: string) =>
+  value.trim().replace(/[\.,?!]/g, '').toLocaleLowerCase();
+
 const AiAssistantExperienceComponent: FunctionComponent<AiAssistantExperienceProps> = ({
   lastTranscription,
 }) => {
@@ -19,8 +22,9 @@ const AiAssistantExperienceComponent: FunctionComponent<AiAssistantExperiencePro
   const viewport = useThree((state) => state.viewport);
   const localizationCaptions = useLocalizationCaptions();
 
-  const welcomeMessage =
-    lastTranscription?.value.toLowerCase() === localizationCaptions[LocalizationKey.AiAssistantWelcomePrompt].toLocaleLowerCase();
+  const welcomeMessage = lastTranscription ?
+    cleanUpTranscription(lastTranscription.value) === cleanUpTranscription(localizationCaptions[LocalizationKey.AiAssistantWelcomePrompt]) :
+    false;
 
   return (
     <>
