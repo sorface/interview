@@ -103,18 +103,6 @@ public class QuestionService : IQuestionService
         };
 
         await _questionRepository.CreateAsync(result, cancellationToken);
-        if (roomId is not null)
-        {
-            var roomQuestion = new RoomQuestion
-            {
-                QuestionId = result.Id,
-                RoomId = roomId.Value,
-                Room = null,
-                Question = null,
-                State = RoomQuestionState.Open,
-            };
-            await _roomQuestionRepository.CreateAsync(roomQuestion, cancellationToken);
-        }
 
         return new QuestionItem
         {
