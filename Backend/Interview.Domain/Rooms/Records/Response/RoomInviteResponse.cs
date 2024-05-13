@@ -18,12 +18,12 @@ public class RoomInviteResponse
     public required EVRoomParticipantType ParticipantType { get; set; }
 
     /// <summary>
-    /// Get max invite count.
+    /// Gets or sets get max invite count.
     /// </summary>
     public required int Max { get; set; }
 
     /// <summary>
-    /// Get current invite count.
+    /// Gets or sets get current invite count.
     /// </summary>
     public required int Used { get; set; }
 }
