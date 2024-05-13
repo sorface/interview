@@ -276,20 +276,19 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         result[userId] = averageVolume;
       }
 
-      const micEnabled = userAudioStream?.getAudioTracks().some(audioTrack => audioTrack.enabled);
-
-      if (somebodyIsSpeaking && micEnabled) {
-        micDisabledAutomatically.current = true;
-        onMuteMic();
-      } else if (!somebodyIsSpeaking && !micEnabled && micDisabledAutomatically.current) {
-        onUnmuteMic();
-      }
-
       if (updateLouderUserTimeout.current > 0) {
         updateLouderUserTimeout.current -= delta;
         prevTime = time;
         requestRef.current = requestAnimationFrame(updateAudioAnalyser);
         return;
+      }
+
+      const micEnabled = userAudioStream?.getAudioTracks().some(audioTrack => audioTrack.enabled);
+      if (somebodyIsSpeaking && micEnabled) {
+        micDisabledAutomatically.current = true;
+        onMuteMic();
+      } else if (!somebodyIsSpeaking && !micEnabled && micDisabledAutomatically.current) {
+        onUnmuteMic();
       }
 
       if (newLouderUserId && newLouderUserId !== louderUserId.current) {
