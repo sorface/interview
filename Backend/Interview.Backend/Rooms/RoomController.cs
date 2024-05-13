@@ -47,8 +47,11 @@ public class RoomController : ControllerBase
         [FromQuery] PageRequest request,
         [FromQuery] RoomPageDetailRequestFilter? filter)
     {
-        return _roomService.FindPageAsync(filter ?? new RoomPageDetailRequestFilter(), request.PageNumber,
-            request.PageSize, HttpContext.RequestAborted);
+        return _roomService.FindPageAsync(
+            filter ?? new RoomPageDetailRequestFilter(),
+            request.PageNumber,
+            request.PageSize,
+            HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -257,9 +260,7 @@ public class RoomController : ControllerBase
     {
         var request = new TranscriptionRequest
         {
-            RoomId = roomId,
-            UserId = currentUserAccessor.GetUserIdOrThrow(),
-            TranscriptionTypeMap = options,
+            RoomId = roomId, UserId = currentUserAccessor.GetUserIdOrThrow(), TranscriptionTypeMap = options,
         };
         return _roomService.GetTranscriptionAsync(request, HttpContext.RequestAborted);
     }
