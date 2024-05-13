@@ -260,7 +260,9 @@ public class RoomController : ControllerBase
     {
         var request = new TranscriptionRequest
         {
-            RoomId = roomId, UserId = currentUserAccessor.GetUserIdOrThrow(), TranscriptionTypeMap = options,
+            RoomId = roomId,
+            UserId = currentUserAccessor.GetUserIdOrThrow(),
+            TranscriptionTypeMap = options,
         };
         return _roomService.GetTranscriptionAsync(request, HttpContext.RequestAborted);
     }
