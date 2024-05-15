@@ -1,3 +1,5 @@
+export const inviteParamName = 'invite';
+
 export const pathnames = {
   home: '/:redirect?',
   rooms: '/rooms',
