@@ -58,6 +58,7 @@ public class ServiceConfigurator
             {
                 policy
                     .WithOrigins(corsOptions.AllowedOrigins.ToArray())
+                    .SetIsOriginAllowedToAllowWildcardSubdomains()
                     .AllowCredentials()
                     .AllowAnyMethod()
                     .AllowAnyHeader();
