@@ -1,7 +1,6 @@
-namespace Interview.Backend.Auth
+namespace Interview.Backend.Auth;
+
+public class CorsOptions
 {
-    public class CorsOptions
-    {
-        public List<string> AllowedOrigins { get; set; } = new ();
-    }
+    public List<string> AllowedOrigins { get; set; } = new();
 }
