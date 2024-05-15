@@ -65,7 +65,9 @@ export const useGetMeApi = () => {
   const loadMe = useCallback(async () => {
     dispatch({ name: 'startLoad' });
     try {
-      const response = await fetch(`${REACT_APP_BACKEND_URL}/users/self`);
+      const response = await fetch(`${REACT_APP_BACKEND_URL}/users/self`, {
+        credentials: 'include'
+      });
       if (!response.ok) {
         throw new Error('UserApi error');
       }
