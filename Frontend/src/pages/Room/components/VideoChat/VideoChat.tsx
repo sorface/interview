@@ -15,7 +15,7 @@ import { CodeEditor } from '../CodeEditor/CodeEditor';
 import { RoomState } from '../../../../types/room';
 import { parseWsMessage } from './utils/parseWsMessage';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
-import { EventsSearchParams, roomsApiDeclaration } from '../../../../apiDeclarations';
+import { RoomIdParam, roomsApiDeclaration } from '../../../../apiDeclarations';
 import { EventsSearch } from '../../../../types/event';
 import { UserType } from '../../../../types/user';
 import { useReactionsStatus } from '../../hooks/useReactionsStatus';
@@ -112,7 +112,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   const {
     apiMethodState: apiRoomEventsSearchState,
     fetchData: fetchRoomEventsSearch,
-  } = useApiMethod<EventsSearch, EventsSearchParams>(roomsApiDeclaration.eventsSearch);
+  } = useApiMethod<EventsSearch, RoomIdParam>(roomsApiDeclaration.eventsSearch);
   const {
     data: roomEventsSearch,
   } = apiRoomEventsSearchState;

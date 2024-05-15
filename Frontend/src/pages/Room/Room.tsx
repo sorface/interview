@@ -3,18 +3,22 @@ import { useParams, Navigate } from 'react-router-dom';
 import useWebSocket from 'react-use-websocket';
 import toast from 'react-hot-toast';
 import {
+  ApplyRoomInviteBody,
+  GenerateRoomInviteBody,
   GetRoomParticipantParams,
   GetRoomQuestionsBody,
+  RoomIdParam,
+  roomInviteApiDeclaration,
   roomQuestionApiDeclaration,
   roomsApiDeclaration,
 } from '../../apiDeclarations';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { REACT_APP_WS_URL } from '../../config';
-import { IconNames, pathnames } from '../../constants';
+import { IconNames, inviteParamName, pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { useCommunist } from '../../hooks/useCommunist';
-import { RoomParticipant, RoomQuestion, RoomState, Room as RoomType } from '../../types/room';
+import { RoomInvite, RoomParticipant, RoomQuestion, RoomState, Room as RoomType } from '../../types/room';
 import { ActionModal } from '../../components/ActionModal/ActionModal';
 import { Reactions } from './components/Reactions/Reactions';
 import { ActiveQuestion } from './components/ActiveQuestion/ActiveQuestion';
@@ -32,6 +36,8 @@ import { LocalizationKey } from '../../localization';
 import { MessagePage } from '../../components/MessagePage/MessagePage';
 import { ThemedIcon } from './components/ThemedIcon/ThemedIcon';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { Invitations } from './components/Invitations/Invitations';
+import { UserType } from '../../types/user';
 
 import './Room.css';
 
@@ -50,6 +56,7 @@ export const Room: FunctionComponent = () => {
   const { getCommunist } = useCommunist();
   const communist = getCommunist();
   let { id } = useParams();
+  const { [inviteParamName]: inviteParam } = useParams();
   const socketUrl = `${REACT_APP_WS_URL}/ws?Authorization=${communist}&roomId=${id}`;
   const { lastMessage, readyState, sendMessage } = useWebSocket(socketUrl);
   const wsClosed = readyState === 3 || readyState === 2;
@@ -119,6 +126,42 @@ export const Room: FunctionComponent = () => {
     data: roomParticipant, process: { loading: roomParticipantLoading, error: roomParticipantError },
   } = apiRoomParticipantState;
 
+  const {
+    apiMethodState: apiRoomInvitesState,
+    fetchData: fetchRoomInvites,
+  } = useApiMethod<RoomInvite[], RoomIdParam>(roomInviteApiDeclaration.get);
+  const {
+    process: { loading: roomInvitesLoading, error: roomInvitesError },
+    data: roomInvitesData,
+  } = apiRoomInvitesState;
+
+  const {
+    apiMethodState: apiApplyRoomInviteState,
+    fetchData: fetchApplyRoomInvite,
+  } = useApiMethod<RoomInvite, ApplyRoomInviteBody>(roomInviteApiDeclaration.apply);
+  const {
+    process: { loading: applyRoomInviteLoading, error: applyRoomInviteError },
+    data: applyRoomInviteData,
+  } = apiApplyRoomInviteState;
+
+  const {
+    apiMethodState: apiGenerateRoomInviteState,
+    fetchData: fetchGenerateRoomInvite,
+  } = useApiMethod<RoomInvite, GenerateRoomInviteBody>(roomInviteApiDeclaration.generate);
+  const {
+    process: { loading: generateRoomInviteLoading, error: generateRoomInviteError },
+    data: generateRoomInviteData,
+  } = apiGenerateRoomInviteState;
+
+  const {
+    apiMethodState: apiGenerateRoomAllInvitesState,
+    fetchData: fetchGenerateRoomAllInvites,
+  } = useApiMethod<RoomInvite, RoomIdParam>(roomInviteApiDeclaration.generateAll);
+  const {
+    process: { loading: generateRoomAllInvitesLoading, error: generateRoomAllInvitesError },
+    data: generateRoomAllInvitesData,
+  } = apiGenerateRoomAllInvitesState;
+
   const roomParticipantWillLoaded = roomParticipant === null && !roomParticipantError;
 
   const {
@@ -145,6 +188,34 @@ export const Room: FunctionComponent = () => {
   }, [id, getRoomQuestions]);
 
   useEffect(() => {
+    if (!inviteParam) {
+      return;
+    }
+    if (!id) {
+      throw new Error('Room id not found');
+    }
+    fetchApplyRoomInvite({
+      inviteId: inviteParam,
+      roomId: id,
+    });
+  }, [inviteParam, id, fetchApplyRoomInvite]);
+
+  useEffect(() => {
+    if (!generateRoomInviteData && !generateRoomAllInvitesData) {
+      return;
+    }
+    if (!id) {
+      throw new Error('Room id not found');
+    }
+    fetchRoomInvites({
+      roomId: id,
+    });
+  }, [generateRoomInviteData, generateRoomAllInvitesData, id, fetchRoomInvites]);
+
+  useEffect(() => {
+    if (inviteParam && !applyRoomInviteData) {
+      return;
+    }
     if (!auth?.id) {
       return;
     }
@@ -158,7 +229,7 @@ export const Room: FunctionComponent = () => {
       RoomId: id,
       UserId: auth.id,
     });
-  }, [id, auth?.id, fetchData, fetchRoomState, updateQuestions, getRoomParticipant]);
+  }, [id, auth?.id, inviteParam, applyRoomInviteData, fetchData, fetchRoomState, updateQuestions, getRoomParticipant]);
 
   useEffect(() => {
     if (!room) {
@@ -312,6 +383,34 @@ export const Room: FunctionComponent = () => {
     setRecognitionEnabled(!recognitionEnabled);
   }, [recognitionEnabled]);
 
+  const handleInvitesOpen = () => {
+    if (!id) {
+      throw new Error('Room id not found');
+    }
+    fetchRoomInvites({
+      roomId: id,
+    });
+  };
+
+  const handleInviteGenerate = (participantType: UserType) => {
+    if (!id) {
+      throw new Error('Room id not found');
+    }
+    fetchGenerateRoomInvite({
+      roomId: id,
+      participantType,
+    });
+  };
+
+  const handleInvitesAllGenerate = () => {
+    if (!id) {
+      throw new Error('Room id not found');
+    }
+    fetchGenerateRoomAllInvites({
+      roomId: id,
+    });
+  };
+
   if (roomInReview && id) {
     return <Navigate to={pathnames.roomAnalyticsSummary.replace(':id', id)} replace />;
   }
@@ -330,9 +429,10 @@ export const Room: FunctionComponent = () => {
     <MainContentWrapper withMargin className="room-wrapper">
       <EnterVideoChatModal
         open={welcomeScreen}
-        loading={loading || roomParticipantLoading || roomParticipantWillLoaded || readyState === connectingReadyState}
+        loading={loading || roomParticipantLoading || roomParticipantWillLoaded || applyRoomInviteLoading || readyState === connectingReadyState}
         viewerMode={viewerMode}
         roomName={room?.name}
+        error={applyRoomInviteError && localizationCaptions[LocalizationKey.ErrorApplyRoomInvite]}
         userVideoStream={userVideoStream}
         userAudioStream={userAudioStream}
         micEnabled={micEnabled}
@@ -383,6 +483,17 @@ export const Room: FunctionComponent = () => {
                 <div>{localizationCaptions[LocalizationKey.WaitingRoom]}</div>
               )}
               <div className={`actions-field ${viewerMode ? 'actions-field-viewer' : ''}`}>
+                {!viewerMode && (
+                  <Invitations
+                    roomId={id || ''}
+                    roomInvitesData={roomInvitesData}
+                    roomInvitesError={roomInvitesError || generateRoomInviteError || generateRoomAllInvitesError}
+                    roomInvitesLoading={roomInvitesLoading || generateRoomInviteLoading || generateRoomAllInvitesLoading}
+                    onOpen={handleInvitesOpen}
+                    onGenerateInvite={handleInviteGenerate}
+                    onGenerateAllInvites={handleInvitesAllGenerate}
+                  />
+                )}
                 {!viewerMode && (
                   <div className='start-room-review'>
                     <ActionModal

@@ -1,3 +1,4 @@
+using System.Transactions;
 using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Storage;
@@ -140,6 +141,9 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         var createdParticipants = await _roomParticipantService.CreateAsync(room.Id, participants, cancellationToken);
         room.Participants.AddRange(createdParticipants);
         await _roomRepository.CreateAsync(room, cancellationToken);
+
+        await GenerateInvitesAsync(room.Id, cancellationToken);
+
         return room;
     }
 
@@ -402,13 +406,41 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     public Task<List<RoomInviteResponse>> GetInvitesAsync(Guid roomId, CancellationToken cancellationToken = default)
     {
         return _db.RoomInvites.AsNoTracking()
+            .Include(roomInvite => roomInvite.Invite)
             .Where(e => e.RoomById == roomId && e.InviteById != null && e.ParticipantType != null)
             .Select(e => new RoomInviteResponse
             {
                 InviteId = e.InviteById!.Value,
                 ParticipantType = e.ParticipantType!.EnumValue,
+                Max = e.Invite!.UsesMax,
+                Used = e.Invite.UsesCurrent,
             })
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<RoomInviteResponse>> GenerateInvitesAsync(
+        Guid roomId,
+        CancellationToken cancellationToken = default)
+    {
+        List<RoomInviteResponse> invites = new();
+
+        foreach (var participantType in SERoomParticipantType.List)
+        {
+            invites.Add(await _roomInviteService.GenerateAsync(roomId, participantType, 20, cancellationToken));
+        }
+
+        return invites;
+    }
+
+    public Task<RoomInviteResponse> GenerateInviteAsync(
+        RoomInviteGeneratedRequest roomInviteGenerated,
+        CancellationToken cancellationToken = default)
+    {
+        return _roomInviteService.GenerateAsync(
+            roomInviteGenerated.RoomId,
+            SERoomParticipantType.FromEnum(roomInviteGenerated.ParticipantType),
+            20,
+            cancellationToken);
     }
 
     public async Task<AnalyticsSummary> GetAnalyticsSummaryAsync(
@@ -456,7 +488,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return response;
     }
 
-    public async Task<RoomInviteDetail> ApplyInvite(
+    public async Task<RoomInviteResponse> ApplyInvite(
         Guid roomId,
         Guid? invite,
         CancellationToken cancellationToken = default)
@@ -486,11 +518,12 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         if (participant is not null)
         {
-            return new RoomInviteDetail
+            return new RoomInviteResponse
             {
-                ParticipantType = participant.Type,
-                RoomId = roomId,
-                ParticipantId = participant.Id,
+                ParticipantType = participant.Type.EnumValue,
+                InviteId = invite!.Value,
+                Max = 0,
+                Used = 0,
             };
         }
 
@@ -508,11 +541,12 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         participant = participants.First();
         await _roomParticipantRepository.CreateAsync(participant, cancellationToken);
 
-        return new RoomInviteDetail
+        return new RoomInviteResponse
         {
-            ParticipantType = participant.Type,
-            RoomId = roomId,
-            ParticipantId = participant.Id,
+            ParticipantType = participant.Type.EnumValue,
+            InviteId = invite!.Value,
+            Max = 0,
+            Used = 0,
         };
     }
 
@@ -521,7 +555,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         Guid userId,
         CancellationToken cancellationToken)
     {
-        var participantType = await _roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(roomId, userId, cancellationToken);
+        var participantType =
+            await _roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(roomId, userId, cancellationToken);
         if (participantType is null)
         {
             throw new NotFoundException($"Not found participant type by room id {roomId} and user id {userId}");

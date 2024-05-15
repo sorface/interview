@@ -2,8 +2,8 @@ import { ApiContractGet, ApiContractPatch, ApiContractPost, ApiContractPut } fro
 import { Question } from './types/question';
 import { Tag } from './types/tag';
 import { Reaction } from './types/reaction';
-import { Room, RoomQuestionState, RoomReview, RoomStateAdditionalStatefulPayload, RoomStatus } from './types/room';
-import { User } from './types/user';
+import { Room, RoomInvite, RoomQuestionState, RoomReview, RoomStateAdditionalStatefulPayload, RoomStatus } from './types/room';
+import { User, UserType } from './types/user';
 
 export interface PaginationUrlParams {
   PageSize: number;
@@ -36,7 +36,7 @@ export interface GetRoomParticipantParams {
   UserId: User['id'];
 }
 
-export interface EventsSearchParams {
+export interface RoomIdParam {
   roomId: Room['id'];
 }
 
@@ -85,7 +85,7 @@ export const roomsApiDeclaration = {
     baseUrl: '/room-participants',
     urlParams: params,
   }),
-  eventsSearch: (params: EventsSearchParams): ApiContractPost => ({
+  eventsSearch: (params: RoomIdParam): ApiContractPost => ({
     method: 'POST',
     baseUrl: `/rooms/${params.roomId}/transcription/search`,
     body: {
@@ -288,6 +288,39 @@ export const roomReviewApiDeclaration = {
     method: 'PUT',
     baseUrl: `/room-reviews/${params.id}`,
     body: { review: params.review, state: params.state },
+  }),
+};
+
+export interface ApplyRoomInviteBody {
+  roomId: Room['id'];
+  inviteId: RoomInvite['inviteId'];
+}
+
+export interface GenerateRoomInviteBody {
+  roomId: Room['id'];
+  participantType: UserType;
+}
+
+export const roomInviteApiDeclaration = {
+  get: (params: RoomIdParam): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: `/rooms/invites/${params.roomId}`,
+  }),
+  apply: (body: ApplyRoomInviteBody): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: `/rooms/invites/${body.roomId}/apply`,
+    urlParams: { inviteId: body.inviteId },
+    body: {},
+  }),
+  generate: (body: GenerateRoomInviteBody): ApiContractPut => ({
+    method: 'PUT',
+    baseUrl: '/rooms/invites',
+    body,
+  }),
+  generateAll: (param: RoomIdParam): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: `/rooms/invites/${param.roomId}`,
+    body: {},
   }),
 };
 

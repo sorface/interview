@@ -95,7 +95,7 @@ public class RoomServicePermissionAccessor : IRoomService, IServiceDecorator
         return await _roomService.GetAnalyticsAsync(request, cancellationToken);
     }
 
-    public Task<RoomInviteDetail> ApplyInvite(Guid roomId, Guid? invite, CancellationToken cancellationToken = default)
+    public Task<RoomInviteResponse> ApplyInvite(Guid roomId, Guid? invite, CancellationToken cancellationToken = default)
     {
         if (_securityService.CurrentUser() is null)
         {
@@ -109,6 +109,22 @@ public class RoomServicePermissionAccessor : IRoomService, IServiceDecorator
     {
         await _securityService.EnsureRoomPermissionAsync(roomId, SEPermission.RoomInviteGet, cancellationToken);
         return await _roomService.GetInvitesAsync(roomId, cancellationToken);
+    }
+
+    public async Task<List<RoomInviteResponse>> GenerateInvitesAsync(Guid roomId, CancellationToken cancellationToken = default)
+    {
+        await _securityService.EnsureRoomPermissionAsync(roomId, SEPermission.RoomInviteGenerate, cancellationToken);
+
+        return await _roomService.GenerateInvitesAsync(roomId, cancellationToken);
+    }
+
+    public async Task<RoomInviteResponse> GenerateInviteAsync(
+        RoomInviteGeneratedRequest roomInviteGenerated,
+        CancellationToken cancellationToken = default)
+    {
+        await _securityService.EnsureRoomPermissionAsync(roomInviteGenerated.RoomId, SEPermission.RoomInviteGenerate, cancellationToken);
+
+        return await _roomService.GenerateInviteAsync(roomInviteGenerated, cancellationToken);
     }
 
     public async Task<AnalyticsSummary> GetAnalyticsSummaryAsync(RoomAnalyticsRequest request, CancellationToken cancellationToken = default)

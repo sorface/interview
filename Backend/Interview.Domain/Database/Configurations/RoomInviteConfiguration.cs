@@ -11,9 +11,10 @@ public class RoomInviteConfiguration : EntityTypeConfigurationBase<RoomInvite>
     {
         builder.HasOne(entity => entity.Invite)
             .WithMany()
-            .HasForeignKey(entity => entity.InviteById);
+            .HasForeignKey(entity => entity.InviteById)
+            .OnDelete(DeleteBehavior.Cascade);
         builder.HasOne(entity => entity.Room)
-            .WithMany()
+            .WithMany(entity => entity.Invites)
             .HasForeignKey(entity => entity.RoomById);
         builder.Property(entity => entity.ParticipantType)
             .HasConversion(type => type!.Name, name => SERoomParticipantType.FromName(name, false))

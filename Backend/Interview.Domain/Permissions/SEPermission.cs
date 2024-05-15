@@ -327,6 +327,13 @@ public class SEPermission : SmartEnum<SEPermission>
             "Getting a Room Invites",
             EVPermission.RoomInviteGet);
 
+    public static readonly SEPermission RoomInviteGenerate =
+        new(
+            Guid.Parse("C1F43CA8-21F1-41E6-9794-E7D44156BF73"),
+            "RoomInviteGenerate",
+            "Generate for a Room Invites",
+            EVPermission.RoomInviteGenerate);
+
     public Guid Id { get; }
 
     public string Description { get; }

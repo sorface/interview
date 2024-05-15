@@ -3,7 +3,7 @@ export const pathnames = {
   rooms: '/rooms',
   roomsCreate: '/rooms/create',
   roomsParticipants: '/rooms/participants/:id',
-  room: '/room/:id',
+  room: `/room/:id/:${inviteParamName}?`,
   roomAnalyticsSummary: '/rooms/:id/analytics/summary',
   questions: '/questions',
   questionsCreate: '/questions/create',
@@ -28,6 +28,8 @@ export const enum IconNames {
   ThemeSwitchLight = 'sunny',
   ThemeSwitchDark = 'moon',
   People = 'people',
+  Clipboard = 'clipboard',
+  Refresh = 'refresh',
   TV = 'tv',
 }
 
@@ -45,4 +47,3 @@ export const reactionIcon: Record<string, IconNames> = {
 export const toastSuccessOptions = {
   icon: '👌',
 };
-

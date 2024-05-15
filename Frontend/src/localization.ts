@@ -130,6 +130,10 @@ export const enum LocalizationKey {
   LocalizationLangRu,
   AiAssistantName,
   AiAssistantWelcomePrompt,
+  ErrorApplyRoomInvite,
+  RoomInvitesLoading,
+  Invitations,
+  RefreshAll,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -263,6 +267,10 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.LocalizationLangRu]: 'Русский',
     [LocalizationKey.AiAssistantName]: 'Michael (Alpha)',
     [LocalizationKey.AiAssistantWelcomePrompt]: 'Hi Michael',
+    [LocalizationKey.ErrorApplyRoomInvite]: 'Meeting invitation is invalid',
+    [LocalizationKey.RoomInvitesLoading]: 'Loading room invites',
+    [LocalizationKey.Invitations]: 'Invitations',
+    [LocalizationKey.RefreshAll]: 'Refresh all',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -394,5 +402,9 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.LocalizationLangRu]: 'Русский',
     [LocalizationKey.AiAssistantName]: 'Михаил (Альфа)',
     [LocalizationKey.AiAssistantWelcomePrompt]: 'Привет Михаил',
+    [LocalizationKey.ErrorApplyRoomInvite]: 'Приглашение на встречу недействительно',
+    [LocalizationKey.RoomInvitesLoading]: 'Загрузка приглашений в комнату',
+    [LocalizationKey.Invitations]: 'Приглашения',
+    [LocalizationKey.RefreshAll]: 'Обновить все',
   },
 }

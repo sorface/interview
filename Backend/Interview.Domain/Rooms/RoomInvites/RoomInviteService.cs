@@ -1,5 +1,6 @@
 using Interview.Domain.Database;
 using Interview.Domain.Invites;
+using Interview.Domain.Rooms.Records.Response;
 using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomParticipants.Service;
@@ -18,7 +19,7 @@ public class RoomInviteService : IRoomInviteService
         _roomParticipantService = roomParticipantService;
     }
 
-    public async Task<RoomInviteDetail> ApplyInvite(
+    public async Task<RoomInviteResponse> ApplyInvite(
         Guid inviteId,
         Guid userId,
         CancellationToken cancellationToken = default)
@@ -80,22 +81,24 @@ public class RoomInviteService : IRoomInviteService
                 await _db.SaveChangesAsync(cancellationToken);
                 await databaseContextTransaction.CommitAsync(cancellationToken);
 
-                return new RoomInviteDetail
+                return new RoomInviteResponse
                 {
-                    ParticipantId = roomParticipant.Id,
-                    ParticipantType = roomParticipant.Type,
-                    RoomId = roomInvite.Room.Id,
+                    InviteId = invite.Id,
+                    ParticipantType = roomInvite.ParticipantType!.EnumValue,
+                    Used = invite.UsesCurrent,
+                    Max = invite.UsesMax,
                 };
             }
 
             // await UpdateInviteLimit(roomInvite, cancellationToken);
             await databaseContextTransaction.CommitAsync(cancellationToken);
 
-            return new RoomInviteDetail
+            return new RoomInviteResponse
             {
-                ParticipantId = participant.Id,
-                ParticipantType = participant.Type,
-                RoomId = roomInvite.Room.Id,
+                InviteId = invite.Id,
+                ParticipantType = roomInvite.ParticipantType!.EnumValue,
+                Used = invite.UsesCurrent,
+                Max = invite.UsesMax,
             };
         }
         catch
@@ -103,6 +106,35 @@ public class RoomInviteService : IRoomInviteService
             await databaseContextTransaction.RollbackAsync(cancellationToken);
             throw;
         }
+    }
+
+    public async Task<RoomInviteResponse> GenerateAsync(
+        Guid roomId,
+        SERoomParticipantType participantType,
+        int inviteMaxCount,
+        CancellationToken cancellationToken)
+    {
+        await _db.RoomInvites
+            .Where(roomInvite => roomInvite.RoomById == roomId && participantType == roomInvite.ParticipantType)
+            .ExecuteDeleteAsync(cancellationToken);
+
+        var invite = new Invite(inviteMaxCount);
+
+        await _db.Invites.AddAsync(invite, cancellationToken);
+
+        var newRoomInvite = new RoomInvite(invite.Id, roomId, participantType);
+
+        await _db.RoomInvites.AddAsync(newRoomInvite, cancellationToken);
+
+        await _db.SaveChangesAsync(cancellationToken);
+
+        return new RoomInviteResponse
+        {
+            InviteId = invite.Id,
+            ParticipantType = newRoomInvite.ParticipantType!.EnumValue,
+            Used = invite.UsesCurrent,
+            Max = invite.UsesMax,
+        };
     }
 
     private async Task UpdateInviteLimit(RoomInvite roomInvite, CancellationToken cancellationToken = default)

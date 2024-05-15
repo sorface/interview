@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { Routes, Route, useLocation, matchPath } from 'react-router-dom';
-import { pathnames } from '../constants';
+import { inviteParamName, pathnames } from '../constants';
 import { Home } from '../pages/Home/Home';
 import { Rooms } from '../pages/Rooms/Rooms';
 import { Questions } from '../pages/Questions/Questions';
@@ -34,7 +34,10 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
   user,
 }) => {
   const location = useLocation();
-  const fullScreenPage = matchPath(pathnames.room, location.pathname);
+  const fullScreenPage = matchPath(
+    { path: pathnames.room.replace(`/:${inviteParamName}?`, ''), end: false, },
+    location.pathname,
+  );
   const authenticated = !!user;
 
   const userContent = authenticated ?
