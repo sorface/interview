@@ -6,8 +6,6 @@ public sealed class RoomCreateRequest
 
     public string TwitchChannel { get; set; } = string.Empty;
 
-    public string AccessType { get; set; } = SERoomAccessType.Public.Name;
-
     public HashSet<Guid> Questions { get; set; } = new();
 
     public HashSet<Guid> Experts { get; set; } = new();
