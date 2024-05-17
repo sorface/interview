@@ -477,11 +477,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasColumnType("TEXT")
                         .HasDefaultValue('N');
 
-                    b.Property<string>("TwitchChannel")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("TEXT");
 
