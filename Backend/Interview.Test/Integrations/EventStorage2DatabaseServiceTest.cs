@@ -18,11 +18,11 @@ public class EventStorage2DatabaseServiceTest
         var clock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(clock);
 
-        var room1 = new Room("Test 1", string.Empty, SERoomAcсessType.Public) { Status = SERoomStatus.Close, };
+        var room1 = new Room("Test 1", string.Empty, SERoomAccessType.Public) { Status = SERoomStatus.Close, };
         appDbContext.Rooms.Add(room1);
-        appDbContext.Rooms.Add(new Room("Test 2", string.Empty, SERoomAcсessType.Public) { Status = SERoomStatus.Close, });
-        appDbContext.Rooms.Add(new Room("Test 3", string.Empty, SERoomAcсessType.Public) { Status = SERoomStatus.Close, });
-        appDbContext.Rooms.Add(new Room("Test 4", string.Empty, SERoomAcсessType.Public) { Status = SERoomStatus.Close, });
+        appDbContext.Rooms.Add(new Room("Test 2", string.Empty, SERoomAccessType.Public) { Status = SERoomStatus.Close, });
+        appDbContext.Rooms.Add(new Room("Test 3", string.Empty, SERoomAccessType.Public) { Status = SERoomStatus.Close, });
+        appDbContext.Rooms.Add(new Room("Test 4", string.Empty, SERoomAccessType.Public) { Status = SERoomStatus.Close, });
         appDbContext.SaveChanges();
         var queuedRoomEvents = appDbContext.Rooms.Where(e => e.Id != room1.Id).Select(e => new QueuedRoomEvent { RoomId = e.Id, });
         appDbContext.QueuedRoomEvents.AddRange(queuedRoomEvents);

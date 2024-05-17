@@ -17,7 +17,7 @@ public class AppDbContextTest
         var clock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(clock);
 
-        var room = new Room("Test room", "1234", SERoomAcсessType.Public)
+        var room = new Room("Test room", "1234", SERoomAccessType.Public)
         {
             Questions = new List<RoomQuestion>
             {
