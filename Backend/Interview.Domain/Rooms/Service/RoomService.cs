@@ -83,7 +83,65 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     public Task<IPagedList<RoomPageDetail>> FindPageAsync(
         RoomPageDetailRequestFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
-        return _roomRepository.GetDetailedPageAsync(filter, pageNumber, pageSize, cancellationToken);
+        IQueryable<Room> queryable = _db.Rooms
+            .Include(e => e.Participants)
+                .ThenInclude(e => e.User)
+            .Include(e => e.Questions)
+            .Include(e => e.Configuration)
+            .Include(e => e.Tags)
+            .OrderBy(e => e.Status == SERoomStatus.Active ? 1 :
+                e.Status == SERoomStatus.Review ? 2 :
+                e.Status == SERoomStatus.New ? 3 :
+                4)
+            .ThenByDescending(e => e.CreateDate);
+        var filterName = filter.Name?.Trim().ToLower();
+        if (!string.IsNullOrWhiteSpace(filterName))
+        {
+            queryable = queryable.Where(e => e.Name.ToLower().Contains(filterName));
+        }
+
+        if (filter.Statuses is not null && filter.Statuses.Count > 0)
+        {
+            var mapStatuses = filter.Statuses.Join(
+                SERoomStatus.List,
+                status => status,
+                status => status.EnumValue,
+                (_, roomStatus) => roomStatus).ToList();
+            queryable = queryable.Where(e => mapStatuses.Contains(e.Status));
+        }
+
+        if (!_currentUserAccessor.IsAdmin())
+        {
+            var currentUserId = _currentUserAccessor.GetUserIdOrThrow();
+            queryable = queryable.Where(e => e.AcсessType == SERoomAcсessType.Public || (e.AcсessType == SERoomAcсessType.Private && e.Participants.Any(p => currentUserId == p.User.Id)));
+        }
+
+        if (filter.Participants is not null && filter.Participants.Count > 0)
+        {
+            queryable = queryable.Where(e => e.Participants.Any(p => filter.Participants.Contains(p.User.Id)));
+        }
+
+        return queryable
+            .Select(e => new RoomPageDetail
+            {
+                Id = e.Id,
+                Name = e.Name,
+                TwitchChannel = e.TwitchChannel,
+                Questions = e.Questions.Select(question => question.Question)
+                    .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
+                    .ToList(),
+                Users = e.Participants.Select(participant =>
+                        new RoomUserDetail
+                        {
+                            Id = participant.User.Id,
+                            Nickname = participant.User.Nickname,
+                            Avatar = participant.User.Avatar,
+                        })
+                    .ToList(),
+                RoomStatus = e.Status.EnumValue,
+                Tags = e.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
+            })
+            .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
 
     public async Task<RoomDetail> FindByIdAsync(Guid id, CancellationToken cancellationToken)
