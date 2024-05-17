@@ -89,13 +89,13 @@ public class RoomConnectionListener : IActiveRoomSource, IConnectionListener, IW
         try
         {
             var client = new TwitchChatClient(roomId);
-            client.Connect(_chatBotAccount.Username, _chatBotAccount.AccessToken, detail.Room.TwitchChannel);
+            client.Connect(_chatBotAccount.Username, _chatBotAccount.AccessToken);
             _twitchClients.TryAdd(roomId, client);
-            _logger.LogInformation("Start listen new room {RoomId} {TwitchChannel}", roomId, detail.Room.TwitchChannel);
+            _logger.LogInformation("Start listen new room {RoomId}", roomId);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Unable connect to twitch {RoomId} {TwitchChannel}", roomId, detail.Room.TwitchChannel);
+            _logger.LogError(e, "Unable connect to twitch {RoomId}", roomId);
         }
     }
 }

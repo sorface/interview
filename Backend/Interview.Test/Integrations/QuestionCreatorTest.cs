@@ -58,7 +58,7 @@ namespace Interview.Test.Integrations
         public async Task CreateShouldFailIfRoomIsNotAvailable()
         {
             await using var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
-            var room = new Room("Test Room", string.Empty, SERoomAcсessType.Public);
+            var room = new Room("Test Room", SERoomAcсessType.Public);
             appDbContext.Rooms.Add(room);
             await appDbContext.SaveChangesAsync();
             appDbContext.ChangeTracker.Clear();
