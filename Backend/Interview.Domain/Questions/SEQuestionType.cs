@@ -1,4 +1,4 @@
-﻿using Ardalis.SmartEnum;
+using Ardalis.SmartEnum;
 
 namespace Interview.Domain.Questions;
 

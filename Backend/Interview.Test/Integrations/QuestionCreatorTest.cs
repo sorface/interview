@@ -49,7 +49,12 @@ namespace Interview.Test.Integrations
                 .Returns(Task.CompletedTask);
 
             var creator = CreateQuestionCreate(appDbContext, roomMemberChecker.Object);
-            var questionCreateRequest = new QuestionCreateRequest { Tags = new HashSet<Guid>(), Value = value };
+            var questionCreateRequest = new QuestionCreateRequest
+            {
+                Tags = new HashSet<Guid>(),
+                Value = value,
+                Type = EVQuestionType.Private,
+            };
             var question = await creator.CreateAsync(questionCreateRequest, room?.Id, CancellationToken.None);
             question.Should().NotBeNull().And.Match<QuestionItem>(e => e.Value == value);
             roomMemberChecker.Verify(e => e.EnsureCurrentUserMemberOfRoomAsync(room == null ? It.IsAny<Guid>() : room.Id, It.IsAny<CancellationToken>()), room is not null ? Times.Once() : Times.Never());
@@ -70,7 +75,12 @@ namespace Interview.Test.Integrations
                 .Throws<UnavailableException>();
 
             var creator = CreateQuestionCreate(appDbContext, roomMemberChecker.Object);
-            var questionCreateRequest = new QuestionCreateRequest { Tags = new HashSet<Guid>(), Value = "Test" };
+            var questionCreateRequest = new QuestionCreateRequest
+            {
+                Tags = new HashSet<Guid>(),
+                Value = "Test",
+                Type = EVQuestionType.Private,
+            };
             await Assert.ThrowsAsync<UnavailableException>(() => creator.CreateAsync(questionCreateRequest, room.Id, CancellationToken.None));
             roomMemberChecker.Verify(e => e.EnsureCurrentUserMemberOfRoomAsync(room.Id, It.IsAny<CancellationToken>()), Times.Once());
         }

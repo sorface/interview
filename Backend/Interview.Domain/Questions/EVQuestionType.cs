@@ -1,4 +1,4 @@
-﻿namespace Interview.Domain.Questions;
+namespace Interview.Domain.Questions;
 
 /// <summary>
 /// Question type.

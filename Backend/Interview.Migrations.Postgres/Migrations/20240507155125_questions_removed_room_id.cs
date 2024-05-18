@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -31,7 +31,7 @@ SELECT
     q.UpdateDate
 FROM Questions AS q
 WHERE q.RoomId IS NOT NULL AND NOT EXISTS(SELECT 1 FROM RoomQuestions AS rq WHERE rq.RoomId = q.RoomId AND rq.QuestionId = rq.Id)");
-            
+
             migrationBuilder.DropForeignKey(
                 name: "FK_Questions_Rooms_RoomId",
                 table: "Questions");

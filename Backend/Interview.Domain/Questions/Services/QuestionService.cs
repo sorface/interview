@@ -99,7 +99,7 @@ public class QuestionService : IQuestionService
         var result = new Question(request.Value)
         {
             Tags = tags,
-            Type = roomId is null ? SEQuestionType.Public : SEQuestionType.Private,
+            Type = GetQuestionType(),
         };
 
         await _questionRepository.CreateAsync(result, cancellationToken);
@@ -111,6 +111,16 @@ public class QuestionService : IQuestionService
             Tags = result.Tags.Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, })
                 .ToList(),
         };
+
+        SEQuestionType GetQuestionType()
+        {
+            if (request.Type == EVQuestionType.Public && !_currentUserAccessor.IsAdmin())
+            {
+                throw new AccessDeniedException("You cannot create a public question.");
+            }
+
+            return SEQuestionType.FromValue((int)request.Type);
+        }
     }
 
     public async Task<QuestionItem> UpdateAsync(
