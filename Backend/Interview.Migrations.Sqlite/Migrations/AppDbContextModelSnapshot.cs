@@ -456,7 +456,7 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("AcсessType")
+                    b.Property<int>("AccessType")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(0);
@@ -851,6 +851,13 @@ namespace Interview.Migrations.Sqlite.Migrations
                             Id = new Guid("1f6c85db-c2a0-4096-8ead-a292397ab4e5"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "DeleteRoomState",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("fcc9bbca-15c6-4221-8d2d-e052b8cd4385"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "PublicRoomCreate",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new

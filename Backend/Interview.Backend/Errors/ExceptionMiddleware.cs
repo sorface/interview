@@ -1,4 +1,5 @@
 using System.Net;
+using Ardalis.SmartEnum;
 using Interview.Backend.Responses;
 using Interview.Domain;
 
@@ -45,7 +46,7 @@ public class ExceptionMiddleware
             {
                 AccessDeniedException => (HttpStatusCode.Forbidden, exception.Message),
                 NotFoundException => (HttpStatusCode.NotFound, exception.Message),
-                UserException => (HttpStatusCode.BadRequest, exception.Message),
+                UserException or SmartEnumNotFoundException => (HttpStatusCode.BadRequest, exception.Message),
                 _ => (HttpStatusCode.InternalServerError, "Internal Server Error."),
             };
         }

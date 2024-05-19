@@ -157,5 +157,8 @@ public enum EVPermission
 
     [Description("Generate a Room Invites")]
     RoomInviteGenerate,
+
+    [Description("Creating a new public room")]
+    PublicRoomCreate,
 #pragma warning restore SA1602
 }

@@ -37,7 +37,10 @@ public class RoomServicePermissionAccessor : IRoomService, IServiceDecorator
 
     public async Task<Room> CreateAsync(RoomCreateRequest request, CancellationToken cancellationToken = default)
     {
-        await _securityService.EnsurePermissionAsync(SEPermission.RoomCreate, cancellationToken);
+        var permission = request.AccessType == SERoomAccessType.Public
+            ? SEPermission.PublicRoomCreate
+            : SEPermission.RoomCreate;
+        await _securityService.EnsurePermissionAsync(permission, cancellationToken);
         return await _roomService.CreateAsync(request, cancellationToken);
     }
 
