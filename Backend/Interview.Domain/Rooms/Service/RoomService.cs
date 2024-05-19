@@ -121,12 +121,6 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
 
-        var twitchChannel = request.TwitchChannel?.Trim();
-        if (string.IsNullOrEmpty(twitchChannel))
-        {
-            throw new UserException("Twitch channel should not be empty");
-        }
-
         var room = new Room(name, SERoomAcсessType.FromName(request.AccessType)) { Tags = tags, };
         var roomQuestions = questions.Select(question =>
             new RoomQuestion { Room = room, Question = question, State = RoomQuestionState.Open });
@@ -159,12 +153,6 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         if (string.IsNullOrEmpty(name))
         {
             throw new UserException("Room name should not be empty");
-        }
-
-        var twitchChannel = request.TwitchChannel?.Trim();
-        if (string.IsNullOrEmpty(twitchChannel))
-        {
-            throw new UserException("Room twitch channel should not be empty");
         }
 
         var foundRoom = await _roomRepository.FindByIdAsync(roomId, cancellationToken);
