@@ -129,7 +129,14 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         var room = new Room(name, twitchChannel, SERoomAcсessType.FromName(request.AccessType)) { Tags = tags, };
         var roomQuestions = questions.Select(question =>
-            new RoomQuestion { Room = room, Question = question, State = RoomQuestionState.Open });
+            new RoomQuestion
+            {
+                Room = room,
+                Question = question,
+                State = RoomQuestionState.Open,
+                RoomId = default,
+                QuestionId = default,
+            });
 
         room.Questions.AddRange(roomQuestions);
 

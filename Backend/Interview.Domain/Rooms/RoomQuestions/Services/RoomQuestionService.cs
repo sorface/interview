@@ -118,7 +118,14 @@ public class RoomQuestionService : IRoomQuestionService
             throw NotFoundException.Create<Question>(questionId);
         }
 
-        var newRoomQuestion = new RoomQuestion { Room = room, Question = question, State = RoomQuestionState.Open };
+        var newRoomQuestion = new RoomQuestion
+        {
+            Room = room,
+            Question = question,
+            State = RoomQuestionState.Open,
+            RoomId = default,
+            QuestionId = default,
+        };
 
         await _roomQuestionRepository.CreateAsync(newRoomQuestion, cancellationToken);
 

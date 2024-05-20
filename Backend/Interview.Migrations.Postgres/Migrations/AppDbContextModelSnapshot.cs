@@ -161,8 +161,11 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
-                    b.Property<Guid?>("RoomId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("Type")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasComment("Available values: [Private: 2, Public: 1]");
 
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("timestamp without time zone");
@@ -175,8 +178,6 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
-
-                    b.HasIndex("RoomId");
 
                     b.ToTable("Questions");
                 });
@@ -1362,14 +1363,7 @@ namespace Interview.Migrations.Postgres.Migrations
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
-                    b.HasOne("Interview.Domain.Rooms.Room", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.Navigation("CreatedBy");
-
-                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("Interview.Domain.Reactions.Reaction", b =>

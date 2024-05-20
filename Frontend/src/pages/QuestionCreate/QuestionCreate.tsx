@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FormEvent, FunctionComponent, useCallback, useEffect, useState } from 'react';
+import React, { ChangeEvent, FormEvent, FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { CreateQuestionBody, CreateTagBody, GetTagsParams, UpdateQuestionBody, questionsApiDeclaration, tagsApiDeclaration } from '../../apiDeclarations';
@@ -9,12 +9,14 @@ import { MainContentWrapper } from '../../components/MainContentWrapper/MainCont
 import { SubmitField } from '../../components/SubmitField/SubmitField';
 import { pathnames, toastSuccessOptions } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
-import { Question } from '../../types/question';
+import { Question, QuestionType } from '../../types/question';
 import { Tag } from '../../types/tag';
 import { TagsSelector } from '../../components/TagsSelector/TagsSelector';
 import { LocalizationKey } from '../../localization';
 import { HeaderField } from '../../components/HeaderField/HeaderField';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { AuthContext } from '../../context/AuthContext';
+import { checkAdmin } from '../../utils/checkAdmin';
 
 import './QuestionCreate.css';
 
@@ -23,6 +25,8 @@ const pageNumber = 1;
 const pageSize = 30;
 
 export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) => {
+  const auth = useContext(AuthContext);
+  const admin = checkAdmin(auth);
   const localizationCaptions = useLocalizationCaptions();
   const {
     apiMethodState: questionState,
@@ -59,6 +63,7 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
   const [questionValue, setQuestionValue] = useState('');
   const [tagsSearchValue, setTagsSearchValue] = useState('');
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [type, setType] = useState<QuestionType>(QuestionType.Private);
 
   const totalLoading = loading || createTagLoading || updatingLoading || questionLoading;
   const totalError = error || questionError || tagsError || updatingError || createTagError;
@@ -143,9 +148,10 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
     fetchCreateQuestion({
       value: questionValue,
       tags: selectedTags.map(tag => tag.id),
+      type,
     });
 
-  }, [selectedTags, questionValue, fetchCreateQuestion]);
+  }, [selectedTags, questionValue, type, fetchCreateQuestion]);
 
   const handleSubmitEdit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -156,9 +162,14 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
       id: question.id,
       value: questionValue,
       tags: selectedTags.map(tag => tag.id),
+      type,
     });
 
-  }, [selectedTags, question, questionValue, fetchUpdateQuestion]);
+  }, [selectedTags, question, questionValue, type, fetchUpdateQuestion]);
+
+  const handleTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setType(e.target.value as QuestionType);
+  };
 
   const renderStatus = () => {
     if (totalError) {
@@ -194,6 +205,15 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
           <div><label htmlFor="qestionText">{localizationCaptions[LocalizationKey.QuestionText]}:</label></div>
           <input id="qestionText" name={valueFieldName} type="text" value={questionValue} onChange={handleQuestionValueChange} />
         </Field>
+        {admin && (
+          <Field>
+            <div><label htmlFor="qestionType">{localizationCaptions[LocalizationKey.QuestionType]}:</label></div>
+            <select id="qestionType" value={type} onChange={handleTypeChange}>
+              <option value={QuestionType.Private}>{localizationCaptions[LocalizationKey.QuestionTypePrivate]}</option>
+              <option value={QuestionType.Public}>{localizationCaptions[LocalizationKey.QuestionTypePublic]}</option>
+            </select>
+          </Field>
+        )}
         <Field>
           <TagsSelector
             placeHolder={localizationCaptions[LocalizationKey.TagsPlaceholder]}

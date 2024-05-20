@@ -3,6 +3,7 @@ using System;
 using Interview.Domain.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Interview.Migrations.Sqlite.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240507155200_questions_removed_room_id")]
+    partial class questions_removed_room_id
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.10");
@@ -307,13 +310,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                             Id = new Guid("3b1a04f3-8d35-4608-87fb-1d83d76cd99d"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("97b2411a-b9d4-49cb-9525-0e31b7d35496"),
-                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("95f1f088-6931-4914-92c1-c1f1d7d75a18"),
-                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            PermissionId = new Guid("c1f43ca8-21f1-41e6-9794-e7d44156bf73"),
                             UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
@@ -975,13 +971,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                         },
                         new
                         {
-                            Id = new Guid("c1f43ca8-21f1-41e6-9794-e7d44156bf73"),
-                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Type = "RoomInviteGenerate",
-                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
                             Id = new Guid("b530321a-a51a-4a36-8afd-6e8a8dbae248"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "RoomInviteGet",
@@ -1440,11 +1429,10 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasOne("Interview.Domain.Invites.Invite", "Invite")
                         .WithMany()
-                        .HasForeignKey("InviteById")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("InviteById");
 
                     b.HasOne("Interview.Domain.Rooms.Room", "Room")
-                        .WithMany("Invites")
+                        .WithMany()
                         .HasForeignKey("RoomById");
 
                     b.Navigation("CreatedBy");
@@ -1678,8 +1666,6 @@ namespace Interview.Migrations.Sqlite.Migrations
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>
                 {
                     b.Navigation("Configuration");
-
-                    b.Navigation("Invites");
 
                     b.Navigation("Participants");
 

@@ -1,5 +1,5 @@
 import { ApiContractGet, ApiContractPatch, ApiContractPost, ApiContractPut } from './types/apiContracts';
-import { Question } from './types/question';
+import { Question, QuestionType } from './types/question';
 import { Tag } from './types/tag';
 import { Reaction } from './types/reaction';
 import { Room, RoomInvite, RoomQuestionState, RoomReview, RoomStateAdditionalStatefulPayload, RoomStatus } from './types/room';
@@ -137,6 +137,7 @@ export const roomQuestionApiDeclaration = {
 export interface CreateQuestionBody {
   value: string;
   tags: Array<Tag['id']>
+  type: QuestionType;
 }
 
 export interface UpdateQuestionBody extends CreateQuestionBody {
