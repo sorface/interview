@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
+import React, { FunctionComponent, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { GetQuestionsParams, questionsApiDeclaration } from '../../apiDeclarations';
 import { Field } from '../../components/FieldsBlock/Field';
@@ -6,11 +6,9 @@ import { HeaderWithLink } from '../../components/HeaderWithLink/HeaderWithLink';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { Paginator } from '../../components/Paginator/Paginator';
 import { pathnames } from '../../constants';
-import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Question } from '../../types/question';
 import { Tag } from '../../types/tag';
-import { checkAdmin } from '../../utils/checkAdmin';
 import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
 import { TagsView } from '../../components/TagsView/TagsView';
 import { QustionsSearch } from '../../components/QustionsSearch/QustionsSearch';
@@ -25,8 +23,6 @@ const pageSize = 10;
 const initialPageNumber = 1;
 
 export const Questions: FunctionComponent = () => {
-  const auth = useContext(AuthContext);
-  const admin = checkAdmin(auth);
   const localizationCaptions = useLocalizationCaptions();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const [searchValue, setSearchValue] = useState('');
@@ -88,7 +84,7 @@ export const Questions: FunctionComponent = () => {
     <MainContentWrapper>
       <HeaderField />
       <HeaderWithLink
-        linkVisible={admin}
+        linkVisible={true}
         path={pathnames.questionsCreate}
         linkCaption="+"
         linkFloat="right"
