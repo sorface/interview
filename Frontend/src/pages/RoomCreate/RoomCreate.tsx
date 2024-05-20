@@ -199,7 +199,6 @@ export const RoomCreate: FunctionComponent = () => {
         </Field>
         <Field>
           <Link to={pathnames.questions}>{localizationCaptions[LocalizationKey.QuestionsPageName]}:</Link>
-          <div>{localizationCaptions[LocalizationKey.RoomQuestions]}:</div>
           <div className="items-selected">
             {selectedQuestions.map(question => question.value).join(', ')}
           </div>
