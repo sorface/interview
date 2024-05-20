@@ -1,6 +1,4 @@
-using Interview.Domain.RoomParticipants;
-
-namespace Interview.Domain.Rooms.Service.Records.Response.Detail;
+namespace Interview.Domain.Rooms.Records.Response.Detail;
 
 public class RoomInviteDetail
 {
@@ -8,5 +6,5 @@ public class RoomInviteDetail
 
     public Guid RoomId { get; set; }
 
-    public RoomParticipantType ParticipantType { get; set; }
+    public string? ParticipantType { get; set; }
 }

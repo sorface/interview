@@ -19,14 +19,35 @@
   padding-bottom: 1rem;
 }
 
+.room-page .room-page-header-wrapper {
+  display: flex;
+}
+
 .room-page .room-page-header-caption {
-  display: inline-block;
+  display: flex;
   width: 270px;
   text-align: left;
 }
 
+.room-page .room-page-header-caption h3 {
+  display: inline-block;
+}
+
+.room-page .room-page-header-viewers {
+  display: inline-flex;
+  align-items: center;
+  padding-left: 0.5rem;
+  font-size: 1rem;
+  color: var(--active);
+}
+
+.room-page .room-page-header-viewers ion-icon {
+  font-size: 1.25rem;
+}
+
 .room-page .room-page-header-caption-viewer {
   width: 100%;
+  flex-direction: column;
 }
 
 .room-page .room-page-header .reactions-field {

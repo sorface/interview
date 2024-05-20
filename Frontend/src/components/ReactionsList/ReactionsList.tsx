@@ -1,9 +1,11 @@
 import React, { FunctionComponent, useCallback } from 'react';
 import { Reaction } from '../../types/reaction';
 import { SwitchButton } from '../../pages/Room/components/VideoChat/SwitchButton';
-import { IconNames, reactionIcon, reactionLocalization } from '../../constants';
+import { IconNames, reactionIcon } from '../../constants';
 import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
 import { ReactionsFeed } from '../../pages/Room/hooks/useReactionsFeed';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { LocalizationKey } from '../../localization';
 
 import './ReactionsList.css';
 
@@ -26,6 +28,12 @@ export const ReactionsList: FunctionComponent<ReactionsListProps> = ({
   sortOrder,
   onClick,
 }) => {
+  const localizationCaptions = useLocalizationCaptions();
+  const reactionLocalization: Record<string, string> = {
+    Like: localizationCaptions[LocalizationKey.Like],
+    Dislike: localizationCaptions[LocalizationKey.Dislike],
+  }
+
   const handleReactionClick = useCallback((reaction: Reaction) => () => {
     onClick(reaction);
   }, [onClick]);

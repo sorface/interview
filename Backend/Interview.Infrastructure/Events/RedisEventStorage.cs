@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using Interview.Domain.Events.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -31,7 +32,7 @@ public class RedisEventStorage : IEventStorage
         return new ValueTask(_collection.InsertAsync(redisEvent));
     }
 
-    public async IAsyncEnumerable<IReadOnlyCollection<IStorageEvent>> GetBySpecAsync(ISpecification<IStorageEvent> spec, int chunkSize, CancellationToken cancellationToken)
+    public async IAsyncEnumerable<IReadOnlyCollection<IStorageEvent>> GetBySpecAsync(ISpecification<IStorageEvent> spec, int chunkSize, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var newSpec = BuildNewSpec(spec);
         var collection = _redis.RedisCollection<RedisEvent>(chunkSize);
@@ -51,7 +52,7 @@ public class RedisEventStorage : IEventStorage
         }
     }
 
-    public async IAsyncEnumerable<IReadOnlyCollection<IStorageEvent>> GetLatestBySpecAsync(ISpecification<IStorageEvent> spec, int chunkSize, CancellationToken cancellationToken)
+    public async IAsyncEnumerable<IReadOnlyCollection<IStorageEvent>> GetLatestBySpecAsync(ISpecification<IStorageEvent> spec, int chunkSize, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var newSpec = BuildNewSpec(spec);
         var collection = _redis.RedisCollection<RedisEvent>(chunkSize);
@@ -155,7 +156,7 @@ public class RedisEventStorage : IEventStorage
 
             // visit left side of this expression p.Id this would be p
             var inner = Visit(node.Expression);
-            return Expression.Property(inner, otherMember);
+            return Expression.Property(inner, otherMember!);
         }
     }
 }

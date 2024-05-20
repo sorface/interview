@@ -1,5 +1,5 @@
 import React, { FormEvent, FunctionComponent, useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { CreateRoomBody, CreateTagBody, GetTagsParams, roomsApiDeclaration, tagsApiDeclaration } from '../../apiDeclarations';
 import { Field } from '../../components/FieldsBlock/Field';
@@ -15,7 +15,9 @@ import { Question } from '../../types/question';
 import { User } from '../../types/user';
 import { TagsSelector } from '../../components/TagsSelector/TagsSelector';
 import { Tag } from '../../types/tag';
-import { Localization } from '../../localization';
+import { LocalizationKey } from '../../localization';
+import { HeaderField } from '../../components/HeaderField/HeaderField';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 
 import './RoomCreate.css';
 
@@ -25,6 +27,7 @@ const pageNumber = 1;
 const pageSize = 30;
 
 export const RoomCreate: FunctionComponent = () => {
+  const localizationCaptions = useLocalizationCaptions();
   const navigate = useNavigate();
   const { apiMethodState, fetchData } = useApiMethod<string, CreateRoomBody>(roomsApiDeclaration.create);
   const { process: { loading, error }, data: createdRoomId } = apiMethodState;
@@ -62,9 +65,9 @@ export const RoomCreate: FunctionComponent = () => {
     if (!createdRoomId) {
       return;
     }
-    toast.success(Localization.RoomCreated, toastSuccessOptions);
+    toast.success(localizationCaptions[LocalizationKey.RoomCreated], toastSuccessOptions);
     navigate(pathnames.rooms);
-  }, [createdRoomId, navigate]);
+  }, [createdRoomId, localizationCaptions, navigate]);
 
   const handleTagSelect = (tag: Tag) => {
     setSelectedTags([...selectedTags, tag]);
@@ -148,7 +151,7 @@ export const RoomCreate: FunctionComponent = () => {
     if (totalError) {
       return (
         <Field>
-          <div>{Localization.Error}: {totalError}</div>
+          <div>{localizationCaptions[LocalizationKey.Error]}: {totalError}</div>
         </Field>
       );
     }
@@ -160,12 +163,13 @@ export const RoomCreate: FunctionComponent = () => {
       );
     }
     return <></>;
-  }, [totalError, totalLoading]);
+  }, [totalError, totalLoading, localizationCaptions]);
 
   return (
     <MainContentWrapper className="question-create">
+      <HeaderField />
       <HeaderWithLink
-        title={Localization.CreateRoom}
+        title={localizationCaptions[LocalizationKey.CreateRoom]}
         linkVisible={true}
         path={pathnames.rooms}
         linkCaption="<"
@@ -174,16 +178,16 @@ export const RoomCreate: FunctionComponent = () => {
       {renderStatus()}
       <form action="" onSubmit={handleSubmit}>
         <Field>
-          <label htmlFor="roomName">{Localization.RoomName}:</label>
+          <label htmlFor="roomName">{localizationCaptions[LocalizationKey.RoomName]}:</label>
           <input id="roomName" name={nameFieldName} type="text" required />
         </Field>
         <Field>
-          <label htmlFor="twitchChannel">{Localization.RoomTwitchChannel}:</label>
+          <label htmlFor="twitchChannel">{localizationCaptions[LocalizationKey.RoomTwitchChannel]}:</label>
           <input id="twitchChannel" name={twitchChannelFieldName} type="text" required />
         </Field>
         <Field>
           <TagsSelector
-            placeHolder={Localization.TagsPlaceholder}
+            placeHolder={localizationCaptions[LocalizationKey.TagsPlaceholder]}
             loading={tagsLoading}
             tags={tags || []}
             selectedTags={selectedTags}
@@ -194,8 +198,8 @@ export const RoomCreate: FunctionComponent = () => {
           />
         </Field>
         <Field>
-          <div>Questions:</div>
-          <div>{Localization.RoomQuestions}:</div>
+          <Link to={pathnames.questions}>{localizationCaptions[LocalizationKey.QuestionsPageName]}:</Link>
+          <div>{localizationCaptions[LocalizationKey.RoomQuestions]}:</div>
           <div className="items-selected">
             {selectedQuestions.map(question => question.value).join(', ')}
           </div>
@@ -206,7 +210,7 @@ export const RoomCreate: FunctionComponent = () => {
           />
         </Field>
         <Field>
-          <span>{Localization.RoomExperts}: </span>
+          <span>{localizationCaptions[LocalizationKey.RoomExperts]}: </span>
           <span className="items-selected">
             {selectedExperts.map(user => user.nickname).join(', ')}
           </span>
@@ -218,7 +222,7 @@ export const RoomCreate: FunctionComponent = () => {
           />
         </Field>
         <Field>
-          <span>{Localization.RoomExaminees}: </span>
+          <span>{localizationCaptions[LocalizationKey.RoomExaminees]}: </span>
           <span className="items-selected">
             {selectedExaminees.map(user => user.nickname).join(', ')}
           </span>
@@ -229,7 +233,7 @@ export const RoomCreate: FunctionComponent = () => {
             onUnselect={handleExamineeUnSelect}
           />
         </Field>
-        <SubmitField caption={Localization.Create} />
+        <SubmitField caption={localizationCaptions[LocalizationKey.Create]} />
       </form>
     </MainContentWrapper>
   );

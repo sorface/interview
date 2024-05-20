@@ -2,7 +2,7 @@ using Interview.Domain.Users.Records;
 using Interview.Domain.Users.Roles;
 using X.PagedList;
 
-namespace Interview.Domain.Users;
+namespace Interview.Domain.Users.Service;
 
 public interface IUserService : IService
 {

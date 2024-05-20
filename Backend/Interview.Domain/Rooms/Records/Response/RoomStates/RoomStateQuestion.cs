@@ -1,6 +1,6 @@
-using Interview.Domain.RoomQuestions;
+using Interview.Domain.Rooms.RoomQuestions;
 
-namespace Interview.Domain.Rooms.Service.Records.Response.RoomStates;
+namespace Interview.Domain.Rooms.Records.Response.RoomStates;
 
 public class RoomStateQuestion
 {

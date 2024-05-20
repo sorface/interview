@@ -12,7 +12,9 @@ import { useApiMethod } from '../../hooks/useApiMethod';
 import { Question } from '../../types/question';
 import { Tag } from '../../types/tag';
 import { TagsSelector } from '../../components/TagsSelector/TagsSelector';
-import { Localization } from '../../localization';
+import { LocalizationKey } from '../../localization';
+import { HeaderField } from '../../components/HeaderField/HeaderField';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 
 import './QuestionCreate.css';
 
@@ -21,6 +23,7 @@ const pageNumber = 1;
 const pageSize = 30;
 
 export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) => {
+  const localizationCaptions = useLocalizationCaptions();
   const {
     apiMethodState: questionState,
     fetchData: fetchCreateQuestion,
@@ -101,17 +104,17 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
     if (!createdQuestionId) {
       return;
     }
-    toast.success(Localization.QuestionCreatedSuccessfully, toastSuccessOptions);
+    toast.success(localizationCaptions[LocalizationKey.QuestionCreatedSuccessfully], toastSuccessOptions);
     navigate(pathnames.questions);
-  }, [createdQuestionId, navigate]);
+  }, [createdQuestionId, localizationCaptions, navigate]);
 
   useEffect(() => {
     if (!updatedQuestionId) {
       return;
     }
-    toast.success(Localization.QuestionUpdatedSuccessfully, toastSuccessOptions);
+    toast.success(localizationCaptions[LocalizationKey.QuestionUpdatedSuccessfully], toastSuccessOptions);
     navigate(pathnames.questions);
-  }, [updatedQuestionId, navigate]);
+  }, [updatedQuestionId, localizationCaptions, navigate]);
 
   const handleSelect = (tag: Tag) => {
     setSelectedTags([...selectedTags, tag]);
@@ -161,7 +164,7 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
     if (totalError) {
       return (
         <Field>
-          <div>{Localization.Error}: {totalError}</div>
+          <div>{localizationCaptions[LocalizationKey.Error]}: {totalError}</div>
         </Field>
       );
     }
@@ -177,8 +180,9 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
 
   return (
     <MainContentWrapper className="question-create">
+      <HeaderField />
       <HeaderWithLink
-        title={Localization.CreateQuestion}
+        title={localizationCaptions[LocalizationKey.CreateQuestion]}
         linkVisible={true}
         path={pathnames.questions}
         linkCaption="<"
@@ -187,12 +191,12 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
       {renderStatus()}
       <form onSubmit={edit ? handleSubmitEdit : handleSubmitCreate}>
         <Field>
-          <div><label htmlFor="qestionText">{Localization.QuestionText}:</label></div>
+          <div><label htmlFor="qestionText">{localizationCaptions[LocalizationKey.QuestionText]}:</label></div>
           <input id="qestionText" name={valueFieldName} type="text" value={questionValue} onChange={handleQuestionValueChange} />
         </Field>
         <Field>
           <TagsSelector
-            placeHolder={Localization.TagsPlaceholder}
+            placeHolder={localizationCaptions[LocalizationKey.TagsPlaceholder]}
             loading={tagsLoading}
             tags={tags || []}
             selectedTags={selectedTags}
@@ -202,7 +206,7 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
             onCreate={handleTagCreate}
           />
         </Field>
-        <SubmitField caption={Localization.Create} />
+        <SubmitField caption={localizationCaptions[LocalizationKey.Create]} />
       </form>
     </MainContentWrapper>
   );

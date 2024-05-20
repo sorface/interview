@@ -1,5 +1,6 @@
 using Interview.Domain;
 using Interview.Domain.Certificates;
+using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.ChangeEntityProcessors;
 using Interview.Domain.Events.Events.Serializers;
@@ -8,7 +9,6 @@ using Interview.Domain.Events.Storage;
 using Interview.Domain.Repository;
 using Interview.Domain.Users;
 using Interview.Infrastructure.Certificates.Pdf;
-using Interview.Infrastructure.Database;
 using Interview.Infrastructure.Events;
 using Interview.Infrastructure.Users;
 using Microsoft.EntityFrameworkCore.Internal;

@@ -1,68 +1,66 @@
 using Interview.Domain.Events.Events;
 using Interview.Domain.Repository;
-using Interview.Domain.RoomConfigurations;
-using Interview.Domain.RoomQuestions;
 using Interview.Domain.Rooms;
+using Interview.Domain.Rooms.RoomConfigurations;
 
-namespace Interview.Domain.Events.ChangeEntityProcessors
+namespace Interview.Domain.Events.ChangeEntityProcessors;
+
+public class RoomConfigurationChangeEntityProcessor : IEntityPostProcessor
 {
-    public class RoomConfigurationChangeEntityProcessor : IEntityPostProcessor
+    private readonly IRoomEventDispatcher _eventDispatcher;
+
+    public RoomConfigurationChangeEntityProcessor(IRoomEventDispatcher eventDispatcher)
     {
-        private readonly IRoomEventDispatcher _eventDispatcher;
+        _eventDispatcher = eventDispatcher;
+    }
 
-        public RoomConfigurationChangeEntityProcessor(IRoomEventDispatcher eventDispatcher)
+    public async ValueTask ProcessAddedAsync(IReadOnlyCollection<Entity> entities, CancellationToken cancellationToken)
+    {
+        foreach (var entity in entities.OfType<RoomConfiguration>())
         {
-            _eventDispatcher = eventDispatcher;
-        }
-
-        public async ValueTask ProcessAddedAsync(IReadOnlyCollection<Entity> entities, CancellationToken cancellationToken)
-        {
-            foreach (var entity in entities.OfType<RoomConfiguration>())
+            var @event = CreateEvent(entity, null);
+            if (@event is not null)
             {
-                var @event = CreateEvent(entity, null);
-                if (@event is not null)
-                {
-                    await _eventDispatcher.WriteAsync(@event, cancellationToken);
-                }
+                await _eventDispatcher.WriteAsync(@event, cancellationToken);
             }
         }
+    }
 
-        public async ValueTask ProcessModifiedAsync(IReadOnlyCollection<(Entity Original, Entity Current)> entities, CancellationToken cancellationToken)
+    public async ValueTask ProcessModifiedAsync(IReadOnlyCollection<(Entity Original, Entity Current)> entities, CancellationToken cancellationToken)
+    {
+        foreach (var (originalEntity, currentEntity) in entities)
         {
-            foreach (var (originalEntity, currentEntity) in entities)
+            switch (originalEntity)
             {
-                switch (originalEntity)
-                {
-                    case RoomConfiguration originalC when currentEntity is RoomConfiguration currentC:
+                case RoomConfiguration originalC when currentEntity is RoomConfiguration currentC:
+                    {
+                        var e = CreateEvent(currentC, originalC);
+                        if (e is not null)
                         {
-                            var e = CreateEvent(currentC, originalC);
-                            if (e is not null)
-                            {
-                                await _eventDispatcher.WriteAsync(e, cancellationToken);
-                            }
-
-                            break;
+                            await _eventDispatcher.WriteAsync(e, cancellationToken);
                         }
-                }
+
+                        break;
+                    }
             }
         }
+    }
 
-        private static IRoomEvent? CreateEvent(RoomConfiguration current, RoomConfiguration? original)
+    private static IRoomEvent? CreateEvent(RoomConfiguration current, RoomConfiguration? original)
+    {
+        if (original is null || original.CodeEditorContent != current.CodeEditorContent)
         {
-            if (original is null || original.CodeEditorContent != current.CodeEditorContent)
-            {
-                return new ChangeCodeEditorRoomEvent(current.Id, current.CodeEditorContent);
-            }
-
-            return null;
+            return new ChangeCodeEditorRoomEvent(current.Id, current.CodeEditorContent);
         }
 
-        public sealed class ChangeCodeEditorRoomEvent : RoomEvent
+        return null;
+    }
+
+    public sealed class ChangeCodeEditorRoomEvent : RoomEvent
+    {
+        public ChangeCodeEditorRoomEvent(Guid roomId, string? value)
+            : base(roomId, EventType.ChangeCodeEditor, value, false)
         {
-            public ChangeCodeEditorRoomEvent(Guid roomId, string? value)
-                : base(roomId, EventType.ChangeCodeEditor, value, false)
-            {
-            }
         }
     }
 }

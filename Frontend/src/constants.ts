@@ -1,11 +1,11 @@
-import { Localization } from './localization';
+export const inviteParamName = 'invite';
 
 export const pathnames = {
   home: '/:redirect?',
   rooms: '/rooms',
   roomsCreate: '/rooms/create',
   roomsParticipants: '/rooms/participants/:id',
-  room: '/rooms/:id',
+  room: `/room/:id/:${inviteParamName}?`,
   roomAnalyticsSummary: '/rooms/:id/analytics/summary',
   questions: '/questions',
   questionsCreate: '/questions/create',
@@ -29,6 +29,10 @@ export const enum IconNames {
   CodeEditor = 'code-slash',
   ThemeSwitchLight = 'sunny',
   ThemeSwitchDark = 'moon',
+  People = 'people',
+  Clipboard = 'clipboard',
+  Refresh = 'refresh',
+  TV = 'tv',
 }
 
 export const enum IconThemePostfix {
@@ -45,8 +49,3 @@ export const reactionIcon: Record<string, IconNames> = {
 export const toastSuccessOptions = {
   icon: '👌',
 };
-
-export const reactionLocalization: Record<string, string> = {
-  Like: Localization.Like,
-  Dislike: Localization.Dislike,
-}

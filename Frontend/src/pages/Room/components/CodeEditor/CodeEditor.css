@@ -4,6 +4,7 @@
 
 .code-editor .code-editor-tools {
   text-align: left;
+  padding: 0.25rem 0.5rem;
 }
 
 .code-editor .code-editor-tools-select {

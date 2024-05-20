@@ -11,7 +11,7 @@ public class ServiceResult : IEquatable<ServiceResult>
 
     public static ServiceResult<T> Created<T>(T value) => new CreateServiceResult<T>(value);
 
-    public static ServiceResult<T> NoContent<T>() => new NoContentServiceResult<T>(default);
+    public static ServiceResult<T> NoContent<T>() => new NoContentServiceResult<T>(default!);
 
     public bool Equals(ServiceResult? other)
     {

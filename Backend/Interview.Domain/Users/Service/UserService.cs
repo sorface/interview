@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Interview.Domain.Permissions;
 using Interview.Domain.Repository;
 using Interview.Domain.Users.Permissions;
@@ -7,7 +6,7 @@ using Interview.Domain.Users.Roles;
 using NSpecifications;
 using X.PagedList;
 
-namespace Interview.Domain.Users;
+namespace Interview.Domain.Users.Service;
 
 public sealed class UserService : IUserService
 {

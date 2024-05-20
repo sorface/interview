@@ -1,5 +1,5 @@
-using Interview.Domain.RoomQuestionReactions;
-using Interview.Infrastructure.Database;
+using Interview.Domain.Database;
+using Interview.Domain.Rooms.RoomQuestionReactions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Infrastructure.RoomQuestionReactions;

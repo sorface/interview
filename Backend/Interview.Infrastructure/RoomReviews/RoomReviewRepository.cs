@@ -1,7 +1,7 @@
-using Interview.Domain.RoomReviews;
-using Interview.Domain.Rooms.Service.Records.Response.Detail;
-using Interview.Domain.Rooms.Service.Records.Response.Page;
-using Interview.Infrastructure.Database;
+using Interview.Domain.Database;
+using Interview.Domain.Rooms.Records.Response.Detail;
+using Interview.Domain.Rooms.RoomReviews;
+using Interview.Domain.Rooms.RoomReviews.Response.Page;
 using Microsoft.EntityFrameworkCore;
 using NSpecifications;
 using X.PagedList;

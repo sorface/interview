@@ -1,25 +1,27 @@
+using System.Transactions;
+using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Storage;
 using Interview.Domain.Questions;
 using Interview.Domain.Reactions;
 using Interview.Domain.Repository;
-using Interview.Domain.RoomInvites;
-using Interview.Domain.RoomParticipants;
-using Interview.Domain.RoomQuestionReactions;
-using Interview.Domain.RoomQuestionReactions.Mappers;
-using Interview.Domain.RoomQuestionReactions.Specifications;
-using Interview.Domain.RoomQuestions;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Request.Transcription;
+using Interview.Domain.Rooms.Records.Response;
+using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.Records.Response.Page;
 using Interview.Domain.Rooms.Records.Response.RoomStates;
-using Interview.Domain.Rooms.Service.Records.Response;
-using Interview.Domain.Rooms.Service.Records.Response.Detail;
-using Interview.Domain.Rooms.Service.Records.Response.Page;
-using Interview.Domain.ServiceResults.Errors;
+using Interview.Domain.Rooms.RoomInvites;
+using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Rooms.RoomParticipants.Service;
+using Interview.Domain.Rooms.RoomQuestionReactions;
+using Interview.Domain.Rooms.RoomQuestionReactions.Mappers;
+using Interview.Domain.Rooms.RoomQuestionReactions.Specifications;
+using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
 using Interview.Domain.Users;
+using Microsoft.EntityFrameworkCore;
 using NSpecifications;
 using X.PagedList;
 using Entity = Interview.Domain.Repository.Entity;
@@ -39,8 +41,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     private readonly ITagRepository _tagRepository;
     private readonly IRoomParticipantRepository _roomParticipantRepository;
     private readonly IEventStorage _eventStorage;
-    private readonly IRoomInviteRepository _roomInviteRepository;
+    private readonly IRoomInviteService _roomInviteService;
     private readonly ICurrentUserAccessor _currentUserAccessor;
+    private readonly IRoomParticipantService _roomParticipantService;
+    private readonly AppDbContext _db;
 
     public RoomService(
         IRoomRepository roomRepository,
@@ -54,8 +58,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         IAppEventRepository eventRepository,
         IRoomStateRepository roomStateRepository,
         IEventStorage eventStorage,
-        IRoomInviteRepository roomInviteRepository,
-        ICurrentUserAccessor currentUserAccessor)
+        IRoomInviteService roomInviteService,
+        ICurrentUserAccessor currentUserAccessor,
+        IRoomParticipantService roomParticipantService,
+        AppDbContext db)
     {
         _roomRepository = roomRepository;
         _questionRepository = questionRepository;
@@ -68,8 +74,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         _roomStateRepository = roomStateRepository;
         _eventStorage = eventStorage;
         _roomQuestionRepository = roomQuestionRepository;
-        _roomInviteRepository = roomInviteRepository;
+        _roomInviteService = roomInviteService;
         _currentUserAccessor = currentUserAccessor;
+        _roomParticipantService = roomParticipantService;
+        _db = db;
     }
 
     public Task<IPagedList<RoomPageDetail>> FindPageAsync(
@@ -125,18 +133,16 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         room.Questions.AddRange(roomQuestions);
 
-        var participantsExperts = experts
-            .Select(user => new RoomParticipant(user, room, RoomParticipantType.Expert))
+        var participants = experts
+            .Select(e => (e, room, SERoomParticipantType.Expert))
+            .Concat(examinees.Select(e => (e, room, SERoomParticipantType.Examinee)))
             .ToList();
 
-        var participantsExaminees = examinees
-            .Select(user => new RoomParticipant(user, room, RoomParticipantType.Examinee))
-            .ToList();
-
-        room.Participants.AddRange(participantsExperts);
-        room.Participants.AddRange(participantsExaminees);
-
+        var createdParticipants = await _roomParticipantService.CreateAsync(room.Id, participants, cancellationToken);
+        room.Participants.AddRange(createdParticipants);
         await _roomRepository.CreateAsync(room, cancellationToken);
+
+        await GenerateInvitesAsync(room.Id, cancellationToken);
 
         return room;
     }
@@ -205,12 +211,13 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             return (currentRoom, participant);
         }
 
-        participant = new RoomParticipant(user, currentRoom, RoomParticipantType.Viewer);
-
+        var participants = await _roomParticipantService.CreateAsync(
+            roomId,
+            new[] { (user, currentRoom, SERoomParticipantType.Viewer) },
+            cancellationToken);
+        participant = participants.First();
         currentRoom.Participants.Add(participant);
-
         await _roomRepository.UpdateAsync(currentRoom, cancellationToken);
-
         return (currentRoom, participant);
     }
 
@@ -396,6 +403,46 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return analytics;
     }
 
+    public Task<List<RoomInviteResponse>> GetInvitesAsync(Guid roomId, CancellationToken cancellationToken = default)
+    {
+        return _db.RoomInvites.AsNoTracking()
+            .Include(roomInvite => roomInvite.Invite)
+            .Where(e => e.RoomById == roomId && e.InviteById != null && e.ParticipantType != null)
+            .Select(e => new RoomInviteResponse
+            {
+                InviteId = e.InviteById!.Value,
+                ParticipantType = e.ParticipantType!.EnumValue,
+                Max = e.Invite!.UsesMax,
+                Used = e.Invite.UsesCurrent,
+            })
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<RoomInviteResponse>> GenerateInvitesAsync(
+        Guid roomId,
+        CancellationToken cancellationToken = default)
+    {
+        List<RoomInviteResponse> invites = new();
+
+        foreach (var participantType in SERoomParticipantType.List)
+        {
+            invites.Add(await _roomInviteService.GenerateAsync(roomId, participantType, 20, cancellationToken));
+        }
+
+        return invites;
+    }
+
+    public Task<RoomInviteResponse> GenerateInviteAsync(
+        RoomInviteGeneratedRequest roomInviteGenerated,
+        CancellationToken cancellationToken = default)
+    {
+        return _roomInviteService.GenerateAsync(
+            roomInviteGenerated.RoomId,
+            SERoomParticipantType.FromEnum(roomInviteGenerated.ParticipantType),
+            20,
+            cancellationToken);
+    }
+
     public async Task<AnalyticsSummary> GetAnalyticsSummaryAsync(
         RoomAnalyticsRequest request, CancellationToken cancellationToken = default)
     {
@@ -441,7 +488,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return response;
     }
 
-    public async Task<RoomInviteDetail> ApplyInvite(
+    public async Task<RoomInviteResponse> ApplyInvite(
         Guid roomId,
         Guid? invite,
         CancellationToken cancellationToken = default)
@@ -457,7 +504,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         if (invite is not null)
         {
-            return await _roomInviteRepository
+            return await _roomInviteService
                 .ApplyInvite(invite.Value, _currentUserAccessor.UserId!.Value, cancellationToken);
         }
 
@@ -466,16 +513,17 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw AccessDeniedException.CreateForAction("private room");
         }
 
-        var participant = await _roomParticipantRepository.FindByRoomIdAndUserId(
+        var participant = await _roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(
             roomId, _currentUserAccessor.UserId!.Value, cancellationToken);
 
         if (participant is not null)
         {
-            return new RoomInviteDetail
+            return new RoomInviteResponse
             {
-                ParticipantType = participant.Type,
-                RoomId = roomId,
-                ParticipantId = participant.Id,
+                ParticipantType = participant.Type.EnumValue,
+                InviteId = invite!.Value,
+                Max = 0,
+                Used = 0,
             };
         }
 
@@ -486,24 +534,29 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw new NotFoundException("Current user not found");
         }
 
-        participant = new RoomParticipant(user, room, RoomParticipantType.Viewer);
-
+        var participants = await _roomParticipantService.CreateAsync(
+            roomId,
+            new[] { (user, room, SERoomParticipantType.Viewer) },
+            cancellationToken);
+        participant = participants.First();
         await _roomParticipantRepository.CreateAsync(participant, cancellationToken);
 
-        return new RoomInviteDetail
+        return new RoomInviteResponse
         {
-            ParticipantType = participant.Type,
-            RoomId = roomId,
-            ParticipantId = participant.Id,
+            ParticipantType = participant.Type.EnumValue,
+            InviteId = invite!.Value,
+            Max = 0,
+            Used = 0,
         };
     }
 
-    private async Task<RoomParticipant?> EnsureParticipantTypeAsync(
+    private async Task<RoomParticipant> EnsureParticipantTypeAsync(
         Guid roomId,
         Guid userId,
         CancellationToken cancellationToken)
     {
-        var participantType = await _roomParticipantRepository.FindByRoomIdAndUserId(roomId, userId, cancellationToken);
+        var participantType =
+            await _roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(roomId, userId, cancellationToken);
         if (participantType is null)
         {
             throw new NotFoundException($"Not found participant type by room id {roomId} and user id {userId}");

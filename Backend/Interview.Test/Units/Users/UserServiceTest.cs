@@ -4,6 +4,7 @@ using Interview.Domain.Users;
 using Interview.Domain.Users.Permissions;
 using Interview.Domain.Users.Records;
 using Interview.Domain.Users.Roles;
+using Interview.Domain.Users.Service;
 using Moq;
 using NSpecifications;
 

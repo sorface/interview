@@ -7,12 +7,14 @@ import { MainContentWrapper } from '../../components/MainContentWrapper/MainCont
 import { SubmitField } from '../../components/SubmitField/SubmitField';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Room } from '../../types/room';
-import { Localization } from '../../localization';
+import { LocalizationKey } from '../../localization';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 
 const userFieldName = 'user';
 const userTypeFieldName = 'userType';
 
 export const RoomParticipants: FunctionComponent = () => {
+  const localizationCaptions = useLocalizationCaptions();
   let { id } = useParams();
   const { apiMethodState, fetchData } = useApiMethod<Room, Room['id']>(roomsApiDeclaration.getById);
   const { process: { loading, error }, data: room } = apiMethodState;
@@ -85,12 +87,12 @@ export const RoomParticipants: FunctionComponent = () => {
             ))}
           </select>
           <select name={userTypeFieldName}>
-            <option value="Viewer">{Localization.Viewer}</option>
-            <option value="Expert">{Localization.Expert}</option>
-            <option value="Examinee">{Localization.Examinee}</option>
+            <option value="Viewer">{localizationCaptions[LocalizationKey.Viewer]}</option>
+            <option value="Expert">{localizationCaptions[LocalizationKey.Expert]}</option>
+            <option value="Examinee">{localizationCaptions[LocalizationKey.Examinee]}</option>
           </select>
         </Field>
-        <SubmitField caption={Localization.Save} />
+        <SubmitField caption={localizationCaptions[LocalizationKey.Save]} />
         {changeParticipantStatusLoading && (
           <Field><div>Changing participant status...</div></Field>
         )}
@@ -109,6 +111,7 @@ export const RoomParticipants: FunctionComponent = () => {
     changeParticipantStatusError,
     room,
     changeParticipantStatusData,
+    localizationCaptions,
     handleSubmit,
   ]);
 

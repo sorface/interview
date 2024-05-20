@@ -1,0 +1,11 @@
+.header-field {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  font-size: var(--menu-font-size);
+  line-height: 1.6 !important;
+  border-radius: 0rem !important;
+  padding-left: 0rem !important;
+  padding-right: 0rem !important;
+}

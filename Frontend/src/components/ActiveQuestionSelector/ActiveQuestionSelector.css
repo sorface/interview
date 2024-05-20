@@ -7,6 +7,10 @@
   background-color: var(--button-bg);
 }
 
+.activeQuestionSelector-container .no-questions {
+  padding: 0.5rem;
+}
+
 .activeQuestionSelector-input {
   height: 1.625rem;
   display: flex;
@@ -24,7 +28,7 @@
   border: 1px solid var(--button-border-color);
   border-radius: 0.25rem;
   overflow: auto;
-  max-height: 150px;
+  max-height: 300px;
   background-color: var(--wrap-bg);
   z-index: 99;
 }
@@ -34,7 +38,7 @@
 }
 
 .activeQuestionSelector-item {
-  padding: 0.25rem;
+  padding: 0.5rem;
 }
 
 .activeQuestionSelector-item:hover {
@@ -46,9 +50,16 @@
   opacity: 0.4;
 }
 
+.activeQuestionSelector-search-panel {
+  padding: 0.5rem;
+}
+
 .activeQuestionSelector-container .search-box {
   display: flex;
-  padding: 0.25rem;
+}
+
+.activeQuestionSelector-search-panel .search-box {
+  padding-top: 0.5rem;
 }
 
 .activeQuestionSelector-container .search-box input {

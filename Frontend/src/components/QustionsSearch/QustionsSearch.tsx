@@ -3,7 +3,9 @@ import { Tag } from '../../types/tag';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { GetTagsParams, tagsApiDeclaration } from '../../apiDeclarations';
 import { TagsSelector } from '../TagsSelector/TagsSelector';
-import { Localization } from '../../localization';
+import { LocalizationKey } from '../../localization';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { LocalizationCaption } from '../LocalizationCaption/LocalizationCaption';
 
 import './QustionsSearch.css'
 
@@ -22,6 +24,7 @@ export const QustionsSearch: FunctionComponent<QustionsSearchProps> = ({
   const [tagsSearchValue, setTagsSearchValue] = useState('');
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [searchValue, setSearchValue] = useState('');
+  const localizationCaptions = useLocalizationCaptions();
 
   const {
     apiMethodState: tagsState,
@@ -69,15 +72,15 @@ export const QustionsSearch: FunctionComponent<QustionsSearchProps> = ({
       <input
         type="text"
         className="qustions-search-value"
-        placeholder={Localization.SearchByValue}
+        placeholder={localizationCaptions[LocalizationKey.SearchByValue]}
         value={searchValue}
         onChange={handleSearchChange}
       />
       {tagsError ? (
-        <div>{Localization.Error}: {tagsError}</div>
+        <div><LocalizationCaption captionKey={LocalizationKey.Error} />: {tagsError}</div>
       ) : (
         <TagsSelector
-          placeHolder={Localization.SearchByTags}
+          placeHolder={localizationCaptions[LocalizationKey.SearchByTags]}
           loading={tagsLoading}
           tags={tags || []}
           selectedTags={selectedTags}

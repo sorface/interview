@@ -3,41 +3,44 @@ import { Transcript } from '../../../../types/transcript';
 import { stringToColor } from './utils/stringToColor';
 import { Tab, Tabs } from '../../../../components/Tabs/Tabs';
 import { ThemeContext } from '../../../../context/ThemeContext';
-import { Localization } from '../../../../localization';
+import { LocalizationKey } from '../../../../localization';
+import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 
 import './MessagesChat.css';
 
-const chatTab: Tab = {
-  id: 'chat-tab',
-  caption: Localization.ChatTab,
-};
-
-const recognitionTab: Tab = {
-  id: 'recognition-tab',
-  caption: Localization.RecognitionTab,
-};
-
-const tabs = [
-  chatTab,
-  recognitionTab,
-];
-
 interface MessagesChatProps {
   transcripts: Transcript[];
+  textMessages: Transcript[];
   onMessageSubmit: (message: string) => void;
 }
 
 export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
   transcripts,
+  textMessages,
   onMessageSubmit,
 }) => {
+  const localizationCaptions = useLocalizationCaptions();
+  const chatTab: Tab = {
+    id: 'chat-tab',
+    caption: localizationCaptions[LocalizationKey.ChatTab],
+  };
+  
+  const recognitionTab: Tab = {
+    id: 'recognition-tab',
+    caption: localizationCaptions[LocalizationKey.RecognitionTab],
+  };
+  
+  const tabs = [
+    chatTab,
+    recognitionTab,
+  ];
+
   const { themeInUi } = useContext(ThemeContext);
   const messageInputRef = useRef<HTMLInputElement>(null);
   const videochatTranscriptsRef = useRef<HTMLDivElement>(null);
   const [activeTabId, setActiveTabId] = useState(chatTab.id);
-  const transcriptsFiltered = transcripts.filter(transcript =>
-    activeTabId === chatTab.id ? transcript.fromChat : !transcript.fromChat
-  );
+  const chatTabActive = activeTabId === chatTab.id;
+  const messagesFiltered = chatTabActive ? textMessages : transcripts;
 
   useEffect(() => {
     const chatEl = videochatTranscriptsRef.current;
@@ -48,7 +51,7 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
     const height = chatEl.clientHeight;
     const maxScrollTop = scrollHeight - height;
     chatEl.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
-  }, [transcriptsFiltered]);
+  }, [messagesFiltered]);
 
   const handleChatMessageSubmit = () => {
     if (!messageInputRef.current) {
@@ -77,12 +80,12 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
         onTabClick={setActiveTabId}
       />
       <div className='videochat-transcripts' ref={videochatTranscriptsRef}>
-        {transcriptsFiltered.map(transcript => (
+        {messagesFiltered.map(transcript => (
           <div
             key={transcript.frontendId}
           >
             <span>
-              {!transcript.fromChat && `${Localization.Recognized} `}
+              {!chatTabActive && `${localizationCaptions[LocalizationKey.Recognized]} `}
             </span>
             <span
               style={{ color: stringToColor(transcript.userNickname, themeInUi) }}
@@ -99,13 +102,13 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
           <div className='message-input-wrapper'>
             <input
               type='text'
-              placeholder={Localization.ChatMessagePlaceholder}
+              placeholder={localizationCaptions[LocalizationKey.ChatMessagePlaceholder]}
               ref={messageInputRef}
               onKeyDown={handleInputKeyDown}
             />
           </div>
           <div>
-            <button onClick={handleChatMessageSubmit}>{Localization.SendToChat}</button>
+            <button onClick={handleChatMessageSubmit}>{localizationCaptions[LocalizationKey.SendToChat]}</button>
           </div>
         </div>
       )}

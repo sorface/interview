@@ -1,3 +1,5 @@
+using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Users;
 using Interview.Domain.Users.Roles;
 
@@ -5,17 +7,26 @@ namespace Interview.Domain.Permissions;
 
 public interface ISecurityService : IService
 {
-    public void EnsurePermission(SEPermission action);
+    public Task EnsureRoomPermissionAsync(Guid? roomId, SEPermission action, CancellationToken cancellationToken)
+    {
+        return roomId is null
+            ? EnsurePermissionAsync(action, cancellationToken)
+            : EnsureRoomPermissionAsync(roomId.Value, action, cancellationToken);
+    }
 
-    public User? CurrentUser();
+    Task EnsureRoomPermissionAsync(Guid roomId, SEPermission action, CancellationToken cancellationToken);
 
-    public Guid? CurrentUserId();
+    Task EnsurePermissionAsync(SEPermission action, CancellationToken cancellationToken);
 
-    public bool IsAdmin();
+    User? CurrentUser();
 
-    public bool HasRole(RoleName roleName);
+    Guid? CurrentUserId();
 
-    public bool HasPermission(SEPermission permission);
+    bool IsAdmin();
+
+    bool HasRole(RoleName roleName);
+
+    bool HasPermission(SEPermission permission);
 }
 
 public class SecurityService : ISecurityService
@@ -24,17 +35,47 @@ public class SecurityService : ISecurityService
 
     private readonly ICurrentPermissionAccessor _currentPermissionAccessor;
 
-    public SecurityService(ICurrentPermissionAccessor currentPermissionAccessor, ICurrentUserAccessor currentUserAccessor)
+    private readonly IRoomParticipantRepository _roomParticipantRepository;
+
+    public SecurityService(
+        ICurrentPermissionAccessor currentPermissionAccessor,
+        ICurrentUserAccessor currentUserAccessor,
+        IRoomParticipantRepository roomParticipantRepository)
     {
         _currentPermissionAccessor = currentPermissionAccessor;
         _currentUserAccessor = currentUserAccessor;
+        _roomParticipantRepository = roomParticipantRepository;
     }
 
-    public void EnsurePermission(SEPermission action)
+    public async Task EnsureRoomPermissionAsync(Guid roomId, SEPermission action, CancellationToken cancellationToken)
+    {
+        var userId = _currentUserAccessor.UserId;
+        if (userId is null)
+        {
+            throw AccessDeniedException.CreateForAction(action.Name);
+        }
+
+        var participantPermission = await _roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(roomId, userId.Value, cancellationToken);
+
+        // The user may not yet be a member of the room.
+        if (participantPermission is not null)
+        {
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+            if (participantPermission.Permissions is not null &&
+                participantPermission.Permissions.Any(e => e.PermissionId == action.Id))
+            {
+                return;
+            }
+        }
+
+        await EnsurePermissionAsync(action, cancellationToken);
+    }
+
+    public Task EnsurePermissionAsync(SEPermission action, CancellationToken cancellationToken)
     {
         if (_currentUserAccessor.IsAdmin())
         {
-            return;
+            return Task.CompletedTask;
         }
 
         var isProtectedResource = _currentPermissionAccessor.IsProtectedResource(action.Name);
@@ -43,6 +84,8 @@ public class SecurityService : ISecurityService
         {
             throw AccessDeniedException.CreateForAction(action.Name);
         }
+
+        return Task.CompletedTask;
     }
 
     public User? CurrentUser() => _currentUserAccessor.UserDetailed;

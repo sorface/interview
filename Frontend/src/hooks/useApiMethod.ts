@@ -83,11 +83,17 @@ const createFetchUrl = (apiContract: ApiContract) => {
 };
 
 const createFetchRequestInit = (apiContract: ApiContract) => {
-  if (apiContract.method === 'GET') {
-    return undefined;
-  }
-  return {
+  const defaultRequestInit: RequestInit = {
+    credentials: 'include',
     method: apiContract.method,
+  };
+
+  if (apiContract.method === 'GET') {
+    return defaultRequestInit;
+  }
+
+  return {
+    ...defaultRequestInit,
     headers: {
       'Content-Type': 'application/json',
     },

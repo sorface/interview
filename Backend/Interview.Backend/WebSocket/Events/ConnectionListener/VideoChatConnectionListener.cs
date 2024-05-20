@@ -8,7 +8,7 @@ using Interview.Domain.Events;
 using Interview.Domain.Events.Events;
 using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Events.Sender;
-using Interview.Domain.RoomParticipants;
+using Interview.Domain.Rooms.RoomParticipants;
 
 namespace Interview.Backend.WebSocket.Events.ConnectionListener;
 
@@ -80,7 +80,7 @@ public class VideoChatConnectionListener : IConnectionListener, IVideChatConnect
     public async Task<bool> TryConnectAsync(SocketEventDetail detail, CancellationToken cancellationToken)
     {
         var participantRepository = detail.ScopedServiceProvider.GetRequiredService<IRoomParticipantRepository>();
-        var roomParticipant = await participantRepository.FindByRoomIdAndUserId(detail.RoomId, detail.UserId, cancellationToken);
+        var roomParticipant = await participantRepository.FindByRoomIdAndUserIdDetailedAsync(detail.RoomId, detail.UserId, cancellationToken);
         if (roomParticipant is null)
         {
             _logger.LogWarning("Not found room participant {RoomId} {UserId}", detail.RoomId, detail.UserId);

@@ -15,7 +15,9 @@ import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
 import { TagsView } from '../../components/TagsView/TagsView';
 import { QustionsSearch } from '../../components/QustionsSearch/QustionsSearch';
 import { ActionModal } from '../../components/ActionModal/ActionModal';
-import { Localization } from '../../localization';
+import { LocalizationKey } from '../../localization';
+import { HeaderField } from '../../components/HeaderField/HeaderField';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 
 import './Questions.css';
 
@@ -25,6 +27,7 @@ const initialPageNumber = 1;
 export const Questions: FunctionComponent = () => {
   const auth = useContext(AuthContext);
   const admin = checkAdmin(auth);
+  const localizationCaptions = useLocalizationCaptions();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const [searchValue, setSearchValue] = useState('');
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -68,21 +71,22 @@ export const Questions: FunctionComponent = () => {
           openButtonCaption='📁'
           error={archiveError}
           loading={archiveLoading}
-          title={Localization.ArchiveQuestion}
-          loadingCaption={Localization.ArchiveQuestionLoading}
+          title={localizationCaptions[LocalizationKey.ArchiveQuestion]}
+          loadingCaption={localizationCaptions[LocalizationKey.ArchiveQuestionLoading]}
           onAction={() => {archiveQuestion(question.id)}}
         />
         </div>
         <TagsView
-          placeHolder={Localization.NoTags}
+          placeHolder={localizationCaptions[LocalizationKey.NoTags]}
           tags={question.tags}
         />
       </Field>
     </li>
-  ), [archiveLoading, archiveError, archiveQuestion]);
+  ), [archiveLoading, archiveError, localizationCaptions, archiveQuestion]);
 
   return (
-    <MainContentWrapper thin>
+    <MainContentWrapper>
+      <HeaderField />
       <HeaderWithLink
         linkVisible={admin}
         path={pathnames.questionsCreate}

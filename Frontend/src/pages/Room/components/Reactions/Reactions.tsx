@@ -16,7 +16,8 @@ import { Event } from '../../../../types/event';
 import { UserType } from '../../../../types/user';
 import { Loader } from '../../../../components/Loader/Loader';
 import { useReactionsFeed } from '../../hooks/useReactionsFeed';
-import { Localization } from '../../../../localization';
+import { LocalizationKey } from '../../../../localization';
+import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 
 import './Reactions.css';
 
@@ -49,6 +50,7 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
   participantType,
   lastWsMessage,
 }) => {
+  const localizationCaptions = useLocalizationCaptions();
   const {
     apiMethodState: apiReactionsState,
     fetchData: fetchReactions,
@@ -174,7 +176,7 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
 
   if (errorReactions) {
     return (
-      <div>{Localization.ReactionsLoadingError}: {errorReactions}</div>
+      <div>{localizationCaptions[LocalizationKey.ReactionsLoadingError]}: {errorReactions}</div>
     );
   }
   if (loadingReactions) {
@@ -199,10 +201,10 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
         reactionsFeed={reactionsFeed}
         onClick={handleEventClick}
       />
-      {errorRoomReaction && <div>{Localization.ErrorSendingReaction}</div>}
-      {loadingRoomEvent && <div>{Localization.GetRoomEvent}...</div>}
-      {errorRoomEvent && <div>{Localization.ErrorGetRoomEvent}</div>}
-      {errorSendRoomEvent && <div>{Localization.ErrorSendingRoomEvent}</div>}
+      {errorRoomReaction && <div>{localizationCaptions[LocalizationKey.ErrorSendingReaction]}</div>}
+      {loadingRoomEvent && <div>{localizationCaptions[LocalizationKey.GetRoomEvent]}...</div>}
+      {errorRoomEvent && <div>{localizationCaptions[LocalizationKey.ErrorGetRoomEvent]}</div>}
+      {errorSendRoomEvent && <div>{localizationCaptions[LocalizationKey.ErrorSendingRoomEvent]}</div>}
     </div>
   );
 };

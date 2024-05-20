@@ -30,17 +30,6 @@ public interface IEditableCurrentUserAccessor : ICurrentUserAccessor
     void SetUser(User user);
 }
 
-public sealed class CurrentUserAccessor : IEditableCurrentUserAccessor
-{
-    private User? _currentUser;
-
-    public Guid? UserId => _currentUser?.Id;
-
-    public User? UserDetailed => _currentUser;
-
-    public void SetUser(User user) => _currentUser = user;
-}
-
 public static class CurrentUserAccessorExt
 {
     public static Guid GetUserIdOrThrow(this ICurrentUserAccessor self)

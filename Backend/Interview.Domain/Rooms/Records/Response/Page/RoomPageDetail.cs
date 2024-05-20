@@ -1,4 +1,4 @@
-using Interview.Domain.Rooms.Service.Records.Response.Detail;
+using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Tags.Records.Response;
 
 namespace Interview.Domain.Rooms.Records.Response.Page;

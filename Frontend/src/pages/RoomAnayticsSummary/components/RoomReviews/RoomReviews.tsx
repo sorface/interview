@@ -9,7 +9,8 @@ import { Paginator } from '../../../../components/Paginator/Paginator';
 import { Room, RoomReview } from '../../../../types/room';
 import { SubmitField } from '../../../../components/SubmitField/SubmitField';
 import { Field } from '../../../../components/FieldsBlock/Field';
-import { Localization } from '../../../../localization';
+import { LocalizationKey } from '../../../../localization';
+import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 
 import './RoomReviews.css';
 
@@ -25,6 +26,7 @@ export const RoomReviews: FunctionComponent<RoomReviewsProps> = ({ roomId }) => 
   let { id } = useParams();
   const auth = useContext(AuthContext);
   const admin = checkAdmin(auth);
+  const localizationCaptions = useLocalizationCaptions();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const { apiMethodState: roomReviewsState, fetchData: fetchReviews } = useApiMethod<RoomReview[], GetRoomReviewsParams>(roomReviewApiDeclaration.getPage);
   const { process: { loading, error }, data: roomReviews } = roomReviewsState;
@@ -155,7 +157,7 @@ export const RoomReviews: FunctionComponent<RoomReviewsProps> = ({ roomId }) => 
           <div className='roomReview-item-review'>
             <div>{roomReview.review}</div>
             <div className='roomReview-item-review-user'>
-              {Localization.WithLove}, {roomReview.user.nickname}.
+              {localizationCaptions[LocalizationKey.WithLove]}, {roomReview.user.nickname}.
             </div>
           </div>
           {(admin || auth?.id === roomReview.user.id) && (
@@ -181,6 +183,7 @@ export const RoomReviews: FunctionComponent<RoomReviewsProps> = ({ roomId }) => 
     admin,
     auth?.id,
     editingRoomReview,
+    localizationCaptions,
     handleRoomReviewDelete,
     handleRoomReviewEdit,
     handleRoomReviewEditClose,
@@ -211,7 +214,7 @@ export const RoomReviews: FunctionComponent<RoomReviewsProps> = ({ roomId }) => 
     >
       <>
         <Field className='roomReviews'>
-          <h3>{Localization.Reviews}:</h3>
+          <h3>{localizationCaptions[LocalizationKey.Reviews]}:</h3>
           <ul className="roomReviews-list">
             {roomReviewsSafe.map(createRoomReviewItem)}
           </ul>
@@ -226,11 +229,11 @@ export const RoomReviews: FunctionComponent<RoomReviewsProps> = ({ roomId }) => 
         <Field>
           <div className='roomReview'>
             <form onSubmit={handleSubmit}>
-              <label htmlFor="reviewText">{Localization.AddReview}:</label>
-              <textarea id="reviewText" placeholder={Localization.AddReviewPlaceholder} name={valueFieldName}></textarea>
+              <label htmlFor="reviewText">{localizationCaptions[LocalizationKey.AddReview]}:</label>
+              <textarea id="reviewText" placeholder={localizationCaptions[LocalizationKey.AddReviewPlaceholder]} name={valueFieldName}></textarea>
               {addRoomReviewLoading && (<div>Sending room review...</div>)}
               {addRoomReviewError && (<div>Error sending room review</div>)}
-              <SubmitField caption={Localization.Send} />
+              <SubmitField caption={localizationCaptions[LocalizationKey.Send]} />
             </form>
           </div>
         </Field>

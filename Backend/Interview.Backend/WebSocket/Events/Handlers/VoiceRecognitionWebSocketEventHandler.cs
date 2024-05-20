@@ -26,7 +26,9 @@ public class VoiceRecognitionWebSocketEventHandler : WebSocketEventHandlerBase
     }
 }
 
+#pragma warning disable SA1402
 public sealed class UserMessageEventPayload
+#pragma warning restore SA1402
 {
     public string Message { get; }
 

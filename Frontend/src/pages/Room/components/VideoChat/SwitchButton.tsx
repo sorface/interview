@@ -13,6 +13,7 @@ interface SwitchButtonProps {
   subCaption?: string;
   loading?: boolean;
   counter?: number;
+  htmlDisabled?: boolean;
   onClick: () => void;
 }
 
@@ -24,6 +25,7 @@ export const SwitchButton: FunctionComponent<SwitchButtonProps> = ({
   subCaption,
   loading,
   counter,
+  htmlDisabled,
   onClick,
 }) => {
   const iconName = enabled ? iconEnabledName : iconDisabledName;
@@ -31,6 +33,7 @@ export const SwitchButton: FunctionComponent<SwitchButtonProps> = ({
   return (
     <div className="switch-button-container">
       <button
+        disabled={htmlDisabled}
         className={`switch-button ${(!enabled && disabledColor) ? 'switch-button-disabled' : ''}`}
         onClick={onClick}
       >

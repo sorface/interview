@@ -2,7 +2,9 @@ using Interview.Domain.Repository;
 
 namespace Interview.Domain;
 
+#pragma warning disable SA1649
 public class UserException : Exception
+#pragma warning restore SA1649
 {
     public UserException(string message)
         : base(message)
@@ -15,7 +17,9 @@ public class UserException : Exception
     }
 }
 
+#pragma warning disable SA1402
 public class NotFoundException : UserException
+#pragma warning restore SA1402
 {
     public NotFoundException(string message)
         : base(message)
@@ -34,7 +38,9 @@ public class NotFoundException : UserException
     }
 }
 
+#pragma warning disable SA1402
 public class AccessDeniedException : UserException
+#pragma warning restore SA1402
 {
     public AccessDeniedException(string message)
         : base(message)
@@ -50,7 +56,9 @@ public class AccessDeniedException : UserException
         => new AccessDeniedException($"Action was denied for the '{resource.ToLower()}' resource.");
 }
 
+#pragma warning disable SA1402
 public abstract class ExceptionMessage
+#pragma warning restore SA1402
 {
     public static string UserNotFound() => $"User not found";
 

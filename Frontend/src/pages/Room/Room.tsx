@@ -1,20 +1,24 @@
-import { FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
+import { FunctionComponent, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import useWebSocket from 'react-use-websocket';
 import toast from 'react-hot-toast';
 import {
+  ApplyRoomInviteBody,
+  GenerateRoomInviteBody,
   GetRoomParticipantParams,
   GetRoomQuestionsBody,
+  RoomIdParam,
+  roomInviteApiDeclaration,
   roomQuestionApiDeclaration,
   roomsApiDeclaration,
 } from '../../apiDeclarations';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { REACT_APP_WS_URL } from '../../config';
-import { IconNames, pathnames } from '../../constants';
+import { IconNames, inviteParamName, pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { useCommunist } from '../../hooks/useCommunist';
-import { RoomParticipant, RoomQuestion, RoomState, Room as RoomType } from '../../types/room';
+import { RoomInvite, RoomParticipant, RoomQuestion, RoomState, Room as RoomType } from '../../types/room';
 import { ActionModal } from '../../components/ActionModal/ActionModal';
 import { Reactions } from './components/Reactions/Reactions';
 import { ActiveQuestion } from './components/ActiveQuestion/ActiveQuestion';
@@ -24,11 +28,16 @@ import { SwitchButton } from './components/VideoChat/SwitchButton';
 import { Link } from 'react-router-dom';
 import { ThemeSwitchMini } from '../../components/ThemeSwitchMini/ThemeSwitchMini';
 import { EnterVideoChatModal } from './components/VideoChat/EnterVideoChatModal';
-import { Devices, useUserStream } from './hooks/useUserStream';
+import { Devices, useUserStreams } from './hooks/useUserStreams';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useUnreadChatMessages } from './hooks/useUnreadChatMessages';
-import { Localization } from '../../localization';
+import { useScreenStream } from './hooks/useScreenStream';
+import { LocalizationKey } from '../../localization';
 import { MessagePage } from '../../components/MessagePage/MessagePage';
+import { ThemedIcon } from './components/ThemedIcon/ThemedIcon';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { Invitations } from './components/Invitations/Invitations';
+import { UserType } from '../../types/user';
 
 import './Room.css';
 
@@ -47,6 +56,7 @@ export const Room: FunctionComponent = () => {
   const { getCommunist } = useCommunist();
   const communist = getCommunist();
   let { id } = useParams();
+  const { [inviteParamName]: inviteParam } = useParams();
   const socketUrl = `${REACT_APP_WS_URL}/ws?Authorization=${communist}&roomId=${id}`;
   const { lastMessage, readyState, sendMessage } = useWebSocket(socketUrl);
   const wsClosed = readyState === 3 || readyState === 2;
@@ -57,12 +67,21 @@ export const Room: FunctionComponent = () => {
   const [messagesChatEnabled, setMessagesChatEnabled] = useState(false);
   const [welcomeScreen, setWelcomeScreen] = useState(true);
   const [micEnabled, setMicEnabled] = useState(true);
+  const micDisabledAutomatically = useRef(false);
   const [cameraEnabled, setCameraEnabled] = useState(true);
   const [selectedDevices, setSelectedDevices] = useState<Devices | null>(null);
   const [recognitionEnabled, setRecognitionEnabled] = useState(false);
-  const { userStream } = useUserStream({
+  const [peersLength, setPeersLength] = useState(0);
+  const {
+    userAudioStream,
+    userVideoStream,
+    disableVideo,
+    enableVideo,
+  } = useUserStreams({
     selectedDevices,
   });
+  const { screenStream, requestScreenStream } = useScreenStream();
+  const localizationCaptions = useLocalizationCaptions();
 
   const handleVoiceRecognition = (transcript: string) => {
     sendMessage(JSON.stringify({
@@ -107,6 +126,42 @@ export const Room: FunctionComponent = () => {
     data: roomParticipant, process: { loading: roomParticipantLoading, error: roomParticipantError },
   } = apiRoomParticipantState;
 
+  const {
+    apiMethodState: apiRoomInvitesState,
+    fetchData: fetchRoomInvites,
+  } = useApiMethod<RoomInvite[], RoomIdParam>(roomInviteApiDeclaration.get);
+  const {
+    process: { loading: roomInvitesLoading, error: roomInvitesError },
+    data: roomInvitesData,
+  } = apiRoomInvitesState;
+
+  const {
+    apiMethodState: apiApplyRoomInviteState,
+    fetchData: fetchApplyRoomInvite,
+  } = useApiMethod<RoomInvite, ApplyRoomInviteBody>(roomInviteApiDeclaration.apply);
+  const {
+    process: { loading: applyRoomInviteLoading, error: applyRoomInviteError },
+    data: applyRoomInviteData,
+  } = apiApplyRoomInviteState;
+
+  const {
+    apiMethodState: apiGenerateRoomInviteState,
+    fetchData: fetchGenerateRoomInvite,
+  } = useApiMethod<RoomInvite, GenerateRoomInviteBody>(roomInviteApiDeclaration.generate);
+  const {
+    process: { loading: generateRoomInviteLoading, error: generateRoomInviteError },
+    data: generateRoomInviteData,
+  } = apiGenerateRoomInviteState;
+
+  const {
+    apiMethodState: apiGenerateRoomAllInvitesState,
+    fetchData: fetchGenerateRoomAllInvites,
+  } = useApiMethod<RoomInvite, RoomIdParam>(roomInviteApiDeclaration.generateAll);
+  const {
+    process: { loading: generateRoomAllInvitesLoading, error: generateRoomAllInvitesError },
+    data: generateRoomAllInvitesData,
+  } = apiGenerateRoomAllInvitesState;
+
   const roomParticipantWillLoaded = roomParticipant === null && !roomParticipantError;
 
   const {
@@ -133,6 +188,34 @@ export const Room: FunctionComponent = () => {
   }, [id, getRoomQuestions]);
 
   useEffect(() => {
+    if (!inviteParam) {
+      return;
+    }
+    if (!id) {
+      throw new Error('Room id not found');
+    }
+    fetchApplyRoomInvite({
+      inviteId: inviteParam,
+      roomId: id,
+    });
+  }, [inviteParam, id, fetchApplyRoomInvite]);
+
+  useEffect(() => {
+    if (!generateRoomInviteData && !generateRoomAllInvitesData) {
+      return;
+    }
+    if (!id) {
+      throw new Error('Room id not found');
+    }
+    fetchRoomInvites({
+      roomId: id,
+    });
+  }, [generateRoomInviteData, generateRoomAllInvitesData, id, fetchRoomInvites]);
+
+  useEffect(() => {
+    if (inviteParam && !applyRoomInviteData) {
+      return;
+    }
     if (!auth?.id) {
       return;
     }
@@ -146,7 +229,7 @@ export const Room: FunctionComponent = () => {
       RoomId: id,
       UserId: auth.id,
     });
-  }, [id, auth?.id, fetchData, fetchRoomState, updateQuestions, getRoomParticipant]);
+  }, [id, auth?.id, inviteParam, applyRoomInviteData, fetchData, fetchRoomState, updateQuestions, getRoomParticipant]);
 
   useEffect(() => {
     if (!room) {
@@ -231,6 +314,10 @@ export const Room: FunctionComponent = () => {
     setMessagesChatEnabled(!messagesChatEnabled);
   };
 
+  const handleScreenShare = () => {
+    requestScreenStream();
+  };
+
   const loaders = [
     {},
     {},
@@ -255,18 +342,27 @@ export const Room: FunctionComponent = () => {
   };
 
   const handleCameraSwitch = useCallback(() => {
-    if (userStream) {
-      enableDisableUserTrack(userStream, 'video', !cameraEnabled);
+    if (cameraEnabled) {
+      disableVideo();
+    } else {
+      enableVideo();
     }
     setCameraEnabled(!cameraEnabled);
-  }, [userStream, cameraEnabled]);
+  }, [cameraEnabled, disableVideo, enableVideo]);
+
+  const enableDisableMic = useCallback((enabled: boolean) => {
+    if (userAudioStream) {
+      enableDisableUserTrack(userAudioStream, 'audio', enabled);
+    }
+    setMicEnabled(enabled);
+  }, [userAudioStream]);
 
   const handleMicSwitch = useCallback(() => {
-    if (userStream) {
-      enableDisableUserTrack(userStream, 'audio', !micEnabled);
+    if (micEnabled) {
+      micDisabledAutomatically.current = false;
     }
-    setMicEnabled(!micEnabled);
-  }, [userStream, micEnabled]);
+    enableDisableMic(!micEnabled);
+  }, [micEnabled, enableDisableMic]);
 
   useEffect(() => {
     if (welcomeScreen || viewerMode) {
@@ -275,9 +371,45 @@ export const Room: FunctionComponent = () => {
     setRecognitionEnabled(micEnabled);
   }, [welcomeScreen, viewerMode, micEnabled]);
 
+  const muteMic = useCallback(() => {
+    enableDisableMic(false);
+  }, [enableDisableMic]);
+
+  const unmuteMic = useCallback(() => {
+    enableDisableMic(true);
+  }, [enableDisableMic]);
+
   const handleVoiceRecognitionSwitch = useCallback(() => {
     setRecognitionEnabled(!recognitionEnabled);
   }, [recognitionEnabled]);
+
+  const handleInvitesOpen = () => {
+    if (!id) {
+      throw new Error('Room id not found');
+    }
+    fetchRoomInvites({
+      roomId: id,
+    });
+  };
+
+  const handleInviteGenerate = (participantType: UserType) => {
+    if (!id) {
+      throw new Error('Room id not found');
+    }
+    fetchGenerateRoomInvite({
+      roomId: id,
+      participantType,
+    });
+  };
+
+  const handleInvitesAllGenerate = () => {
+    if (!id) {
+      throw new Error('Room id not found');
+    }
+    fetchGenerateRoomAllInvites({
+      roomId: id,
+    });
+  };
 
   if (roomInReview && id) {
     return <Navigate to={pathnames.roomAnalyticsSummary.replace(':id', id)} replace />;
@@ -285,22 +417,24 @@ export const Room: FunctionComponent = () => {
 
   if (wsClosed) {
     return (
-      <MessagePage title={Localization.ConnectionError} message={Localization.RoomConnectionError}>
+      <MessagePage title={localizationCaptions[LocalizationKey.ConnectionError]} message={localizationCaptions[LocalizationKey.RoomConnectionError]}>
         <Link to={pathnames.rooms}>
-          <button>{Localization.Exit}</button>
+          <button>{localizationCaptions[LocalizationKey.Exit]}</button>
         </Link>
       </MessagePage>
     );
   }
 
   return (
-    <MainContentWrapper className="room-wrapper">
+    <MainContentWrapper withMargin className="room-wrapper">
       <EnterVideoChatModal
         open={welcomeScreen}
-        loading={loading || roomParticipantLoading || roomParticipantWillLoaded || readyState === connectingReadyState}
+        loading={loading || roomParticipantLoading || roomParticipantWillLoaded || applyRoomInviteLoading || readyState === connectingReadyState}
         viewerMode={viewerMode}
         roomName={room?.name}
-        userStream={userStream}
+        error={applyRoomInviteError && localizationCaptions[LocalizationKey.ErrorApplyRoomInvite]}
+        userVideoStream={userVideoStream}
+        userAudioStream={userAudioStream}
         micEnabled={micEnabled}
         cameraEnabled={cameraEnabled}
         onSelect={handleMediaSelect}
@@ -310,10 +444,10 @@ export const Room: FunctionComponent = () => {
       />
       <ProcessWrapper
         loading={loading}
-        loadingPrefix={Localization.LoadingRoom}
+        loadingPrefix={localizationCaptions[LocalizationKey.LoadingRoom]}
         loaders={loaders}
         error={error}
-        errorPrefix={Localization.ErrorLoadingRoom}
+        errorPrefix={localizationCaptions[LocalizationKey.ErrorLoadingRoom]}
       >
         <div className="room-page">
           <div className="room-page-main">
@@ -322,12 +456,15 @@ export const Room: FunctionComponent = () => {
                 <span
                   className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
                 >
-                  <div>{room?.name}</div>
+                  <div className='room-page-header-wrapper'>
+                    <h3>{room?.name}</h3>
+                    <span className='room-page-header-viewers'><ThemedIcon name={IconNames.People} /> {peersLength + 1}</span>
+                  </div>
                   {viewerMode && (
                     <div
                       className="room-page-header-question-viewer"
                     >
-                      {Localization.ActiveQuestion}: {currentQuestion?.value}
+                      {localizationCaptions[LocalizationKey.ActiveQuestion]}: {currentQuestion?.value}
                     </div>
                   )}
                 </span>
@@ -343,16 +480,27 @@ export const Room: FunctionComponent = () => {
                 </div>
               )}
               {!reactionsVisible && (
-                <div>{Localization.WaitingRoom}</div>
+                <div>{localizationCaptions[LocalizationKey.WaitingRoom]}</div>
               )}
               <div className={`actions-field ${viewerMode ? 'actions-field-viewer' : ''}`}>
                 {!viewerMode && (
+                  <Invitations
+                    roomId={id || ''}
+                    roomInvitesData={roomInvitesData}
+                    roomInvitesError={roomInvitesError || generateRoomInviteError || generateRoomAllInvitesError}
+                    roomInvitesLoading={roomInvitesLoading || generateRoomInviteLoading || generateRoomAllInvitesLoading}
+                    onOpen={handleInvitesOpen}
+                    onGenerateInvite={handleInviteGenerate}
+                    onGenerateAllInvites={handleInvitesAllGenerate}
+                  />
+                )}
+                {!viewerMode && (
                   <div className='start-room-review'>
                     <ActionModal
-                      title={Localization.StartReviewRoomModalTitle}
-                      openButtonCaption={Localization.StartReviewRoom}
+                      title={localizationCaptions[LocalizationKey.StartReviewRoomModalTitle]}
+                      openButtonCaption={localizationCaptions[LocalizationKey.StartReviewRoom]}
                       loading={roomStartReviewLoading}
-                      loadingCaption={Localization.CloseRoomLoading}
+                      loadingCaption={localizationCaptions[LocalizationKey.CloseRoomLoading]}
                       error={roomStartReviewError}
                       onAction={handleStartReviewRoom}
                     />
@@ -362,16 +510,22 @@ export const Room: FunctionComponent = () => {
               </div>
             </div>
             <div className="room-page-main-content">
-              {loadingRoomState && <div>{Localization.LoadingRoomState}...</div>}
-              {errorRoomState && <div>{Localization.ErrorLoadingRoomState}...</div>}
+              {loadingRoomState && <div>{localizationCaptions[LocalizationKey.LoadingRoomState]}...</div>}
+              {errorRoomState && <div>{localizationCaptions[LocalizationKey.ErrorLoadingRoomState]}...</div>}
               <VideoChat
                 roomState={roomState}
                 viewerMode={viewerMode}
                 lastWsMessage={lastMessage}
                 messagesChatEnabled={messagesChatEnabled}
-                userStream={userStream}
+                userVideoStream={userVideoStream}
+                userAudioStream={userAudioStream}
+                screenStream={screenStream}
                 videoTrackEnabled={cameraEnabled}
+                micDisabledAutomatically={micDisabledAutomatically}
                 onSendWsMessage={sendMessage}
+                onUpdatePeersLength={setPeersLength}
+                onMuteMic={muteMic}
+                onUnmuteMic={unmuteMic}
               />
             </div>
           </div>
@@ -383,7 +537,7 @@ export const Room: FunctionComponent = () => {
                   iconEnabledName={IconNames.MicOn}
                   iconDisabledName={IconNames.MicOff}
                   disabledColor
-                  subCaption={Localization.Microphone}
+                  subCaption={localizationCaptions[LocalizationKey.Microphone]}
                   onClick={handleMicSwitch}
                 />
                 <SwitchButton
@@ -391,17 +545,18 @@ export const Room: FunctionComponent = () => {
                   iconEnabledName={IconNames.VideocamOn}
                   iconDisabledName={IconNames.VideocamOff}
                   disabledColor
-                  subCaption={Localization.Camera}
+                  subCaption={localizationCaptions[LocalizationKey.Camera]}
                   onClick={handleCameraSwitch}
                 />
                 {recognitionNotSupported ? (
-                  <div>{Localization.VoiceRecognitionNotSupported}</div>
+                  <div>{localizationCaptions[LocalizationKey.VoiceRecognitionNotSupported]}</div>
                 ) : (
                   <SwitchButton
                     enabled={recognitionEnabled}
+                    htmlDisabled={!micEnabled}
                     iconEnabledName={IconNames.RecognitionOn}
                     iconDisabledName={IconNames.RecognitionOff}
-                    subCaption={Localization.VoiceRecognition}
+                    subCaption={localizationCaptions[LocalizationKey.VoiceRecognition]}
                     disabledColor
                     onClick={handleVoiceRecognitionSwitch}
                   />
@@ -414,7 +569,7 @@ export const Room: FunctionComponent = () => {
                 enabled={!messagesChatEnabled}
                 iconEnabledName={IconNames.Chat}
                 iconDisabledName={IconNames.Chat}
-                subCaption={Localization.Chat}
+                subCaption={localizationCaptions[LocalizationKey.Chat]}
                 onClick={handleMessagesChatSwitch}
               />
               {reactionsVisible && (
@@ -426,10 +581,19 @@ export const Room: FunctionComponent = () => {
                   lastWsMessage={lastMessage}
                 />
               )}
+              {!viewerMode && (
+                <SwitchButton
+                  enabled={true}
+                  iconEnabledName={IconNames.TV}
+                  iconDisabledName={IconNames.TV}
+                  subCaption={localizationCaptions[LocalizationKey.ScreenShare]}
+                  onClick={handleScreenShare}
+                />
+              )}
             </div>
             <div className="room-tools room-tools-right">
               <Link to={pathnames.rooms}>
-                <button>{Localization.Exit}</button>
+                <button>{localizationCaptions[LocalizationKey.Exit]}</button>
               </Link>
             </div>
           </div>

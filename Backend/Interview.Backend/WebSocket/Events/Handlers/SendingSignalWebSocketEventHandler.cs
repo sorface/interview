@@ -3,7 +3,7 @@ using Interview.Backend.WebSocket.Events.ConnectionListener;
 using Interview.Domain.Events.Events;
 using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Events.Sender;
-using Interview.Domain.RoomParticipants;
+using Interview.Domain.Rooms.RoomParticipants;
 
 namespace Interview.Backend.WebSocket.Events.Handlers;
 
@@ -48,6 +48,7 @@ public class SendingSignalWebSocketEventHandler : WebSocketEventHandlerBase<Send
                 ParticipantType = detail.ParticipantType,
             },
             Signal = payload.Signal,
+            ScreenShare = payload.ScreenShare,
         };
         var payloadStr = _serializer.SerializePayloadAsString(payloadForSerialization);
         var sendEvent = new RoomEvent(detail.RoomId, "user joined", payloadStr, false);
@@ -64,17 +65,25 @@ public class SendingSignalWebSocketEventHandler : WebSocketEventHandlerBase<Send
         public Guid To { get; set; }
 
         public string? Signal { get; set; }
+
+        public bool? ScreenShare { get; set; }
     }
 }
 
+#pragma warning disable SA1402
 public class UserDetailResponse
+#pragma warning restore SA1402
 {
     public required UserDetail From { get; init; }
 
     public required string? Signal { get; init; }
+
+    public required bool? ScreenShare { get; init; }
 }
 
+#pragma warning disable SA1402
 public class UserDetail
+#pragma warning restore SA1402
 {
     public required Guid Id { get; init; }
 

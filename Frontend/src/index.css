@@ -23,7 +23,7 @@
   --active-tab-color: #5993FF;
   --border-radius: 0.5rem;
   --fields-block-margin: 0rem 1rem;
-  --fields-wrap-margin: 0rem 2.5rem;
+  --fields-wrap-margin: 0rem 0rem;
   --nav-menu-margin-horizontal: -2.5rem;
   --chat-width: 19.5rem;
   --fadeIn-animation: fadeIn 300ms;
@@ -88,10 +88,12 @@ button {
   font-size: 0.9rem;
   border: 1px solid var(--button-border-color);
   padding: 0rem 2rem;
-  height: 1.75rem;
+  min-height: 1.75rem;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: 300ms !important;
   border-radius: var(--border-radius);
@@ -104,6 +106,10 @@ button:hover {
 button.active {
   background-color: var(--button-hover-color);
   color: var(--button-bg);
+}
+
+button.danger {
+  border-color: var(--active);
 }
 
 button:disabled,

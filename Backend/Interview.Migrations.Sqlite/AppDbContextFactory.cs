@@ -1,6 +1,6 @@
 using System;
+using Interview.Domain.Database;
 using Interview.Domain.Events.ChangeEntityProcessors;
-using Interview.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 

@@ -3,15 +3,14 @@ using Interview.Backend.Auth;
 using Interview.Backend.Responses;
 using Interview.Domain;
 using Interview.Domain.Events.Storage;
-using Interview.Domain.RoomReviews.Records;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Request.Transcription;
+using Interview.Domain.Rooms.Records.Response;
+using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.Records.Response.Page;
 using Interview.Domain.Rooms.Records.Response.RoomStates;
+using Interview.Domain.Rooms.RoomReviews.Records;
 using Interview.Domain.Rooms.Service;
-using Interview.Domain.Rooms.Service.Records.Response;
-using Interview.Domain.Rooms.Service.Records.Response.Detail;
-using Interview.Domain.Rooms.Service.Records.Response.Page;
 using Interview.Domain.ServiceResults.Success;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -44,9 +43,15 @@ public class RoomController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<IPagedList<RoomPageDetail>> GetPage([FromQuery] PageRequest request, [FromQuery] RoomPageDetailRequestFilter? filter)
+    public Task<IPagedList<RoomPageDetail>> GetPage(
+        [FromQuery] PageRequest request,
+        [FromQuery] RoomPageDetailRequestFilter? filter)
     {
-        return _roomService.FindPageAsync(filter ?? new RoomPageDetailRequestFilter(), request.PageNumber, request.PageSize, HttpContext.RequestAborted);
+        return _roomService.FindPageAsync(
+            filter ?? new RoomPageDetailRequestFilter(),
+            request.PageNumber,
+            request.PageSize,
+            HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -181,6 +186,11 @@ public class RoomController : ControllerBase
         return _roomService.GetAnalyticsSummaryAsync(request, HttpContext.RequestAborted);
     }
 
+    /// <summary>
+    /// Closing the room.
+    /// </summary>
+    /// <param name="id">room id.</param>
+    /// <returns>result operation.</returns>
     [Authorize]
     [HttpPatch("{id:guid}/close")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
@@ -193,6 +203,11 @@ public class RoomController : ControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Moving the room to the review stage.
+    /// </summary>
+    /// <param name="id">room id.</param>
+    /// <returns>result operation.</returns>
     [Authorize]
     [HttpPatch("{id:guid}/startReview")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
@@ -203,16 +218,6 @@ public class RoomController : ControllerBase
         await _roomService.StartReviewAsync(id, HttpContext.RequestAborted);
 
         return Ok();
-    }
-
-    [Authorize]
-    [HttpPost("{id:guid}/invites")]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
-    public Task<RoomInviteDetail> ApplyInvite([FromRoute(Name = "id")] Guid id, [FromQuery(Name = "id")] Guid invite)
-    {
-        return _roomService.ApplyInvite(id, invite, HttpContext.RequestAborted);
     }
 
     /// <summary>

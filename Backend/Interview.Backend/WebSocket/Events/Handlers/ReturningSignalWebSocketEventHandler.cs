@@ -39,7 +39,7 @@ public class ReturningSignalWebSocketEventHandler : WebSocketEventHandlerBase<Re
             return;
         }
 
-        var receivingReturnedSignalPayload = new { Signal = payload.Signal, From = detail.UserId };
+        var receivingReturnedSignalPayload = new { Signal = payload.Signal, From = detail.UserId, ScreenShare = payload.ScreenShare };
         var strPayload = _serializer.SerializePayloadAsString(receivingReturnedSignalPayload);
         var sendEvent = new RoomEvent(detail.RoomId, "receiving returned signal", strPayload, false);
         var provider = new CachedRoomEventProvider(sendEvent, _serializer);
@@ -55,5 +55,7 @@ public class ReturningSignalWebSocketEventHandler : WebSocketEventHandlerBase<Re
         public Guid To { get; set; }
 
         public string? Signal { get; set; }
+
+        public bool? ScreenShare { get; set; }
     }
 }
