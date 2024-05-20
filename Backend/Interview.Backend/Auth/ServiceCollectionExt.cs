@@ -1,6 +1,7 @@
 using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Responses;
 using Interview.Backend.WebSocket.Configuration;
+using Interview.Domain.Users.Service;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
