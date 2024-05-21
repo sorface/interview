@@ -24,7 +24,7 @@ import { SwitchButton } from './components/VideoChat/SwitchButton';
 import { Link } from 'react-router-dom';
 import { ThemeSwitchMini } from '../../components/ThemeSwitchMini/ThemeSwitchMini';
 import { EnterVideoChatModal } from './components/VideoChat/EnterVideoChatModal';
-import { Devices, useUserStreams } from './hooks/useUserStreams';
+import { useUserStreams } from './hooks/useUserStreams';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useUnreadChatMessages } from './hooks/useUnreadChatMessages';
 import { useScreenStream } from './hooks/useScreenStream';
@@ -36,14 +36,6 @@ import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import './Room.css';
 
 const connectingReadyState = 0;
-
-const enableDisableUserTrack = (stream: MediaStream, kind: string, enabled: boolean) => {
-  const track = stream.getTracks().find(track => track.kind === kind);
-  if (!track) {
-    return;
-  }
-  track.enabled = enabled;
-};
 
 export const Room: FunctionComponent = () => {
   const auth = useContext(AuthContext);
@@ -59,20 +51,21 @@ export const Room: FunctionComponent = () => {
   const [currentQuestion, setCurrentQuestion] = useState<RoomQuestion>();
   const [messagesChatEnabled, setMessagesChatEnabled] = useState(false);
   const [welcomeScreen, setWelcomeScreen] = useState(true);
-  const [micEnabled, setMicEnabled] = useState(true);
   const micDisabledAutomatically = useRef(false);
-  const [cameraEnabled, setCameraEnabled] = useState(true);
-  const [selectedDevices, setSelectedDevices] = useState<Devices | null>(null);
   const [recognitionEnabled, setRecognitionEnabled] = useState(false);
   const [peersLength, setPeersLength] = useState(0);
   const {
+    devices,
     userAudioStream,
     userVideoStream,
-    disableVideo,
-    enableVideo,
-  } = useUserStreams({
-    selectedDevices,
-  });
+    updateDevices,
+    setSelectedCameraId,
+    setSelectedMicId,
+    cameraEnabled,
+    micEnabled,
+    setCameraEnabled,
+    setMicEnabled,
+  } = useUserStreams();
   const { screenStream, requestScreenStream } = useScreenStream();
   const localizationCaptions = useLocalizationCaptions();
 
@@ -253,12 +246,6 @@ export const Room: FunctionComponent = () => {
     { height: '890px' }
   ];
 
-  const handleMediaSelect = useCallback((devices: Devices) => {
-    setSelectedDevices(devices);
-    setMicEnabled(true);
-    setCameraEnabled(true);
-  }, []);
-
   const handleWelcomeScreenClose = () => {
     setWelcomeScreen(false);
     sendMessage(JSON.stringify({
@@ -271,20 +258,12 @@ export const Room: FunctionComponent = () => {
   };
 
   const handleCameraSwitch = useCallback(() => {
-    if (cameraEnabled) {
-      disableVideo();
-    } else {
-      enableVideo();
-    }
     setCameraEnabled(!cameraEnabled);
-  }, [cameraEnabled, disableVideo, enableVideo]);
+  }, [cameraEnabled, setCameraEnabled]);
 
   const enableDisableMic = useCallback((enabled: boolean) => {
-    if (userAudioStream) {
-      enableDisableUserTrack(userAudioStream, 'audio', enabled);
-    }
     setMicEnabled(enabled);
-  }, [userAudioStream]);
+  }, [setMicEnabled]);
 
   const handleMicSwitch = useCallback(() => {
     if (micEnabled) {
@@ -333,11 +312,14 @@ export const Room: FunctionComponent = () => {
         loading={loading || roomParticipantLoading || roomParticipantWillLoaded || readyState === connectingReadyState}
         viewerMode={viewerMode}
         roomName={room?.name}
+        devices={devices}
+        setSelectedCameraId={setSelectedCameraId}
+        setSelectedMicId={setSelectedMicId}
+        updateDevices={updateDevices}
         userVideoStream={userVideoStream}
         userAudioStream={userAudioStream}
         micEnabled={micEnabled}
         cameraEnabled={cameraEnabled}
-        onSelect={handleMediaSelect}
         onClose={handleWelcomeScreenClose}
         onMicSwitch={handleMicSwitch}
         onCameraSwitch={handleCameraSwitch}
@@ -409,7 +391,6 @@ export const Room: FunctionComponent = () => {
                 userVideoStream={userVideoStream}
                 userAudioStream={userAudioStream}
                 screenStream={screenStream}
-                videoTrackEnabled={cameraEnabled}
                 micDisabledAutomatically={micDisabledAutomatically}
                 onSendWsMessage={sendMessage}
                 onUpdatePeersLength={setPeersLength}

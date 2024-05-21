@@ -1,16 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
-
-interface Device {
-  deviceId?: MediaDeviceInfo['deviceId'];
-}
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCanvasStream } from './useCanvasStream';
 
 export interface Devices {
-  mic?: Device;
-  camera?: Device;
-}
-
-interface UseUserStreamParams {
-  selectedDevices: Devices | null;
+  mic: MediaDeviceInfo[];
+  camera: MediaDeviceInfo[];
 }
 
 const videoConstraints = {
@@ -29,32 +22,83 @@ const audioConstraints = {
   autoGainControl: true,
 };
 
-export const useUserStreams = ({
-  selectedDevices,
-}: UseUserStreamParams) => {
+const getDevices = async () =>
+  await navigator.mediaDevices.enumerateDevices();
+
+const micDeviceKind = 'audioinput';
+const cameraDeviceKind = 'videoinput';
+
+const enableDisableUserTrack = (stream: MediaStream, enabled: boolean) =>
+  stream.getTracks().forEach(track => track.enabled = enabled);
+
+export const useUserStreams = () => {
+  const [devices, setDevices] = useState<Devices>({ camera: [], mic: [] });
+  const [selectedCameraId, setSelectedCameraId] = useState<MediaDeviceInfo['deviceId']>();
+  const [selectedMicId, setSelectedMicId] = useState<MediaDeviceInfo['deviceId']>();
+  const [micEnabled, setMicEnabled] = useState(true);
+  const [cameraEnabled, setCameraEnabled] = useState(true);
   const [userAudioStream, setUserAudioStream] = useState<MediaStream | null>(null);
   const [userAudioProcessedStream, setUserAudioProcessedStream] = useState<MediaStream | null>(null);
   const [userVideoStream, setUserVideoStream] = useState<MediaStream | null>(null);
+  const userVideoStreamRef = useRef<MediaStream | null>(null);
+  const canvasMediaStream = useCanvasStream({
+    enabled: !!selectedCameraId,
+    width: videoConstraints.width,
+    height: videoConstraints.height,
+    frameRate: videoConstraints.frameRate,
+    cameraStream: cameraEnabled ? userVideoStream : null,
+  });
+
+  const updateDevices = useCallback(async () => {
+    const allDevices = await getDevices();
+    const micDevices = allDevices.filter(device => device.kind === micDeviceKind);
+    const cameraDevices = allDevices.filter(device => device.kind === cameraDeviceKind);
+    setDevices({
+      camera: cameraDevices,
+      mic: micDevices,
+    });
+  }, []);
 
   useEffect(() => {
-    if (!selectedDevices) {
+    if (!selectedCameraId) {
+      return;
+    }
+    const updateUserVideoStream = async () => {
+      const videoRequest = {
+        ...videoConstraints,
+        deviceId: selectedCameraId,
+      };
+      if (!videoRequest) {
+        return;
+      }
+      const newUserStream = await navigator.mediaDevices.getUserMedia({
+        video: videoRequest,
+      });
+      setUserVideoStream(newUserStream);
+      userVideoStreamRef.current = newUserStream;
+    };
+    updateUserVideoStream();
+  }, [selectedCameraId]);
+
+  useEffect(() => {
+    if (!selectedMicId) {
       return;
     }
     const updateUserAudioStream = async () => {
-      const micRequest = selectedDevices.mic?.deviceId && {
+      const micRequest = {
         ...audioConstraints,
-        deviceId: selectedDevices.mic?.deviceId,
+        deviceId: selectedMicId,
       };
       if (!micRequest) {
         return;
       }
       const newUserStream = await navigator.mediaDevices.getUserMedia({
-        audio: micRequest || undefined,
+        audio: micRequest,
       });
       setUserAudioStream(newUserStream);
     };
     updateUserAudioStream();
-  }, [selectedDevices]);
+  }, [selectedMicId]);
 
   useEffect(() => {
     if (!userAudioStream) {
@@ -92,54 +136,60 @@ export const useUserStreams = ({
     };
   }, [userAudioStream]);
 
-  useEffect(() => {
-    if (!selectedDevices) {
-      return;
-    }
-    const updateUserVideoStream = async () => {
-      const videoRequest = selectedDevices.camera?.deviceId && {
-        ...videoConstraints,
-        deviceId: selectedDevices.camera?.deviceId,
-      };
-      if (!videoRequest) {
-        return;
-      }
-      const newUserStream = await navigator.mediaDevices.getUserMedia({
-        video: videoRequest || undefined,
-      });
-      setUserVideoStream(newUserStream);
-    };
-    updateUserVideoStream();
-  }, [selectedDevices]);
-
   const disableVideo = useCallback(() => {
-    if (!userVideoStream) {
+    const userVideoStreamRefCurrent = userVideoStreamRef.current;
+    if (!userVideoStreamRefCurrent) {
       console.warn('disableVideo userVideoStream not found');
       return;
     }
 
-    userVideoStream.getTracks().forEach(track => track.stop());
-  }, [userVideoStream]);
+    userVideoStreamRefCurrent.getTracks().forEach(track => track.stop());
+  }, []);
 
   const enableVideo = useCallback(async () => {
-    if (!selectedDevices) {
+    if (!selectedCameraId) {
       console.warn('enableVideo selectedDevices not found');
       return;
     }
-    const videoRequest = selectedDevices.camera?.deviceId && {
+    const videoRequest = {
       ...videoConstraints,
-      deviceId: selectedDevices.camera?.deviceId,
+      deviceId: selectedCameraId,
     };
     const newUserStream = await navigator.mediaDevices.getUserMedia({
-      video: videoRequest || undefined,
+      video: videoRequest,
     });
     setUserVideoStream(newUserStream);
-  }, [selectedDevices]);
+    userVideoStreamRef.current = newUserStream;
+  }, [selectedCameraId]);
+
+  useEffect(() => {
+    if (cameraEnabled) {
+      enableVideo();
+      return;
+    }
+    disableVideo();
+    return;
+  }, [cameraEnabled, enableVideo, disableVideo]);
+
+  useEffect(() => {
+    if (!userAudioProcessedStream) {
+      return;
+    }
+    enableDisableUserTrack(userAudioProcessedStream, micEnabled);
+  }, [userAudioProcessedStream, micEnabled]);
 
   return {
     userAudioStream: userAudioProcessedStream,
-    userVideoStream,
-    disableVideo,
-    enableVideo,
-  }
+    userVideoStream: canvasMediaStream,
+    devices,
+    selectedCameraId,
+    selectedMicId,
+    setSelectedCameraId,
+    setSelectedMicId,
+    cameraEnabled,
+    micEnabled,
+    setCameraEnabled,
+    setMicEnabled,
+    updateDevices,
+  };
 };

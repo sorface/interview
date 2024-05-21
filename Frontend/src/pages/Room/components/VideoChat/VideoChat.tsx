@@ -43,7 +43,6 @@ interface VideoChatProps {
   userVideoStream: MediaStream | null;
   userAudioStream: MediaStream | null;
   screenStream: MediaStream | null;
-  videoTrackEnabled: boolean;
   micDisabledAutomatically: React.MutableRefObject<boolean>;
   onSendWsMessage: SendMessage;
   onUpdatePeersLength: (length: number) => void;
@@ -100,7 +99,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   userVideoStream,
   userAudioStream,
   screenStream,
-  videoTrackEnabled,
   micDisabledAutomatically,
   onSendWsMessage,
   onUpdatePeersLength,
@@ -133,19 +131,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   const { activeReactions } = useReactionsStatus({
     lastMessage: lastWsMessage,
   });
-
-  useEffect(() => {
-    if (videoTrackEnabled && userVideoStream) {
-      try {
-        peers.filter(peer => !peer.screenShare).forEach(peer => {
-          const videoTrack = userVideoStream.getVideoTracks()[0];
-          peer.peer.addTrack(videoTrack, userVideoStream);
-        });
-      } catch (e) {
-        console.error('add video track error: ', e);
-      }
-    }
-  }, [videoTrackEnabled, peers, userVideoStream]);
 
   const createPeer = useCallback((to: string, forViewer?: boolean, screenShare?: boolean) => {
     if (viewerMode) {
@@ -596,7 +581,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             order={3}
             viewer={false}
             nickname={localizationCaptions[LocalizationKey.AiAssistantName]}
-            videoTrackEnabled={true}
           >
             <div className='videochat-ai-assistant'>
               <Canvas shadows camera={{ position: [0, 0.5, 6.5], fov: 38 }} className='videochat-video'>
@@ -609,7 +593,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             viewer={viewerMode}
             avatar={auth?.avatar}
             nickname={`${auth?.nickname} (${localizationCaptions[LocalizationKey.You]})`}
-            videoTrackEnabled={videoTrackEnabled}
             reaction={activeReactions[auth?.id || '']}
           >
             <video
