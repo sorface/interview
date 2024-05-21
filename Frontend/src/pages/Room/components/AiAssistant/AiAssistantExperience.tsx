@@ -13,7 +13,7 @@ export interface AiAssistantExperienceProps {
 const logoUrl = '/logo192.png';
 
 const cleanUpTranscription = (value: string) =>
-  value.trim().replace(/[\.,?!]/g, '').toLocaleLowerCase();
+  value.trim().replace(/[.,?!]/g, '').toLocaleLowerCase();
 
 const AiAssistantExperienceComponent: FunctionComponent<AiAssistantExperienceProps> = ({
   lastTranscription,

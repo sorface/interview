@@ -42,6 +42,13 @@ export interface RoomReview {
   state: 'Open' | 'Closed';
 }
 
+export interface RoomInvite {
+  inviteId: string;
+  participantType: UserType;
+  max: number;
+  used: number;
+}
+
 export interface RoomParticipant {
   id: string;
   roomId: Room['id'];

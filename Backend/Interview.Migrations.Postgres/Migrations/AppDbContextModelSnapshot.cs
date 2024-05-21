@@ -161,8 +161,11 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
-                    b.Property<Guid?>("RoomId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("Type")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasComment("Available values: [Private: 2, Public: 1]");
 
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("timestamp without time zone");
@@ -175,8 +178,6 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
-
-                    b.HasIndex("RoomId");
 
                     b.ToTable("Questions");
                 });
@@ -311,6 +312,13 @@ namespace Interview.Migrations.Postgres.Migrations
                             Id = new Guid("3b1a04f3-8d35-4608-87fb-1d83d76cd99d"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("97b2411a-b9d4-49cb-9525-0e31b7d35496"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("95f1f088-6931-4914-92c1-c1f1d7d75a18"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("c1f43ca8-21f1-41e6-9794-e7d44156bf73"),
                             UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
@@ -972,6 +980,13 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
+                            Id = new Guid("c1f43ca8-21f1-41e6-9794-e7d44156bf73"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "RoomInviteGenerate",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
                             Id = new Guid("b530321a-a51a-4a36-8afd-6e8a8dbae248"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "RoomInviteGet",
@@ -1348,14 +1363,7 @@ namespace Interview.Migrations.Postgres.Migrations
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
-                    b.HasOne("Interview.Domain.Rooms.Room", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.Navigation("CreatedBy");
-
-                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("Interview.Domain.Reactions.Reaction", b =>
@@ -1437,10 +1445,11 @@ namespace Interview.Migrations.Postgres.Migrations
 
                     b.HasOne("Interview.Domain.Invites.Invite", "Invite")
                         .WithMany()
-                        .HasForeignKey("InviteById");
+                        .HasForeignKey("InviteById")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Interview.Domain.Rooms.Room", "Room")
-                        .WithMany()
+                        .WithMany("Invites")
                         .HasForeignKey("RoomById");
 
                     b.Navigation("CreatedBy");
@@ -1674,6 +1683,8 @@ namespace Interview.Migrations.Postgres.Migrations
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>
                 {
                     b.Navigation("Configuration");
+
+                    b.Navigation("Invites");
 
                     b.Navigation("Participants");
 

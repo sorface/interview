@@ -21,7 +21,5 @@ public class Question : ArchiveEntity
 
     public List<Tag> Tags { get; internal set; } = new List<Tag>();
 
-    public Guid? RoomId { get; internal set; }
-
-    public Room? Room { get; internal set; }
+    public SEQuestionType Type { get; internal set; }
 }

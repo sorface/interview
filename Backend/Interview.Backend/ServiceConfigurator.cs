@@ -49,19 +49,21 @@ public class ServiceConfigurator
 
     public void AddServices(IServiceCollection serviceCollection)
     {
-        if (_environment.IsDevelopment())
+        var corsOptions = _configuration.GetSection(nameof(CorsOptions)).Get<CorsOptions>() ??
+                            throw new InvalidOperationException(nameof(SwaggerOption));
+
+        serviceCollection.AddCors(options =>
         {
-            serviceCollection.AddCors(options =>
+            options.AddPolicy("All", policy =>
             {
-                options.AddPolicy("All", policy =>
-                {
-                    policy
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowAnyOrigin();
-                });
+                policy
+                    .WithOrigins(corsOptions.AllowedOrigins.ToArray())
+                    .SetIsOriginAllowedToAllowWildcardSubdomains()
+                    .AllowCredentials()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
             });
-        }
+        });
 
         serviceCollection
             .AddControllers()

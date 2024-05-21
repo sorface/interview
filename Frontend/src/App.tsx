@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useCallback, useEffect } from 'react';
-import { HashRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AppRoutes } from './routes/AppRoutes';
 import { AuthContext } from './context/AuthContext';
@@ -57,7 +57,7 @@ export const App: FunctionComponent = () => {
   }, [loading, userWillLoad, error, user, handlePageReset]);
 
   return (
-    <HashRouter>
+    <BrowserRouter>
       <Toaster
         position="top-center"
         toastOptions={{
@@ -83,6 +83,6 @@ export const App: FunctionComponent = () => {
           </AuthContext.Provider>
         </LocalizationProvider>
       </ThemeProvider>
-    </HashRouter>
+    </BrowserRouter>
   );
 };

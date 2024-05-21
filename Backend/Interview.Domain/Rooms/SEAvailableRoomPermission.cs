@@ -54,6 +54,8 @@ public class SEAvailableRoomPermission : SmartEnum<SEAvailableRoomPermission, Gu
 
     public static readonly SEAvailableRoomPermission RoomInviteGet = new(SEPermission.RoomInviteGet, new Guid("07DEA11A-65A4-4826-AB4F-9D2CDFAA72F3"));
 
+    public static readonly SEAvailableRoomPermission RoomInviteGenerate = new(SEPermission.RoomInviteGenerate, new Guid("95F1F088-6931-4914-92C1-C1F1D7D75A18"));
+
     public SEAvailableRoomPermission(SEPermission name, Guid value)
         : base(name.Name, value)
     {

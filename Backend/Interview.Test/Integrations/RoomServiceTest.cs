@@ -7,6 +7,7 @@ using Interview.Domain.Reactions;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Response;
+using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.RoomInvites;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomParticipants.Service;
@@ -70,11 +71,13 @@ public class RoomServiceTest
         {
             Room = savedRoom,
             State = RoomQuestionState.Active,
-            Question = questions[2]
+            Question = questions[2],
+            QuestionId = default,
+            RoomId = default,
         };
         appDbContext.RoomQuestions.AddRange(
-            new RoomQuestion { Room = savedRoom, State = RoomQuestionState.Open, Question = questions[0] },
-            new RoomQuestion { Room = savedRoom, State = RoomQuestionState.Closed, Question = questions[1] },
+            new RoomQuestion { Room = savedRoom, State = RoomQuestionState.Open, Question = questions[0], QuestionId = default, RoomId = default },
+            new RoomQuestion { Room = savedRoom, State = RoomQuestionState.Closed, Question = questions[1], QuestionId = default, RoomId = default },
             activeRoomQuestion);
 
         await appDbContext.SaveChangesAsync();
@@ -152,28 +155,36 @@ public class RoomServiceTest
                 Id = Guid.Parse("B15AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
                 Question = questions[0],
                 Room = room1,
-                State = RoomQuestionState.Open
+                State = RoomQuestionState.Open,
+                QuestionId = default,
+                RoomId = default,
             },
             new()
             {
                 Id = Guid.Parse("B25AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
                 Question = questions[1],
                 Room = room1,
-                State = RoomQuestionState.Closed
+                State = RoomQuestionState.Closed,
+                QuestionId = default,
+                RoomId = default,
             },
             new()
             {
                 Id = Guid.Parse("B35AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
                 Question = questions[2],
                 Room = room1,
-                State = RoomQuestionState.Closed
+                State = RoomQuestionState.Closed,
+                QuestionId = default,
+                RoomId = default,
             },
             new()
             {
                 Id = Guid.Parse("B45AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
                 Question = questions[3],
                 Room = room1,
-                State = RoomQuestionState.Active
+                State = RoomQuestionState.Active,
+                QuestionId = default,
+                RoomId = default,
             },
         };
         appDbContext.RoomQuestions.AddRange(roomQuestion);
@@ -491,28 +502,36 @@ public class RoomServiceTest
                 Id = Guid.Parse("B15AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
                 Question = questions[0],
                 Room = room1,
-                State = RoomQuestionState.Open
+                State = RoomQuestionState.Open,
+                QuestionId = default,
+                RoomId = default,
             },
             new()
             {
                 Id = Guid.Parse("B25AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
                 Question = questions[1],
                 Room = room1,
-                State = RoomQuestionState.Closed
+                State = RoomQuestionState.Closed,
+                QuestionId = default,
+                RoomId = default,
             },
             new()
             {
                 Id = Guid.Parse("B35AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
                 Question = questions[2],
                 Room = room1,
-                State = RoomQuestionState.Closed
+                State = RoomQuestionState.Closed,
+                QuestionId = default,
+                RoomId = default,
             },
             new()
             {
                 Id = Guid.Parse("B45AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
                 Question = questions[3],
                 Room = room1,
-                State = RoomQuestionState.Active
+                State = RoomQuestionState.Active,
+                QuestionId = default,
+                RoomId = default,
             },
         };
         appDbContext.RoomQuestions.AddRange(roomQuestion);
@@ -709,6 +728,40 @@ public class RoomServiceTest
             {
                 InviteId = e.InviteById!.Value,
                 ParticipantType = e.ParticipantType!.EnumValue,
+                Max = e.Invite!.UsesMax,
+                Used = e.Invite!.UsesCurrent,
+            })
+            .OrderBy(e => e.InviteId)
+            .ToList();
+        appDbContext.ChangeTracker.Clear();
+
+        var roomService = CreateRoomService(appDbContext);
+        var actualInvites = await roomService.GetInvitesAsync(checkRoom.Id);
+        actualInvites.Sort((i1, i2) => i1.InviteId.CompareTo(i2.InviteId));
+        actualInvites.Should().HaveCount(expectInvites.Count).And.BeEquivalentTo(expectInvites);
+    }
+
+    [Fact]
+    public async Task GetInvitesAsync()
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+
+        var generatedRooms = Enumerable.Range(0, 5)
+            .Select(i => new Room(DefaultRoomName + i, DefaultRoomName + i, SERoomAcсessType.Public)).ToList();
+        appDbContext.Rooms.AddRange(generatedRooms);
+        var roomInvites = generatedRooms.SelectMany(GenerateInvites).ToList();
+        appDbContext.RoomInvites.AddRange(roomInvites);
+        await appDbContext.SaveChangesAsync();
+
+        var checkRoom = appDbContext.Rooms.AsEnumerable().OrderBy(_ => Guid.NewGuid()).First();
+        var expectInvites = appDbContext.RoomInvites.Where(e => e.RoomById == checkRoom.Id)
+            .Select(e => new RoomInviteResponse
+            {
+                InviteId = e.InviteById!.Value,
+                ParticipantType = e.ParticipantType!.EnumValue,
+                Max = e.Invite!.UsesMax,
+                Used = e.Invite!.UsesCurrent,
             })
             .OrderBy(e => e.InviteId)
             .ToList();

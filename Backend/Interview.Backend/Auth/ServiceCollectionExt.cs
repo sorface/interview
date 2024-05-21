@@ -36,6 +36,7 @@ public static class ServiceCollectionExt
                 };
                 options.Cookie.HttpOnly = false;
                 options.Cookie.Name = WebSocketAuthorizationOptions.DefaultCookieName;
+                options.Cookie.Domain = authorizationService.Domain;
                 options.ClaimsIssuer = authorizationService.ClaimsIssuer;
                 options.ExpireTimeSpan = TimeSpan.FromDays(10);
             })

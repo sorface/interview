@@ -2,6 +2,7 @@ using CSharpFunctionalExtensions;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Repository;
 using Interview.Domain.RoomParticipants;
+using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.ServiceResults.Errors;
 using Interview.Domain.ServiceResults.Success;
 using Interview.Domain.Tags;
@@ -15,32 +16,35 @@ namespace Interview.Domain.Questions.Services;
 public class QuestionService : IQuestionService
 {
     private readonly IQuestionRepository _questionRepository;
-
+    private readonly IRoomQuestionRepository _roomQuestionRepository;
     private readonly IQuestionNonArchiveRepository _questionNonArchiveRepository;
-
     private readonly ArchiveService<Question> _archiveService;
-
     private readonly ITagRepository _tagRepository;
-
     private readonly IRoomMembershipChecker _roomMembershipChecker;
+    private readonly ICurrentUserAccessor _currentUserAccessor;
 
     public QuestionService(
         IQuestionRepository questionRepository,
         IQuestionNonArchiveRepository questionNonArchiveRepository,
         ArchiveService<Question> archiveService,
         ITagRepository tagRepository,
-        IRoomMembershipChecker roomMembershipChecker)
+        IRoomMembershipChecker roomMembershipChecker,
+        ICurrentUserAccessor currentUserAccessor,
+        IRoomQuestionRepository roomQuestionRepository)
     {
         _questionRepository = questionRepository;
         _questionNonArchiveRepository = questionNonArchiveRepository;
         _archiveService = archiveService;
         _tagRepository = tagRepository;
         _roomMembershipChecker = roomMembershipChecker;
+        _currentUserAccessor = currentUserAccessor;
+        _roomQuestionRepository = roomQuestionRepository;
     }
 
     public async Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken)
     {
-        ASpec<Question> spec = new Spec<Question>(e => e.RoomId == null);
+        var currentUserId = _currentUserAccessor.UserId ?? Guid.Empty;
+        ASpec<Question> spec = new Spec<Question>(e => e.Type == SEQuestionType.Public || e.CreatedById == currentUserId);
 
         if (request.Tags is not null && request.Tags.Count > 0)
         {
@@ -95,10 +99,11 @@ public class QuestionService : IQuestionService
         var result = new Question(request.Value)
         {
             Tags = tags,
-            RoomId = roomId,
+            Type = GetQuestionType(),
         };
 
         await _questionRepository.CreateAsync(result, cancellationToken);
+
         return new QuestionItem
         {
             Id = result.Id,
@@ -106,6 +111,16 @@ public class QuestionService : IQuestionService
             Tags = result.Tags.Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, })
                 .ToList(),
         };
+
+        SEQuestionType GetQuestionType()
+        {
+            if (request.Type == EVQuestionType.Public && !_currentUserAccessor.IsAdmin())
+            {
+                throw new AccessDeniedException("You cannot create a public question.");
+            }
+
+            return SEQuestionType.FromValue((int)request.Type);
+        }
     }
 
     public async Task<QuestionItem> UpdateAsync(
