@@ -11,7 +11,7 @@ import './ReactionsList.css';
 
 const defaultIconName = IconNames.None;
 
-const ignoredReactions: string[] = [];
+const ignoredReactions: string[] = ['CodeEditorLanguage'];
 
 interface ReactionsListProps {
   reactions: Reaction[];

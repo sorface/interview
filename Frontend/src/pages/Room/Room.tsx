@@ -169,6 +169,7 @@ export const Room: FunctionComponent = () => {
 
   const eventsState = useEventsState({ roomState, lastWsMessage: lastMessage });
   const codeEditorEnabled = !!eventsState[EventName.CodeEditor];
+  const codeEditorLanguage = String(eventsState[EventName.CodeEditorLanguage]);
 
   const currentUserExpert = roomParticipant?.userType === 'Expert';
   const currentUserExaminee = roomParticipant?.userType === 'Examinee';
@@ -504,6 +505,7 @@ export const Room: FunctionComponent = () => {
                 lastWsMessage={lastMessage}
                 messagesChatEnabled={messagesChatEnabled}
                 codeEditorEnabled={codeEditorEnabled}
+                codeEditorLanguage={codeEditorLanguage}
                 userVideoStream={userVideoStream}
                 userAudioStream={userAudioStream}
                 screenStream={screenStream}

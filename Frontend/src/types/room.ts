@@ -16,7 +16,7 @@ export interface Room {
 export type RoomStateType = 'CodeEditor';
 
 export type RoomStateAdditionalStatefulPayload = {
-  enabled: boolean;
+  value: string | boolean;
 };
 
 interface RoomStateAdditional {

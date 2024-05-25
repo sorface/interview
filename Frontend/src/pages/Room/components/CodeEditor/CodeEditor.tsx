@@ -5,6 +5,9 @@ import { Theme, ThemeContext } from '../../../../context/ThemeContext';
 import { RoomState } from '../../../../types/room';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
+import { useApiMethod } from '../../../../hooks/useApiMethod';
+import { SendEventBody, roomsApiDeclaration } from '../../../../apiDeclarations';
+import { EventName } from '../../../../constants';
 
 import './CodeEditor.css';
 
@@ -31,6 +34,8 @@ const languageOptions = [
   'yaml',
 ];
 
+const defaultLanguage = languageOptions[0];
+
 const fontSizeOptions = [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48];
 
 const renderOptions = (options: Array<number | string>) =>
@@ -41,6 +46,7 @@ const renderOptions = (options: Array<number | string>) =>
   ));
 
 interface CodeEditorProps {
+  language: string;
   roomState: RoomState | null;
   readOnly: boolean;
   lastWsMessage: MessageEvent<any> | null;
@@ -48,6 +54,7 @@ interface CodeEditorProps {
 }
 
 export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
+  language,
   roomState,
   readOnly,
   lastWsMessage,
@@ -58,7 +65,10 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   const ignoreChangeRef = useRef(false);
   const [value, setValue] = useState<string>('');
   const [fontSize, setFontSize] = useState(22);
-  const [language, setLanguage] = useState<string>('plaintext');
+
+  const {
+    fetchData: sendRoomEvent,
+  } = useApiMethod<unknown, SendEventBody>(roomsApiDeclaration.sendEvent);
 
   useEffect(() => {
     if (!roomState) {
@@ -109,14 +119,21 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   };
 
   const handleLanguageChange: ChangeEventHandler<HTMLSelectElement> = (event) => {
-    setLanguage(event.target.value);
+    if (!roomState) {
+      return;
+    }
+    sendRoomEvent({
+      roomId: roomState.id,
+      type: EventName.CodeEditorLanguage,
+      additionalData: { value: event.target.value },
+    })
   };
 
   return (
     <div className='code-editor'>
       <div className='code-editor-tools'>
         <span>{localizationCaptions[LocalizationKey.Language]}:</span>
-        <select className='code-editor-tools-select' value={language} onChange={handleLanguageChange}>
+        <select className='code-editor-tools-select' value={language || defaultLanguage} onChange={handleLanguageChange}>
           {renderOptions(languageOptions)}
         </select>
         <span>{localizationCaptions[LocalizationKey.FontSize]}:</span>
@@ -132,7 +149,7 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
           quickSuggestions: false,
           readOnly,
         }}
-        language={language}
+        language={language || defaultLanguage}
         theme={themeInUi === Theme.Dark ? 'vs-dark' : 'light'}
         value={value}
         onChange={handleChange}
