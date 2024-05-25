@@ -11,13 +11,14 @@ import {
   roomReactionApiDeclaration,
   roomsApiDeclaration,
 } from '../../../../apiDeclarations';
-import { Room, RoomState, RoomStateAdditionalStatefulPayload } from '../../../../types/room';
+import { Room } from '../../../../types/room';
 import { Event } from '../../../../types/event';
 import { UserType } from '../../../../types/user';
 import { Loader } from '../../../../components/Loader/Loader';
 import { useReactionsFeed } from '../../hooks/useReactionsFeed';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
+import { EventsState } from '../../hooks/useEventsState';
 
 import './Reactions.css';
 
@@ -33,11 +34,9 @@ const eventToReaction = (event: Event): Reaction => ({
   }
 });
 
-type ParsedStates = Record<string, boolean>;
-
 export interface ReactionsProps {
   room: Room | null;
-  roomState: RoomState | null;
+  eventsState: EventsState;
   roles: string[];
   participantType: UserType | null;
   lastWsMessage: MessageEvent<any> | null;
@@ -45,7 +44,7 @@ export interface ReactionsProps {
 
 export const Reactions: FunctionComponent<ReactionsProps> = ({
   room,
-  roomState,
+  eventsState,
   roles,
   participantType,
   lastWsMessage,
@@ -88,7 +87,6 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
   const { reactionsFeed } = useReactionsFeed({
     lastMessage: lastWsMessage,
   });
-  const [parsedStates, setParsedStates] = useState<ParsedStates>({});
   const [lastSendedReactionType, setLastSendedReactionType] = useState('');
 
   const reactionsSafe = reactions || [];
@@ -116,39 +114,6 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
     });
   }, [room?.id, fetchReactions, fetchRoomEvents]);
 
-  useEffect(() => {
-    if (!roomState) {
-      return;
-    }
-    const parsedStates: ParsedStates = {};
-    roomState.states.forEach(roomState =>
-      parsedStates[roomState.type] = (JSON.parse(roomState.payload) as RoomStateAdditionalStatefulPayload).enabled
-    );
-    setParsedStates(parsedStates);
-  }, [roomState]);
-
-  useEffect(() => {
-    if (!lastWsMessage || !parsedStates) {
-      return;
-    }
-    try {
-      const parsedData = JSON.parse(lastWsMessage?.data);
-      if (!parsedData?.Stateful) {
-        return;
-      }
-      const stateType = parsedData.Type;
-      const stateValue = (parsedData.Value.AdditionalData as RoomStateAdditionalStatefulPayload).enabled;
-      const oldValue = parsedStates[stateType];
-      if (oldValue !== stateValue) {
-        setParsedStates({
-          ...parsedStates,
-          [stateType]: stateValue,
-        });
-      }
-    } catch {
-    }
-  }, [lastWsMessage, parsedStates]);
-
   const handleReactionClick = useCallback((reaction: Reaction) => {
     if (!room) {
       throw new Error('Error sending reaction. Room not found.');
@@ -162,17 +127,17 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
   }, [room, sendRoomReaction]);
 
   const handleEventClick = useCallback((event: Reaction) => {
-    if (!room || !parsedStates) {
+    if (!room || !eventsState) {
       throw new Error('Error sending reaction. Room not found.');
     }
-    const prevEnabled = Boolean(parsedStates[event.type.name]);
+    const prevEnabled = Boolean(eventsState[event.type.name]);
     sendRoomEvent({
       roomId: room.id,
       type: event.type.name,
       additionalData: { enabled: !prevEnabled },
     });
     setLastSendedReactionType(event.type.name);
-  }, [room, parsedStates, sendRoomEvent]);
+  }, [room, eventsState, sendRoomEvent]);
 
   if (errorReactions) {
     return (
