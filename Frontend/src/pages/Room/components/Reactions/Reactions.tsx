@@ -134,7 +134,7 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
     sendRoomEvent({
       roomId: room.id,
       type: event.type.name,
-      additionalData: { enabled: !prevEnabled },
+      additionalData: { value: !prevEnabled },
     });
     setLastSendedReactionType(event.type.name);
   }, [room, eventsState, sendRoomEvent]);

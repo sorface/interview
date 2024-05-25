@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { RoomState, RoomStateAdditionalStatefulPayload } from '../../../types/room';
 
-export type EventsState = Record<string, boolean>;
+export type EventsState = Record<string, string | boolean | null>;
 
 interface UseEventsStateParams {
   roomState: RoomState | null;
@@ -20,7 +20,7 @@ export const useEventsState = ({
     }
     const parsedStates: EventsState = {};
     roomState.states.forEach(roomState =>
-      parsedStates[roomState.type] = (JSON.parse(roomState.payload) as RoomStateAdditionalStatefulPayload).enabled
+      parsedStates[roomState.type] = (JSON.parse(roomState.payload) as RoomStateAdditionalStatefulPayload).value
     );
     setEventsState(parsedStates);
   }, [roomState]);
@@ -35,7 +35,7 @@ export const useEventsState = ({
         return;
       }
       const stateType = parsedData.Type;
-      const stateValue = (parsedData.Value.AdditionalData as RoomStateAdditionalStatefulPayload).enabled;
+      const stateValue = (parsedData.Value.AdditionalData as RoomStateAdditionalStatefulPayload).value;
       const oldValue = eventsState[stateType];
       if (oldValue !== stateValue) {
         setEventsState({
