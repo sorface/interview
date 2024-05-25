@@ -7,7 +7,6 @@ export type RoomStatus = 'New' | 'Active' | 'Review' | 'Close';
 export interface Room {
   id: string;
   name: string;
-  twitchChannel: string;
   users: User[];
   tags: Tag[];
   roomStatus: RoomStatus;
