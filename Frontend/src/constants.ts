@@ -49,3 +49,7 @@ export const reactionIcon: Record<string, IconNames> = {
 export const toastSuccessOptions = {
   icon: '👌',
 };
+
+export const enum EventName {
+  CodeEditor = 'CodeEditor',
+}

@@ -14,7 +14,7 @@ import {
 } from '../../apiDeclarations';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { REACT_APP_WS_URL } from '../../config';
-import { IconNames, inviteParamName, pathnames } from '../../constants';
+import { EventName, IconNames, inviteParamName, pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { useCommunist } from '../../hooks/useCommunist';
@@ -38,6 +38,7 @@ import { ThemedIcon } from './components/ThemedIcon/ThemedIcon';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Invitations } from './components/Invitations/Invitations';
 import { UserType } from '../../types/user';
+import { useEventsState } from './hooks/useEventsState';
 
 import './Room.css';
 
@@ -165,6 +166,9 @@ export const Room: FunctionComponent = () => {
     process: { loading: loadingRoomState, error: errorRoomState },
     data: roomState,
   } = apiRoomStateState;
+
+  const eventsState = useEventsState({ roomState, lastWsMessage: lastMessage });
+  const codeEditorEnabled = !!eventsState[EventName.CodeEditor];
 
   const currentUserExpert = roomParticipant?.userType === 'Expert';
   const currentUserExaminee = roomParticipant?.userType === 'Examinee';
@@ -499,6 +503,7 @@ export const Room: FunctionComponent = () => {
                 viewerMode={viewerMode}
                 lastWsMessage={lastMessage}
                 messagesChatEnabled={messagesChatEnabled}
+                codeEditorEnabled={codeEditorEnabled}
                 userVideoStream={userVideoStream}
                 userAudioStream={userAudioStream}
                 screenStream={screenStream}
@@ -556,7 +561,7 @@ export const Room: FunctionComponent = () => {
               {reactionsVisible && (
                 <Reactions
                   room={room}
-                  roomState={roomState}
+                  eventsState={eventsState}
                   roles={auth?.roles || []}
                   participantType={roomParticipant?.userType || null}
                   lastWsMessage={lastMessage}

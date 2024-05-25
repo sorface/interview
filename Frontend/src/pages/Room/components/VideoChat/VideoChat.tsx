@@ -40,6 +40,7 @@ interface VideoChatProps {
   viewerMode: boolean;
   lastWsMessage: MessageEvent<any> | null;
   messagesChatEnabled: boolean;
+  codeEditorEnabled: boolean;
   userVideoStream: MediaStream | null;
   userAudioStream: MediaStream | null;
   screenStream: MediaStream | null;
@@ -96,6 +97,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   viewerMode,
   lastWsMessage,
   messagesChatEnabled,
+  codeEditorEnabled,
   userVideoStream,
   userAudioStream,
   screenStream,
@@ -494,7 +496,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           setPeers([...peersRef.current]);
           break;
         case 'receiving returned signal':
-          const item = peersRef.current.find(p => 
+          const item = peersRef.current.find(p =>
             p.peerID === parsedPayload.From && (screenShare ? p.screenShare : true)
           );
           if (item) {
@@ -573,9 +575,28 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     }));
   };
 
+  const needToRenderMainField = screenSharePeer || codeEditorEnabled;
+
+  const renderMain = () => {
+    if (screenSharePeer) {
+      return <VideoChatVideo peer={screenSharePeer.peer} />;
+    }
+    if (codeEditorEnabled) {
+      return (
+        <CodeEditor
+          roomState={roomState}
+          readOnly={viewerMode}
+          lastWsMessage={lastWsMessage}
+          onSendWsMessage={onSendWsMessage}
+        />
+      );
+    }
+    return <></>;
+  };
+
   return (
     <div className='room-columns'>
-      <Field className='videochat-field'>
+      <Field className={`videochat-field ${needToRenderMainField ? '' : 'fullscreen'}`}>
         <div className='videochat'>
           <VideochatParticipant
             order={3}
@@ -620,18 +641,11 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           ))}
         </div>
       </Field>
-      <Field className='videochat-field videochat-field-main'>
-        {screenSharePeer ? (
-          <VideoChatVideo peer={screenSharePeer.peer} />
-        ) : (
-          <CodeEditor
-            roomState={roomState}
-            readOnly={viewerMode}
-            lastWsMessage={lastWsMessage}
-            onSendWsMessage={onSendWsMessage}
-          />
-        )}
-      </Field>
+      {needToRenderMainField && (
+        <Field className='videochat-field videochat-field-main'>
+          {renderMain()}
+        </Field>
+      )}
       {!!messagesChatEnabled && (
         <Field className='videochat-field videochat-field-chat'>
           <MessagesChat

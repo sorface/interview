@@ -11,7 +11,7 @@ import './ReactionsList.css';
 
 const defaultIconName = IconNames.None;
 
-const ignoredReactions = ['CodeEditor'];
+const ignoredReactions: string[] = [];
 
 interface ReactionsListProps {
   reactions: Reaction[];
@@ -32,6 +32,7 @@ export const ReactionsList: FunctionComponent<ReactionsListProps> = ({
   const reactionLocalization: Record<string, string> = {
     Like: localizationCaptions[LocalizationKey.Like],
     Dislike: localizationCaptions[LocalizationKey.Dislike],
+    CodeEditor: localizationCaptions[LocalizationKey.CodeEditor],
   }
 
   const handleReactionClick = useCallback((reaction: Reaction) => () => {

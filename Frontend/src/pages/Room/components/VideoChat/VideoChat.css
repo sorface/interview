@@ -10,6 +10,11 @@
   overflow-x: hidden;
 }
 
+
+.room-columns .videochat-field.fullscreen {
+  width: 100%;
+}
+
 .room-columns .videochat-field:last-child {
   margin-right: 0rem !important;
 }
@@ -30,6 +35,10 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
+}
+
+.videochat-field.fullscreen .videochat {
+  flex-direction: row;
 }
 
 .videochat-ai-assistant {
@@ -72,6 +81,11 @@
   height: var(--videochat-video-size);
   margin-bottom: 0.5rem;
   animation: var(--fadeIn-animation);
+}
+
+.videochat-field.fullscreen .videochat-participant {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 
 .videochat-participant ion-icon {
