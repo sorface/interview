@@ -10,3 +10,15 @@
 .code-editor .code-editor-tools-select {
   margin-right: 0.75rem;
 }
+
+.code-editor-cursor {
+  width: 3px;
+}
+
+.code-editor-tooltip {
+  width: max-content;
+  padding: 0.15rem;
+  font-size: 0.75rem;
+  background: var(--form-bg) !important;
+  transform: translateY(-18px) translateX(3px);
+}
