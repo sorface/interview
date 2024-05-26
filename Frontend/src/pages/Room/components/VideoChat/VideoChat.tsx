@@ -42,6 +42,7 @@ interface VideoChatProps {
   messagesChatEnabled: boolean;
   codeEditorEnabled: boolean;
   codeEditorLanguage: string;
+  codeEditorRemoteCursor: string;
   userVideoStream: MediaStream | null;
   userAudioStream: MediaStream | null;
   screenStream: MediaStream | null;
@@ -100,6 +101,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   messagesChatEnabled,
   codeEditorEnabled,
   codeEditorLanguage,
+  codeEditorRemoteCursor,
   userVideoStream,
   userAudioStream,
   screenStream,
@@ -587,6 +589,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       return (
         <CodeEditor
           language={codeEditorLanguage}
+          remoteCursor={codeEditorRemoteCursor}
           roomState={roomState}
           readOnly={viewerMode}
           lastWsMessage={lastWsMessage}

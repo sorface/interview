@@ -53,4 +53,5 @@ export const toastSuccessOptions = {
 export const enum EventName {
   CodeEditor = 'CodeEditor',
   CodeEditorLanguage = 'CodeEditorLanguage',
+  CodeEditorCursor = 'CodeEditorCursor',
 }
