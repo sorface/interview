@@ -51,8 +51,8 @@ const sendCursorEventTimeout = 222;
 
 const remoteCursorClassName = 'code-editor-cursor';
 const remoteTooltipClassName = 'code-editor-tooltip';
-const remoteCursorColor = 'var(--text)';
-const remoteSelectionColor = 'var(--page-bg)';
+const remoteCursorColor = 'var(--active)';
+const remoteSelectionColor = 'var(--active)';
 
 const renderOptions = (options: Array<number | string>) =>
   options.map(option => (
