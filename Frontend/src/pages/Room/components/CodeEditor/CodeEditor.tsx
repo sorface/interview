@@ -78,7 +78,6 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   lastWsMessage,
   onSendWsMessage,
 }) => {
-  console.log('readOnly: ', readOnly);
   const auth = useContext(AuthContext);
   const { themeInUi } = useContext(ThemeContext);
   const localizationCaptions = useLocalizationCaptions();
