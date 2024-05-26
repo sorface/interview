@@ -286,7 +286,6 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
             {
                 Id = e.Id,
                 Name = e.Name,
-                TwitchChannel = e.TwitchChannel,
                 Questions = e.Questions.Select(question => question.Question)
                     .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
                     .ToList(),

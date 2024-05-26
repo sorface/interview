@@ -79,7 +79,7 @@ public class RoomParticipantServiceTest
     {
         var faker = new Faker();
         var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
-        room = new Room(faker.Random.Word(), string.Empty, SERoomAcсessType.Public);
+        room = new Room(faker.Random.Word(), SERoomAcсessType.Public);
         appDbContext.Rooms.Add(room);
         user = new User(faker.Random.Word(), string.Empty);
         appDbContext.Users.Add(user);

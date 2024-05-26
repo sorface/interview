@@ -12,22 +12,19 @@ namespace Interview.Domain.Rooms;
 
 public class Room : Entity
 {
-    public Room(string name, string twitchChannel, SERoomAcсessType acсessType)
+    public Room(string name, SERoomAcсessType acсessType)
     {
         Name = name;
-        TwitchChannel = twitchChannel;
         Status = SERoomStatus.New;
         AcсessType = acсessType;
     }
 
     private Room()
-        : this(string.Empty, string.Empty, SERoomAcсessType.Public)
+        : this(string.Empty, SERoomAcсessType.Public)
     {
     }
 
     public string Name { get; internal set; }
-
-    public string TwitchChannel { get; internal set; }
 
     public SERoomAcсessType AcсessType { get; internal set; }
 

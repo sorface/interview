@@ -22,7 +22,6 @@ import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import './RoomCreate.css';
 
 const nameFieldName = 'roomName';
-const twitchChannelFieldName = 'roomTwitchChannel';
 const pageNumber = 1;
 const pageSize = 30;
 
@@ -97,16 +96,8 @@ export const RoomCreate: FunctionComponent = () => {
     if (typeof roomName !== 'string') {
       throw new Error('qestionText field type error');
     }
-    const roomTwitchChannel = data.get(twitchChannelFieldName);
-    if (!roomTwitchChannel) {
-      return;
-    }
-    if (typeof roomTwitchChannel !== 'string') {
-      throw new Error('roomTwitchChannel field type error');
-    }
     fetchData({
       name: roomName,
-      twitchChannel: roomTwitchChannel,
       questions: selectedQuestions.map(question => question.id),
       experts: selectedExperts.map(user => user.id),
       examinees: selectedExaminees.map(user => user.id),
@@ -180,10 +171,6 @@ export const RoomCreate: FunctionComponent = () => {
         <Field>
           <label htmlFor="roomName">{localizationCaptions[LocalizationKey.RoomName]}:</label>
           <input id="roomName" name={nameFieldName} type="text" required />
-        </Field>
-        <Field>
-          <label htmlFor="twitchChannel">{localizationCaptions[LocalizationKey.RoomTwitchChannel]}:</label>
-          <input id="twitchChannel" name={twitchChannelFieldName} type="text" required />
         </Field>
         <Field>
           <TagsSelector
