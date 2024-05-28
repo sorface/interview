@@ -1,22 +1,21 @@
-using System.Net.WebSockets;
-using System.Text;
 using System.Text.Json;
 using Interview.Backend.WebSocket.Events.ConnectionListener;
 using Interview.Domain.Events.Events;
 using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Events.Sender;
+using Interview.Domain.Rooms.RoomParticipants;
 
 namespace Interview.Backend.WebSocket.Events.Handlers;
 
-public class ReturningSignalWebSocketEventHandler : WebSocketEventHandlerBase<ReturningSignalWebSocketEventHandler.ReceivePayload>
+public class SendingSignalWebSocketByNameEventHandler : WebSocketByNameEventHandlerBase<SendingSignalWebSocketByNameEventHandler.ReceivePayload>
 {
     private readonly IVideChatConnectionProvider _userWebSocketConnectionProvider;
     private readonly ILogger<WebSocketEventSender> _webSocketEventSender;
     private readonly IEventSenderAdapter _eventSenderAdapter;
     private readonly IRoomEventSerializer _serializer;
 
-    public ReturningSignalWebSocketEventHandler(
-        ILogger<WebSocketEventHandlerBase<ReceivePayload>> logger,
+    public SendingSignalWebSocketByNameEventHandler(
+        ILogger<WebSocketByNameEventHandlerBase<ReceivePayload>> logger,
         IVideChatConnectionProvider userWebSocketConnectionProvider,
         ILogger<WebSocketEventSender> webSocketEventSender,
         IEventSenderAdapter eventSenderAdapter,
@@ -29,19 +28,30 @@ public class ReturningSignalWebSocketEventHandler : WebSocketEventHandlerBase<Re
         _serializer = serializer;
     }
 
-    protected override string SupportType => "returning signal";
+    protected override string SupportType => "sending signal";
 
     protected override async Task HandleEventAsync(SocketEventDetail detail, ReceivePayload payload, CancellationToken cancellationToken)
     {
         if (!_userWebSocketConnectionProvider.TryGetConnections(payload.To, detail.RoomId, out var connections))
         {
-            Logger.LogWarning("Not found {To} user connections. {RoomId} current {UserId}", payload.To, detail.RoomId, detail.UserId);
+            Logger.LogWarning("Not found {To} user connections. {RoomId} {From}", payload.To, detail.RoomId, detail.UserId);
             return;
         }
 
-        var receivingReturnedSignalPayload = new { Signal = payload.Signal, From = detail.UserId, ScreenShare = payload.ScreenShare };
-        var strPayload = _serializer.SerializePayloadAsString(receivingReturnedSignalPayload);
-        var sendEvent = new RoomEvent(detail.RoomId, "receiving returned signal", strPayload, false);
+        var payloadForSerialization = new UserDetailResponse
+        {
+            From = new UserDetail
+            {
+                Id = detail.User.Id,
+                Nickname = detail.User.Nickname,
+                Avatar = detail.User.Avatar,
+                ParticipantType = detail.ParticipantType,
+            },
+            Signal = payload.Signal,
+            ScreenShare = payload.ScreenShare,
+        };
+        var payloadStr = _serializer.SerializePayloadAsString(payloadForSerialization);
+        var sendEvent = new RoomEvent(detail.RoomId, "user joined", payloadStr, false);
         var provider = new CachedRoomEventProvider(sendEvent, _serializer);
         foreach (var webSocket in connections)
         {
@@ -58,4 +68,28 @@ public class ReturningSignalWebSocketEventHandler : WebSocketEventHandlerBase<Re
 
         public bool? ScreenShare { get; set; }
     }
+}
+
+#pragma warning disable SA1402
+public class UserDetailResponse
+#pragma warning restore SA1402
+{
+    public required UserDetail From { get; init; }
+
+    public required string? Signal { get; init; }
+
+    public required bool? ScreenShare { get; init; }
+}
+
+#pragma warning disable SA1402
+public class UserDetail
+#pragma warning restore SA1402
+{
+    public required Guid Id { get; init; }
+
+    public required string Nickname { get; init; }
+
+    public required string? Avatar { get; init; }
+
+    public required EVRoomParticipantType ParticipantType { get; init; }
 }

@@ -4,13 +4,13 @@ using Interview.Infrastructure.Chat;
 
 namespace Interview.Backend.WebSocket.Events.Handlers;
 
-public class VoiceRecognitionWebSocketEventHandler : WebSocketEventHandlerBase
+public class VoiceRecognitionWebSocketByNameEventHandler : WebSocketByNameEventHandlerBase
 {
     private readonly IRoomEventDispatcher _eventDispatcher;
 
-    public VoiceRecognitionWebSocketEventHandler(
+    public VoiceRecognitionWebSocketByNameEventHandler(
         IRoomEventDispatcher eventDispatcher,
-        ILogger<WebSocketEventHandlerBase> logger)
+        ILogger<WebSocketByNameEventHandlerBase> logger)
         : base(logger)
     {
         _eventDispatcher = eventDispatcher;

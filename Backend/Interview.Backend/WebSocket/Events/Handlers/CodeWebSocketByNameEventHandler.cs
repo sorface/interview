@@ -4,9 +4,9 @@ using Interview.Domain.Rooms.RoomParticipants;
 
 namespace Interview.Backend.WebSocket.Events.Handlers;
 
-public class CodeWebSocketEventHandler : WebSocketEventHandlerBase
+public class CodeWebSocketByNameEventHandler : WebSocketByNameEventHandlerBase
 {
-    public CodeWebSocketEventHandler(ILogger<WebSocketEventHandlerBase> logger)
+    public CodeWebSocketByNameEventHandler(ILogger<WebSocketByNameEventHandlerBase> logger)
         : base(logger)
     {
     }
