@@ -12,6 +12,8 @@ public sealed class AppEventWebSocketEventHandler : WebSocketEventHandlerBase<Di
     {
     }
 
+    public override int Order => int.MaxValue;
+
     protected override async ValueTask<bool> IsSupportTaskAsync(SocketEventDetail detail, CancellationToken cancellationToken)
     {
         var db = detail.ScopedServiceProvider.GetRequiredService<AppDbContext>();

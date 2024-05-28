@@ -13,6 +13,8 @@ namespace Interview.Backend.WebSocket.Events.Handlers
             Logger = logger;
         }
 
+        public virtual int Order => 0;
+
         public async Task<bool> HandleAsync(SocketEventDetail detail, CancellationToken cancellationToken)
         {
             var isSupportType = await IsSupportTaskAsync(detail, cancellationToken);

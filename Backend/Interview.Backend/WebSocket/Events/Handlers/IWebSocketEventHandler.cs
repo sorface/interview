@@ -4,6 +4,8 @@ namespace Interview.Backend.WebSocket.Events.Handlers;
 
 public interface IWebSocketEventHandler
 {
+    int Order { get; }
+
     Task<bool> HandleAsync(SocketEventDetail detail, CancellationToken cancellationToken);
 }
 
