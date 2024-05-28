@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 
 namespace Interview.Backend.WebSocket.Events.Handlers
 {
@@ -24,7 +24,7 @@ namespace Interview.Backend.WebSocket.Events.Handlers
             try
             {
                 var payload = ParsePayload(detail.Event);
-                if (payload is not null)
+                if (IsValidPayload(payload))
                 {
                     await HandleEventAsync(detail, payload, cancellationToken);
                 }
@@ -39,10 +39,12 @@ namespace Interview.Backend.WebSocket.Events.Handlers
             return false;
         }
 
+        protected virtual bool IsValidPayload(TPayload? payload) => payload is not null;
+
         protected abstract ValueTask<bool>
             IsSupportTaskAsync(SocketEventDetail detail, CancellationToken cancellationToken);
 
-        protected abstract Task HandleEventAsync(SocketEventDetail detail, TPayload payload, CancellationToken cancellationToken);
+        protected abstract Task HandleEventAsync(SocketEventDetail detail, TPayload? payload, CancellationToken cancellationToken);
 
         protected virtual TPayload? ParsePayload(WebSocketEvent @event) => string.IsNullOrEmpty(@event.Value) ? default : JsonSerializer.Deserialize<TPayload>(@event.Value);
     }

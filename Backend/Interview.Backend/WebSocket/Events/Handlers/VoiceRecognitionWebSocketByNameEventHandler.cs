@@ -18,9 +18,9 @@ public class VoiceRecognitionWebSocketByNameEventHandler : WebSocketByNameEventH
 
     protected override string SupportType => "voice-recognition";
 
-    protected override Task HandleEventAsync(SocketEventDetail detail, string message, CancellationToken cancellationToken)
+    protected override Task HandleEventAsync(SocketEventDetail detail, string? message, CancellationToken cancellationToken)
     {
-        var payload = new UserMessageEventPayload(message, detail.User.Nickname);
+        var payload = new UserMessageEventPayload(message ?? string.Empty, detail.User.Nickname);
         var @event = new RoomEvent<UserMessageEventPayload>(detail.RoomId, EventType.VoiceRecognition, payload, false);
         return _eventDispatcher.WriteAsync(@event, cancellationToken);
     }

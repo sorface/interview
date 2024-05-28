@@ -31,8 +31,13 @@ public class ReturningSignalWebSocketByNameEventHandler : WebSocketByNameEventHa
 
     protected override string SupportType => "returning signal";
 
-    protected override async Task HandleEventAsync(SocketEventDetail detail, ReceivePayload payload, CancellationToken cancellationToken)
+    protected override async Task HandleEventAsync(SocketEventDetail detail, ReceivePayload? payload, CancellationToken cancellationToken)
     {
+        if (payload is null)
+        {
+            return;
+        }
+
         if (!_userWebSocketConnectionProvider.TryGetConnections(payload.To, detail.RoomId, out var connections))
         {
             Logger.LogWarning("Not found {To} user connections. {RoomId} current {UserId}", payload.To, detail.RoomId, detail.UserId);

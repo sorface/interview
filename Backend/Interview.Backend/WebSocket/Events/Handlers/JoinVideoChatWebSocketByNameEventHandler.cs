@@ -31,7 +31,7 @@ public class JoinVideoChatWebSocketByNameEventHandler : WebSocketByNameEventHand
 
     protected override string SupportType => "join video chat";
 
-    protected override async Task HandleEventAsync(SocketEventDetail detail, string payload, CancellationToken cancellationToken)
+    protected override async Task HandleEventAsync(SocketEventDetail detail, string? payload, CancellationToken cancellationToken)
     {
         var successConnectResult = await _videChatConnectionProvider.TryConnectAsync(detail, cancellationToken);
         if (!successConnectResult)
