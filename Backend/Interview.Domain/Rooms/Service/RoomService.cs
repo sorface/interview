@@ -106,7 +106,6 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         }
 
         var name = request.Name.Trim();
-
         if (string.IsNullOrEmpty(name))
         {
             throw new UserException("Room name should not be empty");
@@ -115,12 +114,17 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         var questions =
             await FindByIdsOrErrorAsync(_questionRepository, request.Questions, "questions", cancellationToken);
 
-        var experts = await FindByIdsOrErrorAsync(_userRepository, request.Experts, "experts", cancellationToken);
+        var currentUserId = _currentUserAccessor.GetUserIdOrThrow();
+        ICollection<Guid> requestExperts = request.Experts;
+        if (!request.Experts.Contains(currentUserId) && !request.Examinees.Contains(currentUserId))
+        {
+            // If the current user is not listed as a member of the room, add him/her with the role 'Expert'
+            requestExperts = requestExperts.Concat(new[] { currentUserId }).ToList();
+        }
 
+        var experts = await FindByIdsOrErrorAsync(_userRepository, requestExperts, "experts", cancellationToken);
         var examinees = await FindByIdsOrErrorAsync(_userRepository, request.Examinees, "examinees", cancellationToken);
-
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
-
         var room = new Room(name, SERoomAcсessType.FromName(request.AccessType)) { Tags = tags, };
         var roomQuestions = questions.Select(question =>
             new RoomQuestion
@@ -142,9 +146,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         var createdParticipants = await _roomParticipantService.CreateAsync(room.Id, participants, cancellationToken);
         room.Participants.AddRange(createdParticipants);
         await _roomRepository.CreateAsync(room, cancellationToken);
-
         await GenerateInvitesAsync(room.Id, cancellationToken);
-
         return room;
     }
 
