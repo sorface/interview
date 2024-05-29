@@ -18,6 +18,7 @@ import { Tag } from '../../types/tag';
 import { LocalizationKey } from '../../localization';
 import { HeaderField } from '../../components/HeaderField/HeaderField';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { RoomAccessType } from '../../types/room';
 
 import './RoomCreate.css';
 
@@ -111,6 +112,7 @@ export const RoomCreate: FunctionComponent = () => {
       experts: selectedExperts.map(user => user.id),
       examinees: selectedExaminees.map(user => user.id),
       tags: selectedTags.map(tag => tag.id),
+      accessType: RoomAccessType.Private,
     });
   }, [selectedQuestions, selectedExperts, selectedExaminees, selectedTags, fetchData]);
 

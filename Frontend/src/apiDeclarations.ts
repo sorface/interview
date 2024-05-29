@@ -2,7 +2,7 @@ import { ApiContractGet, ApiContractPatch, ApiContractPost, ApiContractPut } fro
 import { Question } from './types/question';
 import { Tag } from './types/tag';
 import { Reaction } from './types/reaction';
-import { Room, RoomInvite, RoomQuestionState, RoomReview, RoomStateAdditionalStatefulPayload, RoomStatus } from './types/room';
+import { Room, RoomAccessType, RoomInvite, RoomQuestionState, RoomReview, RoomStateAdditionalStatefulPayload, RoomStatus } from './types/room';
 import { User, UserType } from './types/user';
 
 export interface PaginationUrlParams {
@@ -17,6 +17,7 @@ export interface CreateRoomBody {
   experts: Array<User['id']>;
   examinees: Array<User['id']>;
   tags: Array<Tag['id']>;
+  accessType: RoomAccessType;
 }
 
 export interface SendEventBody {
