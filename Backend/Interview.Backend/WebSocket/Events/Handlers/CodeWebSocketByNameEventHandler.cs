@@ -4,16 +4,16 @@ using Interview.Domain.Rooms.RoomParticipants;
 
 namespace Interview.Backend.WebSocket.Events.Handlers;
 
-public class CodeWebSocketEventHandler : WebSocketEventHandlerBase
+public class CodeWebSocketByNameEventHandler : WebSocketByNameEventHandlerBase
 {
-    public CodeWebSocketEventHandler(ILogger<WebSocketEventHandlerBase> logger)
+    public CodeWebSocketByNameEventHandler(ILogger<WebSocketByNameEventHandlerBase> logger)
         : base(logger)
     {
     }
 
     protected override string SupportType => "code";
 
-    protected override async Task HandleEventAsync(SocketEventDetail detail, string payload, CancellationToken cancellationToken)
+    protected override async Task HandleEventAsync(SocketEventDetail detail, string? payload, CancellationToken cancellationToken)
     {
         var participantRepository = detail.ScopedServiceProvider.GetRequiredService<IRoomParticipantRepository>();
         var roomParticipant = await participantRepository.FindByRoomIdAndUserIdDetailedAsync(detail.RoomId, detail.UserId, cancellationToken);
@@ -31,7 +31,7 @@ public class CodeWebSocketEventHandler : WebSocketEventHandlerBase
         }
 
         var repository = detail.ScopedServiceProvider.GetRequiredService<IRoomConfigurationRepository>();
-        var request = new UpsertCodeStateRequest { CodeEditorContent = payload, RoomId = detail.RoomId, };
+        var request = new UpsertCodeStateRequest { CodeEditorContent = payload ?? string.Empty, RoomId = detail.RoomId, };
         await repository.UpsertCodeStateAsync(request, cancellationToken);
     }
 }

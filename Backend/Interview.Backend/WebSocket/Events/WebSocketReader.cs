@@ -24,7 +24,7 @@ public class WebSocketReader
         _manager = manager;
         _eventStorage = eventStorage;
         _logger = logger;
-        _handlers = handlers.ToArray();
+        _handlers = handlers.OrderBy(e => e.Order).ToArray();
     }
 
     public async Task ReadAsync(
@@ -78,15 +78,27 @@ public class WebSocketReader
             user,
             room,
             participantType);
-        var tasks = _handlers.Select(e => e.HandleAsync(socketEventDetail, ct));
-        var results = await Task.WhenAll(tasks);
-        if (results.All(e => !e))
+        var handleAny = await HandleAsync(socketEventDetail, ct);
+        if (!handleAny)
         {
             _logger.LogWarning(
                 "Not found handler for {Type} {Value}",
                 socketEventDetail.Event.Type,
                 socketEventDetail.Event.Value);
         }
+    }
+
+    private async Task<bool> HandleAsync(SocketEventDetail socketEventDetail, CancellationToken cancellationToken)
+    {
+        foreach (var handler in _handlers)
+        {
+            if (await handler.HandleAsync(socketEventDetail, cancellationToken))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private async Task<WebSocketEvent?> DeserializeResultAsync(System.Net.WebSockets.WebSocket webSocket, CancellationToken ct)

@@ -8,15 +8,15 @@ using Interview.Domain.Events.Sender;
 
 namespace Interview.Backend.WebSocket.Events.Handlers;
 
-public class ReturningSignalWebSocketEventHandler : WebSocketEventHandlerBase<ReturningSignalWebSocketEventHandler.ReceivePayload>
+public class ReturningSignalWebSocketByNameEventHandler : WebSocketByNameEventHandlerBase<ReturningSignalWebSocketByNameEventHandler.ReceivePayload>
 {
     private readonly IVideChatConnectionProvider _userWebSocketConnectionProvider;
     private readonly ILogger<WebSocketEventSender> _webSocketEventSender;
     private readonly IEventSenderAdapter _eventSenderAdapter;
     private readonly IRoomEventSerializer _serializer;
 
-    public ReturningSignalWebSocketEventHandler(
-        ILogger<WebSocketEventHandlerBase<ReceivePayload>> logger,
+    public ReturningSignalWebSocketByNameEventHandler(
+        ILogger<WebSocketByNameEventHandlerBase<ReceivePayload>> logger,
         IVideChatConnectionProvider userWebSocketConnectionProvider,
         ILogger<WebSocketEventSender> webSocketEventSender,
         IEventSenderAdapter eventSenderAdapter,
@@ -31,8 +31,13 @@ public class ReturningSignalWebSocketEventHandler : WebSocketEventHandlerBase<Re
 
     protected override string SupportType => "returning signal";
 
-    protected override async Task HandleEventAsync(SocketEventDetail detail, ReceivePayload payload, CancellationToken cancellationToken)
+    protected override async Task HandleEventAsync(SocketEventDetail detail, ReceivePayload? payload, CancellationToken cancellationToken)
     {
+        if (payload is null)
+        {
+            return;
+        }
+
         if (!_userWebSocketConnectionProvider.TryGetConnections(payload.To, detail.RoomId, out var connections))
         {
             Logger.LogWarning("Not found {To} user connections. {RoomId} current {UserId}", payload.To, detail.RoomId, detail.UserId);
