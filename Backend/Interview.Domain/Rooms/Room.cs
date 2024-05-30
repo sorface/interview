@@ -12,21 +12,21 @@ namespace Interview.Domain.Rooms;
 
 public class Room : Entity
 {
-    public Room(string name, SERoomAcсessType acсessType)
+    public Room(string name, SERoomAccessType accessType)
     {
         Name = name;
         Status = SERoomStatus.New;
-        AcсessType = acсessType;
+        AccessType = accessType;
     }
 
     private Room()
-        : this(string.Empty, SERoomAcсessType.Public)
+        : this(string.Empty, SERoomAccessType.Public)
     {
     }
 
     public string Name { get; internal set; }
 
-    public SERoomAcсessType AcсessType { get; internal set; }
+    public SERoomAccessType AccessType { get; internal set; }
 
     public SERoomStatus Status { get; internal set; }
 

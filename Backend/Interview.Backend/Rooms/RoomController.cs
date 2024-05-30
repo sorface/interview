@@ -132,7 +132,6 @@ public class RoomController : ControllerBase
         var domainRequest = new RoomCreateRequest
         {
             Name = request.Name,
-            TwitchChannel = request.TwitchChannel,
             AccessType = SERoomAccessType.FromName(request.AccessType),
             Questions = request.Questions,
             Experts = request.Experts,

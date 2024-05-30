@@ -4,7 +4,7 @@ public sealed class RoomCreateRequest
 {
     public string Name { get; set; } = string.Empty;
 
-    public SERoomAccessType AccessType { get; set; } = SERoomAcсessType.Public;
+    public SERoomAccessType AccessType { get; set; } = SERoomAccessType.Public;
 
     public required HashSet<Guid> Questions { get; init; }
 

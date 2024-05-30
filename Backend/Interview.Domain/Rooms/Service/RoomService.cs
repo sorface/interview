@@ -126,7 +126,6 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             {
                 Id = e.Id,
                 Name = e.Name,
-                TwitchChannel = e.TwitchChannel,
                 Questions = e.Questions.Select(question => question.Question)
                     .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
                     .ToList(),
@@ -183,7 +182,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         var experts = await FindByIdsOrErrorAsync(_userRepository, requestExperts, "experts", cancellationToken);
         var examinees = await FindByIdsOrErrorAsync(_userRepository, request.Examinees, "examinees", cancellationToken);
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
-        var room = new Room(name, SERoomAcсessType.FromName(request.AccessType)) { Tags = tags, };
+        var room = new Room(name, request.AccessType) { Tags = tags, };
         var roomQuestions = questions.Select(question =>
             new RoomQuestion
             {
