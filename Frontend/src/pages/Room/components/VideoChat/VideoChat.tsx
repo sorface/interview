@@ -40,10 +40,12 @@ interface VideoChatProps {
   viewerMode: boolean;
   lastWsMessage: MessageEvent<any> | null;
   messagesChatEnabled: boolean;
+  codeEditorEnabled: boolean;
+  codeEditorLanguage: string;
+  codeEditorRemoteCursor: string;
   userVideoStream: MediaStream | null;
   userAudioStream: MediaStream | null;
   screenStream: MediaStream | null;
-  videoTrackEnabled: boolean;
   micDisabledAutomatically: React.MutableRefObject<boolean>;
   onSendWsMessage: SendMessage;
   onUpdatePeersLength: (length: number) => void;
@@ -97,10 +99,12 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   viewerMode,
   lastWsMessage,
   messagesChatEnabled,
+  codeEditorEnabled,
+  codeEditorLanguage,
+  codeEditorRemoteCursor,
   userVideoStream,
   userAudioStream,
   screenStream,
-  videoTrackEnabled,
   micDisabledAutomatically,
   onSendWsMessage,
   onUpdatePeersLength,
@@ -133,19 +137,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   const { activeReactions } = useReactionsStatus({
     lastMessage: lastWsMessage,
   });
-
-  useEffect(() => {
-    if (videoTrackEnabled && userVideoStream) {
-      try {
-        peers.filter(peer => !peer.screenShare).forEach(peer => {
-          const videoTrack = userVideoStream.getVideoTracks()[0];
-          peer.peer.addTrack(videoTrack, userVideoStream);
-        });
-      } catch (e) {
-        console.error('add video track error: ', e);
-      }
-    }
-  }, [videoTrackEnabled, peers, userVideoStream]);
 
   const createPeer = useCallback((to: string, forViewer?: boolean, screenShare?: boolean) => {
     if (viewerMode) {
@@ -509,7 +500,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           setPeers([...peersRef.current]);
           break;
         case 'receiving returned signal':
-          const item = peersRef.current.find(p => 
+          const item = peersRef.current.find(p =>
             p.peerID === parsedPayload.From && (screenShare ? p.screenShare : true)
           );
           if (item) {
@@ -588,15 +579,35 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     }));
   };
 
+  const needToRenderMainField = screenSharePeer || codeEditorEnabled;
+
+  const renderMain = () => {
+    if (screenSharePeer) {
+      return <VideoChatVideo peer={screenSharePeer.peer} />;
+    }
+    if (codeEditorEnabled) {
+      return (
+        <CodeEditor
+          language={codeEditorLanguage}
+          remoteCursor={codeEditorRemoteCursor}
+          roomState={roomState}
+          readOnly={viewerMode}
+          lastWsMessage={lastWsMessage}
+          onSendWsMessage={onSendWsMessage}
+        />
+      );
+    }
+    return <></>;
+  };
+
   return (
     <div className='room-columns'>
-      <Field className='videochat-field'>
+      <Field className={`videochat-field ${needToRenderMainField ? '' : 'fullscreen'}`}>
         <div className='videochat'>
           <VideochatParticipant
             order={3}
             viewer={false}
             nickname={localizationCaptions[LocalizationKey.AiAssistantName]}
-            videoTrackEnabled={true}
           >
             <div className='videochat-ai-assistant'>
               <Canvas shadows camera={{ position: [0, 0.5, 6.5], fov: 38 }} className='videochat-video'>
@@ -609,7 +620,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             viewer={viewerMode}
             avatar={auth?.avatar}
             nickname={`${auth?.nickname} (${localizationCaptions[LocalizationKey.You]})`}
-            videoTrackEnabled={videoTrackEnabled}
             reaction={activeReactions[auth?.id || '']}
           >
             <video
@@ -637,18 +647,11 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           ))}
         </div>
       </Field>
-      <Field className='videochat-field videochat-field-main'>
-        {screenSharePeer ? (
-          <VideoChatVideo peer={screenSharePeer.peer} />
-        ) : (
-          <CodeEditor
-            roomState={roomState}
-            readOnly={viewerMode}
-            lastWsMessage={lastWsMessage}
-            onSendWsMessage={onSendWsMessage}
-          />
-        )}
-      </Field>
+      {needToRenderMainField && (
+        <Field className='videochat-field videochat-field-main'>
+          {renderMain()}
+        </Field>
+      )}
       {!!messagesChatEnabled && (
         <Field className='videochat-field videochat-field-chat'>
           <MessagesChat

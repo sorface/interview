@@ -9,6 +9,7 @@ using Interview.Domain.RoomParticipants;
 using Interview.Domain.Rooms;
 using Interview.Domain.Users;
 using Interview.Infrastructure.Questions;
+using Interview.Infrastructure.RoomQuestions;
 using Interview.Infrastructure.Tags;
 using Moq;
 
@@ -48,7 +49,12 @@ namespace Interview.Test.Integrations
                 .Returns(Task.CompletedTask);
 
             var creator = CreateQuestionCreate(appDbContext, roomMemberChecker.Object);
-            var questionCreateRequest = new QuestionCreateRequest { Tags = new HashSet<Guid>(), Value = value };
+            var questionCreateRequest = new QuestionCreateRequest
+            {
+                Tags = new HashSet<Guid>(),
+                Value = value,
+                Type = EVQuestionType.Private,
+            };
             var question = await creator.CreateAsync(questionCreateRequest, room?.Id, CancellationToken.None);
             question.Should().NotBeNull().And.Match<QuestionItem>(e => e.Value == value);
             roomMemberChecker.Verify(e => e.EnsureCurrentUserMemberOfRoomAsync(room == null ? It.IsAny<Guid>() : room.Id, It.IsAny<CancellationToken>()), room is not null ? Times.Once() : Times.Never());
@@ -58,7 +64,7 @@ namespace Interview.Test.Integrations
         public async Task CreateShouldFailIfRoomIsNotAvailable()
         {
             await using var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
-            var room = new Room("Test Room", string.Empty, SERoomAccessType.Public);
+            var room = new Room("Test Room", SERoomAcсessType.Public);
             appDbContext.Rooms.Add(room);
             await appDbContext.SaveChangesAsync();
             appDbContext.ChangeTracker.Clear();
@@ -69,7 +75,12 @@ namespace Interview.Test.Integrations
                 .Throws<UnavailableException>();
 
             var creator = CreateQuestionCreate(appDbContext, roomMemberChecker.Object);
-            var questionCreateRequest = new QuestionCreateRequest { Tags = new HashSet<Guid>(), Value = "Test" };
+            var questionCreateRequest = new QuestionCreateRequest
+            {
+                Tags = new HashSet<Guid>(),
+                Value = "Test",
+                Type = EVQuestionType.Private,
+            };
             await Assert.ThrowsAsync<UnavailableException>(() => creator.CreateAsync(questionCreateRequest, room.Id, CancellationToken.None));
             roomMemberChecker.Verify(e => e.EnsureCurrentUserMemberOfRoomAsync(room.Id, It.IsAny<CancellationToken>()), Times.Once());
         }
@@ -79,13 +90,16 @@ namespace Interview.Test.Integrations
             var questionRepository = new QuestionRepository(appDbContext);
             var tagRepository = new TagRepository(appDbContext);
             var currentUser = new CurrentUserAccessor();
+            var roomQuestionRepository = new RoomQuestionRepository(appDbContext);
             currentUser.SetUser(appDbContext.Users.First());
             return new QuestionService(
                 questionRepository,
                 new QuestionNonArchiveRepository(appDbContext),
                 new ArchiveService<Question>(questionRepository),
                 tagRepository,
-                roomMembershipChecker);
+                roomMembershipChecker,
+                currentUser,
+                roomQuestionRepository);
         }
 
         private class UnavailableException : Exception

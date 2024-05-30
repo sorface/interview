@@ -11,10 +11,12 @@ public class RoomQuestionTypeConfiguration : EntityTypeConfigurationBase<RoomQue
     {
         builder.HasOne<Room>(roomQuestion => roomQuestion.Room)
             .WithMany(room => room.Questions)
+            .HasForeignKey(e => e.RoomId)
             .IsRequired();
 
         builder.HasOne<Question>(roomQuestion => roomQuestion.Question)
             .WithMany()
+            .HasForeignKey(e => e.QuestionId)
             .IsRequired();
 
         builder.Property(roomQuestion => roomQuestion.State)

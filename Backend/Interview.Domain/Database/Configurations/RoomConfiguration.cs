@@ -10,7 +10,6 @@ public class RoomConfiguration : EntityTypeConfigurationBase<Room>
     protected override void ConfigureCore(EntityTypeBuilder<Room> builder)
     {
         builder.Property(room => room.Name).IsRequired().HasMaxLength(70);
-        builder.Property(room => room.TwitchChannel).IsRequired().HasMaxLength(100);
         builder.Property(room => room.Status)
             .HasConversion(e => e.Value, e => SERoomStatus.FromValue(e))
             .IsRequired()

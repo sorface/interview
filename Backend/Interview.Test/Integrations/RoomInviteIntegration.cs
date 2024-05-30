@@ -36,7 +36,7 @@ namespace Interview.Test.Integrations
             appDbContext.Invites.Add(invite);
             await appDbContext.SaveChangesAsync();
 
-            var room = new Room(name: "something", twitchChannel: "twitch channel", SERoomAccessType.Private);
+            var room = new Room(name: "something", SERoomAcсessType.Private);
 
             appDbContext.Rooms.Add(room);
             await appDbContext.SaveChangesAsync();
@@ -102,7 +102,7 @@ namespace Interview.Test.Integrations
             var invite = new Invite(5);
 
             appDbContext.Invites.Add(invite);
-            var room = new Room(name: "something", twitchChannel: "twitch channel", SERoomAccessType.Private);
+            var room = new Room(name: "something", SERoomAcсessType.Private);
 
             appDbContext.Rooms.Add(room);
             var roomInvite = new RoomInvite(invite, room, SERoomParticipantType.Expert);
@@ -177,7 +177,7 @@ namespace Interview.Test.Integrations
             await appDbContext.SaveChangesAsync();
 
             appDbContext.Invites.Add(invite);
-            var room = new Room(name: "something", twitchChannel: "twitch channel", SERoomAccessType.Private);
+            var room = new Room(name: "something", SERoomAcсessType.Private);
             await appDbContext.SaveChangesAsync();
 
             appDbContext.Rooms.Add(room);

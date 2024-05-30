@@ -12,7 +12,6 @@ export enum RoomAccessType {
 export interface Room {
   id: string;
   name: string;
-  twitchChannel: string;
   users: User[];
   tags: Tag[];
   roomStatus: RoomStatus;
@@ -21,7 +20,7 @@ export interface Room {
 export type RoomStateType = 'CodeEditor';
 
 export type RoomStateAdditionalStatefulPayload = {
-  enabled: boolean;
+  value: string | boolean;
 };
 
 interface RoomStateAdditional {

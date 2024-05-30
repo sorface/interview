@@ -14,6 +14,7 @@ using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.Users;
 using Interview.Infrastructure.Questions;
 using Interview.Infrastructure.RoomParticipants;
+using Interview.Infrastructure.RoomQuestions;
 using Interview.Infrastructure.Tags;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -40,10 +41,7 @@ public class QuestionServiceTest
 
                 foreach (var question in questions)
                 {
-                    if (faker.Random.Bool())
-                    {
-                        question.RoomId = faker.PickRandom(rooms).Id;
-                    }
+                    question.Type = faker.Random.Bool() ? SEQuestionType.Private : SEQuestionType.Public;
                 }
 
                 yield return new object[] { rooms, questions, };
@@ -93,7 +91,7 @@ public class QuestionServiceTest
         var questionsWithoutRoomId = appDbContext.Questions
             .AsNoTracking()
             .IgnoreQueryFilters()
-            .Where(e => e.RoomId == null)
+            .Where(e => e.Type == SEQuestionType.Public)
             .Select(e => e.Id)
             .ToHashSet();
         var totalQuestionCount = await appDbContext.Questions
@@ -136,7 +134,7 @@ public class QuestionServiceTest
         appDbContext.Users.Add(user);
         appDbContext.SaveChanges();
 
-        var room = new Room("room#1", "twitch", SERoomAccessType.Public);
+        var room = new Room("room#1", SERoomAcсessType.Public);
         appDbContext.Rooms.Add(room);
         appDbContext.SaveChanges();
 
@@ -148,7 +146,7 @@ public class QuestionServiceTest
         appDbContext.Reactions.Add(reaction);
         appDbContext.SaveChanges();
 
-        var roomQuestion = new RoomQuestion() { Room = room, Question = question, State = RoomQuestionState.Active };
+        var roomQuestion = new RoomQuestion { Room = room, Question = question, State = RoomQuestionState.Active, QuestionId = default, RoomId = default, };
         appDbContext.RoomQuestions.Add(roomQuestion);
         appDbContext.SaveChanges();
 
@@ -197,6 +195,7 @@ public class QuestionServiceTest
         var currentUser = new CurrentUserAccessor();
         currentUser.SetUser(appDbContext.Users.First());
         var aRoomMembershipChecker = roomMembershipChecker ?? new RoomMembershipChecker(currentUser, new RoomParticipantRepository(appDbContext));
-        return new QuestionService(questionRepository, questionArchiveRepository, archiveService, tagRepository, aRoomMembershipChecker);
+        var roomQuestionRepository = new RoomQuestionRepository(appDbContext);
+        return new QuestionService(questionRepository, questionArchiveRepository, archiveService, tagRepository, aRoomMembershipChecker, currentUser, roomQuestionRepository);
     }
 }

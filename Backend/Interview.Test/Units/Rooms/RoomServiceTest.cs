@@ -67,7 +67,7 @@ public class RoomServiceTest
     [Fact(DisplayName = "Patch update of room when room not found")]
     public async Task PatchUpdateRoomWhenRoomNotFound()
     {
-        var roomPatchUpdateRequest = new RoomUpdateRequest { Name = "new_value_name_room", TwitchChannel = "TwitchCH" };
+        var roomPatchUpdateRequest = new RoomUpdateRequest { Name = "new_value_name_room" };
         var roomId = Guid.NewGuid();
 
         _roomRepository.Setup(repository => repository.FindByIdAsync(roomId, default))

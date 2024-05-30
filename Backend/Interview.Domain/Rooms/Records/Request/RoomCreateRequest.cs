@@ -2,11 +2,9 @@ namespace Interview.Domain.Rooms.Records.Request;
 
 public sealed class RoomCreateRequest
 {
-    public required string Name { get; init; }
+    public string Name { get; set; } = string.Empty;
 
-    public required string TwitchChannel { get; init; }
-
-    public required SERoomAccessType AccessType { get; init; }
+    public SERoomAccessType AccessType { get; set; } = SERoomAcсessType.Public;
 
     public required HashSet<Guid> Questions { get; init; }
 

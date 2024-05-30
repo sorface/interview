@@ -8,7 +8,6 @@ interface VideochatParticipantProps {
   children: ReactNode;
   avatar?: string;
   nickname?: string;
-  videoTrackEnabled?: boolean;
   reaction?: string | null;
 }
 

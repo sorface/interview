@@ -164,7 +164,6 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         }
 
         var name = request.Name.Trim();
-
         if (string.IsNullOrEmpty(name))
         {
             throw new UserException("Room name should not be empty");
@@ -173,21 +172,27 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         var questions =
             await FindByIdsOrErrorAsync(_questionRepository, request.Questions, "questions", cancellationToken);
 
-        var experts = await FindByIdsOrErrorAsync(_userRepository, request.Experts, "experts", cancellationToken);
-
-        var examinees = await FindByIdsOrErrorAsync(_userRepository, request.Examinees, "examinees", cancellationToken);
-
-        var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
-
-        var twitchChannel = request.TwitchChannel?.Trim();
-        if (string.IsNullOrEmpty(twitchChannel))
+        var currentUserId = _currentUserAccessor.GetUserIdOrThrow();
+        ICollection<Guid> requestExperts = request.Experts;
+        if (!request.Experts.Contains(currentUserId) && !request.Examinees.Contains(currentUserId))
         {
-            throw new UserException("Twitch channel should not be empty");
+            // If the current user is not listed as a member of the room, add him/her with the role 'Expert'
+            requestExperts = requestExperts.Concat(new[] { currentUserId }).ToList();
         }
 
-        var room = new Room(name, twitchChannel, request.AccessType) { Tags = tags, };
+        var experts = await FindByIdsOrErrorAsync(_userRepository, requestExperts, "experts", cancellationToken);
+        var examinees = await FindByIdsOrErrorAsync(_userRepository, request.Examinees, "examinees", cancellationToken);
+        var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
+        var room = new Room(name, SERoomAcсessType.FromName(request.AccessType)) { Tags = tags, };
         var roomQuestions = questions.Select(question =>
-            new RoomQuestion { Room = room, Question = question, State = RoomQuestionState.Open });
+            new RoomQuestion
+            {
+                Room = room,
+                Question = question,
+                State = RoomQuestionState.Open,
+                RoomId = default,
+                QuestionId = default,
+            });
 
         room.Questions.AddRange(roomQuestions);
 
@@ -199,9 +204,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         var createdParticipants = await _roomParticipantService.CreateAsync(room.Id, participants, cancellationToken);
         room.Participants.AddRange(createdParticipants);
         await _roomRepository.CreateAsync(room, cancellationToken);
-
         await GenerateInvitesAsync(room.Id, cancellationToken);
-
         return room;
     }
 
@@ -219,12 +222,6 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw new UserException("Room name should not be empty");
         }
 
-        var twitchChannel = request.TwitchChannel?.Trim();
-        if (string.IsNullOrEmpty(twitchChannel))
-        {
-            throw new UserException("Room twitch channel should not be empty");
-        }
-
         var foundRoom = await _roomRepository.FindByIdAsync(roomId, cancellationToken);
         if (foundRoom is null)
         {
@@ -234,7 +231,6 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
 
         foundRoom.Name = name;
-        foundRoom.TwitchChannel = twitchChannel;
 
         foundRoom.Tags.Clear();
         foundRoom.Tags.AddRange(tags);

@@ -28,10 +28,10 @@ public class TwitchChatClient : IDisposable
         _client.OnMessageReceived += ClientOnMessageReceived;
     }
 
-    public void Connect(string username, string accessToken, string channelChat)
+    public void Connect(string username, string accessToken)
     {
         var credentials = new ConnectionCredentials(username, accessToken);
-        _client.Initialize(credentials, channelChat);
+        _client.Initialize(credentials);
         _client.Connect();
     }
 

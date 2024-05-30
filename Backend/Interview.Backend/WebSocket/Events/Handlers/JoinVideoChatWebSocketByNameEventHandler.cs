@@ -8,15 +8,15 @@ using Interview.Domain.Events.Sender;
 
 namespace Interview.Backend.WebSocket.Events.Handlers;
 
-public class JoinVideoChatWebSocketEventHandler : WebSocketEventHandlerBase
+public class JoinVideoChatWebSocketByNameEventHandler : WebSocketByNameEventHandlerBase
 {
     private readonly IVideChatConnectionProvider _videChatConnectionProvider;
     private readonly ILogger<WebSocketEventSender> _webSocketEventSender;
     private readonly IEventSenderAdapter _eventSenderAdapter;
     private readonly IRoomEventSerializer _serializer;
 
-    public JoinVideoChatWebSocketEventHandler(
-        ILogger<JoinVideoChatWebSocketEventHandler> logger,
+    public JoinVideoChatWebSocketByNameEventHandler(
+        ILogger<JoinVideoChatWebSocketByNameEventHandler> logger,
         IVideChatConnectionProvider videChatConnectionProvider,
         ILogger<WebSocketEventSender> webSocketEventSender,
         IEventSenderAdapter eventSenderAdapter,
@@ -31,7 +31,7 @@ public class JoinVideoChatWebSocketEventHandler : WebSocketEventHandlerBase
 
     protected override string SupportType => "join video chat";
 
-    protected override async Task HandleEventAsync(SocketEventDetail detail, string payload, CancellationToken cancellationToken)
+    protected override async Task HandleEventAsync(SocketEventDetail detail, string? payload, CancellationToken cancellationToken)
     {
         var successConnectResult = await _videChatConnectionProvider.TryConnectAsync(detail, cancellationToken);
         if (!successConnectResult)

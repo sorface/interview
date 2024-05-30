@@ -1,5 +1,5 @@
 import { ApiContractGet, ApiContractPatch, ApiContractPost, ApiContractPut } from './types/apiContracts';
-import { Question } from './types/question';
+import { Question, QuestionType } from './types/question';
 import { Tag } from './types/tag';
 import { Reaction } from './types/reaction';
 import { Room, RoomAccessType, RoomInvite, RoomQuestionState, RoomReview, RoomStateAdditionalStatefulPayload, RoomStatus } from './types/room';
@@ -12,7 +12,6 @@ export interface PaginationUrlParams {
 
 export interface CreateRoomBody {
   name: string;
-  twitchChannel: string;
   questions: Array<Question['id']>;
   experts: Array<User['id']>;
   examinees: Array<User['id']>;
@@ -138,6 +137,7 @@ export const roomQuestionApiDeclaration = {
 export interface CreateQuestionBody {
   value: string;
   tags: Array<Tag['id']>
+  type: QuestionType;
 }
 
 export interface UpdateQuestionBody extends CreateQuestionBody {

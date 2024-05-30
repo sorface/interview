@@ -38,7 +38,7 @@ public class RoomServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var savedRoom = new Room(DefaultRoomName, DefaultRoomName, SERoomAccessType.Public);
+        var savedRoom = new Room(DefaultRoomName, SERoomAcсessType.Public);
 
         appDbContext.Rooms.Add(savedRoom);
 
@@ -47,7 +47,7 @@ public class RoomServiceTest
         var roomRepository = new RoomRepository(appDbContext);
         var roomService = CreateRoomService(appDbContext);
 
-        var roomPatchUpdateRequest = new RoomUpdateRequest { Name = "New_Value_Name_Room", TwitchChannel = "TwitchCH" };
+        var roomPatchUpdateRequest = new RoomUpdateRequest { Name = "New_Value_Name_Room" };
 
         _ = await roomService.UpdateAsync(savedRoom.Id, roomPatchUpdateRequest);
 
@@ -62,7 +62,7 @@ public class RoomServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var savedRoom = new Room(DefaultRoomName, DefaultRoomName, SERoomAccessType.Public);
+        var savedRoom = new Room(DefaultRoomName, SERoomAcсessType.Public);
 
         appDbContext.Rooms.Add(savedRoom);
         var questions = new[] { new Question("V1"), new Question("V2"), new Question("V3") };
@@ -71,11 +71,13 @@ public class RoomServiceTest
         {
             Room = savedRoom,
             State = RoomQuestionState.Active,
-            Question = questions[2]
+            Question = questions[2],
+            QuestionId = default,
+            RoomId = default,
         };
         appDbContext.RoomQuestions.AddRange(
-            new RoomQuestion { Room = savedRoom, State = RoomQuestionState.Open, Question = questions[0] },
-            new RoomQuestion { Room = savedRoom, State = RoomQuestionState.Closed, Question = questions[1] },
+            new RoomQuestion { Room = savedRoom, State = RoomQuestionState.Open, Question = questions[0], QuestionId = default, RoomId = default },
+            new RoomQuestion { Room = savedRoom, State = RoomQuestionState.Closed, Question = questions[1], QuestionId = default, RoomId = default },
             activeRoomQuestion);
 
         await appDbContext.SaveChangesAsync();
@@ -99,10 +101,10 @@ public class RoomServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var room1 = new Room(DefaultRoomName, DefaultRoomName, SERoomAccessType.Public);
+        var room1 = new Room(DefaultRoomName, SERoomAcсessType.Public);
 
         appDbContext.Rooms.Add(room1);
-        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", DefaultRoomName + "2", SERoomAccessType.Public));
+        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", SERoomAcсessType.Public));
 
         var questions = new Question[]
         {
@@ -153,28 +155,36 @@ public class RoomServiceTest
                 Id = Guid.Parse("B15AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
                 Question = questions[0],
                 Room = room1,
-                State = RoomQuestionState.Open
+                State = RoomQuestionState.Open,
+                QuestionId = default,
+                RoomId = default,
             },
             new()
             {
                 Id = Guid.Parse("B25AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
                 Question = questions[1],
                 Room = room1,
-                State = RoomQuestionState.Closed
+                State = RoomQuestionState.Closed,
+                QuestionId = default,
+                RoomId = default,
             },
             new()
             {
                 Id = Guid.Parse("B35AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
                 Question = questions[2],
                 Room = room1,
-                State = RoomQuestionState.Closed
+                State = RoomQuestionState.Closed,
+                QuestionId = default,
+                RoomId = default,
             },
             new()
             {
                 Id = Guid.Parse("B45AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
                 Question = questions[3],
                 Room = room1,
-                State = RoomQuestionState.Active
+                State = RoomQuestionState.Active,
+                QuestionId = default,
+                RoomId = default,
             },
         };
         appDbContext.RoomQuestions.AddRange(roomQuestion);
@@ -438,10 +448,10 @@ public class RoomServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var room1 = new Room(DefaultRoomName, DefaultRoomName, SERoomAccessType.Public);
+        var room1 = new Room(DefaultRoomName, SERoomAcсessType.Public);
 
         appDbContext.Rooms.Add(room1);
-        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", DefaultRoomName + "2", SERoomAccessType.Public));
+        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", SERoomAcсessType.Public));
 
         var questions = new Question[]
         {
@@ -492,28 +502,36 @@ public class RoomServiceTest
                 Id = Guid.Parse("B15AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
                 Question = questions[0],
                 Room = room1,
-                State = RoomQuestionState.Open
+                State = RoomQuestionState.Open,
+                QuestionId = default,
+                RoomId = default,
             },
             new()
             {
                 Id = Guid.Parse("B25AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
                 Question = questions[1],
                 Room = room1,
-                State = RoomQuestionState.Closed
+                State = RoomQuestionState.Closed,
+                QuestionId = default,
+                RoomId = default,
             },
             new()
             {
                 Id = Guid.Parse("B35AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
                 Question = questions[2],
                 Room = room1,
-                State = RoomQuestionState.Closed
+                State = RoomQuestionState.Closed,
+                QuestionId = default,
+                RoomId = default,
             },
             new()
             {
                 Id = Guid.Parse("B45AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
                 Question = questions[3],
                 Room = room1,
-                State = RoomQuestionState.Active
+                State = RoomQuestionState.Active,
+                QuestionId = default,
+                RoomId = default,
             },
         };
         appDbContext.RoomQuestions.AddRange(roomQuestion);
@@ -698,7 +716,7 @@ public class RoomServiceTest
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
         var generatedRooms = Enumerable.Range(0, 5)
-            .Select(i => new Room(DefaultRoomName + i, DefaultRoomName + i, SERoomAccessType.Public)).ToList();
+            .Select(i => new Room(DefaultRoomName + i, SERoomAcсessType.Public)).ToList();
         appDbContext.Rooms.AddRange(generatedRooms);
         var roomInvites = generatedRooms.SelectMany(GenerateInvites).ToList();
         appDbContext.RoomInvites.AddRange(roomInvites);
@@ -730,7 +748,7 @@ public class RoomServiceTest
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
         var generatedRooms = Enumerable.Range(0, 5)
-            .Select(i => new Room(DefaultRoomName + i, DefaultRoomName + i, SERoomAccessType.Public)).ToList();
+            .Select(i => new Room(DefaultRoomName + i, SERoomAcсessType.Public)).ToList();
         appDbContext.Rooms.AddRange(generatedRooms);
         var roomInvites = generatedRooms.SelectMany(GenerateInvites).ToList();
         appDbContext.RoomInvites.AddRange(roomInvites);

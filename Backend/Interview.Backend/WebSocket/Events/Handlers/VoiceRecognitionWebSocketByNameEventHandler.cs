@@ -4,13 +4,13 @@ using Interview.Infrastructure.Chat;
 
 namespace Interview.Backend.WebSocket.Events.Handlers;
 
-public class VoiceRecognitionWebSocketEventHandler : WebSocketEventHandlerBase
+public class VoiceRecognitionWebSocketByNameEventHandler : WebSocketByNameEventHandlerBase
 {
     private readonly IRoomEventDispatcher _eventDispatcher;
 
-    public VoiceRecognitionWebSocketEventHandler(
+    public VoiceRecognitionWebSocketByNameEventHandler(
         IRoomEventDispatcher eventDispatcher,
-        ILogger<WebSocketEventHandlerBase> logger)
+        ILogger<WebSocketByNameEventHandlerBase> logger)
         : base(logger)
     {
         _eventDispatcher = eventDispatcher;
@@ -18,9 +18,9 @@ public class VoiceRecognitionWebSocketEventHandler : WebSocketEventHandlerBase
 
     protected override string SupportType => "voice-recognition";
 
-    protected override Task HandleEventAsync(SocketEventDetail detail, string message, CancellationToken cancellationToken)
+    protected override Task HandleEventAsync(SocketEventDetail detail, string? message, CancellationToken cancellationToken)
     {
-        var payload = new UserMessageEventPayload(message, detail.User.Nickname);
+        var payload = new UserMessageEventPayload(message ?? string.Empty, detail.User.Nickname);
         var @event = new RoomEvent<UserMessageEventPayload>(detail.RoomId, EventType.VoiceRecognition, payload, false);
         return _eventDispatcher.WriteAsync(@event, cancellationToken);
     }
