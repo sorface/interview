@@ -4,6 +4,11 @@ import { User, UserType } from './user';
 
 export type RoomStatus = 'New' | 'Active' | 'Review' | 'Close';
 
+export enum RoomAccessType {
+  Public = 'Public',
+  Private = 'Private',
+}
+
 export interface Room {
   id: string;
   name: string;

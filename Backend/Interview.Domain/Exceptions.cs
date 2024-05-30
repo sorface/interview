@@ -1,3 +1,4 @@
+using Ardalis.SmartEnum;
 using Interview.Domain.Repository;
 
 namespace Interview.Domain;

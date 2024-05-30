@@ -46,6 +46,7 @@ public sealed class RoleName : SmartEnum<RoleName>
             SEPermission.QuestionFindById,
             SEPermission.AppEventPage,
             SEPermission.TranscriptionGet,
+            SEPermission.RoomCreate,
             SEPermission.TagFindPage,
             SEPermission.QuestionCreate,
         });

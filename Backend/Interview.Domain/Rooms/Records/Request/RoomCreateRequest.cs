@@ -4,13 +4,13 @@ public sealed class RoomCreateRequest
 {
     public string Name { get; set; } = string.Empty;
 
-    public string AccessType { get; set; } = SERoomAcсessType.Public.Name;
+    public SERoomAccessType AccessType { get; set; } = SERoomAccessType.Public;
 
-    public HashSet<Guid> Questions { get; set; } = new();
+    public required HashSet<Guid> Questions { get; init; }
 
-    public HashSet<Guid> Experts { get; set; } = new();
+    public required HashSet<Guid> Experts { get; init; }
 
-    public HashSet<Guid> Examinees { get; set; } = new();
+    public required HashSet<Guid> Examinees { get; init; }
 
-    public HashSet<Guid> Tags { get; set; } = new();
+    public required HashSet<Guid> Tags { get; init; }
 }
