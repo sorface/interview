@@ -47,7 +47,7 @@ const defaultLanguage = languageOptions[0];
 
 const fontSizeOptions = [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48];
 
-const sendCursorEventTimeout = 222;
+const sendCursorEventTimeout = 22;
 
 const remoteCursorClassName = 'code-editor-cursor';
 const remoteTooltipClassName = 'code-editor-tooltip';
@@ -63,7 +63,6 @@ const renderOptions = (options: Array<number | string>) =>
 
 interface CodeEditorProps {
   language: string;
-  remoteCursor: string;
   roomState: RoomState | null;
   readOnly: boolean;
   lastWsMessage: MessageEvent<any> | null;
@@ -72,7 +71,6 @@ interface CodeEditorProps {
 
 export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   language,
-  remoteCursor: remoteCursorEvent,
   roomState,
   readOnly,
   lastWsMessage,
@@ -126,30 +124,6 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
     }
   }, [lastWsMessage]);
 
-  useEffect(() => {
-    if (!roomState || readOnly || !cursorPosition || !selectionPosition) {
-      console.warn('Cannot send room event');
-      return;
-    }
-    const sendEventTimeoutId = setTimeout(() => {
-      sendRoomEvent({
-        roomId: roomState.id,
-        type: EventName.CodeEditorCursor,
-        additionalData: {
-          value: JSON.stringify({
-            cursor: cursorPosition,
-            selection: selectionPosition,
-            id: auth?.id,
-            nickname: auth?.nickname,
-          }),
-        },
-      });
-    }, sendCursorEventTimeout);
-    return () => {
-      clearTimeout(sendEventTimeoutId);
-    };
-  }, [cursorPosition, selectionPosition, roomState, readOnly, auth, sendRoomEvent]);
-
   const dirtyChangeRemoteCursorHeight = (height: number) => {
     const el = document.querySelector(`.${remoteCursorClassName}`) as HTMLElement;
     if (!el) {
@@ -158,6 +132,10 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
     }
     el.style.height = `${height}px`;
   };
+
+  useEffect(() => {
+    dirtyChangeRemoteCursorHeight(~~(fontSize + (fontSize / 4)));
+  }, [fontSize]);
 
   const dirtyChangeRemoteCursorTooltip = useCallback((content: string) => {
     const el = document.querySelector(`.${remoteTooltipClassName}`) as HTMLElement;
@@ -169,35 +147,58 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   }, []);
 
   useEffect(() => {
-    dirtyChangeRemoteCursorHeight(~~(fontSize + (fontSize / 4)));
-  }, [fontSize]);
-
-  useEffect(() => {
-    if (!remoteCursorEvent || !remoteCursor || !remoteSelection || !auth) {
+    if (!lastWsMessage?.data || !auth || !remoteCursor || !remoteSelection) {
       return;
     }
     try {
-      const remoteCursorParsed = JSON.parse(remoteCursorEvent);
-      if (!remoteCursorParsed.id) {
-        return;
+      const parsedData = JSON.parse(lastWsMessage?.data);
+      const value = parsedData.Value;
+      switch (parsedData?.Type) {
+        case EventName.CodeEditorCursor:
+          if (auth.id === value.UserId) {
+            remoteSelection.hide();
+            remoteCursor.hide();
+            return;
+          }
+          if (value.AdditionalData.cursor.column === -1) {
+            remoteCursor.hide();
+            remoteSelection.hide();
+            return;
+          }
+          dirtyChangeRemoteCursorTooltip(value.AdditionalData.nickname);
+          remoteCursor.setPosition(value.AdditionalData.cursor);
+          remoteCursor.show();
+          remoteSelection.setPositions(value.AdditionalData.selection.start, value.AdditionalData.selection.end);
+          remoteSelection.show();
+          break;
+        default:
+          break;
       }
-      if (auth.id === remoteCursorParsed.id) {
-        remoteSelection.hide();
-        remoteCursor.hide();
-        return;
-      }
-      if (remoteCursorParsed.cursor.column === -1) {
-        remoteCursor.hide();
-        remoteSelection.hide();
-        return;
-      }
-      dirtyChangeRemoteCursorTooltip(remoteCursorParsed.nickname);
-      remoteCursor.setPosition(remoteCursorParsed.cursor);
-      remoteCursor.show();
-      remoteSelection.setPositions(remoteCursorParsed.selection.start, remoteCursorParsed.selection.end);
-      remoteSelection.show();
-    } catch { }
-  }, [remoteCursorEvent, remoteSelection, remoteCursor, auth, dirtyChangeRemoteCursorTooltip]);
+    } catch (err) {
+      console.error('parse editor message error: ', err);
+    }
+  }, [lastWsMessage, remoteSelection, remoteCursor, auth, dirtyChangeRemoteCursorTooltip]);
+
+  useEffect(() => {
+    if (!roomState || readOnly || !cursorPosition || !selectionPosition) {
+      console.warn('Cannot send room event');
+      return;
+    }
+    const sendEventTimeoutId = setTimeout(() => {
+      onSendWsMessage(JSON.stringify({
+        Type: EventName.CodeEditorCursor,
+        Value: JSON.stringify({
+          cursor: cursorPosition,
+          selection: selectionPosition,
+          id: auth?.id,
+          nickname: auth?.nickname,
+        }),
+      }));
+    }, sendCursorEventTimeout);
+    return () => {
+      clearTimeout(sendEventTimeoutId);
+    };
+  }, [cursorPosition, selectionPosition, roomState, readOnly, auth, onSendWsMessage]);
 
   const handleEditorMount: OnMount = (mountedEditor) => {
     const newRemoteCursorManager = new RemoteCursorManager({
