@@ -1,21 +1,65 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using IdentityModel.Client;
 
 namespace Interview.Backend.Auth.Sorface;
 
-public class SorfaceTokenValidateHandler
+public class SorfaceTokenHandler
 {
     private const string AnErrorOccurredWhileRetrievingTheUserProfile =
         "An error occurred while retrieving the user profile.";
 
+    private const string AnErrorOccurredWhileRetrievingTheRefreshToken =
+        "An error occurred while retrieving refresh token.";
+
     private readonly AuthorizationService _options;
     private readonly IHttpClientFactory _httpClientFactory;
 
-    public SorfaceTokenValidateHandler(AuthorizationService options, IHttpClientFactory httpClientFactory)
+    public SorfaceTokenHandler(AuthorizationService options, IHttpClientFactory httpClientFactory)
     {
         _options = options;
         _httpClientFactory = httpClientFactory;
+    }
+
+    public async Task<TokenResponse?> RefreshTokenAsync(
+        string? refreshToken,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(refreshToken))
+        {
+            throw new HttpRequestException(AnErrorOccurredWhileRetrievingTheRefreshToken);
+        }
+
+        var form = new List<KeyValuePair<string, string>>
+        {
+            new("refresh_token", $"{refreshToken}"),
+            new("grant_type", "refresh_token"),
+        };
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, _options.TokenEndpoint)
+        {
+            Content = new FormUrlEncodedContent(form),
+        };
+
+        var chars = $"{_options.ClientId}:{_options.ClientSecret}";
+
+        var bytes = Encoding.UTF8.GetBytes(chars);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(bytes));
+
+        using var response = await _httpClientFactory.CreateClient()
+            .SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new HttpRequestException(AnErrorOccurredWhileRetrievingTheRefreshToken);
+        }
+
+        var content = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        var jsonDocument = JsonDocument.Parse(content);
+
+        return jsonDocument.Deserialize<TokenResponse>();
     }
 
     public async Task<JsonDocument> GetTokenPrincipalAsync(

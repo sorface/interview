@@ -19,7 +19,15 @@ public static class ServiceCollectionExt
             })
             .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
             {
-                options.Events.OnValidatePrincipal = SorfacePrincipalValidator.ValidateAsync;
+                options.Events.OnValidatePrincipal = context =>
+                {
+                    var sorfacePrincipalValidator =
+                        context.HttpContext.RequestServices.GetRequiredService<SorfacePrincipalValidator>();
+
+                    return sorfacePrincipalValidator.ValidateAsync(context);
+                };
+                options.Cookie.HttpOnly = false;
+                options.Cookie.Name = "_auth";
 
                 options.Events.OnRedirectToAccessDenied = context =>
                 {

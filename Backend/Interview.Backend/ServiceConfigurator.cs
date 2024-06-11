@@ -108,8 +108,9 @@ public class ServiceConfigurator
         serviceCollection.AddSingleton(sorfaceAuth);
 
         serviceCollection.AddHttpClient();
-        serviceCollection.AddSingleton<SorfaceTokenValidateHandler>();
-        
+        serviceCollection.AddSingleton<SorfacePrincipalValidator>();
+        serviceCollection.AddSingleton<SorfaceTokenHandler>();
+
         var adminUsers = _configuration.GetSection(nameof(AdminUsers))
             .Get<AdminUsers>() ?? throw new ArgumentException($"Not found \"{nameof(AdminUsers)}\" section");
 
