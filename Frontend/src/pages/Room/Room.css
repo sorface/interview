@@ -2,11 +2,6 @@
   margin: 0rem;
 }
 
-.room-wrapper .theme-switch-mini {
-  width: 1rem;
-  padding-left: 0.5rem;
-}
-
 .room-page {
   display: flex;
   flex-direction: column;

@@ -16,7 +16,6 @@ import { User } from '../../types/user';
 import { TagsSelector } from '../../components/TagsSelector/TagsSelector';
 import { Tag } from '../../types/tag';
 import { LocalizationKey } from '../../localization';
-import { HeaderField } from '../../components/HeaderField/HeaderField';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { RoomAccessType } from '../../types/room';
 
@@ -160,7 +159,6 @@ export const RoomCreate: FunctionComponent = () => {
 
   return (
     <MainContentWrapper className="question-create">
-      <HeaderField />
       <HeaderWithLink
         title={localizationCaptions[LocalizationKey.CreateRoom]}
         linkVisible={true}

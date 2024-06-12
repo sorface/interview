@@ -13,7 +13,6 @@ import { Question, QuestionType } from '../../types/question';
 import { Tag } from '../../types/tag';
 import { TagsSelector } from '../../components/TagsSelector/TagsSelector';
 import { LocalizationKey } from '../../localization';
-import { HeaderField } from '../../components/HeaderField/HeaderField';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { AuthContext } from '../../context/AuthContext';
 import { checkAdmin } from '../../utils/checkAdmin';
@@ -191,7 +190,6 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
 
   return (
     <MainContentWrapper className="question-create">
-      <HeaderField />
       <HeaderWithLink
         title={localizationCaptions[LocalizationKey.CreateQuestion]}
         linkVisible={true}
