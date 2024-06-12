@@ -2,6 +2,7 @@
   text-align: center;
   display: flex;
   flex-direction: row;
+  justify-content: center;
   max-width: 2048px;
   margin-right: auto;
   margin-left: auto;
