@@ -77,7 +77,7 @@ export const App: FunctionComponent = () => {
       <ThemeProvider>
         <LocalizationProvider>
           <AuthContext.Provider value={user}>
-            <div className="App">
+            <div className="App-container">
               {renderMainContent()}
             </div>
           </AuthContext.Provider>

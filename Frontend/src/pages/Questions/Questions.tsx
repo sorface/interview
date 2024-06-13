@@ -14,7 +14,6 @@ import { TagsView } from '../../components/TagsView/TagsView';
 import { QustionsSearch } from '../../components/QustionsSearch/QustionsSearch';
 import { ActionModal } from '../../components/ActionModal/ActionModal';
 import { LocalizationKey } from '../../localization';
-import { HeaderField } from '../../components/HeaderField/HeaderField';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 
 import './Questions.css';
@@ -82,7 +81,6 @@ export const Questions: FunctionComponent = () => {
 
   return (
     <MainContentWrapper>
-      <HeaderField />
       <HeaderWithLink
         linkVisible={true}
         path={pathnames.questionsCreate}

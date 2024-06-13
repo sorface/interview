@@ -1,7 +1,6 @@
 import { FunctionComponent, useContext } from 'react';
 import { Theme, ThemeContext } from '../../context/ThemeContext';
-import { IconNames } from '../../constants';
-import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
+import { ToggleSwitch } from '../ToggleSwitch/ToggleSwitch';
 
 import './ThemeSwitchMini.css';
 
@@ -10,13 +9,13 @@ interface ThemeSwitchMiniProps {
 }
 
 const getNextTheme = (themeInUi: Theme) =>
-themeInUi === Theme.Light ? Theme.Dark : Theme.Light;
+  themeInUi === Theme.Light ? Theme.Dark : Theme.Light;
 
 export const ThemeSwitchMini: FunctionComponent<ThemeSwitchMiniProps> = ({
   className,
 }) => {
   const { themeInUi, setTheme } = useContext(ThemeContext);
-  const iconName = themeInUi === Theme.Light ? IconNames.ThemeSwitchDark : IconNames.ThemeSwitchLight;
+  const toggled = themeInUi === Theme.Dark;
 
   const handleSwitch = () => {
     setTheme(getNextTheme(themeInUi));
@@ -27,7 +26,10 @@ export const ThemeSwitchMini: FunctionComponent<ThemeSwitchMiniProps> = ({
       className={`theme-switch-mini ${className}`}
       onClick={handleSwitch}
     >
-      <ThemedIcon name={iconName} />
+      <ToggleSwitch
+        toggled={toggled}
+        onToggle={handleSwitch}
+      />
     </div>
   );
 };

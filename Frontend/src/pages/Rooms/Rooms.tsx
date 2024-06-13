@@ -13,7 +13,6 @@ import { ProcessWrapper, skeletonTransitionMs } from '../../components/ProcessWr
 import { TagsView } from '../../components/TagsView/TagsView';
 import { RoomsSearch } from '../../components/RoomsSearch/RoomsSearch';
 import { ButtonLink } from '../../components/ButtonLink/ButtonLink';
-import { HeaderField } from '../../components/HeaderField/HeaderField';
 import { RoomsFilter } from '../../components/RoomsFilter/RoomsFilter';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
@@ -140,12 +139,12 @@ export const Rooms: FunctionComponent = () => {
 
   return (
     <MainContentWrapper className='rooms-page'>
-      <HeaderField>
+      <Field>
         <RoomsSearch
           searchValue={searchValueInput}
           onSearchChange={setSearchValueInput}
         />
-      </HeaderField>
+      </Field>
       <Field>
         <div className='room-actions'>
           <RoomsFilter

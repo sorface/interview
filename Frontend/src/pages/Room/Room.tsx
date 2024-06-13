@@ -26,7 +26,6 @@ import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
 import { VideoChat } from './components/VideoChat/VideoChat';
 import { SwitchButton } from './components/VideoChat/SwitchButton';
 import { Link } from 'react-router-dom';
-import { ThemeSwitchMini } from '../../components/ThemeSwitchMini/ThemeSwitchMini';
 import { EnterVideoChatModal } from './components/VideoChat/EnterVideoChatModal';
 import { useUserStreams } from './hooks/useUserStreams';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
@@ -493,7 +492,6 @@ export const Room: FunctionComponent = () => {
                     />
                   </div>
                 )}
-                <ThemeSwitchMini />
               </div>
             </div>
             <div className="room-page-main-content">
