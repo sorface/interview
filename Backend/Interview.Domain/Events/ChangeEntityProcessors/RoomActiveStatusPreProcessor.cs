@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Domain.Events.ChangeEntityProcessors;
 
-public class RoomActiveStatusPreProcessor : IEntityPreProcessor
+public class RoomActiveStatusPreProcessor : EntityProcessorBase<Room>, IEntityPreProcessor
 {
     private readonly ILogger<RoomActiveStatusPreProcessor> _logger;
     private readonly AppDbContext _db;
@@ -16,43 +16,30 @@ public class RoomActiveStatusPreProcessor : IEntityPreProcessor
         _db = db;
     }
 
-    public ValueTask ProcessAddedAsync(IReadOnlyCollection<Entity> entities, CancellationToken cancellationToken)
+    protected override ValueTask ProcessAddedAsync(Room entity, CancellationToken cancellationToken)
     {
         return ValueTask.CompletedTask;
     }
 
-    public async ValueTask ProcessModifiedAsync(
-        IReadOnlyCollection<(Entity Original, Entity Current)> entities,
-        CancellationToken cancellationToken)
+    protected override async ValueTask ProcessModifiedAsync(Room original, Room current, CancellationToken cancellationToken)
     {
-        foreach (var (originalEntity, currentEntity) in entities)
+        if (current.Timer is null)
         {
-            switch (originalEntity)
+            await _db.Entry(current).Reference(e => e.Timer).LoadAsync(cancellationToken);
+            if (current.Timer is null)
             {
-                case Room originalC when currentEntity is Room currentC:
-                    {
-                        if (currentC.Timer is null)
-                        {
-                            await _db.Entry(currentC).Reference(e => e.Timer).LoadAsync(cancellationToken);
-                            if (currentC.Timer is null)
-                            {
-                                _logger.LogWarning("Timer is not present in room [{id}]", currentC.Id);
-                                break;
-                            }
-                        }
-
-                        if (originalC.Status != SERoomStatus.Active && currentC.Status == SERoomStatus.Active)
-                        {
-                            currentC.Timer.ActualStartTime = DateTime.Now;
-
-                            _logger.LogWarning("Timer actual start time is updated for room [{id}]", currentC.Id);
-                        }
-
-                        _logger.LogInformation(@"update room with timer {timer}", originalC.Timer?.Duration);
-
-                        break;
-                    }
+                _logger.LogWarning("Timer is not present in room [{id}]", current.Id);
+                return;
             }
         }
+
+        if (original.Status != SERoomStatus.Active && current.Status == SERoomStatus.Active)
+        {
+            current.Timer.ActualStartTime = DateTime.Now;
+
+            _logger.LogWarning("Timer actual start time is updated for room [{id}]", current.Id);
+        }
+
+        _logger.LogInformation(@"update room with timer {timer}", original.Timer?.Duration);
     }
 }
