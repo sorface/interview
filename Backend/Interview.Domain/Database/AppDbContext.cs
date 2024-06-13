@@ -9,6 +9,7 @@ using Interview.Domain.Rooms.RoomInvites;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomQuestionReactions;
 using Interview.Domain.Rooms.RoomQuestions;
+using Interview.Domain.Rooms.RoomTimers;
 using Interview.Domain.Tags;
 using Interview.Domain.Users;
 using Interview.Domain.Users.Permissions;
@@ -64,6 +65,8 @@ public class AppDbContext : DbContext
     public DbSet<Invite> Invites { get; private set; } = null!;
 
     public DbSet<RoomInvite> RoomInvites { get; private set; } = null!;
+
+    public DbSet<RoomTimer> RoomTimers { get; private set; } = null!;
 
     public DbSet<AvailableRoomPermission> AvailableRoomPermission { get; private set; } = null!;
 
