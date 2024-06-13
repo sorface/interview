@@ -1,3 +1,4 @@
+using Interview.Domain.Database;
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms;
 using Microsoft.Extensions.Logging;
@@ -7,10 +8,12 @@ namespace Interview.Domain.Events.ChangeEntityProcessors;
 public class RoomActiveStatusPreProcessor : IEntityPreProcessor
 {
     private readonly ILogger<RoomActiveStatusPreProcessor> _logger;
+    private readonly AppDbContext _db;
 
-    public RoomActiveStatusPreProcessor(ILogger<RoomActiveStatusPreProcessor> logger)
+    public RoomActiveStatusPreProcessor(ILogger<RoomActiveStatusPreProcessor> logger, AppDbContext db)
     {
         _logger = logger;
+        _db = db;
     }
 
     public ValueTask ProcessAddedAsync(IReadOnlyCollection<Entity> entities, CancellationToken cancellationToken)
@@ -18,7 +21,7 @@ public class RoomActiveStatusPreProcessor : IEntityPreProcessor
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask ProcessModifiedAsync(
+    public async ValueTask ProcessModifiedAsync(
         IReadOnlyCollection<(Entity Original, Entity Current)> entities,
         CancellationToken cancellationToken)
     {
@@ -30,8 +33,12 @@ public class RoomActiveStatusPreProcessor : IEntityPreProcessor
                     {
                         if (currentC.Timer is null)
                         {
-                            _logger.LogWarning("Timer is not present in room [{id}]", currentC.Id);
-                            break;
+                            await _db.Entry(currentC).Reference(e => e.Timer).LoadAsync(cancellationToken);
+                            if (currentC.Timer is null)
+                            {
+                                _logger.LogWarning("Timer is not present in room [{id}]", currentC.Id);
+                                break;
+                            }
                         }
 
                         if (originalC.Status != SERoomStatus.Active && currentC.Status == SERoomStatus.Active)
@@ -47,7 +54,5 @@ public class RoomActiveStatusPreProcessor : IEntityPreProcessor
                     }
             }
         }
-
-        return ValueTask.CompletedTask;
     }
 }

@@ -48,7 +48,7 @@ public static class ServiceCollectionExt
 
                 .AddClasses(filter => filter.AssignableTo<IEntityPostProcessor>())
                 .As<IEntityPostProcessor>()
-                .WithSingletonLifetime()
+                .WithScopedLifetime()
 
                 .AddClasses(filter => filter.AssignableTo<IEntityPreProcessor>())
                 .As<IEntityPreProcessor>()
