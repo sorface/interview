@@ -1,4 +1,5 @@
 using Interview.Domain.Rooms;
+using Interview.Domain.Rooms.RoomTimers;
 using Interview.Domain.Tags;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -18,6 +19,11 @@ public class RoomConfiguration : EntityTypeConfigurationBase<Room>
             .HasOne<Domain.Rooms.RoomConfigurations.RoomConfiguration>(room => room.Configuration)
             .WithOne(e => e.Room)
             .HasForeignKey<Domain.Rooms.RoomConfigurations.RoomConfiguration>(e => e.Id);
+        builder
+            .HasOne<RoomTimer>(room => room.Timer)
+            .WithOne(roomTimer => roomTimer.Room)
+            .HasForeignKey<RoomTimer>(roomTimer => roomTimer.Id)
+            .OnDelete(DeleteBehavior.Cascade);
         builder.HasMany<Tag>(e => e.Tags).WithMany();
         builder.Property(room => room.AccessType)
             .HasConversion(e => e.Value, e => SERoomAccessType.FromValue(e))

@@ -18,6 +18,7 @@ using Interview.Domain.Rooms.RoomQuestionReactions;
 using Interview.Domain.Rooms.RoomQuestionReactions.Mappers;
 using Interview.Domain.Rooms.RoomQuestionReactions.Specifications;
 using Interview.Domain.Rooms.RoomQuestions;
+using Interview.Domain.Rooms.RoomTimers;
 using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
 using Interview.Domain.Users;
@@ -202,6 +203,12 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         var createdParticipants = await _roomParticipantService.CreateAsync(room.Id, participants, cancellationToken);
         room.Participants.AddRange(createdParticipants);
+
+        if (request.Duration is not null)
+        {
+            room.Timer = new RoomTimer { Duration = request.Duration.Value, };
+        }
+
         await _roomRepository.CreateAsync(room, cancellationToken);
         await GenerateInvitesAsync(room.Id, cancellationToken);
         return room;
