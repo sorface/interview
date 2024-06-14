@@ -1,8 +1,9 @@
 using Interview.Domain;
 using Interview.Domain.Certificates;
 using Interview.Domain.Database;
+using Interview.Domain.Database.Processors;
 using Interview.Domain.Events;
-using Interview.Domain.Events.ChangeEntityProcessors;
+using Interview.Domain.Events.DatabaseProcessors;
 using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Events.Sender;
 using Interview.Domain.Events.Storage;
@@ -41,7 +42,7 @@ public static class ServiceCollectionExt
 
         self.Scan(selector =>
         {
-            selector.FromAssemblies(typeof(UserRepository).Assembly, typeof(RoomQuestionReactionChangeEntityProcessor).Assembly)
+            selector.FromAssemblies(typeof(UserRepository).Assembly, typeof(RoomQuestionReactionPostProcessor).Assembly)
                 .AddClasses(filter => filter.AssignableTo(typeof(IRepository<>)))
                 .AsImplementedInterfaces()
                 .WithScopedLifetime()

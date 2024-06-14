@@ -1,11 +1,11 @@
 using Interview.Domain.Database;
-using Interview.Domain.Repository;
+using Interview.Domain.Database.Processors;
 using Interview.Domain.Rooms;
 using Microsoft.Extensions.Logging;
 
-namespace Interview.Domain.Events.ChangeEntityProcessors;
+namespace Interview.Domain.Events.DatabaseProcessors;
 
-public class RoomActiveStatusPreProcessor : EntityProcessorBase<Room>, IEntityPreProcessor
+public class RoomActiveStatusPreProcessor : EntityPreProcessor<Room>
 {
     private readonly ILogger<RoomActiveStatusPreProcessor> _logger;
     private readonly AppDbContext _db;
@@ -16,12 +16,8 @@ public class RoomActiveStatusPreProcessor : EntityProcessorBase<Room>, IEntityPr
         _db = db;
     }
 
-    protected override ValueTask ProcessAddedAsync(Room entity, CancellationToken cancellationToken)
-    {
-        return ValueTask.CompletedTask;
-    }
-
-    protected override async ValueTask ProcessModifiedAsync(Room original, Room current, CancellationToken cancellationToken)
+    protected override async ValueTask ProcessModifiedAsync(
+        Room original, Room current, CancellationToken cancellationToken)
     {
         if (current.Timer is null)
         {
