@@ -31,8 +31,4 @@
         <ProjectReference Include="..\Interview.Infrastructure\Interview.Infrastructure.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Units\Processors" />
-    </ItemGroup>
-
 </Project>

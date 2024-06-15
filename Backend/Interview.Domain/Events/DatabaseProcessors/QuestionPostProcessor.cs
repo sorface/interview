@@ -1,6 +1,6 @@
 using Interview.Domain.Connections;
 using Interview.Domain.Database.Processors;
-using Interview.Domain.Events.DatabaseProcessors.Events.Question;
+using Interview.Domain.Events.DatabaseProcessors.Records.Question;
 using Interview.Domain.Questions;
 
 namespace Interview.Domain.Events.DatabaseProcessors;
