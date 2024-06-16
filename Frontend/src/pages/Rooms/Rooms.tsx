@@ -3,23 +3,24 @@ import { Link, generatePath } from 'react-router-dom';
 import { GetRoomPageParams, roomsApiDeclaration } from '../../apiDeclarations';
 import { Field } from '../../components/FieldsBlock/Field';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
-import { pathnames } from '../../constants';
+import { IconNames, pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Room, RoomStatus } from '../../types/room';
 import { checkAdmin } from '../../utils/checkAdmin';
 import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
-import { TagsView } from '../../components/TagsView/TagsView';
 import { RoomsSearch } from '../../components/RoomsSearch/RoomsSearch';
 import { ButtonLink } from '../../components/ButtonLink/ButtonLink';
 import { RoomsFilter } from '../../components/RoomsFilter/RoomsFilter';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
+import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
+import { UserAvatar } from '../../components/UserAvatar/UserAvatar';
 
 import './Rooms.css';
 
-const pageSize = 10;
+const pageSize = 30;
 const initialPageNumber = 1;
 const searchDebounceMs = 300;
 
@@ -77,42 +78,44 @@ export const Rooms: FunctionComponent = () => {
       generatePath(pathnames.room, { id: room.id });
 
     return (
-      <Field key={room.id}>
+      <div key={room.id} className='room-item-wrapper'>
         <li>
-          <div className='room-item'>
-            <div className='room-link'>
-              <Link to={roomLink} >
+          <Link to={roomLink} >
+            <div className='room-item'>
+              <div className='room-status-wrapper'>
+                <div className='room-status'>
+                  {roomStatusCaption[room.roomStatus]}
+                </div>
+                <div className='room-action-links'>
+                  {admin && (
+                    <Link
+                      to={`${pathnames.roomsParticipants.replace(':id', room.id)}`}
+                      className='room-edit-participants-link'
+                    >
+                      <ThemedIcon name={IconNames.Settings} />
+                    </Link>
+                  )}
+                </div>
+              </div>
+              <div className='room-name'>
                 {room.name}
-              </Link>
-              <div className='room-status'>
-                {roomStatusCaption[room.roomStatus]}
+              </div>
+              <div className='room-participants'>
+                {room.users.map(roomParticipant => (
+                  <div className='room-participant'>
+                    {roomParticipant.avatar &&
+                      <UserAvatar
+                        src={roomParticipant.avatar}
+                        nickname={roomParticipant.nickname}
+                      />
+                    }
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="room-tags">
-              <TagsView
-                placeHolder={localizationCaptions[LocalizationKey.NoTags]}
-                tags={room.tags}
-              />
-            </div>
-            <div className='room-action-links'>
-              <Link
-                to={roomLink}
-                className='room-join-link'
-              >
-                {localizationCaptions[LocalizationKey.Join]}
-              </Link>
-              {admin && (
-                <Link
-                  to={`${pathnames.roomsParticipants.replace(':id', room.id)}`}
-                  className='room-edit-participants-link'
-                >
-                  {localizationCaptions[LocalizationKey.EditParticipants]}
-                </Link>
-              )}
-            </div>
-          </div>
+          </Link>
         </li>
-      </Field>
+      </div>
     );
   }, [admin, localizationCaptions]);
 
@@ -145,6 +148,7 @@ export const Rooms: FunctionComponent = () => {
         <ItemsGrid
           currentData={rooms || []}
           loading={loading}
+          loaderClassName='room-item-wrapper room-item-loader'
           renderItem={createRoomItem}
           nextPageAvailable={rooms?.length === pageSize}
           handleNextPage={handleNextPage}

@@ -12,6 +12,7 @@ interface ItemsGridProps<T extends object> {
   currentData: T[];
   loading: boolean;
   nextPageAvailable: boolean;
+  loaderClassName?: string;
   renderItem: (room: T) => JSX.Element;
   handleNextPage: () => void;
 }
@@ -20,6 +21,7 @@ export const ItemsGrid = <T extends object>({
   currentData,
   loading,
   nextPageAvailable,
+  loaderClassName,
   renderItem,
   handleNextPage,
 }: ItemsGridProps<T>) => {
@@ -36,31 +38,30 @@ export const ItemsGrid = <T extends object>({
     setDataDisplayed(true);
   }, [dataLoaded, dataDisplayed]);
 
+  const noRecords = !accumData.length && !loading;
+
   return (
     <>
       <ul className="items-grid">
-        {(!accumData.length && !loading) ? (
+        {noRecords ? (
           <Field>
             <div className="items-grid-no-data">{localizationCaptions[LocalizationKey.NoRecords]}</div>
           </Field>
         ) : (
-          <>
-            {accumData.map(renderItem)}
-            {nextPageAvailable && (
-              <InfinitePaginator onNextPage={handleNextPage} />
-            )}
-          </>
+          accumData.map(renderItem)
         )}
         {loading && loaders.map((loader, index) => (
-          <Field key={`loader${index}`}>
+          <div key={`loader${index}`} className={loaderClassName}>
             <div
               style={{ height: loader.height || '1.8rem' }}
-              className="process-wrapper-loader"
             >
               <Loader />
             </div>
-          </Field>
+          </div>
         ))}
+        {!noRecords && nextPageAvailable && (
+          <InfinitePaginator onNextPage={handleNextPage} />
+        )}
       </ul>
     </>
   );

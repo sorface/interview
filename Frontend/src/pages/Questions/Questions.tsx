@@ -93,6 +93,7 @@ export const Questions: FunctionComponent = () => {
         <ItemsGrid
           currentData={questions || []}
           loading={loading}
+          loaderClassName='question-item field-wrap'
           renderItem={createQuestionItem}
           nextPageAvailable={questions?.length === pageSize}
           handleNextPage={handleNextPage}
