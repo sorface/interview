@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const compareObjects = (obj1: object, obj2: object) =>
   JSON.stringify(obj1) === JSON.stringify(obj2);
 
 export const useAccumData = <T extends object>(currentData: T[] | null) => {
-  const [allData, setAllData] = useState<T[]>([]);
+  const [accumData, setAccumData] = useState<T[]>([]);
   const allDataRef = useRef<T[]>([]);
 
   useEffect(() => {
@@ -22,8 +22,16 @@ export const useAccumData = <T extends object>(currentData: T[] | null) => {
       ...allDataRef.current,
       ...currentData,
     ];
-    setAllData(allDataRef.current);
+    setAccumData(allDataRef.current);
   }, [currentData]);
 
-  return allData as T[];
+  const resetAccumData = useCallback(() => {
+    allDataRef.current = [];
+    setAccumData(allDataRef.current);
+  }, []);
+
+  return {
+    accumData: accumData as T[],
+    resetAccumData,
+  };
 };

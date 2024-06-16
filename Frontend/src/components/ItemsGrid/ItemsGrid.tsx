@@ -12,6 +12,7 @@ interface ItemsGridProps<T extends object> {
   currentData: T[];
   loading: boolean;
   nextPageAvailable: boolean;
+  triggerResetAccumData: string;
   loaderClassName?: string;
   renderItem: (room: T) => JSX.Element;
   handleNextPage: () => void;
@@ -21,13 +22,14 @@ export const ItemsGrid = <T extends object>({
   currentData,
   loading,
   nextPageAvailable,
+  triggerResetAccumData,
   loaderClassName,
   renderItem,
   handleNextPage,
 }: ItemsGridProps<T>) => {
   const localizationCaptions = useLocalizationCaptions();
   const loaders = Array.from({ length: 3 }, () => ({ height: '4rem' }));
-  const accumData = useAccumData<T>(currentData);
+  const { accumData, resetAccumData } = useAccumData<T>(currentData);
   const dataLoaded = !loading && accumData.length !== 0;
   const [dataDisplayed, setDataDisplayed] = useState(false);
 
@@ -37,6 +39,10 @@ export const ItemsGrid = <T extends object>({
     }
     setDataDisplayed(true);
   }, [dataLoaded, dataDisplayed]);
+
+  useEffect(() => {
+    resetAccumData();
+  }, [triggerResetAccumData, resetAccumData])
 
   const noRecords = !accumData.length && !loading;
 
