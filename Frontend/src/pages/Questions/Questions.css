@@ -7,11 +7,6 @@
   align-items: stretch;
 }
 
-.questions-page .items-grid .tags-view {
-  width: 100%;
-  justify-content: center;
-}
-
 .questions-page .items-grid .question-controls {
   position: absolute;
   display: flex;
