@@ -1,52 +1,42 @@
-.rooms-list {
-  padding: 0px;
-  list-style-type: none;
-  text-align: left;
-}
-
 .rooms-page .room-actions {
   display: flex;
   justify-content: space-between;
   gap: 0.25rem;
 }
 
-.rooms-list .room-item {
+.rooms-page .items-grid .room-item {
   display: flex;
   justify-content: center;
   padding-bottom: 1rem;
   margin: 0rem 1rem;
 }
 
-.rooms-list .room-link {
+.rooms-page .items-grid .room-link {
   flex: 1;
   align-self: flex-start;
   font-size: var(--menu-font-size);
 }
 
-.rooms-list .room-status {
+.rooms-page .items-grid .room-status {
   font-size: 0.75rem;
 }
 
-.rooms-list .room-tags {
+.rooms-page .items-grid .room-tags {
   flex: 1;
   text-align: right;
   margin-top: 0.5rem;
 }
 
-.rooms-list .room-edit-participants-link {
+.rooms-page .items-grid .room-edit-participants-link {
   font-size: 0.75rem;
   opacity: 0.75;
 }
 
-.rooms-list .room-action-links {
+.rooms-page .items-grid .room-action-links {
   display: flex;
   flex-direction: column;
 }
 
-.rooms-list .rooms-list-no-data {
-  text-align: center;
-}
-
-.rooms-list .field-wrap {
+.rooms-page .items-grid .field-wrap {
   height: 4rem;
 }

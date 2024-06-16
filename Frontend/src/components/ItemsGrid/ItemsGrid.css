@@ -1,0 +1,9 @@
+.items-grid {
+  padding: 0px;
+  list-style-type: none;
+  text-align: left;
+}
+
+.items-grid-no-data {
+  text-align: center;
+}

@@ -4,7 +4,6 @@ import { GetQuestionsParams, questionsApiDeclaration } from '../../apiDeclaratio
 import { Field } from '../../components/FieldsBlock/Field';
 import { HeaderWithLink } from '../../components/HeaderWithLink/HeaderWithLink';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
-import { Paginator } from '../../components/Paginator/Paginator';
 import { pathnames } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Question } from '../../types/question';
@@ -15,6 +14,7 @@ import { QustionsSearch } from '../../components/QustionsSearch/QustionsSearch';
 import { ActionModal } from '../../components/ActionModal/ActionModal';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
 
 import './Questions.css';
 
@@ -33,8 +33,6 @@ export const Questions: FunctionComponent = () => {
   const { apiMethodState: archiveQuestionsState, fetchData: archiveQuestion } = useApiMethod<Question, Question['id']>(questionsApiDeclaration.archive);
   const { process: { loading: archiveLoading, error: archiveError }, data: archivedQuestion } = archiveQuestionsState;
 
-  const questionsSafe = questions || [];
-
   useEffect(() => {
     fetchQuestios({
       PageNumber: pageNumber,
@@ -46,10 +44,6 @@ export const Questions: FunctionComponent = () => {
 
   const handleNextPage = useCallback(() => {
     setPageNumber(pageNumber + 1);
-  }, [pageNumber]);
-
-  const handlePrevPage = useCallback(() => {
-    setPageNumber(pageNumber - 1);
   }, [pageNumber]);
 
   const createQuestionItem = useCallback((question: Question) => (
@@ -80,7 +74,7 @@ export const Questions: FunctionComponent = () => {
   ), [archiveLoading, archiveError, localizationCaptions, archiveQuestion]);
 
   return (
-    <MainContentWrapper>
+    <MainContentWrapper className="questions-page">
       <HeaderWithLink
         linkVisible={true}
         path={pathnames.questionsCreate}
@@ -93,22 +87,16 @@ export const Questions: FunctionComponent = () => {
         />
         </HeaderWithLink>
       <ProcessWrapper
-        loading={loading || archiveLoading}
+        loading={false}
         error={error|| archiveError}
-        loaders={Array.from({ length: pageSize }, () => ({ height: '4.75rem' }))}
       >
-        <>
-          <ul className="questions-list">
-            {questionsSafe.map(createQuestionItem)}
-          </ul>
-          <Paginator
-            pageNumber={pageNumber}
-            prevDisabled={pageNumber === initialPageNumber}
-            nextDisabled={questionsSafe.length !== pageSize}
-            onPrevClick={handlePrevPage}
-            onNextClick={handleNextPage}
-          />
-        </>
+        <ItemsGrid
+          currentData={questions || []}
+          loading={loading}
+          renderItem={createQuestionItem}
+          nextPageAvailable={questions?.length === pageSize}
+          handleNextPage={handleNextPage}
+        />
       </ProcessWrapper>
     </MainContentWrapper>
   );

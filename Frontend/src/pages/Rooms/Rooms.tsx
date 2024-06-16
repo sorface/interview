@@ -3,19 +3,19 @@ import { Link, generatePath } from 'react-router-dom';
 import { GetRoomPageParams, roomsApiDeclaration } from '../../apiDeclarations';
 import { Field } from '../../components/FieldsBlock/Field';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
-import { Paginator } from '../../components/Paginator/Paginator';
 import { pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Room, RoomStatus } from '../../types/room';
 import { checkAdmin } from '../../utils/checkAdmin';
-import { ProcessWrapper, skeletonTransitionMs } from '../../components/ProcessWrapper/ProcessWrapper';
+import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
 import { TagsView } from '../../components/TagsView/TagsView';
 import { RoomsSearch } from '../../components/RoomsSearch/RoomsSearch';
 import { ButtonLink } from '../../components/ButtonLink/ButtonLink';
 import { RoomsFilter } from '../../components/RoomsFilter/RoomsFilter';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
+import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
 
 import './Rooms.css';
 
@@ -34,9 +34,6 @@ export const Rooms: FunctionComponent = () => {
   const [searchValue, setSearchValue] = useState('');
   const [participating, setParticipating] = useState(false);
   const [closed, setClosed] = useState(false);
-  const [loadersCount, setLoadersCount] = useState(0);
-  const loaders = Array.from({ length: loadersCount || 1 }, () => ({ height: '4rem' }));
-  const roomsSafe = rooms || [];
 
   useEffect(() => {
     const participants = (auth?.id && participating) ? [auth?.id] : [];
@@ -51,20 +48,6 @@ export const Rooms: FunctionComponent = () => {
   }, [pageNumber, searchValue, auth?.id, participating, closed, fetchData]);
 
   useEffect(() => {
-    if (loadersCount || !roomsSafe.length || loading) {
-      return;
-    }
-    const loadersCountTimeout = setTimeout(() => {
-      setLoadersCount(roomsSafe.length);
-    }, skeletonTransitionMs);
-
-    return () => {
-      clearTimeout(loadersCountTimeout);
-    };
-
-  }, [roomsSafe.length, loading, loadersCount]);
-
-  useEffect(() => {
     const searchTimeout = setTimeout(() => {
       setSearchValue(searchValueInput);
     }, searchDebounceMs);
@@ -76,10 +59,6 @@ export const Rooms: FunctionComponent = () => {
 
   const handleNextPage = useCallback(() => {
     setPageNumber(pageNumber + 1);
-  }, [pageNumber]);
-
-  const handlePrevPage = useCallback(() => {
-    setPageNumber(pageNumber - 1);
   }, [pageNumber]);
 
   const createRoomItem = useCallback((room: Room) => {
@@ -160,29 +139,17 @@ export const Rooms: FunctionComponent = () => {
         </div>
       </Field>
       <ProcessWrapper
-        loading={loading}
+        loading={false}
         error={error}
-        loaders={loaders}
       >
-        <>
-          <ul className="rooms-list">
-            {(rooms && !rooms.length) ? (
-              <Field>
-                <div className="rooms-list-no-data">{localizationCaptions[LocalizationKey.NoRecords]}</div>
-              </Field>
-            ) : (
-              roomsSafe.map(createRoomItem)
-            )}
-          </ul>
-        </>
+        <ItemsGrid
+          currentData={rooms || []}
+          loading={loading}
+          renderItem={createRoomItem}
+          nextPageAvailable={rooms?.length === pageSize}
+          handleNextPage={handleNextPage}
+        />
       </ProcessWrapper>
-      <Paginator
-        pageNumber={pageNumber}
-        prevDisabled={loading || (pageNumber === initialPageNumber)}
-        nextDisabled={loading || (roomsSafe.length !== pageSize)}
-        onPrevClick={handlePrevPage}
-        onNextClick={handleNextPage}
-      />
     </MainContentWrapper>
   );
 };
