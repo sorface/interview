@@ -7,9 +7,7 @@ import { MainContentWrapper } from '../../components/MainContentWrapper/MainCont
 import { pathnames } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Question } from '../../types/question';
-import { Tag } from '../../types/tag';
 import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
-import { TagsView } from '../../components/TagsView/TagsView';
 import { QustionsSearch } from '../../components/QustionsSearch/QustionsSearch';
 import { ActionModal } from '../../components/ActionModal/ActionModal';
 import { LocalizationKey } from '../../localization';
@@ -25,7 +23,6 @@ export const Questions: FunctionComponent = () => {
   const localizationCaptions = useLocalizationCaptions();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const [searchValue, setSearchValue] = useState('');
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
   const { apiMethodState: questionsState, fetchData: fetchQuestios } = useApiMethod<Question[], GetQuestionsParams>(questionsApiDeclaration.getPage);
   const { process: { loading, error }, data: questions } = questionsState;
@@ -37,10 +34,10 @@ export const Questions: FunctionComponent = () => {
     fetchQuestios({
       PageNumber: pageNumber,
       PageSize: pageSize,
-      tags: selectedTags.map(tag => tag.id),
+      tags: [],
       value: searchValue,
     });
-  }, [pageNumber, selectedTags, searchValue, archivedQuestion, fetchQuestios]);
+  }, [pageNumber, searchValue, archivedQuestion, fetchQuestios]);
 
   const handleNextPage = useCallback(() => {
     setPageNumber(pageNumber + 1);
@@ -65,10 +62,6 @@ export const Questions: FunctionComponent = () => {
           onAction={() => {archiveQuestion(question.id)}}
         />
         </div>
-        <TagsView
-          placeHolder={localizationCaptions[LocalizationKey.NoTags]}
-          tags={question.tags}
-        />
       </Field>
     </li>
   ), [archiveLoading, archiveError, localizationCaptions, archiveQuestion]);
@@ -83,7 +76,6 @@ export const Questions: FunctionComponent = () => {
       >
         <QustionsSearch
           onSearchChange={setSearchValue}
-          onTagsChange={setSelectedTags}
         />
         </HeaderWithLink>
       <ProcessWrapper
