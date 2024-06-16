@@ -101,7 +101,7 @@ export const Invitations: FunctionComponent<InvitationsProps> = ({
               id: roomId,
               [inviteParamName]: roomInvite.inviteId,
             });
-            const inviteUrlDispaly = `${window.location.origin}/#${invitePath}`;
+            const inviteUrlDispaly = `${window.location.origin}${invitePath}`;
             return (
               <div key={roomInvite.inviteId} className='invitations-modal-item'>
                 <div className='invitations-modal-item-participantType'>{participantTypeLocalization[roomInvite.participantType]} ({roomInvite.used}/{roomInvite.max}):</div>
