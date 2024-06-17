@@ -1,3 +1,4 @@
+using Interview.Domain.Categories.Page;
 using Interview.Domain.Database;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.Records.Request;
@@ -308,11 +309,17 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
         return Set
             .Include(e => e.Participants)
             .Include(e => e.Configuration)
+            .Include(e => e.Category)
             .Select(e => new RoomDetail
             {
                 Id = e.Id,
                 Name = e.Name,
-                Owner = new RoomUserDetail { Id = e.CreatedBy!.Id, Nickname = e.CreatedBy!.Nickname, Avatar = e.CreatedBy!.Avatar, },
+                Owner = new RoomUserDetail
+                {
+                    Id = e.CreatedBy!.Id,
+                    Nickname = e.CreatedBy!.Nickname,
+                    Avatar = e.CreatedBy!.Avatar,
+                },
                 Participants = e.Participants.Select(participant =>
                         new RoomUserDetail
                         {
@@ -328,8 +335,15 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                     ParticipantType = roomInvite.ParticipantType!.EnumValue,
                     Max = roomInvite.Invite!.UsesMax,
                     Used = roomInvite.Invite.UsesCurrent,
-                }).ToList(),
+                })
+                    .ToList(),
                 Type = e.AccessType.EnumValue,
+                CategoryResponse = e.Category == null ? null : new CategoryResponse
+                {
+                    Id = e.Category.Id,
+                    Name = e.Category.Name,
+                    ParentId = e.Category.ParentId,
+                },
             })
             .FirstOrDefaultAsync(room => room.Id == roomId, cancellationToken: cancellationToken);
     }

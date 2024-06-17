@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -21,7 +21,7 @@ namespace Interview.Migrations.Postgres.Migrations
                     { new Guid("1b2dd31b-b35e-48e2-8f33-d0366b9d60ba"), new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "EditCategory", new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified) },
                     { new Guid("9001520d-b1d2-4ade-8f70-570d2b7efea1"), new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "FindCategoryPage", new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified) }
                 });
-            
+
             migrationBuilder.Sql(@"INSERT INTO PermissionUser
 (
  UserId,

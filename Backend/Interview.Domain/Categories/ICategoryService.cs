@@ -1,4 +1,4 @@
-﻿using CSharpFunctionalExtensions;
+using CSharpFunctionalExtensions;
 using Interview.Domain.Categories.Edit;
 using Interview.Domain.Categories.Page;
 using Interview.Domain.ServiceResults.Errors;

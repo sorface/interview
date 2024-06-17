@@ -1,4 +1,4 @@
-﻿namespace Interview.Domain.Categories.Edit;
+namespace Interview.Domain.Categories.Edit;
 
 public class CategoryEditRequest
 {

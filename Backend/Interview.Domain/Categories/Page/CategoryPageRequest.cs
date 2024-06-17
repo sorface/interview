@@ -1,4 +1,4 @@
-﻿namespace Interview.Domain.Categories.Page;
+namespace Interview.Domain.Categories.Page;
 
 public class CategoryPageRequest
 {

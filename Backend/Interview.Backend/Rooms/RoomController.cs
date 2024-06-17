@@ -137,6 +137,7 @@ public class RoomController : ControllerBase
             Experts = request.Experts,
             Examinees = request.Examinees,
             Tags = request.Tags,
+            CategoryId = request.CategoryId,
         };
 
         var room = await _roomService.CreateAsync(domainRequest, HttpContext.RequestAborted);

@@ -1,4 +1,4 @@
-﻿using CSharpFunctionalExtensions;
+using CSharpFunctionalExtensions;
 using Interview.Domain.Categories.Edit;
 using Interview.Domain.Categories.Page;
 using Interview.Domain.Database;
@@ -102,22 +102,13 @@ public class CategoryService : ICategoryService
         });
     }
 
-    private async Task<ServiceError?> EnsureValidAsync(CategoryEditRequest request, CancellationToken cancellationToken)
+    private Task<ServiceError?> EnsureValidAsync(CategoryEditRequest request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.Name))
         {
-            return ServiceError.Error("Category should not be empty");
+            return Task.FromResult<ServiceError?>(ServiceError.Error("Category should not be empty"));
         }
 
-        if (request.ParentId is not null)
-        {
-            var hasParent = await _db.Categories.AnyAsync(e => e.Id == request.ParentId, cancellationToken);
-            if (!hasParent)
-            {
-                return ServiceError.NotFound($"Not found parent for category by id '{request.ParentId}'");
-            }
-        }
-
-        return null;
+        return Category.ValidateParentAsync(_db, request.ParentId, cancellationToken);
     }
 }

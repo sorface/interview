@@ -23,6 +23,14 @@ public class ServiceError : IEquatable<ServiceError>
         return appError(this);
     }
 
+    public void Throw()
+    {
+        Match<object?>(
+            e => throw new UserException(e.Message),
+            e => new NotFoundException(e.Message),
+            e => new AccessDeniedException(e.Message));
+    }
+
     public bool Equals(ServiceError? other)
     {
         if (ReferenceEquals(null, other))
