@@ -47,7 +47,11 @@ public class RoomServiceTest
         var roomRepository = new RoomRepository(appDbContext);
         var roomService = CreateRoomService(appDbContext);
 
-        var roomPatchUpdateRequest = new RoomUpdateRequest { Name = "New_Value_Name_Room" };
+        var roomPatchUpdateRequest = new RoomUpdateRequest
+        {
+            Name = "New_Value_Name_Room",
+            CategoryId = null
+        };
 
         _ = await roomService.UpdateAsync(savedRoom.Id, roomPatchUpdateRequest);
 
