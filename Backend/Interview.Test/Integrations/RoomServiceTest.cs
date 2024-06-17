@@ -62,7 +62,7 @@ public class RoomServiceTest
         foundedRoom!.Name.Should().BeEquivalentTo(roomPatchUpdateRequest.Name);
         foundedRoom!.CategoryId.Should().BeNull();
     }
-    
+
     [Fact(DisplayName = "Patch update room with request name not null and add category")]
     public async Task PatchUpdateRoomWithRequestNameIsNotNull_And_Add_Category()
     {
