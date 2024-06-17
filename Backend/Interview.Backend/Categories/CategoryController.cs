@@ -20,10 +20,10 @@ public class CategoryController : ControllerBase
     }
 
     /// <summary>
-    /// Getting a available tags page.
+    /// Getting a available category page.
     /// </summary>
     /// <param name="request">Request.</param>
-    /// <returns>A page of questions with metadata about the pages.</returns>
+    /// <returns>A page of category with metadata about the pages.</returns>
     [Authorize]
     [HttpGet]
     [Produces("application/json")]
@@ -37,10 +37,10 @@ public class CategoryController : ControllerBase
     }
 
     /// <summary>
-    /// Creating a new tag.
+    /// Creating a new category.
     /// </summary>
-    /// <param name="request">Tag edit request.</param>
-    /// <returns>The object of the new question.</returns>
+    /// <param name="request">category edit request.</param>
+    /// <returns>The object of the new category.</returns>
     [Authorize]
     [HttpPost]
     [Produces("application/json")]
@@ -55,11 +55,11 @@ public class CategoryController : ControllerBase
     }
 
     /// <summary>
-    /// Updating the tag by ID.
+    /// Updating the category by ID.
     /// </summary>
-    /// <param name="id">ID of the of tag.</param>
-    /// <param name="request">The object with the tag data for which you need to update.</param>
-    /// <returns>Updated question object.</returns>
+    /// <param name="id">ID of the of category.</param>
+    /// <param name="request">The object with the category data for which you need to update.</param>
+    /// <returns>Updated category object.</returns>
     [Authorize]
     [HttpPut("{id:guid}")]
     [Produces("application/json")]
