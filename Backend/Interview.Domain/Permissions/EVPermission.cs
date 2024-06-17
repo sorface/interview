@@ -160,5 +160,11 @@ public enum EVPermission
 
     [Description("Creating a new public room")]
     PublicRoomCreate,
+
+    [Description("Create/Update category")]
+    EditCategory,
+
+    [Description("Find category page")]
+    FindCategoryPage,
 #pragma warning restore SA1602
 }

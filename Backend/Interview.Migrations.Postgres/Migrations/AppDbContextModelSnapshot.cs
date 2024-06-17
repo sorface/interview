@@ -893,6 +893,20 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
+                            Id = new Guid("1b2dd31b-b35e-48e2-8f33-d0366b9d60ba"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "EditCategory",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("9001520d-b1d2-4ade-8f70-570d2b7efea1"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "FindCategoryPage",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
                             Id = new Guid("fcc9bbca-15c6-4221-8d2d-e052b8cd4385"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "PublicRoomCreate",

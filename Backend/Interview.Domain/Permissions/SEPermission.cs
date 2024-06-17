@@ -340,6 +340,18 @@ public class SEPermission : SmartEnum<SEPermission>
         "Creating a new public room",
         EVPermission.PublicRoomCreate);
 
+    public static readonly SEPermission EditCategory = new(
+        Guid.Parse("1B2DD31B-B35E-48E2-8F33-D0366B9D60BA"),
+        "EditCategory",
+        "Create/Update category",
+        EVPermission.EditCategory);
+
+    public static readonly SEPermission FindCategoryPage = new(
+        Guid.Parse("9001520D-B1D2-4ADE-8F70-570D2B7EFEA1"),
+        "FindCategoryPage",
+        "Find category page",
+        EVPermission.FindCategoryPage);
+
     public Guid Id { get; }
 
     public string Description { get; }
