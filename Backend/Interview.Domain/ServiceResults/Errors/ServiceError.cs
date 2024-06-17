@@ -27,8 +27,8 @@ public class ServiceError : IEquatable<ServiceError>
     {
         Match<object?>(
             e => throw new UserException(e.Message),
-            e => new NotFoundException(e.Message),
-            e => new AccessDeniedException(e.Message));
+            e => throw new NotFoundException(e.Message),
+            e => throw new AccessDeniedException(e.Message));
     }
 
     public bool Equals(ServiceError? other)
