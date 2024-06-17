@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Interview.Domain.Categories;
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Domain.Rooms.RoomInvites;
@@ -29,6 +30,10 @@ public class Room : Entity
     public SERoomAccessType AccessType { get; internal set; }
 
     public SERoomStatus Status { get; internal set; }
+
+    public Guid? CategoryId { get; internal set; }
+
+    public Category? Category { get; set; }
 
     public RoomConfiguration? Configuration { get; set; }
 

@@ -32,6 +32,38 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.ToTable("AppEventRole");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Categories.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("Categories");
+                });
+
             modelBuilder.Entity("Interview.Domain.Events.AppEvent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -462,6 +494,9 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(0);
 
+                    b.Property<Guid?>("CategoryId")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("TEXT");
 
@@ -482,6 +517,8 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("CreatedById");
 
@@ -1319,6 +1356,21 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Interview.Domain.Categories.Category", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Categories.Category", "Parent")
+                        .WithMany()
+                        .HasForeignKey("ParentId");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Parent");
+                });
+
             modelBuilder.Entity("Interview.Domain.Events.AppEvent", b =>
                 {
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
@@ -1410,9 +1462,16 @@ namespace Interview.Migrations.Sqlite.Migrations
 
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>
                 {
+                    b.HasOne("Interview.Domain.Categories.Category", "Category")
+                        .WithMany("Rooms")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
+
+                    b.Navigation("Category");
 
                     b.Navigation("CreatedBy");
                 });
@@ -1675,6 +1734,11 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasForeignKey("TagsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Interview.Domain.Categories.Category", b =>
+                {
+                    b.Navigation("Rooms");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>
