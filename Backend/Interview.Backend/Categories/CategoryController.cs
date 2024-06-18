@@ -31,7 +31,7 @@ public class CategoryController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<IPagedList<CategoryResponse>> GetTagPage([FromQuery] CategoryPageRequest request)
+    public Task<IPagedList<CategoryResponse>> FindPage([FromQuery] CategoryPageRequest request)
     {
         return _categoryService.FindPageAsync(request, HttpContext.RequestAborted);
     }
@@ -49,9 +49,9 @@ public class CategoryController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<ActionResult<CategoryResponse>> CreateTag(CategoryEditRequest request)
+    public Task<ActionResult<CategoryResponse>> Create(CategoryEditRequest request)
     {
-        return _categoryService.CreateTagAsync(request, HttpContext.RequestAborted).ToResponseAsync();
+        return _categoryService.CreateAsync(request, HttpContext.RequestAborted).ToResponseAsync();
     }
 
     /// <summary>
@@ -69,8 +69,8 @@ public class CategoryController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<ActionResult<CategoryResponse>> UpdateTag(Guid id, CategoryEditRequest request)
+    public Task<ActionResult<CategoryResponse>> Update(Guid id, CategoryEditRequest request)
     {
-        return _categoryService.UpdateTagAsync(id, request, HttpContext.RequestAborted).ToResponseAsync();
+        return _categoryService.UpdateAsync(id, request, HttpContext.RequestAborted).ToResponseAsync();
     }
 }

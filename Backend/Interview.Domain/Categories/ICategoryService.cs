@@ -11,7 +11,7 @@ public interface ICategoryService : IService
 {
     Task<IPagedList<CategoryResponse>> FindPageAsync(CategoryPageRequest request, CancellationToken cancellationToken);
 
-    Task<Result<ServiceResult<CategoryResponse>, ServiceError>> CreateTagAsync(CategoryEditRequest request, CancellationToken cancellationToken);
+    Task<Result<ServiceResult<CategoryResponse>, ServiceError>> CreateAsync(CategoryEditRequest request, CancellationToken cancellationToken);
 
-    Task<Result<ServiceResult<CategoryResponse>, ServiceError>> UpdateTagAsync(Guid id, CategoryEditRequest request, CancellationToken cancellationToken);
+    Task<Result<ServiceResult<CategoryResponse>, ServiceError>> UpdateAsync(Guid id, CategoryEditRequest request, CancellationToken cancellationToken);
 }

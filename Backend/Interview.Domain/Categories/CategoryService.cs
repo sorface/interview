@@ -52,7 +52,7 @@ public class CategoryService : ICategoryService
         }
     }
 
-    public async Task<Result<ServiceResult<CategoryResponse>, ServiceError>> CreateTagAsync(CategoryEditRequest request, CancellationToken cancellationToken)
+    public async Task<Result<ServiceResult<CategoryResponse>, ServiceError>> CreateAsync(CategoryEditRequest request, CancellationToken cancellationToken)
     {
         var error = await EnsureValidAsync(request, cancellationToken);
         if (error is not null)
@@ -76,7 +76,7 @@ public class CategoryService : ICategoryService
         });
     }
 
-    public async Task<Result<ServiceResult<CategoryResponse>, ServiceError>> UpdateTagAsync(Guid id, CategoryEditRequest request, CancellationToken cancellationToken)
+    public async Task<Result<ServiceResult<CategoryResponse>, ServiceError>> UpdateAsync(Guid id, CategoryEditRequest request, CancellationToken cancellationToken)
     {
         var error = await EnsureValidAsync(request, cancellationToken);
         if (error is not null)

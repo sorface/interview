@@ -25,15 +25,15 @@ public class CategoryServicePermissionAccessor : ICategoryService, IServiceDecor
         return await _service.FindPageAsync(request, cancellationToken);
     }
 
-    public async Task<Result<ServiceResult<CategoryResponse>, ServiceError>> CreateTagAsync(CategoryEditRequest request, CancellationToken cancellationToken)
+    public async Task<Result<ServiceResult<CategoryResponse>, ServiceError>> CreateAsync(CategoryEditRequest request, CancellationToken cancellationToken)
     {
         await _securityService.EnsurePermissionAsync(SEPermission.EditCategory, cancellationToken);
-        return await _service.CreateTagAsync(request, cancellationToken);
+        return await _service.CreateAsync(request, cancellationToken);
     }
 
-    public async Task<Result<ServiceResult<CategoryResponse>, ServiceError>> UpdateTagAsync(Guid id, CategoryEditRequest request, CancellationToken cancellationToken)
+    public async Task<Result<ServiceResult<CategoryResponse>, ServiceError>> UpdateAsync(Guid id, CategoryEditRequest request, CancellationToken cancellationToken)
     {
         await _securityService.EnsurePermissionAsync(SEPermission.EditCategory, cancellationToken);
-        return await _service.UpdateTagAsync(id, request, cancellationToken);
+        return await _service.UpdateAsync(id, request, cancellationToken);
     }
 }
