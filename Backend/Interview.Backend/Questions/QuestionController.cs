@@ -1,4 +1,5 @@
 using Interview.Backend.Auth;
+using Interview.Backend.Common;
 using Interview.Backend.Responses;
 using Interview.Domain;
 using Interview.Domain.Questions.Records.FindPage;
@@ -29,13 +30,13 @@ public class QuestionController : ControllerBase
     [Authorize]
     [HttpGet]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(IPagedList<QuestionItem>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedListResponse<QuestionItem>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<IPagedList<QuestionItem>> GetPage([FromQuery] FindPageRequest request)
+    public Task<PagedListResponse<QuestionItem>> GetPage([FromQuery] FindPageRequest request)
     {
-        return _questionService.FindPageAsync(request, HttpContext.RequestAborted);
+        return _questionService.FindPageAsync(request, HttpContext.RequestAborted).ToPagedListResponseAsync();
     }
 
     /// <summary>

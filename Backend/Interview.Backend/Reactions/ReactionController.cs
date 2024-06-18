@@ -1,4 +1,5 @@
 using Interview.Backend.Auth;
+using Interview.Backend.Common;
 using Interview.Backend.Responses;
 using Interview.Domain;
 using Interview.Domain.Reactions.Records;
@@ -27,10 +28,10 @@ public class ReactionController : ControllerBase
     /// <returns>List of reactions.</returns>
     [HttpGet]
     [Authorize]
-    [ProducesResponseType(typeof(IPagedList<ReactionDetail>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedListResponse<ReactionDetail>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<IPagedList<ReactionDetail>> GetPage([FromQuery] PageRequest request) =>
-        _reactionService.FindPageAsync(request.PageNumber, request.PageSize, HttpContext.RequestAborted);
+    public Task<PagedListResponse<ReactionDetail>> GetPage([FromQuery] PageRequest request) =>
+        _reactionService.FindPageAsync(request.PageNumber, request.PageSize, HttpContext.RequestAborted).ToPagedListResponseAsync();
 }

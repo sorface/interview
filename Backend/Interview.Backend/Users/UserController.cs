@@ -1,4 +1,5 @@
 using Interview.Backend.Auth;
+using Interview.Backend.Common;
 using Interview.Backend.Responses;
 using Interview.Domain;
 using Interview.Domain.Users.Records;
@@ -23,19 +24,19 @@ public class UserController : ControllerBase
     [Authorize]
     [HttpGet]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(IPagedList<UserDetail>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedListResponse<UserDetail>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<IPagedList<UserDetail>> FindPage([FromQuery] PageRequest request)
+    public Task<PagedListResponse<UserDetail>> FindPage([FromQuery] PageRequest request)
     {
-        return _userService.FindPageAsync(request.PageNumber, request.PageSize, HttpContext.RequestAborted);
+        return _userService.FindPageAsync(request.PageNumber, request.PageSize, HttpContext.RequestAborted).ToPagedListResponseAsync();
     }
 
     [Authorize]
     [HttpGet("nickname/{nickname}")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(IPagedList<UserDetail>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedListResponse<UserDetail>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
@@ -48,27 +49,27 @@ public class UserController : ControllerBase
     [Authorize]
     [HttpGet("role/{role}")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(IPagedList<UserDetail>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedListResponse<UserDetail>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<IPagedList<UserDetail>> FindByRole([FromQuery] PageRequest pageRequest, [FromRoute] RoleNameType role)
+    public Task<PagedListResponse<UserDetail>> FindByRole([FromQuery] PageRequest pageRequest, [FromRoute] RoleNameType role)
     {
-        return _userService.FindByRoleAsync(pageRequest.PageNumber, pageRequest.PageSize, role, HttpContext.RequestAborted);
+        return _userService.FindByRoleAsync(pageRequest.PageNumber, pageRequest.PageSize, role, HttpContext.RequestAborted).ToPagedListResponseAsync();
     }
 
     [Authorize]
     [HttpGet("admins")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(IPagedList<UserDetail>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedListResponse<UserDetail>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<IPagedList<UserDetail>> FindAdmins([FromQuery] PageRequest pageRequest)
+    public Task<PagedListResponse<UserDetail>> FindAdmins([FromQuery] PageRequest pageRequest)
     {
-        return _userService.FindByRoleAsync(pageRequest.PageNumber, pageRequest.PageSize, RoleNameType.Admin, HttpContext.RequestAborted);
+        return _userService.FindByRoleAsync(pageRequest.PageNumber, pageRequest.PageSize, RoleNameType.Admin, HttpContext.RequestAborted).ToPagedListResponseAsync();
     }
 
     [Authorize]

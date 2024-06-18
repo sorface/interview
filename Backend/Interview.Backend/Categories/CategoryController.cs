@@ -1,3 +1,4 @@
+using Interview.Backend.Common;
 using Interview.Backend.Responses;
 using Interview.Domain.Categories;
 using Interview.Domain.Categories.Edit;
@@ -27,13 +28,13 @@ public class CategoryController : ControllerBase
     [Authorize]
     [HttpGet]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(IPagedList<CategoryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedListResponse<CategoryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<IPagedList<CategoryResponse>> FindPage([FromQuery] CategoryPageRequest request)
+    public Task<PagedListResponse<CategoryResponse>> FindPage([FromQuery] CategoryPageRequest request)
     {
-        return _categoryService.FindPageAsync(request, HttpContext.RequestAborted);
+        return _categoryService.FindPageAsync(request, HttpContext.RequestAborted).ToPagedListResponseAsync();
     }
 
     /// <summary>

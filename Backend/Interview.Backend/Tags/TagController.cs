@@ -1,3 +1,4 @@
+using Interview.Backend.Common;
 using Interview.Backend.Responses;
 using Interview.Domain;
 using Interview.Domain.Tags;
@@ -28,13 +29,13 @@ public class TagController : ControllerBase
     [Authorize]
     [HttpGet("tag")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(IPagedList<TagItem>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedListResponse<TagItem>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<IPagedList<TagItem>> GetTagPage([FromQuery] string? value, [FromQuery] PageRequest request)
+    public Task<PagedListResponse<TagItem>> GetTagPage([FromQuery] string? value, [FromQuery] PageRequest request)
     {
-        return _tagService.FindTagsPageAsync(value, request.PageNumber, request.PageSize, HttpContext.RequestAborted);
+        return _tagService.FindTagsPageAsync(value, request.PageNumber, request.PageSize, HttpContext.RequestAborted).ToPagedListResponseAsync();
     }
 
     /// <summary>
