@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Domain.Categories;
 
-public class Category : Entity
+public class Category : ArchiveEntity
 {
-    public required string Name { get; set; }
+    public required string Name { get; set; } = string.Empty;
 
     public Guid? ParentId { get; set; }
 

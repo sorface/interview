@@ -31,12 +31,12 @@ public class CategoryService : ICategoryService
 
         static ASpec<Category> BuildSpecification(CategoryPageRequest request)
         {
+            ASpec<Category> res = new Spec<Category>(e => !e.IsArchived);
             if (request.Filter is null)
             {
-                return Spec<Category>.Any;
+                return res;
             }
 
-            var res = Spec<Category>.Any;
             if (request.Filter.ParentId is not null)
             {
                 res &= new Spec<Category>(e => e.ParentId == request.Filter.ParentId);

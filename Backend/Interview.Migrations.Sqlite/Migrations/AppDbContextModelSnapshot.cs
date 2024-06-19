@@ -44,6 +44,11 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsArchived")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(128)
