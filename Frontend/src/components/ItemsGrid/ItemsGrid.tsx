@@ -9,7 +9,7 @@ import { InfinitePaginator } from '../../components/InfinitePaginator/InfinitePa
 import './ItemsGrid.css';
 
 interface ItemsGridProps<T extends object> {
-  currentData: T[];
+  currentData: T[] | null;
   loading: boolean;
   nextPageAvailable: boolean;
   triggerResetAccumData: string;
@@ -30,7 +30,7 @@ export const ItemsGrid = <T extends object>({
   const localizationCaptions = useLocalizationCaptions();
   const loaders = Array.from({ length: 3 }, () => ({ height: '4rem' }));
   const { accumData, resetAccumData } = useAccumData<T>(currentData);
-  const dataLoaded = !loading && accumData.length !== 0;
+  const dataLoaded = !loading && currentData;
   const [dataDisplayed, setDataDisplayed] = useState(false);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export const ItemsGrid = <T extends object>({
     resetAccumData();
   }, [triggerResetAccumData, resetAccumData])
 
-  const noRecords = !accumData.length && !loading;
+  const noRecords = dataDisplayed && !accumData.length;
 
   return (
     <>
@@ -56,7 +56,7 @@ export const ItemsGrid = <T extends object>({
         ) : (
           accumData.map(renderItem)
         )}
-        {loading && loaders.map((loader, index) => (
+        {(loading || !dataDisplayed) && loaders.map((loader, index) => (
           <div key={`loader${index}`} className={loaderClassName}>
             <div
               style={{ height: loader.height || '1.8rem' }}
