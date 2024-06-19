@@ -146,7 +146,7 @@ export const Rooms: FunctionComponent = () => {
         error={error}
       >
         <ItemsGrid
-          currentData={rooms || []}
+          currentData={rooms}
           loading={loading}
           triggerResetAccumData={`${searchValue}${participating}${closed}`}
           loaderClassName='room-item-wrapper room-item-loader'

@@ -83,7 +83,7 @@ export const Questions: FunctionComponent = () => {
         error={error|| archiveError}
       >
         <ItemsGrid
-          currentData={questions || []}
+          currentData={questions}
           loading={loading}
           triggerResetAccumData={`${searchValue}`}
           loaderClassName='question-item field-wrap'
