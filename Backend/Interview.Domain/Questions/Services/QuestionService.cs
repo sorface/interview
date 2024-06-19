@@ -16,7 +16,6 @@ namespace Interview.Domain.Questions.Services;
 public class QuestionService : IQuestionService
 {
     private readonly IQuestionRepository _questionRepository;
-    private readonly IRoomQuestionRepository _roomQuestionRepository;
     private readonly IQuestionNonArchiveRepository _questionNonArchiveRepository;
     private readonly ArchiveService<Question> _archiveService;
     private readonly ITagRepository _tagRepository;
@@ -29,8 +28,7 @@ public class QuestionService : IQuestionService
         ArchiveService<Question> archiveService,
         ITagRepository tagRepository,
         IRoomMembershipChecker roomMembershipChecker,
-        ICurrentUserAccessor currentUserAccessor,
-        IRoomQuestionRepository roomQuestionRepository)
+        ICurrentUserAccessor currentUserAccessor)
     {
         _questionRepository = questionRepository;
         _questionNonArchiveRepository = questionNonArchiveRepository;
@@ -38,7 +36,6 @@ public class QuestionService : IQuestionService
         _tagRepository = tagRepository;
         _roomMembershipChecker = roomMembershipChecker;
         _currentUserAccessor = currentUserAccessor;
-        _roomQuestionRepository = roomQuestionRepository;
     }
 
     public async Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken)

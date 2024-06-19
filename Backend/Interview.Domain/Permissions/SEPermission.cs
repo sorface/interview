@@ -352,6 +352,24 @@ public class SEPermission : SmartEnum<SEPermission>
         "Find category page",
         EVPermission.FindCategoryPage);
 
+    public static readonly SEPermission FindCategoryPageArchive = new(
+        Guid.Parse("B4DCA27C-5733-4B37-BB63-7ECA6F8E831B"),
+        "FindCategoryPageArchive",
+        "Find archived category page",
+        EVPermission.FindCategoryPageArchive);
+
+    public static readonly SEPermission CategoryArchive = new(
+        Guid.Parse("C0AFEC8D-04D0-4A7A-9F20-C3D4C891F04E"),
+        "CategoryArchive",
+        "Archiving a category",
+        EVPermission.CategoryArchive);
+
+    public static readonly SEPermission CategoryUnarchive = new(
+        Guid.Parse("84DC5BCE-FA74-47CB-949A-042DA1126C0C"),
+        "CategoryUnarchive",
+        "Unarchiving a category",
+        EVPermission.CategoryUnarchive);
+
     public Guid Id { get; }
 
     public string Description { get; }

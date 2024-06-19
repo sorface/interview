@@ -166,5 +166,14 @@ public enum EVPermission
 
     [Description("Find category page")]
     FindCategoryPage,
+
+    [Description("Find archived category page")]
+    FindCategoryPageArchive,
+
+    [Description("Archiving a category")]
+    CategoryArchive,
+
+    [Description("Unarchiving a category")]
+    CategoryUnarchive,
 #pragma warning restore SA1602
 }

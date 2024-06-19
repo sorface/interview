@@ -38,6 +38,59 @@ public class CategoryController : ControllerBase
     }
 
     /// <summary>
+    /// Getting a available archived category page.
+    /// </summary>
+    /// <param name="request">Request.</param>
+    /// <returns>A page of category with metadata about the pages.</returns>
+    [Authorize]
+    [HttpGet("archive")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(PagedListResponse<CategoryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
+    public Task<PagedListResponse<CategoryResponse>> FindArchivePage([FromQuery] CategoryPageRequest request)
+    {
+        return _categoryService.FindArchivePageAsync(request, HttpContext.RequestAborted).ToPagedListResponseAsync();
+    }
+
+    /// <summary>
+    /// Archive category.
+    /// </summary>
+    /// <param name="id">Id category.</param>
+    /// <returns>Archived category.</returns>
+    [Authorize]
+    [HttpPost("archive/{id:guid}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(CategoryResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
+    public Task<CategoryResponse> Archive(Guid id)
+    {
+        return _categoryService.ArchiveAsync(id, HttpContext.RequestAborted);
+    }
+
+    /// <summary>
+    /// Unarchive category.
+    /// </summary>
+    /// <param name="id">Id category.</param>
+    /// <returns>Unarchived category.</returns>
+    [Authorize]
+    [HttpPost("unarchive/{id:guid}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(CategoryResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
+    public Task<CategoryResponse> Unarchive(Guid id)
+    {
+        return _categoryService.UnarchiveAsync(id, HttpContext.RequestAborted);
+    }
+
+    /// <summary>
     /// Creating a new category.
     /// </summary>
     /// <param name="request">category edit request.</param>

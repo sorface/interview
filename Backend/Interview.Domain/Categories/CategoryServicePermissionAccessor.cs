@@ -25,6 +25,12 @@ public class CategoryServicePermissionAccessor : ICategoryService, IServiceDecor
         return await _service.FindPageAsync(request, cancellationToken);
     }
 
+    public async Task<IPagedList<CategoryResponse>> FindArchivePageAsync(CategoryPageRequest request, CancellationToken cancellationToken)
+    {
+        await _securityService.EnsurePermissionAsync(SEPermission.FindCategoryPageArchive, cancellationToken);
+        return await _service.FindArchivePageAsync(request, cancellationToken);
+    }
+
     public async Task<Result<ServiceResult<CategoryResponse>, ServiceError>> CreateAsync(CategoryEditRequest request, CancellationToken cancellationToken)
     {
         await _securityService.EnsurePermissionAsync(SEPermission.EditCategory, cancellationToken);
@@ -35,5 +41,17 @@ public class CategoryServicePermissionAccessor : ICategoryService, IServiceDecor
     {
         await _securityService.EnsurePermissionAsync(SEPermission.EditCategory, cancellationToken);
         return await _service.UpdateAsync(id, request, cancellationToken);
+    }
+
+    public async Task<CategoryResponse> ArchiveAsync(Guid id, CancellationToken cancellationToken)
+    {
+        await _securityService.EnsurePermissionAsync(SEPermission.CategoryArchive, cancellationToken);
+        return await _service.ArchiveAsync(id, cancellationToken);
+    }
+
+    public async Task<CategoryResponse> UnarchiveAsync(Guid id, CancellationToken cancellationToken)
+    {
+        await _securityService.EnsurePermissionAsync(SEPermission.CategoryUnarchive, cancellationToken);
+        return await _service.ArchiveAsync(id, cancellationToken);
     }
 }

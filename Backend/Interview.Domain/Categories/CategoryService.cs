@@ -13,43 +13,22 @@ namespace Interview.Domain.Categories;
 public class CategoryService : ICategoryService
 {
     private readonly AppDbContext _db;
+    private readonly ArchiveService<Category> _archiveService;
 
-    public CategoryService(AppDbContext db)
+    public CategoryService(AppDbContext db, ArchiveService<Category> archiveService)
     {
         _db = db;
+        _archiveService = archiveService;
     }
 
     public Task<IPagedList<CategoryResponse>> FindPageAsync(CategoryPageRequest request, CancellationToken cancellationToken)
     {
-        var filter = BuildSpecification(request);
-        return _db.Categories
-            .AsNoTracking()
-            .Where(filter)
-            .OrderBy(e => e.Name)
-            .Select(e => new CategoryResponse { Id = e.Id, Name = e.Name, ParentId = e.ParentId })
-            .ToPagedListAsync(request.Page.PageNumber, request.Page.PageSize, cancellationToken);
+        return FindPageCoreAsync(false, request, cancellationToken);
+    }
 
-        static ASpec<Category> BuildSpecification(CategoryPageRequest request)
-        {
-            ASpec<Category> res = new Spec<Category>(e => !e.IsArchived);
-            if (request.Filter is null)
-            {
-                return res;
-            }
-
-            if (request.Filter.ParentId is not null)
-            {
-                res &= new Spec<Category>(e => e.ParentId == request.Filter.ParentId);
-            }
-
-            var name = request.Filter.Name?.Trim();
-            if (!string.IsNullOrWhiteSpace(name))
-            {
-                res &= new Spec<Category>(e => e.Name.Contains(name));
-            }
-
-            return res;
-        }
+    public Task<IPagedList<CategoryResponse>> FindArchivePageAsync(CategoryPageRequest request, CancellationToken cancellationToken)
+    {
+        return FindPageCoreAsync(true, request, cancellationToken);
     }
 
     public async Task<Result<ServiceResult<CategoryResponse>, ServiceError>> CreateAsync(CategoryEditRequest request, CancellationToken cancellationToken)
@@ -100,6 +79,61 @@ public class CategoryService : ICategoryService
             Name = category.Name,
             ParentId = category.ParentId,
         });
+    }
+
+    public async Task<CategoryResponse> ArchiveAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _archiveService.ArchiveAsync(id, cancellationToken);
+        return new CategoryResponse
+        {
+            Id = result.Id,
+            Name = result.Name,
+            ParentId = result.ParentId,
+        };
+    }
+
+    public async Task<CategoryResponse> UnarchiveAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _archiveService.UnarchiveAsync(id, cancellationToken);
+        return new CategoryResponse
+        {
+            Id = result.Id,
+            Name = result.Name,
+            ParentId = result.ParentId,
+        };
+    }
+
+    private Task<IPagedList<CategoryResponse>> FindPageCoreAsync(bool archive, CategoryPageRequest request, CancellationToken cancellationToken)
+    {
+        var filter = BuildSpecification(archive, request);
+        return _db.Categories
+            .AsNoTracking()
+            .Where(filter)
+            .OrderBy(e => e.Name)
+            .Select(e => new CategoryResponse { Id = e.Id, Name = e.Name, ParentId = e.ParentId })
+            .ToPagedListAsync(request.Page.PageNumber, request.Page.PageSize, cancellationToken);
+
+        static ASpec<Category> BuildSpecification(bool archive, CategoryPageRequest request)
+        {
+            ASpec<Category> res = new Spec<Category>(e => e.IsArchived == archive);
+            if (request.Filter is null)
+            {
+                return res;
+            }
+
+            if (request.Filter.ParentId is not null)
+            {
+                res &= new Spec<Category>(e => e.ParentId == request.Filter.ParentId);
+            }
+
+            var name = request.Filter.Name?.Trim();
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                res &= new Spec<Category>(e => e.Name.Contains(name));
+            }
+
+            return res;
+        }
     }
 
     private Task<ServiceError?> EnsureValidAsync(CategoryEditRequest request, CancellationToken cancellationToken)
