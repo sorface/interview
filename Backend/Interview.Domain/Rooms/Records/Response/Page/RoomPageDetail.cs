@@ -16,4 +16,6 @@ public class RoomPageDetail
     public List<TagItem>? Tags { get; set; }
 
     public required EVRoomStatus RoomStatus { get; init; }
+
+    public RoomTimerDetail? Timer { get; set; }
 }

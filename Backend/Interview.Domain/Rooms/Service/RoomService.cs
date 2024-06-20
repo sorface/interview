@@ -86,10 +86,11 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     {
         IQueryable<Room> queryable = _db.Rooms
             .Include(e => e.Participants)
-                .ThenInclude(e => e.User)
+            .ThenInclude(e => e.User)
             .Include(e => e.Questions)
             .Include(e => e.Configuration)
             .Include(e => e.Tags)
+            .Include(e => e.Timer)
             .OrderBy(e => e.Status == SERoomStatus.Active ? 1 :
                 e.Status == SERoomStatus.Review ? 2 :
                 e.Status == SERoomStatus.New ? 3 :
@@ -114,13 +115,31 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         if (!_currentUserAccessor.IsAdmin())
         {
             var currentUserId = _currentUserAccessor.GetUserIdOrThrow();
-            queryable = queryable.Where(e => e.AccessType == SERoomAccessType.Public || (e.AccessType == SERoomAccessType.Private && e.Participants.Any(p => currentUserId == p.User.Id)));
+            queryable = queryable.Where(e =>
+                e.AccessType == SERoomAccessType.Public || (e.AccessType == SERoomAccessType.Private &&
+                                                            e.Participants.Any(p => currentUserId == p.User.Id)));
         }
 
         if (filter.Participants is not null && filter.Participants.Count > 0)
         {
             queryable = queryable.Where(e => e.Participants.Any(p => filter.Participants.Contains(p.User.Id)));
         }
+
+        Func<RoomTimer?, RoomTimerDetail?> mapTimer = timer =>
+        {
+            if (timer is null)
+            {
+                return null;
+            }
+
+            return new RoomTimerDetail
+            {
+                Duration = timer.Duration,
+                StartTime = timer.ActualStartTime != null
+                    ? ((DateTimeOffset)timer.ActualStartTime).ToUnixTimeSeconds()
+                    : 0,
+            };
+        };
 
         return queryable
             .Select(e => new RoomPageDetail
@@ -140,6 +159,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                     .ToList(),
                 RoomStatus = e.Status.EnumValue,
                 Tags = e.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
+                Timer = mapTimer.Invoke(e.Timer),
             })
             .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
