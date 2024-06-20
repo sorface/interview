@@ -2,17 +2,10 @@ using Interview.Domain.Events.Events;
 
 namespace Interview.Domain.Events.DatabaseProcessors.Records.Room;
 
-public class RoomTimerStartEvent : RoomEvent<RoomTimerPayload>
+public class RoomTimerStartEvent : RoomEvent<RoomTimerStartEventPayload>
 {
-    public RoomTimerStartEvent(Guid roomId, RoomTimerPayload? value)
+    public RoomTimerStartEvent(Guid roomId, RoomTimerStartEventPayload? value)
         : base(roomId, EventType.StartRoomTimer, value, false)
     {
     }
-}
-
-public sealed class RoomTimerPayload
-{
-    public long Duration { get; set; }
-
-    public long StartTime { get; set; }
 }

@@ -34,7 +34,7 @@ public class RoomTimerPostProcessor : EntityPostProcessor<Room>
             return;
         }
 
-        var roomTimer = new RoomTimerPayload
+        var roomTimer = new RoomTimerStartEventPayload
         {
             Duration = current.Timer.Duration,
             StartTime = ((DateTimeOffset)current.Timer.ActualStartTime).ToUnixTimeSeconds(),
