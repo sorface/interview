@@ -16,7 +16,7 @@ public static class PagedListExt
     public static async Task<PagedListResponse<T>> ToPagedListResponseAsync<T>(this Task<IPagedList<T>> self)
     {
         var res = await self;
-        return new PagedListResponse<T>(res);
+        return res.ToPagedListResponse();
     }
 
     /// <summary>

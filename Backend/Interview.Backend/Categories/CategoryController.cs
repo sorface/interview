@@ -28,13 +28,13 @@ public class CategoryController : ControllerBase
     [Authorize]
     [HttpGet]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(PagedListResponse<CategoryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IPagedList<CategoryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<PagedListResponse<CategoryResponse>> FindPage([FromQuery] CategoryPageRequest request)
+    public Task<IPagedList<CategoryResponse>> FindPage([FromQuery] CategoryPageRequest request)
     {
-        return _categoryService.FindPageAsync(request, HttpContext.RequestAborted).ToPagedListResponseAsync();
+        return _categoryService.FindPageAsync(request, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -45,13 +45,13 @@ public class CategoryController : ControllerBase
     [Authorize]
     [HttpGet("archive")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(PagedListResponse<CategoryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IPagedList<CategoryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<PagedListResponse<CategoryResponse>> FindArchivePage([FromQuery] CategoryPageRequest request)
+    public Task<IPagedList<CategoryResponse>> FindArchivePage([FromQuery] CategoryPageRequest request)
     {
-        return _categoryService.FindArchivePageAsync(request, HttpContext.RequestAborted).ToPagedListResponseAsync();
+        return _categoryService.FindArchivePageAsync(request, HttpContext.RequestAborted);
     }
 
     /// <summary>

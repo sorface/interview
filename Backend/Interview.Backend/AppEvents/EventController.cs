@@ -25,13 +25,13 @@ public class EventController : ControllerBase
     [Authorize]
     [HttpGet]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(PagedListResponse<QuestionItem>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IPagedList<QuestionItem>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<PagedListResponse<AppEventItem>> GetPage([FromQuery] PageRequest request, [FromServices] IAppEventService service)
+    public Task<IPagedList<AppEventItem>> GetPage([FromQuery] PageRequest request, [FromServices] IAppEventService service)
     {
-        return service.FindPageAsync(request.PageNumber, request.PageSize, HttpContext.RequestAborted).ToPagedListResponseAsync();
+        return service.FindPageAsync(request.PageNumber, request.PageSize, HttpContext.RequestAborted);
     }
 
     /// <summary>

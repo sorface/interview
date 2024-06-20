@@ -28,10 +28,10 @@ public class ReactionController : ControllerBase
     /// <returns>List of reactions.</returns>
     [HttpGet]
     [Authorize]
-    [ProducesResponseType(typeof(PagedListResponse<ReactionDetail>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IPagedList<ReactionDetail>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<PagedListResponse<ReactionDetail>> GetPage([FromQuery] PageRequest request) =>
-        _reactionService.FindPageAsync(request.PageNumber, request.PageSize, HttpContext.RequestAborted).ToPagedListResponseAsync();
+    public Task<IPagedList<ReactionDetail>> GetPage([FromQuery] PageRequest request) =>
+        _reactionService.FindPageAsync(request.PageNumber, request.PageSize, HttpContext.RequestAborted);
 }

@@ -30,13 +30,13 @@ public class QuestionController : ControllerBase
     [Authorize]
     [HttpGet]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(PagedListResponse<QuestionItem>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IPagedList<QuestionItem>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public Task<PagedListResponse<QuestionItem>> GetPage([FromQuery] FindPageRequest request)
+    public Task<IPagedList<QuestionItem>> GetPage([FromQuery] FindPageRequest request)
     {
-        return _questionService.FindPageAsync(request, HttpContext.RequestAborted).ToPagedListResponseAsync();
+        return _questionService.FindPageAsync(request, HttpContext.RequestAborted);
     }
 
     /// <summary>
