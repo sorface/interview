@@ -36,7 +36,7 @@ public class QuestionPostProcessorTest
         var activeRooms = new List<Guid> { activeRoomId }.AsReadOnly();
 
         var questionId = Guid.Parse("b47e5f7f-6371-452d-a736-c5c3f0e17ab0");
-        
+
         var originalQuestion = new Question("value") { Id = questionId };
         var currentQuestion = new Question("value2") { Id = questionId };
 
@@ -59,25 +59,25 @@ public class QuestionPostProcessorTest
         );
 
         var questionChangeEvent = eventArgumentCaptor.Value;
-        
+
         questionChangeEvent.Stateful.Should().BeFalse();
         questionChangeEvent.RoomId.Should().Be(activeRoomId);
         questionChangeEvent.Type.Should().Be(EventType.ChangeQuestion);
 
         var payload = questionChangeEvent.Value;
-        
+
         payload.Should().NotBeNull();
-        
+
         payload?.QuestionId.Should().Be(questionId);
         payload?.OldValue.Should().Be(originalQuestion.Value);
         payload?.NewValue.Should().Be(currentQuestion.Value);
     }
-    
+
     [Fact(DisplayName = "The event was not sent because there are no active rooms")]
     public async Task EventNotSentWhenActiveRoomsNotPresent()
     {
         var questionId = Guid.Parse("b47e5f7f-6371-452d-a736-c5c3f0e17ab0");
-        
+
         var originalQuestion = new Question("value") { Id = questionId };
         var currentQuestion = new Question("value2") { Id = questionId };
 

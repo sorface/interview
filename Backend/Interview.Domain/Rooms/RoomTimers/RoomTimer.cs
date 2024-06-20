@@ -8,17 +8,17 @@ namespace Interview.Domain.Rooms.RoomTimers;
 public class RoomTimer : Entity
 {
     /// <summary>
-    /// Duration timer.
+    /// Gets or sets duration timer.
     /// </summary>
     public long Duration { get; set; }
 
     /// <summary>
-    /// the actual start time of the timer.
+    /// Gets or sets the actual start time of the timer.
     /// </summary>
     public DateTime? ActualStartTime { get; set; }
-    
+
     /// <summary>
-    /// Timer Room.
+    /// Gets or sets timer Room.
     /// </summary>
     public Room? Room { get; set; }
 }

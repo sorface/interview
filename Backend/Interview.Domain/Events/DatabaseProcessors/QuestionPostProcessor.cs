@@ -16,7 +16,7 @@ public class QuestionPostProcessor : EntityPostProcessor<Question>
         _connectUserSource = connectUserSource;
     }
 
-    protected override async ValueTask ProcessModifiedAsync(
+    public override async ValueTask ProcessModifiedAsync(
         Question original,
         Question current,
         CancellationToken cancellationToken)

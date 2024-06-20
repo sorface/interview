@@ -13,7 +13,7 @@ public class RoomPostProcessor : EntityPostProcessor<Room>
         _eventDispatcher = eventDispatcher;
     }
 
-    protected override async ValueTask ProcessModifiedAsync(Room original, Room current, CancellationToken cancellationToken)
+    public override async ValueTask ProcessModifiedAsync(Room original, Room current, CancellationToken cancellationToken)
     {
         var @event = original.Status != current.Status
             ? new RoomChangeStatusEvent(current.Id, current.Status.EnumValue.ToString())

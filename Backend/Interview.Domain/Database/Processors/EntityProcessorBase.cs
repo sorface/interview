@@ -1,4 +1,5 @@
 using Interview.Domain.Repository;
+using Interview.Domain.Rooms.RoomConfigurations;
 
 namespace Interview.Domain.Database.Processors;
 
@@ -29,7 +30,7 @@ public abstract class EntityProcessorBase<T> : IEntityProcessor
         }
     }
 
-    protected abstract ValueTask ProcessAddedAsync(T entity, CancellationToken cancellationToken);
+    public abstract ValueTask ProcessAddedAsync(T entity, CancellationToken cancellationToken);
 
-    protected abstract ValueTask ProcessModifiedAsync(T original, T current, CancellationToken cancellationToken);
+    public abstract ValueTask ProcessModifiedAsync(T original, T current, CancellationToken cancellationToken);
 }

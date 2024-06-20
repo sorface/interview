@@ -13,7 +13,7 @@ public class RoomQuestionReactionPostProcessor : EntityPostProcessor<RoomQuestio
         _eventDispatcher = eventDispatcher;
     }
 
-    protected override async ValueTask ProcessAddedAsync(
+    public override async ValueTask ProcessAddedAsync(
         RoomQuestionReaction entity,
         CancellationToken cancellationToken)
     {

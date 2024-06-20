@@ -16,7 +16,7 @@ public class RoomActiveStatusPreProcessor : EntityPreProcessor<Room>
         _db = db;
     }
 
-    protected override async ValueTask ProcessModifiedAsync(
+    public override async ValueTask ProcessModifiedAsync(
         Room original, Room current, CancellationToken cancellationToken)
     {
         if (current.Timer is null)

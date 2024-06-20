@@ -14,7 +14,7 @@ public class RoomConfigurationPostProcessor : EntityPostProcessor<RoomConfigurat
         _eventDispatcher = eventDispatcher;
     }
 
-    protected override async ValueTask ProcessAddedAsync(RoomConfiguration entity, CancellationToken cancellationToken)
+    public override async ValueTask ProcessAddedAsync(RoomConfiguration entity, CancellationToken cancellationToken)
     {
         var @event = CreateEvent(entity, null);
 
@@ -24,7 +24,7 @@ public class RoomConfigurationPostProcessor : EntityPostProcessor<RoomConfigurat
         }
     }
 
-    protected override async ValueTask ProcessModifiedAsync(
+    public override async ValueTask ProcessModifiedAsync(
         RoomConfiguration original,
         RoomConfiguration current,
         CancellationToken cancellationToken)

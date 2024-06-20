@@ -13,14 +13,14 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
         _eventDispatcher = eventDispatcher;
     }
 
-    protected override async ValueTask ProcessAddedAsync(RoomQuestion entity, CancellationToken cancellationToken)
+    public override async ValueTask ProcessAddedAsync(RoomQuestion entity, CancellationToken cancellationToken)
     {
         var @event = new RoomQuestionAddEvent(entity.Room!.Id, new AddEventPayload(entity.Question!.Id, entity.State));
 
         await _eventDispatcher.WriteAsync(@event, cancellationToken);
     }
 
-    protected override async ValueTask ProcessModifiedAsync(
+    public override async ValueTask ProcessModifiedAsync(
         RoomQuestion original,
         RoomQuestion current,
         CancellationToken cancellationToken)
