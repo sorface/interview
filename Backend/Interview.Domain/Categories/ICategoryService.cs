@@ -9,6 +9,8 @@ namespace Interview.Domain.Categories;
 
 public interface ICategoryService : IService
 {
+    Task<CategoryResponse> FindByIdAsync(Guid id, CancellationToken cancellationToken);
+
     Task<IPagedList<CategoryResponse>> FindPageAsync(CategoryPageRequest request, CancellationToken cancellationToken);
 
     Task<IPagedList<CategoryResponse>> FindArchivePageAsync(CategoryPageRequest request, CancellationToken cancellationToken);

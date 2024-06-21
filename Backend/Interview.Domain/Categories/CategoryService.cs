@@ -21,6 +21,20 @@ public class CategoryService : ICategoryService
         _archiveService = archiveService;
     }
 
+    public async Task<CategoryResponse> FindByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var response = await _db.Categories.AsNoTracking()
+            .Where(e => e.Id == id)
+            .Select(CategoryResponse.Mapper.Expression)
+            .FirstOrDefaultAsync(cancellationToken);
+        if (response is null)
+        {
+            throw NotFoundException.Create<Category>(id);
+        }
+
+        return response;
+    }
+
     public Task<IPagedList<CategoryResponse>> FindPageAsync(CategoryPageRequest request, CancellationToken cancellationToken)
     {
         return FindPageCoreAsync(false, request, cancellationToken);
@@ -47,12 +61,8 @@ public class CategoryService : ICategoryService
         };
         await _db.Categories.AddAsync(category, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
-        return ServiceResult.Created(new CategoryResponse
-        {
-            Id = category.Id,
-            Name = category.Name,
-            ParentId = category.ParentId,
-        });
+        var response = CategoryResponse.Mapper.Map(category);
+        return ServiceResult.Ok(response);
     }
 
     public async Task<Result<ServiceResult<CategoryResponse>, ServiceError>> UpdateAsync(Guid id, CategoryEditRequest request, CancellationToken cancellationToken)
@@ -73,34 +83,20 @@ public class CategoryService : ICategoryService
         category.Name = request.Name.Trim();
         category.ParentId = request.ParentId;
         await _db.SaveChangesAsync(cancellationToken);
-        return ServiceResult.Ok(new CategoryResponse
-        {
-            Id = category.Id,
-            Name = category.Name,
-            ParentId = category.ParentId,
-        });
+        var response = CategoryResponse.Mapper.Map(category);
+        return ServiceResult.Ok(response);
     }
 
     public async Task<CategoryResponse> ArchiveAsync(Guid id, CancellationToken cancellationToken)
     {
         var result = await _archiveService.ArchiveAsync(id, cancellationToken);
-        return new CategoryResponse
-        {
-            Id = result.Id,
-            Name = result.Name,
-            ParentId = result.ParentId,
-        };
+        return CategoryResponse.Mapper.Map(result);
     }
 
     public async Task<CategoryResponse> UnarchiveAsync(Guid id, CancellationToken cancellationToken)
     {
         var result = await _archiveService.UnarchiveAsync(id, cancellationToken);
-        return new CategoryResponse
-        {
-            Id = result.Id,
-            Name = result.Name,
-            ParentId = result.ParentId,
-        };
+        return CategoryResponse.Mapper.Map(result);
     }
 
     private Task<IPagedList<CategoryResponse>> FindPageCoreAsync(bool archive, CategoryPageRequest request, CancellationToken cancellationToken)
@@ -110,7 +106,7 @@ public class CategoryService : ICategoryService
             .AsNoTracking()
             .Where(filter)
             .OrderBy(e => e.Name)
-            .Select(e => new CategoryResponse { Id = e.Id, Name = e.Name, ParentId = e.ParentId })
+            .Select(CategoryResponse.Mapper.Expression)
             .ToPagedListAsync(request.Page.PageNumber, request.Page.PageSize, cancellationToken);
 
         static ASpec<Category> BuildSpecification(bool archive, CategoryPageRequest request)
@@ -124,6 +120,10 @@ public class CategoryService : ICategoryService
             if (request.Filter.ParentId is not null)
             {
                 res &= new Spec<Category>(e => e.ParentId == request.Filter.ParentId);
+            }
+            else if (request.Filter.ShowOnlyWithoutParent)
+            {
+                res &= new Spec<Category>(e => e.ParentId == null);
             }
 
             var name = request.Filter.Name?.Trim();

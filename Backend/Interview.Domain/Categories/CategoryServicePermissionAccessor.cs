@@ -19,6 +19,12 @@ public class CategoryServicePermissionAccessor : ICategoryService, IServiceDecor
         _securityService = securityService;
     }
 
+    public async Task<CategoryResponse> FindByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        await _securityService.EnsurePermissionAsync(SEPermission.GetCategoryById, cancellationToken);
+        return await _service.FindByIdAsync(id, cancellationToken);
+    }
+
     public async Task<IPagedList<CategoryResponse>> FindPageAsync(CategoryPageRequest request, CancellationToken cancellationToken)
     {
         await _securityService.EnsurePermissionAsync(SEPermission.FindCategoryPage, cancellationToken);

@@ -928,6 +928,13 @@ namespace Interview.Migrations.Sqlite.Migrations
                         },
                         new
                         {
+                            Id = new Guid("bc98d0b8-b4a3-4b66-b8c1-db1fca0647e0"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "GetCategoryById",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
                             Id = new Guid("fcc9bbca-15c6-4221-8d2d-e052b8cd4385"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "PublicRoomCreate",

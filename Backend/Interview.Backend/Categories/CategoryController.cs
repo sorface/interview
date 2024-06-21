@@ -21,6 +21,25 @@ public class CategoryController : ControllerBase
     }
 
     /// <summary>
+    /// Getting a category by ID.
+    /// </summary>
+    /// <param name="id">Category id.</param>
+    /// <returns>The found object of the category.</returns>
+    [Authorize]
+    [HttpGet("{id:guid}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(CategoryResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
+    public Task<CategoryResponse> FindById(Guid id)
+    {
+        return _categoryService.FindByIdAsync(id, HttpContext.RequestAborted);
+    }
+
+    /// <summary>
     /// Getting a available category page.
     /// </summary>
     /// <param name="request">Request.</param>

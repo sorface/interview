@@ -175,5 +175,8 @@ public enum EVPermission
 
     [Description("Unarchiving a category")]
     CategoryUnarchive,
+
+    [Description("Get category by id")]
+    GetCategoryById,
 #pragma warning restore SA1602
 }

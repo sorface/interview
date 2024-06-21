@@ -370,6 +370,12 @@ public class SEPermission : SmartEnum<SEPermission>
         "Unarchiving a category",
         EVPermission.CategoryUnarchive);
 
+    public static readonly SEPermission GetCategoryById = new(
+        Guid.Parse("BC98D0B8-B4A3-4B66-B8C1-DB1FCA0647E0"),
+        "GetCategoryById",
+        "Get category by id",
+        EVPermission.GetCategoryById);
+
     public Guid Id { get; }
 
     public string Description { get; }
