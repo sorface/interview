@@ -15,4 +15,6 @@ public class RoomDetail
     public List<RoomInviteResponse> Invites { get; init; }
 
     public EVRoomAccessType Type { get; init; }
+
+    public RoomTimerDetail? Timer { get; init; }
 }

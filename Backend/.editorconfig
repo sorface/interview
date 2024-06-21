@@ -8,6 +8,7 @@ root = true
 indent_style = space
 # (Please don't specify an indent_size here; that has too many unintended consequences.)
 
+max_line_length=170
 # Code files
 [*.{cs,csx,vb,vbx}]
 indent_size = 4
@@ -267,7 +268,9 @@ csharp_preserve_single_line_statements = true
 dotnet_diagnostic.SA1206.severity=none
 dotnet_diagnostic.SA1201.severity=none
 dotnet_diagnostic.SA1401.severity=none
+dotnet_diagnostic.SA1402.severity=none
 dotnet_diagnostic.SA1101.severity=none
+dotnet_diagnostic.SA1116.severity=none
 dotnet_diagnostic.SA1309.severity=none
 dotnet_diagnostic.SA1200.severity=none
 dotnet_diagnostic.SA1600.severity=none

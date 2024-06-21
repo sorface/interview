@@ -763,8 +763,8 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("uuid");
 
-                    b.Property<long>("Duration")
-                        .HasColumnType("bigint");
+                    b.Property<double>("Duration")
+                        .HasColumnType("double precision");
 
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("timestamp without time zone");
@@ -773,7 +773,7 @@ namespace Interview.Migrations.Postgres.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.ToTable("RoomTimer");
+                    b.ToTable("RoomTimer", (string)null);
                 });
 
             modelBuilder.Entity("Interview.Domain.Tags.Tag", b =>

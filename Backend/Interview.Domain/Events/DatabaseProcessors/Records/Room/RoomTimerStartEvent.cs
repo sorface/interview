@@ -9,3 +9,10 @@ public class RoomTimerStartEvent : RoomEvent<RoomTimerStartEventPayload>
     {
     }
 }
+
+public sealed class RoomTimerStartEventPayload
+{
+    public double DurationSec { get; set; }
+
+    public DateTime StartTime { get; set; }
+}

@@ -10,7 +10,7 @@ public class RoomTimer : Entity
     /// <summary>
     /// Gets or sets duration timer.
     /// </summary>
-    public long Duration { get; set; }
+    public TimeSpan Duration { get; set; }
 
     /// <summary>
     /// Gets or sets the actual start time of the timer.

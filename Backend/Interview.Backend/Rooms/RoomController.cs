@@ -125,9 +125,9 @@ public class RoomController : ControllerBase
     /// <returns>Created room.</returns>
     [Authorize]
     [HttpPost]
-    [ProducesResponseType(typeof(Room), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(RoomPageDetail), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Room>> Create([FromBody] RoomCreateApiRequest request)
+    public async Task<ActionResult<RoomPageDetail>> Create([FromBody] RoomCreateApiRequest request)
     {
         var domainRequest = new RoomCreateRequest
         {
@@ -137,7 +137,7 @@ public class RoomController : ControllerBase
             Experts = request.Experts,
             Examinees = request.Examinees,
             Tags = request.Tags,
-            Duration = request.Duration,
+            DurationSec = request.Duration,
         };
 
         var room = await _roomService.CreateAsync(domainRequest, HttpContext.RequestAborted);

@@ -24,10 +24,7 @@ public class RoomConfigurationPostProcessor : EntityPostProcessor<RoomConfigurat
         }
     }
 
-    public override async ValueTask ProcessModifiedAsync(
-        RoomConfiguration original,
-        RoomConfiguration current,
-        CancellationToken cancellationToken)
+    public override async ValueTask ProcessModifiedAsync(RoomConfiguration original, RoomConfiguration current, CancellationToken cancellationToken)
     {
         var @event = CreateEvent(current, original);
         if (@event is not null)

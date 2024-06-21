@@ -125,22 +125,6 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             queryable = queryable.Where(e => e.Participants.Any(p => filter.Participants.Contains(p.User.Id)));
         }
 
-        Func<RoomTimer?, RoomTimerDetail?> mapTimer = timer =>
-        {
-            if (timer is null)
-            {
-                return null;
-            }
-
-            return new RoomTimerDetail
-            {
-                Duration = timer.Duration,
-                StartTime = timer.ActualStartTime != null
-                    ? ((DateTimeOffset)timer.ActualStartTime).ToUnixTimeSeconds()
-                    : 0,
-            };
-        };
-
         return queryable
             .Select(e => new RoomPageDetail
             {
@@ -150,16 +134,11 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                     .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
                     .ToList(),
                 Users = e.Participants.Select(participant =>
-                        new RoomUserDetail
-                        {
-                            Id = participant.User.Id,
-                            Nickname = participant.User.Nickname,
-                            Avatar = participant.User.Avatar,
-                        })
+                        new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, })
                     .ToList(),
                 RoomStatus = e.Status.EnumValue,
                 Tags = e.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
-                Timer = mapTimer.Invoke(e.Timer),
+                Timer = e.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)e.Timer.Duration.TotalSeconds, StartTime = e.Timer.ActualStartTime, },
             })
             .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
@@ -176,7 +155,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return room;
     }
 
-    public async Task<Room> CreateAsync(RoomCreateRequest request, CancellationToken cancellationToken = default)
+    public async Task<RoomPageDetail> CreateAsync(RoomCreateRequest request, CancellationToken cancellationToken = default)
     {
         if (request is null)
         {
@@ -224,14 +203,28 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         var createdParticipants = await _roomParticipantService.CreateAsync(room.Id, participants, cancellationToken);
         room.Participants.AddRange(createdParticipants);
 
-        if (request.Duration is not null)
+        if (request.DurationSec is not null)
         {
-            room.Timer = new RoomTimer { Duration = request.Duration.Value, };
+            room.Timer = new RoomTimer { Duration = TimeSpan.FromSeconds(request.DurationSec.Value), };
         }
 
         await _roomRepository.CreateAsync(room, cancellationToken);
         await GenerateInvitesAsync(room.Id, cancellationToken);
-        return room;
+
+        return new RoomPageDetail
+        {
+            Id = room.Id,
+            Name = room.Name,
+            Questions = room.Questions.Select(question => question.Question)
+                .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
+                .ToList(),
+            Users = room.Participants.Select(participant =>
+                    new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, })
+                .ToList(),
+            RoomStatus = room.Status.EnumValue,
+            Tags = room.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
+            Timer = room.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)room.Timer.Duration.TotalSeconds, StartTime = room.Timer.ActualStartTime, },
+        };
     }
 
     public async Task<RoomItem> UpdateAsync(

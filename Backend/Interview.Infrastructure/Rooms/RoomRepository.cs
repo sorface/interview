@@ -308,6 +308,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
         return Set
             .Include(e => e.Participants)
             .Include(e => e.Configuration)
+            .Include(e => e.Timer)
             .Select(e => new RoomDetail
             {
                 Id = e.Id,
@@ -330,6 +331,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                     Used = roomInvite.Invite.UsesCurrent,
                 }).ToList(),
                 Type = e.AccessType.EnumValue,
+                Timer = e.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)e.Timer.Duration.TotalSeconds, StartTime = e.Timer.ActualStartTime, },
             })
             .FirstOrDefaultAsync(room => room.Id == roomId, cancellationToken: cancellationToken);
     }

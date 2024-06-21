@@ -11,13 +11,17 @@ namespace Interview.Test.Units.Processors;
 
 public class RoomActiveStatusPreProcessorTest
 {
+    private readonly ISystemClock _systemClock = new TestSystemClock
+    {
+        UtcNow = new DateTimeOffset(1971, 10, 20, 0, 0, 0, TimeSpan.Zero)
+    };
     private readonly RoomActiveStatusPreProcessor _roomActiveStatusPreProcessor;
 
     public RoomActiveStatusPreProcessorTest()
     {
-        var databaseContext = new TestAppDbContextFactory().Create(new SystemClock());
+        var databaseContext = new TestAppDbContextFactory().Create(_systemClock);
         var mockLogger = new Mock<ILogger<RoomActiveStatusPreProcessor>>();
-        _roomActiveStatusPreProcessor = new RoomActiveStatusPreProcessor(mockLogger.Object, databaseContext);
+        _roomActiveStatusPreProcessor = new RoomActiveStatusPreProcessor(mockLogger.Object, databaseContext, _systemClock);
     }
 
     [Fact(DisplayName = "The room has been changed to the active status. The current date is entered in the timer.")]
@@ -35,7 +39,7 @@ public class RoomActiveStatusPreProcessorTest
         await _roomActiveStatusPreProcessor.ProcessModifiedAsync(entities, new CancellationToken());
 
         roomCurrent.Timer.Should().NotBeNull();
-        roomCurrent.Timer.ActualStartTime.Should().NotBeNull();
+        roomCurrent.Timer.ActualStartTime.Should().Be(_systemClock.UtcNow.UtcDateTime);
     }
 
     [Fact(DisplayName =
