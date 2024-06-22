@@ -1,3 +1,5 @@
+using Interview.Domain.Categories.Page;
+
 namespace Interview.Domain.Rooms.Records.Response.Detail;
 
 public class RoomDetail
@@ -15,4 +17,6 @@ public class RoomDetail
     public List<RoomInviteResponse> Invites { get; init; }
 
     public EVRoomAccessType Type { get; init; }
+
+    public required CategoryResponse? CategoryResponse { get; init; }
 }

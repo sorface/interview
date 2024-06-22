@@ -340,6 +340,42 @@ public class SEPermission : SmartEnum<SEPermission>
         "Creating a new public room",
         EVPermission.PublicRoomCreate);
 
+    public static readonly SEPermission EditCategory = new(
+        Guid.Parse("1B2DD31B-B35E-48E2-8F33-D0366B9D60BA"),
+        "EditCategory",
+        "Create/Update category",
+        EVPermission.EditCategory);
+
+    public static readonly SEPermission FindCategoryPage = new(
+        Guid.Parse("9001520D-B1D2-4ADE-8F70-570D2B7EFEA1"),
+        "FindCategoryPage",
+        "Find category page",
+        EVPermission.FindCategoryPage);
+
+    public static readonly SEPermission FindCategoryPageArchive = new(
+        Guid.Parse("B4DCA27C-5733-4B37-BB63-7ECA6F8E831B"),
+        "FindCategoryPageArchive",
+        "Find archived category page",
+        EVPermission.FindCategoryPageArchive);
+
+    public static readonly SEPermission CategoryArchive = new(
+        Guid.Parse("C0AFEC8D-04D0-4A7A-9F20-C3D4C891F04E"),
+        "CategoryArchive",
+        "Archiving a category",
+        EVPermission.CategoryArchive);
+
+    public static readonly SEPermission CategoryUnarchive = new(
+        Guid.Parse("84DC5BCE-FA74-47CB-949A-042DA1126C0C"),
+        "CategoryUnarchive",
+        "Unarchiving a category",
+        EVPermission.CategoryUnarchive);
+
+    public static readonly SEPermission GetCategoryById = new(
+        Guid.Parse("BC98D0B8-B4A3-4B66-B8C1-DB1FCA0647E0"),
+        "GetCategoryById",
+        "Get category by id",
+        EVPermission.GetCategoryById);
+
     public Guid Id { get; }
 
     public string Description { get; }

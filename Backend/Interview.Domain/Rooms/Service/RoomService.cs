@@ -1,4 +1,5 @@
 using System.Transactions;
+using Interview.Domain.Categories;
 using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Storage;
@@ -181,8 +182,11 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         var experts = await FindByIdsOrErrorAsync(_userRepository, requestExperts, "experts", cancellationToken);
         var examinees = await FindByIdsOrErrorAsync(_userRepository, request.Examinees, "examinees", cancellationToken);
+        var categoryValidateResult = await Category.ValidateCategoryAsync(_db, request.CategoryId, cancellationToken);
+        categoryValidateResult?.Throw();
+
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
-        var room = new Room(name, request.AccessType) { Tags = tags, };
+        var room = new Room(name, request.AccessType) { Tags = tags, CategoryId = request.CategoryId };
         var roomQuestions = questions.Select(question =>
             new RoomQuestion
             {
@@ -227,10 +231,13 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw NotFoundException.Create<User>(roomId);
         }
 
+        var categoryValidateResult = await Category.ValidateCategoryAsync(_db, request.CategoryId, cancellationToken);
+        categoryValidateResult?.Throw();
+
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
 
         foundRoom.Name = name;
-
+        foundRoom.CategoryId = request.CategoryId;
         foundRoom.Tags.Clear();
         foundRoom.Tags.AddRange(tags);
         await _roomRepository.UpdateAsync(foundRoom, cancellationToken);

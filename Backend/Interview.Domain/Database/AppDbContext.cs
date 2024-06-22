@@ -1,3 +1,4 @@
+using Interview.Domain.Categories;
 using Interview.Domain.Events;
 using Interview.Domain.Events.ChangeEntityProcessors;
 using Interview.Domain.Invites;
@@ -66,6 +67,8 @@ public class AppDbContext : DbContext
     public DbSet<RoomInvite> RoomInvites { get; private set; } = null!;
 
     public DbSet<AvailableRoomPermission> AvailableRoomPermission { get; private set; } = null!;
+
+    public DbSet<Category> Categories { get; private set; } = null!;
 
     public override int SaveChanges()
     {

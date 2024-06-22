@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Interview.Domain.Categories;
 using Interview.Domain.Database;
 using Interview.Domain.Events.Storage;
 using Interview.Domain.Invites;
@@ -47,13 +48,52 @@ public class RoomServiceTest
         var roomRepository = new RoomRepository(appDbContext);
         var roomService = CreateRoomService(appDbContext);
 
-        var roomPatchUpdateRequest = new RoomUpdateRequest { Name = "New_Value_Name_Room" };
+        var roomPatchUpdateRequest = new RoomUpdateRequest
+        {
+            Name = "New_Value_Name_Room",
+            CategoryId = null
+        };
 
         _ = await roomService.UpdateAsync(savedRoom.Id, roomPatchUpdateRequest);
 
         var foundedRoom = await roomRepository.FindByIdAsync(savedRoom.Id);
 
-        foundedRoom?.Name.Should().BeEquivalentTo(roomPatchUpdateRequest.Name);
+        foundedRoom.Should().NotBeNull();
+        foundedRoom!.Name.Should().BeEquivalentTo(roomPatchUpdateRequest.Name);
+        foundedRoom!.CategoryId.Should().BeNull();
+    }
+
+    [Fact(DisplayName = "Patch update room with request name not null and add category")]
+    public async Task PatchUpdateRoomWithRequestNameIsNotNull_And_Add_Category()
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+
+        var savedRoom = new Room(DefaultRoomName, SERoomAccessType.Public);
+
+        appDbContext.Rooms.Add(savedRoom);
+
+        var category = new Category { Name = "Test" };
+        appDbContext.Categories.Add(category);
+
+        await appDbContext.SaveChangesAsync();
+
+        var roomRepository = new RoomRepository(appDbContext);
+        var roomService = CreateRoomService(appDbContext);
+
+        var roomPatchUpdateRequest = new RoomUpdateRequest
+        {
+            Name = "New_Value_Name_Room",
+            CategoryId = category.Id,
+        };
+
+        _ = await roomService.UpdateAsync(savedRoom.Id, roomPatchUpdateRequest);
+
+        var foundedRoom = await roomRepository.FindByIdAsync(savedRoom.Id);
+
+        foundedRoom.Should().NotBeNull();
+        foundedRoom!.Name.Should().BeEquivalentTo(roomPatchUpdateRequest.Name);
+        foundedRoom!.CategoryId.Should().NotBeNull().And.Be(category.Id);
     }
 
     [Fact(DisplayName = "Close room should correctly close active room")]

@@ -18,4 +18,6 @@ public class RoomCreateApiRequest
     public HashSet<Guid> Examinees { get; set; } = new();
 
     public HashSet<Guid> Tags { get; set; } = new();
+
+    public Guid? CategoryId { get; set; }
 }
