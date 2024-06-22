@@ -134,7 +134,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 Questions = e.Questions.Select(question => question.Question)
                     .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
                     .ToList(),
-                Users = e.Participants.Select(participant =>
+                Participants = e.Participants.Select(participant =>
                         new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, })
                     .ToList(),
                 RoomStatus = e.Status.EnumValue,
@@ -222,7 +222,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             Questions = room.Questions.Select(question => question.Question)
                 .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
                 .ToList(),
-            Users = room.Participants.Select(participant =>
+            Participants = room.Participants.Select(participant =>
                     new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, })
                 .ToList(),
             RoomStatus = room.Status.EnumValue,
