@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Interview.Domain.QuestionAnswers;
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms;
 using Interview.Domain.Tags;
@@ -19,7 +20,9 @@ public class Question : ArchiveEntity
 
     public string Value { get; internal set; }
 
-    public List<Tag> Tags { get; internal set; } = new List<Tag>();
+    public List<Tag> Tags { get; internal set; } = new();
+
+    public List<QuestionAnswer> Answers { get; internal set; } = new();
 
     public SEQuestionType Type { get; internal set; }
 }

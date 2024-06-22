@@ -2,6 +2,7 @@ using Interview.Domain.Categories;
 using Interview.Domain.Events;
 using Interview.Domain.Events.ChangeEntityProcessors;
 using Interview.Domain.Invites;
+using Interview.Domain.QuestionAnswers;
 using Interview.Domain.Questions;
 using Interview.Domain.Reactions;
 using Interview.Domain.Repository;
@@ -69,6 +70,8 @@ public class AppDbContext : DbContext
     public DbSet<AvailableRoomPermission> AvailableRoomPermission { get; private set; } = null!;
 
     public DbSet<Category> Categories { get; private set; } = null!;
+
+    public DbSet<QuestionAnswer> QuestionAnswers { get; private set; } = null!;
 
     public override int SaveChanges()
     {
