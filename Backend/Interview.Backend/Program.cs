@@ -2,12 +2,8 @@ using Interview.Backend;
 using Interview.Backend.AppEvents;
 using Interview.Backend.Logging;
 using Interview.Domain.Database;
-using Interview.Domain.Events.Storage;
-using Interview.Infrastructure.Events;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
-using Serilog.Formatting.Elasticsearch;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("oauth.json", true);

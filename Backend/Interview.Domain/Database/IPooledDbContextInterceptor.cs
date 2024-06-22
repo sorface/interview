@@ -1,4 +1,4 @@
-using Interview.Domain.Events.ChangeEntityProcessors;
+using Interview.Domain.Database.Processors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
