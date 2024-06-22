@@ -518,6 +518,9 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasMaxLength(70)
                         .HasColumnType("character varying(70)");
 
+                    b.Property<DateTime?>("ScheduleStartTime")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<char>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("character(1)")

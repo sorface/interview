@@ -19,5 +19,7 @@ public class RoomCreateApiRequest
 
     public long? Duration { get; set; }
 
+    public long? ScheduleStartTime { get; set; }
+
     public Guid? CategoryId { get; set; }
 }

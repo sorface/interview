@@ -20,5 +20,7 @@ public class RoomDetail
 
     public RoomTimerDetail? Timer { get; init; }
 
+    public DateTime? ScheduledStartTime { get; init; }
+
     public required CategoryResponse? CategoryResponse { get; init; }
 }

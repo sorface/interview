@@ -140,6 +140,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 RoomStatus = e.Status.EnumValue,
                 Tags = e.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
                 Timer = e.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)e.Timer.Duration.TotalSeconds, StartTime = e.Timer.ActualStartTime, },
+                ScheduledStartTime = e.ScheduleStartTime,
             })
             .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
@@ -207,6 +208,12 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         var createdParticipants = await _roomParticipantService.CreateAsync(room.Id, participants, cancellationToken);
         room.Participants.AddRange(createdParticipants);
 
+        if (request.ScheduleStartTime is not null)
+        {
+            var scheduleStartTime = DateTimeOffset.FromUnixTimeSeconds(request.ScheduleStartTime.Value);
+            room.ScheduleStartTime = scheduleStartTime.UtcDateTime;
+        }
+
         if (request.DurationSec is not null)
         {
             room.Timer = new RoomTimer { Duration = TimeSpan.FromSeconds(request.DurationSec.Value), };
@@ -228,6 +235,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             RoomStatus = room.Status.EnumValue,
             Tags = room.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
             Timer = room.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)room.Timer.Duration.TotalSeconds, StartTime = room.Timer.ActualStartTime, },
+            ScheduledStartTime = room.ScheduleStartTime,
         };
     }
 
