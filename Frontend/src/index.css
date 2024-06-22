@@ -45,6 +45,10 @@
   transition: background-color 300ms, border-color 300ms;
 }
 
+:root[data-color-transition="enabled"] .move-transition {
+  transition: background-color 300ms, border-color 300ms, padding-left 200ms, width 200ms;
+}
+
 @media screen and (max-width: 1100px) {
   :root {
     --chat-width: 14rem;
@@ -71,8 +75,9 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--text);

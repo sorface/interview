@@ -1,4 +1,5 @@
 using Interview.Backend.Auth;
+using Interview.Backend.Common;
 using Interview.Backend.Responses;
 using Interview.Domain;
 using Interview.Domain.Users.Records;
@@ -35,7 +36,7 @@ public class UserController : ControllerBase
     [Authorize]
     [HttpGet("nickname/{nickname}")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(IPagedList<UserDetail>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedListResponse<UserDetail>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]

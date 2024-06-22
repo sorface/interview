@@ -6,7 +6,6 @@ import { pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { HomeAction } from './components/HomeContent/HomeAction';
 import { LocalizationKey } from '../../localization';
-import { HeaderField } from '../../components/HeaderField/HeaderField';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 
 import './Home.css';
@@ -26,7 +25,6 @@ export const Home: FunctionComponent = () => {
 
   return (
     <MainContentWrapper>
-      <HeaderField/>
       <Field>
         <p>{localizationCaptions[LocalizationKey.AppDescription]}</p>
         <div className="home-action">

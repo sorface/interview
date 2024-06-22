@@ -90,16 +90,14 @@ namespace Interview.Test.Integrations
             var questionRepository = new QuestionRepository(appDbContext);
             var tagRepository = new TagRepository(appDbContext);
             var currentUser = new CurrentUserAccessor();
-            var roomQuestionRepository = new RoomQuestionRepository(appDbContext);
             currentUser.SetUser(appDbContext.Users.First());
             return new QuestionService(
                 questionRepository,
                 new QuestionNonArchiveRepository(appDbContext),
-                new ArchiveService<Question>(questionRepository),
+                new ArchiveService<Question>(appDbContext),
                 tagRepository,
                 roomMembershipChecker,
-                currentUser,
-                roomQuestionRepository);
+                currentUser);
         }
 
         private class UnavailableException : Exception

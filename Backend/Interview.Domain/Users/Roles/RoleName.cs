@@ -49,6 +49,7 @@ public sealed class RoleName : SmartEnum<RoleName>
             SEPermission.RoomCreate,
             SEPermission.TagFindPage,
             SEPermission.QuestionCreate,
+            SEPermission.FindCategoryPage,
         });
 
     public static readonly RoleName Admin = new(

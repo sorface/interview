@@ -4,7 +4,6 @@ import { Field } from '../../components/FieldsBlock/Field';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { useCommunist } from '../../hooks/useCommunist';
 import { ThemeSwitch } from '../../components/ThemeSwitch/ThemeSwitch';
-import { HeaderField } from '../../components/HeaderField/HeaderField';
 import { LangSwitch } from '../../components/LangSwitch/LangSwitch';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
@@ -45,7 +44,7 @@ export const Session: FunctionComponent = () => {
 
   return (
     <MainContentWrapper>
-      <HeaderField><h2>{localizationCaptions[LocalizationKey.Settings]}</h2></HeaderField>
+      <Field><h2>{localizationCaptions[LocalizationKey.Settings]}</h2></Field>
       {renderAuth()}
     </MainContentWrapper>
   );

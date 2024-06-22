@@ -11,21 +11,6 @@
   justify-content: center;
 }
 
-.process-wrapper-loader.fadeOut {
-  animation-duration: 0.4s;
-  animation-fill-mode: both;
-  animation-name: fadeOut;
-}
-
-@keyframes fadeOut {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
 .process-wrapper-loader .loader-wrapper {
   height: 100%;
   display: flex;

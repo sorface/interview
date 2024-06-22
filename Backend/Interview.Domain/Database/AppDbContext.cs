@@ -1,4 +1,5 @@
 using Interview.Domain.Database.Processors;
+using Interview.Domain.Categories;
 using Interview.Domain.Events;
 using Interview.Domain.Invites;
 using Interview.Domain.Questions;
@@ -69,6 +70,8 @@ public class AppDbContext : DbContext
     public DbSet<RoomTimer> RoomTimers { get; private set; } = null!;
 
     public DbSet<AvailableRoomPermission> AvailableRoomPermission { get; private set; } = null!;
+
+    public DbSet<Category> Categories { get; private set; } = null!;
 
     public override int SaveChanges()
     {

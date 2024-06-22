@@ -3,24 +3,24 @@ import { Link, generatePath } from 'react-router-dom';
 import { GetRoomPageParams, roomsApiDeclaration } from '../../apiDeclarations';
 import { Field } from '../../components/FieldsBlock/Field';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
-import { Paginator } from '../../components/Paginator/Paginator';
-import { pathnames } from '../../constants';
+import { IconNames, pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Room, RoomStatus } from '../../types/room';
 import { checkAdmin } from '../../utils/checkAdmin';
-import { ProcessWrapper, skeletonTransitionMs } from '../../components/ProcessWrapper/ProcessWrapper';
-import { TagsView } from '../../components/TagsView/TagsView';
+import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
 import { RoomsSearch } from '../../components/RoomsSearch/RoomsSearch';
 import { ButtonLink } from '../../components/ButtonLink/ButtonLink';
-import { HeaderField } from '../../components/HeaderField/HeaderField';
 import { RoomsFilter } from '../../components/RoomsFilter/RoomsFilter';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
+import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
+import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
+import { UserAvatar } from '../../components/UserAvatar/UserAvatar';
 
 import './Rooms.css';
 
-const pageSize = 10;
+const pageSize = 30;
 const initialPageNumber = 1;
 const searchDebounceMs = 300;
 
@@ -35,9 +35,6 @@ export const Rooms: FunctionComponent = () => {
   const [searchValue, setSearchValue] = useState('');
   const [participating, setParticipating] = useState(false);
   const [closed, setClosed] = useState(false);
-  const [loadersCount, setLoadersCount] = useState(0);
-  const loaders = Array.from({ length: loadersCount || 1 }, () => ({ height: '4rem' }));
-  const roomsSafe = rooms || [];
 
   useEffect(() => {
     const participants = (auth?.id && participating) ? [auth?.id] : [];
@@ -52,20 +49,6 @@ export const Rooms: FunctionComponent = () => {
   }, [pageNumber, searchValue, auth?.id, participating, closed, fetchData]);
 
   useEffect(() => {
-    if (loadersCount || !roomsSafe.length || loading) {
-      return;
-    }
-    const loadersCountTimeout = setTimeout(() => {
-      setLoadersCount(roomsSafe.length);
-    }, skeletonTransitionMs);
-
-    return () => {
-      clearTimeout(loadersCountTimeout);
-    };
-
-  }, [roomsSafe.length, loading, loadersCount]);
-
-  useEffect(() => {
     const searchTimeout = setTimeout(() => {
       setSearchValue(searchValueInput);
     }, searchDebounceMs);
@@ -77,10 +60,6 @@ export const Rooms: FunctionComponent = () => {
 
   const handleNextPage = useCallback(() => {
     setPageNumber(pageNumber + 1);
-  }, [pageNumber]);
-
-  const handlePrevPage = useCallback(() => {
-    setPageNumber(pageNumber - 1);
   }, [pageNumber]);
 
   const createRoomItem = useCallback((room: Room) => {
@@ -99,53 +78,55 @@ export const Rooms: FunctionComponent = () => {
       generatePath(pathnames.room, { id: room.id });
 
     return (
-      <Field key={room.id}>
+      <div key={room.id} className='room-item-wrapper'>
         <li>
-          <div className='room-item'>
-            <div className='room-link'>
-              <Link to={roomLink} >
+          <Link to={roomLink} >
+            <div className='room-item'>
+              <div className='room-status-wrapper'>
+                <div className='room-status'>
+                  {roomStatusCaption[room.roomStatus]}
+                </div>
+                <div className='room-action-links'>
+                  {admin && (
+                    <Link
+                      to={`${pathnames.roomsParticipants.replace(':id', room.id)}`}
+                      className='room-edit-participants-link'
+                    >
+                      <ThemedIcon name={IconNames.Settings} />
+                    </Link>
+                  )}
+                </div>
+              </div>
+              <div className='room-name'>
                 {room.name}
-              </Link>
-              <div className='room-status'>
-                {roomStatusCaption[room.roomStatus]}
+              </div>
+              <div className='room-participants'>
+                {room.users.map(roomParticipant => (
+                  <div className='room-participant'>
+                    {roomParticipant.avatar &&
+                      <UserAvatar
+                        src={roomParticipant.avatar}
+                        nickname={roomParticipant.nickname}
+                      />
+                    }
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="room-tags">
-              <TagsView
-                placeHolder={localizationCaptions[LocalizationKey.NoTags]}
-                tags={room.tags}
-              />
-            </div>
-            <div className='room-action-links'>
-              <Link
-                to={roomLink}
-                className='room-join-link'
-              >
-                {localizationCaptions[LocalizationKey.Join]}
-              </Link>
-              {admin && (
-                <Link
-                  to={`${pathnames.roomsParticipants.replace(':id', room.id)}`}
-                  className='room-edit-participants-link'
-                >
-                  {localizationCaptions[LocalizationKey.EditParticipants]}
-                </Link>
-              )}
-            </div>
-          </div>
+          </Link>
         </li>
-      </Field>
+      </div>
     );
   }, [admin, localizationCaptions]);
 
   return (
     <MainContentWrapper className='rooms-page'>
-      <HeaderField>
+      <Field>
         <RoomsSearch
           searchValue={searchValueInput}
           onSearchChange={setSearchValueInput}
         />
-      </HeaderField>
+      </Field>
       <Field>
         <div className='room-actions'>
           <RoomsFilter
@@ -161,29 +142,19 @@ export const Rooms: FunctionComponent = () => {
         </div>
       </Field>
       <ProcessWrapper
-        loading={loading}
+        loading={false}
         error={error}
-        loaders={loaders}
       >
-        <>
-          <ul className="rooms-list">
-            {(rooms && !rooms.length) ? (
-              <Field>
-                <div className="rooms-list-no-data">{localizationCaptions[LocalizationKey.NoRecords]}</div>
-              </Field>
-            ) : (
-              roomsSafe.map(createRoomItem)
-            )}
-          </ul>
-        </>
+        <ItemsGrid
+          currentData={rooms}
+          loading={loading}
+          triggerResetAccumData={`${searchValue}${participating}${closed}`}
+          loaderClassName='room-item-wrapper room-item-loader'
+          renderItem={createRoomItem}
+          nextPageAvailable={rooms?.length === pageSize}
+          handleNextPage={handleNextPage}
+        />
       </ProcessWrapper>
-      <Paginator
-        pageNumber={pageNumber}
-        prevDisabled={loading || (pageNumber === initialPageNumber)}
-        nextDisabled={loading || (roomsSafe.length !== pageSize)}
-        onPrevClick={handlePrevPage}
-        onNextClick={handleNextPage}
-      />
     </MainContentWrapper>
   );
 };

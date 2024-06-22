@@ -190,12 +190,17 @@ public class QuestionServiceTest
     {
         var questionRepository = new QuestionRepository(appDbContext);
         var questionArchiveRepository = new QuestionNonArchiveRepository(appDbContext);
-        var archiveService = new ArchiveService<Question>(questionRepository);
+        var archiveService = new ArchiveService<Question>(appDbContext);
         var tagRepository = new TagRepository(appDbContext);
         var currentUser = new CurrentUserAccessor();
         currentUser.SetUser(appDbContext.Users.First());
         var aRoomMembershipChecker = roomMembershipChecker ?? new RoomMembershipChecker(currentUser, new RoomParticipantRepository(appDbContext));
-        var roomQuestionRepository = new RoomQuestionRepository(appDbContext);
-        return new QuestionService(questionRepository, questionArchiveRepository, archiveService, tagRepository, aRoomMembershipChecker, currentUser, roomQuestionRepository);
+        return new QuestionService(
+            questionRepository,
+            questionArchiveRepository,
+            archiveService,
+            tagRepository,
+            aRoomMembershipChecker,
+            currentUser);
     }
 }

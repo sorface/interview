@@ -4,7 +4,6 @@ import { ProcessWrapper } from '../ProcessWrapper/ProcessWrapper';
 import { Paginator } from '../../components/Paginator/Paginator';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Question } from '../../types/question';
-import { Tag } from '../../types/tag';
 import { QustionsSearch } from '../QustionsSearch/QustionsSearch';
 
 import './QuestionsSelector.css';
@@ -24,7 +23,6 @@ export const QuestionsSelector: FunctionComponent<QuestionsSelectorProps> = ({
   onUnselect,
 }) => {
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const { apiMethodState, fetchData } = useApiMethod<Question[], GetQuestionsParams>(questionsApiDeclaration.getPage);
   const { process: { loading, error }, data: questions } = apiMethodState;
@@ -35,9 +33,9 @@ export const QuestionsSelector: FunctionComponent<QuestionsSelectorProps> = ({
       PageNumber: pageNumber,
       PageSize: pageSize,
       value: searchValue,
-      tags: selectedTags.map(tag => tag.id),
+      tags: [],
     });
-  }, [fetchData, pageNumber, searchValue, selectedTags]);
+  }, [fetchData, pageNumber, searchValue]);
 
   const handleCheckboxChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
@@ -94,7 +92,6 @@ export const QuestionsSelector: FunctionComponent<QuestionsSelectorProps> = ({
     <>
       <QustionsSearch
         onSearchChange={setSearchValue}
-        onTagsChange={setSelectedTags}
       />
       <ProcessWrapper
         loading={loading}
