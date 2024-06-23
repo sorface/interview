@@ -17,12 +17,12 @@ public class QuestionItem
             ? new CategoryResponse { Id = e.Category.Id, Name = e.Category.Name, ParentId = e.Category.ParentId, }
             : null,
         Answers = e.Answers.Select(q => new QuestionAnswerResponse
-            {
-                Id = q.Id,
-                Title = q.Title,
-                Content = q.Content,
-                CodeEditor = q.CodeEditor,
-            })
+        {
+            Id = q.Id,
+            Title = q.Title,
+            Content = q.Content,
+            CodeEditor = q.CodeEditor,
+        })
             .ToList(),
         CodeEditor = e.CodeEditor == null
             ? null

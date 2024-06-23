@@ -252,10 +252,10 @@ namespace Interview.Migrations.Postgres.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
                     b.HasIndex("CodeEditorId")
                         .IsUnique();
-
-                    b.HasIndex("CategoryId");
 
                     b.HasIndex("CreatedById");
 
@@ -1575,22 +1575,22 @@ namespace Interview.Migrations.Postgres.Migrations
 
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
                 {
-                    b.HasOne("Interview.Domain.Questions.CodeEditors.QuestionCodeEditor", "CodeEditor")
-                        .WithOne()
-                        .HasForeignKey("Interview.Domain.Questions.Question", "CodeEditorId");
-
                     b.HasOne("Interview.Domain.Categories.Category", "Category")
                         .WithMany("Questions")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Interview.Domain.Questions.CodeEditors.QuestionCodeEditor", "CodeEditor")
+                        .WithOne()
+                        .HasForeignKey("Interview.Domain.Questions.Question", "CodeEditorId");
+
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
-                    b.Navigation("CodeEditor");
-
                     b.Navigation("Category");
+
+                    b.Navigation("CodeEditor");
 
                     b.Navigation("CreatedBy");
                 });

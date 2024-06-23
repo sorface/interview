@@ -1,10 +1,10 @@
 using CSharpFunctionalExtensions;
-using Interview.Domain.Database;
-using Interview.Domain.Questions.CodeEditors;
-using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Categories;
 using Interview.Domain.Categories.Page;
 using Interview.Domain.Database;
+using Interview.Domain.Database;
+using Interview.Domain.Questions.CodeEditors;
+using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.RoomParticipants;
 using Interview.Domain.Tags;
@@ -321,11 +321,11 @@ public class QuestionService : IQuestionService
             Id = entity.Id,
             Value = entity.Value,
             Tags = entity.Tags.Select(e => new TagItem
-                {
-                    Id = e.Id,
-                    Value = e.Value,
-                    HexValue = e.HexColor,
-                })
+            {
+                Id = e.Id,
+                Value = e.Value,
+                HexValue = e.HexColor,
+            })
                 .ToList(),
             Category = category is not null
                 ? new CategoryResponse
@@ -336,12 +336,12 @@ public class QuestionService : IQuestionService
                 }
                 : null,
             Answers = entity.Answers.Select(q => new QuestionAnswerResponse
-                {
-                    Id = q.Id,
-                    Title = q.Title,
-                    Content = q.Content,
-                    CodeEditor = q.CodeEditor,
-                })
+            {
+                Id = q.Id,
+                Title = q.Title,
+                Content = q.Content,
+                CodeEditor = q.CodeEditor,
+            })
                 .ToList(),
             CodeEditor = entity.CodeEditor == null
                 ? null
