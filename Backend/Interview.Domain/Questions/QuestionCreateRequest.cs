@@ -1,3 +1,4 @@
+using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Tags;
 
@@ -11,6 +12,7 @@ public sealed class QuestionCreateRequest
 
     public required EVQuestionType Type { get; set; }
 
-    // public required bool CodeEditor { get; set; }
+    public required QuestionCodeEditorEditRequest? CodeEditor { get; set; }
+
     public required List<QuestionAnswerCreateRequest>? Answers { get; set; }
 }

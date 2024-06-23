@@ -17,7 +17,7 @@ public class QuestionAnswer : Entity
     public required Question? Question { get; set; }
 
     public static void EnsureValid(
-        ICollection<QuestionAnswerCreateRequest>? answers,
+        IEnumerable<Validate>? answers,
         bool isAvailableCodeEditor)
     {
         if (answers is null)
@@ -33,6 +33,19 @@ public class QuestionAnswer : Entity
         if (answers.Any(e => e.CodeEditor))
         {
             throw new Exception("Code editor is not available for answer.");
+        }
+    }
+
+    public record Validate(bool CodeEditor)
+    {
+        public Validate(QuestionAnswerEditRequest a)
+            : this(a.CodeEditor)
+        {
+        }
+
+        public Validate(QuestionAnswerCreateRequest a)
+            : this(a.CodeEditor)
+        {
         }
     }
 }

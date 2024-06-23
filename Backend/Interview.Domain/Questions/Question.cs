@@ -21,6 +21,8 @@ public class Question : ArchiveEntity
 
     public string Value { get; internal set; }
 
+    public Guid? CodeEditorId { get; internal set; }
+
     public QuestionCodeEditor? CodeEditor { get; internal set; }
 
     public List<Tag> Tags { get; internal set; } = new();

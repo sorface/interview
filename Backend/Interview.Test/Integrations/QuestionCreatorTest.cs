@@ -3,6 +3,7 @@ using FluentAssertions;
 using Interview.Domain;
 using Interview.Domain.Database;
 using Interview.Domain.Questions;
+using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Questions.Services;
@@ -70,6 +71,11 @@ namespace Interview.Test.Integrations
                         CodeEditor = false
                     },
                 },
+                CodeEditor = new QuestionCodeEditorEditRequest
+                {
+                    Content = "my content",
+                    Lang = "C#"
+                },
             };
             var question = await creator.CreateAsync(questionCreateRequest, room?.Id, CancellationToken.None);
             question.Should().NotBeNull().And.Match<QuestionItem>(e => e.Value == value);
@@ -82,6 +88,10 @@ namespace Interview.Test.Integrations
             question.Answers[1].Title.Should().Be("#2");
             question.Answers[1].Content.Should().Be("test 2");
             question.Answers[1].CodeEditor.Should().BeFalse();
+
+            question.CodeEditor.Should().NotBeNull();
+            question.CodeEditor!.Content.Should().Be("my content");
+            question.CodeEditor!.Lang.Should().Be("C#");
         }
 
         [Fact(DisplayName = "Creation should not succeed if the room is not available")]
@@ -105,6 +115,7 @@ namespace Interview.Test.Integrations
                 Value = "Test",
                 Type = EVQuestionType.Private,
                 Answers = new List<QuestionAnswerCreateRequest>(),
+                CodeEditor = null,
             };
             await Assert.ThrowsAsync<UnavailableException>(() => creator.CreateAsync(questionCreateRequest, room.Id, CancellationToken.None));
             roomMemberChecker.Verify(e => e.EnsureCurrentUserMemberOfRoomAsync(room.Id, It.IsAny<CancellationToken>()), Times.Once());

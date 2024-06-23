@@ -1,4 +1,5 @@
 using Interview.Domain.Questions;
+using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Tags;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -19,6 +20,6 @@ public class QuestionTypeConfiguration : EntityTypeConfigurationBase<Question>
             .HasDefaultValue(SEQuestionType.Public);
         builder.HasOne(e => e.CodeEditor)
             .WithOne()
-            .HasForeignKey<Question>();
+            .HasForeignKey<Question>(e => e.CodeEditorId);
     }
 }

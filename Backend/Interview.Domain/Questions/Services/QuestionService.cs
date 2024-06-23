@@ -1,5 +1,6 @@
 using CSharpFunctionalExtensions;
 using Interview.Domain.Database;
+using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Repository;
@@ -67,14 +68,28 @@ public class QuestionService : IQuestionService
                     Id = question.Id,
                     Value = question.Value,
                     Tags = question.Tags
-                        .Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, }).ToList(),
+                        .Select(e => new TagItem
+                        {
+                            Id = e.Id,
+                            Value = e.Value,
+                            HexValue = e.HexColor,
+                        })
+                        .ToList(),
                     Answers = question.Answers.Select(q => new QuestionAnswerResponse
                     {
                         Id = q.Id,
                         Title = q.Title,
                         Content = q.Content,
                         CodeEditor = q.CodeEditor,
-                    }).ToList(),
+                    })
+                        .ToList(),
+                    CodeEditor = question.CodeEditor == null
+                        ? null
+                        : new QuestionCodeEditorResponse
+                        {
+                            Content = question.CodeEditor.Content,
+                            Lang = question.CodeEditor.Lang,
+                        },
                 });
         return await _questionNonArchiveRepository.GetPageDetailedAsync(
             spec, mapper, request.Page.PageNumber, request.Page.PageSize, cancellationToken);
@@ -96,6 +111,13 @@ public class QuestionService : IQuestionService
                 Content = q.Content,
                 CodeEditor = q.CodeEditor,
             }).ToList(),
+            CodeEditor = question.CodeEditor == null
+                ? null
+                : new QuestionCodeEditorResponse
+                {
+                    Content = question.CodeEditor.Content,
+                    Lang = question.CodeEditor.Lang,
+                },
         });
 
         var isArchiveSpecification = new Spec<Question>(question => question.IsArchived);
@@ -112,14 +134,19 @@ public class QuestionService : IQuestionService
             await _roomMembershipChecker.EnsureCurrentUserMemberOfRoomAsync(roomId.Value, cancellationToken);
         }
 
-        // QuestionAnswer.EnsureValid(request.Answers, request.CodeEditor);
+        QuestionAnswer.EnsureValid(request.Answers?.Select(e => new QuestionAnswer.Validate(e)), request.CodeEditor is not null);
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
         var result = new Question(request.Value)
         {
             Tags = tags,
             Type = GetQuestionType(),
-
-            // CodeEditor = request.CodeEditor,
+            CodeEditor = request.CodeEditor is null
+                ? null
+                : new QuestionCodeEditor
+                {
+                    Content = request.CodeEditor.Content,
+                    Lang = request.CodeEditor.Lang,
+                },
         };
 
         if (request.Answers is not null)
@@ -146,6 +173,13 @@ public class QuestionService : IQuestionService
             Tags = result.Tags.Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, })
                 .ToList(),
             Answers = result.Answers.Select(QuestionAnswerResponse.Mapper.Map).ToList(),
+            CodeEditor = result.CodeEditor == null
+                ? null
+                : new QuestionCodeEditorResponse
+                {
+                    Content = result.CodeEditor.Content,
+                    Lang = result.CodeEditor.Lang,
+                },
         };
 
         SEQuestionType GetQuestionType()
@@ -164,6 +198,7 @@ public class QuestionService : IQuestionService
     {
         var entity = await _db.Questions
             .Include(e => e.Answers)
+            .Include(e => e.CodeEditor)
             .Where(e => !e.IsArchived && e.Id == id)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -198,10 +233,35 @@ public class QuestionService : IQuestionService
             }
         }
 
-        // QuestionAnswer.EnsureValid(request.NewAnswers, request.CodeEditor);
+        QuestionAnswer.EnsureValid(request.NewAnswers?.Select(e => new QuestionAnswer.Validate(e)), request.CodeEditor is not null);
+        QuestionAnswer.EnsureValid(request.ExistsAnswers?.Select(e => new QuestionAnswer.Validate(e)), request.CodeEditor is not null);
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
 
-        // entity.CodeEditor = request.CodeEditor;
+        if (request.CodeEditor is not null && entity.CodeEditor is not null)
+        {
+            entity.CodeEditor.Content = request.CodeEditor.Content;
+            entity.CodeEditor.Lang = request.CodeEditor.Lang;
+        }
+        else
+        {
+            // remove exists code editor
+            if (entity.CodeEditor is not null)
+            {
+                _db.QuestionCodeEditors.Remove(entity.CodeEditor);
+                entity.CodeEditor = null;
+            }
+
+            // add new if needed
+            if (request.CodeEditor is not null)
+            {
+                entity.CodeEditor = new QuestionCodeEditor
+                {
+                    Content = request.CodeEditor.Content,
+                    Lang = request.CodeEditor.Lang,
+                };
+            }
+        }
+
         entity.Value = request.Value;
         entity.Tags.Clear();
         entity.Tags.AddRange(tags);
@@ -217,9 +277,15 @@ public class QuestionService : IQuestionService
                 Id = e.Id,
                 Value = e.Value,
                 HexValue = e.HexColor,
-            })
-                .ToList(),
+            }).ToList(),
             Answers = entity.Answers.Select(QuestionAnswerResponse.Mapper.Map).ToList(),
+            CodeEditor = entity.CodeEditor == null
+                ? null
+                : new QuestionCodeEditorResponse
+                {
+                    Content = entity.CodeEditor.Content,
+                    Lang = entity.CodeEditor.Lang,
+                },
         };
     }
 
@@ -240,6 +306,13 @@ public class QuestionService : IQuestionService
             Tags = question.Tags.Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, })
                 .ToList(),
             Answers = question.Answers.Select(QuestionAnswerResponse.Mapper.Map).ToList(),
+            CodeEditor = question.CodeEditor == null
+                ? null
+                : new QuestionCodeEditorResponse
+                {
+                    Content = question.CodeEditor.Content,
+                    Lang = question.CodeEditor.Lang,
+                },
         };
     }
 
@@ -268,6 +341,7 @@ public class QuestionService : IQuestionService
             Tags = question.Tags.Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, })
                 .ToList(),
             Answers = new List<QuestionAnswerResponse>(),
+            CodeEditor = null,
         };
     }
 
@@ -282,6 +356,7 @@ public class QuestionService : IQuestionService
             Tags = archiveQuestion.Tags
                 .Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, }).ToList(),
             Answers = new List<QuestionAnswerResponse>(),
+            CodeEditor = null,
         };
     }
 
@@ -296,6 +371,7 @@ public class QuestionService : IQuestionService
             Tags = unarchiveQuestion.Tags
                 .Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, }).ToList(),
             Answers = new List<QuestionAnswerResponse>(),
+            CodeEditor = null,
         };
     }
 }

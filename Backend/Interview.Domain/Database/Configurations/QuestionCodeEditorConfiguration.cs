@@ -1,4 +1,4 @@
-﻿using Interview.Domain.Questions.CodeEditors;
+using Interview.Domain.Questions.CodeEditors;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Interview.Domain.Database.Configurations;

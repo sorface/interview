@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Interview.Migrations.Postgres.Migrations
+namespace Interview.Migrations.Sqlite.Migrations
 {
     /// <inheritdoc />
     public partial class question_code_editor_add_table : Migration
@@ -11,16 +11,22 @@ namespace Interview.Migrations.Postgres.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<Guid>(
+                name: "CodeEditorId",
+                table: "Questions",
+                type: "TEXT",
+                nullable: true);
+
             migrationBuilder.CreateTable(
                 name: "QuestionCodeEditors",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Content = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
-                    Lang = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    UpdateDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    CreatedById = table.Column<Guid>(type: "uuid", nullable: true)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Content = table.Column<string>(type: "TEXT", maxLength: 2048, nullable: false),
+                    Lang = table.Column<string>(type: "TEXT", maxLength: 32, nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdateDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedById = table.Column<Guid>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -33,28 +39,41 @@ namespace Interview.Migrations.Postgres.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Questions_CodeEditorId",
+                table: "Questions",
+                column: "CodeEditorId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_QuestionCodeEditors_CreatedById",
                 table: "QuestionCodeEditors",
                 column: "CreatedById");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Questions_QuestionCodeEditors_Id",
+                name: "FK_Questions_QuestionCodeEditors_CodeEditorId",
                 table: "Questions",
-                column: "Id",
+                column: "CodeEditorId",
                 principalTable: "QuestionCodeEditors",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                principalColumn: "Id");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Questions_QuestionCodeEditors_Id",
+                name: "FK_Questions_QuestionCodeEditors_CodeEditorId",
                 table: "Questions");
 
             migrationBuilder.DropTable(
                 name: "QuestionCodeEditors");
+
+            migrationBuilder.DropIndex(
+                name: "IX_Questions_CodeEditorId",
+                table: "Questions");
+
+            migrationBuilder.DropColumn(
+                name: "CodeEditorId",
+                table: "Questions");
         }
     }
 }

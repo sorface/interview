@@ -1,3 +1,4 @@
+using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Tags.Records.Response;
 
@@ -12,4 +13,6 @@ public class QuestionItem
     public required List<TagItem> Tags { get; init; }
 
     public required List<QuestionAnswerResponse> Answers { get; init; }
+
+    public required QuestionCodeEditorResponse? CodeEditor { get; init; }
 }

@@ -219,6 +219,9 @@ namespace Interview.Migrations.Postgres.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("CodeEditorId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
 
@@ -245,6 +248,9 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasColumnType("character varying(128)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CodeEditorId")
+                        .IsUnique();
 
                     b.HasIndex("CreatedById");
 
@@ -1569,15 +1575,13 @@ namespace Interview.Migrations.Postgres.Migrations
 
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
                 {
+                    b.HasOne("Interview.Domain.Questions.CodeEditors.QuestionCodeEditor", "CodeEditor")
+                        .WithOne()
+                        .HasForeignKey("Interview.Domain.Questions.Question", "CodeEditorId");
+
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
-
-                    b.HasOne("Interview.Domain.Questions.CodeEditors.QuestionCodeEditor", "CodeEditor")
-                        .WithOne()
-                        .HasForeignKey("Interview.Domain.Questions.Question", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("CodeEditor");
 
