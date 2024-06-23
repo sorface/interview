@@ -187,6 +187,9 @@ namespace Interview.Migrations.Postgres.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("CategoryId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
 
@@ -213,6 +216,8 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasColumnType("character varying(128)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("CreatedById");
 
@@ -504,9 +509,6 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasColumnType("integer")
                         .HasDefaultValue(0);
 
-                    b.Property<Guid?>("CategoryId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
 
@@ -527,8 +529,6 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
 
                     b.HasIndex("CreatedById");
 
@@ -1488,9 +1488,16 @@ namespace Interview.Migrations.Postgres.Migrations
 
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
                 {
+                    b.HasOne("Interview.Domain.Categories.Category", "Category")
+                        .WithMany("Questions")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
+
+                    b.Navigation("Category");
 
                     b.Navigation("CreatedBy");
                 });
@@ -1542,16 +1549,9 @@ namespace Interview.Migrations.Postgres.Migrations
 
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>
                 {
-                    b.HasOne("Interview.Domain.Categories.Category", "Category")
-                        .WithMany("Rooms")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
-
-                    b.Navigation("Category");
 
                     b.Navigation("CreatedBy");
                 });
@@ -1835,7 +1835,7 @@ namespace Interview.Migrations.Postgres.Migrations
 
             modelBuilder.Entity("Interview.Domain.Categories.Category", b =>
                 {
-                    b.Navigation("Rooms");
+                    b.Navigation("Questions");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>

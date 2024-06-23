@@ -1,13 +1,12 @@
-using CSharpFunctionalExtensions;
+using Interview.Domain.Categories;
+using Interview.Domain.Categories.Page;
+using Interview.Domain.Database;
 using Interview.Domain.Questions.Records.FindPage;
-using Interview.Domain.Repository;
 using Interview.Domain.RoomParticipants;
-using Interview.Domain.Rooms.RoomQuestions;
-using Interview.Domain.ServiceResults.Errors;
-using Interview.Domain.ServiceResults.Success;
 using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
 using Interview.Domain.Users;
+using Microsoft.EntityFrameworkCore;
 using NSpecifications;
 using X.PagedList;
 
@@ -21,6 +20,7 @@ public class QuestionService : IQuestionService
     private readonly ITagRepository _tagRepository;
     private readonly IRoomMembershipChecker _roomMembershipChecker;
     private readonly ICurrentUserAccessor _currentUserAccessor;
+    private readonly AppDbContext _db;
 
     public QuestionService(
         IQuestionRepository questionRepository,
@@ -28,7 +28,8 @@ public class QuestionService : IQuestionService
         ArchiveService<Question> archiveService,
         ITagRepository tagRepository,
         IRoomMembershipChecker roomMembershipChecker,
-        ICurrentUserAccessor currentUserAccessor)
+        ICurrentUserAccessor currentUserAccessor,
+        AppDbContext db)
     {
         _questionRepository = questionRepository;
         _questionNonArchiveRepository = questionNonArchiveRepository;
@@ -36,6 +37,7 @@ public class QuestionService : IQuestionService
         _tagRepository = tagRepository;
         _roomMembershipChecker = roomMembershipChecker;
         _currentUserAccessor = currentUserAccessor;
+        _db = db;
     }
 
     public async Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken)
@@ -54,34 +56,21 @@ public class QuestionService : IQuestionService
             spec &= new Spec<Question>(e => e.Value.ToLower().Contains(questionValue));
         }
 
-        var mapper =
-            new Mapper<Question, QuestionItem>(
-                question => new QuestionItem
-                {
-                    Id = question.Id,
-                    Value = question.Value,
-                    Tags = question.Tags
-                        .Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, }).ToList(),
-                });
+        if (request.CategoryId is not null)
+        {
+            spec &= new Spec<Question>(e => e.CategoryId == request.CategoryId);
+        }
+
         return await _questionNonArchiveRepository.GetPageDetailedAsync(
-            spec, mapper, request.Page.PageNumber, request.Page.PageSize, cancellationToken);
+            spec, QuestionItem.Mapper, request.Page.PageNumber, request.Page.PageSize, cancellationToken);
     }
 
     public Task<IPagedList<QuestionItem>> FindPageArchiveAsync(
         int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
-        var mapper = new Mapper<Question, QuestionItem>(question => new QuestionItem
-        {
-            Id = question.Id,
-            Value = question.Value,
-            Tags = question.Tags.Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, })
-                .ToList(),
-        });
-
         var isArchiveSpecification = new Spec<Question>(question => question.IsArchived);
-
         return _questionRepository
-            .GetPageDetailedAsync(isArchiveSpecification, mapper, pageNumber, pageSize, cancellationToken);
+            .GetPageDetailedAsync(isArchiveSpecification, QuestionItem.Mapper, pageNumber, pageSize, cancellationToken);
     }
 
     public async Task<QuestionItem> CreateAsync(
@@ -92,11 +81,15 @@ public class QuestionService : IQuestionService
             await _roomMembershipChecker.EnsureCurrentUserMemberOfRoomAsync(roomId.Value, cancellationToken);
         }
 
+        var categoryValidateResult = await Category.ValidateCategoryAsync(_db, request.CategoryId, cancellationToken);
+        categoryValidateResult?.Throw();
+
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
         var result = new Question(request.Value)
         {
             Tags = tags,
             Type = GetQuestionType(),
+            CategoryId = request.CategoryId,
         };
 
         await _questionRepository.CreateAsync(result, cancellationToken);
@@ -107,6 +100,17 @@ public class QuestionService : IQuestionService
             Value = result.Value,
             Tags = result.Tags.Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, })
                 .ToList(),
+            Category = result.CategoryId is not null ?
+                await _db.Categories.AsNoTracking()
+                    .Where(e => e.Id == result.CategoryId)
+                    .Select(e => new CategoryResponse
+                    {
+                        Id = e.Id,
+                        Name = e.Name,
+                        ParentId = e.ParentId,
+                    })
+                    .FirstOrDefaultAsync(cancellationToken)
+                : null,
         };
 
         SEQuestionType GetQuestionType()
@@ -130,40 +134,31 @@ public class QuestionService : IQuestionService
             throw NotFoundException.Create<Question>(id);
         }
 
+        var categoryValidateResult = await Category.ValidateCategoryAsync(_db, request.CategoryId, cancellationToken);
+        categoryValidateResult?.Throw();
+
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
 
         entity.Value = request.Value;
+        entity.CategoryId = request.CategoryId;
         entity.Tags.Clear();
         entity.Tags.AddRange(tags);
 
         await _questionRepository.UpdateAsync(entity, cancellationToken);
 
-        return new QuestionItem
-        {
-            Id = entity.Id,
-            Value = entity.Value,
-            Tags = entity.Tags.Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, })
-                .ToList(),
-        };
+        return await ToQuestionItemAsync(entity, cancellationToken);
     }
 
     public async Task<QuestionItem> FindByIdAsync(
         Guid id, CancellationToken cancellationToken = default)
     {
-        var question = await _questionNonArchiveRepository.FindByIdAsync(id, cancellationToken);
-
-        if (question is null)
-        {
-            throw NotFoundException.Create<Question>(id);
-        }
-
-        return new QuestionItem
-        {
-            Id = question.Id,
-            Value = question.Value,
-            Tags = question.Tags.Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, })
-                .ToList(),
-        };
+        var question = await _db.Questions.AsNoTracking()
+            .Include(e => e.Tags)
+            .Include(e => e.Category)
+            .Where(e => !e.IsArchived && e.Id == id)
+            .Select(QuestionItem.Mapper.Expression)
+            .FirstOrDefaultAsync(cancellationToken);
+        return question ?? throw NotFoundException.Create<Question>(id);
     }
 
     /// <summary>
@@ -175,22 +170,14 @@ public class QuestionService : IQuestionService
     public async Task<QuestionItem> DeletePermanentlyAsync(
         Guid id, CancellationToken cancellationToken = default)
     {
-        var question = await _questionRepository.FindByIdAsync(id, cancellationToken);
-
+        var question = await _questionRepository.FindByIdDetailedAsync(id, cancellationToken);
         if (question == null)
         {
             throw NotFoundException.Create<Question>(id);
         }
 
         await _questionRepository.DeletePermanentlyAsync(question, cancellationToken);
-
-        return new QuestionItem
-        {
-            Id = question.Id,
-            Value = question.Value,
-            Tags = question.Tags.Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, })
-                .ToList(),
-        };
+        return await ToQuestionItemAsync(question, cancellationToken);
     }
 
     public async Task<QuestionItem> ArchiveAsync(Guid id, CancellationToken cancellationToken = default)
@@ -203,6 +190,7 @@ public class QuestionService : IQuestionService
             Value = archiveQuestion.Value,
             Tags = archiveQuestion.Tags
                 .Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, }).ToList(),
+            Category = null,
         };
     }
 
@@ -215,7 +203,44 @@ public class QuestionService : IQuestionService
             Id = unarchiveQuestion.Id,
             Value = unarchiveQuestion.Value,
             Tags = unarchiveQuestion.Tags
-                .Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, }).ToList(),
+                .Select(e => new TagItem
+                {
+                    Id = e.Id,
+                    Value = e.Value,
+                    HexValue = e.HexColor,
+                })
+                .ToList(),
+            Category = null,
+        };
+    }
+
+    private async Task<QuestionItem> ToQuestionItemAsync(Question entity, CancellationToken cancellationToken)
+    {
+        var category = entity.Category;
+        if (category is null && entity.CategoryId is not null)
+        {
+            category = await _db.Categories.AsNoTracking().FirstOrDefaultAsync(e => e.Id == entity.CategoryId, cancellationToken);
+        }
+
+        return new QuestionItem
+        {
+            Id = entity.Id,
+            Value = entity.Value,
+            Tags = entity.Tags.Select(e => new TagItem
+            {
+                Id = e.Id,
+                Value = e.Value,
+                HexValue = e.HexColor,
+            })
+                .ToList(),
+            Category = category is not null
+                ? new CategoryResponse
+                {
+                    Id = category.Id,
+                    Name = category.Name,
+                    ParentId = category.ParentId,
+                }
+                : null,
         };
     }
 }

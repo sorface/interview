@@ -51,7 +51,6 @@ public class RoomServiceTest
         var roomPatchUpdateRequest = new RoomUpdateRequest
         {
             Name = "New_Value_Name_Room",
-            CategoryId = null
         };
 
         _ = await roomService.UpdateAsync(savedRoom.Id, roomPatchUpdateRequest);
@@ -60,7 +59,6 @@ public class RoomServiceTest
 
         foundedRoom.Should().NotBeNull();
         foundedRoom!.Name.Should().BeEquivalentTo(roomPatchUpdateRequest.Name);
-        foundedRoom!.CategoryId.Should().BeNull();
     }
 
     [Fact(DisplayName = "Patch update room with request name not null and add category")]
@@ -73,9 +71,6 @@ public class RoomServiceTest
 
         appDbContext.Rooms.Add(savedRoom);
 
-        var category = new Category { Name = "Test" };
-        appDbContext.Categories.Add(category);
-
         await appDbContext.SaveChangesAsync();
 
         var roomRepository = new RoomRepository(appDbContext);
@@ -84,7 +79,6 @@ public class RoomServiceTest
         var roomPatchUpdateRequest = new RoomUpdateRequest
         {
             Name = "New_Value_Name_Room",
-            CategoryId = category.Id,
         };
 
         _ = await roomService.UpdateAsync(savedRoom.Id, roomPatchUpdateRequest);
@@ -93,7 +87,6 @@ public class RoomServiceTest
 
         foundedRoom.Should().NotBeNull();
         foundedRoom!.Name.Should().BeEquivalentTo(roomPatchUpdateRequest.Name);
-        foundedRoom!.CategoryId.Should().NotBeNull().And.Be(category.Id);
     }
 
     [Fact(DisplayName = "Close room should correctly close active room")]

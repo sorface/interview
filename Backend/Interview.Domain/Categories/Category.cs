@@ -1,4 +1,5 @@
 using Interview.Domain.Database;
+using Interview.Domain.Questions;
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms;
 using Interview.Domain.ServiceResults.Errors;
@@ -14,7 +15,7 @@ public class Category : ArchiveEntity
 
     public Category? Parent { get; set; }
 
-    public List<Room> Rooms { get; set; } = new();
+    public List<Question> Questions { get; set; } = new();
 
     public static async Task<ServiceError?> ValidateCategoryAsync(AppDbContext db, Guid? id, CancellationToken cancellationToken)
     {
