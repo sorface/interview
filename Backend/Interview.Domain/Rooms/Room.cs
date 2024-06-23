@@ -32,10 +32,6 @@ public class Room : Entity
 
     public SERoomStatus Status { get; internal set; }
 
-    public Guid? CategoryId { get; internal set; }
-
-    public Category? Category { get; set; }
-
     public RoomConfiguration? Configuration { get; set; }
 
     public RoomTimer? Timer { get; set; }

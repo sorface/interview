@@ -1,6 +1,7 @@
 using Bogus;
 using FluentAssertions;
 using Interview.Domain;
+using Interview.Domain.Categories;
 using Interview.Domain.Database;
 using Interview.Domain.Questions;
 using Interview.Domain.Questions.Records.FindPage;
@@ -35,7 +36,13 @@ namespace Interview.Test.Integrations
         [MemberData(nameof(CreateData))]
         public async Task Create(string value, Room? room)
         {
+            var category = new Category { Name = "Test" };
             await using var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
+
+            appDbContext.Categories.Add(category);
+            await appDbContext.SaveChangesAsync();
+            appDbContext.ChangeTracker.Clear();
+
             if (room is not null)
             {
                 appDbContext.Rooms.Add(room);
@@ -54,10 +61,13 @@ namespace Interview.Test.Integrations
                 Tags = new HashSet<Guid>(),
                 Value = value,
                 Type = EVQuestionType.Private,
+                CategoryId = category.Id,
             };
             var question = await creator.CreateAsync(questionCreateRequest, room?.Id, CancellationToken.None);
             question.Should().NotBeNull().And.Match<QuestionItem>(e => e.Value == value);
             roomMemberChecker.Verify(e => e.EnsureCurrentUserMemberOfRoomAsync(room == null ? It.IsAny<Guid>() : room.Id, It.IsAny<CancellationToken>()), room is not null ? Times.Once() : Times.Never());
+            question.Category.Should().NotBeNull();
+            question.Category!.Id.Should().Be(category.Id);
         }
 
         [Fact(DisplayName = "Creation should not succeed if the room is not available")]
@@ -66,6 +76,8 @@ namespace Interview.Test.Integrations
             await using var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
             var room = new Room("Test Room", SERoomAccessType.Public);
             appDbContext.Rooms.Add(room);
+            var category = new Category { Name = "Test" };
+            appDbContext.Categories.Add(category);
             await appDbContext.SaveChangesAsync();
             appDbContext.ChangeTracker.Clear();
 
@@ -80,6 +92,7 @@ namespace Interview.Test.Integrations
                 Tags = new HashSet<Guid>(),
                 Value = "Test",
                 Type = EVQuestionType.Private,
+                CategoryId = category.Id,
             };
             await Assert.ThrowsAsync<UnavailableException>(() => creator.CreateAsync(questionCreateRequest, room.Id, CancellationToken.None));
             roomMemberChecker.Verify(e => e.EnsureCurrentUserMemberOfRoomAsync(room.Id, It.IsAny<CancellationToken>()), Times.Once());
@@ -97,7 +110,8 @@ namespace Interview.Test.Integrations
                 new ArchiveService<Question>(appDbContext),
                 tagRepository,
                 roomMembershipChecker,
-                currentUser);
+                currentUser,
+                appDbContext);
         }
 
         private class UnavailableException : Exception
