@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Interview.Domain.Database.Configurations;
 
-public class QuestionTypeConfiguration : EntityTypeConfigurationBase<Question>
+public class QuestionConfiguration : EntityTypeConfigurationBase<Question>
 {
     protected override void ConfigureCore(EntityTypeBuilder<Question> builder)
     {
@@ -18,6 +18,11 @@ public class QuestionTypeConfiguration : EntityTypeConfigurationBase<Question>
             .HasComment($"Available values: [{string.Join(", ", SEQuestionType.List.Select(e => e.Name + ": " + e.Value))}]")
             .IsRequired()
             .HasDefaultValue(SEQuestionType.Public);
+        builder.HasOne(e => e.Category)
+            .WithMany(e => e.Questions)
+            .HasForeignKey(e => e.CategoryId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.NoAction);
         builder.HasOne(e => e.CodeEditor)
             .WithOne()
             .HasForeignKey<Question>(e => e.CodeEditorId);

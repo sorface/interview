@@ -19,6 +19,4 @@ public class RoomDetail
     public EVRoomAccessType Type { get; init; }
 
     public RoomTimerDetail? Timer { get; init; }
-
-    public required CategoryResponse? CategoryResponse { get; init; }
 }

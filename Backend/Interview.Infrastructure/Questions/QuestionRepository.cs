@@ -34,6 +34,7 @@ public class QuestionRepository : EfRepository<Question>, IQuestionRepository
     {
         return set
             .Include(e => e.Tags)
+            .Include(e => e.Category)
             .Include(e => e.CodeEditor)
             .Include(e => e.Answers);
     }
