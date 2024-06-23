@@ -826,6 +826,34 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.ToTable("RoomStates");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Rooms.RoomTimers.RoomTimer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ActualStartTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("Duration")
+                        .HasColumnType("REAL");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("RoomTimer", (string)null);
+                });
+
             modelBuilder.Entity("Interview.Domain.Tags.Tag", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1745,6 +1773,23 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Navigation("Room");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Rooms.RoomTimers.RoomTimer", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Rooms.Room", "Room")
+                        .WithOne("Timer")
+                        .HasForeignKey("Interview.Domain.Rooms.RoomTimers.RoomTimer", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Room");
+                });
+
             modelBuilder.Entity("Interview.Domain.Tags.Tag", b =>
                 {
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
@@ -1864,6 +1909,8 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Navigation("QueuedRoomEvent");
 
                     b.Navigation("RoomStates");
+
+                    b.Navigation("Timer");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.RoomParticipants.RoomParticipant", b =>

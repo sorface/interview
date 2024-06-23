@@ -54,4 +54,9 @@ public class EventType
     /// The event is sent when the speech from the video is recognized.
     /// </summary>
     public static readonly string VoiceRecognition = "VoiceRecognition";
+
+    /// <summary>
+    /// The event is sent when the room timer started.
+    /// </summary>
+    public static readonly string StartRoomTimer = "StartRoomTimer";
 }

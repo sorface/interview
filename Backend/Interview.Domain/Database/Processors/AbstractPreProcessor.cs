@@ -1,5 +1,5 @@
-using Interview.Domain.Events.ChangeEntityProcessors;
 using Interview.Domain.Repository;
+using Interview.Domain.Rooms.RoomConfigurations;
 
 namespace Interview.Domain.Database.Processors
 {

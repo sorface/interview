@@ -19,6 +19,7 @@ using Interview.Domain.Rooms.RoomQuestionReactions;
 using Interview.Domain.Rooms.RoomQuestionReactions.Mappers;
 using Interview.Domain.Rooms.RoomQuestionReactions.Specifications;
 using Interview.Domain.Rooms.RoomQuestions;
+using Interview.Domain.Rooms.RoomTimers;
 using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
 using Interview.Domain.Users;
@@ -86,10 +87,11 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     {
         IQueryable<Room> queryable = _db.Rooms
             .Include(e => e.Participants)
-                .ThenInclude(e => e.User)
+            .ThenInclude(e => e.User)
             .Include(e => e.Questions)
             .Include(e => e.Configuration)
             .Include(e => e.Tags)
+            .Include(e => e.Timer)
             .OrderBy(e => e.Status == SERoomStatus.Active ? 1 :
                 e.Status == SERoomStatus.Review ? 2 :
                 e.Status == SERoomStatus.New ? 3 :
@@ -114,7 +116,9 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         if (!_currentUserAccessor.IsAdmin())
         {
             var currentUserId = _currentUserAccessor.GetUserIdOrThrow();
-            queryable = queryable.Where(e => e.AccessType == SERoomAccessType.Public || (e.AccessType == SERoomAccessType.Private && e.Participants.Any(p => currentUserId == p.User.Id)));
+            queryable = queryable.Where(e =>
+                e.AccessType == SERoomAccessType.Public || (e.AccessType == SERoomAccessType.Private &&
+                                                            e.Participants.Any(p => currentUserId == p.User.Id)));
         }
 
         if (filter.Participants is not null && filter.Participants.Count > 0)
@@ -131,15 +135,11 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                     .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
                     .ToList(),
                 Users = e.Participants.Select(participant =>
-                        new RoomUserDetail
-                        {
-                            Id = participant.User.Id,
-                            Nickname = participant.User.Nickname,
-                            Avatar = participant.User.Avatar,
-                        })
+                        new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, })
                     .ToList(),
                 RoomStatus = e.Status.EnumValue,
                 Tags = e.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
+                Timer = e.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)e.Timer.Duration.TotalSeconds, StartTime = e.Timer.ActualStartTime, },
             })
             .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
@@ -156,7 +156,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return room;
     }
 
-    public async Task<Room> CreateAsync(RoomCreateRequest request, CancellationToken cancellationToken = default)
+    public async Task<RoomPageDetail> CreateAsync(RoomCreateRequest request, CancellationToken cancellationToken = default)
     {
         if (request is null)
         {
@@ -206,9 +206,29 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         var createdParticipants = await _roomParticipantService.CreateAsync(room.Id, participants, cancellationToken);
         room.Participants.AddRange(createdParticipants);
+
+        if (request.DurationSec is not null)
+        {
+            room.Timer = new RoomTimer { Duration = TimeSpan.FromSeconds(request.DurationSec.Value), };
+        }
+
         await _roomRepository.CreateAsync(room, cancellationToken);
         await GenerateInvitesAsync(room.Id, cancellationToken);
-        return room;
+
+        return new RoomPageDetail
+        {
+            Id = room.Id,
+            Name = room.Name,
+            Questions = room.Questions.Select(question => question.Question)
+                .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
+                .ToList(),
+            Users = room.Participants.Select(participant =>
+                    new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, })
+                .ToList(),
+            RoomStatus = room.Status.EnumValue,
+            Tags = room.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
+            Timer = room.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)room.Timer.Duration.TotalSeconds, StartTime = room.Timer.ActualStartTime, },
+        };
     }
 
     public async Task<RoomItem> UpdateAsync(

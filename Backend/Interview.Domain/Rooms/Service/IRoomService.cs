@@ -17,8 +17,7 @@ public interface IRoomService : IService
 
     Task<RoomDetail> FindByIdAsync(Guid id, CancellationToken cancellationToken);
 
-    Task<Room> CreateAsync(
-        RoomCreateRequest request, CancellationToken cancellationToken = default);
+    Task<RoomPageDetail> CreateAsync(RoomCreateRequest request, CancellationToken cancellationToken = default);
 
     Task<RoomItem> UpdateAsync(
         Guid roomId, RoomUpdateRequest? request, CancellationToken cancellationToken = default);

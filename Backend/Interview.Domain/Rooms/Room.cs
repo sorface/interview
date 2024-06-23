@@ -5,6 +5,7 @@ using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Domain.Rooms.RoomInvites;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomQuestions;
+using Interview.Domain.Rooms.RoomTimers;
 using Interview.Domain.Tags;
 
 [assembly: InternalsVisibleTo("Interview.Test")]
@@ -36,6 +37,8 @@ public class Room : Entity
     public Category? Category { get; set; }
 
     public RoomConfiguration? Configuration { get; set; }
+
+    public RoomTimer? Timer { get; set; }
 
     public List<RoomQuestion> Questions { get; set; } = new();
 
