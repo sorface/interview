@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms;
@@ -19,6 +20,8 @@ public class Question : ArchiveEntity
     }
 
     public string Value { get; internal set; }
+
+    public QuestionCodeEditor? CodeEditor { get; internal set; }
 
     public List<Tag> Tags { get; internal set; } = new();
 

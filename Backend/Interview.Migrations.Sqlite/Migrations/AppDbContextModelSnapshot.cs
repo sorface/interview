@@ -176,6 +176,38 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.ToTable("Invites");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Questions.CodeEditors.QuestionCodeEditor", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Lang")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("QuestionCodeEditors");
+                });
+
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1521,11 +1553,28 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Navigation("CreatedBy");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Questions.CodeEditors.QuestionCodeEditor", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.Navigation("CreatedBy");
+                });
+
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
                 {
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Questions.CodeEditors.QuestionCodeEditor", "CodeEditor")
+                        .WithOne()
+                        .HasForeignKey("Interview.Domain.Questions.Question", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CodeEditor");
 
                     b.Navigation("CreatedBy");
                 });

@@ -17,5 +17,8 @@ public class QuestionTypeConfiguration : EntityTypeConfigurationBase<Question>
             .HasComment($"Available values: [{string.Join(", ", SEQuestionType.List.Select(e => e.Name + ": " + e.Value))}]")
             .IsRequired()
             .HasDefaultValue(SEQuestionType.Public);
+        builder.HasOne(e => e.CodeEditor)
+            .WithOne()
+            .HasForeignKey<Question>();
     }
 }

@@ -3,6 +3,7 @@ using Interview.Domain.Database.Processors;
 using Interview.Domain.Events;
 using Interview.Domain.Invites;
 using Interview.Domain.Questions;
+using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Reactions;
 using Interview.Domain.Repository;
@@ -75,6 +76,8 @@ public class AppDbContext : DbContext
     public DbSet<Category> Categories { get; private set; } = null!;
 
     public DbSet<QuestionAnswer> QuestionAnswers { get; private set; } = null!;
+
+    public DbSet<QuestionCodeEditor> QuestionCodeEditors { get; private set; } = null!;
 
     public override int SaveChanges()
     {
