@@ -34,6 +34,7 @@ export const QuestionsSelector: FunctionComponent<QuestionsSelectorProps> = ({
       PageSize: pageSize,
       value: searchValue,
       tags: [],
+      categoryId: '',
     });
   }, [fetchData, pageNumber, searchValue]);
 

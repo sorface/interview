@@ -63,6 +63,7 @@ export const ActiveQuestion: FunctionComponent<ActiveQuestionProps> = ({
         value: question,
         tags: [],
         type: QuestionType.Private,
+        categoryId: '',
       },
     });
   }, [room, createRoomQuestion]);

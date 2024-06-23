@@ -7,11 +7,14 @@ export const pathnames = {
   roomsParticipants: '/rooms/participants/:id',
   room: `/room/:id/:${inviteParamName}?`,
   roomAnalyticsSummary: '/rooms/:id/analytics/summary',
-  questions: '/questions',
+  questions: '/questions/:category',
   questionsCreate: '/questions/create',
   questionsEdit: '/questions/edit/:id',
   session: '/session',
   terms: '/terms',
+  categories: '/categories',
+  categoriesCreate: '/categories/create',
+  categoriesEdit: '/categories/edit/:id',
 };
 
 export const enum IconNames {

@@ -1,7 +1,7 @@
-import React, { ChangeEvent, FormEvent, FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
+import React, { ChangeEvent, ChangeEventHandler, FormEvent, FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
-import { CreateQuestionBody, CreateTagBody, GetTagsParams, UpdateQuestionBody, questionsApiDeclaration, tagsApiDeclaration } from '../../apiDeclarations';
+import { CreateQuestionBody, GetCategoriesParams, UpdateQuestionBody, categoriesApiDeclaration, questionsApiDeclaration } from '../../apiDeclarations';
 import { Field } from '../../components/FieldsBlock/Field';
 import { HeaderWithLink } from '../../components/HeaderWithLink/HeaderWithLink';
 import { Loader } from '../../components/Loader/Loader';
@@ -10,18 +10,15 @@ import { SubmitField } from '../../components/SubmitField/SubmitField';
 import { pathnames, toastSuccessOptions } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Question, QuestionType } from '../../types/question';
-import { Tag } from '../../types/tag';
-import { TagsSelector } from '../../components/TagsSelector/TagsSelector';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { AuthContext } from '../../context/AuthContext';
 import { checkAdmin } from '../../utils/checkAdmin';
+import { Category } from '../../types/category';
 
 import './QuestionCreate.css';
 
 const valueFieldName = 'qestionText';
-const pageNumber = 1;
-const pageSize = 30;
 
 export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) => {
   const auth = useContext(AuthContext);
@@ -45,27 +42,21 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
   } = useApiMethod<Question, Question['id']>(questionsApiDeclaration.get);
   const { process: { loading: questionLoading, error: questionError }, data: question } = getQuestionState;
 
-  const {
-    apiMethodState: tagsState,
-    fetchData: fetchTags,
-  } = useApiMethod<Tag[], GetTagsParams>(tagsApiDeclaration.getPage);
-  const { process: { loading: tagsLoading, error: tagsError }, data: tags } = tagsState;
+  const { apiMethodState: rootCategoriesState, fetchData: fetchRootCategories } = useApiMethod<Category[], GetCategoriesParams>(categoriesApiDeclaration.getPage);
+  const { process: { loading: rootCategoriesLoading, error: rootCategoriesError }, data: rootCategories } = rootCategoriesState;
 
-  const {
-    apiMethodState: tagCreateState,
-    fetchData: fetchCreateTag,
-  } = useApiMethod<Tag, CreateTagBody>(tagsApiDeclaration.createTag);
-  const { process: { loading: createTagLoading, error: createTagError }, data: createdQuestionTag } = tagCreateState;
+  const { apiMethodState: subCategoriesState, fetchData: fetchSubCategories } = useApiMethod<Category[], GetCategoriesParams>(categoriesApiDeclaration.getPage);
+  const { process: { loading: subCategoriesLoading, error: subCategoriesError }, data: subCategories } = subCategoriesState;
 
   const navigate = useNavigate();
   let { id } = useParams();
   const [questionValue, setQuestionValue] = useState('');
-  const [tagsSearchValue, setTagsSearchValue] = useState('');
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [type, setType] = useState<QuestionType>(QuestionType.Private);
+  const [rootCategory, setRootCategory] = useState('');
+  const [subCategory, setSubCategory] = useState('');
 
-  const totalLoading = loading || createTagLoading || updatingLoading || questionLoading;
-  const totalError = error || questionError || tagsError || updatingError || createTagError;
+  const totalLoading = loading || updatingLoading || questionLoading || rootCategoriesLoading || subCategoriesLoading;
+  const totalError = error || questionError || updatingError || rootCategoriesError || subCategoriesError;
 
   useEffect(() => {
     if (!edit) {
@@ -78,31 +69,29 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
   }, [edit, id, fetchQuestion]);
 
   useEffect(() => {
+    fetchRootCategories({
+      name: '',
+      PageNumber: 1,
+      PageSize: 30,
+      showOnlyWithoutParent: true,
+    });
+  }, [fetchRootCategories]);
+
+  useEffect(() => {
+    fetchSubCategories({
+      name: '',
+      PageNumber: 1,
+      PageSize: 30,
+      parentId: rootCategory,
+    });
+  }, [rootCategory, fetchSubCategories]);
+
+  useEffect(() => {
     if (!question) {
       return;
     }
     setQuestionValue(question.value);
-    setSelectedTags(question.tags);
   }, [question]);
-
-  useEffect(() => {
-    fetchTags({
-      PageNumber: pageNumber,
-      PageSize: pageSize,
-      value: tagsSearchValue,
-    });
-  }, [createdQuestionTag, tagsSearchValue, fetchTags]);
-
-  useEffect(() => {
-    if (!createdQuestionTag) {
-      return;
-    }
-    fetchTags({
-      PageNumber: pageNumber,
-      PageSize: pageSize,
-      value: '',
-    });
-  }, [createdQuestionTag, fetchTags]);
 
   useEffect(() => {
     if (!createdQuestionId) {
@@ -120,23 +109,6 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
     navigate(pathnames.questions);
   }, [updatedQuestionId, localizationCaptions, navigate]);
 
-  const handleSelect = (tag: Tag) => {
-    setSelectedTags([...selectedTags, tag]);
-  };
-
-  const handleUnselect = (tag: Tag) => {
-    const newSelectedTags = selectedTags.filter(tg => tg.id !== tag.id);
-    setSelectedTags(newSelectedTags);
-  };
-
-  const handleTagSearch = (value: string) => {
-    setTagsSearchValue(value);
-  };
-
-  const handleTagCreate = (tag: Omit<Tag, 'id'>) => {
-    fetchCreateTag(tag);
-  };
-
   const handleQuestionValueChange = (event: ChangeEvent<HTMLInputElement>) => {
     setQuestionValue(event.target.value);
   };
@@ -146,11 +118,11 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
 
     fetchCreateQuestion({
       value: questionValue,
-      tags: selectedTags.map(tag => tag.id),
+      tags: [],
       type,
+      categoryId: subCategory,
     });
-
-  }, [selectedTags, questionValue, type, fetchCreateQuestion]);
+  }, [questionValue, type, subCategory, fetchCreateQuestion]);
 
   const handleSubmitEdit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -160,14 +132,23 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
     fetchUpdateQuestion({
       id: question.id,
       value: questionValue,
-      tags: selectedTags.map(tag => tag.id),
+      tags: [],
       type,
+      categoryId: subCategory,
     });
 
-  }, [selectedTags, question, questionValue, type, fetchUpdateQuestion]);
+  }, [question, questionValue, type, subCategory, fetchUpdateQuestion]);
 
   const handleTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setType(e.target.value as QuestionType);
+  };
+
+  const handleRootCategoryChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+    setRootCategory(e.target.value);
+  };
+
+  const handleSubCategoryChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+    setSubCategory(e.target.value);
   };
 
   const renderStatus = () => {
@@ -200,6 +181,20 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
       {renderStatus()}
       <form onSubmit={edit ? handleSubmitEdit : handleSubmitCreate}>
         <Field>
+          <select id="rootCategory" value={rootCategory} onChange={handleRootCategoryChange}>
+            <option value=''>{localizationCaptions[LocalizationKey.NotSelected]}</option>
+            {rootCategories?.map(rootCategory => (
+              <option key={rootCategory.id} value={rootCategory.id}>{rootCategory.name}</option>
+            ))}
+          </select>
+          <select id="subCategory" value={subCategory} onChange={handleSubCategoryChange}>
+            <option value=''>{localizationCaptions[LocalizationKey.NotSelected]}</option>
+            {subCategories?.map(subCategory => (
+              <option key={subCategory.id} value={subCategory.id}>{subCategory.name}</option>
+            ))}
+          </select>
+        </Field>
+        <Field>
           <div><label htmlFor="qestionText">{localizationCaptions[LocalizationKey.QuestionText]}:</label></div>
           <input id="qestionText" name={valueFieldName} type="text" value={questionValue} onChange={handleQuestionValueChange} />
         </Field>
@@ -212,18 +207,6 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
             </select>
           </Field>
         )}
-        <Field>
-          <TagsSelector
-            placeHolder={localizationCaptions[LocalizationKey.TagsPlaceholder]}
-            loading={tagsLoading}
-            tags={tags || []}
-            selectedTags={selectedTags}
-            onSelect={handleSelect}
-            onUnselect={handleUnselect}
-            onSearch={handleTagSearch}
-            onCreate={handleTagCreate}
-          />
-        </Field>
         <SubmitField caption={localizationCaptions[LocalizationKey.Create]} />
       </form>
     </MainContentWrapper>

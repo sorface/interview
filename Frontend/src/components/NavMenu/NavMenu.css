@@ -25,7 +25,7 @@
   height: var(--height);
   overflow-x: hidden;
   align-items: stretch;
-  z-index: 1;
+  z-index: 2;
 }
 
 .nav-menu .nav-menu-item {
@@ -124,4 +124,67 @@
 
 .nav-menu .nav-menu-theme-switch ion-icon {
   padding-left: 1rem;
+}
+
+.nav-menu .categories-list {
+  text-align: left;
+  padding-left: 3.875rem;
+  padding-top: 1rem;
+}
+
+.nav-menu-overlay {
+  position: absolute;
+  top: var(--margin);
+  width: 16.375rem;
+  height: var(--height);
+  text-align: left;
+  left: 0;
+  border-radius: 1.125rem;
+  padding: var(--menu-padding);
+  background-color: var(--wrap-bg);
+  animation: slide 0.35s forwards;
+  z-index: 1;
+}
+
+@keyframes slide {
+  0% { left: 0rem; }
+  100% { left: calc(var(--width-expanded) + var(--menu-padding) * 2 + var(--margin) + 0.125rem); }
+}
+
+.nav-menu-overlay-gap {
+  position: absolute;
+  top: var(--margin);
+  height: var(--height);
+  width: 0.125rem;
+  left: calc(var(--width-expanded) + var(--menu-padding) * 2 + var(--margin));
+  opacity: 0;
+  z-index: 1;
+}
+
+.nav-menu-overlay h4 {
+  text-align: left;
+  font-size: 0.875rem;
+  padding: 1.5625rem 2rem 0rem 2rem;
+  margin: 0;
+}
+
+.nav-menu-overlay .categories-list {
+  padding: 1rem 2rem;
+}
+
+.nav-menu-page-overlay {
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: #000;
+  opacity: 0.0;
+  animation: slide-opacity 0.35s forwards;
+  z-index: 1;
+}
+
+@keyframes slide-opacity {
+  0% { opacity: 0; }
+  100% { opacity: 0.5; }
 }

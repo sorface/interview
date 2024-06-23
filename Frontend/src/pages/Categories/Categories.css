@@ -1,0 +1,35 @@
+.categories-page .header-with-link {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.categories-page .items-grid .category-item {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.categories-page .items-grid .category-controls {
+  position: absolute;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.25rem 1rem;
+  right: 2.5rem;
+}
+
+.categories-page .items-grid .category-controls button {
+  padding: 0rem 0.75rem;
+}
+
+.categories-page .categories-additional-filters {
+  display: flex;
+}
+
+.categories-page .categories-additional-filters label[for="showOnlyWithoutParent"] {
+  margin-right: 1rem;
+}

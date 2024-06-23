@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { GetQuestionsParams, questionsApiDeclaration } from '../../apiDeclarations';
 import { Field } from '../../components/FieldsBlock/Field';
 import { HeaderWithLink } from '../../components/HeaderWithLink/HeaderWithLink';
@@ -23,6 +23,7 @@ export const Questions: FunctionComponent = () => {
   const localizationCaptions = useLocalizationCaptions();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const [searchValue, setSearchValue] = useState('');
+  const { category } = useParams();
 
   const { apiMethodState: questionsState, fetchData: fetchQuestios } = useApiMethod<Question[], GetQuestionsParams>(questionsApiDeclaration.getPage);
   const { process: { loading, error }, data: questions } = questionsState;
@@ -36,8 +37,9 @@ export const Questions: FunctionComponent = () => {
       PageSize: pageSize,
       tags: [],
       value: searchValue,
+      categoryId: category?.replace(':category', '') || '',
     });
-  }, [pageNumber, searchValue, archivedQuestion, fetchQuestios]);
+  }, [pageNumber, searchValue, archivedQuestion, category, fetchQuestios]);
 
   const handleNextPage = useCallback(() => {
     setPageNumber(pageNumber + 1);
@@ -57,8 +59,8 @@ export const Questions: FunctionComponent = () => {
           openButtonCaption='📁'
           error={archiveError}
           loading={archiveLoading}
-          title={localizationCaptions[LocalizationKey.ArchiveQuestion]}
-          loadingCaption={localizationCaptions[LocalizationKey.ArchiveQuestionLoading]}
+          title={localizationCaptions[LocalizationKey.Archive]}
+          loadingCaption={localizationCaptions[LocalizationKey.ArchiveLoading]}
           onAction={() => {archiveQuestion(question.id)}}
         />
         </div>
@@ -85,7 +87,7 @@ export const Questions: FunctionComponent = () => {
         <ItemsGrid
           currentData={questions}
           loading={loading}
-          triggerResetAccumData={`${searchValue}`}
+          triggerResetAccumData={`${searchValue}${category}`}
           loaderClassName='question-item field-wrap'
           renderItem={createQuestionItem}
           nextPageAvailable={questions?.length === pageSize}
