@@ -1,4 +1,4 @@
-﻿using Interview.Domain.QuestionAnswers;
+using Interview.Domain.Questions.QuestionAnswers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

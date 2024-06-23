@@ -201,6 +201,7 @@ public class QuestionServiceTest
             archiveService,
             tagRepository,
             aRoomMembershipChecker,
-            currentUser);
+            currentUser,
+            appDbContext);
     }
 }

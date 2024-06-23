@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using Interview.Domain.QuestionAnswers;
+using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms;
 using Interview.Domain.Tags;

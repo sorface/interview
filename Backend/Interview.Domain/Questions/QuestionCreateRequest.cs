@@ -1,3 +1,4 @@
+using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Tags;
 
 namespace Interview.Domain.Questions;
@@ -9,4 +10,7 @@ public sealed class QuestionCreateRequest
     public HashSet<Guid> Tags { get; set; } = new();
 
     public required EVQuestionType Type { get; set; }
+
+    // public required bool CodeEditor { get; set; }
+    public required List<QuestionAnswerCreateRequest>? Answers { get; set; }
 }

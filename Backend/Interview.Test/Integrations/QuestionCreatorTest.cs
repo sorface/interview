@@ -3,6 +3,7 @@ using FluentAssertions;
 using Interview.Domain;
 using Interview.Domain.Database;
 using Interview.Domain.Questions;
+using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Questions.Services;
 using Interview.Domain.RoomParticipants;
@@ -54,10 +55,33 @@ namespace Interview.Test.Integrations
                 Tags = new HashSet<Guid>(),
                 Value = value,
                 Type = EVQuestionType.Private,
+                Answers = new List<QuestionAnswerCreateRequest>
+                {
+                    new()
+                    {
+                        Title = "#1",
+                        Content = "test",
+                        CodeEditor = false
+                    },
+                    new()
+                    {
+                        Title = "#2",
+                        Content = "test 2",
+                        CodeEditor = false
+                    },
+                },
             };
             var question = await creator.CreateAsync(questionCreateRequest, room?.Id, CancellationToken.None);
             question.Should().NotBeNull().And.Match<QuestionItem>(e => e.Value == value);
             roomMemberChecker.Verify(e => e.EnsureCurrentUserMemberOfRoomAsync(room == null ? It.IsAny<Guid>() : room.Id, It.IsAny<CancellationToken>()), room is not null ? Times.Once() : Times.Never());
+            question.Answers.Should().HaveCount(2);
+            question.Answers[0].Title.Should().Be("#1");
+            question.Answers[0].Content.Should().Be("test");
+            question.Answers[0].CodeEditor.Should().BeFalse();
+
+            question.Answers[1].Title.Should().Be("#2");
+            question.Answers[1].Content.Should().Be("test 2");
+            question.Answers[1].CodeEditor.Should().BeFalse();
         }
 
         [Fact(DisplayName = "Creation should not succeed if the room is not available")]
@@ -80,6 +104,7 @@ namespace Interview.Test.Integrations
                 Tags = new HashSet<Guid>(),
                 Value = "Test",
                 Type = EVQuestionType.Private,
+                Answers = new List<QuestionAnswerCreateRequest>(),
             };
             await Assert.ThrowsAsync<UnavailableException>(() => creator.CreateAsync(questionCreateRequest, room.Id, CancellationToken.None));
             roomMemberChecker.Verify(e => e.EnsureCurrentUserMemberOfRoomAsync(room.Id, It.IsAny<CancellationToken>()), Times.Once());
@@ -97,7 +122,8 @@ namespace Interview.Test.Integrations
                 new ArchiveService<Question>(appDbContext),
                 tagRepository,
                 roomMembershipChecker,
-                currentUser);
+                currentUser,
+                appDbContext);
         }
 
         private class UnavailableException : Exception

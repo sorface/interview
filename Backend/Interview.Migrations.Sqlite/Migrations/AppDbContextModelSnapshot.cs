@@ -176,47 +176,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.ToTable("Invites");
                 });
 
-            modelBuilder.Entity("Interview.Domain.QuestionAnswers.QuestionAnswer", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CodeEditor")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(1024)
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("QuestionId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("QuestionId");
-
-                    b.ToTable("QuestionAnswers");
-                });
-
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
                 {
                     b.Property<Guid>("Id")
@@ -253,6 +212,46 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.HasIndex("CreatedById");
 
                     b.ToTable("Questions");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionAnswers.QuestionAnswer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("CodeEditor")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("QuestionAnswers");
                 });
 
             modelBuilder.Entity("Interview.Domain.Reactions.Reaction", b =>
@@ -1522,7 +1521,16 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Navigation("CreatedBy");
                 });
 
-            modelBuilder.Entity("Interview.Domain.QuestionAnswers.QuestionAnswer", b =>
+            modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionAnswers.QuestionAnswer", b =>
                 {
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
                         .WithMany()
@@ -1537,15 +1545,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Question");
-                });
-
-            modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
-                {
-                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById");
-
-                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("Interview.Domain.Reactions.Reaction", b =>
