@@ -1,6 +1,6 @@
+using Interview.Domain.Categories.Page;
 using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
-using Interview.Domain.Categories.Page;
 using Interview.Domain.Repository;
 using Interview.Domain.Tags.Records.Response;
 
@@ -16,6 +16,21 @@ public class QuestionItem
         Category = e.Category != null
             ? new CategoryResponse { Id = e.Category.Id, Name = e.Category.Name, ParentId = e.Category.ParentId, }
             : null,
+        Answers = e.Answers.Select(q => new QuestionAnswerResponse
+            {
+                Id = q.Id,
+                Title = q.Title,
+                Content = q.Content,
+                CodeEditor = q.CodeEditor,
+            })
+            .ToList(),
+        CodeEditor = e.CodeEditor == null
+            ? null
+            : new QuestionCodeEditorResponse
+            {
+                Content = e.CodeEditor.Content,
+                Lang = e.CodeEditor.Lang,
+            },
     });
 
     public Guid Id { get; init; }

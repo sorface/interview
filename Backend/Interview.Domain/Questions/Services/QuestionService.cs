@@ -321,11 +321,11 @@ public class QuestionService : IQuestionService
             Id = entity.Id,
             Value = entity.Value,
             Tags = entity.Tags.Select(e => new TagItem
-            {
-                Id = e.Id,
-                Value = e.Value,
-                HexValue = e.HexColor,
-            })
+                {
+                    Id = e.Id,
+                    Value = e.Value,
+                    HexValue = e.HexColor,
+                })
                 .ToList(),
             Category = category is not null
                 ? new CategoryResponse
@@ -335,6 +335,21 @@ public class QuestionService : IQuestionService
                     ParentId = category.ParentId,
                 }
                 : null,
+            Answers = entity.Answers.Select(q => new QuestionAnswerResponse
+                {
+                    Id = q.Id,
+                    Title = q.Title,
+                    Content = q.Content,
+                    CodeEditor = q.CodeEditor,
+                })
+                .ToList(),
+            CodeEditor = entity.CodeEditor == null
+                ? null
+                : new QuestionCodeEditorResponse
+                {
+                    Content = entity.CodeEditor.Content,
+                    Lang = entity.CodeEditor.Lang,
+                },
         };
     }
 }
