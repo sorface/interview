@@ -44,7 +44,7 @@ export const ItemsGrid = <T extends object>({
     resetAccumData();
   }, [triggerResetAccumData, resetAccumData])
 
-  const noRecords = dataDisplayed && !accumData.length;
+  const noRecords = dataDisplayed && !loading && !accumData.length;
 
   return (
     <>
