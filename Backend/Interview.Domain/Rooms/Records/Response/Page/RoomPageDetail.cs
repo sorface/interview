@@ -11,7 +11,7 @@ public class RoomPageDetail
 
     public List<RoomQuestionDetail>? Questions { get; set; }
 
-    public List<RoomUserDetail>? Users { get; set; }
+    public List<RoomUserDetail>? Participants { get; set; }
 
     public List<TagItem>? Tags { get; set; }
 

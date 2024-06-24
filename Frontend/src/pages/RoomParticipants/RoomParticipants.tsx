@@ -82,8 +82,8 @@ export const RoomParticipants: FunctionComponent = () => {
       <form action="" onSubmit={handleSubmit}>
         <Field>
           <select name={userFieldName}>
-            {room.users.map(user => (
-              <option key={user.id} value={user.id}>{user.nickname}</option>
+            {room.participants.map(participant => (
+              <option key={participant.id} value={participant.id}>{participant.nickname}</option>
             ))}
           </select>
           <select name={userTypeFieldName}>

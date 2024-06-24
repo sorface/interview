@@ -12,7 +12,7 @@ export enum RoomAccessType {
 export interface Room {
   id: string;
   name: string;
-  users: User[];
+  participants: User[];
   tags: Tag[];
   roomStatus: RoomStatus;
 }

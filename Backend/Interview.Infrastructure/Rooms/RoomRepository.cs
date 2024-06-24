@@ -290,7 +290,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                 Questions = e.Questions.Select(question => question.Question)
                     .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
                     .ToList(),
-                Users = e.Participants.Select(participant =>
+                Participants = e.Participants.Select(participant =>
                         new RoomUserDetail
                         {
                             Id = participant.User.Id,
