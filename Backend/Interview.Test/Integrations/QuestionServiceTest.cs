@@ -3,6 +3,7 @@ using FluentAssertions;
 using Interview.Domain;
 using Interview.Domain.Database;
 using Interview.Domain.Questions;
+using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Questions.Services;
 using Interview.Domain.Reactions;
@@ -64,6 +65,131 @@ public class QuestionServiceTest
 
         Assert.NotNull(foundQuestion);
         foundQuestion.Value.Should().BeEquivalentTo(question.Value);
+    }
+
+    [Fact]
+    public async Task Update_Editor()
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+
+        var question = new Question(value: DefaultQuestionValue)
+        {
+            CodeEditor = new QuestionCodeEditor
+            {
+                Content = "test",
+                Lang = "js",
+            }
+        };
+        appDbContext.Questions.Add(question);
+        await appDbContext.SaveChangesAsync();
+        appDbContext.ChangeTracker.Clear();
+
+        var questionService = CreateQuestionService(appDbContext);
+        var questionEditRequest = new QuestionEditRequest
+        {
+            Value = DefaultQuestionValue,
+            CategoryId = null,
+            CodeEditor = new QuestionCodeEditorEditRequest
+            {
+                Content = "new2",
+                Lang = "ts"
+            },
+            NewAnswers = null,
+            ExistsAnswers = null
+        };
+        var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
+        var dbQuestion = await appDbContext.Questions
+            .Include(e => e.Answers)
+            .Include(e => e.CodeEditor)
+            .FirstAsync(e => e.Id == updatedQuestion.Id);
+
+        Assert.NotNull(updatedQuestion);
+        Assert.NotNull(dbQuestion);
+        dbQuestion.Value.Should().BeEquivalentTo(question.Value);
+        dbQuestion.CodeEditor.Should().NotBeNull();
+        dbQuestion.CodeEditor!.Content.Should().Be("new2");
+        dbQuestion.CodeEditor!.Lang.Should().Be("ts");
+        dbQuestion.Answers.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Update_Editor_To_Null()
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+
+        var question = new Question(value: DefaultQuestionValue)
+        {
+            CodeEditor = new QuestionCodeEditor
+            {
+                Content = "test",
+                Lang = "js",
+            }
+        };
+        appDbContext.Questions.Add(question);
+        await appDbContext.SaveChangesAsync();
+        appDbContext.ChangeTracker.Clear();
+
+        var questionService = CreateQuestionService(appDbContext);
+        var questionEditRequest = new QuestionEditRequest
+        {
+            Value = DefaultQuestionValue,
+            CategoryId = null,
+            CodeEditor = null,
+            NewAnswers = null,
+            ExistsAnswers = null
+        };
+        var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
+        var dbQuestion = await appDbContext.Questions
+            .Include(e => e.Answers)
+            .Include(e => e.CodeEditor)
+            .FirstAsync(e => e.Id == updatedQuestion.Id);
+
+        Assert.NotNull(updatedQuestion);
+        Assert.NotNull(dbQuestion);
+        dbQuestion.Value.Should().BeEquivalentTo(question.Value);
+        dbQuestion.CodeEditor.Should().BeNull();
+        dbQuestion.Answers.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Update_Null_Editor_To_Not_Null()
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+
+        var question = new Question(value: DefaultQuestionValue);
+        appDbContext.Questions.Add(question);
+        await appDbContext.SaveChangesAsync();
+        appDbContext.ChangeTracker.Clear();
+
+        var questionService = CreateQuestionService(appDbContext);
+        var questionEditRequest = new QuestionEditRequest
+        {
+            Value = DefaultQuestionValue,
+            CategoryId = null,
+            CodeEditor = new QuestionCodeEditorEditRequest
+            {
+                Content = "test",
+                Lang = "js"
+            },
+            NewAnswers = null,
+            ExistsAnswers = null
+        };
+        var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
+        var dbQuestion = await appDbContext.Questions
+            .Include(e => e.Answers)
+            .Include(e => e.CodeEditor)
+            .FirstAsync(e => e.Id == updatedQuestion.Id);
+
+        Assert.NotNull(updatedQuestion);
+        Assert.NotNull(dbQuestion);
+        dbQuestion.Value.Should().BeEquivalentTo(question.Value);
+        dbQuestion.CodeEditor.Should().NotBeNull();
+        dbQuestion.CodeEditor!.Content.Should().Be("test");
+        dbQuestion.CodeEditor!.Lang.Should().Be("js");
+        dbQuestion.Answers.Should().BeEmpty();
     }
 
     [Fact(DisplayName = "Searching question by id when question not found")]
