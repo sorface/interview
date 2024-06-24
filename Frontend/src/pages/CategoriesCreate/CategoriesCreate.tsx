@@ -104,7 +104,7 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }
 
     fetchCreateCategory({
       name: categoryName,
-      parentId: categoryParent,
+      parentId: categoryParent || null,
     });
 
   }, [categoryName, categoryParent, fetchCreateCategory]);
