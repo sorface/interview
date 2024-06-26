@@ -138,7 +138,6 @@ public class RoomController : ControllerBase
             Examinees = request.Examinees,
             Tags = request.Tags,
             DurationSec = request.Duration,
-            CategoryId = request.CategoryId,
             ScheduleStartTime = request.ScheduleStartTime,
         };
 
