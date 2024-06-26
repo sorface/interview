@@ -9,4 +9,6 @@ public sealed class QuestionCreateRequest
     public HashSet<Guid> Tags { get; set; } = new();
 
     public required EVQuestionType Type { get; set; }
+
+    public required Guid? CategoryId { get; init; }
 }

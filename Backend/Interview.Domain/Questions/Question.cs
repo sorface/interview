@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Interview.Domain.Categories;
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms;
 using Interview.Domain.Tags;
@@ -22,4 +23,8 @@ public class Question : ArchiveEntity
     public List<Tag> Tags { get; internal set; } = new List<Tag>();
 
     public SEQuestionType Type { get; internal set; }
+
+    public Guid? CategoryId { get; internal set; }
+
+    public Category? Category { get; set; }
 }

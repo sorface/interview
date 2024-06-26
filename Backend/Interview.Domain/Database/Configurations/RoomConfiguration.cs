@@ -30,10 +30,5 @@ public class RoomConfiguration : EntityTypeConfigurationBase<Room>
             .HasConversion(e => e.Value, e => SERoomAccessType.FromValue(e))
             .IsRequired()
             .HasDefaultValue(SERoomAccessType.Public);
-        builder.HasOne(e => e.Category)
-            .WithMany(e => e.Rooms)
-            .HasForeignKey(e => e.CategoryId)
-            .IsRequired(false)
-            .OnDelete(DeleteBehavior.NoAction);
     }
 }

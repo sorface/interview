@@ -1,0 +1,16 @@
+.categories-list {
+  font-size: 0.875rem;
+}
+
+.categories-list .categories-list-item {
+  cursor: pointer;
+  padding-bottom: 0.75rem;
+}
+
+.categories-list .categories-list-item:hover {
+  text-decoration: underline;
+}
+
+.categories-list .loader-wrapper {
+  height: 2rem;
+}

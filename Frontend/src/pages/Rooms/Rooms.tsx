@@ -101,7 +101,7 @@ export const Rooms: FunctionComponent = () => {
                 {room.name}
               </div>
               <div className='room-participants'>
-                {room.users.map(roomParticipant => (
+                {room.participants.map(roomParticipant => (
                   <div className='room-participant'>
                     {roomParticipant.avatar &&
                       <UserAvatar

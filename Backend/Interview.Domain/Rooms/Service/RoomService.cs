@@ -134,7 +134,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 Questions = e.Questions.Select(question => question.Question)
                     .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
                     .ToList(),
-                Users = e.Participants.Select(participant =>
+                Participants = e.Participants.Select(participant =>
                         new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, })
                     .ToList(),
                 RoomStatus = e.Status.EnumValue,
@@ -183,11 +183,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         var experts = await FindByIdsOrErrorAsync(_userRepository, requestExperts, "experts", cancellationToken);
         var examinees = await FindByIdsOrErrorAsync(_userRepository, request.Examinees, "examinees", cancellationToken);
-        var categoryValidateResult = await Category.ValidateCategoryAsync(_db, request.CategoryId, cancellationToken);
-        categoryValidateResult?.Throw();
-
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
-        var room = new Room(name, request.AccessType) { Tags = tags, CategoryId = request.CategoryId };
+        var room = new Room(name, request.AccessType) { Tags = tags, };
         var roomQuestions = questions.Select(question =>
             new RoomQuestion
             {
@@ -229,7 +226,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             Questions = room.Questions.Select(question => question.Question)
                 .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
                 .ToList(),
-            Users = room.Participants.Select(participant =>
+            Participants = room.Participants.Select(participant =>
                     new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, })
                 .ToList(),
             RoomStatus = room.Status.EnumValue,
@@ -259,13 +256,9 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw NotFoundException.Create<User>(roomId);
         }
 
-        var categoryValidateResult = await Category.ValidateCategoryAsync(_db, request.CategoryId, cancellationToken);
-        categoryValidateResult?.Throw();
-
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
 
         foundRoom.Name = name;
-        foundRoom.CategoryId = request.CategoryId;
         foundRoom.Tags.Clear();
         foundRoom.Tags.AddRange(tags);
         await _roomRepository.UpdateAsync(foundRoom, cancellationToken);
