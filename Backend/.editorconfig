@@ -14,7 +14,6 @@ max_line_length=170
 indent_size = 4
 insert_final_newline = true
 charset = utf-8
-
 # XML project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
 indent_size = 4
@@ -200,7 +199,7 @@ csharp_new_line_before_finally = true
 csharp_new_line_before_members_in_object_initializers = true
 csharp_new_line_before_members_in_anonymous_types = true
 csharp_new_line_between_query_expression_clauses = true
-
+csharp_align_multiline_parameter=true
 # Indentation preferences
 csharp_indent_block_contents = true
 csharp_indent_braces = false
@@ -271,6 +270,7 @@ dotnet_diagnostic.SA1401.severity=none
 dotnet_diagnostic.SA1402.severity=none
 dotnet_diagnostic.SA1101.severity=none
 dotnet_diagnostic.SA1116.severity=none
+dotnet_diagnostic.SA1128.severity=none
 dotnet_diagnostic.SA1309.severity=none
 dotnet_diagnostic.SA1200.severity=none
 dotnet_diagnostic.SA1600.severity=none

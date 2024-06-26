@@ -1,4 +1,3 @@
-using System.Net;
 using System.Net.Mime;
 using Interview.Backend.Auth;
 using Interview.Backend.Responses;
