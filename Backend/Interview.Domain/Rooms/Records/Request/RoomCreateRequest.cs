@@ -14,5 +14,7 @@ public sealed class RoomCreateRequest
 
     public required HashSet<Guid> Tags { get; init; }
 
+    public long? ScheduleStartTime { get; set; }
+
     public long? DurationSec { get; set; }
 }

@@ -140,6 +140,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 RoomStatus = e.Status.EnumValue,
                 Tags = e.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
                 Timer = e.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)e.Timer.Duration.TotalSeconds, StartTime = e.Timer.ActualStartTime, },
+                ScheduledStartTime = e.ScheduleStartTime,
             })
             .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
