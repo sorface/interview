@@ -11,6 +11,7 @@ using Interview.Backend.WebSocket.Events;
 using Interview.Backend.WebSocket.Events.ConnectionListener;
 using Interview.Backend.WebSocket.Events.Handlers;
 using Interview.DependencyInjection;
+using Interview.Domain.Dates;
 using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Infrastructure.Chat;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -215,6 +216,7 @@ public class ServiceConfigurator
     {
         serviceCollection.AddSwaggerGen(options =>
         {
+            options.MapType<Date>(() => new OpenApiSchema { Type = "integer", Format = "int64" });
             options.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "Open API",

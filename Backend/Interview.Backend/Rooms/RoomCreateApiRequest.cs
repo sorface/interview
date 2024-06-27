@@ -1,3 +1,5 @@
+using Interview.Domain.Dates;
+
 namespace Interview.Backend.Rooms;
 
 /// <summary>
@@ -19,5 +21,5 @@ public class RoomCreateApiRequest
 
     public long? Duration { get; set; }
 
-    public long? ScheduleStartTime { get; set; }
+    public Date? ScheduleStartTime { get; set; }
 }

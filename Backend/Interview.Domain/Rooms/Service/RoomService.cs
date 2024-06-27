@@ -207,8 +207,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         if (request.ScheduleStartTime is not null)
         {
-            var scheduleStartTime = DateTimeOffset.FromUnixTimeSeconds(request.ScheduleStartTime.Value);
-            room.ScheduleStartTime = scheduleStartTime.UtcDateTime;
+            room.ScheduleStartTime = request.ScheduleStartTime.Value.UtcDateTime;
         }
 
         if (request.DurationSec is not null)
