@@ -1,5 +1,3 @@
-using Interview.Domain.Dates;
-
 namespace Interview.Domain.Rooms.Records.Request;
 
 public sealed class RoomCreateRequest
@@ -16,7 +14,7 @@ public sealed class RoomCreateRequest
 
     public required HashSet<Guid> Tags { get; init; }
 
-    public Date? ScheduleStartTime { get; set; }
-
     public long? DurationSec { get; set; }
+
+    public DateTime? ScheduleStartTime { get; set; }
 }

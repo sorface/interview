@@ -1,5 +1,3 @@
-using System.Transactions;
-using Interview.Domain.Categories;
 using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Storage;
@@ -184,7 +182,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         var experts = await FindByIdsOrErrorAsync(_userRepository, requestExperts, "experts", cancellationToken);
         var examinees = await FindByIdsOrErrorAsync(_userRepository, request.Examinees, "examinees", cancellationToken);
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
-        var room = new Room(name, request.AccessType) { Tags = tags, };
+        var room = new Room(name, request.AccessType) { Tags = tags, ScheduleStartTime = request.ScheduleStartTime, };
         var roomQuestions = questions.Select(question =>
             new RoomQuestion
             {
@@ -204,11 +202,6 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         var createdParticipants = await _roomParticipantService.CreateAsync(room.Id, participants, cancellationToken);
         room.Participants.AddRange(createdParticipants);
-
-        if (request.ScheduleStartTime is not null)
-        {
-            room.ScheduleStartTime = request.ScheduleStartTime.Value.UtcDateTime;
-        }
 
         if (request.DurationSec is not null)
         {
@@ -231,7 +224,6 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             RoomStatus = room.Status.EnumValue,
             Tags = room.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
             Timer = room.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)room.Timer.Duration.TotalSeconds, StartTime = room.Timer.ActualStartTime, },
-            ScheduledStartTime = room.ScheduleStartTime,
         };
     }
 

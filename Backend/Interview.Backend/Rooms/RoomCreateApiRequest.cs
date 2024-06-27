@@ -1,4 +1,4 @@
-using Interview.Domain.Dates;
+using Microsoft.Extensions.FileSystemGlobbing.Internal.Patterns;
 
 namespace Interview.Backend.Rooms;
 
@@ -21,5 +21,5 @@ public class RoomCreateApiRequest
 
     public long? Duration { get; set; }
 
-    public Date? ScheduleStartTime { get; set; }
+    public DateTime? ScheduleStartTime { get; set; }
 }
