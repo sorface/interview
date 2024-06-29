@@ -255,7 +255,9 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         return new RoomItem
         {
-            Id = foundRoom.Id, Name = foundRoom.Name, Tags = tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
+            Id = foundRoom.Id,
+            Name = foundRoom.Name,
+            Tags = tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
         };
     }
 
@@ -420,7 +422,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         state = new RoomState
         {
-            Payload = payload, RoomId = roomId, Type = type, Room = null,
+            Payload = payload,
+            RoomId = roomId,
+            Type = type,
+            Room = null,
         };
         await _roomStateRepository.CreateAsync(state, cancellationToken);
     }
@@ -467,7 +472,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             .Where(e => e.RoomById == roomId && e.InviteById != null && e.ParticipantType != null)
             .Select(e => new RoomInviteResponse
             {
-                InviteId = e.InviteById!.Value, ParticipantType = e.ParticipantType!.EnumValue, Max = e.Invite!.UsesMax, Used = e.Invite.UsesCurrent,
+                InviteId = e.InviteById!.Value,
+                ParticipantType = e.ParticipantType!.EnumValue,
+                Max = e.Invite!.UsesMax,
+                Used = e.Invite.UsesCurrent,
             })
             .ToListAsync(cancellationToken);
     }
@@ -564,7 +572,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         {
             return new RoomInviteResponse
             {
-                ParticipantType = participant.Type.EnumValue, InviteId = invite!.Value, Max = 0, Used = 0,
+                ParticipantType = participant.Type.EnumValue,
+                InviteId = invite!.Value,
+                Max = 0,
+                Used = 0,
             };
         }
 
@@ -584,7 +595,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         return new RoomInviteResponse
         {
-            ParticipantType = participant.Type.EnumValue, InviteId = invite!.Value, Max = 0, Used = 0,
+            ParticipantType = participant.Type.EnumValue,
+            InviteId = invite!.Value,
+            Max = 0,
+            Used = 0,
         };
     }
 
