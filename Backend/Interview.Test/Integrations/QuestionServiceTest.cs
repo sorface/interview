@@ -4,6 +4,7 @@ using Interview.Domain;
 using Interview.Domain.Database;
 using Interview.Domain.Questions;
 using Interview.Domain.Questions.CodeEditors;
+using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Questions.Services;
 using Interview.Domain.Reactions;
@@ -65,6 +66,308 @@ public class QuestionServiceTest
 
         Assert.NotNull(foundQuestion);
         foundQuestion.Value.Should().BeEquivalentTo(question.Value);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Add_Answer(bool codeEditor)
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+
+        var question = new Question(value: DefaultQuestionValue);
+        appDbContext.Questions.Add(question);
+        await appDbContext.SaveChangesAsync();
+        appDbContext.ChangeTracker.Clear();
+
+        var questionService = CreateQuestionService(appDbContext);
+        var questionEditRequest = new QuestionEditRequest
+        {
+            Value = DefaultQuestionValue,
+            CategoryId = null,
+            CodeEditor = new QuestionCodeEditorEditRequest
+            {
+                Content = "t",
+                Lang = "ts"
+            },
+            NewAnswers = new List<QuestionAnswerCreateRequest>
+            {
+                new()
+                {
+                    Content = "test content",
+                    CodeEditor = codeEditor,
+                    Title = "test title"
+                }
+            },
+            ExistsAnswers = null
+        };
+        var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
+        var dbQuestion = await appDbContext.Questions
+            .Include(e => e.Answers)
+            .Include(e => e.CodeEditor)
+            .FirstAsync(e => e.Id == updatedQuestion.Id);
+
+        Assert.NotNull(updatedQuestion);
+        Assert.NotNull(dbQuestion);
+        dbQuestion.Value.Should().BeEquivalentTo(question.Value);
+        dbQuestion.CodeEditor.Should().NotBeNull();
+        dbQuestion.Answers.Should().HaveCount(1);
+        dbQuestion.Answers[0].Content.Should().Be("test content");
+        dbQuestion.Answers[0].Title.Should().Be("test title");
+        dbQuestion.Answers[0].CodeEditor.Should().Be(codeEditor);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Update_Answer(bool codeEditor)
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+
+        var question = new Question(value: DefaultQuestionValue)
+        {
+            Answers = new List<QuestionAnswer>
+            {
+                new()
+                {
+                    Title = "test title",
+                    Content = "test content",
+                    CodeEditor = codeEditor,
+                    QuestionId = default,
+                    Question = null
+                }
+            }
+        };
+        appDbContext.Questions.Add(question);
+        await appDbContext.SaveChangesAsync();
+        appDbContext.ChangeTracker.Clear();
+
+        var questionService = CreateQuestionService(appDbContext);
+        var questionEditRequest = new QuestionEditRequest
+        {
+            Value = DefaultQuestionValue,
+            CategoryId = null,
+            CodeEditor = new QuestionCodeEditorEditRequest
+            {
+                Content = "t",
+                Lang = "ts"
+            },
+            NewAnswers = null,
+            ExistsAnswers = new HashSet<QuestionAnswerEditRequest>
+            {
+                new()
+                {
+                    Id = question.Answers[0].Id,
+                    Title = "test title 1",
+                    Content = "test content 1",
+                    CodeEditor = !question.Answers[0].CodeEditor
+                }
+            }
+        };
+        var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
+        var dbQuestion = await appDbContext.Questions
+            .Include(e => e.Answers)
+            .Include(e => e.CodeEditor)
+            .FirstAsync(e => e.Id == updatedQuestion.Id);
+
+        Assert.NotNull(updatedQuestion);
+        Assert.NotNull(dbQuestion);
+        dbQuestion.Value.Should().BeEquivalentTo(question.Value);
+        dbQuestion.CodeEditor.Should().NotBeNull();
+        dbQuestion.Answers.Should().HaveCount(1);
+        dbQuestion.Answers[0].Content.Should().Be("test content 1");
+        dbQuestion.Answers[0].Title.Should().Be("test title 1");
+        dbQuestion.Answers[0].CodeEditor.Should().Be(!codeEditor);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Update_And_Add_Answer(bool codeEditor)
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+
+        var question = new Question(value: DefaultQuestionValue)
+        {
+            Answers = new List<QuestionAnswer>
+            {
+                new()
+                {
+                    Title = "test title",
+                    Content = "test content",
+                    CodeEditor = codeEditor,
+                    QuestionId = default,
+                    Question = null
+                }
+            }
+        };
+        appDbContext.Questions.Add(question);
+        await appDbContext.SaveChangesAsync();
+        appDbContext.ChangeTracker.Clear();
+
+        var questionService = CreateQuestionService(appDbContext);
+        var questionEditRequest = new QuestionEditRequest
+        {
+            Value = DefaultQuestionValue,
+            CategoryId = null,
+            CodeEditor = new QuestionCodeEditorEditRequest
+            {
+                Content = "t",
+                Lang = "ts"
+            },
+            NewAnswers = new List<QuestionAnswerCreateRequest>
+            {
+                new()
+                {
+                    Content = "new test content",
+                    CodeEditor = codeEditor,
+                    Title = "new test title"
+                }
+            },
+            ExistsAnswers = new HashSet<QuestionAnswerEditRequest>
+            {
+                new()
+                {
+                    Id = question.Answers[0].Id,
+                    Title = "test title 1",
+                    Content = "test content 1",
+                    CodeEditor = !question.Answers[0].CodeEditor
+                }
+            }
+        };
+        var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
+        var dbQuestion = await appDbContext.Questions
+            .Include(e => e.Answers)
+            .Include(e => e.CodeEditor)
+            .FirstAsync(e => e.Id == updatedQuestion.Id);
+
+        Assert.NotNull(updatedQuestion);
+        Assert.NotNull(dbQuestion);
+        dbQuestion.Value.Should().BeEquivalentTo(question.Value);
+        dbQuestion.CodeEditor.Should().NotBeNull();
+        dbQuestion.Answers.Should().HaveCount(2);
+        var updatedAnswer = dbQuestion.Answers.First(e => e.Id == question.Answers[0].Id);
+        updatedAnswer.Content.Should().Be("test content 1");
+        updatedAnswer.Title.Should().Be("test title 1");
+        updatedAnswer.CodeEditor.Should().Be(!codeEditor);
+
+        var newAnswer = dbQuestion.Answers.First(e => e.Id != question.Answers[0].Id);
+        newAnswer.Content.Should().Be("new test content");
+        newAnswer.Title.Should().Be("new test title");
+        newAnswer.CodeEditor.Should().Be(codeEditor);
+    }
+
+    [Fact]
+    public async Task Remove_Answer()
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+
+        var question = new Question(value: DefaultQuestionValue)
+        {
+            Answers = new List<QuestionAnswer>
+            {
+                new()
+                {
+                    Title = "test title",
+                    Content = "test content",
+                    CodeEditor = true,
+                    QuestionId = default,
+                    Question = null
+                }
+            }
+        };
+        appDbContext.Questions.Add(question);
+        await appDbContext.SaveChangesAsync();
+        appDbContext.ChangeTracker.Clear();
+
+        var questionService = CreateQuestionService(appDbContext);
+        var questionEditRequest = new QuestionEditRequest
+        {
+            Value = DefaultQuestionValue,
+            CategoryId = null,
+            CodeEditor = null,
+            NewAnswers = null,
+            ExistsAnswers = null
+        };
+        var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
+        var dbQuestion = await appDbContext.Questions
+            .Include(e => e.Answers)
+            .Include(e => e.CodeEditor)
+            .FirstAsync(e => e.Id == updatedQuestion.Id);
+
+        Assert.NotNull(updatedQuestion);
+        Assert.NotNull(dbQuestion);
+        dbQuestion.Value.Should().BeEquivalentTo(question.Value);
+        dbQuestion.CodeEditor.Should().BeNull();
+        dbQuestion.Answers.Should().HaveCount(0);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Remove_And_Add_Answer(bool codeEditor)
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+
+        var question = new Question(value: DefaultQuestionValue)
+        {
+            Answers = new List<QuestionAnswer>
+            {
+                new()
+                {
+                    Title = "test title",
+                    Content = "test content",
+                    CodeEditor = true,
+                    QuestionId = default,
+                    Question = null
+                }
+            }
+        };
+        appDbContext.Questions.Add(question);
+        await appDbContext.SaveChangesAsync();
+        appDbContext.ChangeTracker.Clear();
+
+        var questionService = CreateQuestionService(appDbContext);
+        var questionEditRequest = new QuestionEditRequest
+        {
+            Value = DefaultQuestionValue,
+            CategoryId = null,
+            CodeEditor = new QuestionCodeEditorEditRequest
+            {
+                Content = "t",
+                Lang = "ts"
+            },
+            NewAnswers = new List<QuestionAnswerCreateRequest>
+            {
+                new()
+                {
+                    Content = "new test content",
+                    CodeEditor = codeEditor,
+                    Title = "new test title"
+                }
+            },
+            ExistsAnswers = null
+        };
+        var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
+        var dbQuestion = await appDbContext.Questions
+            .Include(e => e.Answers)
+            .Include(e => e.CodeEditor)
+            .FirstAsync(e => e.Id == updatedQuestion.Id);
+
+        Assert.NotNull(updatedQuestion);
+        Assert.NotNull(dbQuestion);
+        dbQuestion.Value.Should().BeEquivalentTo(question.Value);
+        dbQuestion.CodeEditor.Should().NotBeNull();
+        dbQuestion.Answers.Should().HaveCount(1);
+        dbQuestion.Answers[0].Content.Should().Be("new test content");
+        dbQuestion.Answers[0].Title.Should().Be("new test title");
+        dbQuestion.Answers[0].CodeEditor.Should().Be(codeEditor);
+
     }
 
     [Fact]
