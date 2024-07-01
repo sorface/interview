@@ -1,4 +1,5 @@
-using Interview.Domain.Tags;
+using Interview.Domain.Questions.CodeEditors;
+using Interview.Domain.Questions.QuestionAnswers;
 
 namespace Interview.Domain.Questions;
 
@@ -9,4 +10,10 @@ public sealed class QuestionEditRequest
     public HashSet<Guid> Tags { get; set; } = new();
 
     public required Guid? CategoryId { get; init; }
+
+    public required QuestionCodeEditorEditRequest? CodeEditor { get; set; }
+
+    public required List<QuestionAnswerCreateRequest>? NewAnswers { get; set; }
+
+    public required HashSet<QuestionAnswerEditRequest>? ExistsAnswers { get; set; }
 }

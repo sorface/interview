@@ -32,6 +32,10 @@ public class QuestionRepository : EfRepository<Question>, IQuestionRepository
 
     protected override IQueryable<Question> ApplyIncludes(DbSet<Question> set)
     {
-        return set.Include(e => e.Tags).Include(e => e.Category);
+        return set
+            .Include(e => e.Tags)
+            .Include(e => e.Category)
+            .Include(e => e.CodeEditor)
+            .Include(e => e.Answers);
     }
 }
