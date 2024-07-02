@@ -15,6 +15,10 @@ export interface Room {
   participants: User[];
   tags: Tag[];
   roomStatus: RoomStatus;
+  timer: {
+    durationSec: number;
+    startTime?: string;
+  };
 }
 
 export type RoomStateType = 'CodeEditor';
