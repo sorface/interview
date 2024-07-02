@@ -575,7 +575,7 @@ public class QuestionServiceTest
         appDbContext.Reactions.Add(reaction);
         appDbContext.SaveChanges();
 
-        var roomQuestion = new RoomQuestion { Room = room, Question = question, State = RoomQuestionState.Active, QuestionId = default, RoomId = default, };
+        var roomQuestion = new RoomQuestion { Room = room, Question = question, State = RoomQuestionState.Active, QuestionId = default, RoomId = default, Order = 0, };
         appDbContext.RoomQuestions.Add(roomQuestion);
         appDbContext.SaveChanges();
 

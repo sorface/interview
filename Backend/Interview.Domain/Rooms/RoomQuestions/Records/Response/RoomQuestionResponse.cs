@@ -2,9 +2,11 @@ namespace Interview.Domain.Rooms.RoomQuestions.Records.Response;
 
 public class RoomQuestionResponse
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; set; }
 
-    public string? Value { get; set; }
+    public required string? Value { get; set; }
 
-    public RoomQuestionStateType? State { get; set; }
+    public required int Order { get; set; }
+
+    public required RoomQuestionStateType? State { get; set; }
 }

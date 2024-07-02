@@ -766,6 +766,11 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("Order")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
                     b.Property<Guid>("QuestionId")
                         .HasColumnType("uuid");
 

@@ -170,7 +170,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         }
 
         var questions =
-            await FindByIdsOrErrorAsync(_questionRepository, request.Questions, "questions", cancellationToken);
+            await FindByIdsOrErrorAsync(_questionRepository, request.Questions.Select(e => e.Id).ToList(), "questions", cancellationToken);
 
         var currentUserId = _currentUserAccessor.GetUserIdOrThrow();
         ICollection<Guid> requestExperts = request.Experts;
@@ -184,15 +184,19 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         var examinees = await FindByIdsOrErrorAsync(_userRepository, request.Examinees, "examinees", cancellationToken);
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
         var room = new Room(name, request.AccessType) { Tags = tags, };
-        var roomQuestions = questions.Select(question =>
-            new RoomQuestion
-            {
-                Room = room,
-                Question = question,
-                State = RoomQuestionState.Open,
-                RoomId = default,
-                QuestionId = default,
-            });
+        var roomQuestions = questions
+            .Join(request.Questions,
+                e => e.Id,
+                e => e.Id,
+                (dbQ, requestQ) => new RoomQuestion
+                {
+                    Room = room,
+                    Question = dbQ,
+                    State = RoomQuestionState.Open,
+                    RoomId = default,
+                    QuestionId = default,
+                    Order = requestQ.Order,
+                });
 
         room.Questions.AddRange(roomQuestions);
 

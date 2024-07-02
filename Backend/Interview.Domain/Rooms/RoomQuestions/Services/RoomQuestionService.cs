@@ -1,8 +1,10 @@
+using Interview.Domain.Database;
 using Interview.Domain.Questions;
 using Interview.Domain.Questions.Services;
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms.RoomQuestions.Records;
 using Interview.Domain.Rooms.RoomQuestions.Records.Response;
+using Microsoft.EntityFrameworkCore;
 using NSpecifications;
 
 namespace Interview.Domain.Rooms.RoomQuestions.Services;
@@ -10,23 +12,23 @@ namespace Interview.Domain.Rooms.RoomQuestions.Services;
 public class RoomQuestionService : IRoomQuestionService
 {
     private readonly IRoomQuestionRepository _roomQuestionRepository;
-
     private readonly IQuestionRepository _questionRepository;
-
     private readonly IRoomRepository _roomRepository;
-
     private readonly IQuestionService _questionService;
+    private readonly AppDbContext _db;
 
     public RoomQuestionService(
         IRoomQuestionRepository roomQuestionRepository,
         IRoomRepository roomRepository,
         IQuestionRepository questionRepository,
-        IQuestionService questionService)
+        IQuestionService questionService,
+        AppDbContext db)
     {
         _roomQuestionRepository = roomQuestionRepository;
         _roomRepository = roomRepository;
         _questionRepository = questionRepository;
         _questionService = questionService;
+        _db = db;
     }
 
     public async Task<RoomQuestionDetail> ChangeActiveQuestionAsync(
@@ -125,6 +127,7 @@ public class RoomQuestionService : IRoomQuestionService
             State = RoomQuestionState.Open,
             RoomId = default,
             QuestionId = default,
+            Order = request.Order,
         };
 
         await _roomQuestionRepository.CreateAsync(newRoomQuestion, cancellationToken);
@@ -150,16 +153,18 @@ public class RoomQuestionService : IRoomQuestionService
         }
 
         var states = request.States.Select(e => RoomQuestionState.FromValue((int)e)).ToList();
-
-        var specification = new Spec<RoomQuestion>(rq => rq.Room!.Id == request.RoomId && states.Contains(rq.State!));
-
-        var mapper = Mapper<RoomQuestion>.Create(rq => new { Id = rq.Question!.Id, State = rq.State, Value = rq.Question.Value, });
-        var questions = await _roomQuestionRepository.FindAsync(specification, mapper, cancellationToken);
+        var questions = await _db.RoomQuestions
+            .AsNoTracking()
+            .Where(rq => rq.Room!.Id == request.RoomId && states.Contains(rq.State!))
+            .OrderBy(e => e.Order)
+            .Select(rq => new { Id = rq.Question!.Id, State = rq.State, Value = rq.Question.Value, Order = rq.Order })
+            .ToListAsync(cancellationToken);
         return questions.ConvertAll(e => new RoomQuestionResponse
         {
             Id = e.Id,
             State = e.State!.EnumValue,
             Value = e.Value,
+            Order = e.Order,
         });
     }
 }

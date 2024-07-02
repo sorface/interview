@@ -28,6 +28,7 @@ public class AppDbContextTest
                     RoomId = default,
                     QuestionId = default,
                     Room = null,
+                    Order = 0,
                 }
             }
         };
