@@ -37,6 +37,12 @@ public class NotFoundException : UserException
     {
         return new NotFoundException($"Not found '{typeof(T).Name}' by Id '{id}'");
     }
+
+    public static NotFoundException Create<T>(IEnumerable<Guid> ids)
+        where T : Entity
+    {
+        return new NotFoundException($"Not found '{typeof(T).Name}' by ids '{string.Join(", ", ids)}'");
+    }
 }
 
 #pragma warning disable SA1402

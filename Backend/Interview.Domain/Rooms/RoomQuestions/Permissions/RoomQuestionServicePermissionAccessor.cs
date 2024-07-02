@@ -2,6 +2,8 @@ using Interview.Domain.Permissions;
 using Interview.Domain.Rooms.RoomQuestions.Records;
 using Interview.Domain.Rooms.RoomQuestions.Records.Response;
 using Interview.Domain.Rooms.RoomQuestions.Services;
+using Interview.Domain.Rooms.RoomQuestions.Services.Update;
+using Interview.Domain.ServiceResults.Success;
 
 namespace Interview.Domain.Rooms.RoomQuestions.Permissions;
 
@@ -16,6 +18,12 @@ public class RoomQuestionServicePermissionAccessor : IRoomQuestionService, IServ
     {
         _roomQuestionService = roomQuestionService;
         _securityService = securityService;
+    }
+
+    public async Task<ServiceResult> UpdateAsync(Guid roomId, List<RoomQuestionUpdateRequest> request, CancellationToken cancellationToken = default)
+    {
+        await _securityService.EnsureRoomPermissionAsync(roomId, SEPermission.RoomQuestionUpdate, cancellationToken);
+        return await _roomQuestionService.UpdateAsync(roomId, request, cancellationToken);
     }
 
     public async Task<RoomQuestionDetail> ChangeActiveQuestionAsync(

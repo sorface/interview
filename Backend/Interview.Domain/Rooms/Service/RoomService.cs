@@ -131,8 +131,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             {
                 Id = e.Id,
                 Name = e.Name,
-                Questions = e.Questions.Select(question => question.Question)
-                    .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
+                Questions = e.Questions.OrderBy(rq => rq.Order)
+                    .Select(question => new RoomQuestionDetail { Id = question.Question!.Id, Value = question.Question.Value, Order = question.Order, })
                     .ToList(),
                 Participants = e.Participants.Select(participant =>
                         new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, })
@@ -196,7 +196,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                     RoomId = default,
                     QuestionId = default,
                     Order = requestQ.Order,
-                });
+                })
+            .OrderBy(e => e.Order);
 
         room.Questions.AddRange(roomQuestions);
 
@@ -220,8 +221,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         {
             Id = room.Id,
             Name = room.Name,
-            Questions = room.Questions.Select(question => question.Question)
-                .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
+            Questions = room.Questions.OrderBy(rq => rq.Order)
+                .Select(question => new RoomQuestionDetail { Id = question.Question!.Id, Value = question.Question.Value, Order = question.Order, })
                 .ToList(),
             Participants = room.Participants.Select(participant =>
                     new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, })

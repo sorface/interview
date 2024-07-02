@@ -4,6 +4,8 @@ using Interview.Domain.Questions.Services;
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms.RoomQuestions.Records;
 using Interview.Domain.Rooms.RoomQuestions.Records.Response;
+using Interview.Domain.Rooms.RoomQuestions.Services.Update;
+using Interview.Domain.ServiceResults.Success;
 using Microsoft.EntityFrameworkCore;
 using NSpecifications;
 
@@ -70,6 +72,40 @@ public class RoomQuestionService : IRoomQuestionService
             QuestionId = roomQuestion.Question!.Id,
             State = roomQuestion.State,
         };
+    }
+
+    public async Task<ServiceResult> UpdateAsync(
+        Guid roomId,
+        List<RoomQuestionUpdateRequest> request,
+        CancellationToken cancellationToken = default)
+    {
+        var hasRoom =
+            await _roomRepository.HasAsync(new Spec<Room>(room => room.Id == roomId), cancellationToken);
+
+        if (hasRoom is false)
+        {
+            throw NotFoundException.Create<Room>(roomId);
+        }
+
+        var requiredQuestions = request.Select(e => e.QuestionId).ToHashSet();
+        var dbRoomQuestions = await _db.RoomQuestions.Where(e => requiredQuestions.Contains(e.QuestionId)).ToListAsync(cancellationToken);
+        requiredQuestions.ExceptWith(dbRoomQuestions.Select(e => e.QuestionId));
+        if (requiredQuestions.Count > 0)
+        {
+            throw NotFoundException.Create<RoomQuestion>(requiredQuestions);
+        }
+
+        foreach (var (dbQuestion, order) in dbRoomQuestions.Join(
+                     request,
+                     question => question.QuestionId,
+                     e => e.QuestionId,
+                     (dbQuestion, updateRequest) => (dbQuestion: dbQuestion, Order: updateRequest.Order)))
+        {
+            dbQuestion.Order = order;
+        }
+
+        await _db.SaveChangesAsync(cancellationToken);
+        return ServiceResult.Ok();
     }
 
     /// <summary>
