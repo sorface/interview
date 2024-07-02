@@ -178,6 +178,11 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             requestExperts = requestExperts.Concat(new[] { currentUserId }).ToList();
         }
 
+        if (request.ScheduleStartTime is not null && DateTime.UtcNow > request.ScheduleStartTime)
+        {
+            throw new UserException("The scheduled start date must be greater than the current time");
+        }
+
         var experts = await FindByIdsOrErrorAsync(_userRepository, requestExperts, "experts", cancellationToken);
         var examinees = await FindByIdsOrErrorAsync(_userRepository, request.Examinees, "examinees", cancellationToken);
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);

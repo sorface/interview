@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -11,7 +11,8 @@ public class DateTimeJsonConverter : JsonConverter<DateTime>
     public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var str = reader.GetString() ?? string.Empty;
-        return DateTime.ParseExact(str, DefaultDateTimeFormat, CultureInfo.InvariantCulture);
+
+        return DateTime.Parse(str, null, DateTimeStyles.RoundtripKind);
     }
 
     public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
