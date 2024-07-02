@@ -38,6 +38,7 @@ import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Invitations } from './components/Invitations/Invitations';
 import { UserType } from '../../types/user';
 import { useEventsState } from './hooks/useEventsState';
+import { RoomTimer } from './components/RoomTimer/RoomTimer';
 
 import './Room.css';
 
@@ -56,6 +57,7 @@ export const Room: FunctionComponent = () => {
   const [reactionsVisible, setReactionsVisible] = useState(false);
   const [currentQuestionId, setCurrentQuestionId] = useState<RoomQuestion['id']>();
   const [currentQuestion, setCurrentQuestion] = useState<RoomQuestion>();
+  const [wsRoomTimer, setWsRoomTimer] = useState<RoomType['timer'] | null>(null);
   const [messagesChatEnabled, setMessagesChatEnabled] = useState(false);
   const [welcomeScreen, setWelcomeScreen] = useState(true);
   const micDisabledAutomatically = useRef(false);
@@ -166,6 +168,7 @@ export const Room: FunctionComponent = () => {
     data: roomState,
   } = apiRoomStateState;
 
+  const roomTimer = wsRoomTimer || room?.timer;
   const eventsState = useEventsState({ roomState, lastWsMessage: lastMessage });
   const codeEditorEnabled = !!eventsState[EventName.CodeEditor];
   const codeEditorLanguage = String(eventsState[EventName.CodeEditorLanguage]);
@@ -286,6 +289,12 @@ export const Room: FunctionComponent = () => {
           break;
         case 'AddRoomQuestion':
           updateQuestions();
+          break;
+        case 'StartRoomTimer':
+          setWsRoomTimer({
+            durationSec: parsedData.Value.DurationSec,
+            startTime: parsedData.Value.StartTime,
+          });
           break;
         default:
           break;
@@ -455,6 +464,9 @@ export const Room: FunctionComponent = () => {
                   )}
                 </span>
               </div>
+              {(viewerMode && !!(roomTimer?.startTime)) && (
+                <RoomTimer durationSec={roomTimer.durationSec} startTime={roomTimer.startTime} />
+              )}
 
               {!viewerMode && (
                 <div className="reactions-field">
@@ -463,6 +475,9 @@ export const Room: FunctionComponent = () => {
                     roomQuestions={roomQuestions || []}
                     initialQuestionText={currentQuestion?.value}
                   />
+                  {!!(roomTimer?.startTime) && (
+                    <RoomTimer durationSec={roomTimer.durationSec} startTime={roomTimer.startTime} />
+                  )}
                 </div>
               )}
               {!reactionsVisible && (
