@@ -1,3 +1,22 @@
 .question-create #qestionText {
   width: 100%;
 }
+
+.question-create .code-editor {
+  height: 32.25rem;
+  overflow: hidden;
+}
+
+.question-code-editor-controls {
+  display: flex;
+  justify-content: space-between;
+}
+
+.question-create .question-answer-controls {
+  display: flex;
+  justify-content: space-between; 
+}
+
+.question-create .question-answer-name {
+  width: 30.5rem;
+}

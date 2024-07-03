@@ -36,6 +36,8 @@ export const enum IconNames {
   Clipboard = 'clipboard',
   Refresh = 'refresh',
   TV = 'tv',
+  Add = 'add',
+  Trash = 'trash',
 }
 
 export const enum IconThemePostfix {
