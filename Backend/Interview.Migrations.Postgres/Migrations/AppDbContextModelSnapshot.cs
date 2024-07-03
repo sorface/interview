@@ -181,6 +181,38 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.ToTable("Invites");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Questions.CodeEditors.QuestionCodeEditor", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Lang")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("QuestionCodeEditors");
+                });
+
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
                 {
                     b.Property<Guid>("Id")
@@ -188,6 +220,9 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("CodeEditorId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
@@ -219,9 +254,52 @@ namespace Interview.Migrations.Postgres.Migrations
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("CodeEditorId")
+                        .IsUnique();
+
                     b.HasIndex("CreatedById");
 
                     b.ToTable("Questions");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionAnswers.QuestionAnswer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("CodeEditor")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("QuestionAnswers");
                 });
 
             modelBuilder.Entity("Interview.Domain.Reactions.Reaction", b =>
@@ -1486,6 +1564,15 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Navigation("CreatedBy");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Questions.CodeEditors.QuestionCodeEditor", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.Navigation("CreatedBy");
+                });
+
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
                 {
                     b.HasOne("Interview.Domain.Categories.Category", "Category")
@@ -1493,13 +1580,36 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Interview.Domain.Questions.CodeEditors.QuestionCodeEditor", "CodeEditor")
+                        .WithOne()
+                        .HasForeignKey("Interview.Domain.Questions.Question", "CodeEditorId");
+
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
                     b.Navigation("Category");
 
+                    b.Navigation("CodeEditor");
+
                     b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionAnswers.QuestionAnswer", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Questions.Question", "Question")
+                        .WithMany("Answers")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Question");
                 });
 
             modelBuilder.Entity("Interview.Domain.Reactions.Reaction", b =>
@@ -1836,6 +1946,11 @@ namespace Interview.Migrations.Postgres.Migrations
             modelBuilder.Entity("Interview.Domain.Categories.Category", b =>
                 {
                     b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
+                {
+                    b.Navigation("Answers");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>

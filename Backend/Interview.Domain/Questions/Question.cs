@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Interview.Domain.Categories;
+using Interview.Domain.Questions.CodeEditors;
+using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms;
 using Interview.Domain.Tags;
@@ -20,7 +22,13 @@ public class Question : ArchiveEntity
 
     public string Value { get; internal set; }
 
-    public List<Tag> Tags { get; internal set; } = new List<Tag>();
+    public Guid? CodeEditorId { get; internal set; }
+
+    public QuestionCodeEditor? CodeEditor { get; internal set; }
+
+    public List<Tag> Tags { get; internal set; } = new();
+
+    public List<QuestionAnswer> Answers { get; internal set; } = new();
 
     public SEQuestionType Type { get; internal set; }
 

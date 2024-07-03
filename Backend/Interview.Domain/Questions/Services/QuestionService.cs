@@ -1,6 +1,10 @@
+using CSharpFunctionalExtensions;
 using Interview.Domain.Categories;
 using Interview.Domain.Categories.Page;
 using Interview.Domain.Database;
+using Interview.Domain.Database;
+using Interview.Domain.Questions.CodeEditors;
+using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.RoomParticipants;
 using Interview.Domain.Tags;
@@ -81,6 +85,7 @@ public class QuestionService : IQuestionService
             await _roomMembershipChecker.EnsureCurrentUserMemberOfRoomAsync(roomId.Value, cancellationToken);
         }
 
+        QuestionAnswer.EnsureValid(request.Answers?.Select(e => new QuestionAnswer.Validate(e)), request.CodeEditor is not null);
         var categoryValidateResult = await Category.ValidateCategoryAsync(_db, request.CategoryId, cancellationToken);
         categoryValidateResult?.Throw();
 
@@ -90,7 +95,29 @@ public class QuestionService : IQuestionService
             Tags = tags,
             Type = GetQuestionType(),
             CategoryId = request.CategoryId,
+            CodeEditor = request.CodeEditor is null
+                ? null
+                : new QuestionCodeEditor
+                {
+                    Content = request.CodeEditor.Content,
+                    Lang = request.CodeEditor.Lang,
+                },
         };
+
+        if (request.Answers is not null)
+        {
+            foreach (var questionAnswerCreateRequest in request.Answers)
+            {
+                result.Answers.Add(new QuestionAnswer
+                {
+                    Title = questionAnswerCreateRequest.Title,
+                    Content = questionAnswerCreateRequest.Content,
+                    CodeEditor = questionAnswerCreateRequest.CodeEditor,
+                    QuestionId = default,
+                    Question = null,
+                });
+            }
+        }
 
         await _questionRepository.CreateAsync(result, cancellationToken);
 
@@ -111,6 +138,14 @@ public class QuestionService : IQuestionService
                     })
                     .FirstOrDefaultAsync(cancellationToken)
                 : null,
+            Answers = result.Answers.Select(QuestionAnswerResponse.Mapper.Map).ToList(),
+            CodeEditor = result.CodeEditor == null
+                ? null
+                : new QuestionCodeEditorResponse
+                {
+                    Content = result.CodeEditor.Content,
+                    Lang = result.CodeEditor.Lang,
+                },
         };
 
         SEQuestionType GetQuestionType()
@@ -127,17 +162,75 @@ public class QuestionService : IQuestionService
     public async Task<QuestionItem> UpdateAsync(
         Guid id, QuestionEditRequest request, CancellationToken cancellationToken = default)
     {
-        var entity = await _questionNonArchiveRepository.FindByIdAsync(id, cancellationToken);
+        var entity = await _db.Questions
+            .Include(e => e.Answers)
+            .Include(e => e.CodeEditor)
+            .Include(e => e.Category)
+            .Where(e => !e.IsArchived && e.Id == id)
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (entity == null)
         {
             throw NotFoundException.Create<Question>(id);
         }
 
+        var answersMap = request.ExistsAnswers?.ToDictionary(e => e.Id)
+                              ?? new Dictionary<Guid, QuestionAnswerEditRequest>();
+        entity.Answers.RemoveAll(e => !answersMap.ContainsKey(e.Id));
+        foreach (var questionAnswer in entity.Answers)
+        {
+            var newAnswer = answersMap[questionAnswer.Id];
+            questionAnswer.Title = newAnswer.Title;
+            questionAnswer.CodeEditor = newAnswer.CodeEditor;
+            questionAnswer.Content = newAnswer.Content;
+        }
+
+        if (request.NewAnswers is not null)
+        {
+            foreach (var questionAnswerCreateRequest in request.NewAnswers)
+            {
+                entity.Answers.Add(new QuestionAnswer
+                {
+                    Title = questionAnswerCreateRequest.Title,
+                    Content = questionAnswerCreateRequest.Content,
+                    CodeEditor = questionAnswerCreateRequest.CodeEditor,
+                    QuestionId = default,
+                    Question = null,
+                });
+            }
+        }
+
+        QuestionAnswer.EnsureValid(request.NewAnswers?.Select(e => new QuestionAnswer.Validate(e)), request.CodeEditor is not null);
+        QuestionAnswer.EnsureValid(request.ExistsAnswers?.Select(e => new QuestionAnswer.Validate(e)), request.CodeEditor is not null);
         var categoryValidateResult = await Category.ValidateCategoryAsync(_db, request.CategoryId, cancellationToken);
         categoryValidateResult?.Throw();
 
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
+
+        if (request.CodeEditor is not null && entity.CodeEditor is not null)
+        {
+            entity.CodeEditor.Content = request.CodeEditor.Content;
+            entity.CodeEditor.Lang = request.CodeEditor.Lang;
+        }
+        else
+        {
+            // remove exists code editor
+            if (entity.CodeEditor is not null)
+            {
+                _db.QuestionCodeEditors.Remove(entity.CodeEditor);
+                entity.CodeEditor = null;
+            }
+
+            // add new if needed
+            if (request.CodeEditor is not null)
+            {
+                entity.CodeEditor = new QuestionCodeEditor
+                {
+                    Content = request.CodeEditor.Content,
+                    Lang = request.CodeEditor.Lang,
+                };
+            }
+        }
 
         entity.Value = request.Value;
         entity.CategoryId = request.CategoryId;
@@ -155,6 +248,8 @@ public class QuestionService : IQuestionService
         var question = await _db.Questions.AsNoTracking()
             .Include(e => e.Tags)
             .Include(e => e.Category)
+            .Include(e => e.CodeEditor)
+            .Include(e => e.Answers)
             .Where(e => !e.IsArchived && e.Id == id)
             .Select(QuestionItem.Mapper.Expression)
             .FirstOrDefaultAsync(cancellationToken);
@@ -171,6 +266,7 @@ public class QuestionService : IQuestionService
         Guid id, CancellationToken cancellationToken = default)
     {
         var question = await _questionRepository.FindByIdDetailedAsync(id, cancellationToken);
+
         if (question == null)
         {
             throw NotFoundException.Create<Question>(id);
@@ -190,6 +286,8 @@ public class QuestionService : IQuestionService
             Value = archiveQuestion.Value,
             Tags = archiveQuestion.Tags
                 .Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, }).ToList(),
+            Answers = new List<QuestionAnswerResponse>(),
+            CodeEditor = null,
             Category = null,
         };
     }
@@ -203,13 +301,9 @@ public class QuestionService : IQuestionService
             Id = unarchiveQuestion.Id,
             Value = unarchiveQuestion.Value,
             Tags = unarchiveQuestion.Tags
-                .Select(e => new TagItem
-                {
-                    Id = e.Id,
-                    Value = e.Value,
-                    HexValue = e.HexColor,
-                })
-                .ToList(),
+                .Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, }).ToList(),
+            Answers = new List<QuestionAnswerResponse>(),
+            CodeEditor = null,
             Category = null,
         };
     }
@@ -241,6 +335,21 @@ public class QuestionService : IQuestionService
                     ParentId = category.ParentId,
                 }
                 : null,
+            Answers = entity.Answers.Select(q => new QuestionAnswerResponse
+            {
+                Id = q.Id,
+                Title = q.Title,
+                Content = q.Content,
+                CodeEditor = q.CodeEditor,
+            })
+                .ToList(),
+            CodeEditor = entity.CodeEditor == null
+                ? null
+                : new QuestionCodeEditorResponse
+                {
+                    Content = entity.CodeEditor.Content,
+                    Lang = entity.CodeEditor.Lang,
+                },
         };
     }
 }

@@ -18,6 +18,8 @@ export interface CreateRoomBody {
   examinees: Array<User['id']>;
   tags: Array<Tag['id']>;
   accessType: RoomAccessType;
+  scheduleStartTime: string;
+  duration: number;
 }
 
 export interface SendEventBody {

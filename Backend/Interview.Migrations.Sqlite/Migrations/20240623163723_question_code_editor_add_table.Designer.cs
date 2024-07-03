@@ -3,6 +3,7 @@ using System;
 using Interview.Domain.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Interview.Migrations.Sqlite.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240623163723_question_code_editor_add_table")]
+    partial class question_code_editor_add_table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.10");
@@ -214,9 +217,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("CategoryId")
-                        .HasColumnType("TEXT");
-
                     b.Property<Guid?>("CodeEditorId")
                         .HasColumnType("TEXT");
 
@@ -246,8 +246,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
 
                     b.HasIndex("CodeEditorId")
                         .IsUnique();
@@ -582,6 +580,9 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(0);
 
+                    b.Property<Guid?>("CategoryId")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("TEXT");
 
@@ -602,6 +603,8 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("CreatedById");
 
@@ -1570,11 +1573,6 @@ namespace Interview.Migrations.Sqlite.Migrations
 
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
                 {
-                    b.HasOne("Interview.Domain.Categories.Category", "Category")
-                        .WithMany("Questions")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("Interview.Domain.Questions.CodeEditors.QuestionCodeEditor", "CodeEditor")
                         .WithOne()
                         .HasForeignKey("Interview.Domain.Questions.Question", "CodeEditorId");
@@ -1582,8 +1580,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
-
-                    b.Navigation("Category");
 
                     b.Navigation("CodeEditor");
 
@@ -1654,9 +1650,16 @@ namespace Interview.Migrations.Sqlite.Migrations
 
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>
                 {
+                    b.HasOne("Interview.Domain.Categories.Category", "Category")
+                        .WithMany("Rooms")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
+
+                    b.Navigation("Category");
 
                     b.Navigation("CreatedBy");
                 });
@@ -1940,7 +1943,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
             modelBuilder.Entity("Interview.Domain.Categories.Category", b =>
                 {
-                    b.Navigation("Questions");
+                    b.Navigation("Rooms");
                 });
 
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
