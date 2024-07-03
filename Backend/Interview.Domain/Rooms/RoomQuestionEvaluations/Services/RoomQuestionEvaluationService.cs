@@ -80,7 +80,7 @@ public class RoomQuestionEvaluationService : IRoomQuestionEvaluationService
 
     private async Task<RoomQuestionEvaluation?> FindQuestionEvaluation(Guid roomId, Guid questionId, Guid userId, CancellationToken cancellationToken)
     {
-        await ValidateQuestionEvaluation(roomId, questionId, cancellationToken);
+        await ValidateQuestionEvaluation(roomId, userId, cancellationToken);
 
         return await _roomQuestionEvaluationRepository.FindByQuestionIdAndRoomAsync(roomId, questionId, userId, cancellationToken);
     }

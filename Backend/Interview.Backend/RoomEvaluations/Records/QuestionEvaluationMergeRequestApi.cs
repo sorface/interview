@@ -10,4 +10,3 @@ public class QuestionEvaluationMergeRequestApi
 
     public int? Mark { get; set; }
 }
-

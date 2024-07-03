@@ -1,3 +1,4 @@
+using Interview.Domain.Rooms.RoomQuestionEvaluations;
 using Interview.Domain.Rooms.RoomReviews.Mappers;
 using Interview.Domain.Rooms.RoomReviews.Records;
 using Interview.Domain.Rooms.RoomReviews.Response.Page;
@@ -15,14 +16,18 @@ public class RoomReviewService : IRoomReviewService
 
     private readonly IUserRepository _userRepository;
 
+    private readonly IRoomQuestionEvaluationRepository _roomQuestionEvaluationRepository;
+
     public RoomReviewService(
         IRoomReviewRepository roomReviewRepository,
         IUserRepository userRepository,
-        IRoomRepository roomRepository)
+        IRoomRepository roomRepository,
+        IRoomQuestionEvaluationRepository roomQuestionEvaluationRepository)
     {
         _roomReviewRepository = roomReviewRepository;
         _userRepository = userRepository;
         _roomRepository = roomRepository;
+        _roomQuestionEvaluationRepository = roomQuestionEvaluationRepository;
     }
 
     public Task<IPagedList<RoomReviewPageDetail>> FindPageAsync(
@@ -70,12 +75,10 @@ public class RoomReviewService : IRoomReviewService
             throw new UserException("Room should be in Review status");
         }
 
-        var roomReview = new RoomReview(user, room, SERoomReviewState.Open)
-        {
-            Review = request.Review,
-        };
+        var roomReview = new RoomReview(user, room, SERoomReviewState.Open) { Review = request.Review, };
 
         await _roomReviewRepository.CreateAsync(roomReview, cancellationToken);
+        await _roomQuestionEvaluationRepository.Submit(room.Id, user.Id, cancellationToken);
 
         return RoomReviewDetailMapper.Instance.Map(roomReview);
     }
@@ -88,6 +91,16 @@ public class RoomReviewService : IRoomReviewService
         if (roomReview is null)
         {
             throw NotFoundException.Create<RoomReview>(id);
+        }
+
+        if (roomReview.Room is null)
+        {
+            throw new UserException("The review is not linked to the room");
+        }
+
+        if (roomReview.Room.Status != SERoomStatus.Review)
+        {
+            throw new UserException("Room should be in Review status");
         }
 
         roomReview.Review = request.Review;

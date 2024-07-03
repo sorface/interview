@@ -5,7 +5,7 @@ namespace Interview.Domain.Rooms.RoomQuestionEvaluations;
 public class SERoomQuestionEvaluationState : SmartEnum<SERoomQuestionEvaluationState>
 {
     public static readonly SERoomQuestionEvaluationState Draft = new("Draft", 0, EVRoomQuestionEvaluationState.Draft);
-    public static readonly SERoomQuestionEvaluationState Submitted = new("Submitted", 0, EVRoomQuestionEvaluationState.Submitted);
+    public static readonly SERoomQuestionEvaluationState Submitted = new("Submitted", 1, EVRoomQuestionEvaluationState.Submitted);
 
     public EVRoomQuestionEvaluationState EnumValue { get; }
 

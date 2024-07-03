@@ -3,7 +3,7 @@ using Interview.Domain.Rooms.RoomQuestionEvaluations.Records.Response;
 
 namespace Interview.Domain.Rooms.RoomQuestionEvaluations.Services;
 
-public interface IRoomQuestionEvaluationService
+public interface IRoomQuestionEvaluationService : IService
 {
     public Task<QuestionEvaluationDetail> FindByRoomIdAndQuestionId(QuestionEvaluationGetRequest request, CancellationToken cancellationToken);
 

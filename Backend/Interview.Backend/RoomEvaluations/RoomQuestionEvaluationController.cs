@@ -31,7 +31,7 @@ public class RoomQuestionEvaluationController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<QuestionEvaluationDetail?> FindByRoomIdAndQuestionId(QuestionEvaluationGetRequestApi request)
+    public async Task<QuestionEvaluationDetail?> FindByRoomIdAndQuestionId([FromQuery] QuestionEvaluationGetRequestApi request)
     {
         var user = HttpContext.User.ToUser();
 
@@ -46,7 +46,7 @@ public class RoomQuestionEvaluationController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost]
+    [HttpPost("merge")]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(QuestionEvaluationDetail), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]

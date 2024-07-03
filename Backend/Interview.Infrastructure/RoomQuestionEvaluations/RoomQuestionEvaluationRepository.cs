@@ -37,8 +37,28 @@ public class RoomQuestionEvaluationRepository : EfRepository<RoomQuestionEvaluat
         return await ApplyIncludes(Set)
             .Include(e => e.RoomQuestion)
             .Include(e => e.CreatedBy)
-            .Select(e => e)
             .Where(e => e.RoomQuestionId == roomQuestion.Id && e.CreatedById == userId)
-            .FirstAsync(cancellationToken);
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task Submit(Guid roomId, Guid userId, CancellationToken cancellationToken)
+    {
+        var transaction = await Db.Database.BeginTransactionAsync(cancellationToken);
+
+        var roomQuestionEvaluations = ApplyIncludes(Set)
+            .Include(evaluation => evaluation.RoomQuestion)
+            .Include(evaluation => evaluation.CreatedBy)
+            .Where(evaluation => evaluation.RoomQuestion!.RoomId == roomId && evaluation.CreatedById == userId);
+
+        await roomQuestionEvaluations.ForEachAsync(evaluation =>
+            {
+                evaluation.State = SERoomQuestionEvaluationState.Submitted;
+            },
+            cancellationToken);
+
+        // todo: not work batch update
+        // await roomQuestionEvaluations.ExecuteUpdateAsync(property => property.SetProperty(e => e.State, evaluation => SERoomQuestionEvaluationState.Submitted), cancellationToken);
+        await Db.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
     }
 }
