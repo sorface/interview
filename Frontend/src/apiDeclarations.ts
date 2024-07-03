@@ -142,6 +142,12 @@ export interface CreateQuestionBody {
   tags: Array<Tag['id']>
   type: QuestionType;
   categoryId: Category['id'];
+  codeEditor: Question['codeEditor'] | null;
+  answers: Array<{
+    title: string;
+    content: string;
+    codeEditor: boolean;
+  }>;
 }
 
 export interface UpdateQuestionBody extends CreateQuestionBody {
