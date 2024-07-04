@@ -146,6 +146,7 @@ export const enum LocalizationKey {
   RoomInvitesLoading,
   Invitations,
   RefreshAll,
+  NextRoomQuestion,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -295,6 +296,7 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.RoomInvitesLoading]: 'Loading room invites',
     [LocalizationKey.Invitations]: 'Invitations',
     [LocalizationKey.RefreshAll]: 'Refresh all',
+    [LocalizationKey.NextRoomQuestion]: 'Next question',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -442,5 +444,6 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.RoomInvitesLoading]: 'Загрузка приглашений в комнату',
     [LocalizationKey.Invitations]: 'Приглашения',
     [LocalizationKey.RefreshAll]: 'Обновить все',
+    [LocalizationKey.NextRoomQuestion]: 'Следующий вопрос',
   },
 }

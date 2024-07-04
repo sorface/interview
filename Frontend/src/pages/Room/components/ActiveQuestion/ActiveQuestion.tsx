@@ -65,6 +65,7 @@ export const ActiveQuestion: FunctionComponent<ActiveQuestionProps> = ({
         type: QuestionType.Private,
         categoryId: '',
       },
+      order: 0,
     });
   }, [room, createRoomQuestion]);
 

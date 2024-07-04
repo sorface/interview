@@ -6,6 +6,9 @@ import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 
 import './ActiveQuestionSelector.css';
 
+const sortOption = (option1: RoomQuestion, option2: RoomQuestion) =>
+  option1.order - option2.order;
+
 export interface ActiveQuestionSelectorProps {
   initialQuestionText?: string;
   placeHolder: string;
@@ -107,41 +110,50 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   };
 
   return (
-    <div className="activeQuestionSelector-container">
-      <div ref={inputRef} onClick={handleInputClick} className="activeQuestionSelector-input">
-        <div className="activeQuestionSelector-selected-value">{getDisplay()}</div>
-        <div className="activeQuestionSelector-tools">
-          <div className="activeQuestionSelector-tool">
-            <OpenIcon sizeRem={1.5} />
+    <>
+      <div className="activeQuestionSelector-container">
+        <div ref={inputRef} onClick={handleInputClick} className="activeQuestionSelector-input">
+          <div className="activeQuestionSelector-selected-value">{getDisplay()}</div>
+          <div className="activeQuestionSelector-tools">
+            <div className="activeQuestionSelector-tool">
+              <OpenIcon sizeRem={1.5} />
+            </div>
           </div>
         </div>
+        {showMenu && (
+          <div className="activeQuestionSelector-menu">
+            <div ref={searchRef} className="activeQuestionSelector-search-panel">
+              <span>{localizationCaptions[LocalizationKey.ShowClosedQuestions]}</span>
+              <input type="checkbox" onClick={onShowClosedQuestions} />
+              <div className="search-box" >
+                <input onChange={onSearch} value={searchValue} />
+                {searchValue && (
+                  <button onClick={handleCreate}>{localizationCaptions[LocalizationKey.CreateQuestion]}</button>
+                )}
+              </div>
+            </div>
+            {options.length === 0 && (
+              <div className='no-questions'>{localizationCaptions[LocalizationKey.NoQuestionsSelector]}</div>
+            )}
+            {options.sort(sortOption).map((option) => (
+              <div
+                onClick={() => onItemClick(option)}
+                key={option.value}
+                className={`activeQuestionSelector-item ${!isOpened(option) && 'closed'}`}
+              >
+                {option.value}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-      {showMenu && (
-        <div className="activeQuestionSelector-menu">
-          <div ref={searchRef} className="activeQuestionSelector-search-panel">
-            <span>{localizationCaptions[LocalizationKey.ShowClosedQuestions]}</span>
-            <input type="checkbox" onClick={onShowClosedQuestions} />
-            <div className="search-box" >
-              <input onChange={onSearch} value={searchValue} />
-              {searchValue && (
-                <button onClick={handleCreate}>{localizationCaptions[LocalizationKey.CreateQuestion]}</button>
-              )}
-            </div>
-          </div>
-          {options.length === 0 && (
-            <div className='no-questions'>{localizationCaptions[LocalizationKey.NoQuestionsSelector]}</div>
-          )}
-          {options.map((option) => (
-            <div
-              onClick={() => onItemClick(option)}
-              key={option.value}
-              className={`activeQuestionSelector-item ${!isOpened(option) && 'closed'}`}
-            >
-              {option.value}
-            </div>
-          ))}
-        </div>
+      {options.length !== 0 && (
+        <button
+          onClick={() => onItemClick(options[0])}
+        >
+          {localizationCaptions[LocalizationKey.NextRoomQuestion]}
+        </button>
       )}
-    </div>
+    </>
   );
 };
