@@ -1,4 +1,3 @@
-using Interview.Domain.Categories.Page;
 using Interview.Domain.Database;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.Records.Request;
@@ -339,6 +338,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                     .ToList(),
                 Type = e.AccessType.EnumValue,
                 Timer = e.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)e.Timer.Duration.TotalSeconds, StartTime = e.Timer.ActualStartTime, },
+                ScheduledStartTime = e.ScheduleStartTime,
             })
             .FirstOrDefaultAsync(room => room.Id == roomId, cancellationToken: cancellationToken);
     }

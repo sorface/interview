@@ -1,3 +1,5 @@
+using Microsoft.Extensions.FileSystemGlobbing.Internal.Patterns;
+
 namespace Interview.Backend.Rooms;
 
 /// <summary>
@@ -18,4 +20,6 @@ public class RoomCreateApiRequest
     public HashSet<Guid> Tags { get; set; } = new();
 
     public long? Duration { get; set; }
+
+    public DateTime? ScheduleStartTime { get; set; }
 }

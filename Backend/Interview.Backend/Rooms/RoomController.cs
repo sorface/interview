@@ -138,6 +138,7 @@ public class RoomController : ControllerBase
             Examinees = request.Examinees,
             Tags = request.Tags,
             DurationSec = request.Duration,
+            ScheduleStartTime = request.ScheduleStartTime,
         };
 
         var room = await _roomService.CreateAsync(domainRequest, HttpContext.RequestAborted);
