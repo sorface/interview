@@ -18,4 +18,6 @@ public class RoomPageDetail
     public required EVRoomStatus RoomStatus { get; init; }
 
     public RoomTimerDetail? Timer { get; set; }
+
+    public DateTime? ScheduledStartTime { get; init; }
 }

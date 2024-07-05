@@ -11,7 +11,7 @@ import { createAudioAnalyser, frequencyBinCount } from './utils/createAudioAnaly
 import { limitLength } from './utils/limitLength';
 import { randomId } from './utils/randomId';
 import { Field } from '../../../../components/FieldsBlock/Field';
-import { CodeEditor } from '../CodeEditor/CodeEditor';
+import { RoomCodeEditor } from '../RoomCodeEditor/RoomCodeEditor';
 import { RoomState } from '../../../../types/room';
 import { parseWsMessage } from './utils/parseWsMessage';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
@@ -24,6 +24,7 @@ import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptio
 import { checkIsAudioStream } from './utils/checkIsAudioStream';
 import { Canvas } from '@react-three/fiber';
 import { AiAssistantExperience } from '../AiAssistant/AiAssistantExperience';
+import { CodeEditorLang } from '../../../../types/question';
 
 import './VideoChat.css';
 
@@ -41,7 +42,7 @@ interface VideoChatProps {
   lastWsMessage: MessageEvent<any> | null;
   messagesChatEnabled: boolean;
   codeEditorEnabled: boolean;
-  codeEditorLanguage: string;
+  codeEditorLanguage: CodeEditorLang;
   userVideoStream: MediaStream | null;
   userAudioStream: MediaStream | null;
   screenStream: MediaStream | null;
@@ -585,7 +586,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     }
     if (codeEditorEnabled) {
       return (
-        <CodeEditor
+        <RoomCodeEditor
           language={codeEditorLanguage}
           roomState={roomState}
           readOnly={viewerMode}

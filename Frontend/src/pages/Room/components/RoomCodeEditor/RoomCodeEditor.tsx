@@ -1,75 +1,42 @@
-import { ChangeEventHandler, FunctionComponent, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import Editor, { OnChange, OnMount } from '@monaco-editor/react';
+import { FunctionComponent, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { OnChange, OnMount } from '@monaco-editor/react';
 import { RemoteCursorManager, RemoteSelectionManager } from '@convergencelabs/monaco-collab-ext';
 import { SendMessage } from 'react-use-websocket';
-import { Theme, ThemeContext } from '../../../../context/ThemeContext';
 import { RoomState } from '../../../../types/room';
-import { LocalizationKey } from '../../../../localization';
-import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
 import { SendEventBody, roomsApiDeclaration } from '../../../../apiDeclarations';
 import { EventName } from '../../../../constants';
 import { AuthContext } from '../../../../context/AuthContext';
 import { RemoteCursor } from '@convergencelabs/monaco-collab-ext/typings/RemoteCursor';
 import { RemoteSelection } from '@convergencelabs/monaco-collab-ext/typings/RemoteSelection';
+import { CodeEditorLang } from '../../../../types/question';
+import { CodeEditor, defaultCodeEditorFontSize } from '../../../../components/CodeEditor/CodeEditor';
 
-import './CodeEditor.css';
+import './RoomCodeEditor.css';
 
 interface CursorPosition {
   lineNumber: number;
   column: number;
 }
 
-const languageOptions = [
-  'plaintext',
-  'c',
-  'cpp',
-  'csharp',
-  'css',
-  'go',
-  'html',
-  'java',
-  'javascript',
-  'kotlin',
-  'mysql',
-  'php',
-  'python',
-  'ruby',
-  'rust',
-  'sql',
-  'swift',
-  'typescript',
-  'xml',
-  'yaml',
-];
-
-const defaultLanguage = languageOptions[0];
-
-const fontSizeOptions = [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48];
+const defaultLanguage = CodeEditorLang.Plaintext;
 
 const sendCursorEventTimeout = 22;
 
-const remoteCursorClassName = 'code-editor-cursor';
-const remoteTooltipClassName = 'code-editor-tooltip';
+const remoteCursorClassName = 'room-code-editor-cursor';
+const remoteTooltipClassName = 'room-code-editor-tooltip';
 const remoteCursorColor = 'var(--active)';
 const remoteSelectionColor = 'var(--active)';
 
-const renderOptions = (options: Array<number | string>) =>
-  options.map(option => (
-    <option key={option} value={option}>
-      {option}
-    </option>
-  ));
-
-interface CodeEditorProps {
-  language: string;
+interface RoomCodeEditorProps {
+  language?: CodeEditorLang;
   roomState: RoomState | null;
   readOnly: boolean;
   lastWsMessage: MessageEvent<any> | null;
   onSendWsMessage: SendMessage;
 }
 
-export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
+export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   language,
   roomState,
   readOnly,
@@ -77,11 +44,8 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   onSendWsMessage,
 }) => {
   const auth = useContext(AuthContext);
-  const { themeInUi } = useContext(ThemeContext);
-  const localizationCaptions = useLocalizationCaptions();
   const ignoreChangeRef = useRef(false);
   const [value, setValue] = useState<string>('');
-  const [fontSize, setFontSize] = useState(22);
   const [remoteCursor, setRemoteCursor] = useState<RemoteCursor | null>(null);
   const [remoteSelection, setRemoteSelection] = useState<RemoteSelection | null>(null);
   const [cursorPosition, setCursorPosition] = useState<CursorPosition | null>(null);
@@ -133,9 +97,9 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
     el.style.height = `${height}px`;
   };
 
-  useEffect(() => {
-    dirtyChangeRemoteCursorHeight(~~(fontSize + (fontSize / 4)));
-  }, [fontSize]);
+  const handleFontSizeChange = (size: number) => {
+    dirtyChangeRemoteCursorHeight(~~(size + (size / 4)));
+  };
 
   const dirtyChangeRemoteCursorTooltip = useCallback((content: string) => {
     const el = document.querySelector(`.${remoteTooltipClassName}`) as HTMLElement;
@@ -212,7 +176,7 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
     const cursor = newRemoteCursorManager.addCursor('cursor1', remoteCursorColor, '');
     cursor.hide();
     setRemoteCursor(cursor);
-    dirtyChangeRemoteCursorHeight(fontSize);
+    dirtyChangeRemoteCursorHeight(defaultCodeEditorFontSize);
     const remoteSelectionManager = new RemoteSelectionManager({ editor: mountedEditor });
     const selection = remoteSelectionManager.addSelection('selection1', remoteSelectionColor);
     setRemoteSelection(selection);
@@ -242,11 +206,7 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
     ignoreChangeRef.current = true;
   };
 
-  const handleFontSizeChange: ChangeEventHandler<HTMLSelectElement> = (event) => {
-    setFontSize(Number(event.target.value));
-  };
-
-  const handleLanguageChange: ChangeEventHandler<HTMLSelectElement> = (event) => {
+  const handleLanguageChange = (lang: CodeEditorLang) => {
     if (!roomState) {
       console.warn('roomState not found');
       return;
@@ -254,36 +214,20 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
     sendRoomEvent({
       roomId: roomState.id,
       type: EventName.CodeEditorLanguage,
-      additionalData: { value: event.target.value },
+      additionalData: { value: lang },
     });
   };
 
   return (
-    <div className='code-editor'>
-      <div className='code-editor-tools'>
-        <span>{localizationCaptions[LocalizationKey.Language]}:</span>
-        <select className='code-editor-tools-select' value={language || defaultLanguage} onChange={handleLanguageChange}>
-          {renderOptions(languageOptions)}
-        </select>
-        <span>{localizationCaptions[LocalizationKey.FontSize]}:</span>
-        <select className='code-editor-tools-select' value={fontSize} onChange={handleFontSizeChange}>
-          {renderOptions(fontSizeOptions)}
-        </select>
-      </div>
-      <Editor
-        keepCurrentModel={true}
-        options={{
-          minimap: { enabled: false },
-          fontSize,
-          quickSuggestions: false,
-          readOnly,
-        }}
-        language={language || defaultLanguage}
-        theme={themeInUi === Theme.Dark ? 'vs-dark' : 'light'}
-        value={value}
-        onChange={handleChange}
-        onMount={handleEditorMount}
-      />
-    </div>
+    <CodeEditor
+      language={language || defaultLanguage}
+      languages={Object.values(CodeEditorLang)}
+      readOnly={readOnly}
+      value={value}
+      onMount={handleEditorMount}
+      onChange={handleChange}
+      onLanguageChange={handleLanguageChange}
+      onFontSizeChange={handleFontSizeChange}
+    />
   );
 };

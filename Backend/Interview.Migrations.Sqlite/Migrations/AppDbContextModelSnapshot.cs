@@ -600,6 +600,9 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasMaxLength(70)
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("ScheduleStartTime")
+                        .HasColumnType("TEXT");
+
                     b.Property<char>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")

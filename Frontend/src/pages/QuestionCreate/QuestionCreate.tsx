@@ -1,4 +1,4 @@
-import React, { ChangeEvent, ChangeEventHandler, FormEvent, FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
+import React, { ChangeEvent, ChangeEventHandler, FormEvent, MouseEvent, FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { CreateQuestionBody, GetCategoriesParams, UpdateQuestionBody, categoriesApiDeclaration, questionsApiDeclaration } from '../../apiDeclarations';
@@ -7,14 +7,17 @@ import { HeaderWithLink } from '../../components/HeaderWithLink/HeaderWithLink';
 import { Loader } from '../../components/Loader/Loader';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { SubmitField } from '../../components/SubmitField/SubmitField';
-import { pathnames, toastSuccessOptions } from '../../constants';
+import { IconNames, pathnames, toastSuccessOptions } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
-import { Question, QuestionType } from '../../types/question';
+import { CodeEditorLang, Question, QuestionType } from '../../types/question';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { AuthContext } from '../../context/AuthContext';
 import { checkAdmin } from '../../utils/checkAdmin';
 import { Category } from '../../types/category';
+import { Gap } from '../../components/Gap/Gap';
+import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
+import { CodeEditor } from '../../components/CodeEditor/CodeEditor';
 
 import './QuestionCreate.css';
 
@@ -54,6 +57,8 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
   const [type, setType] = useState<QuestionType>(QuestionType.Private);
   const [rootCategory, setRootCategory] = useState('');
   const [subCategory, setSubCategory] = useState('');
+  const [codeEditor, setCodeEditor] = useState<Question['codeEditor'] | null>(null);
+  const [answers, setAnswers] = useState<Question['answers']>([]);
 
   const totalLoading = loading || updatingLoading || questionLoading || rootCategoriesLoading || subCategoriesLoading;
   const totalError = error || questionError || updatingError || rootCategoriesError || subCategoriesError;
@@ -91,6 +96,8 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
       return;
     }
     setQuestionValue(question.value);
+    setCodeEditor(question.codeEditor);
+    setAnswers(question.answers);
   }, [question]);
 
   useEffect(() => {
@@ -121,8 +128,10 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
       tags: [],
       type,
       categoryId: subCategory,
+      answers,
+      codeEditor,
     });
-  }, [questionValue, type, subCategory, fetchCreateQuestion]);
+  }, [questionValue, type, subCategory, answers, codeEditor, fetchCreateQuestion]);
 
   const handleSubmitEdit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -135,9 +144,11 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
       tags: [],
       type,
       categoryId: subCategory,
+      answers,
+      codeEditor,
     });
 
-  }, [question, questionValue, type, subCategory, fetchUpdateQuestion]);
+  }, [question, questionValue, type, subCategory, answers, codeEditor, fetchUpdateQuestion]);
 
   const handleTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setType(e.target.value as QuestionType);
@@ -149,6 +160,97 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
 
   const handleSubCategoryChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
     setSubCategory(e.target.value);
+  };
+
+  const handleAddCodeEditor = (e: MouseEvent) => {
+    e.preventDefault();
+    setCodeEditor({
+      content: '',
+      lang: CodeEditorLang.Plaintext,
+    });
+  };
+
+  const handleRemoveCodeEditor = (e: MouseEvent) => {
+    e.preventDefault();
+    setCodeEditor(null);
+  };
+
+  const handleLanguageChange = (lang: CodeEditorLang) => {
+    if (!codeEditor) {
+      return;
+    }
+    setCodeEditor({
+      ...codeEditor,
+      lang,
+    });
+  };
+
+  const handleCodeEditorChange = (content: string | undefined) => {
+    if (!codeEditor) {
+      return;
+    }
+    setCodeEditor({
+      ...codeEditor,
+      content: content || '',
+    });
+  };
+
+  const handleAddQuestionAnswer = (e: MouseEvent) => {
+    e.preventDefault();
+    setAnswers([
+      ...answers,
+      {
+        id: `${Math.random()}`,
+        codeEditor: false,
+        content: '',
+        title: '',
+      },
+    ]);
+  };
+
+  const handleAnswerTitleChange = (id: string): ChangeEventHandler<HTMLInputElement> => (e) => {
+    const newAnswers = answers.map(answer => {
+      if (answer.id !== id) {
+        return answer;
+      }
+      return {
+        ...answer,
+        title: e.target.value,
+      };
+    });
+    setAnswers(newAnswers);
+  };
+
+  const handleAnswerLanguageChange = (id: string) => (lang: CodeEditorLang) => {
+    const newAnswers = answers.map(answer => {
+      if (answer.id !== id) {
+        return answer;
+      }
+      return {
+        ...answer,
+        codeEditor: lang !== CodeEditorLang.Plaintext,
+      };
+    });
+    setAnswers(newAnswers);
+  };
+
+  const handleAnswerContentChange = (id: string) => (content: string | undefined) => {
+    const newAnswers = answers.map(answer => {
+      if (answer.id !== id) {
+        return answer;
+      }
+      return {
+        ...answer,
+        content: content || '',
+      };
+    });
+    setAnswers(newAnswers);
+  };
+
+  const handleAnswerDelete = (id: string) => (e: MouseEvent) => {
+    e.preventDefault();
+    const newAnswers = answers.filter(answer => answer.id !== id);
+    setAnswers(newAnswers);
   };
 
   const renderStatus = () => {
@@ -197,6 +299,61 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
         <Field>
           <div><label htmlFor="qestionText">{localizationCaptions[LocalizationKey.QuestionText]}:</label></div>
           <input id="qestionText" name={valueFieldName} type="text" value={questionValue} onChange={handleQuestionValueChange} />
+          <Gap sizeRem={0.75} />
+          <div className='question-code-editor-controls'>
+            <button style={{ ...(codeEditor && { display: 'none' }) }} onClick={handleAddCodeEditor}>
+              <ThemedIcon name={IconNames.Add} />
+              {localizationCaptions[LocalizationKey.QuestionAddCodeEditor]}
+            </button>
+            <div style={{ ...(!codeEditor && { display: 'none' }) }}>
+              {localizationCaptions[LocalizationKey.QuestionCodeEditor]}
+            </div>
+            <button style={{ ...(!codeEditor && { display: 'none' }) }} onClick={handleRemoveCodeEditor}>
+              <ThemedIcon name={IconNames.Trash} />
+              {localizationCaptions[LocalizationKey.QuestionRemoveCodeEditor]}
+            </button>
+          </div>
+          {codeEditor && (
+            <CodeEditor
+              languages={Object.values(CodeEditorLang)}
+              language={codeEditor.lang}
+              value={codeEditor.content}
+              onLanguageChange={handleLanguageChange}
+              onChange={handleCodeEditorChange}
+            />
+          )}
+        </Field>
+        <Field>
+          <div>{localizationCaptions[LocalizationKey.QuestionAnswerOptions]}</div>
+          <Gap sizeRem={0.75} />
+          {answers.map(answer => (
+            <div key={answer.id}>
+              <div className='question-answer-controls'>
+                <input
+                  className='question-answer-name'
+                  placeholder={localizationCaptions[LocalizationKey.QuestionAnswerOptionName]}
+                  value={answer.title}
+                  onChange={handleAnswerTitleChange(answer.id)}
+                />
+                <button onClick={handleAnswerDelete(answer.id)}>
+                  <ThemedIcon name={IconNames.Trash} />
+                  {localizationCaptions[LocalizationKey.QuestionDeleteAnswerOption]}
+                </button>
+              </div>
+              <CodeEditor
+                value={answer.content}
+                language={(answer.codeEditor && codeEditor?.lang) ? codeEditor.lang : CodeEditorLang.Plaintext}
+                languages={codeEditor ? [CodeEditorLang.Plaintext, codeEditor.lang] : [CodeEditorLang.Plaintext]}
+                onLanguageChange={handleAnswerLanguageChange(answer.id)}
+                onChange={handleAnswerContentChange(answer.id)}
+              />
+            </div>
+          ))}
+          <Gap sizeRem={0.75} />
+          <button onClick={handleAddQuestionAnswer}>
+            <ThemedIcon name={IconNames.Add} />
+            {localizationCaptions[LocalizationKey.QuestionAddAnswerOption]}
+          </button>
         </Field>
         {admin && (
           <Field>

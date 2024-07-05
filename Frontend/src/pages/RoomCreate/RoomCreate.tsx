@@ -21,7 +21,18 @@ import { RoomAccessType } from '../../types/room';
 
 import './RoomCreate.css';
 
+const getFormFieldOrError = (form: FormData, fieldName: string) => {
+  const value = form.get(fieldName);
+  if (typeof value !== 'string') {
+    throw new Error(`${fieldName} field type error`);
+  }
+  return value;
+};
+
 const nameFieldName = 'roomName';
+const dateFieldName = 'roomDate';
+const startTimeFieldName = 'roomStartTime';
+const endTimeFieldName = 'roomEndTime';
 const pageNumber = 1;
 const pageSize = 30;
 
@@ -89,13 +100,19 @@ export const RoomCreate: FunctionComponent = () => {
     event.preventDefault();
     const form = event.target as HTMLFormElement;
     const data = new FormData(form);
-    const roomName = data.get(nameFieldName);
-    if (!roomName) {
-      return;
+    const roomName = getFormFieldOrError(data, nameFieldName);
+    const roomDateValue = getFormFieldOrError(data, dateFieldName);
+    const roomDateStart = new Date(roomDateValue);
+    const roomStartTime = getFormFieldOrError(data, startTimeFieldName).split(':');
+    roomDateStart.setHours(parseInt(roomStartTime[0]));
+    roomDateStart.setMinutes(parseInt(roomStartTime[1]));
+    const roomEndTime = getFormFieldOrError(data, endTimeFieldName).split(':');
+    const roomDateEnd = new Date(roomDateStart);
+    if (roomEndTime.length > 1) {
+      roomDateEnd.setHours(parseInt(roomEndTime[0]));
+      roomDateEnd.setMinutes(parseInt(roomEndTime[1]));
     }
-    if (typeof roomName !== 'string') {
-      throw new Error('qestionText field type error');
-    }
+    const duration = (roomDateEnd.getTime() - roomDateStart.getTime()) / 1000;
     fetchData({
       name: roomName,
       questions: selectedQuestions.map((question, index) => ({ id: question.id, order: index })),
@@ -103,6 +120,8 @@ export const RoomCreate: FunctionComponent = () => {
       examinees: selectedExaminees.map(user => user.id),
       tags: selectedTags.map(tag => tag.id),
       accessType: RoomAccessType.Private,
+      scheduleStartTime: roomDateStart.toISOString(),
+      duration,
     });
   }, [selectedQuestions, selectedExperts, selectedExaminees, selectedTags, fetchData]);
 
@@ -171,6 +190,20 @@ export const RoomCreate: FunctionComponent = () => {
         <Field>
           <label htmlFor="roomName">{localizationCaptions[LocalizationKey.RoomName]}:</label>
           <input id="roomName" name={nameFieldName} type="text" required />
+        </Field>
+        <Field>
+          <div>
+            <label htmlFor="roomDate">{localizationCaptions[LocalizationKey.RoomDate]}:</label>
+            <input id="roomDate" name={dateFieldName} type="date" required />
+          </div>
+          <div>
+            <label htmlFor="roomTimeStart">{localizationCaptions[LocalizationKey.RoomStartTime]}:</label>
+            <input id="roomTimeStart" name={startTimeFieldName} type="time" required />
+          </div>
+          <div>
+            <label htmlFor="roomTimeEnd">{localizationCaptions[LocalizationKey.RoomEndTime]}:</label>
+            <input id="roomTimeEnd" name={endTimeFieldName} type="time" />
+          </div>
         </Field>
         <Field>
           <TagsSelector

@@ -16,6 +16,8 @@ public sealed class RoomCreateRequest
 
     public long? DurationSec { get; set; }
 
+    public DateTime? ScheduleStartTime { get; set; }
+
     public class Question
     {
         public required Guid Id { get; init; }

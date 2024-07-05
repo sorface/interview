@@ -18,6 +18,8 @@ export interface CreateRoomBody {
   examinees: Array<User['id']>;
   tags: Array<Tag['id']>;
   accessType: RoomAccessType;
+  scheduleStartTime: string;
+  duration: number;
 }
 
 export interface SendEventBody {
@@ -141,6 +143,12 @@ export interface CreateQuestionBody {
   tags: Array<Tag['id']>
   type: QuestionType;
   categoryId: Category['id'];
+  codeEditor: Question['codeEditor'] | null;
+  answers: Array<{
+    title: string;
+    content: string;
+    codeEditor: boolean;
+  }>;
 }
 
 export interface UpdateQuestionBody extends CreateQuestionBody {
