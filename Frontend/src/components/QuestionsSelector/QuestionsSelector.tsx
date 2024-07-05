@@ -5,6 +5,7 @@ import { Paginator } from '../../components/Paginator/Paginator';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Question } from '../../types/question';
 import { QustionsSearch } from '../QustionsSearch/QustionsSearch';
+import { DragNDropListItem } from '../DragNDropList/DragNDropList';
 
 import './QuestionsSelector.css';
 
@@ -12,7 +13,7 @@ const pageSize = 10;
 const initialPageNumber = 1;
 
 interface QuestionsSelectorProps {
-  selected: Question[];
+  selected: DragNDropListItem[];
   onSelect: (question: Question) => void;
   onUnselect: (question: Question) => void;
 }

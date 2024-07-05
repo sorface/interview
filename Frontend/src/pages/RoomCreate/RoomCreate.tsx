@@ -18,6 +18,7 @@ import { Tag } from '../../types/tag';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { RoomAccessType } from '../../types/room';
+import { DragNDropList, DragNDropListItem } from '../../components/DragNDropList/DragNDropList';
 
 import './RoomCreate.css';
 
@@ -54,7 +55,7 @@ export const RoomCreate: FunctionComponent = () => {
   } = useApiMethod<Tag, CreateTagBody>(tagsApiDeclaration.createTag);
   const { process: { loading: createTagLoading, error: createTagError }, data: createdQuestionTag } = tagCreateState;
 
-  const [selectedQuestions, setSelectedQuestions] = useState<Question[]>([]);
+  const [selectedQuestions, setSelectedQuestions] = useState<DragNDropListItem[]>([]);
   const [selectedExperts, setSelectedExperts] = useState<User[]>([]);
   const [selectedExaminees, setSelectedExaminees] = useState<User[]>([]);
   const [tagsSearchValue, setTagsSearchValue] = useState('');
@@ -126,7 +127,12 @@ export const RoomCreate: FunctionComponent = () => {
   }, [selectedQuestions, selectedExperts, selectedExaminees, selectedTags, fetchData]);
 
   const handleQuestionSelect = useCallback((question: Question) => {
-    setSelectedQuestions([...selectedQuestions, question]);
+    const newSelectedQuestion: DragNDropListItem = {
+      id: question.id,
+      value: question.value,
+      order: selectedQuestions.length
+    };
+    setSelectedQuestions([...selectedQuestions, newSelectedQuestion]);
   }, [selectedQuestions]);
 
   const handleQuestionUnSelect = useCallback((question: Question) => {
@@ -220,7 +226,10 @@ export const RoomCreate: FunctionComponent = () => {
         <Field>
           <Link to={pathnames.questions}>{localizationCaptions[LocalizationKey.QuestionsPageName]}:</Link>
           <div className="items-selected">
-            {selectedQuestions.map(question => question.value).join(', ')}
+            <DragNDropList
+              items={selectedQuestions}
+              onItemsChange={setSelectedQuestions}
+            />
           </div>
           <QuestionsSelector
             selected={selectedQuestions}
