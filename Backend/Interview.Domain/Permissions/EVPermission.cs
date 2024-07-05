@@ -184,5 +184,8 @@ public enum EVPermission
 
     [Description("Find evaluation")]
     RoomQuestionEvaluationFind,
+
+    [Description("Update room questions")]
+    RoomQuestionUpdate,
 #pragma warning restore SA1602
 }

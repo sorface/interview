@@ -13,7 +13,7 @@ export interface PaginationUrlParams {
 
 export interface CreateRoomBody {
   name: string;
-  questions: Array<Question['id']>;
+  questions: Array<{ id: Question['id']; order: number; }>;
   experts: Array<User['id']>;
   examinees: Array<User['id']>;
   tags: Array<Tag['id']>;
@@ -112,6 +112,7 @@ export interface ChangeActiveQuestionBody {
 export interface CreateRoomQuestionBody {
   roomId: Room['id'];
   question: CreateQuestionBody;
+  order: number;
 }
 
 export interface GetRoomQuestionsBody {
@@ -142,6 +143,12 @@ export interface CreateQuestionBody {
   tags: Array<Tag['id']>
   type: QuestionType;
   categoryId: Category['id'];
+  codeEditor: Question['codeEditor'] | null;
+  answers: Array<{
+    title: string;
+    content: string;
+    codeEditor: boolean;
+  }>;
 }
 
 export interface UpdateQuestionBody extends CreateQuestionBody {

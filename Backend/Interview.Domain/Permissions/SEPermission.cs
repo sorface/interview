@@ -388,6 +388,13 @@ public class SEPermission : SmartEnum<SEPermission>
         "Find evaluation",
         EVPermission.RoomQuestionEvaluationFind);
 
+    public static readonly SEPermission RoomQuestionUpdate = new(
+            Guid.Parse("4F39059A-E69F-4494-9B48-54E3A6AEA2F3"),
+            "RoomQuestionUpdate",
+            "Update room questions",
+            EVPermission.RoomQuestionUpdate);
+
+
     public Guid Id { get; }
 
     public string Description { get; }

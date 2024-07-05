@@ -55,6 +55,7 @@ public class SEAvailableRoomPermission : SmartEnum<SEAvailableRoomPermission, Gu
     public static readonly SEAvailableRoomPermission RoomInviteGet = new(SEPermission.RoomInviteGet, new Guid("07DEA11A-65A4-4826-AB4F-9D2CDFAA72F3"));
 
     public static readonly SEAvailableRoomPermission RoomInviteGenerate = new(SEPermission.RoomInviteGenerate, new Guid("95F1F088-6931-4914-92C1-C1F1D7D75A18"));
+    public static readonly SEAvailableRoomPermission RoomQuestionUpdate = new(SEPermission.RoomQuestionUpdate, new Guid("BE526DEE-9C74-44BB-AF6B-1B2298FA1197"));
 
     public static readonly SEAvailableRoomPermission RoomQuestionEvaluationMerge = new(SEPermission.RoomQuestionEvaluationMerge, new Guid("0c24de0f-6fe3-4d95-81fb-e9e7542852f7"));
 

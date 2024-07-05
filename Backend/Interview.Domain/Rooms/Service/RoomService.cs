@@ -1,5 +1,3 @@
-using System.Transactions;
-using Interview.Domain.Categories;
 using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Storage;
@@ -82,8 +80,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         _db = db;
     }
 
-    public Task<IPagedList<RoomPageDetail>> FindPageAsync(
-        RoomPageDetailRequestFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public Task<IPagedList<RoomPageDetail>> FindPageAsync(RoomPageDetailRequestFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
         IQueryable<Room> queryable = _db.Rooms
             .Include(e => e.Participants)
@@ -131,8 +128,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             {
                 Id = e.Id,
                 Name = e.Name,
-                Questions = e.Questions.Select(question => question.Question)
-                    .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
+                Questions = e.Questions.OrderBy(rq => rq.Order)
+                    .Select(question => new RoomQuestionDetail { Id = question.Question!.Id, Value = question.Question.Value, Order = question.Order, })
                     .ToList(),
                 Participants = e.Participants.Select(participant =>
                         new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, })
@@ -140,6 +137,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 RoomStatus = e.Status.EnumValue,
                 Tags = e.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
                 Timer = e.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)e.Timer.Duration.TotalSeconds, StartTime = e.Timer.ActualStartTime, },
+                ScheduledStartTime = e.ScheduleStartTime,
             })
             .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
@@ -170,7 +168,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         }
 
         var questions =
-            await FindByIdsOrErrorAsync(_questionRepository, request.Questions, "questions", cancellationToken);
+            await FindByIdsOrErrorAsync(_questionRepository, request.Questions.Select(e => e.Id).ToList(), "questions", cancellationToken);
 
         var currentUserId = _currentUserAccessor.GetUserIdOrThrow();
         ICollection<Guid> requestExperts = request.Experts;
@@ -180,19 +178,29 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             requestExperts = requestExperts.Concat(new[] { currentUserId }).ToList();
         }
 
+        if (request.ScheduleStartTime is not null && DateTime.UtcNow > request.ScheduleStartTime)
+        {
+            throw new UserException("The scheduled start date must be greater than the current time");
+        }
+
         var experts = await FindByIdsOrErrorAsync(_userRepository, requestExperts, "experts", cancellationToken);
         var examinees = await FindByIdsOrErrorAsync(_userRepository, request.Examinees, "examinees", cancellationToken);
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
-        var room = new Room(name, request.AccessType) { Tags = tags, };
-        var roomQuestions = questions.Select(question =>
-            new RoomQuestion
-            {
-                Room = room,
-                Question = question,
-                State = RoomQuestionState.Open,
-                RoomId = default,
-                QuestionId = default,
-            });
+        var room = new Room(name, request.AccessType) { Tags = tags, ScheduleStartTime = request.ScheduleStartTime, };
+        var roomQuestions = questions
+            .Join(request.Questions,
+                e => e.Id,
+                e => e.Id,
+                (dbQ, requestQ) => new RoomQuestion
+                {
+                    Room = room,
+                    Question = dbQ,
+                    State = RoomQuestionState.Open,
+                    RoomId = default,
+                    QuestionId = default,
+                    Order = requestQ.Order,
+                })
+            .OrderBy(e => e.Order);
 
         room.Questions.AddRange(roomQuestions);
 
@@ -216,8 +224,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         {
             Id = room.Id,
             Name = room.Name,
-            Questions = room.Questions.Select(question => question.Question)
-                .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
+            Questions = room.Questions.OrderBy(rq => rq.Order)
+                .Select(question => new RoomQuestionDetail { Id = question.Question!.Id, Value = question.Question.Value, Order = question.Order, })
                 .ToList(),
             Participants = room.Participants.Select(participant =>
                     new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, })
@@ -225,11 +233,11 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             RoomStatus = room.Status.EnumValue,
             Tags = room.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
             Timer = room.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)room.Timer.Duration.TotalSeconds, StartTime = room.Timer.ActualStartTime, },
+            ScheduledStartTime = room.ScheduleStartTime,
         };
     }
 
-    public async Task<RoomItem> UpdateAsync(
-        Guid roomId, RoomUpdateRequest? request, CancellationToken cancellationToken = default)
+    public async Task<RoomItem> UpdateAsync(Guid roomId, RoomUpdateRequest? request, CancellationToken cancellationToken = default)
     {
         if (request is null)
         {
@@ -263,8 +271,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         };
     }
 
-    public async Task<(Room, RoomParticipant)> AddParticipantAsync(
-        Guid roomId, Guid userId, CancellationToken cancellationToken = default)
+    public async Task<(Room, RoomParticipant)> AddParticipantAsync(Guid roomId, Guid userId, CancellationToken cancellationToken = default)
     {
         var currentRoom = await _roomRepository.FindByIdAsync(roomId, cancellationToken);
         if (currentRoom is null)
@@ -294,8 +301,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return (currentRoom, participant);
     }
 
-    public async Task SendEventRequestAsync(
-        IEventRequest request, CancellationToken cancellationToken = default)
+    public async Task SendEventRequestAsync(IEventRequest request, CancellationToken cancellationToken = default)
     {
         var eventSpecification = new Spec<AppEvent>(e => e.Type == request.Type);
         var dbEvent = await _eventRepository.FindFirstOrDefaultAsync(eventSpecification, cancellationToken);
@@ -341,9 +347,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     /// <param name="roomId">Room id.</param>
     /// <param name="cancellationToken">Token.</param>
     /// <returns>Result.</returns>
-    public async Task CloseAsync(
-        Guid roomId,
-        CancellationToken cancellationToken = default)
+    public async Task CloseAsync(Guid roomId, CancellationToken cancellationToken = default)
     {
         var currentRoom = await _roomRepository.FindByIdAsync(roomId, cancellationToken);
         if (currentRoom == null)
@@ -381,9 +385,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         await _roomRepository.UpdateAsync(currentRoom, cancellationToken);
     }
 
-    public async Task<ActualRoomStateResponse> GetActualStateAsync(
-        Guid roomId,
-        CancellationToken cancellationToken = default)
+    public async Task<ActualRoomStateResponse> GetActualStateAsync(Guid roomId, CancellationToken cancellationToken = default)
     {
         var roomState =
             await _roomRepository.FindByIdDetailedAsync(roomId, ActualRoomStateResponse.Mapper, cancellationToken);
@@ -406,8 +408,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return roomState;
     }
 
-    public async Task UpsertRoomStateAsync(
-        Guid roomId, string type, string payload, CancellationToken cancellationToken = default)
+    public async Task UpsertRoomStateAsync(Guid roomId, string type, string payload, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(type))
         {
@@ -462,9 +463,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         await _roomStateRepository.DeleteAsync(state, cancellationToken);
     }
 
-    public async Task<Analytics> GetAnalyticsAsync(
-        RoomAnalyticsRequest request,
-        CancellationToken cancellationToken = default)
+    public async Task<Analytics> GetAnalyticsAsync(RoomAnalyticsRequest request, CancellationToken cancellationToken = default)
     {
         var analytics = await _roomRepository.GetAnalyticsAsync(request, cancellationToken);
 
@@ -491,9 +490,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<RoomInviteResponse>> GenerateInvitesAsync(
-        Guid roomId,
-        CancellationToken cancellationToken = default)
+    public async Task<List<RoomInviteResponse>> GenerateInvitesAsync(Guid roomId, CancellationToken cancellationToken = default)
     {
         List<RoomInviteResponse> invites = new();
 
@@ -505,9 +502,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return invites;
     }
 
-    public Task<RoomInviteResponse> GenerateInviteAsync(
-        RoomInviteGeneratedRequest roomInviteGenerated,
-        CancellationToken cancellationToken = default)
+    public Task<RoomInviteResponse> GenerateInviteAsync(RoomInviteGeneratedRequest roomInviteGenerated, CancellationToken cancellationToken = default)
     {
         return _roomInviteService.GenerateAsync(
             roomInviteGenerated.RoomId,
@@ -516,8 +511,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             cancellationToken);
     }
 
-    public async Task<AnalyticsSummary> GetAnalyticsSummaryAsync(
-        RoomAnalyticsRequest request, CancellationToken cancellationToken = default)
+    public async Task<AnalyticsSummary> GetAnalyticsSummaryAsync(RoomAnalyticsRequest request, CancellationToken cancellationToken = default)
     {
         var analytics = await _roomRepository.GetAnalyticsSummaryAsync(request, cancellationToken);
 
@@ -529,9 +523,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return analytics;
     }
 
-    public async Task<Dictionary<string, List<IStorageEvent>>> GetTranscriptionAsync(
-        TranscriptionRequest request,
-        CancellationToken cancellationToken = default)
+    public async Task<Dictionary<string, List<IStorageEvent>>> GetTranscriptionAsync(TranscriptionRequest request, CancellationToken cancellationToken = default)
     {
         await EnsureParticipantTypeAsync(request.RoomId, request.UserId, cancellationToken);
         var response = new Dictionary<string, List<IStorageEvent>>();
@@ -561,10 +553,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return response;
     }
 
-    public async Task<RoomInviteResponse> ApplyInvite(
-        Guid roomId,
-        Guid? invite,
-        CancellationToken cancellationToken = default)
+    public async Task<RoomInviteResponse> ApplyInvite(Guid roomId, Guid? invite, CancellationToken cancellationToken = default)
     {
         var roomSpec = new Spec<Room>(room => room.Id == roomId);
 
@@ -623,10 +612,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         };
     }
 
-    private async Task<RoomParticipant> EnsureParticipantTypeAsync(
-        Guid roomId,
-        Guid userId,
-        CancellationToken cancellationToken)
+    private async Task<RoomParticipant> EnsureParticipantTypeAsync(Guid roomId, Guid userId, CancellationToken cancellationToken)
     {
         var participantType =
             await _roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(roomId, userId, cancellationToken);
@@ -646,11 +632,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return string.Join(", ", notFoundEntityIds);
     }
 
-    private async Task<List<T>> FindByIdsOrErrorAsync<T>(
-        IRepository<T> repository,
-        ICollection<Guid> ids,
-        string entityName,
-        CancellationToken cancellationToken)
+    private async Task<List<T>> FindByIdsOrErrorAsync<T>(IRepository<T> repository, ICollection<Guid> ids, string entityName, CancellationToken cancellationToken)
         where T : Entity
     {
         var entities = await repository.FindByIdsAsync(ids, cancellationToken);

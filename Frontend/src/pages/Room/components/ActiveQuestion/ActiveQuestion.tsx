@@ -64,7 +64,10 @@ export const ActiveQuestion: FunctionComponent<ActiveQuestionProps> = ({
         tags: [],
         type: QuestionType.Private,
         categoryId: '',
+        answers: [],
+        codeEditor: null,
       },
+      order: 0,
     });
   }, [room, createRoomQuestion]);
 

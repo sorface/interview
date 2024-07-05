@@ -39,6 +39,7 @@ import { Invitations } from './components/Invitations/Invitations';
 import { UserType } from '../../types/user';
 import { useEventsState } from './hooks/useEventsState';
 import { RoomTimer } from './components/RoomTimer/RoomTimer';
+import { CodeEditorLang } from '../../types/question';
 
 import './Room.css';
 
@@ -171,7 +172,7 @@ export const Room: FunctionComponent = () => {
   const roomTimer = wsRoomTimer || room?.timer;
   const eventsState = useEventsState({ roomState, lastWsMessage: lastMessage });
   const codeEditorEnabled = !!eventsState[EventName.CodeEditor];
-  const codeEditorLanguage = String(eventsState[EventName.CodeEditorLanguage]);
+  const codeEditorLanguage = String(eventsState[EventName.CodeEditorLanguage]) as CodeEditorLang;
 
   const currentUserExpert = roomParticipant?.userType === 'Expert';
   const currentUserExaminee = roomParticipant?.userType === 'Examinee';

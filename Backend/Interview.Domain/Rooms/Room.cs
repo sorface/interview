@@ -27,6 +27,8 @@ public class Room : Entity
 
     public string Name { get; internal set; }
 
+    public DateTime? ScheduleStartTime { get; internal set; }
+
     public SERoomAccessType AccessType { get; internal set; }
 
     public SERoomStatus Status { get; internal set; }

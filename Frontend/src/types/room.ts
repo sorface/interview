@@ -74,4 +74,5 @@ export interface RoomQuestion {
   id: string;
   state: RoomQuestionState;
   value: string;
+  order: number;
 }
