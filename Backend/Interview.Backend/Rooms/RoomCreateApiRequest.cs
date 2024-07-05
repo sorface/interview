@@ -20,4 +20,6 @@ public class RoomCreateApiRequest
     public HashSet<Guid> Tags { get; set; } = new();
 
     public long? Duration { get; set; }
+
+    public DateTime? ScheduleStartTime { get; set; }
 }
