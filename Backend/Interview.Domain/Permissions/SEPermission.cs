@@ -394,7 +394,6 @@ public class SEPermission : SmartEnum<SEPermission>
             "Update room questions",
             EVPermission.RoomQuestionUpdate);
 
-
     public Guid Id { get; }
 
     public string Description { get; }

@@ -19,5 +19,4 @@ public class RoomQuestion : Entity
     public List<RoomQuestionEvaluation> Evaluations { get; set; } = new();
 
     public required int Order { get; set; }
-
 }
