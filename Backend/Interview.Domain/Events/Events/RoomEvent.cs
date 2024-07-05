@@ -1,5 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using Interview.Domain.Events.Sender;
+using Interview.Domain.Rooms.RoomParticipants;
 
 namespace Interview.Domain.Events.Events;
 
@@ -28,6 +31,9 @@ public class RoomEvent<T> : IRoomEvent<T>
     public bool Stateful { get; }
 
     public DateTime CreatedAt { get; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
+    public virtual IRoomEventFilter Filter { get; init; } = new EmptyRoomEventFilter();
 
     public T? Value { get; }
 
@@ -65,4 +71,14 @@ public class RoomEvent<T> : IRoomEvent<T>
 
         return JsonSerializer.Serialize(Value);
     }
+}
+
+public interface IRoomEventFilter
+{
+    bool Satisfy(IConnectionDetail detail);
+}
+
+public class EmptyRoomEventFilter : IRoomEventFilter
+{
+    public bool Satisfy(IConnectionDetail detail) => true;
 }

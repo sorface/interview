@@ -1,3 +1,4 @@
+using Interview.Domain.Events.Sender;
 using Interview.Domain.Rooms.RoomParticipants;
 
 namespace Interview.Backend.WebSocket.Events.ConnectionListener;
@@ -9,4 +10,4 @@ public interface IConnectionListener
     Task OnDisconnectAsync(WebSocketConnectDetail detail, CancellationToken cancellationToken);
 }
 
-public record WebSocketConnectDetail(System.Net.WebSockets.WebSocket WebSocket, Room Room, User User, EVRoomParticipantType ParticipantType);
+public record WebSocketConnectDetail(System.Net.WebSockets.WebSocket WebSocket, Room Room, User User, EVRoomParticipantType ParticipantType) : IConnectionDetail;

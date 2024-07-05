@@ -1,3 +1,5 @@
+using Interview.Domain.Rooms.RoomParticipants;
+
 namespace Interview.Domain.Events.Events;
 
 public interface IRoomEvent
@@ -11,6 +13,8 @@ public interface IRoomEvent
     bool Stateful { get; }
 
     DateTime CreatedAt { get; }
+
+    IRoomEventFilter Filter { get; }
 
     string? BuildStringPayload();
 }

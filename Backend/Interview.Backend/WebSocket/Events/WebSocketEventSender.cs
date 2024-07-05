@@ -1,5 +1,6 @@
 using System.Net.WebSockets;
 using System.Text;
+using Interview.Backend.WebSocket.Events.ConnectionListener;
 using Interview.Domain.Events.Sender;
 
 namespace Interview.Backend.WebSocket.Events;
@@ -33,5 +34,21 @@ public class WebSocketEventSender : IEventSender
             var eventAsStr = Encoding.UTF8.GetString(@event.Span);
             _logger.LogError(e, "Send {Event}", eventAsStr);
         }
+    }
+}
+
+public class WebSocketEventSenderFactory : IEventSenderFactory
+{
+    private ILogger<WebSocketEventSender> _logger;
+
+    public WebSocketEventSenderFactory(ILogger<WebSocketEventSender> logger)
+    {
+        _logger = logger;
+    }
+
+    public IEventSender Create(IConnectionDetail connectionDetail)
+    {
+        var webSocket = ((WebSocketConnectDetail)connectionDetail).WebSocket;
+        return new WebSocketEventSender(_logger, webSocket);
     }
 }

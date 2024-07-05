@@ -17,6 +17,7 @@ public class EventSenderJob : BackgroundService
     private readonly IRoomEventSerializer _roomEventSerializer;
     private readonly ILogger<WebSocketEventSender> _webSocketEventSender;
     private readonly IEventSenderAdapter _eventSenderAdapter;
+    private readonly IEventSenderFactory _eventSenderFactory;
 
     public EventSenderJob(
         IRoomEventDispatcher roomEventDispatcher,
@@ -25,7 +26,8 @@ public class EventSenderJob : BackgroundService
         IRoomEventSerializer roomEventSerializer,
         IServiceScopeFactory scopeFactory,
         ILogger<WebSocketEventSender> webSocketEventSender,
-        IEventSenderAdapter eventSenderAdapter)
+        IEventSenderAdapter eventSenderAdapter,
+        IEventSenderFactory eventSenderFactory)
     {
         _roomEventDispatcher = roomEventDispatcher;
         _webSocketConnectionSource = webSocketConnectionSource;
@@ -34,6 +36,7 @@ public class EventSenderJob : BackgroundService
         _scopeFactory = scopeFactory;
         _webSocketEventSender = webSocketEventSender;
         _eventSenderAdapter = eventSenderAdapter;
+        _eventSenderFactory = eventSenderFactory;
     }
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -120,7 +123,7 @@ public class EventSenderJob : BackgroundService
     private async Task ProcessEventAsync(
         IRoomEvent currentEvent,
         List<IRoomEvent> statefulEvents,
-        IReadOnlyCollection<System.Net.WebSockets.WebSocket> subscribers,
+        IReadOnlyCollection<WebSocketConnectDetail> subscribers,
         CancellationToken cancellationToken)
     {
         if (currentEvent.Stateful)
@@ -130,9 +133,10 @@ public class EventSenderJob : BackgroundService
 
         var provider = new CachedRoomEventProvider(currentEvent, _roomEventSerializer);
         _logger.LogDebug("Start sending {@Event}", currentEvent);
-        await Parallel.ForEachAsync(subscribers, cancellationToken, async (entry, token) =>
+        var destSubscribers = subscribers.Where(e => currentEvent.Filter.Satisfy(e));
+        await Parallel.ForEachAsync(destSubscribers, cancellationToken, async (entry, token) =>
         {
-            var sender = new WebSocketEventSender(_webSocketEventSender, entry);
+            var sender = _eventSenderFactory.Create(entry);
             await _eventSenderAdapter.SendAsync(provider, sender, token);
         });
     }

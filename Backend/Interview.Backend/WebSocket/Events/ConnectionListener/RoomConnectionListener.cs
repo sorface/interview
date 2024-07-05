@@ -72,7 +72,7 @@ public class RoomConnectionListener : IActiveRoomSource, IConnectionListener, IW
             });
     }
 
-    public bool TryGetConnections(Guid roomId, [NotNullWhen(true)] out IReadOnlyCollection<System.Net.WebSockets.WebSocket>? connections)
+    public bool TryGetConnections(Guid roomId, [NotNullWhen(true)] out IReadOnlyCollection<WebSocketConnectDetail>? connections)
     {
         if (!_activeRooms.TryGetValue(roomId, out var details) || details.Count == 0)
         {
@@ -80,7 +80,7 @@ public class RoomConnectionListener : IActiveRoomSource, IConnectionListener, IW
             return false;
         }
 
-        connections = details.Select(e => e.WebSocket).ToList();
+        connections = details;
         return true;
     }
 
@@ -104,5 +104,5 @@ public interface IWebSocketConnectionSource
 {
     bool TryGetConnections(
         Guid roomId,
-        [NotNullWhen(true)] out IReadOnlyCollection<System.Net.WebSockets.WebSocket>? connections);
+        [NotNullWhen(true)] out IReadOnlyCollection<WebSocketConnectDetail>? connections);
 }
