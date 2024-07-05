@@ -1,8 +1,12 @@
+using Interview.Domain.Database;
 using Interview.Domain.Questions;
 using Interview.Domain.Questions.Services;
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms.RoomQuestions.Records;
 using Interview.Domain.Rooms.RoomQuestions.Records.Response;
+using Interview.Domain.Rooms.RoomQuestions.Services.Update;
+using Interview.Domain.ServiceResults.Success;
+using Microsoft.EntityFrameworkCore;
 using NSpecifications;
 
 namespace Interview.Domain.Rooms.RoomQuestions.Services;
@@ -10,23 +14,23 @@ namespace Interview.Domain.Rooms.RoomQuestions.Services;
 public class RoomQuestionService : IRoomQuestionService
 {
     private readonly IRoomQuestionRepository _roomQuestionRepository;
-
     private readonly IQuestionRepository _questionRepository;
-
     private readonly IRoomRepository _roomRepository;
-
     private readonly IQuestionService _questionService;
+    private readonly AppDbContext _db;
 
     public RoomQuestionService(
         IRoomQuestionRepository roomQuestionRepository,
         IRoomRepository roomRepository,
         IQuestionRepository questionRepository,
-        IQuestionService questionService)
+        IQuestionService questionService,
+        AppDbContext db)
     {
         _roomQuestionRepository = roomQuestionRepository;
         _roomRepository = roomRepository;
         _questionRepository = questionRepository;
         _questionService = questionService;
+        _db = db;
     }
 
     public async Task<RoomQuestionDetail> ChangeActiveQuestionAsync(
@@ -68,6 +72,40 @@ public class RoomQuestionService : IRoomQuestionService
             QuestionId = roomQuestion.Question!.Id,
             State = roomQuestion.State,
         };
+    }
+
+    public async Task<ServiceResult> UpdateAsync(
+        Guid roomId,
+        List<RoomQuestionUpdateRequest> request,
+        CancellationToken cancellationToken = default)
+    {
+        var hasRoom =
+            await _roomRepository.HasAsync(new Spec<Room>(room => room.Id == roomId), cancellationToken);
+
+        if (hasRoom is false)
+        {
+            throw NotFoundException.Create<Room>(roomId);
+        }
+
+        var requiredQuestions = request.Select(e => e.QuestionId).ToHashSet();
+        var dbRoomQuestions = await _db.RoomQuestions.Where(e => requiredQuestions.Contains(e.QuestionId)).ToListAsync(cancellationToken);
+        requiredQuestions.ExceptWith(dbRoomQuestions.Select(e => e.QuestionId));
+        if (requiredQuestions.Count > 0)
+        {
+            throw NotFoundException.Create<RoomQuestion>(requiredQuestions);
+        }
+
+        foreach (var (dbQuestion, order) in dbRoomQuestions.Join(
+                     request,
+                     question => question.QuestionId,
+                     e => e.QuestionId,
+                     (dbQuestion, updateRequest) => (dbQuestion: dbQuestion, Order: updateRequest.Order)))
+        {
+            dbQuestion.Order = order;
+        }
+
+        await _db.SaveChangesAsync(cancellationToken);
+        return ServiceResult.Ok();
     }
 
     /// <summary>
@@ -125,6 +163,7 @@ public class RoomQuestionService : IRoomQuestionService
             State = RoomQuestionState.Open,
             RoomId = default,
             QuestionId = default,
+            Order = request.Order,
         };
 
         await _roomQuestionRepository.CreateAsync(newRoomQuestion, cancellationToken);
@@ -150,16 +189,18 @@ public class RoomQuestionService : IRoomQuestionService
         }
 
         var states = request.States.Select(e => RoomQuestionState.FromValue((int)e)).ToList();
-
-        var specification = new Spec<RoomQuestion>(rq => rq.Room!.Id == request.RoomId && states.Contains(rq.State!));
-
-        var mapper = Mapper<RoomQuestion>.Create(rq => new { Id = rq.Question!.Id, State = rq.State, Value = rq.Question.Value, });
-        var questions = await _roomQuestionRepository.FindAsync(specification, mapper, cancellationToken);
+        var questions = await _db.RoomQuestions
+            .AsNoTracking()
+            .Where(rq => rq.Room!.Id == request.RoomId && states.Contains(rq.State!))
+            .OrderBy(e => e.Order)
+            .Select(rq => new { Id = rq.Question!.Id, State = rq.State, Value = rq.Question.Value, Order = rq.Order })
+            .ToListAsync(cancellationToken);
         return questions.ConvertAll(e => new RoomQuestionResponse
         {
             Id = e.Id,
             State = e.State!.EnumValue,
             Value = e.Value,
+            Order = e.Order,
         });
     }
 }

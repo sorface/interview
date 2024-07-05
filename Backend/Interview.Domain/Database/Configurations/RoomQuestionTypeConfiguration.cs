@@ -1,6 +1,7 @@
 using Interview.Domain.Questions;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomQuestions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Interview.Domain.Database.Configurations;
@@ -9,6 +10,8 @@ public class RoomQuestionTypeConfiguration : EntityTypeConfigurationBase<RoomQue
 {
     protected override void ConfigureCore(EntityTypeBuilder<RoomQuestion> builder)
     {
+        builder.Property(e => e.Order).HasDefaultValue(0);
+
         builder.HasOne<Room>(roomQuestion => roomQuestion.Room)
             .WithMany(room => room.Questions)
             .HasForeignKey(e => e.RoomId)

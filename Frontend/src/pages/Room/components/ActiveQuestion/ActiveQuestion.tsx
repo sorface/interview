@@ -67,6 +67,7 @@ export const ActiveQuestion: FunctionComponent<ActiveQuestionProps> = ({
         answers: [],
         codeEditor: null,
       },
+      order: 0,
     });
   }, [room, createRoomQuestion]);
 

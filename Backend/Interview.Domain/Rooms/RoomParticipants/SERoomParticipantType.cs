@@ -42,6 +42,7 @@ public sealed class SERoomParticipantType : SmartEnum<SERoomParticipantType>
         SEAvailableRoomPermission.RoomQuestionReactionCreate,
         SEAvailableRoomPermission.RoomQuestionFindGuids,
         SEAvailableRoomPermission.RoomQuestionCreate,
+        SEAvailableRoomPermission.RoomQuestionUpdate,
         SEAvailableRoomPermission.RoomQuestionChangeActiveQuestion,
         SEAvailableRoomPermission.RoomReviewCreate,
         SEAvailableRoomPermission.RoomInviteGenerate,

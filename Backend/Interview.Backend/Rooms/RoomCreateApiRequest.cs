@@ -1,4 +1,4 @@
-using Microsoft.Extensions.FileSystemGlobbing.Internal.Patterns;
+using Interview.Domain.Rooms.Records.Request;
 
 namespace Interview.Backend.Rooms;
 
@@ -11,7 +11,7 @@ public class RoomCreateApiRequest
 
     public string AccessType { get; set; } = SERoomAccessType.Public.Name;
 
-    public HashSet<Guid> Questions { get; set; } = new();
+    public HashSet<RoomCreateRequest.Question> Questions { get; set; } = new();
 
     public HashSet<Guid> Experts { get; set; } = new();
 

@@ -115,7 +115,7 @@ export const RoomCreate: FunctionComponent = () => {
     const duration = (roomDateEnd.getTime() - roomDateStart.getTime()) / 1000;
     fetchData({
       name: roomName,
-      questions: selectedQuestions.map(question => question.id),
+      questions: selectedQuestions.map((question, index) => ({ id: question.id, order: index })),
       experts: selectedExperts.map(user => user.id),
       examinees: selectedExaminees.map(user => user.id),
       tags: selectedTags.map(tag => tag.id),

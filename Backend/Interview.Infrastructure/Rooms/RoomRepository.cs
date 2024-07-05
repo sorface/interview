@@ -149,7 +149,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                 .Where(e => e.Id == roomId)
                 .Select(e => new Analytics
                 {
-                    Questions = e.Questions.Select(q => new Analytics.AnalyticsQuestion
+                    Questions = e.Questions.OrderBy(rq => rq.Order).Select(q => new Analytics.AnalyticsQuestion
                     {
                         Id = q.Question!.Id,
                         Status = q.State!.Name,
@@ -286,8 +286,8 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
             {
                 Id = e.Id,
                 Name = e.Name,
-                Questions = e.Questions.Select(question => question.Question)
-                    .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
+                Questions = e.Questions.OrderBy(rq => rq.Order)
+                    .Select(question => new RoomQuestionDetail { Id = question.Question!.Id, Value = question.Question.Value, Order = question.Order, })
                     .ToList(),
                 Participants = e.Participants.Select(participant =>
                         new RoomUserDetail

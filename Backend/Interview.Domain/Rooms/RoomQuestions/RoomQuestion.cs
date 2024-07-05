@@ -5,10 +5,6 @@ namespace Interview.Domain.Rooms.RoomQuestions;
 
 public class RoomQuestion : Entity
 {
-    public RoomQuestion()
-    {
-    }
-
     public required Guid RoomId { get; set; }
 
     public required Guid QuestionId { get; set; }
@@ -18,4 +14,6 @@ public class RoomQuestion : Entity
     public required Question? Question { get; set; }
 
     public required RoomQuestionState State { get; set; }
+
+    public required int Order { get; set; }
 }

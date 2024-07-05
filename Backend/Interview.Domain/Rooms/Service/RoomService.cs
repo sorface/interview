@@ -128,8 +128,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             {
                 Id = e.Id,
                 Name = e.Name,
-                Questions = e.Questions.Select(question => question.Question)
-                    .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
+                Questions = e.Questions.OrderBy(rq => rq.Order)
+                    .Select(question => new RoomQuestionDetail { Id = question.Question!.Id, Value = question.Question.Value, Order = question.Order, })
                     .ToList(),
                 Participants = e.Participants.Select(participant =>
                         new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, })
@@ -168,7 +168,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         }
 
         var questions =
-            await FindByIdsOrErrorAsync(_questionRepository, request.Questions, "questions", cancellationToken);
+            await FindByIdsOrErrorAsync(_questionRepository, request.Questions.Select(e => e.Id).ToList(), "questions", cancellationToken);
 
         var currentUserId = _currentUserAccessor.GetUserIdOrThrow();
         ICollection<Guid> requestExperts = request.Experts;
@@ -187,15 +187,20 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         var examinees = await FindByIdsOrErrorAsync(_userRepository, request.Examinees, "examinees", cancellationToken);
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
         var room = new Room(name, request.AccessType) { Tags = tags, ScheduleStartTime = request.ScheduleStartTime, };
-        var roomQuestions = questions.Select(question =>
-            new RoomQuestion
-            {
-                Room = room,
-                Question = question,
-                State = RoomQuestionState.Open,
-                RoomId = default,
-                QuestionId = default,
-            });
+        var roomQuestions = questions
+            .Join(request.Questions,
+                e => e.Id,
+                e => e.Id,
+                (dbQ, requestQ) => new RoomQuestion
+                {
+                    Room = room,
+                    Question = dbQ,
+                    State = RoomQuestionState.Open,
+                    RoomId = default,
+                    QuestionId = default,
+                    Order = requestQ.Order,
+                })
+            .OrderBy(e => e.Order);
 
         room.Questions.AddRange(roomQuestions);
 
@@ -219,8 +224,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         {
             Id = room.Id,
             Name = room.Name,
-            Questions = room.Questions.Select(question => question.Question)
-                .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
+            Questions = room.Questions.OrderBy(rq => rq.Order)
+                .Select(question => new RoomQuestionDetail { Id = question.Question!.Id, Value = question.Question.Value, Order = question.Order, })
                 .ToList(),
             Participants = room.Participants.Select(participant =>
                     new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, })

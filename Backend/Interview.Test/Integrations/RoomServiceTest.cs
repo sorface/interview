@@ -107,10 +107,11 @@ public class RoomServiceTest
             Question = questions[2],
             QuestionId = default,
             RoomId = default,
+            Order = 0,
         };
         appDbContext.RoomQuestions.AddRange(
-            new RoomQuestion { Room = savedRoom, State = RoomQuestionState.Open, Question = questions[0], QuestionId = default, RoomId = default },
-            new RoomQuestion { Room = savedRoom, State = RoomQuestionState.Closed, Question = questions[1], QuestionId = default, RoomId = default },
+            new RoomQuestion { Room = savedRoom, State = RoomQuestionState.Open, Question = questions[0], QuestionId = default, RoomId = default, Order = 0 },
+            new RoomQuestion { Room = savedRoom, State = RoomQuestionState.Closed, Question = questions[1], QuestionId = default, RoomId = default, Order = 0 },
             activeRoomQuestion);
 
         await appDbContext.SaveChangesAsync();
@@ -191,6 +192,7 @@ public class RoomServiceTest
                 State = RoomQuestionState.Open,
                 QuestionId = default,
                 RoomId = default,
+                Order = 0,
             },
             new()
             {
@@ -200,6 +202,7 @@ public class RoomServiceTest
                 State = RoomQuestionState.Closed,
                 QuestionId = default,
                 RoomId = default,
+                Order = 0,
             },
             new()
             {
@@ -209,6 +212,7 @@ public class RoomServiceTest
                 State = RoomQuestionState.Closed,
                 QuestionId = default,
                 RoomId = default,
+                Order = 0,
             },
             new()
             {
@@ -218,6 +222,7 @@ public class RoomServiceTest
                 State = RoomQuestionState.Active,
                 QuestionId = default,
                 RoomId = default,
+                Order = 0,
             },
         };
         appDbContext.RoomQuestions.AddRange(roomQuestion);
@@ -538,6 +543,7 @@ public class RoomServiceTest
                 State = RoomQuestionState.Open,
                 QuestionId = default,
                 RoomId = default,
+                Order = 0,
             },
             new()
             {
@@ -547,6 +553,7 @@ public class RoomServiceTest
                 State = RoomQuestionState.Closed,
                 QuestionId = default,
                 RoomId = default,
+                Order = 0,
             },
             new()
             {
@@ -556,6 +563,7 @@ public class RoomServiceTest
                 State = RoomQuestionState.Closed,
                 QuestionId = default,
                 RoomId = default,
+                Order = 0,
             },
             new()
             {
@@ -565,6 +573,7 @@ public class RoomServiceTest
                 State = RoomQuestionState.Active,
                 QuestionId = default,
                 RoomId = default,
+                Order = 0,
             },
         };
         appDbContext.RoomQuestions.AddRange(roomQuestion);
