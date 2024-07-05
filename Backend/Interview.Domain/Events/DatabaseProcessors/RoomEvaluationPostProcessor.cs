@@ -49,28 +49,7 @@ public class RoomEvaluationPostProcessor : EntityPostProcessor<RoomQuestionEvalu
             return;
         }
 
-        if (entity.RoomQuestion.Question is null)
-        {
-            await _databaseContext.Entry(entity.RoomQuestion).Reference(roomQuestion => roomQuestion.Question).LoadAsync(cancellationToken);
-        }
-
-        if (entity.RoomQuestion.Question is null)
-        {
-            return;
-        }
-
-        if (entity.RoomQuestion.Room is null)
-        {
-            await _databaseContext.Entry(entity.RoomQuestion).Reference(roomQuestion => roomQuestion.Room).LoadAsync(cancellationToken);
-        }
-
-        if (entity.RoomQuestion.Room is null || entity.RoomQuestion.Question is null)
-        {
-            return;
-        }
-
         var @event = funcEventMapper.Invoke(entity.RoomQuestion.RoomId, entity.RoomQuestion.QuestionId);
-
         await _eventDispatcher.WriteAsync(@event, cancellationToken);
     }
 }
