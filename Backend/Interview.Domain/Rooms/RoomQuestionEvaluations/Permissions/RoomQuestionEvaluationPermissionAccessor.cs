@@ -16,11 +16,11 @@ public class RoomQuestionEvaluationPermissionAccessor : IRoomQuestionEvaluationS
         _roomQuestionEvaluationService = roomQuestionEvaluationService;
     }
 
-    public async Task<QuestionEvaluationDetail> FindByRoomIdAndQuestionId(QuestionEvaluationGetRequest request, CancellationToken cancellationToken)
+    public async Task<QuestionEvaluationDetail> FindByRoomIdAndQuestionIdAsync(QuestionEvaluationGetRequest request, CancellationToken cancellationToken)
     {
         await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomQuestionEvaluationFind, cancellationToken);
 
-        return await _roomQuestionEvaluationService.FindByRoomIdAndQuestionId(request, cancellationToken);
+        return await _roomQuestionEvaluationService.FindByRoomIdAndQuestionIdAsync(request, cancellationToken);
     }
 
     public async Task<QuestionEvaluationDetail> MergeAsync(QuestionEvaluationMergeRequest mergeRequest, CancellationToken cancellationToken)

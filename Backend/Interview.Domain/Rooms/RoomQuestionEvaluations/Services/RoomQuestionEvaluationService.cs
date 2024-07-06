@@ -26,7 +26,7 @@ public class RoomQuestionEvaluationService : IRoomQuestionEvaluationService
         _roomParticipantRepository = roomParticipantRepository;
     }
 
-    public async Task<QuestionEvaluationDetail> FindByRoomIdAndQuestionId(QuestionEvaluationGetRequest request, CancellationToken cancellationToken)
+    public async Task<QuestionEvaluationDetail> FindByRoomIdAndQuestionIdAsync(QuestionEvaluationGetRequest request, CancellationToken cancellationToken)
     {
         var evaluation = await FindQuestionEvaluation(request.RoomId, request.QuestionId, request.UserId, cancellationToken);
 
@@ -35,7 +35,12 @@ public class RoomQuestionEvaluationService : IRoomQuestionEvaluationService
             throw new NotFoundException($@"Evaluation not found by question id [{request.QuestionId}] and room id [{request.RoomId}]");
         }
 
-        return new QuestionEvaluationDetail(evaluation.Id) { Mark = evaluation.Mark != null ? evaluation.Mark!.Value : null, Review = evaluation.Review, };
+        return new QuestionEvaluationDetail
+        {
+            Id = evaluation.Id,
+            Mark = evaluation.Mark != null ? evaluation.Mark!.Value : null,
+            Review = evaluation.Review,
+        };
     }
 
     public async Task<QuestionEvaluationDetail> MergeAsync(QuestionEvaluationMergeRequest mergeRequest, CancellationToken cancellationToken)

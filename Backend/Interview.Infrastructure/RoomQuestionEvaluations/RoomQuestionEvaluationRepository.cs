@@ -41,7 +41,7 @@ public class RoomQuestionEvaluationRepository : EfRepository<RoomQuestionEvaluat
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task Submit(Guid roomId, Guid userId, CancellationToken cancellationToken)
+    public async Task SubmitAsync(Guid roomId, Guid userId, CancellationToken cancellationToken)
     {
         var transaction = await Db.Database.BeginTransactionAsync(cancellationToken);
 

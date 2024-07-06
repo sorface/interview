@@ -5,7 +5,7 @@ namespace Interview.Domain.Rooms.RoomQuestionEvaluations.Services;
 
 public interface IRoomQuestionEvaluationService : IService
 {
-    public Task<QuestionEvaluationDetail> FindByRoomIdAndQuestionId(QuestionEvaluationGetRequest request, CancellationToken cancellationToken);
+    public Task<QuestionEvaluationDetail> FindByRoomIdAndQuestionIdAsync(QuestionEvaluationGetRequest request, CancellationToken cancellationToken);
 
     public Task<QuestionEvaluationDetail> MergeAsync(QuestionEvaluationMergeRequest mergeRequest, CancellationToken cancellationToken);
 }

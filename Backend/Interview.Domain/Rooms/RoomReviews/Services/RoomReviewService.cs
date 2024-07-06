@@ -78,7 +78,7 @@ public class RoomReviewService : IRoomReviewService
         var roomReview = new RoomReview(user, room, SERoomReviewState.Open) { Review = request.Review, };
 
         await _roomReviewRepository.CreateAsync(roomReview, cancellationToken);
-        await _roomQuestionEvaluationRepository.Submit(room.Id, user.Id, cancellationToken);
+        await _roomQuestionEvaluationRepository.SubmitAsync(room.Id, user.Id, cancellationToken);
 
         return RoomReviewDetailMapper.Instance.Map(roomReview);
     }

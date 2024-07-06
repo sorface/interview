@@ -2,12 +2,7 @@ namespace Interview.Domain.Rooms.RoomQuestionEvaluations.Records.Response;
 
 public class QuestionEvaluationDetail
 {
-    public QuestionEvaluationDetail(Guid id)
-    {
-        Id = id;
-    }
-
-    public Guid Id { get; }
+    public required Guid Id { get; init; }
 
     public int? Mark { get; set; }
 

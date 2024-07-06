@@ -4,19 +4,19 @@ namespace Interview.Domain.Rooms.RoomQuestionEvaluations;
 
 public class SERoomQuestionEvaluationState : SmartEnum<SERoomQuestionEvaluationState>
 {
-    public static readonly SERoomQuestionEvaluationState Draft = new("Draft", 0, EVRoomQuestionEvaluationState.Draft);
-    public static readonly SERoomQuestionEvaluationState Submitted = new("Submitted", 1, EVRoomQuestionEvaluationState.Submitted);
+    public static readonly SERoomQuestionEvaluationState Draft = new("Draft", EVRoomQuestionEvaluationState.Draft);
+    public static readonly SERoomQuestionEvaluationState Submitted = new("Submitted", EVRoomQuestionEvaluationState.Submitted);
 
     public EVRoomQuestionEvaluationState EnumValue { get; }
 
-    private SERoomQuestionEvaluationState(string name, int value, EVRoomQuestionEvaluationState enumValue)
-        : base(name, value)
+    private SERoomQuestionEvaluationState(string name, EVRoomQuestionEvaluationState enumValue)
+        : base(name, (int)enumValue)
     {
         EnumValue = enumValue;
     }
 
-    public static SERoomQuestionEvaluationState? FromEnum(EVRoomQuestionEvaluationState enumValue)
+    public static SERoomQuestionEvaluationState? FromValue(EVRoomQuestionEvaluationState enumValue)
     {
-        return List.FirstOrDefault(it => it.EnumValue == enumValue);
+        return SERoomQuestionEvaluationState.FromValue((int)enumValue);
     }
 }

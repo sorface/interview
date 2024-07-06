@@ -42,7 +42,7 @@ public class RoomQuestionEvaluationController : ControllerBase
 
         var questionEvaluationGetRequest = new QuestionEvaluationGetRequest { UserId = user.Id, RoomId = request.RoomId, QuestionId = request.QuestionId, };
 
-        return await _roomQuestionEvaluationService.FindByRoomIdAndQuestionId(questionEvaluationGetRequest, HttpContext.RequestAborted);
+        return await _roomQuestionEvaluationService.FindByRoomIdAndQuestionIdAsync(questionEvaluationGetRequest, HttpContext.RequestAborted);
     }
 
     [Authorize]
