@@ -35,12 +35,7 @@ public class RoomQuestionEvaluationService : IRoomQuestionEvaluationService
             throw new NotFoundException($@"Evaluation not found by question id [{request.QuestionId}] and room id [{request.RoomId}]");
         }
 
-        return new QuestionEvaluationDetail
-        {
-            Id = evaluation.Id,
-            Mark = evaluation.Mark != null ? evaluation.Mark!.Value : null,
-            Review = evaluation.Review,
-        };
+        return new QuestionEvaluationDetail { Id = evaluation.Id, Mark = evaluation.Mark != null ? evaluation.Mark!.Value : null, Review = evaluation.Review, };
     }
 
     public async Task<QuestionEvaluationDetail> MergeAsync(QuestionEvaluationMergeRequest mergeRequest, CancellationToken cancellationToken)
@@ -80,7 +75,7 @@ public class RoomQuestionEvaluationService : IRoomQuestionEvaluationService
             await _roomQuestionEvaluationRepository.UpdateAsync(questionEvaluation, cancellationToken);
         }
 
-        return new QuestionEvaluationDetail(questionEvaluation.Id) { Mark = questionEvaluation.Mark, Review = questionEvaluation.Review, };
+        return new QuestionEvaluationDetail { Id = questionEvaluation.Id, Mark = questionEvaluation.Mark, Review = questionEvaluation.Review, };
     }
 
     private async Task<RoomQuestionEvaluation?> FindQuestionEvaluation(Guid roomId, Guid questionId, Guid userId, CancellationToken cancellationToken)
