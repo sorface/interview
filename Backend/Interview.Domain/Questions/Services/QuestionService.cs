@@ -310,6 +310,17 @@ public class QuestionService : IQuestionService
         };
     }
 
+    private static string EnsureValidQuestionValue(string value)
+    {
+        value = value?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(value) || value.Length < 3)
+        {
+            throw new UserException("Question value must be at least 3 characters long");
+        }
+
+        return value;
+    }
+
     private async Task<QuestionItem> ToQuestionItemAsync(Question entity, CancellationToken cancellationToken)
     {
         var category = entity.Category;
@@ -353,16 +364,5 @@ public class QuestionService : IQuestionService
                     Lang = entity.CodeEditor.Lang,
                 },
         };
-    }
-
-    private static string EnsureValidQuestionValue(string value)
-    {
-        value = value?.Trim() ?? string.Empty;
-        if (string.IsNullOrWhiteSpace(value) || value.Length < 3)
-        {
-            throw new UserException("Question value must be at least 3 characters long");
-        }
-
-        return value;
     }
 }

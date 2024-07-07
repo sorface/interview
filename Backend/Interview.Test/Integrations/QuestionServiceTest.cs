@@ -1,6 +1,7 @@
 using Bogus;
 using FluentAssertions;
 using Interview.Domain;
+using Interview.Domain.Categories;
 using Interview.Domain.Database;
 using Interview.Domain.Questions;
 using Interview.Domain.Questions.CodeEditors;
@@ -77,6 +78,8 @@ public class QuestionServiceTest
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
         var question = new Question(value: DefaultQuestionValue);
+        var category = new Category { Name = "Test", };
+        appDbContext.Categories.Add(category);
         appDbContext.Questions.Add(question);
         await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
@@ -85,7 +88,7 @@ public class QuestionServiceTest
         var questionEditRequest = new QuestionEditRequest
         {
             Value = DefaultQuestionValue,
-            CategoryId = null,
+            CategoryId = category.Id,
             CodeEditor = new QuestionCodeEditorEditRequest
             {
                 Content = "t",
@@ -140,6 +143,8 @@ public class QuestionServiceTest
                 }
             }
         };
+        var category = new Category { Name = "Test", };
+        appDbContext.Categories.Add(category);
         appDbContext.Questions.Add(question);
         await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
@@ -148,7 +153,7 @@ public class QuestionServiceTest
         var questionEditRequest = new QuestionEditRequest
         {
             Value = DefaultQuestionValue,
-            CategoryId = null,
+            CategoryId = category.Id,
             CodeEditor = new QuestionCodeEditorEditRequest
             {
                 Content = "t",
@@ -204,6 +209,8 @@ public class QuestionServiceTest
                 }
             }
         };
+        var category = new Category { Name = "Test", };
+        appDbContext.Categories.Add(category);
         appDbContext.Questions.Add(question);
         await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
@@ -212,7 +219,7 @@ public class QuestionServiceTest
         var questionEditRequest = new QuestionEditRequest
         {
             Value = DefaultQuestionValue,
-            CategoryId = null,
+            CategoryId = category.Id,
             CodeEditor = new QuestionCodeEditorEditRequest
             {
                 Content = "t",
@@ -280,6 +287,8 @@ public class QuestionServiceTest
                 }
             }
         };
+        var category = new Category { Name = "Test", };
+        appDbContext.Categories.Add(category);
         appDbContext.Questions.Add(question);
         await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
@@ -288,7 +297,7 @@ public class QuestionServiceTest
         var questionEditRequest = new QuestionEditRequest
         {
             Value = DefaultQuestionValue,
-            CategoryId = null,
+            CategoryId = category.Id,
             CodeEditor = null,
             NewAnswers = null,
             ExistsAnswers = null
@@ -328,6 +337,8 @@ public class QuestionServiceTest
                 }
             }
         };
+        var category = new Category { Name = "Test", };
+        appDbContext.Categories.Add(category);
         appDbContext.Questions.Add(question);
         await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
@@ -336,7 +347,7 @@ public class QuestionServiceTest
         var questionEditRequest = new QuestionEditRequest
         {
             Value = DefaultQuestionValue,
-            CategoryId = null,
+            CategoryId = category.Id,
             CodeEditor = new QuestionCodeEditorEditRequest
             {
                 Content = "t",
@@ -384,6 +395,8 @@ public class QuestionServiceTest
                 Lang = "js",
             }
         };
+        var category = new Category { Name = "Test", };
+        appDbContext.Categories.Add(category);
         appDbContext.Questions.Add(question);
         await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
@@ -392,7 +405,7 @@ public class QuestionServiceTest
         var questionEditRequest = new QuestionEditRequest
         {
             Value = DefaultQuestionValue,
-            CategoryId = null,
+            CategoryId = category.Id,
             CodeEditor = new QuestionCodeEditorEditRequest
             {
                 Content = "new2",
@@ -430,6 +443,8 @@ public class QuestionServiceTest
                 Lang = "js",
             }
         };
+        var category = new Category { Name = "Test", };
+        appDbContext.Categories.Add(category);
         appDbContext.Questions.Add(question);
         await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
@@ -438,7 +453,7 @@ public class QuestionServiceTest
         var questionEditRequest = new QuestionEditRequest
         {
             Value = DefaultQuestionValue,
-            CategoryId = null,
+            CategoryId = category.Id,
             CodeEditor = null,
             NewAnswers = null,
             ExistsAnswers = null
@@ -463,6 +478,8 @@ public class QuestionServiceTest
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
         var question = new Question(value: DefaultQuestionValue);
+        var category = new Category { Name = "Test", };
+        appDbContext.Categories.Add(category);
         appDbContext.Questions.Add(question);
         await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
@@ -471,7 +488,7 @@ public class QuestionServiceTest
         var questionEditRequest = new QuestionEditRequest
         {
             Value = DefaultQuestionValue,
-            CategoryId = null,
+            CategoryId = category.Id,
             CodeEditor = new QuestionCodeEditorEditRequest
             {
                 Content = "test",
