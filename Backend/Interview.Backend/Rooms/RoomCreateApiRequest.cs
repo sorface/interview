@@ -11,7 +11,7 @@ public class RoomCreateApiRequest
 
     public string AccessType { get; set; } = SERoomAccessType.Public.Name;
 
-    public HashSet<RoomCreateRequest.Question> Questions { get; set; } = new();
+    public List<RoomQuestionRequest> Questions { get; set; } = new();
 
     public HashSet<Guid> Experts { get; set; } = new();
 

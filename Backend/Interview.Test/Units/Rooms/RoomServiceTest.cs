@@ -58,22 +58,13 @@ public class RoomServiceTest
     [Fact(DisplayName = "Patch update of room when request name is null")]
     public async void PatchUpdateRoomWhenRequestNameIsNull()
     {
-        var roomPatchUpdateRequest = new RoomUpdateRequest { Name = null, };
+        var roomPatchUpdateRequest = new RoomUpdateRequest
+        {
+            Name = null,
+            Questions = new List<RoomQuestionRequest>(),
+        };
 
         await Assert.ThrowsAsync<UserException>(() =>
             _roomService.UpdateAsync(Guid.NewGuid(), roomPatchUpdateRequest));
-    }
-
-    [Fact(DisplayName = "Patch update of room when room not found")]
-    public async Task PatchUpdateRoomWhenRoomNotFound()
-    {
-        var roomPatchUpdateRequest = new RoomUpdateRequest { Name = "new_value_name_room", };
-        var roomId = Guid.NewGuid();
-
-        _roomRepository.Setup(repository => repository.FindByIdAsync(roomId, default))
-            .ReturnsAsync((Room?)null);
-
-        await Assert.ThrowsAsync<NotFoundException>(() =>
-            _roomService.UpdateAsync(roomId, roomPatchUpdateRequest));
     }
 }

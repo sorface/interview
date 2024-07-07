@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Interview.Domain;
 using Interview.Domain.Categories;
 using Interview.Domain.Database;
 using Interview.Domain.Events.Storage;
@@ -51,6 +52,7 @@ public class RoomServiceTest
         var roomPatchUpdateRequest = new RoomUpdateRequest
         {
             Name = "New_Value_Name_Room",
+            Questions = new List<RoomQuestionRequest>(),
         };
 
         _ = await roomService.UpdateAsync(savedRoom.Id, roomPatchUpdateRequest);
@@ -79,6 +81,7 @@ public class RoomServiceTest
         var roomPatchUpdateRequest = new RoomUpdateRequest
         {
             Name = "New_Value_Name_Room",
+            Questions = new List<RoomQuestionRequest>(),
         };
 
         _ = await roomService.UpdateAsync(savedRoom.Id, roomPatchUpdateRequest);
@@ -813,6 +816,20 @@ public class RoomServiceTest
         var actualInvites = await roomService.GetInvitesAsync(checkRoom.Id);
         actualInvites.Sort((i1, i2) => i1.InviteId.CompareTo(i2.InviteId));
         actualInvites.Should().HaveCount(expectInvites.Count).And.BeEquivalentTo(expectInvites);
+    }
+
+    [Fact(DisplayName = "Patch update of room when room not found")]
+    public async Task PatchUpdateRoomWhenRoomNotFound()
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+        var roomPatchUpdateRequest = new RoomUpdateRequest { Name = "new_value_name_room", Questions = new List<RoomQuestionRequest>(), };
+        var roomId = Guid.NewGuid();
+
+        var roomService = CreateRoomService(appDbContext);
+
+        await Assert.ThrowsAsync<NotFoundException>(() =>
+            roomService.UpdateAsync(roomId, roomPatchUpdateRequest));
     }
 
     private IEnumerable<RoomInvite> GenerateInvites(Room room)
