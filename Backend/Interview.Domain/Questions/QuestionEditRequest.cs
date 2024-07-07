@@ -13,7 +13,5 @@ public sealed class QuestionEditRequest
 
     public required QuestionCodeEditorEditRequest? CodeEditor { get; set; }
 
-    public required List<QuestionAnswerCreateRequest>? NewAnswers { get; set; }
-
-    public required HashSet<QuestionAnswerEditRequest>? ExistsAnswers { get; set; }
+    public required List<QuestionAnswerEditRequest>? Answers { get; set; }
 }

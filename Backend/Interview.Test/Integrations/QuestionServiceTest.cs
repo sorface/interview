@@ -94,16 +94,16 @@ public class QuestionServiceTest
                 Content = "t",
                 Lang = "ts"
             },
-            NewAnswers = new List<QuestionAnswerCreateRequest>
+            Answers = new List<QuestionAnswerEditRequest>
             {
                 new()
                 {
                     Content = "test content",
                     CodeEditor = codeEditor,
-                    Title = "test title"
+                    Title = "test title",
+                    Id = null
                 }
             },
-            ExistsAnswers = null
         };
         var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
         var dbQuestion = await appDbContext.Questions
@@ -159,8 +159,7 @@ public class QuestionServiceTest
                 Content = "t",
                 Lang = "ts"
             },
-            NewAnswers = null,
-            ExistsAnswers = new HashSet<QuestionAnswerEditRequest>
+            Answers = new List<QuestionAnswerEditRequest>
             {
                 new()
                 {
@@ -225,17 +224,15 @@ public class QuestionServiceTest
                 Content = "t",
                 Lang = "ts"
             },
-            NewAnswers = new List<QuestionAnswerCreateRequest>
+            Answers = new List<QuestionAnswerEditRequest>
             {
                 new()
                 {
                     Content = "new test content",
                     CodeEditor = codeEditor,
-                    Title = "new test title"
-                }
-            },
-            ExistsAnswers = new HashSet<QuestionAnswerEditRequest>
-            {
+                    Title = "new test title",
+                    Id = null
+                },
                 new()
                 {
                     Id = question.Answers[0].Id,
@@ -243,7 +240,7 @@ public class QuestionServiceTest
                     Content = "test content 1",
                     CodeEditor = !question.Answers[0].CodeEditor
                 }
-            }
+            },
         };
         var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
         var dbQuestion = await appDbContext.Questions
@@ -299,8 +296,7 @@ public class QuestionServiceTest
             Value = DefaultQuestionValue,
             CategoryId = category.Id,
             CodeEditor = null,
-            NewAnswers = null,
-            ExistsAnswers = null
+            Answers = null
         };
         var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
         var dbQuestion = await appDbContext.Questions
@@ -353,16 +349,16 @@ public class QuestionServiceTest
                 Content = "t",
                 Lang = "ts"
             },
-            NewAnswers = new List<QuestionAnswerCreateRequest>
+            Answers = new List<QuestionAnswerEditRequest>
             {
                 new()
                 {
                     Content = "new test content",
                     CodeEditor = codeEditor,
-                    Title = "new test title"
+                    Title = "new test title",
+                    Id = null
                 }
             },
-            ExistsAnswers = null
         };
         var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
         var dbQuestion = await appDbContext.Questions
@@ -411,8 +407,7 @@ public class QuestionServiceTest
                 Content = "new2",
                 Lang = "ts"
             },
-            NewAnswers = null,
-            ExistsAnswers = null
+            Answers = null
         };
         var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
         var dbQuestion = await appDbContext.Questions
@@ -455,8 +450,7 @@ public class QuestionServiceTest
             Value = DefaultQuestionValue,
             CategoryId = category.Id,
             CodeEditor = null,
-            NewAnswers = null,
-            ExistsAnswers = null
+            Answers = null
         };
         var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
         var dbQuestion = await appDbContext.Questions
@@ -494,8 +488,7 @@ public class QuestionServiceTest
                 Content = "test",
                 Lang = "js"
             },
-            NewAnswers = null,
-            ExistsAnswers = null
+            Answers = null
         };
         var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
         var dbQuestion = await appDbContext.Questions
