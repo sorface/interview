@@ -84,6 +84,18 @@ public class RoomConnectionListener : IActiveRoomSource, IConnectionListener, IW
         return true;
     }
 
+    public bool TryGetConnectionsByPredicate(Guid roomId, Func<WebSocketConnectDetail, bool> predicate, [NotNullWhen(true)] out IReadOnlyCollection<System.Net.WebSockets.WebSocket>? connections)
+    {
+        if (!_activeRooms.TryGetValue(roomId, out var details) || details.Count == 0)
+        {
+            connections = default;
+            return false;
+        }
+
+        connections = details.Where(predicate).Select(e => e.WebSocket).ToList();
+        return true;
+    }
+
     private void ConnectToTwitch(WebSocketConnectDetail detail, Guid roomId)
     {
         try

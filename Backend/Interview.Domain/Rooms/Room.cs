@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using Interview.Domain.Categories;
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Domain.Rooms.RoomInvites;

@@ -179,6 +179,12 @@ public enum EVPermission
     [Description("Get category by id")]
     GetCategoryById,
 
+    [Description("Merge evaluation")]
+    RoomQuestionEvaluationMerge,
+
+    [Description("Find evaluation")]
+    RoomQuestionEvaluationFind,
+
     [Description("Update room questions")]
     RoomQuestionUpdate,
 #pragma warning restore SA1602
