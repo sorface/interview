@@ -85,12 +85,13 @@ public class QuestionService : IQuestionService
             await _roomMembershipChecker.EnsureCurrentUserMemberOfRoomAsync(roomId.Value, cancellationToken);
         }
 
+        var value = EnsureValidQuestionValue(request.Value);
         QuestionAnswer.EnsureValid(request.Answers?.Select(e => new QuestionAnswer.Validate(e)), request.CodeEditor is not null);
         var categoryValidateResult = await Category.ValidateCategoryAsync(_db, request.CategoryId, cancellationToken);
         categoryValidateResult?.Throw();
 
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
-        var result = new Question(request.Value)
+        var result = new Question(value)
         {
             Tags = tags,
             Type = GetQuestionType(),
@@ -162,6 +163,7 @@ public class QuestionService : IQuestionService
     public async Task<QuestionItem> UpdateAsync(
         Guid id, QuestionEditRequest request, CancellationToken cancellationToken = default)
     {
+        var value = EnsureValidQuestionValue(request.Value);
         var entity = await _db.Questions
             .Include(e => e.Answers)
             .Include(e => e.CodeEditor)
@@ -232,7 +234,7 @@ public class QuestionService : IQuestionService
             }
         }
 
-        entity.Value = request.Value;
+        entity.Value = value;
         entity.CategoryId = request.CategoryId;
         entity.Tags.Clear();
         entity.Tags.AddRange(tags);
@@ -306,6 +308,17 @@ public class QuestionService : IQuestionService
             CodeEditor = null,
             Category = null,
         };
+    }
+
+    private static string EnsureValidQuestionValue(string value)
+    {
+        value = value?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(value) || value.Length < 3)
+        {
+            throw new UserException("Question value must be at least 3 characters long");
+        }
+
+        return value;
     }
 
     private async Task<QuestionItem> ToQuestionItemAsync(Question entity, CancellationToken cancellationToken)
