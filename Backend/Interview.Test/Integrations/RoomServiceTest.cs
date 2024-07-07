@@ -832,6 +832,110 @@ public class RoomServiceTest
             roomService.UpdateAsync(roomId, roomPatchUpdateRequest));
     }
 
+    [Fact]
+    public async Task Create_Room_With_Questions()
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+        var user = new User("test", "test");
+        appDbContext.Users.Add(user);
+        var question = new Question("test");
+        appDbContext.Questions.Add(question);
+        appDbContext.SaveChanges();
+        appDbContext.ChangeTracker.Clear();
+
+        var roomService = CreateRoomService(appDbContext, user);
+        var roomCreateRequest = new RoomCreateRequest
+        {
+            Questions = new List<RoomQuestionRequest>
+            {
+                new() { Id = question.Id, Order = 10 }
+            },
+            Experts = new HashSet<Guid>(),
+            Examinees = new HashSet<Guid>(),
+            Tags = new HashSet<Guid>(),
+            Name = "My room",
+            AccessType = SERoomAccessType.Public,
+        };
+
+        var createdRoom = await roomService.CreateAsync(roomCreateRequest, CancellationToken.None);
+
+        var dbRoom = await appDbContext.Rooms.Include(e => e.Questions).FirstAsync(e => e.Id == createdRoom.Id);
+
+        dbRoom.Name.Should().Be("My room");
+        dbRoom.AccessType!.Should().Be(SERoomAccessType.Public);
+        dbRoom.Questions.Should().HaveCount(1);
+        dbRoom.Questions[0].Order.Should().Be(10);
+    }
+
+    [Fact]
+    public async Task Update_Room_With_Questions()
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+        var user = new User("test", "test");
+        appDbContext.Users.Add(user);
+        var question1 = new Question("test");
+        var question2 = new Question("test 2");
+        var question3 = new Question("test 3");
+        appDbContext.Questions.AddRange(question1, question2, question3);
+        var initialRoom = new Room("My room", SERoomAccessType.Public)
+        {
+            Questions = new List<RoomQuestion>
+            {
+                new()
+                {
+                    RoomId = default,
+                    QuestionId = question1.Id,
+                    Room = null,
+                    Question = null,
+                    State = RoomQuestionState.Open,
+                    Order = 5
+                },
+                new()
+                {
+                    RoomId = default,
+                    QuestionId = question2.Id,
+                    Room = null,
+                    Question = null,
+                    State = RoomQuestionState.Open,
+                    Order = -4
+                },
+            }
+        };
+        appDbContext.Rooms.Add(initialRoom);
+        appDbContext.SaveChanges();
+        appDbContext.ChangeTracker.Clear();
+
+        var roomService = CreateRoomService(appDbContext, user);
+        var roomUpdateRequest = new RoomUpdateRequest
+        {
+            Name = "My room 2",
+            Tags = new HashSet<Guid>(),
+            Questions = new List<RoomQuestionRequest>
+            {
+                new() { Id = question2.Id, Order = 128 },
+                new() { Id = question3.Id, Order = -1000, }
+            }
+        };
+
+        var createdRoom = await roomService.UpdateAsync(initialRoom.Id, roomUpdateRequest, CancellationToken.None);
+
+        var dbRoom = await appDbContext.Rooms.Include(e => e.Questions).FirstAsync(e => e.Id == createdRoom.Id);
+
+        dbRoom.Name.Should().Be("My room 2");
+        dbRoom.AccessType!.Should().Be(SERoomAccessType.Public);
+        dbRoom.Questions.Should().HaveCount(2);
+
+        var dbLinkedQuestion2 = dbRoom.Questions.FirstOrDefault(e => e.QuestionId == question2.Id);
+        dbLinkedQuestion2.Should().NotBeNull();
+        dbLinkedQuestion2!.Order.Should().Be(128);
+
+        var dbLinkedQuestion3 = dbRoom.Questions.FirstOrDefault(e => e.QuestionId == question3.Id);
+        dbLinkedQuestion3.Should().NotBeNull();
+        dbLinkedQuestion3!.Order.Should().Be(-1000);
+    }
+
     private IEnumerable<RoomInvite> GenerateInvites(Room room)
     {
         foreach (var participantType in SERoomParticipantType.List)
@@ -841,9 +945,14 @@ public class RoomServiceTest
         }
     }
 
-    private static RoomService CreateRoomService(AppDbContext appDbContext)
+    private static RoomService CreateRoomService(AppDbContext appDbContext, User? user = null)
     {
         var userAccessor = new CurrentUserAccessor();
+        if (user is not null)
+        {
+            userAccessor.SetUser(user);
+        }
+
         var roomRepository = new RoomRepository(appDbContext); var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext), userAccessor);
         var roomService = new RoomService(
             roomRepository,
