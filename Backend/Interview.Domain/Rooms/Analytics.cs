@@ -1,37 +1,50 @@
+using Interview.Domain.Rooms.RoomQuestionEvaluations;
+
 namespace Interview.Domain.Rooms;
 
 public class Analytics
 {
-    public List<AnalyticsQuestion>? Questions { get; set; }
+    public required List<AnalyticsQuestion>? Questions { get; set; }
 
     public class AnalyticsQuestion
     {
-        public Guid Id { get; set; }
+        public required Guid Id { get; set; }
 
-        public string Value { get; set; } = string.Empty;
+        public required string Value { get; set; } = string.Empty;
 
-        public string Status { get; set; } = string.Empty;
+        public required string Status { get; set; } = string.Empty;
 
-        public List<AnalyticsUser>? Users { get; set; }
+        public required List<AnalyticsUser>? Users { get; set; }
+    }
+
+    public sealed class AnalyticsUserQuestionEvaluation
+    {
+        public required string? Review { get; set; }
+
+        public required int? Mark { get; set; }
+
+        public required EVRoomQuestionEvaluationState State { get; set; }
     }
 
     public class AnalyticsReactionSummary
     {
-        public Guid Id { get; set; }
+        public required Guid Id { get; set; }
 
-        public string Type { get; set; } = string.Empty;
+        public required string Type { get; set; } = string.Empty;
 
-        public int Count { get; set; }
+        public required int Count { get; set; }
     }
 
     public class AnalyticsUser
     {
-        public Guid Id { get; set; }
+        public required Guid Id { get; set; }
 
-        public string Nickname { get; set; } = string.Empty;
+        public required string Nickname { get; set; } = string.Empty;
 
-        public string Avatar { get; set; } = string.Empty;
+        public required string Avatar { get; set; } = string.Empty;
 
-        public string ParticipantType { get; set; } = string.Empty;
+        public required string ParticipantType { get; set; } = string.Empty;
+
+        public required List<AnalyticsUserQuestionEvaluation> Evaluations { get; set; }
     }
 }

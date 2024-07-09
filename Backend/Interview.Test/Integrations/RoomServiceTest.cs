@@ -12,6 +12,7 @@ using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.RoomInvites;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomParticipants.Service;
+using Interview.Domain.Rooms.RoomQuestionEvaluations;
 using Interview.Domain.Rooms.RoomQuestionReactions;
 using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.Rooms.Service;
@@ -138,6 +139,57 @@ public class RoomServiceTest
         var room1 = new Room(DefaultRoomName, SERoomAccessType.Public);
 
         appDbContext.Rooms.Add(room1);
+
+        var dummyUser = new User("dummy", "dummy");
+        appDbContext.Users.Add(dummyUser);
+        appDbContext.SaveChanges();
+        var dummyRoom = new Room("test room", SERoomAccessType.Public)
+        {
+            Questions = new List<RoomQuestion>
+            {
+                new()
+                {
+                    RoomId = default,
+                    QuestionId = default,
+                    Room = null,
+                    Question = new Question("test q"),
+                    State = RoomQuestionState.Open,
+                    Order = 0,
+                    // Evaluations = new List<RoomQuestionEvaluation>
+                    // {
+                    //     new()
+                    //     {
+                    //         RoomQuestionId = default,
+                    //         CreatedBy = dummyUser,
+                    //         Review = "dummy 2",
+                    //         Mark = 2
+                    //     },
+                    // }
+                },
+                new()
+                {
+                    RoomId = default,
+                    QuestionId = default,
+                    Room = null,
+                    Question = new Question("test q 2"),
+                    State = RoomQuestionState.Active,
+                    Order = 0,
+                    // Evaluations = new List<RoomQuestionEvaluation>
+                    // {
+                    //     new()
+                    //     {
+                    //         RoomQuestionId = default,
+                    //         CreatedBy = dummyUser,
+                    //         Review = "dummy 1",
+                    //         Mark = 1
+                    //     },
+                    // }
+                },
+            },
+        };
+        dummyRoom.Participants.Add(new RoomParticipant(dummyUser, dummyRoom, SERoomParticipantType.Expert));
+
+        appDbContext.Rooms.Add(dummyRoom);
         appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", SERoomAccessType.Public));
 
         var questions = new Question[]
@@ -247,6 +299,27 @@ public class RoomServiceTest
             },
         };
         appDbContext.RoomParticipants.AddRange(roomParticipants);
+
+        var roomQuestionEvaluation = new RoomQuestionEvaluation[]
+        {
+            new()
+            {
+                RoomQuestionId = roomQuestion[1].Id,
+                CreatedById = users[1].Id,
+                Mark = 5,
+                Review = "test",
+                State = SERoomQuestionEvaluationState.Submitted,
+            },
+            new()
+            {
+                RoomQuestionId = roomQuestion[0].Id,
+                CreatedById = users[3].Id,
+                Mark = 10,
+                Review = "test test",
+                State = SERoomQuestionEvaluationState.Draft,
+            },
+        };
+        appDbContext.RoomQuestionEvaluation.AddRange(roomQuestionEvaluation);
         await appDbContext.SaveChangesAsync();
 
         var like = appDbContext.Reactions.Find(ReactionType.Like.Id) ?? throw new Exception("Unexpected state");
@@ -311,21 +384,30 @@ public class RoomServiceTest
 
         var expectAnalytics = new Analytics
         {
-            Questions = new List<Analytics.AnalyticsQuestion>()
+            Questions = new List<Analytics.AnalyticsQuestion>
             {
                 new()
                 {
                     Id = questions[0].Id,
                     Value = questions[0].Value,
                     Status = RoomQuestionState.Open.Name,
-                    Users = new List<Analytics.AnalyticsUser>()
+                    Users = new List<Analytics.AnalyticsUser>
                     {
+                        new()
+                        {
+                            Id = users[0].Id,
+                            Nickname = users[0].Nickname,
+                            Avatar = users[0].Avatar ?? string.Empty,
+                            ParticipantType = SERoomParticipantType.Examinee.Name,
+                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                        },
                         new()
                         {
                             Id = users[1].Id,
                             Nickname = users[1].Nickname,
                             Avatar = users[1].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Expert.Name,
+                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
                         },
                         new()
                         {
@@ -333,6 +415,7 @@ public class RoomServiceTest
                             Nickname = users[2].Nickname,
                             Avatar = users[2].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Viewer.Name,
+                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
                         },
                         new()
                         {
@@ -340,6 +423,15 @@ public class RoomServiceTest
                             Nickname = users[3].Nickname,
                             Avatar = users[3].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Viewer.Name,
+                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>
+                            {
+                                new()
+                                {
+                                    Mark = 10,
+                                    Review = "test test",
+                                    State = EVRoomQuestionEvaluationState.Draft,
+                                }
+                            },
                         },
                     }
                 },
@@ -348,14 +440,31 @@ public class RoomServiceTest
                     Id = questions[1].Id,
                     Value = questions[1].Value,
                     Status = RoomQuestionState.Closed.Name,
-                    Users = new List<Analytics.AnalyticsUser>()
+                    Users = new List<Analytics.AnalyticsUser>
                     {
+                        new()
+                        {
+                            Id = users[0].Id,
+                            Nickname = users[0].Nickname,
+                            Avatar = users[0].Avatar ?? string.Empty,
+                            ParticipantType = SERoomParticipantType.Examinee.Name,
+                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                        },
                         new()
                         {
                             Id = users[1].Id,
                             Nickname = users[1].Nickname,
                             Avatar = users[1].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Expert.Name,
+                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>
+                            {
+                                new()
+                                {
+                                    Mark = 5,
+                                    Review = "test",
+                                    State = EVRoomQuestionEvaluationState.Submitted,
+                                },
+                            },
                         },
                         new()
                         {
@@ -363,6 +472,7 @@ public class RoomServiceTest
                             Nickname = users[2].Nickname,
                             Avatar = users[2].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Viewer.Name,
+                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
                         },
                         new()
                         {
@@ -370,11 +480,92 @@ public class RoomServiceTest
                             Nickname = users[3].Nickname,
                             Avatar = users[3].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Viewer.Name,
+                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
                         },
                     }
                 },
-                new() { Id = questions[2].Id, Value = questions[2].Value, Status = RoomQuestionState.Closed.Name, },
-                new() { Id = questions[3].Id, Value = questions[3].Value, Status = RoomQuestionState.Active.Name, }
+                new()
+                {
+                    Id = questions[2].Id,
+                    Value = questions[2].Value,
+                    Status = RoomQuestionState.Closed.Name,
+                    Users = new List<Analytics.AnalyticsUser>
+                    {
+                        new()
+                        {
+                            Id = users[0].Id,
+                            Nickname = users[0].Nickname,
+                            Avatar = users[0].Avatar ?? string.Empty,
+                            ParticipantType = SERoomParticipantType.Examinee.Name,
+                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                        },
+                        new()
+                        {
+                            Id = users[1].Id,
+                            Nickname = users[1].Nickname,
+                            Avatar = users[1].Avatar ?? string.Empty,
+                            ParticipantType = SERoomParticipantType.Expert.Name,
+                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                        },
+                        new()
+                        {
+                            Id = users[2].Id,
+                            Nickname = users[2].Nickname,
+                            Avatar = users[2].Avatar ?? string.Empty,
+                            ParticipantType = SERoomParticipantType.Viewer.Name,
+                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                        },
+                        new()
+                        {
+                            Id = users[3].Id,
+                            Nickname = users[3].Nickname,
+                            Avatar = users[3].Avatar ?? string.Empty,
+                            ParticipantType = SERoomParticipantType.Viewer.Name,
+                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                        },
+                    },
+                },
+                new()
+                {
+                    Id = questions[3].Id,
+                    Value = questions[3].Value,
+                    Status = RoomQuestionState.Active.Name,
+                    Users = new List<Analytics.AnalyticsUser>
+                    {
+                        new()
+                        {
+                            Id = users[0].Id,
+                            Nickname = users[0].Nickname,
+                            Avatar = users[0].Avatar ?? string.Empty,
+                            ParticipantType = SERoomParticipantType.Examinee.Name,
+                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                        },
+                        new()
+                        {
+                            Id = users[1].Id,
+                            Nickname = users[1].Nickname,
+                            Avatar = users[1].Avatar ?? string.Empty,
+                            ParticipantType = SERoomParticipantType.Expert.Name,
+                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                        },
+                        new()
+                        {
+                            Id = users[2].Id,
+                            Nickname = users[2].Nickname,
+                            Avatar = users[2].Avatar ?? string.Empty,
+                            ParticipantType = SERoomParticipantType.Viewer.Name,
+                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                        },
+                        new()
+                        {
+                            Id = users[3].Id,
+                            Nickname = users[3].Nickname,
+                            Avatar = users[3].Avatar ?? string.Empty,
+                            ParticipantType = SERoomParticipantType.Viewer.Name,
+                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                        },
+                    },
+                }
             }
         };
 

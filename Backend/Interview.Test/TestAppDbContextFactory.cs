@@ -21,7 +21,10 @@ public class TestAppDbContextFactory
         );
 
         var serviceCollection = new ServiceCollection()
-            .AddSingleton<IEntityPreProcessor>(new DateEntityPreProcessor(Mock.Of<ICurrentUserAccessor>(), clock));
+            .AddSingleton<IEntityPreProcessor>(new DateEntityPreProcessor(Mock.Of<ICurrentUserAccessor>(), clock)
+            {
+                TestEnv = true,
+            });
 
         var context = new AppDbContext(option.Options)
         {

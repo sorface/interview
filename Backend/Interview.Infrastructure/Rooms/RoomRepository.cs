@@ -5,6 +5,7 @@ using Interview.Domain.Rooms.Records.Response;
 using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.Records.Response.Page;
 using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Rooms.RoomQuestionEvaluations;
 using Interview.Domain.Rooms.RoomQuestionReactions;
 using Interview.Domain.Tags.Records.Response;
 using Microsoft.EntityFrameworkCore;
@@ -112,36 +113,17 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
             return null;
         }
 
-        var reactions = await GetRoomQuestionReactionAsync(request.RoomId, cancellationToken);
-        var questionReaction = reactions.ToLookup(e => e.RoomQuestion!.Question!.Id);
         foreach (var analyticsQuestion in analytics.Questions!)
         {
-            if (!questionReaction[analyticsQuestion.Id].Any())
-            {
-                continue;
-            }
-
-            analyticsQuestion.Users = await GetUsersAsync(questionReaction[analyticsQuestion.Id]);
+            analyticsQuestion.Users = await GetUsersByQuestionIdAsync(analyticsQuestion.Id, cancellationToken);
         }
 
         return analytics;
 
-        Task<List<RoomQuestionReaction>> GetRoomQuestionReactionAsync(Guid roomId, CancellationToken ct)
-        {
-            return Db.RoomQuestionReactions.AsNoTracking()
-                .Include(e => e.Sender)
-                .Include(e => e.Reaction)
-                .Include(e => e.RoomQuestion)
-                .ThenInclude(e => e!.Question)
-                .Where(e => e.RoomQuestion!.Room!.Id == roomId)
-                .ToListAsync(ct);
-        }
-
         Task<Analytics?> GetAnalyticsCoreAsync(Guid roomId, CancellationToken ct)
         {
             return Set.AsNoTracking()
-                .Include(e => e.Questions)
-                .ThenInclude(e => e.Question)
+                .Include(e => e.Questions).ThenInclude(e => e.Question)
                 .Include(e => e.Participants)
                 .Where(e => e.Id == roomId)
                 .Select(e => new Analytics
@@ -151,34 +133,32 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                         Id = q.Question!.Id,
                         Status = q.State!.Name,
                         Value = q.Question.Value,
+                        Users = null,
                     }).ToList(),
                 })
                 .FirstOrDefaultAsync(ct);
         }
 
-        async Task<List<Analytics.AnalyticsUser>> GetUsersAsync(IEnumerable<RoomQuestionReaction> roomReactions)
+        Task<List<Analytics.AnalyticsUser>> GetUsersByQuestionIdAsync(Guid questionId, CancellationToken ct)
         {
-            var users = reactions.Select(e => e.Sender!.Id).Distinct();
-
-            var participants = await Db.RoomParticipants.AsNoTracking()
+            return Db.RoomParticipants.AsNoTracking()
                 .Include(e => e.Room)
-                .Include(e => e.User)
-                .Where(e => e.Room.Id == request.RoomId && users.Contains(e.User.Id))
-                .ToDictionaryAsync(e => e.User.Id, cancellationToken);
-
-            return roomReactions
-                .GroupBy(e => e.Sender!.Id).Select(e =>
+                .Include(e => e.User).ThenInclude(e => e.RoomQuestionEvaluations.Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.RoomQuestion!.QuestionId == questionId))
+                .Where(e => e.Room.Id == request.RoomId)
+                .Select(e => new Analytics.AnalyticsUser
                 {
-                    var sender = e.First().Sender;
-                    participants.TryGetValue(sender!.Id, out var participant);
-                    return new Analytics.AnalyticsUser
+                    Id = e.User.Id,
+                    Avatar = string.Empty,
+                    Nickname = e.User.Nickname,
+                    ParticipantType = e.Type.Name ?? string.Empty,
+                    Evaluations = e.User.RoomQuestionEvaluations.Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.RoomQuestion!.QuestionId == questionId).Select(rqe => new Analytics.AnalyticsUserQuestionEvaluation
                     {
-                        Id = sender.Id,
-                        Avatar = string.Empty,
-                        Nickname = sender.Nickname,
-                        ParticipantType = participant?.Type.Name ?? string.Empty,
-                    };
-                }).ToList();
+                        Review = rqe.Review,
+                        Mark = rqe.Mark,
+                        State = rqe.State.EnumValue,
+                    }).ToList(),
+                })
+                .ToListAsync(ct);
         }
     }
 
