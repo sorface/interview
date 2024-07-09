@@ -10,6 +10,7 @@ using Interview.Domain.Repository;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomInvites;
 using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Rooms.RoomQuestionEvaluations;
 using Interview.Domain.Rooms.RoomQuestionReactions;
 using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.Rooms.RoomTimers;
@@ -78,6 +79,8 @@ public class AppDbContext : DbContext
     public DbSet<QuestionAnswer> QuestionAnswers { get; private set; } = null!;
 
     public DbSet<QuestionCodeEditor> QuestionCodeEditors { get; private set; } = null!;
+
+    public DbSet<RoomQuestionEvaluation> RoomQuestionEvaluation { get; private set; } = null!;
 
     public override int SaveChanges()
     {

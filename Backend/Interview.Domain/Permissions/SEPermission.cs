@@ -376,8 +376,19 @@ public class SEPermission : SmartEnum<SEPermission>
         "Get category by id",
         EVPermission.GetCategoryById);
 
-    public static readonly SEPermission RoomQuestionUpdate =
-        new(
+    public static readonly SEPermission RoomQuestionEvaluationMerge = new(
+        Guid.Parse("d74df965-84d3-4bcc-af1b-13f5c6299fa7"),
+        "RoomQuestionEvaluationMerge",
+        "Merge evaluation",
+        EVPermission.RoomQuestionEvaluationMerge);
+
+    public static readonly SEPermission RoomQuestionEvaluationFind = new(
+        Guid.Parse("7b231e25-446a-418c-9281-4eb453dd4893"),
+        "RoomQuestionEvaluationFind",
+        "Find evaluation",
+        EVPermission.RoomQuestionEvaluationFind);
+
+    public static readonly SEPermission RoomQuestionUpdate = new(
             Guid.Parse("4F39059A-E69F-4494-9B48-54E3A6AEA2F3"),
             "RoomQuestionUpdate",
             "Update room questions",

@@ -27,6 +27,11 @@ public class RoomTimerPostProcessor : EntityPostProcessor<Room>
         Room current,
         CancellationToken cancellationToken)
     {
+        if (original.Status == current.Status || current.Status != SERoomStatus.Active)
+        {
+            return;
+        }
+
         await _db.Entry(current).Reference(e => e.Timer).LoadAsync(cancellationToken);
 
         if (current.Timer?.ActualStartTime is null)

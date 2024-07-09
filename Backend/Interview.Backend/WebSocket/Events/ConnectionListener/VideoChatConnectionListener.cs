@@ -1,10 +1,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using System.Net.WebSockets;
-using System.Text;
 using Interview.Backend.WebSocket.Events.Handlers;
-using Interview.Domain.Events;
 using Interview.Domain.Events.Events;
 using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Events.Sender;

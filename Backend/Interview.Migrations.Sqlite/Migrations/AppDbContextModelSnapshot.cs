@@ -480,6 +480,20 @@ namespace Interview.Migrations.Sqlite.Migrations
                         },
                         new
                         {
+                            Id = new Guid("49cb7cd3-7329-4098-9ac1-c3972ba09138"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("7b231e25-446a-418c-9281-4eb453dd4893"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("0c24de0f-6fe3-4d95-81fb-e9e7542852f7"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("d74df965-84d3-4bcc-af1b-13f5c6299fa7"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
                             Id = new Guid("369f0b92-915c-4334-bdac-6e82fb3c0c74"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("150f05e3-8d73-45e9-8ecd-6187f7b96461"),
@@ -717,6 +731,45 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("RoomParticipants");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Rooms.RoomQuestionEvaluations.RoomQuestionEvaluation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CreatedById")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("Mark")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Review")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("RoomQuestionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("RoomQuestionId", "CreatedById");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("RoomQuestionEvaluation", (string)null);
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.RoomQuestionReactions.RoomQuestionReaction", b =>
@@ -1227,6 +1280,20 @@ namespace Interview.Migrations.Sqlite.Migrations
                             Id = new Guid("a115f072-638a-4472-8cc3-4cf04da67cfc"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "RoomQuestionCreate",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("7b231e25-446a-418c-9281-4eb453dd4893"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "RoomQuestionEvaluationFind",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("d74df965-84d3-4bcc-af1b-13f5c6299fa7"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "RoomQuestionEvaluationMerge",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -1747,6 +1814,25 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Rooms.RoomQuestionEvaluations.RoomQuestionEvaluation", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Interview.Domain.Rooms.RoomQuestions.RoomQuestion", "RoomQuestion")
+                        .WithMany("Evaluations")
+                        .HasForeignKey("RoomQuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("RoomQuestion");
+                });
+
             modelBuilder.Entity("Interview.Domain.Rooms.RoomQuestionReactions.RoomQuestionReaction", b =>
                 {
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
@@ -1990,6 +2076,11 @@ namespace Interview.Migrations.Sqlite.Migrations
             modelBuilder.Entity("Interview.Domain.Rooms.RoomParticipants.RoomParticipant", b =>
                 {
                     b.Navigation("Permissions");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Rooms.RoomQuestions.RoomQuestion", b =>
+                {
+                    b.Navigation("Evaluations");
                 });
 #pragma warning restore 612, 618
         }

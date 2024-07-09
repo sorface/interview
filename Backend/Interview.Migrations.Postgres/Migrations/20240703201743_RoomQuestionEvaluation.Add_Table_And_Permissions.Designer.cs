@@ -3,6 +3,7 @@ using System;
 using Interview.Domain.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Interview.Migrations.Postgres.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240703201743_RoomQuestionEvaluation.Add_Table_And_Permissions")]
+    partial class RoomQuestionEvaluationAdd_Table_And_Permissions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -513,13 +516,6 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
-                            Id = new Guid("be526dee-9c74-44bb-af6b-1b2298fa1197"),
-                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            PermissionId = new Guid("4f39059a-e69f-4494-9b48-54e3a6aea2f3"),
-                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
                             Id = new Guid("bd3496e3-6e57-447e-a7df-744efff03de5"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("5f088b45-704f-4f61-b4c5-05bd08b80303"),
@@ -618,9 +614,6 @@ namespace Interview.Migrations.Postgres.Migrations
                         .IsRequired()
                         .HasMaxLength(70)
                         .HasColumnType("character varying(70)");
-
-                    b.Property<DateTime?>("ScheduleStartTime")
-                        .HasColumnType("timestamp without time zone");
 
                     b.Property<char>("Status")
                         .ValueGeneratedOnAdd()
@@ -828,11 +821,6 @@ namespace Interview.Migrations.Postgres.Migrations
 
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("uuid");
-
-                    b.Property<int>("Order")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
 
                     b.Property<Guid>("QuestionId")
                         .HasColumnType("uuid");
@@ -1313,13 +1301,6 @@ namespace Interview.Migrations.Postgres.Migrations
                             Id = new Guid("1bb49aa7-1305-427c-9523-e9687392d385"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "RoomQuestionReactionCreate",
-                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = new Guid("4f39059a-e69f-4494-9b48-54e3a6aea2f3"),
-                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Type = "RoomQuestionUpdate",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
