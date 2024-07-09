@@ -326,21 +326,6 @@ public class RoomServiceTest
                             Nickname = users[1].Nickname,
                             Avatar = users[1].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Expert.Name,
-                            Reactions = new List<Analytics.AnalyticsReaction>()
-                            {
-                                new()
-                                {
-                                    Id = ReactionType.Like.Id,
-                                    Type = ReactionType.Like.Name,
-                                    CreatedAt = like.CreateDate
-                                },
-                                new()
-                                {
-                                    Id = ReactionType.Like.Id,
-                                    Type = ReactionType.Like.Name,
-                                    CreatedAt = like.CreateDate
-                                },
-                            },
                         },
                         new()
                         {
@@ -348,15 +333,6 @@ public class RoomServiceTest
                             Nickname = users[2].Nickname,
                             Avatar = users[2].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Viewer.Name,
-                            Reactions = new List<Analytics.AnalyticsReaction>()
-                            {
-                                new()
-                                {
-                                    Id = ReactionType.Like.Id,
-                                    Type = ReactionType.Like.Name,
-                                    CreatedAt = like.CreateDate
-                                },
-                            },
                         },
                         new()
                         {
@@ -364,15 +340,6 @@ public class RoomServiceTest
                             Nickname = users[3].Nickname,
                             Avatar = users[3].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Viewer.Name,
-                            Reactions = new List<Analytics.AnalyticsReaction>()
-                            {
-                                new()
-                                {
-                                    Id = ReactionType.Dislike.Id,
-                                    Type = ReactionType.Dislike.Name,
-                                    CreatedAt = dislike.CreateDate
-                                },
-                            },
                         },
                     }
                 },
@@ -389,15 +356,6 @@ public class RoomServiceTest
                             Nickname = users[1].Nickname,
                             Avatar = users[1].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Expert.Name,
-                            Reactions = new List<Analytics.AnalyticsReaction>()
-                            {
-                                new()
-                                {
-                                    Id = ReactionType.Dislike.Id,
-                                    Type = ReactionType.Dislike.Name,
-                                    CreatedAt = dislike.CreateDate
-                                },
-                            },
                         },
                         new()
                         {
@@ -405,15 +363,6 @@ public class RoomServiceTest
                             Nickname = users[2].Nickname,
                             Avatar = users[2].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Viewer.Name,
-                            Reactions = new List<Analytics.AnalyticsReaction>()
-                            {
-                                new()
-                                {
-                                    Id = ReactionType.Like.Id,
-                                    Type = ReactionType.Like.Name,
-                                    CreatedAt = like.CreateDate
-                                },
-                            },
                         },
                         new()
                         {
@@ -421,15 +370,6 @@ public class RoomServiceTest
                             Nickname = users[3].Nickname,
                             Avatar = users[3].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Viewer.Name,
-                            Reactions = new List<Analytics.AnalyticsReaction>()
-                            {
-                                new()
-                                {
-                                    Id = ReactionType.Dislike.Id,
-                                    Type = ReactionType.Dislike.Name,
-                                    CreatedAt = dislike.CreateDate
-                                },
-                            },
                         },
                     }
                 },
@@ -442,12 +382,7 @@ public class RoomServiceTest
 
         var serviceResult = analyticsResult;
         serviceResult.Should().NotBeNull();
-        serviceResult.Should().BeEquivalentTo(expectAnalytics, e =>
-            e
-                .For(e => e.Questions)
-                .For(e => e.Users)
-                .For(e => e.Reactions)
-                .Exclude(e => e.CreatedAt));
+        serviceResult.Should().BeEquivalentTo(expectAnalytics);
     }
 
     [Fact(DisplayName = "GetAnalyticsSummary should return valid analytics by roomId")]

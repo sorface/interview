@@ -177,19 +177,8 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                         Avatar = string.Empty,
                         Nickname = sender.Nickname,
                         ParticipantType = participant?.Type.Name ?? string.Empty,
-                        Reactions = ToAnalyticsReaction(e),
                     };
                 }).ToList();
-        }
-
-        static List<Analytics.AnalyticsReaction> ToAnalyticsReaction(IGrouping<Guid, RoomQuestionReaction> e)
-        {
-            return e.Select(roomQuestionReaction => new Analytics.AnalyticsReaction
-            {
-                Id = roomQuestionReaction.Reaction!.Id,
-                Type = roomQuestionReaction.Reaction.Type.Name,
-                CreatedAt = roomQuestionReaction.CreateDate,
-            }).ToList();
         }
     }
 
@@ -219,8 +208,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
         CancellationToken cancellationToken = default)
     {
         IQueryable<Room> queryable = Set
-            .Include(e => e.Participants)
-            .ThenInclude(e => e.User)
+            .Include(e => e.Participants).ThenInclude(e => e.User)
             .Include(e => e.Questions)
             .Include(e => e.Configuration)
             .Include(e => e.Tags)

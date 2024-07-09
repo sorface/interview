@@ -42,7 +42,5 @@ public class Analytics
         public string Avatar { get; set; } = string.Empty;
 
         public string ParticipantType { get; set; } = string.Empty;
-
-        public List<AnalyticsReaction>? Reactions { get; set; }
     }
 }
