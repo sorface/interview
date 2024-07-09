@@ -15,15 +15,6 @@ public class Analytics
         public List<AnalyticsUser>? Users { get; set; }
     }
 
-    public class AnalyticsReaction
-    {
-        public Guid Id { get; set; }
-
-        public string Type { get; set; } = string.Empty;
-
-        public DateTime CreatedAt { get; set; }
-    }
-
     public class AnalyticsReactionSummary
     {
         public Guid Id { get; set; }
