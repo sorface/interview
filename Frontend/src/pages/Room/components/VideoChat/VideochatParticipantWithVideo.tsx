@@ -7,7 +7,6 @@ interface VideochatParticipantWithVideoProps {
   children: ReactNode;
   avatar?: string;
   nickname?: string;
-  videoTrackEnabled?: boolean;
   reaction?: string | null;
 }
 
@@ -16,7 +15,6 @@ export const VideochatParticipantWithVideo: FunctionComponent<VideochatParticipa
   children,
   avatar,
   nickname,
-  videoTrackEnabled,
   reaction,
 }) => {
   const orderSafe = order || 2;
@@ -39,19 +37,7 @@ export const VideochatParticipantWithVideo: FunctionComponent<VideochatParticipa
         )}
         {nickname}
       </div>
-      {videoTrackEnabled === false && (
-        avatar ? (
-          <div className='avatar-wrapper-no-video'>
-            <UserAvatar
-              src={avatar}
-              nickname={nickname || ''}
-            />
-          </div>
-        ) : (
-          <div>NO VIDEO</div>
-        )
-      )}
-      <div style={{ ...(videoTrackEnabled === false && { display: 'none' }) }}>
+      <div>
         {children}
       </div>
     </div>

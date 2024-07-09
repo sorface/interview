@@ -149,7 +149,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                 .Where(e => e.Id == roomId)
                 .Select(e => new Analytics
                 {
-                    Questions = e.Questions.Select(q => new Analytics.AnalyticsQuestion
+                    Questions = e.Questions.OrderBy(rq => rq.Order).Select(q => new Analytics.AnalyticsQuestion
                     {
                         Id = q.Question!.Id,
                         Status = q.State!.Name,
@@ -286,11 +286,10 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
             {
                 Id = e.Id,
                 Name = e.Name,
-                TwitchChannel = e.TwitchChannel,
-                Questions = e.Questions.Select(question => question.Question)
-                    .Select(question => new RoomQuestionDetail { Id = question!.Id, Value = question.Value, })
+                Questions = e.Questions.OrderBy(rq => rq.Order)
+                    .Select(question => new RoomQuestionDetail { Id = question.Question!.Id, Value = question.Question.Value, Order = question.Order, })
                     .ToList(),
-                Users = e.Participants.Select(participant =>
+                Participants = e.Participants.Select(participant =>
                         new RoomUserDetail
                         {
                             Id = participant.User.Id,
@@ -309,11 +308,17 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
         return Set
             .Include(e => e.Participants)
             .Include(e => e.Configuration)
+            .Include(e => e.Timer)
             .Select(e => new RoomDetail
             {
                 Id = e.Id,
                 Name = e.Name,
-                Owner = new RoomUserDetail { Id = e.CreatedBy!.Id, Nickname = e.CreatedBy!.Nickname, Avatar = e.CreatedBy!.Avatar, },
+                Owner = new RoomUserDetail
+                {
+                    Id = e.CreatedBy!.Id,
+                    Nickname = e.CreatedBy!.Nickname,
+                    Avatar = e.CreatedBy!.Avatar,
+                },
                 Participants = e.Participants.Select(participant =>
                         new RoomUserDetail
                         {
@@ -329,8 +334,11 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                     ParticipantType = roomInvite.ParticipantType!.EnumValue,
                     Max = roomInvite.Invite!.UsesMax,
                     Used = roomInvite.Invite.UsesCurrent,
-                }).ToList(),
-                Type = e.AcсessType.EnumValue,
+                })
+                    .ToList(),
+                Type = e.AccessType.EnumValue,
+                Timer = e.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)e.Timer.Duration.TotalSeconds, StartTime = e.Timer.ActualStartTime, },
+                ScheduledStartTime = e.ScheduleStartTime,
             })
             .FirstOrDefaultAsync(room => room.Id == roomId, cancellationToken: cancellationToken);
     }

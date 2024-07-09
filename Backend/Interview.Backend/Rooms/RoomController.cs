@@ -125,12 +125,23 @@ public class RoomController : ControllerBase
     /// <returns>Created room.</returns>
     [Authorize]
     [HttpPost]
-    [ProducesResponseType(typeof(Guid), 201)]
+    [ProducesResponseType(typeof(RoomPageDetail), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Room>> Create([FromBody] RoomCreateRequest request)
+    public async Task<ActionResult<RoomPageDetail>> Create([FromBody] RoomCreateApiRequest request)
     {
-        var room = await _roomService.CreateAsync(request, HttpContext.RequestAborted);
+        var domainRequest = new RoomCreateRequest
+        {
+            Name = request.Name,
+            AccessType = SERoomAccessType.FromName(request.AccessType),
+            Questions = request.Questions,
+            Experts = request.Experts,
+            Examinees = request.Examinees,
+            Tags = request.Tags,
+            DurationSec = request.Duration,
+            ScheduleStartTime = request.ScheduleStartTime,
+        };
 
+        var room = await _roomService.CreateAsync(domainRequest, HttpContext.RequestAborted);
         return ServiceResult.Created(room).ToActionResult();
     }
 

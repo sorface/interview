@@ -4,15 +4,24 @@ public sealed class RoomCreateRequest
 {
     public string Name { get; set; } = string.Empty;
 
-    public string TwitchChannel { get; set; } = string.Empty;
+    public SERoomAccessType AccessType { get; set; } = SERoomAccessType.Public;
 
-    public string AccessType { get; set; } = SERoomAcсessType.Public.Name;
+    public required HashSet<Question> Questions { get; init; }
 
-    public HashSet<Guid> Questions { get; set; } = new();
+    public required HashSet<Guid> Experts { get; init; }
 
-    public HashSet<Guid> Experts { get; set; } = new();
+    public required HashSet<Guid> Examinees { get; init; }
 
-    public HashSet<Guid> Examinees { get; set; } = new();
+    public required HashSet<Guid> Tags { get; init; }
 
-    public HashSet<Guid> Tags { get; set; } = new();
+    public long? DurationSec { get; set; }
+
+    public DateTime? ScheduleStartTime { get; set; }
+
+    public class Question
+    {
+        public required Guid Id { get; init; }
+
+        public required int Order { get; init; }
+    }
 }

@@ -1,9 +1,4 @@
-.questions-list {
-  padding: 0px;
-  list-style-type: none;
-}
-
-.questions-list .question-item {
+.questions-page .items-grid .question-item {
   position: relative;
   display: flex;
   flex-wrap: wrap;
@@ -12,12 +7,7 @@
   align-items: stretch;
 }
 
-.questions-list .tags-view {
-  width: 100%;
-  justify-content: center;
-}
-
-.questions-list .question-controls {
+.questions-page .items-grid .question-controls {
   position: absolute;
   display: flex;
   gap: 0.5rem;
@@ -25,10 +15,10 @@
   right: 2.5rem;
 }
 
-.questions-list .question-controls button {
+.questions-page .items-grid .question-controls button {
   padding: 0rem 0.75rem;
 }
 
-.questions-list .question-item-new-value {
+.questions-page .items-grid .question-item-new-value {
   width: 80%;
 }

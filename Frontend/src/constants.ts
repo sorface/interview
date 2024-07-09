@@ -7,11 +7,14 @@ export const pathnames = {
   roomsParticipants: '/rooms/participants/:id',
   room: `/room/:id/:${inviteParamName}?`,
   roomAnalyticsSummary: '/rooms/:id/analytics/summary',
-  questions: '/questions',
+  questions: '/questions/:category',
   questionsCreate: '/questions/create',
   questionsEdit: '/questions/edit/:id',
   session: '/session',
   terms: '/terms',
+  categories: '/categories',
+  categoriesCreate: '/categories/create',
+  categoriesEdit: '/categories/edit/:id',
 };
 
 export const enum IconNames {
@@ -33,6 +36,8 @@ export const enum IconNames {
   Clipboard = 'clipboard',
   Refresh = 'refresh',
   TV = 'tv',
+  Add = 'add',
+  Trash = 'trash',
 }
 
 export const enum IconThemePostfix {
@@ -49,3 +54,9 @@ export const reactionIcon: Record<string, IconNames> = {
 export const toastSuccessOptions = {
   icon: '👌',
 };
+
+export const enum EventName {
+  CodeEditor = 'CodeEditor',
+  CodeEditorLanguage = 'CodeEditorLanguage',
+  CodeEditorCursor = 'CodeEditorCursor',
+}

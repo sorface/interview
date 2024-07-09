@@ -2,7 +2,7 @@ import { FunctionComponent, MouseEventHandler, useCallback, useState } from 'rea
 import { ActiveQuestionSelector } from '../../../../components/ActiveQuestionSelector/ActiveQuestionSelector';
 import { Room, RoomQuestion } from '../../../../types/room';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
-import { Question } from '../../../../types/question';
+import { Question, QuestionType } from '../../../../types/question';
 import { ChangeActiveQuestionBody, CreateRoomQuestionBody, roomQuestionApiDeclaration } from '../../../../apiDeclarations';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
@@ -62,7 +62,12 @@ export const ActiveQuestion: FunctionComponent<ActiveQuestionProps> = ({
       question: {
         value: question,
         tags: [],
+        type: QuestionType.Private,
+        categoryId: '',
+        answers: [],
+        codeEditor: null,
       },
+      order: 0,
     });
   }, [room, createRoomQuestion]);
 

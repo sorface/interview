@@ -20,25 +20,21 @@ interface EnterVideoChatModalProps {
   viewerMode: boolean;
   loading: boolean;
   roomName?: string;
+  devices: Devices;
+  setSelectedCameraId: React.Dispatch<React.SetStateAction<string | undefined>>,
+  setSelectedMicId: React.Dispatch<React.SetStateAction<string | undefined>>,
+  updateDevices: () => Promise<void>;
   error: string | null;
   userVideoStream: MediaStream | null;
   userAudioStream: MediaStream | null;
   micEnabled: boolean;
   cameraEnabled: boolean;
   onClose: () => void;
-  onSelect: (devices: Devices) => void;
   onMicSwitch: () => void;
   onCameraSwitch: () => void;
 }
 
-const micDeviceKind = 'audioinput';
-
-const cameraDeviceKind = 'videoinput';
-
 const updateAnalyserDelay = 1000 / 30;
-
-const getDevices = async () =>
-  await navigator.mediaDevices.enumerateDevices();
 
 const enum Screen {
   Joining,
@@ -51,23 +47,22 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
   loading,
   viewerMode,
   roomName,
+  devices,
+  updateDevices,
+  setSelectedCameraId,
+  setSelectedMicId,
   error,
   userVideoStream,
   userAudioStream,
   micEnabled,
   cameraEnabled,
   onClose,
-  onSelect,
   onMicSwitch,
   onCameraSwitch,
 }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
   const [screen, setScreen] = useState<Screen>(Screen.Joining);
-  const [micDevices, setMicDevices] = useState<MediaDeviceInfo[]>([]);
-  const [micId, setMicId] = useState<MediaDeviceInfo['deviceId']>();
-  const [cameraDevices, setCameraDevices] = useState<MediaDeviceInfo[]>([]);
-  const [cameraId, setCameraId] = useState<MediaDeviceInfo['deviceId']>();
   const [micVolume, setMicVolume] = useState(0);
   const [settingsEnabled, setSettingsEnabled] = useState(false);
   const userVideo = useRef<HTMLVideoElement>(null);
@@ -103,20 +98,6 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
   }, [userVideoStream]);
 
   useEffect(() => {
-    if (!micId && !cameraId) {
-      return;
-    }
-    onSelect({
-      mic: {
-        deviceId: micId,
-      },
-      camera: {
-        deviceId: cameraId,
-      },
-    });
-  }, [micId, cameraId, onSelect]);
-
-  useEffect(() => {
     const frequencyData = new Uint8Array(frequencyBinCount);
     let prevTime = performance.now();
     const updateAudioAnalyser = () => {
@@ -150,21 +131,9 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
     };
   }, []);
 
-  const handleUseMic = async () => {
-    const newMicDevices = (await getDevices()).filter(device => device.kind === micDeviceKind);
-    setMicDevices(newMicDevices);
-  };
-
-  const handleUseCamera = async () => {
-    const newCameraDevices = (await getDevices()).filter(device => device.kind === cameraDeviceKind);
-    setCameraDevices(newCameraDevices);
-  };
-
-  const handleUseAll = async () => {
+  const handleSetupDevices = async () => {
     try {
-      await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-      handleUseMic();
-      handleUseCamera();
+      updateDevices();
       setScreen(Screen.SetupDevices);
     } catch {
       alert(localizationCaptions[LocalizationKey.UserStreamError]);
@@ -172,12 +141,12 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
   };
 
   const handleSelectMic = useCallback((deviceId: MediaDeviceInfo['deviceId']) => {
-    setMicId(deviceId);
-  }, []);
+    setSelectedMicId(deviceId);
+  }, [setSelectedMicId]);
 
   const handleSelectCamera = useCallback((deviceId: MediaDeviceInfo['deviceId']) => {
-    setCameraId(deviceId);
-  }, []);
+    setSelectedCameraId(deviceId);
+  }, [setSelectedCameraId]);
 
   const handleSwitchSettings = () => {
     setSettingsEnabled(!settingsEnabled);
@@ -203,7 +172,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
           viewerMode ? (
             <button className="active" onClick={onClose}>{localizationCaptions[LocalizationKey.Join]}</button>
           ) : (
-            <button onClick={handleUseAll}>{localizationCaptions[LocalizationKey.SetupDevices]}</button>
+            <button onClick={handleSetupDevices}>{localizationCaptions[LocalizationKey.SetupDevices]}</button>
           )
         )}
       </div>
@@ -248,12 +217,12 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
               <div >
                 <div>{localizationCaptions[LocalizationKey.Microphone]}</div>
                 <DeviceSelect
-                  devices={micDevices}
+                  devices={devices.mic}
                   onSelect={handleSelectMic}
                 />
                 <div>{localizationCaptions[LocalizationKey.Camera]}</div>
                 <DeviceSelect
-                  devices={cameraDevices}
+                  devices={devices.camera}
                   onSelect={handleSelectCamera}
                 />
               </div>

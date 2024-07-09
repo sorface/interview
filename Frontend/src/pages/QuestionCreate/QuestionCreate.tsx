@@ -1,28 +1,31 @@
-import React, { ChangeEvent, FormEvent, FunctionComponent, useCallback, useEffect, useState } from 'react';
+import React, { ChangeEvent, ChangeEventHandler, FormEvent, MouseEvent, FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
-import { CreateQuestionBody, CreateTagBody, GetTagsParams, UpdateQuestionBody, questionsApiDeclaration, tagsApiDeclaration } from '../../apiDeclarations';
+import { CreateQuestionBody, GetCategoriesParams, UpdateQuestionBody, categoriesApiDeclaration, questionsApiDeclaration } from '../../apiDeclarations';
 import { Field } from '../../components/FieldsBlock/Field';
 import { HeaderWithLink } from '../../components/HeaderWithLink/HeaderWithLink';
 import { Loader } from '../../components/Loader/Loader';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { SubmitField } from '../../components/SubmitField/SubmitField';
-import { pathnames, toastSuccessOptions } from '../../constants';
+import { IconNames, pathnames, toastSuccessOptions } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
-import { Question } from '../../types/question';
-import { Tag } from '../../types/tag';
-import { TagsSelector } from '../../components/TagsSelector/TagsSelector';
+import { CodeEditorLang, Question, QuestionType } from '../../types/question';
 import { LocalizationKey } from '../../localization';
-import { HeaderField } from '../../components/HeaderField/HeaderField';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { AuthContext } from '../../context/AuthContext';
+import { checkAdmin } from '../../utils/checkAdmin';
+import { Category } from '../../types/category';
+import { Gap } from '../../components/Gap/Gap';
+import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
+import { CodeEditor } from '../../components/CodeEditor/CodeEditor';
 
 import './QuestionCreate.css';
 
 const valueFieldName = 'qestionText';
-const pageNumber = 1;
-const pageSize = 30;
 
 export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) => {
+  const auth = useContext(AuthContext);
+  const admin = checkAdmin(auth);
   const localizationCaptions = useLocalizationCaptions();
   const {
     apiMethodState: questionState,
@@ -42,26 +45,23 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
   } = useApiMethod<Question, Question['id']>(questionsApiDeclaration.get);
   const { process: { loading: questionLoading, error: questionError }, data: question } = getQuestionState;
 
-  const {
-    apiMethodState: tagsState,
-    fetchData: fetchTags,
-  } = useApiMethod<Tag[], GetTagsParams>(tagsApiDeclaration.getPage);
-  const { process: { loading: tagsLoading, error: tagsError }, data: tags } = tagsState;
+  const { apiMethodState: rootCategoriesState, fetchData: fetchRootCategories } = useApiMethod<Category[], GetCategoriesParams>(categoriesApiDeclaration.getPage);
+  const { process: { loading: rootCategoriesLoading, error: rootCategoriesError }, data: rootCategories } = rootCategoriesState;
 
-  const {
-    apiMethodState: tagCreateState,
-    fetchData: fetchCreateTag,
-  } = useApiMethod<Tag, CreateTagBody>(tagsApiDeclaration.createTag);
-  const { process: { loading: createTagLoading, error: createTagError }, data: createdQuestionTag } = tagCreateState;
+  const { apiMethodState: subCategoriesState, fetchData: fetchSubCategories } = useApiMethod<Category[], GetCategoriesParams>(categoriesApiDeclaration.getPage);
+  const { process: { loading: subCategoriesLoading, error: subCategoriesError }, data: subCategories } = subCategoriesState;
 
   const navigate = useNavigate();
   let { id } = useParams();
   const [questionValue, setQuestionValue] = useState('');
-  const [tagsSearchValue, setTagsSearchValue] = useState('');
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [type, setType] = useState<QuestionType>(QuestionType.Private);
+  const [rootCategory, setRootCategory] = useState('');
+  const [subCategory, setSubCategory] = useState('');
+  const [codeEditor, setCodeEditor] = useState<Question['codeEditor'] | null>(null);
+  const [answers, setAnswers] = useState<Question['answers']>([]);
 
-  const totalLoading = loading || createTagLoading || updatingLoading || questionLoading;
-  const totalError = error || questionError || tagsError || updatingError || createTagError;
+  const totalLoading = loading || updatingLoading || questionLoading || rootCategoriesLoading || subCategoriesLoading;
+  const totalError = error || questionError || updatingError || rootCategoriesError || subCategoriesError;
 
   useEffect(() => {
     if (!edit) {
@@ -74,31 +74,31 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
   }, [edit, id, fetchQuestion]);
 
   useEffect(() => {
+    fetchRootCategories({
+      name: '',
+      PageNumber: 1,
+      PageSize: 30,
+      showOnlyWithoutParent: true,
+    });
+  }, [fetchRootCategories]);
+
+  useEffect(() => {
+    fetchSubCategories({
+      name: '',
+      PageNumber: 1,
+      PageSize: 30,
+      parentId: rootCategory,
+    });
+  }, [rootCategory, fetchSubCategories]);
+
+  useEffect(() => {
     if (!question) {
       return;
     }
     setQuestionValue(question.value);
-    setSelectedTags(question.tags);
+    setCodeEditor(question.codeEditor);
+    setAnswers(question.answers);
   }, [question]);
-
-  useEffect(() => {
-    fetchTags({
-      PageNumber: pageNumber,
-      PageSize: pageSize,
-      value: tagsSearchValue,
-    });
-  }, [createdQuestionTag, tagsSearchValue, fetchTags]);
-
-  useEffect(() => {
-    if (!createdQuestionTag) {
-      return;
-    }
-    fetchTags({
-      PageNumber: pageNumber,
-      PageSize: pageSize,
-      value: '',
-    });
-  }, [createdQuestionTag, fetchTags]);
 
   useEffect(() => {
     if (!createdQuestionId) {
@@ -116,23 +116,6 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
     navigate(pathnames.questions);
   }, [updatedQuestionId, localizationCaptions, navigate]);
 
-  const handleSelect = (tag: Tag) => {
-    setSelectedTags([...selectedTags, tag]);
-  };
-
-  const handleUnselect = (tag: Tag) => {
-    const newSelectedTags = selectedTags.filter(tg => tg.id !== tag.id);
-    setSelectedTags(newSelectedTags);
-  };
-
-  const handleTagSearch = (value: string) => {
-    setTagsSearchValue(value);
-  };
-
-  const handleTagCreate = (tag: Omit<Tag, 'id'>) => {
-    fetchCreateTag(tag);
-  };
-
   const handleQuestionValueChange = (event: ChangeEvent<HTMLInputElement>) => {
     setQuestionValue(event.target.value);
   };
@@ -142,10 +125,13 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
 
     fetchCreateQuestion({
       value: questionValue,
-      tags: selectedTags.map(tag => tag.id),
+      tags: [],
+      type,
+      categoryId: subCategory,
+      answers,
+      codeEditor,
     });
-
-  }, [selectedTags, questionValue, fetchCreateQuestion]);
+  }, [questionValue, type, subCategory, answers, codeEditor, fetchCreateQuestion]);
 
   const handleSubmitEdit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -155,10 +141,117 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
     fetchUpdateQuestion({
       id: question.id,
       value: questionValue,
-      tags: selectedTags.map(tag => tag.id),
+      tags: [],
+      type,
+      categoryId: subCategory,
+      answers,
+      codeEditor,
     });
 
-  }, [selectedTags, question, questionValue, fetchUpdateQuestion]);
+  }, [question, questionValue, type, subCategory, answers, codeEditor, fetchUpdateQuestion]);
+
+  const handleTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setType(e.target.value as QuestionType);
+  };
+
+  const handleRootCategoryChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+    setRootCategory(e.target.value);
+  };
+
+  const handleSubCategoryChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+    setSubCategory(e.target.value);
+  };
+
+  const handleAddCodeEditor = (e: MouseEvent) => {
+    e.preventDefault();
+    setCodeEditor({
+      content: '',
+      lang: CodeEditorLang.Plaintext,
+    });
+  };
+
+  const handleRemoveCodeEditor = (e: MouseEvent) => {
+    e.preventDefault();
+    setCodeEditor(null);
+  };
+
+  const handleLanguageChange = (lang: CodeEditorLang) => {
+    if (!codeEditor) {
+      return;
+    }
+    setCodeEditor({
+      ...codeEditor,
+      lang,
+    });
+  };
+
+  const handleCodeEditorChange = (content: string | undefined) => {
+    if (!codeEditor) {
+      return;
+    }
+    setCodeEditor({
+      ...codeEditor,
+      content: content || '',
+    });
+  };
+
+  const handleAddQuestionAnswer = (e: MouseEvent) => {
+    e.preventDefault();
+    setAnswers([
+      ...answers,
+      {
+        id: `${Math.random()}`,
+        codeEditor: false,
+        content: '',
+        title: '',
+      },
+    ]);
+  };
+
+  const handleAnswerTitleChange = (id: string): ChangeEventHandler<HTMLInputElement> => (e) => {
+    const newAnswers = answers.map(answer => {
+      if (answer.id !== id) {
+        return answer;
+      }
+      return {
+        ...answer,
+        title: e.target.value,
+      };
+    });
+    setAnswers(newAnswers);
+  };
+
+  const handleAnswerLanguageChange = (id: string) => (lang: CodeEditorLang) => {
+    const newAnswers = answers.map(answer => {
+      if (answer.id !== id) {
+        return answer;
+      }
+      return {
+        ...answer,
+        codeEditor: lang !== CodeEditorLang.Plaintext,
+      };
+    });
+    setAnswers(newAnswers);
+  };
+
+  const handleAnswerContentChange = (id: string) => (content: string | undefined) => {
+    const newAnswers = answers.map(answer => {
+      if (answer.id !== id) {
+        return answer;
+      }
+      return {
+        ...answer,
+        content: content || '',
+      };
+    });
+    setAnswers(newAnswers);
+  };
+
+  const handleAnswerDelete = (id: string) => (e: MouseEvent) => {
+    e.preventDefault();
+    const newAnswers = answers.filter(answer => answer.id !== id);
+    setAnswers(newAnswers);
+  };
 
   const renderStatus = () => {
     if (totalError) {
@@ -180,7 +273,6 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
 
   return (
     <MainContentWrapper className="question-create">
-      <HeaderField />
       <HeaderWithLink
         title={localizationCaptions[LocalizationKey.CreateQuestion]}
         linkVisible={true}
@@ -191,21 +283,87 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
       {renderStatus()}
       <form onSubmit={edit ? handleSubmitEdit : handleSubmitCreate}>
         <Field>
-          <div><label htmlFor="qestionText">{localizationCaptions[LocalizationKey.QuestionText]}:</label></div>
-          <input id="qestionText" name={valueFieldName} type="text" value={questionValue} onChange={handleQuestionValueChange} />
+          <select id="rootCategory" value={rootCategory} onChange={handleRootCategoryChange}>
+            <option value=''>{localizationCaptions[LocalizationKey.NotSelected]}</option>
+            {rootCategories?.map(rootCategory => (
+              <option key={rootCategory.id} value={rootCategory.id}>{rootCategory.name}</option>
+            ))}
+          </select>
+          <select id="subCategory" value={subCategory} onChange={handleSubCategoryChange}>
+            <option value=''>{localizationCaptions[LocalizationKey.NotSelected]}</option>
+            {subCategories?.map(subCategory => (
+              <option key={subCategory.id} value={subCategory.id}>{subCategory.name}</option>
+            ))}
+          </select>
         </Field>
         <Field>
-          <TagsSelector
-            placeHolder={localizationCaptions[LocalizationKey.TagsPlaceholder]}
-            loading={tagsLoading}
-            tags={tags || []}
-            selectedTags={selectedTags}
-            onSelect={handleSelect}
-            onUnselect={handleUnselect}
-            onSearch={handleTagSearch}
-            onCreate={handleTagCreate}
-          />
+          <div><label htmlFor="qestionText">{localizationCaptions[LocalizationKey.QuestionText]}:</label></div>
+          <input id="qestionText" name={valueFieldName} type="text" value={questionValue} onChange={handleQuestionValueChange} />
+          <Gap sizeRem={0.75} />
+          <div className='question-code-editor-controls'>
+            <button style={{ ...(codeEditor && { display: 'none' }) }} onClick={handleAddCodeEditor}>
+              <ThemedIcon name={IconNames.Add} />
+              {localizationCaptions[LocalizationKey.QuestionAddCodeEditor]}
+            </button>
+            <div style={{ ...(!codeEditor && { display: 'none' }) }}>
+              {localizationCaptions[LocalizationKey.QuestionCodeEditor]}
+            </div>
+            <button style={{ ...(!codeEditor && { display: 'none' }) }} onClick={handleRemoveCodeEditor}>
+              <ThemedIcon name={IconNames.Trash} />
+              {localizationCaptions[LocalizationKey.QuestionRemoveCodeEditor]}
+            </button>
+          </div>
+          {codeEditor && (
+            <CodeEditor
+              languages={Object.values(CodeEditorLang)}
+              language={codeEditor.lang}
+              value={codeEditor.content}
+              onLanguageChange={handleLanguageChange}
+              onChange={handleCodeEditorChange}
+            />
+          )}
         </Field>
+        <Field>
+          <div>{localizationCaptions[LocalizationKey.QuestionAnswerOptions]}</div>
+          <Gap sizeRem={0.75} />
+          {answers.map(answer => (
+            <div key={answer.id}>
+              <div className='question-answer-controls'>
+                <input
+                  className='question-answer-name'
+                  placeholder={localizationCaptions[LocalizationKey.QuestionAnswerOptionName]}
+                  value={answer.title}
+                  onChange={handleAnswerTitleChange(answer.id)}
+                />
+                <button onClick={handleAnswerDelete(answer.id)}>
+                  <ThemedIcon name={IconNames.Trash} />
+                  {localizationCaptions[LocalizationKey.QuestionDeleteAnswerOption]}
+                </button>
+              </div>
+              <CodeEditor
+                value={answer.content}
+                language={(answer.codeEditor && codeEditor?.lang) ? codeEditor.lang : CodeEditorLang.Plaintext}
+                languages={codeEditor ? [CodeEditorLang.Plaintext, codeEditor.lang] : [CodeEditorLang.Plaintext]}
+                onLanguageChange={handleAnswerLanguageChange(answer.id)}
+                onChange={handleAnswerContentChange(answer.id)}
+              />
+            </div>
+          ))}
+          <Gap sizeRem={0.75} />
+          <button onClick={handleAddQuestionAnswer}>
+            <ThemedIcon name={IconNames.Add} />
+            {localizationCaptions[LocalizationKey.QuestionAddAnswerOption]}
+          </button>
+        </Field>
+        {admin && (
+          <Field>
+            <div><label htmlFor="qestionType">{localizationCaptions[LocalizationKey.QuestionType]}:</label></div>
+            <select id="qestionType" value={type} onChange={handleTypeChange}>
+              <option value={QuestionType.Private}>{localizationCaptions[LocalizationKey.QuestionTypePrivate]}</option>
+              <option value={QuestionType.Public}>{localizationCaptions[LocalizationKey.QuestionTypePublic]}</option>
+            </select>
+          </Field>
+        )}
         <SubmitField caption={localizationCaptions[LocalizationKey.Create]} />
       </form>
     </MainContentWrapper>

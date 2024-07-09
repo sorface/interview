@@ -16,9 +16,11 @@ import { Terms } from '../pages/Terms/Terms';
 import { RoomAnayticsSummary } from '../pages/RoomAnayticsSummary/RoomAnayticsSummary';
 import { NavMenu } from '../components/NavMenu/NavMenu';
 import { REACT_APP_BUILD_HASH } from '../config';
-import { UserAvatar } from '../components/UserAvatar/UserAvatar';
 import { LocalizationCaption } from '../components/LocalizationCaption/LocalizationCaption';
 import { LocalizationKey } from '../localization';
+import { Categories } from '../pages/Categories/Categories';
+import { checkAdmin } from '../utils/checkAdmin';
+import { CategoriesCreate } from '../pages/CategoriesCreate/CategoriesCreate';
 
 interface AppRoutesProps {
   user: User | null;
@@ -33,6 +35,7 @@ const renderFooter = () => (
 export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
   user,
 }) => {
+  const admin = checkAdmin(user);
   const location = useLocation();
   const fullScreenPage = matchPath(
     { path: pathnames.room.replace(`/:${inviteParamName}?`, ''), end: false, },
@@ -40,24 +43,12 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
   );
   const authenticated = !!user;
 
-  const userContent = authenticated ?
-    (
-      <div className='nav-menu-user-content'>
-        {user.avatar && (
-          <UserAvatar
-            src={user.avatar}
-            nickname={user.nickname}
-          />
-        )}
-        <span className='nav-menu-user-nickname'>{user.nickname}</span>
-      </div>
-    ) :
-    (<LocalizationCaption captionKey={LocalizationKey.UnauthorizedMessage} />);
-
   return (
     <>
-      <div className={`App-content-wrapper ${fullScreenPage ? 'full-screen-page' : ''}`}>
-        {!fullScreenPage && (<NavMenu item={{ path: pathnames.home.replace(':redirect?', ''), content: <LocalizationCaption captionKey={LocalizationKey.AppName} /> }} />)}
+      {!fullScreenPage && (
+        <NavMenu admin={admin} />
+      )}
+      <div className={`App ${fullScreenPage ? 'full-screen-page' : ''}`}>
         <div className="App-content">
           <Routes>
             <Route path={pathnames.home} element={<Home />} />
@@ -125,12 +116,32 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
                 </ProtectedRoute>
               }
             />
+            <Route path={pathnames.categoriesCreate}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <CategoriesCreate edit={false} />
+                </ProtectedRoute>
+              }
+            />
+            <Route path={pathnames.categoriesEdit}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <CategoriesCreate edit={true} />
+                </ProtectedRoute>
+              }
+            />
+            <Route path={pathnames.categories}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <Categories />
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
-        {!fullScreenPage && (<NavMenu item={{ path: pathnames.session, content: userContent }} />)}
+        {!fullScreenPage && renderFooter()}
       </div>
-      {!fullScreenPage && renderFooter()}
     </>
   );
 };

@@ -1,6 +1,5 @@
 using Interview.Domain.Database;
 using Interview.Domain.Database.Processors;
-using Interview.Domain.Events.ChangeEntityProcessors;
 using Interview.Domain.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;

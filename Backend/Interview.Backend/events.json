@@ -11,6 +11,30 @@
         "Expert",
         "Examinee"
       ]
+    },
+    {
+      "Type": "CodeEditorLanguage",
+      "Stateful": true,
+      "Roles": [
+        "User",
+        "Admin"
+      ],
+      "ParticipantTypes": [
+        "Expert",
+        "Examinee"
+      ]
+    },
+    {
+      "Type": "CodeEditorCursor",
+      "Stateful": true,
+      "Roles": [
+        "User",
+        "Admin"
+      ],
+      "ParticipantTypes": [
+        "Expert",
+        "Examinee"
+      ]
     }
   ]
 }

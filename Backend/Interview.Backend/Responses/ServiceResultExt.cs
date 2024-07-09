@@ -22,5 +22,8 @@ public static class ServiceResultExt
 
     public static ActionResult<T> ToActionResult<T>(this ServiceResult self) => self.ToActionResult();
 
-    public static ActionResult ToActionResult(this ServiceResult self) => new OkObjectResult(string.Empty);
+    public static ActionResult ToActionResult(this ServiceResult self) => new OkObjectResult(new MessageResponse
+    {
+        Message = "OK",
+    });
 }

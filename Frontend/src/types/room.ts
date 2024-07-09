@@ -4,19 +4,27 @@ import { User, UserType } from './user';
 
 export type RoomStatus = 'New' | 'Active' | 'Review' | 'Close';
 
+export enum RoomAccessType {
+  Public = 'Public',
+  Private = 'Private',
+}
+
 export interface Room {
   id: string;
   name: string;
-  twitchChannel: string;
-  users: User[];
+  participants: User[];
   tags: Tag[];
   roomStatus: RoomStatus;
+  timer: {
+    durationSec: number;
+    startTime?: string;
+  };
 }
 
 export type RoomStateType = 'CodeEditor';
 
 export type RoomStateAdditionalStatefulPayload = {
-  enabled: boolean;
+  value: string | boolean;
 };
 
 interface RoomStateAdditional {
@@ -66,4 +74,5 @@ export interface RoomQuestion {
   id: string;
   state: RoomQuestionState;
   value: string;
+  order: number;
 }

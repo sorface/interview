@@ -1,9 +1,10 @@
 import { ApiContractGet, ApiContractPatch, ApiContractPost, ApiContractPut } from './types/apiContracts';
-import { Question } from './types/question';
+import { Question, QuestionType } from './types/question';
 import { Tag } from './types/tag';
 import { Reaction } from './types/reaction';
-import { Room, RoomInvite, RoomQuestionState, RoomReview, RoomStateAdditionalStatefulPayload, RoomStatus } from './types/room';
+import { Room, RoomAccessType, RoomInvite, RoomQuestionState, RoomReview, RoomStateAdditionalStatefulPayload, RoomStatus } from './types/room';
 import { User, UserType } from './types/user';
+import { Category } from './types/category';
 
 export interface PaginationUrlParams {
   PageSize: number;
@@ -12,11 +13,13 @@ export interface PaginationUrlParams {
 
 export interface CreateRoomBody {
   name: string;
-  twitchChannel: string;
-  questions: Array<Question['id']>;
+  questions: Array<{ id: Question['id']; order: number; }>;
   experts: Array<User['id']>;
   examinees: Array<User['id']>;
   tags: Array<Tag['id']>;
+  accessType: RoomAccessType;
+  scheduleStartTime: string;
+  duration: number;
 }
 
 export interface SendEventBody {
@@ -109,6 +112,7 @@ export interface ChangeActiveQuestionBody {
 export interface CreateRoomQuestionBody {
   roomId: Room['id'];
   question: CreateQuestionBody;
+  order: number;
 }
 
 export interface GetRoomQuestionsBody {
@@ -137,6 +141,14 @@ export const roomQuestionApiDeclaration = {
 export interface CreateQuestionBody {
   value: string;
   tags: Array<Tag['id']>
+  type: QuestionType;
+  categoryId: Category['id'];
+  codeEditor: Question['codeEditor'] | null;
+  answers: Array<{
+    title: string;
+    content: string;
+    codeEditor: boolean;
+  }>;
 }
 
 export interface UpdateQuestionBody extends CreateQuestionBody {
@@ -146,6 +158,7 @@ export interface UpdateQuestionBody extends CreateQuestionBody {
 export interface GetQuestionsParams extends PaginationUrlParams {
   tags: Array<Tag['id']>;
   value: string;
+  categoryId: Category['id'];
 }
 
 export const questionsApiDeclaration = {
@@ -157,6 +170,7 @@ export const questionsApiDeclaration = {
       'Page.PageNumber': params.PageNumber,
       Tags: params.tags,
       Value: params.value,
+      CategoryId: params.categoryId,
     },
   }),
   get: (id: Question['id']): ApiContractGet => ({
@@ -171,7 +185,7 @@ export const questionsApiDeclaration = {
   update: (question: UpdateQuestionBody): ApiContractPut => ({
     method: 'PUT',
     baseUrl: `/questions/${question.id}`,
-    body: { value: question.value, tags: question.tags },
+    body: { value: question.value, tags: question.tags, categoryId: question.categoryId },
   }),
   archive: (id: Question['id']): ApiContractPatch => ({
     method: 'PATCH',
@@ -329,5 +343,53 @@ export const eventApiDeclaration = {
     method: 'GET',
     baseUrl: '/event',
     urlParams: params,
+  }),
+};
+
+export interface CreateCategoryBody {
+  name: string;
+  parentId: string | null;
+}
+
+export interface UpdateCategoryBody extends CreateCategoryBody {
+  id: string;
+}
+
+export interface GetCategoriesParams extends PaginationUrlParams {
+  name: string;
+  parentId?: Category['id'] | null;
+  showOnlyWithoutParent?: boolean;
+}
+
+export const categoriesApiDeclaration = {
+  getPage: (params: GetCategoriesParams): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: '/category',
+    urlParams: {
+      'Page.PageSize': params.PageSize,
+      'Page.PageNumber': params.PageNumber,
+      Name: params.name,
+      ...(typeof params.showOnlyWithoutParent === 'boolean' && ({ 'Filter.ShowOnlyWithoutParent': params.showOnlyWithoutParent })),
+      ...(params.parentId && ({ 'Filter.ParentId': params.parentId })),
+    },
+  }),
+  get: (id: Category['id']): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: `/category/${id}`,
+  }),
+  create: (category: CreateCategoryBody): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: '/category',
+    body: category,
+  }),
+  update: (category: UpdateCategoryBody): ApiContractPut => ({
+    method: 'PUT',
+    baseUrl: `/category/${category.id}`,
+    body: { name: category.name, parentId: category.parentId },
+  }),
+  archive: (id: Category['id']): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: `/category/archive/${id}`,
+    body: undefined,
   }),
 };

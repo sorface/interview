@@ -37,6 +37,43 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.ToTable("AppEventRole");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Categories.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsArchived")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("Categories");
+                });
+
             modelBuilder.Entity("Interview.Domain.Events.AppEvent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -144,10 +181,48 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.ToTable("Invites");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Questions.CodeEditors.QuestionCodeEditor", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Lang")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("QuestionCodeEditors");
+                });
+
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("CodeEditorId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
@@ -161,8 +236,11 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
-                    b.Property<Guid?>("RoomId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("Type")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasComment("Available values: [Private: 2, Public: 1]");
 
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("timestamp without time zone");
@@ -174,11 +252,54 @@ namespace Interview.Migrations.Postgres.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("CodeEditorId")
+                        .IsUnique();
+
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("RoomId");
-
                     b.ToTable("Questions");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionAnswers.QuestionAnswer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("CodeEditor")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("QuestionAnswers");
                 });
 
             modelBuilder.Entity("Interview.Domain.Reactions.Reaction", b =>
@@ -364,6 +485,20 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
+                            Id = new Guid("49cb7cd3-7329-4098-9ac1-c3972ba09138"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("7b231e25-446a-418c-9281-4eb453dd4893"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("0c24de0f-6fe3-4d95-81fb-e9e7542852f7"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("d74df965-84d3-4bcc-af1b-13f5c6299fa7"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
                             Id = new Guid("369f0b92-915c-4334-bdac-6e82fb3c0c74"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("150f05e3-8d73-45e9-8ecd-6187f7b96461"),
@@ -374,6 +509,13 @@ namespace Interview.Migrations.Postgres.Migrations
                             Id = new Guid("5efeace0-78ca-4616-aee0-9f08574132ce"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("1bb49aa7-1305-427c-9523-e9687392d385"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("be526dee-9c74-44bb-af6b-1b2298fa1197"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("4f39059a-e69f-4494-9b48-54e3a6aea2f3"),
                             UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
@@ -461,7 +603,7 @@ namespace Interview.Migrations.Postgres.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("AcсessType")
+                    b.Property<int>("AccessType")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasDefaultValue(0);
@@ -477,15 +619,13 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasMaxLength(70)
                         .HasColumnType("character varying(70)");
 
+                    b.Property<DateTime?>("ScheduleStartTime")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<char>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("character(1)")
                         .HasDefaultValue('N');
-
-                    b.Property<string>("TwitchChannel")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("timestamp without time zone");
@@ -598,6 +738,45 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.ToTable("RoomParticipants");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Rooms.RoomQuestionEvaluations.RoomQuestionEvaluation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .IsRequired()
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("Mark")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Review")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("RoomQuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("RoomQuestionId", "CreatedById");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("RoomQuestionEvaluation", (string)null);
+                });
+
             modelBuilder.Entity("Interview.Domain.Rooms.RoomQuestionReactions.RoomQuestionReaction", b =>
                 {
                     b.Property<Guid>("Id")
@@ -649,6 +828,11 @@ namespace Interview.Migrations.Postgres.Migrations
 
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("uuid");
+
+                    b.Property<int>("Order")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
 
                     b.Property<Guid>("QuestionId")
                         .HasColumnType("uuid");
@@ -752,6 +936,34 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.ToTable("RoomStates");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Rooms.RoomTimers.RoomTimer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("ActualStartTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<double>("Duration")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("RoomTimer", (string)null);
+                });
+
             modelBuilder.Entity("Interview.Domain.Tags.Tag", b =>
                 {
                     b.Property<Guid>("Id")
@@ -853,9 +1065,58 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
+                            Id = new Guid("c0afec8d-04d0-4a7a-9f20-c3d4c891f04e"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "CategoryArchive",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("84dc5bce-fa74-47cb-949a-042da1126c0c"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "CategoryUnarchive",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
                             Id = new Guid("1f6c85db-c2a0-4096-8ead-a292397ab4e5"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "DeleteRoomState",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("1b2dd31b-b35e-48e2-8f33-d0366b9d60ba"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "EditCategory",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("9001520d-b1d2-4ade-8f70-570d2b7efea1"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "FindCategoryPage",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("b4dca27c-5733-4b37-bb63-7eca6f8e831b"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "FindCategoryPageArchive",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("bc98d0b8-b4a3-4b66-b8c1-db1fca0647e0"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "GetCategoryById",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("fcc9bbca-15c6-4221-8d2d-e052b8cd4385"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "PublicRoomCreate",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -1028,6 +1289,20 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
+                            Id = new Guid("7b231e25-446a-418c-9281-4eb453dd4893"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "RoomQuestionEvaluationFind",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("d74df965-84d3-4bcc-af1b-13f5c6299fa7"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "RoomQuestionEvaluationMerge",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
                             Id = new Guid("150f05e3-8d73-45e9-8ecd-6187f7b96461"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "RoomQuestionFindGuids",
@@ -1038,6 +1313,13 @@ namespace Interview.Migrations.Postgres.Migrations
                             Id = new Guid("1bb49aa7-1305-427c-9523-e9687392d385"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "RoomQuestionReactionCreate",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("4f39059a-e69f-4494-9b48-54e3a6aea2f3"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "RoomQuestionUpdate",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -1321,6 +1603,21 @@ namespace Interview.Migrations.Postgres.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Interview.Domain.Categories.Category", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Categories.Category", "Parent")
+                        .WithMany()
+                        .HasForeignKey("ParentId");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Parent");
+                });
+
             modelBuilder.Entity("Interview.Domain.Events.AppEvent", b =>
                 {
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
@@ -1356,20 +1653,52 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Navigation("CreatedBy");
                 });
 
-            modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
+            modelBuilder.Entity("Interview.Domain.Questions.CodeEditors.QuestionCodeEditor", b =>
                 {
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
-                    b.HasOne("Interview.Domain.Rooms.Room", "Room")
+                    b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
+                {
+                    b.HasOne("Interview.Domain.Categories.Category", "Category")
+                        .WithMany("Questions")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Interview.Domain.Questions.CodeEditors.QuestionCodeEditor", "CodeEditor")
+                        .WithOne()
+                        .HasForeignKey("Interview.Domain.Questions.Question", "CodeEditorId");
+
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("CreatedById");
+
+                    b.Navigation("Category");
+
+                    b.Navigation("CodeEditor");
+
+                    b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionAnswers.QuestionAnswer", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Questions.Question", "Question")
+                        .WithMany("Answers")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("Room");
+                    b.Navigation("Question");
                 });
 
             modelBuilder.Entity("Interview.Domain.Reactions.Reaction", b =>
@@ -1490,6 +1819,25 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Rooms.RoomQuestionEvaluations.RoomQuestionEvaluation", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Interview.Domain.Rooms.RoomQuestions.RoomQuestion", "RoomQuestion")
+                        .WithMany("Evaluations")
+                        .HasForeignKey("RoomQuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("RoomQuestion");
+                });
+
             modelBuilder.Entity("Interview.Domain.Rooms.RoomQuestionReactions.RoomQuestionReaction", b =>
                 {
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
@@ -1582,6 +1930,23 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.HasOne("Interview.Domain.Rooms.Room", "Room")
                         .WithMany("RoomStates")
                         .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Rooms.RoomTimers.RoomTimer", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Rooms.Room", "Room")
+                        .WithOne("Timer")
+                        .HasForeignKey("Interview.Domain.Rooms.RoomTimers.RoomTimer", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1686,6 +2051,16 @@ namespace Interview.Migrations.Postgres.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Interview.Domain.Categories.Category", b =>
+                {
+                    b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
+                {
+                    b.Navigation("Answers");
+                });
+
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>
                 {
                     b.Navigation("Configuration");
@@ -1699,11 +2074,18 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Navigation("QueuedRoomEvent");
 
                     b.Navigation("RoomStates");
+
+                    b.Navigation("Timer");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.RoomParticipants.RoomParticipant", b =>
                 {
                     b.Navigation("Permissions");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Rooms.RoomQuestions.RoomQuestion", b =>
+                {
+                    b.Navigation("Evaluations");
                 });
 #pragma warning restore 612, 618
         }

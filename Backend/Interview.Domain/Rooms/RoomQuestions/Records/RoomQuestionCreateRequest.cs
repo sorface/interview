@@ -9,4 +9,6 @@ public class RoomQuestionCreateRequest
     public Guid? QuestionId { get; set; }
 
     public QuestionCreateRequest? Question { get; set; }
+
+    public int Order { get; set; }
 }

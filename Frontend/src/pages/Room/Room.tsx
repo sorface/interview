@@ -14,7 +14,7 @@ import {
 } from '../../apiDeclarations';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { REACT_APP_WS_URL } from '../../config';
-import { IconNames, inviteParamName, pathnames } from '../../constants';
+import { EventName, IconNames, inviteParamName, pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { useCommunist } from '../../hooks/useCommunist';
@@ -26,9 +26,8 @@ import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
 import { VideoChat } from './components/VideoChat/VideoChat';
 import { SwitchButton } from './components/VideoChat/SwitchButton';
 import { Link } from 'react-router-dom';
-import { ThemeSwitchMini } from '../../components/ThemeSwitchMini/ThemeSwitchMini';
 import { EnterVideoChatModal } from './components/VideoChat/EnterVideoChatModal';
-import { Devices, useUserStreams } from './hooks/useUserStreams';
+import { useUserStreams } from './hooks/useUserStreams';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useUnreadChatMessages } from './hooks/useUnreadChatMessages';
 import { useScreenStream } from './hooks/useScreenStream';
@@ -38,18 +37,13 @@ import { ThemedIcon } from './components/ThemedIcon/ThemedIcon';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Invitations } from './components/Invitations/Invitations';
 import { UserType } from '../../types/user';
+import { useEventsState } from './hooks/useEventsState';
+import { RoomTimer } from './components/RoomTimer/RoomTimer';
+import { CodeEditorLang } from '../../types/question';
 
 import './Room.css';
 
 const connectingReadyState = 0;
-
-const enableDisableUserTrack = (stream: MediaStream, kind: string, enabled: boolean) => {
-  const track = stream.getTracks().find(track => track.kind === kind);
-  if (!track) {
-    return;
-  }
-  track.enabled = enabled;
-};
 
 export const Room: FunctionComponent = () => {
   const auth = useContext(AuthContext);
@@ -64,22 +58,24 @@ export const Room: FunctionComponent = () => {
   const [reactionsVisible, setReactionsVisible] = useState(false);
   const [currentQuestionId, setCurrentQuestionId] = useState<RoomQuestion['id']>();
   const [currentQuestion, setCurrentQuestion] = useState<RoomQuestion>();
+  const [wsRoomTimer, setWsRoomTimer] = useState<RoomType['timer'] | null>(null);
   const [messagesChatEnabled, setMessagesChatEnabled] = useState(false);
   const [welcomeScreen, setWelcomeScreen] = useState(true);
-  const [micEnabled, setMicEnabled] = useState(true);
   const micDisabledAutomatically = useRef(false);
-  const [cameraEnabled, setCameraEnabled] = useState(true);
-  const [selectedDevices, setSelectedDevices] = useState<Devices | null>(null);
   const [recognitionEnabled, setRecognitionEnabled] = useState(false);
   const [peersLength, setPeersLength] = useState(0);
   const {
+    devices,
     userAudioStream,
     userVideoStream,
-    disableVideo,
-    enableVideo,
-  } = useUserStreams({
-    selectedDevices,
-  });
+    updateDevices,
+    setSelectedCameraId,
+    setSelectedMicId,
+    cameraEnabled,
+    micEnabled,
+    setCameraEnabled,
+    setMicEnabled,
+  } = useUserStreams();
   const { screenStream, requestScreenStream } = useScreenStream();
   const localizationCaptions = useLocalizationCaptions();
 
@@ -172,6 +168,11 @@ export const Room: FunctionComponent = () => {
     process: { loading: loadingRoomState, error: errorRoomState },
     data: roomState,
   } = apiRoomStateState;
+
+  const roomTimer = wsRoomTimer || room?.timer;
+  const eventsState = useEventsState({ roomState, lastWsMessage: lastMessage });
+  const codeEditorEnabled = !!eventsState[EventName.CodeEditor];
+  const codeEditorLanguage = String(eventsState[EventName.CodeEditorLanguage]) as CodeEditorLang;
 
   const currentUserExpert = roomParticipant?.userType === 'Expert';
   const currentUserExaminee = roomParticipant?.userType === 'Examinee';
@@ -290,6 +291,12 @@ export const Room: FunctionComponent = () => {
         case 'AddRoomQuestion':
           updateQuestions();
           break;
+        case 'StartRoomTimer':
+          setWsRoomTimer({
+            durationSec: parsedData.Value.DurationSec,
+            startTime: parsedData.Value.StartTime,
+          });
+          break;
         default:
           break;
       }
@@ -324,12 +331,6 @@ export const Room: FunctionComponent = () => {
     { height: '890px' }
   ];
 
-  const handleMediaSelect = useCallback((devices: Devices) => {
-    setSelectedDevices(devices);
-    setMicEnabled(true);
-    setCameraEnabled(true);
-  }, []);
-
   const handleWelcomeScreenClose = () => {
     setWelcomeScreen(false);
     sendMessage(JSON.stringify({
@@ -342,20 +343,12 @@ export const Room: FunctionComponent = () => {
   };
 
   const handleCameraSwitch = useCallback(() => {
-    if (cameraEnabled) {
-      disableVideo();
-    } else {
-      enableVideo();
-    }
     setCameraEnabled(!cameraEnabled);
-  }, [cameraEnabled, disableVideo, enableVideo]);
+  }, [cameraEnabled, setCameraEnabled]);
 
   const enableDisableMic = useCallback((enabled: boolean) => {
-    if (userAudioStream) {
-      enableDisableUserTrack(userAudioStream, 'audio', enabled);
-    }
     setMicEnabled(enabled);
-  }, [userAudioStream]);
+  }, [setMicEnabled]);
 
   const handleMicSwitch = useCallback(() => {
     if (micEnabled) {
@@ -432,12 +425,15 @@ export const Room: FunctionComponent = () => {
         loading={loading || roomParticipantLoading || roomParticipantWillLoaded || applyRoomInviteLoading || readyState === connectingReadyState}
         viewerMode={viewerMode}
         roomName={room?.name}
+        devices={devices}
+        setSelectedCameraId={setSelectedCameraId}
+        setSelectedMicId={setSelectedMicId}
+        updateDevices={updateDevices}
         error={applyRoomInviteError && localizationCaptions[LocalizationKey.ErrorApplyRoomInvite]}
         userVideoStream={userVideoStream}
         userAudioStream={userAudioStream}
         micEnabled={micEnabled}
         cameraEnabled={cameraEnabled}
-        onSelect={handleMediaSelect}
         onClose={handleWelcomeScreenClose}
         onMicSwitch={handleMicSwitch}
         onCameraSwitch={handleCameraSwitch}
@@ -469,6 +465,9 @@ export const Room: FunctionComponent = () => {
                   )}
                 </span>
               </div>
+              {(viewerMode && !!(roomTimer?.startTime)) && (
+                <RoomTimer durationSec={roomTimer.durationSec} startTime={roomTimer.startTime} />
+              )}
 
               {!viewerMode && (
                 <div className="reactions-field">
@@ -477,6 +476,9 @@ export const Room: FunctionComponent = () => {
                     roomQuestions={roomQuestions || []}
                     initialQuestionText={currentQuestion?.value}
                   />
+                  {!!(roomTimer?.startTime) && (
+                    <RoomTimer durationSec={roomTimer.durationSec} startTime={roomTimer.startTime} />
+                  )}
                 </div>
               )}
               {!reactionsVisible && (
@@ -506,7 +508,6 @@ export const Room: FunctionComponent = () => {
                     />
                   </div>
                 )}
-                <ThemeSwitchMini />
               </div>
             </div>
             <div className="room-page-main-content">
@@ -517,10 +518,11 @@ export const Room: FunctionComponent = () => {
                 viewerMode={viewerMode}
                 lastWsMessage={lastMessage}
                 messagesChatEnabled={messagesChatEnabled}
+                codeEditorEnabled={codeEditorEnabled}
+                codeEditorLanguage={codeEditorLanguage}
                 userVideoStream={userVideoStream}
                 userAudioStream={userAudioStream}
                 screenStream={screenStream}
-                videoTrackEnabled={cameraEnabled}
                 micDisabledAutomatically={micDisabledAutomatically}
                 onSendWsMessage={sendMessage}
                 onUpdatePeersLength={setPeersLength}
@@ -575,7 +577,7 @@ export const Room: FunctionComponent = () => {
               {reactionsVisible && (
                 <Reactions
                   room={room}
-                  roomState={roomState}
+                  eventsState={eventsState}
                   roles={auth?.roles || []}
                   participantType={roomParticipant?.userType || null}
                   lastWsMessage={lastMessage}

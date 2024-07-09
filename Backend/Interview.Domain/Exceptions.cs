@@ -1,3 +1,4 @@
+using Ardalis.SmartEnum;
 using Interview.Domain.Repository;
 
 namespace Interview.Domain;
@@ -35,6 +36,12 @@ public class NotFoundException : UserException
         where T : Entity
     {
         return new NotFoundException($"Not found '{typeof(T).Name}' by Id '{id}'");
+    }
+
+    public static NotFoundException Create<T>(IEnumerable<Guid> ids)
+        where T : Entity
+    {
+        return new NotFoundException($"Not found '{typeof(T).Name}' by ids '{string.Join(", ", ids)}'");
     }
 }
 

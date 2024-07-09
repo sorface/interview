@@ -16,13 +16,24 @@ import { User } from '../../types/user';
 import { TagsSelector } from '../../components/TagsSelector/TagsSelector';
 import { Tag } from '../../types/tag';
 import { LocalizationKey } from '../../localization';
-import { HeaderField } from '../../components/HeaderField/HeaderField';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { RoomAccessType } from '../../types/room';
+import { DragNDropList, DragNDropListItem } from '../../components/DragNDropList/DragNDropList';
 
 import './RoomCreate.css';
 
+const getFormFieldOrError = (form: FormData, fieldName: string) => {
+  const value = form.get(fieldName);
+  if (typeof value !== 'string') {
+    throw new Error(`${fieldName} field type error`);
+  }
+  return value;
+};
+
 const nameFieldName = 'roomName';
-const twitchChannelFieldName = 'roomTwitchChannel';
+const dateFieldName = 'roomDate';
+const startTimeFieldName = 'roomStartTime';
+const endTimeFieldName = 'roomEndTime';
 const pageNumber = 1;
 const pageSize = 30;
 
@@ -44,7 +55,7 @@ export const RoomCreate: FunctionComponent = () => {
   } = useApiMethod<Tag, CreateTagBody>(tagsApiDeclaration.createTag);
   const { process: { loading: createTagLoading, error: createTagError }, data: createdQuestionTag } = tagCreateState;
 
-  const [selectedQuestions, setSelectedQuestions] = useState<Question[]>([]);
+  const [selectedQuestions, setSelectedQuestions] = useState<DragNDropListItem[]>([]);
   const [selectedExperts, setSelectedExperts] = useState<User[]>([]);
   const [selectedExaminees, setSelectedExaminees] = useState<User[]>([]);
   const [tagsSearchValue, setTagsSearchValue] = useState('');
@@ -90,32 +101,38 @@ export const RoomCreate: FunctionComponent = () => {
     event.preventDefault();
     const form = event.target as HTMLFormElement;
     const data = new FormData(form);
-    const roomName = data.get(nameFieldName);
-    if (!roomName) {
-      return;
+    const roomName = getFormFieldOrError(data, nameFieldName);
+    const roomDateValue = getFormFieldOrError(data, dateFieldName);
+    const roomDateStart = new Date(roomDateValue);
+    const roomStartTime = getFormFieldOrError(data, startTimeFieldName).split(':');
+    roomDateStart.setHours(parseInt(roomStartTime[0]));
+    roomDateStart.setMinutes(parseInt(roomStartTime[1]));
+    const roomEndTime = getFormFieldOrError(data, endTimeFieldName).split(':');
+    const roomDateEnd = new Date(roomDateStart);
+    if (roomEndTime.length > 1) {
+      roomDateEnd.setHours(parseInt(roomEndTime[0]));
+      roomDateEnd.setMinutes(parseInt(roomEndTime[1]));
     }
-    if (typeof roomName !== 'string') {
-      throw new Error('qestionText field type error');
-    }
-    const roomTwitchChannel = data.get(twitchChannelFieldName);
-    if (!roomTwitchChannel) {
-      return;
-    }
-    if (typeof roomTwitchChannel !== 'string') {
-      throw new Error('roomTwitchChannel field type error');
-    }
+    const duration = (roomDateEnd.getTime() - roomDateStart.getTime()) / 1000;
     fetchData({
       name: roomName,
-      twitchChannel: roomTwitchChannel,
-      questions: selectedQuestions.map(question => question.id),
+      questions: selectedQuestions.map((question, index) => ({ id: question.id, order: index })),
       experts: selectedExperts.map(user => user.id),
       examinees: selectedExaminees.map(user => user.id),
       tags: selectedTags.map(tag => tag.id),
+      accessType: RoomAccessType.Private,
+      scheduleStartTime: roomDateStart.toISOString(),
+      duration,
     });
   }, [selectedQuestions, selectedExperts, selectedExaminees, selectedTags, fetchData]);
 
   const handleQuestionSelect = useCallback((question: Question) => {
-    setSelectedQuestions([...selectedQuestions, question]);
+    const newSelectedQuestion: DragNDropListItem = {
+      id: question.id,
+      value: question.value,
+      order: selectedQuestions.length
+    };
+    setSelectedQuestions([...selectedQuestions, newSelectedQuestion]);
   }, [selectedQuestions]);
 
   const handleQuestionUnSelect = useCallback((question: Question) => {
@@ -167,7 +184,6 @@ export const RoomCreate: FunctionComponent = () => {
 
   return (
     <MainContentWrapper className="question-create">
-      <HeaderField />
       <HeaderWithLink
         title={localizationCaptions[LocalizationKey.CreateRoom]}
         linkVisible={true}
@@ -182,8 +198,18 @@ export const RoomCreate: FunctionComponent = () => {
           <input id="roomName" name={nameFieldName} type="text" required />
         </Field>
         <Field>
-          <label htmlFor="twitchChannel">{localizationCaptions[LocalizationKey.RoomTwitchChannel]}:</label>
-          <input id="twitchChannel" name={twitchChannelFieldName} type="text" required />
+          <div>
+            <label htmlFor="roomDate">{localizationCaptions[LocalizationKey.RoomDate]}:</label>
+            <input id="roomDate" name={dateFieldName} type="date" required />
+          </div>
+          <div>
+            <label htmlFor="roomTimeStart">{localizationCaptions[LocalizationKey.RoomStartTime]}:</label>
+            <input id="roomTimeStart" name={startTimeFieldName} type="time" required />
+          </div>
+          <div>
+            <label htmlFor="roomTimeEnd">{localizationCaptions[LocalizationKey.RoomEndTime]}:</label>
+            <input id="roomTimeEnd" name={endTimeFieldName} type="time" />
+          </div>
         </Field>
         <Field>
           <TagsSelector
@@ -199,9 +225,11 @@ export const RoomCreate: FunctionComponent = () => {
         </Field>
         <Field>
           <Link to={pathnames.questions}>{localizationCaptions[LocalizationKey.QuestionsPageName]}:</Link>
-          <div>{localizationCaptions[LocalizationKey.RoomQuestions]}:</div>
           <div className="items-selected">
-            {selectedQuestions.map(question => question.value).join(', ')}
+            <DragNDropList
+              items={selectedQuestions}
+              onItemsChange={setSelectedQuestions}
+            />
           </div>
           <QuestionsSelector
             selected={selectedQuestions}

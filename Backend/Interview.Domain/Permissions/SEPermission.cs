@@ -334,6 +334,66 @@ public class SEPermission : SmartEnum<SEPermission>
             "Generate for a Room Invites",
             EVPermission.RoomInviteGenerate);
 
+    public static readonly SEPermission PublicRoomCreate = new(
+        Guid.Parse("FCC9BBCA-15C6-4221-8D2D-E052B8CD4385"),
+        "PublicRoomCreate",
+        "Creating a new public room",
+        EVPermission.PublicRoomCreate);
+
+    public static readonly SEPermission EditCategory = new(
+        Guid.Parse("1B2DD31B-B35E-48E2-8F33-D0366B9D60BA"),
+        "EditCategory",
+        "Create/Update category",
+        EVPermission.EditCategory);
+
+    public static readonly SEPermission FindCategoryPage = new(
+        Guid.Parse("9001520D-B1D2-4ADE-8F70-570D2B7EFEA1"),
+        "FindCategoryPage",
+        "Find category page",
+        EVPermission.FindCategoryPage);
+
+    public static readonly SEPermission FindCategoryPageArchive = new(
+        Guid.Parse("B4DCA27C-5733-4B37-BB63-7ECA6F8E831B"),
+        "FindCategoryPageArchive",
+        "Find archived category page",
+        EVPermission.FindCategoryPageArchive);
+
+    public static readonly SEPermission CategoryArchive = new(
+        Guid.Parse("C0AFEC8D-04D0-4A7A-9F20-C3D4C891F04E"),
+        "CategoryArchive",
+        "Archiving a category",
+        EVPermission.CategoryArchive);
+
+    public static readonly SEPermission CategoryUnarchive = new(
+        Guid.Parse("84DC5BCE-FA74-47CB-949A-042DA1126C0C"),
+        "CategoryUnarchive",
+        "Unarchiving a category",
+        EVPermission.CategoryUnarchive);
+
+    public static readonly SEPermission GetCategoryById = new(
+        Guid.Parse("BC98D0B8-B4A3-4B66-B8C1-DB1FCA0647E0"),
+        "GetCategoryById",
+        "Get category by id",
+        EVPermission.GetCategoryById);
+
+    public static readonly SEPermission RoomQuestionEvaluationMerge = new(
+        Guid.Parse("d74df965-84d3-4bcc-af1b-13f5c6299fa7"),
+        "RoomQuestionEvaluationMerge",
+        "Merge evaluation",
+        EVPermission.RoomQuestionEvaluationMerge);
+
+    public static readonly SEPermission RoomQuestionEvaluationFind = new(
+        Guid.Parse("7b231e25-446a-418c-9281-4eb453dd4893"),
+        "RoomQuestionEvaluationFind",
+        "Find evaluation",
+        EVPermission.RoomQuestionEvaluationFind);
+
+    public static readonly SEPermission RoomQuestionUpdate = new(
+            Guid.Parse("4F39059A-E69F-4494-9B48-54E3A6AEA2F3"),
+            "RoomQuestionUpdate",
+            "Update room questions",
+            EVPermission.RoomQuestionUpdate);
+
     public Guid Id { get; }
 
     public string Description { get; }

@@ -1,14 +1,19 @@
+using Interview.Domain.Categories;
+using Interview.Domain.Database.Processors;
 using Interview.Domain.Events;
-using Interview.Domain.Events.ChangeEntityProcessors;
 using Interview.Domain.Invites;
 using Interview.Domain.Questions;
+using Interview.Domain.Questions.CodeEditors;
+using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Reactions;
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomInvites;
 using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Rooms.RoomQuestionEvaluations;
 using Interview.Domain.Rooms.RoomQuestionReactions;
 using Interview.Domain.Rooms.RoomQuestions;
+using Interview.Domain.Rooms.RoomTimers;
 using Interview.Domain.Tags;
 using Interview.Domain.Users;
 using Interview.Domain.Users.Permissions;
@@ -65,7 +70,17 @@ public class AppDbContext : DbContext
 
     public DbSet<RoomInvite> RoomInvites { get; private set; } = null!;
 
+    public DbSet<RoomTimer> RoomTimers { get; private set; } = null!;
+
     public DbSet<AvailableRoomPermission> AvailableRoomPermission { get; private set; } = null!;
+
+    public DbSet<Category> Categories { get; private set; } = null!;
+
+    public DbSet<QuestionAnswer> QuestionAnswers { get; private set; } = null!;
+
+    public DbSet<QuestionCodeEditor> QuestionCodeEditors { get; private set; } = null!;
+
+    public DbSet<RoomQuestionEvaluation> RoomQuestionEvaluation { get; private set; } = null!;
 
     public override int SaveChanges()
     {
