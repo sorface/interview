@@ -2,8 +2,6 @@ namespace Interview.Domain.Rooms;
 
 public class Analytics
 {
-    public List<AnalyticsReactionSummary>? Reactions { get; set; }
-
     public List<AnalyticsQuestion>? Questions { get; set; }
 
     public class AnalyticsQuestion
@@ -46,7 +44,5 @@ public class Analytics
         public string ParticipantType { get; set; } = string.Empty;
 
         public List<AnalyticsReaction>? Reactions { get; set; }
-
-        public List<AnalyticsReactionSummary>? ReactionsSummary { get; set; }
     }
 }

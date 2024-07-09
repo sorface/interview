@@ -113,9 +113,6 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
         }
 
         var reactions = await GetRoomQuestionReactionAsync(request.RoomId, cancellationToken);
-
-        analytics.Reactions = GetReactions(reactions);
-
         var questionReaction = reactions.ToLookup(e => e.RoomQuestion!.Question!.Id);
         foreach (var analyticsQuestion in analytics.Questions!)
         {
@@ -159,20 +156,6 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                 .FirstOrDefaultAsync(ct);
         }
 
-        List<Analytics.AnalyticsReactionSummary> GetReactions(List<RoomQuestionReaction> roomQuestionReactions)
-        {
-            return roomQuestionReactions
-                .Select(e => e.Reaction)
-                .GroupBy(e => (e!.Id, e.Type))
-                .Select(e => new Analytics.AnalyticsReactionSummary
-                {
-                    Id = e.Key.Id,
-                    Count = e.Count(),
-                    Type = e.Key.Type.Name,
-                })
-                .ToList();
-        }
-
         async Task<List<Analytics.AnalyticsUser>> GetUsersAsync(IEnumerable<RoomQuestionReaction> roomReactions)
         {
             var users = reactions.Select(e => e.Sender!.Id).Distinct();
@@ -195,7 +178,6 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                         Nickname = sender.Nickname,
                         ParticipantType = participant?.Type.Name ?? string.Empty,
                         Reactions = ToAnalyticsReaction(e),
-                        ReactionsSummary = ToAnalyticsReactionSummary(e),
                     };
                 }).ToList();
         }
@@ -208,19 +190,6 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                 Type = roomQuestionReaction.Reaction.Type.Name,
                 CreatedAt = roomQuestionReaction.CreateDate,
             }).ToList();
-        }
-
-        static List<Analytics.AnalyticsReactionSummary> ToAnalyticsReactionSummary(
-            IGrouping<Guid, RoomQuestionReaction> e)
-        {
-            return e.GroupBy(roomQuestionReaction =>
-                    (roomQuestionReaction.Reaction!.Id, roomQuestionReaction.Reaction.Type))
-                .Select(roomQuestionReactions => new Analytics.AnalyticsReactionSummary
-                {
-                    Id = roomQuestionReactions.Key.Id,
-                    Count = roomQuestionReactions.Count(),
-                    Type = roomQuestionReactions.Key.Type.Name,
-                }).ToList();
         }
     }
 

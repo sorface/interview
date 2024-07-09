@@ -311,12 +311,6 @@ public class RoomServiceTest
 
         var expectAnalytics = new Analytics
         {
-            Reactions =
-                new List<Analytics.AnalyticsReactionSummary>()
-                {
-                    new() { Id = ReactionType.Like.Id, Type = ReactionType.Like.Name, Count = 4 },
-                    new() { Id = ReactionType.Dislike.Id, Type = ReactionType.Dislike.Name, Count = 3 },
-                },
             Questions = new List<Analytics.AnalyticsQuestion>()
             {
                 new()
@@ -347,10 +341,6 @@ public class RoomServiceTest
                                     CreatedAt = like.CreateDate
                                 },
                             },
-                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
-                            {
-                                new() { Id = ReactionType.Like.Id, Type = ReactionType.Like.Name, Count = 2, }
-                            },
                         },
                         new()
                         {
@@ -367,10 +357,6 @@ public class RoomServiceTest
                                     CreatedAt = like.CreateDate
                                 },
                             },
-                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
-                            {
-                                new() { Id = ReactionType.Like.Id, Type = ReactionType.Like.Name, Count = 1, }
-                            },
                         },
                         new()
                         {
@@ -386,10 +372,6 @@ public class RoomServiceTest
                                     Type = ReactionType.Dislike.Name,
                                     CreatedAt = dislike.CreateDate
                                 },
-                            },
-                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
-                            {
-                                new() { Id = ReactionType.Dislike.Id, Type = ReactionType.Dislike.Name, Count = 1, }
                             },
                         },
                     }
@@ -416,10 +398,6 @@ public class RoomServiceTest
                                     CreatedAt = dislike.CreateDate
                                 },
                             },
-                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
-                            {
-                                new() { Id = ReactionType.Dislike.Id, Type = ReactionType.Dislike.Name, Count = 1, }
-                            },
                         },
                         new()
                         {
@@ -436,10 +414,6 @@ public class RoomServiceTest
                                     CreatedAt = like.CreateDate
                                 },
                             },
-                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
-                            {
-                                new() { Id = ReactionType.Like.Id, Type = ReactionType.Like.Name, Count = 1, }
-                            },
                         },
                         new()
                         {
@@ -455,10 +429,6 @@ public class RoomServiceTest
                                     Type = ReactionType.Dislike.Name,
                                     CreatedAt = dislike.CreateDate
                                 },
-                            },
-                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>()
-                            {
-                                new() { Id = ReactionType.Dislike.Id, Type = ReactionType.Dislike.Name, Count = 1, }
                             },
                         },
                     }
