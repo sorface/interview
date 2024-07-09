@@ -1,4 +1,5 @@
 using System.Globalization;
+using Bogus.DataSets;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
@@ -113,8 +114,7 @@ public class SorfacePrincipalValidator
             return Result.RejectPrincipal;
         }
 
-        var tokenResponse =
-            await _sorfaceTokenHandler.RefreshTokenAsync(refreshToken, context.HttpContext.RequestAborted);
+        var tokenResponse = await _sorfaceTokenHandler.RefreshTokenAsync(refreshToken, context.HttpContext.RequestAborted);
 
         switch (tokenResponse)
         {
@@ -130,7 +130,7 @@ public class SorfacePrincipalValidator
                 return Result.RejectPrincipal;
         }
 
-        var expirationValue = DateTime.UtcNow.AddSeconds(tokenResponse.ExpiresIn)
+        var expirationValue = DateTime.UtcNow.AddSeconds(tokenResponse.ExpiresIn!.Value)
             .ToString("o", CultureInfo.InvariantCulture);
 
         context.Properties.StoreTokens(new[]

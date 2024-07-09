@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using IdentityModel.Client;
 
 namespace Interview.Backend.Auth.Sorface;
@@ -22,30 +23,23 @@ public class SorfaceTokenHandler
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<TokenResponse?> RefreshTokenAsync(
-        string? refreshToken,
-        CancellationToken cancellationToken = default)
+    public async Task<RefreshTokenObject?> RefreshTokenAsync(string? refreshToken, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(refreshToken))
         {
             throw new HttpRequestException(AnErrorOccurredWhileRetrievingTheRefreshToken);
         }
 
-        var form = new List<KeyValuePair<string, string>>
-        {
-            new("refresh_token", $"{refreshToken}"),
-            new("grant_type", "refresh_token"),
-        };
+        var form = new List<KeyValuePair<string, string>> { new("refresh_token", $"{refreshToken}"), new("grant_type", "refresh_token"), };
 
-        using var request = new HttpRequestMessage(HttpMethod.Post, _options.TokenEndpoint)
-        {
-            Content = new FormUrlEncodedContent(form),
-        };
+        using var request = new HttpRequestMessage(HttpMethod.Post, _options.TokenEndpoint) { Content = new FormUrlEncodedContent(form), };
 
         var chars = $"{_options.ClientId}:{_options.ClientSecret}";
 
         var bytes = Encoding.UTF8.GetBytes(chars);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(bytes));
+        var base64Secret = Convert.ToBase64String(bytes);
+
+        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64Secret);
 
         using var response = await _httpClientFactory.CreateClient()
             .SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
@@ -59,7 +53,7 @@ public class SorfaceTokenHandler
 
         var jsonDocument = JsonDocument.Parse(content);
 
-        return jsonDocument.Deserialize<TokenResponse>();
+        return jsonDocument.Deserialize<RefreshTokenObject>();
     }
 
     public async Task<JsonDocument> GetTokenPrincipalAsync(
@@ -73,10 +67,7 @@ public class SorfaceTokenHandler
 
         var form = new List<KeyValuePair<string, string>> { new("token", $"{accessToken}"), };
 
-        using var request = new HttpRequestMessage(HttpMethod.Post, _options.UserInformationEndpoint)
-        {
-            Content = new FormUrlEncodedContent(form),
-        };
+        using var request = new HttpRequestMessage(HttpMethod.Post, _options.UserInformationEndpoint) { Content = new FormUrlEncodedContent(form), };
 
         var chars = $"{_options.ClientId}:{_options.ClientSecret}";
 
@@ -95,4 +86,22 @@ public class SorfaceTokenHandler
 
         return JsonDocument.Parse(content);
     }
+}
+
+public class RefreshTokenObject
+{
+    [JsonPropertyName("access_token")]
+    public string? AccessToken { get; set; }
+
+    [JsonPropertyName("refresh_token")]
+    public string? RefreshToken { get; set; }
+
+    [JsonPropertyName("scope")]
+    public string? Scope { get; set; }
+
+    [JsonPropertyName("token_type")]
+    public string? TokenType { get; set; }
+
+    [JsonPropertyName("expires_in")]
+    public double? ExpiresIn { get; set; }
 }
