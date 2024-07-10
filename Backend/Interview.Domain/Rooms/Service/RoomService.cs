@@ -167,9 +167,6 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw new UserException("Room name should not be empty");
         }
 
-        var questions =
-            await FindByIdsOrErrorAsync(_questionRepository, request.Questions.Select(e => e.Id).ToList(), "questions", cancellationToken);
-
         var currentUserId = _currentUserAccessor.GetUserIdOrThrow();
         ICollection<Guid> requestExperts = request.Experts;
         if (!request.Experts.Contains(currentUserId) && !request.Examinees.Contains(currentUserId))
@@ -187,6 +184,9 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         var examinees = await FindByIdsOrErrorAsync(_userRepository, request.Examinees, "examinees", cancellationToken);
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
         var room = new Room(name, request.AccessType) { Tags = tags, ScheduleStartTime = request.ScheduleStartTime, };
+
+        var questions =
+            await FindByIdsOrErrorAsync(_questionRepository, request.Questions.Select(e => e.Id).ToList(), "questions", cancellationToken);
         var roomQuestions = questions
             .Join(request.Questions,
                 e => e.Id,
@@ -250,13 +250,45 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw new UserException("Room name should not be empty");
         }
 
-        var foundRoom = await _roomRepository.FindByIdAsync(roomId, cancellationToken);
+        var foundRoom = await _db.Rooms
+            .Include(e => e.Questions)
+            .Include(e => e.Tags)
+            .FirstOrDefaultAsync(e => e.Id == roomId, cancellationToken);
         if (foundRoom is null)
         {
             throw NotFoundException.Create<User>(roomId);
         }
 
         var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
+
+        var requiredQuestions = request.Questions.Select(e => e.Id).ToHashSet();
+        foundRoom.Questions.RemoveAll(e => !requiredQuestions.Contains(e.QuestionId));
+        foreach (var (dbQuestions, order) in foundRoom.Questions
+                     .Join(request.Questions,
+                         e => e.QuestionId,
+                         e => e.Id,
+                         (question, questionRequest) => (DbQuesstions: question, questionRequest.Order)))
+        {
+            dbQuestions.Order = order;
+        }
+
+        requiredQuestions.ExceptWith(foundRoom.Questions.Select(e => e.QuestionId));
+        foreach (var roomQuestionRequest in requiredQuestions.Join(
+                     request.Questions,
+                     id => id,
+                     e => e.Id,
+                     (_, questionRequest) => questionRequest))
+        {
+            foundRoom.Questions.Add(new RoomQuestion
+            {
+                RoomId = foundRoom.Id,
+                QuestionId = roomQuestionRequest.Id,
+                Room = null,
+                Question = null,
+                State = RoomQuestionState.Open,
+                Order = roomQuestionRequest.Order,
+            });
+        }
 
         foundRoom.Name = name;
         foundRoom.Tags.Clear();

@@ -176,8 +176,9 @@ public class QuestionService : IQuestionService
             throw NotFoundException.Create<Question>(id);
         }
 
-        var answersMap = request.ExistsAnswers?.ToDictionary(e => e.Id)
-                              ?? new Dictionary<Guid, QuestionAnswerEditRequest>();
+        var answersMap = request.Answers?
+            .Where(e => e.Id is not null)
+            .ToDictionary(e => e.Id!.Value) ?? new Dictionary<Guid, QuestionAnswerEditRequest>();
         entity.Answers.RemoveAll(e => !answersMap.ContainsKey(e.Id));
         foreach (var questionAnswer in entity.Answers)
         {
@@ -187,9 +188,9 @@ public class QuestionService : IQuestionService
             questionAnswer.Content = newAnswer.Content;
         }
 
-        if (request.NewAnswers is not null)
+        if (request.Answers is not null)
         {
-            foreach (var questionAnswerCreateRequest in request.NewAnswers)
+            foreach (var questionAnswerCreateRequest in request.Answers.Where(e => e.Id is null))
             {
                 entity.Answers.Add(new QuestionAnswer
                 {
@@ -202,8 +203,8 @@ public class QuestionService : IQuestionService
             }
         }
 
-        QuestionAnswer.EnsureValid(request.NewAnswers?.Select(e => new QuestionAnswer.Validate(e)), request.CodeEditor is not null);
-        QuestionAnswer.EnsureValid(request.ExistsAnswers?.Select(e => new QuestionAnswer.Validate(e)), request.CodeEditor is not null);
+        QuestionAnswer.EnsureValid(request.Answers?.Select(e => new QuestionAnswer.Validate(e)), request.CodeEditor is not null);
+
         var categoryValidateResult = await Category.ValidateCategoryAsync(_db, request.CategoryId, cancellationToken);
         categoryValidateResult?.Throw();
 
