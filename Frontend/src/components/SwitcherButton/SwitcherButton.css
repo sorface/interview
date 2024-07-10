@@ -10,7 +10,7 @@
 }
 
 .switcher-button button:last-child {
-  transform: translateX(-1rem);
+  transform: translateX(-0.5rem);
 }
 
 .switcher-button button:last-child:not(.inverted) {

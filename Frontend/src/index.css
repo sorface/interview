@@ -92,9 +92,9 @@ body {
 button {
   color: var(--text);
   background-color: var(--button-bg);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   border: 1px solid var(--button-border-color);
-  padding: 0rem 2rem;
+  padding: 0.25rem 1rem;
   min-height: 1.75rem;
   text-align: center;
   text-decoration: none;
@@ -103,7 +103,7 @@ button {
   justify-content: center;
   cursor: pointer;
   transition: 300ms !important;
-  border-radius: var(--border-radius);
+  border-radius: 2rem;
 }
 
 button:hover {
