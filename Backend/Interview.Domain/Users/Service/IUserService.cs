@@ -16,7 +16,7 @@ public interface IUserService : IService
 
     Task<UserDetail> GetSelfAsync();
 
-    Task<User> UpsertByTwitchIdentityAsync(User user, CancellationToken cancellationToken = default);
+    Task<User> UpsertByExternalIdAsync(User user, CancellationToken cancellationToken = default);
 
     Task<IPagedList<UserDetail>> FindByRoleAsync(
         int pageNumber,

@@ -41,10 +41,10 @@ public class UserServicePermissionAccessor : IUserService, IServiceDecorator
         return await _userService.GetSelfAsync();
     }
 
-    public Task<User> UpsertByTwitchIdentityAsync(User user, CancellationToken cancellationToken = default)
+    public Task<User> UpsertByExternalIdAsync(User user, CancellationToken cancellationToken = default)
     {
         // await _securityService.EnsurePermission(SEPermission.UserFindById);
-        return _userService.UpsertByTwitchIdentityAsync(user, cancellationToken);
+        return _userService.UpsertByExternalIdAsync(user, cancellationToken);
     }
 
     public async Task<IPagedList<UserDetail>> FindByRoleAsync(

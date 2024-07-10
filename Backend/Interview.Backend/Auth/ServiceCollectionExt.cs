@@ -21,9 +21,7 @@ public static class ServiceCollectionExt
             {
                 options.Events.OnValidatePrincipal = context =>
                 {
-                    var sorfacePrincipalValidator =
-                        context.HttpContext.RequestServices.GetRequiredService<SorfacePrincipalValidator>();
-
+                    var sorfacePrincipalValidator = context.HttpContext.RequestServices.GetRequiredService<SorfacePrincipalValidator>();
                     return sorfacePrincipalValidator.ValidateAsync(context);
                 };
                 options.Cookie.HttpOnly = false;
@@ -76,7 +74,7 @@ public static class ServiceCollectionExt
                     }
 
                     var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
-                    var upsertUser = await userService.UpsertByTwitchIdentityAsync(user);
+                    var upsertUser = await userService.UpsertByExternalIdAsync(user);
 
                     context.Principal!.EnrichRolesWithId(upsertUser);
                 };

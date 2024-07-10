@@ -41,10 +41,10 @@ public class UserRepository : EfRepository<User>, IUserRepository
             .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
 
-    public Task<User?> FindByTwitchIdentityAsync(string twitchIdentity, CancellationToken cancellationToken = default)
+    public Task<User?> FindByExternalIdAsync(string twitchIdentity, CancellationToken cancellationToken = default)
     {
         return ApplyIncludes(Set)
-            .FirstOrDefaultAsync(user => user.TwitchIdentity == twitchIdentity, cancellationToken);
+            .FirstOrDefaultAsync(user => user.ExternalId == twitchIdentity, cancellationToken);
     }
 
     public async Task<Dictionary<string, List<PermissionItem>>> FindPermissionByUserId(

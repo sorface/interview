@@ -9,17 +9,14 @@ public class SorfaceAuthenticationOptions : OAuthOptions
 {
     public SorfaceAuthenticationOptions()
     {
-        ClaimActions.MapCustomJson(ClaimTypes.NameIdentifier, user => GetData(user, "id"));
-        ClaimActions.MapCustomJson(ClaimTypes.Name, user => GetData(user, "username"));
-        ClaimActions.MapCustomJson(ClaimTypes.Email, user => GetData(user, "email"));
+        ClaimActions.MapCustomJson(SorfaceClaimTypes.Claims.Profile.Id, user => GetData(user, "id"));
+        ClaimActions.MapCustomJson(SorfaceClaimTypes.Claims.Profile.Username, user => GetData(user, "username"));
+        ClaimActions.MapCustomJson(SorfaceClaimTypes.Claims.Profile.Email, user => GetData(user, "email"));
+        ClaimActions.MapCustomJson(SorfaceClaimTypes.Claims.Profile.Avatar, user => GetData(user, "avatarUrl"));
+        ClaimActions.MapCustomJson(SorfaceClaimTypes.Claims.Profile.FirstName, user => GetData(user, "firstName"));
+        ClaimActions.MapCustomJson(SorfaceClaimTypes.Claims.Profile.LastName, user => GetData(user, "lastName"));
+        ClaimActions.MapCustomJson(SorfaceClaimTypes.Claims.Profile.MiddleName, user => GetData(user, "middleName"));
     }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the "force_verify=true" flag should be sent to Twitch.
-    /// When set to <c>true</c>, Twitch displays the consent screen for every authorization request.
-    /// When left to <c>false</c>, the consent screen is skipped if the user is already logged in.
-    /// </summary>
-    public bool ForceVerify { get; set; }
 
     private static string? GetData(JsonElement user, string key)
     {
