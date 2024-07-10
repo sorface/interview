@@ -1,0 +1,25 @@
+.switcher-button button {
+  position: relative;
+}
+
+.switcher-button button:first-child:not(.inverted) {
+  border-right: unset;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  z-index: 1;
+}
+
+.switcher-button button:last-child {
+  transform: translateX(-1rem);
+}
+
+.switcher-button button:last-child:not(.inverted) {
+  border-left: unset;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  z-index: 1;
+}
+
+.switcher-button button.inverted {
+  z-index: 2;
+}

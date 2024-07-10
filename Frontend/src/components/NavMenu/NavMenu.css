@@ -178,13 +178,13 @@
   position: fixed;
   left: 0;
   top: 0;
-  background-color: #000;
-  opacity: 0.0;
+  background-color: var(--page-overlay-color);
+  opacity: 0;
   animation: slide-opacity 0.35s forwards;
   z-index: 1;
 }
 
 @keyframes slide-opacity {
   0% { opacity: 0; }
-  100% { opacity: 0.5; }
+  100% { opacity: 1; }
 }

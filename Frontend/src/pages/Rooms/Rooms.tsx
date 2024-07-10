@@ -10,13 +10,13 @@ import { Room, RoomStatus } from '../../types/room';
 import { checkAdmin } from '../../utils/checkAdmin';
 import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
 import { RoomsSearch } from '../../components/RoomsSearch/RoomsSearch';
-import { ButtonLink } from '../../components/ButtonLink/ButtonLink';
 import { RoomsFilter } from '../../components/RoomsFilter/RoomsFilter';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
 import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
 import { UserAvatar } from '../../components/UserAvatar/UserAvatar';
+import { RoomCreate } from '../RoomCreate/RoomCreate';
 
 import './Rooms.css';
 
@@ -35,6 +35,7 @@ export const Rooms: FunctionComponent = () => {
   const [searchValue, setSearchValue] = useState('');
   const [participating, setParticipating] = useState(false);
   const [closed, setClosed] = useState(false);
+  const [createModalOpened, setCreateModalOpened] = useState(false);
 
   useEffect(() => {
     const participants = (auth?.id && participating) ? [auth?.id] : [];
@@ -61,6 +62,14 @@ export const Rooms: FunctionComponent = () => {
   const handleNextPage = useCallback(() => {
     setPageNumber(pageNumber + 1);
   }, [pageNumber]);
+
+  const handleOpenCreateModal = () => {
+    setCreateModalOpened(true);
+  }
+
+  const handleCloseCreateModal = () => {
+    setCreateModalOpened(false);
+  }
 
   const createRoomItem = useCallback((room: Room) => {
     const roomStatusCaption: Record<Room['roomStatus'], string> = {
@@ -135,10 +144,11 @@ export const Rooms: FunctionComponent = () => {
             onParticipatingChange={setParticipating}
             onClosedChange={setClosed}
           />
-          <ButtonLink
-            path={pathnames.roomsCreate}
-            caption="+"
-          />
+          <button className='active' onClick={handleOpenCreateModal}>
+            <ThemedIcon name={IconNames.Add} />
+            {localizationCaptions[LocalizationKey.CreateRoom]}
+          </button>
+          {createModalOpened && <RoomCreate open={createModalOpened} onClose={handleCloseCreateModal} />}
         </div>
       </Field>
       <ProcessWrapper

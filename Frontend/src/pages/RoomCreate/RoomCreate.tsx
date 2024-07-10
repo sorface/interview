@@ -1,113 +1,103 @@
-import React, { FormEvent, FunctionComponent, useCallback, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import { CreateRoomBody, CreateTagBody, GetTagsParams, roomsApiDeclaration, tagsApiDeclaration } from '../../apiDeclarations';
+import React, { ChangeEvent, FunctionComponent, useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { CreateRoomBody, RoomIdParam, roomInviteApiDeclaration, roomsApiDeclaration } from '../../apiDeclarations';
 import { Field } from '../../components/FieldsBlock/Field';
-import { HeaderWithLink } from '../../components/HeaderWithLink/HeaderWithLink';
 import { Loader } from '../../components/Loader/Loader';
-import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
-import { QuestionsSelector } from '../../components/QuestionsSelector/QuestionsSelector';
-import { SubmitField } from '../../components/SubmitField/SubmitField';
-import { UsersSelector } from '../../components/UsersSelector/UsersSelector';
-import { pathnames, toastSuccessOptions } from '../../constants';
+import { IconNames } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Question } from '../../types/question';
-import { User } from '../../types/user';
-import { TagsSelector } from '../../components/TagsSelector/TagsSelector';
-import { Tag } from '../../types/tag';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
-import { RoomAccessType } from '../../types/room';
+import { Room, RoomAccessType, RoomInvite } from '../../types/room';
 import { DragNDropList, DragNDropListItem } from '../../components/DragNDropList/DragNDropList';
-
-import './RoomCreate.css';
-
-const getFormFieldOrError = (form: FormData, fieldName: string) => {
-  const value = form.get(fieldName);
-  if (typeof value !== 'string') {
-    throw new Error(`${fieldName} field type error`);
-  }
-  return value;
-};
+import { SwitcherButton } from '../../components/SwitcherButton/SwitcherButton';
+import { ModalFooter } from '../../components/ModalFooter/ModalFooter';
+import { Gap } from '../../components/Gap/Gap';
+import { Typography } from '../../components/Typography/Typography';
+import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
+import { RoomQuestionsSelector } from './RoomQuestionsSelector/RoomQuestionsSelector';
+import { QuestionItem } from '../../components/QuestionItem/QuestionItem';
+import { RoomInvitations } from '../../components/RoomInvitations/RoomInvitations';
+import { RoomCreateField } from './RoomCreateField/RoomCreateField';
+import { Modal } from '../../components/Modal/Modal';
 
 const nameFieldName = 'roomName';
 const dateFieldName = 'roomDate';
 const startTimeFieldName = 'roomStartTime';
 const endTimeFieldName = 'roomEndTime';
-const pageNumber = 1;
-const pageSize = 30;
 
-export const RoomCreate: FunctionComponent = () => {
+enum CreationStep {
+  Step1,
+  Step2,
+}
+
+type RoomFields = {
+  name: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+};
+
+export type RoomQuestionListItem = Question & DragNDropListItem;
+
+interface RoomCreateProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
+  open,
+  onClose,
+}) => {
   const localizationCaptions = useLocalizationCaptions();
   const navigate = useNavigate();
-  const { apiMethodState, fetchData } = useApiMethod<string, CreateRoomBody>(roomsApiDeclaration.create);
-  const { process: { loading, error }, data: createdRoomId } = apiMethodState;
+  const { apiMethodState, fetchData } = useApiMethod<Room, CreateRoomBody>(roomsApiDeclaration.create);
+  const { process: { loading, error }, data: createdRoom } = apiMethodState;
 
   const {
-    apiMethodState: tagsState,
-    fetchData: fetchTags,
-  } = useApiMethod<Tag[], GetTagsParams>(tagsApiDeclaration.getPage);
-  const { process: { loading: tagsLoading, error: tagsError }, data: tags } = tagsState;
-
+    apiMethodState: apiRoomInvitesState,
+    fetchData: fetchRoomInvites,
+  } = useApiMethod<RoomInvite[], RoomIdParam>(roomInviteApiDeclaration.get);
   const {
-    apiMethodState: tagCreateState,
-    fetchData: fetchCreateTag,
-  } = useApiMethod<Tag, CreateTagBody>(tagsApiDeclaration.createTag);
-  const { process: { loading: createTagLoading, error: createTagError }, data: createdQuestionTag } = tagCreateState;
+    process: { loading: roomInvitesLoading, error: roomInvitesError },
+    data: roomInvitesData,
+  } = apiRoomInvitesState;
 
-  const [selectedQuestions, setSelectedQuestions] = useState<DragNDropListItem[]>([]);
-  const [selectedExperts, setSelectedExperts] = useState<User[]>([]);
-  const [selectedExaminees, setSelectedExaminees] = useState<User[]>([]);
-  const [tagsSearchValue, setTagsSearchValue] = useState('');
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [roomFields, setRoomFields] = useState<RoomFields>({
+    name: '',
+    date: '',
+    startTime: '',
+    endTime: '',
+  });
+  const [selectedQuestions, setSelectedQuestions] = useState<RoomQuestionListItem[]>([]);
+  const [creationStep, setCreationStep] = useState<CreationStep>(CreationStep.Step1);
+  const [questionsView, setQuestionsView] = useState(false);
 
-  const totalLoading = loading || createTagLoading;
-  const totalError = error || tagsError || createTagError;
-
-  useEffect(() => {
-    fetchTags({
-      PageNumber: pageNumber,
-      PageSize: pageSize,
-      value: tagsSearchValue,
-    });
-  }, [createdQuestionTag, tagsSearchValue, fetchTags]);
+  const totalLoading = loading;
+  const totalError = error;
 
   useEffect(() => {
-    if (!createdRoomId) {
+    if (!createdRoom) {
       return;
     }
-    toast.success(localizationCaptions[LocalizationKey.RoomCreated], toastSuccessOptions);
-    navigate(pathnames.rooms);
-  }, [createdRoomId, localizationCaptions, navigate]);
+    setCreationStep(CreationStep.Step2);
+  }, [createdRoom, localizationCaptions, navigate]);
 
-  const handleTagSelect = (tag: Tag) => {
-    setSelectedTags([...selectedTags, tag]);
-  };
+  useEffect(() => {
+    if (!createdRoom) {
+      return;
+    }
+    fetchRoomInvites({
+      roomId: createdRoom.id,
+    });
+  }, [createdRoom, fetchRoomInvites]);
 
-  const handleTagUnselect = (tag: Tag) => {
-    const newSelectedTags = selectedTags.filter(tg => tg.id !== tag.id);
-    setSelectedTags(newSelectedTags);
-  };
-
-  const handleTagSearch = (value: string) => {
-    setTagsSearchValue(value);
-  };
-
-  const handleTagCreate = (tag: Omit<Tag, 'id'>) => {
-    fetchCreateTag(tag);
-  };
-
-  const handleSubmit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const form = event.target as HTMLFormElement;
-    const data = new FormData(form);
-    const roomName = getFormFieldOrError(data, nameFieldName);
-    const roomDateValue = getFormFieldOrError(data, dateFieldName);
-    const roomDateStart = new Date(roomDateValue);
-    const roomStartTime = getFormFieldOrError(data, startTimeFieldName).split(':');
+  const handleCreateRoom = () => {
+    const roomDateStart = new Date(roomFields.date);
+    const roomStartTime = roomFields.startTime.split(':');
     roomDateStart.setHours(parseInt(roomStartTime[0]));
     roomDateStart.setMinutes(parseInt(roomStartTime[1]));
-    const roomEndTime = getFormFieldOrError(data, endTimeFieldName).split(':');
+    const roomEndTime = roomFields.endTime.split(':');
     const roomDateEnd = new Date(roomDateStart);
     if (roomEndTime.length > 1) {
       roomDateEnd.setHours(parseInt(roomEndTime[0]));
@@ -115,54 +105,41 @@ export const RoomCreate: FunctionComponent = () => {
     }
     const duration = (roomDateEnd.getTime() - roomDateStart.getTime()) / 1000;
     fetchData({
-      name: roomName,
+      name: roomFields.name,
       questions: selectedQuestions.map((question, index) => ({ id: question.id, order: index })),
-      experts: selectedExperts.map(user => user.id),
-      examinees: selectedExaminees.map(user => user.id),
-      tags: selectedTags.map(tag => tag.id),
+      experts: [],
+      examinees: [],
+      tags: [],
       accessType: RoomAccessType.Private,
       scheduleStartTime: roomDateStart.toISOString(),
       duration,
     });
-  }, [selectedQuestions, selectedExperts, selectedExaminees, selectedTags, fetchData]);
+  };
 
-  const handleQuestionSelect = useCallback((question: Question) => {
-    const newSelectedQuestion: DragNDropListItem = {
-      id: question.id,
-      value: question.value,
-      order: selectedQuestions.length
-    };
-    setSelectedQuestions([...selectedQuestions, newSelectedQuestion]);
-  }, [selectedQuestions]);
+  const handleChangeField = (fieldName: keyof RoomFields) => (e: ChangeEvent<HTMLInputElement>) => {
+    setRoomFields({
+      ...roomFields,
+      [fieldName]: e.target.value,
+    });
+  };
 
-  const handleQuestionUnSelect = useCallback((question: Question) => {
-    const newSelectedQuestions = selectedQuestions.filter(
-      ques => ques.id !== question.id
-    );
+  const handleQuestionsSave = (questions: RoomQuestionListItem[]) => {
+    setSelectedQuestions(questions);
+    setQuestionsView(false);
+  };
+
+  const handleQuestionRemove = (question: Question) => {
+    const newSelectedQuestions = selectedQuestions.filter(q => q.id !== question.id);
     setSelectedQuestions(newSelectedQuestions);
-  }, [selectedQuestions]);
+  };
 
-  const handleExpertSelect = useCallback((user: User) => {
-    setSelectedExperts([...selectedExperts, user]);
-  }, [selectedExperts]);
+  const handleQuestionsViewOpen = () => {
+    setQuestionsView(true);
+  };
 
-  const handleExpertUnSelect = useCallback((user: User) => {
-    const newSelectedUsers = selectedExperts.filter(
-      usr => usr.id !== user.id
-    );
-    setSelectedExperts(newSelectedUsers);
-  }, [selectedExperts]);
-
-  const handleExamineeSelect = useCallback((user: User) => {
-    setSelectedExaminees([...selectedExaminees, user]);
-  }, [selectedExaminees]);
-
-  const handleExamineeUnSelect = useCallback((user: User) => {
-    const newSelectedUsers = selectedExaminees.filter(
-      usr => usr.id !== user.id
-    );
-    setSelectedExaminees(newSelectedUsers);
-  }, [selectedExaminees]);
+  const handleQuestionsViewClose = () => {
+    setQuestionsView(false);
+  };
 
   const renderStatus = useCallback(() => {
     if (totalError) {
@@ -182,87 +159,144 @@ export const RoomCreate: FunctionComponent = () => {
     return <></>;
   }, [totalError, totalLoading, localizationCaptions]);
 
-  return (
-    <MainContentWrapper className="question-create">
-      <HeaderWithLink
-        title={localizationCaptions[LocalizationKey.CreateRoom]}
-        linkVisible={true}
-        path={pathnames.rooms}
-        linkCaption="<"
-        linkFloat="left"
-      />
-      {renderStatus()}
-      <form action="" onSubmit={handleSubmit}>
-        <Field>
-          <label htmlFor="roomName">{localizationCaptions[LocalizationKey.RoomName]}:</label>
-          <input id="roomName" name={nameFieldName} type="text" required />
-        </Field>
-        <Field>
-          <div>
-            <label htmlFor="roomDate">{localizationCaptions[LocalizationKey.RoomDate]}:</label>
-            <input id="roomDate" name={dateFieldName} type="date" required />
-          </div>
-          <div>
-            <label htmlFor="roomTimeStart">{localizationCaptions[LocalizationKey.RoomStartTime]}:</label>
-            <input id="roomTimeStart" name={startTimeFieldName} type="time" required />
-          </div>
-          <div>
-            <label htmlFor="roomTimeEnd">{localizationCaptions[LocalizationKey.RoomEndTime]}:</label>
-            <input id="roomTimeEnd" name={endTimeFieldName} type="time" />
-          </div>
-        </Field>
-        <Field>
-          <TagsSelector
-            placeHolder={localizationCaptions[LocalizationKey.TagsPlaceholder]}
-            loading={tagsLoading}
-            tags={tags || []}
-            selectedTags={selectedTags}
-            onSelect={handleTagSelect}
-            onUnselect={handleTagUnselect}
-            onSearch={handleTagSearch}
-            onCreate={handleTagCreate}
-          />
-        </Field>
-        <Field>
-          <Link to={pathnames.questions}>{localizationCaptions[LocalizationKey.QuestionsPageName]}:</Link>
-          <div className="items-selected">
+  const renderQuestionItem = (question: Question, lastItem: boolean) => (
+    <>
+      <QuestionItem question={question} onRemove={handleQuestionRemove} />
+      {!lastItem && <Gap sizeRem={0.25} />}
+    </>
+  );
+
+  const stepView = {
+    [CreationStep.Step1]: (
+      <>
+        <RoomCreateField.Wrapper>
+          <RoomCreateField.Label>
+            <label htmlFor="roomName"><Typography size='m' bold>{localizationCaptions[LocalizationKey.RoomName]}</Typography></label>
+          </RoomCreateField.Label>
+          <RoomCreateField.Content className='flex flex-1'>
+            <input
+              id="roomName"
+              name={nameFieldName}
+              value={roomFields.name}
+              onChange={handleChangeField('name')}
+              className='flex-1'
+              type="text"
+              required
+            />
+          </RoomCreateField.Content>
+        </RoomCreateField.Wrapper>
+        <RoomCreateField.Wrapper>
+          <RoomCreateField.Label>
+          </RoomCreateField.Label>
+          <RoomCreateField.Content className='px-1'>
+            <Typography size='s'>
+              {localizationCaptions[LocalizationKey.RoomNamePrompt]}
+            </Typography>
+          </RoomCreateField.Content>
+        </RoomCreateField.Wrapper>
+        <Gap sizeRem={2.25} />
+
+        <RoomCreateField.Wrapper>
+          <RoomCreateField.Label>
+            <label htmlFor="roomDate"><Typography size='m' bold>{localizationCaptions[LocalizationKey.RoomDateAndTime]}</Typography></label>
+          </RoomCreateField.Label>
+          <RoomCreateField.Content>
+            <input
+              id='roomDate'
+              name={dateFieldName}
+              value={roomFields.date}
+              type='date'
+              required
+              className='mr-0.5'
+              onChange={handleChangeField('date')}
+            />
+            <input
+              id='roomTimeStart'
+              name={startTimeFieldName}
+              value={roomFields.startTime}
+              type='time'
+              required
+              className='mr-0.5'
+              onChange={handleChangeField('startTime')}
+            />
+            <span className='mr-0.5'>
+              <Typography size='s'>-</Typography>
+            </span>
+            <input
+              id='roomTimeEnd'
+              name={endTimeFieldName}
+              value={roomFields.endTime}
+              type='time'
+              onChange={handleChangeField('endTime')}
+            />
+          </RoomCreateField.Content>
+        </RoomCreateField.Wrapper>
+        <Gap sizeRem={2.25} />
+
+        <RoomCreateField.Wrapper>
+          <RoomCreateField.Label className='self-start'>
+            <label htmlFor="roomDate"><Typography size='m' bold>{localizationCaptions[LocalizationKey.RoomQuestions]}</Typography></label>
+          </RoomCreateField.Label>
+          <RoomCreateField.Content>
             <DragNDropList
               items={selectedQuestions}
+              renderItem={renderQuestionItem}
               onItemsChange={setSelectedQuestions}
             />
-          </div>
-          <QuestionsSelector
-            selected={selectedQuestions}
-            onSelect={handleQuestionSelect}
-            onUnselect={handleQuestionUnSelect}
+            {!!selectedQuestions.length && <Gap sizeRem={1.5} />}
+            <button onClick={handleQuestionsViewOpen}>
+              <ThemedIcon name={IconNames.Add} />
+              {localizationCaptions[LocalizationKey.AddRoomQuestions]}
+            </button>
+          </RoomCreateField.Content>
+        </RoomCreateField.Wrapper>
+        <ModalFooter>
+          <button onClick={onClose}>{localizationCaptions[LocalizationKey.Cancel]}</button>
+          <button className='active' onClick={handleCreateRoom}>{localizationCaptions[LocalizationKey.Continue]}</button>
+        </ModalFooter>
+      </>
+    ),
+    [CreationStep.Step2]: (
+      <>
+        <RoomInvitations
+          roomId={createdRoom?.id || ''}
+          roomInvitesData={roomInvitesData}
+          roomInvitesError={roomInvitesError}
+          roomInvitesLoading={roomInvitesLoading}
+        />
+        <ModalFooter>
+          <button className='active' onClick={onClose}>{localizationCaptions[LocalizationKey.Continue]}</button>
+        </ModalFooter>
+      </>
+    ),
+  };
+
+  return (
+    <Modal
+      contentLabel={questionsView ? localizationCaptions[LocalizationKey.AddingRoomQuestions] : localizationCaptions[LocalizationKey.NewRoom]}
+      open={open}
+      onClose={onClose}
+    >
+      <div className='text-left'>
+        <SwitcherButton
+          captions={[
+            localizationCaptions[LocalizationKey.CreateRoomStep1],
+            localizationCaptions[LocalizationKey.CreateRoomStep2],
+          ]}
+          activeIndex={creationStep}
+        />
+        <Gap sizeRem={2.25} />
+        {renderStatus()}
+        {questionsView ? (
+          <RoomQuestionsSelector
+            preSelected={selectedQuestions}
+            onCancel={handleQuestionsViewClose}
+            onSave={handleQuestionsSave}
           />
-        </Field>
-        <Field>
-          <span>{localizationCaptions[LocalizationKey.RoomExperts]}: </span>
-          <span className="items-selected">
-            {selectedExperts.map(user => user.nickname).join(', ')}
-          </span>
-          <UsersSelector
-            uniqueKey='Experts'
-            selected={selectedExperts}
-            onSelect={handleExpertSelect}
-            onUnselect={handleExpertUnSelect}
-          />
-        </Field>
-        <Field>
-          <span>{localizationCaptions[LocalizationKey.RoomExaminees]}: </span>
-          <span className="items-selected">
-            {selectedExaminees.map(user => user.nickname).join(', ')}
-          </span>
-          <UsersSelector
-            uniqueKey='Examinees'
-            selected={selectedExaminees}
-            onSelect={handleExamineeSelect}
-            onUnselect={handleExamineeUnSelect}
-          />
-        </Field>
-        <SubmitField caption={localizationCaptions[LocalizationKey.Create]} />
-      </form>
-    </MainContentWrapper>
+        ) :
+          stepView[creationStep]
+        }
+      </div>
+    </Modal>
   );
 };
