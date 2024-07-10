@@ -94,7 +94,7 @@ public class ServiceConfigurator
         serviceCollection.AddSingleton<UserClaimService>();
 
         AddWebSocketServices(serviceCollection);
-        
+
         serviceCollection.Configure<ChatBotAccount>(_configuration.GetSection(nameof(ChatBotAccount)));
         serviceCollection.Configure<ForwardedHeadersOptions>(options =>
         {
