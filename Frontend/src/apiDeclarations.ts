@@ -2,7 +2,7 @@ import { ApiContractGet, ApiContractPatch, ApiContractPost, ApiContractPut } fro
 import { Question, QuestionType } from './types/question';
 import { Tag } from './types/tag';
 import { Reaction } from './types/reaction';
-import { Room, RoomAccessType, RoomInvite, RoomQuestionState, RoomReview, RoomStateAdditionalStatefulPayload, RoomStatus } from './types/room';
+import { Room, RoomAccessType, RoomInvite, RoomQuestion, RoomQuestionState, RoomReview, RoomStateAdditionalStatefulPayload, RoomStatus } from './types/room';
 import { User, UserType } from './types/user';
 import { Category } from './types/category';
 
@@ -41,6 +41,12 @@ export interface GetRoomParticipantParams {
 
 export interface RoomIdParam {
   roomId: Room['id'];
+}
+
+export interface RoomEditBody {
+  id: string;
+  name: string;
+  questions: Array<Omit<RoomQuestion, 'state'>>;
 }
 
 const eventsSearchLimit = 50;
@@ -101,6 +107,11 @@ export const roomsApiDeclaration = {
         last: eventsSearchLimit,
       },
     },
+  }),
+  edit: (body: RoomEditBody): ApiContractPatch => ({
+    method: 'PATCH',
+    baseUrl: `/rooms/${body.id}`,
+    body,
   }),
 };
 

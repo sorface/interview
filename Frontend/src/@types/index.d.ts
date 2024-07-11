@@ -1,5 +1,6 @@
 export interface IonIconProps {
   name: string;
+  size?: string;
 }
 
 declare global {

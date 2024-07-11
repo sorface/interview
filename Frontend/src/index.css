@@ -29,6 +29,7 @@
   --fadeIn-animation: fadeIn 300ms;
   --fadeIn-animation-fast: fadeIn 100ms;
   --fadeOutUp-animation: 1s fadeOutUp both;
+  --page-overlay-color: rgba(36, 36, 58, 0.5);
 }
 
 :root[data-theme="Light"] {
@@ -39,10 +40,11 @@
   --button-border-color: #D9D9D9;
   --button-bg: #FFF;
   --bg-success: #00B96B;
+  --shadow: rgba(200, 200, 200, 0.5);
 }
 
 :root[data-color-transition="enabled"] * {
-  transition: background-color 300ms, border-color 300ms;
+  transition: background-color 300ms, border-color 300ms, transform 300ms;
 }
 
 :root[data-color-transition="enabled"] .move-transition {
@@ -90,9 +92,9 @@ body {
 button {
   color: var(--text);
   background-color: var(--button-bg);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   border: 1px solid var(--button-border-color);
-  padding: 0rem 2rem;
+  padding: 0.25rem 1rem;
   min-height: 1.75rem;
   text-align: center;
   text-decoration: none;
@@ -101,7 +103,7 @@ button {
   justify-content: center;
   cursor: pointer;
   transition: 300ms !important;
-  border-radius: var(--border-radius);
+  border-radius: 2rem;
 }
 
 button:hover {
@@ -115,6 +117,11 @@ button.active {
 
 button.danger {
   border-color: var(--active);
+}
+
+button.inverted {
+  background-color: var(--text);
+  color: var(--wrap-bg);
 }
 
 button:disabled,
@@ -156,11 +163,12 @@ table td {
 textarea,
 input[type="text"],
 input[type="color"] {
-  font-size: 1.0rem;
+  font-size: 0.875rem;
   color: var(--text);
   background-color: var(--wrap-bg);
   border: 1px solid var(--button-border-color);
-  border-radius: var(--border-radius);
+  border-radius: 1.125rem;
+  padding: 0.5rem 1rem;
 }
 
 input[type="color"] {
