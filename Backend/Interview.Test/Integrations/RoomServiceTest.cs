@@ -155,16 +155,16 @@ public class RoomServiceTest
                     Question = new Question("test q"),
                     State = RoomQuestionState.Open,
                     Order = 0,
-                    // Evaluations = new List<RoomQuestionEvaluation>
-                    // {
-                    //     new()
-                    //     {
-                    //         RoomQuestionId = default,
-                    //         CreatedBy = dummyUser,
-                    //         Review = "dummy 2",
-                    //         Mark = 2
-                    //     },
-                    // }
+                    Evaluations = new List<RoomQuestionEvaluation>
+                    {
+                        new()
+                        {
+                            RoomQuestionId = default,
+                            CreatedBy = dummyUser,
+                            Review = "dummy 2",
+                            Mark = 2
+                        },
+                    }
                 },
                 new()
                 {
@@ -174,16 +174,16 @@ public class RoomServiceTest
                     Question = new Question("test q 2"),
                     State = RoomQuestionState.Active,
                     Order = 0,
-                    // Evaluations = new List<RoomQuestionEvaluation>
-                    // {
-                    //     new()
-                    //     {
-                    //         RoomQuestionId = default,
-                    //         CreatedBy = dummyUser,
-                    //         Review = "dummy 1",
-                    //         Mark = 1
-                    //     },
-                    // }
+                    Evaluations = new List<RoomQuestionEvaluation>
+                    {
+                        new()
+                        {
+                            RoomQuestionId = default,
+                            CreatedBy = dummyUser,
+                            Review = "dummy 1",
+                            Mark = 1
+                        },
+                    }
                 },
             },
         };

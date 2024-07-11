@@ -20,7 +20,11 @@ public class DateEntityPreProcessor : AbstractPreProcessor
     protected override void AddEntityHandler(Entity entity, CancellationToken cancellationToken = default)
     {
         entity.UpdateCreateDate(_clock.UtcNow.UtcDateTime);
-        if (TestEnv && entity.CreatedById is null)
+        if (TestEnv)
+        {
+            entity.CreatedById ??= _currentUserAccessor.UserId;
+        }
+        else
         {
             entity.CreatedById = _currentUserAccessor.UserId;
         }
