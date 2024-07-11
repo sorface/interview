@@ -4,6 +4,7 @@ import { CodeEditorLang } from '../../types/question';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Theme, ThemeContext } from '../../context/ThemeContext';
 import { LocalizationKey } from '../../localization';
+import { Typography } from '../Typography/Typography';
 
 import './CodeEditor.css';
 
@@ -21,17 +22,19 @@ const renderOptions = (options: Array<number | string>) =>
 interface CodeEditorProps {
   language: CodeEditorLang;
   languages: CodeEditorLang[];
+  className?: string;
   readOnly?: boolean;
   value?: string | undefined;
   onMount?: OnMount | undefined;
   onChange?: OnChange | undefined;
-  onLanguageChange: (language: CodeEditorLang) => void;
+  onLanguageChange?: (language: CodeEditorLang) => void;
   onFontSizeChange?: (size: number) => void;
 }
 
 export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   language,
   languages,
+  className,
   readOnly,
   value,
   onMount,
@@ -50,18 +53,18 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   };
 
   const handleLanguageChange: ChangeEventHandler<HTMLSelectElement> = (event) => {
-    onLanguageChange(event.target.value as CodeEditorLang);
+    onLanguageChange?.(event.target.value as CodeEditorLang);
   };
 
   return (
-    <div className='code-editor'>
+    <div className={`code-editor overflow-hidden ${className}`}>
       <div className='code-editor-tools'>
-        <span>{localizationCaptions[LocalizationKey.Language]}:</span>
-        <select className='code-editor-tools-select' value={language} onChange={handleLanguageChange}>
+        <Typography size='m'>{localizationCaptions[LocalizationKey.Language]}:</Typography>
+        <select className='code-editor-tools-select' value={language} disabled={!onLanguageChange} onChange={handleLanguageChange}>
           {renderOptions(languages)}
         </select>
-        <span>{localizationCaptions[LocalizationKey.FontSize]}:</span>
-        <select className='code-editor-tools-select' value={fontSize} onChange={handleFontSizeChange}>
+        <Typography size='m'>{localizationCaptions[LocalizationKey.FontSize]}:</Typography>
+        <select className='code-editor-tools-select' value={fontSize} disabled={!onFontSizeChange} onChange={handleFontSizeChange}>
           {renderOptions(fontSizeOptions)}
         </select>
       </div>

@@ -1,6 +1,4 @@
-import { FunctionComponent, useRef, useState } from 'react';
-
-import './DragNDropList.css';
+import { ReactElement, useRef, useState } from 'react';
 
 export interface DragNDropListItem {
   id: string;
@@ -8,21 +6,23 @@ export interface DragNDropListItem {
   order: number;
 }
 
-interface DragNDropListProps {
-  items: DragNDropListItem[];
-  onItemsChange: (items: DragNDropListItem[]) => void;
+interface DragNDropListProps<T extends DragNDropListItem> {
+  items: T[];
+  renderItem: (item: T, lastItem: boolean) => ReactElement;
+  onItemsChange: (items: T[]) => void;
 }
 
-export const DragNDropList: FunctionComponent<DragNDropListProps> = ({
+export const DragNDropList = <T extends DragNDropListItem>({
   items,
+  renderItem,
   onItemsChange,
-}) => {
-  const [draggingItem, setDraggingItem] = useState<DragNDropListItem | null>(null);
+}: DragNDropListProps<T>) => {
+  const [draggingItem, setDraggingItem] = useState<T | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const previewContainerRef = useRef<HTMLDivElement | null>(null);
   const previewElRef = useRef<HTMLDivElement | null>(null);
 
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, item: DragNDropListItem) => {
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, item: T) => {
     setDraggingItem(item);
     e.dataTransfer.setData('text/plain', '');
     const crt = (e.target as HTMLDivElement).cloneNode(true) as HTMLDivElement;
@@ -43,7 +43,7 @@ export const DragNDropList: FunctionComponent<DragNDropListProps> = ({
     }
   };
 
-  const dropItem = (targetItem: DragNDropListItem) => {
+  const dropItem = (targetItem: T) => {
     if (!draggingItem) return;
 
     const currentIndex = items.indexOf(draggingItem);
@@ -57,7 +57,7 @@ export const DragNDropList: FunctionComponent<DragNDropListProps> = ({
     }
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, targetItem: DragNDropListItem) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, targetItem: T) => {
     e.preventDefault();
     if (!draggingItem || targetItem === draggingItem) {
       return;
@@ -65,30 +65,25 @@ export const DragNDropList: FunctionComponent<DragNDropListProps> = ({
     dropItem(targetItem);
   };
 
-  const handleDrop = (_: React.DragEvent<HTMLDivElement>, targetItem: DragNDropListItem) => {
+  const handleDrop = (_: React.DragEvent<HTMLDivElement>, targetItem: T) => {
     dropItem(targetItem);
   };
 
   return (
-    <div className="drag-n-drop-list" ref={containerRef}>
+    <div ref={containerRef}>
       <div ref={previewContainerRef} style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}></div>
-      {items.map(item => (
+      {items.map((item, index) => (
         <div
           key={item.id}
           draggable="true"
-          className=
-          {`list-item ${item === draggingItem ?
-            'dragging' : ''
-            }`}
+          className={`cursor-move ${item === draggingItem ? 'opacity-0' : ''}`}
           onDragStart={(e) =>
             handleDragStart(e, item)}
           onDragEnd={handleDragEnd}
           onDragOver={(e) => handleDragOver(e, item)}
           onDrop={(e) => handleDrop(e, item)}
         >
-          <div className="list-item-details">
-            <span>{item.value}</span>
-          </div>
+          {renderItem(item, index === items.length - 1)}
         </div>
       ))}
     </div>

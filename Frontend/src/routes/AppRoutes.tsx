@@ -6,7 +6,6 @@ import { Rooms } from '../pages/Rooms/Rooms';
 import { Questions } from '../pages/Questions/Questions';
 import { QuestionCreate } from '../pages/QuestionCreate/QuestionCreate';
 import { NotFound } from '../pages/NotFound/NotFound';
-import { RoomCreate } from '../pages/RoomCreate/RoomCreate';
 import { Room } from '../pages/Room/Room';
 import { Session } from '../pages/Session/Session';
 import { RoomParticipants } from '../pages/RoomParticipants/RoomParticipants';
@@ -53,13 +52,6 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
           <Routes>
             <Route path={pathnames.home} element={<Home />} />
             <Route path={pathnames.terms} element={<Terms />} />
-            <Route path={pathnames.roomsCreate}
-              element={
-                <ProtectedRoute allowed={authenticated}>
-                  <RoomCreate />
-                </ProtectedRoute>
-              }
-            />
             <Route path={pathnames.roomsParticipants}
               element={
                 <ProtectedRoute allowed={authenticated}>

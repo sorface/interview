@@ -1,0 +1,16 @@
+.typography {
+  font-weight: 400;
+  line-height: 150%;
+}
+
+.typography-m {
+  font-size: 0.875rem;
+}
+
+.typography-s {
+  font-size: 0.75rem;
+}
+
+.typography-bold {
+  font-weight: 600;
+}
