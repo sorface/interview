@@ -91,13 +91,17 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
 
   const handleQuestionCheck = (question: RoomQuestionListItem, checked: boolean) => {
     if (checked) {
-      setSelectedQuestions([
+      const newSelectedQuestions = [
         ...selectedQuestions,
         {
           ...question,
           order: selectedQuestions.length,
         },
-      ]);
+      ].map((selectedQuestion, index) => ({
+        ...selectedQuestion,
+        order: index,
+      }))
+      setSelectedQuestions(newSelectedQuestions);
       return;
     }
     const newSelectedQuestions = selectedQuestions.filter(
