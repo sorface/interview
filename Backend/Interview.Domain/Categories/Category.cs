@@ -21,7 +21,7 @@ public class Category : ArchiveEntity
     {
         if (id is null)
         {
-            return null;
+            return ServiceError.Error("Category should be specified");
         }
 
         var hasCategory = await db.Categories.AnyAsync(e => e.Id == id, cancellationToken);
