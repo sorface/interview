@@ -1,6 +1,6 @@
 import React, { ChangeEvent, FunctionComponent, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CreateRoomBody, RoomIdParam, roomInviteApiDeclaration, roomsApiDeclaration } from '../../apiDeclarations';
+import { CreateRoomBody, RoomEditBody, RoomIdParam, roomInviteApiDeclaration, roomsApiDeclaration } from '../../apiDeclarations';
 import { Field } from '../../components/FieldsBlock/Field';
 import { Loader } from '../../components/Loader/Loader';
 import { IconNames } from '../../constants';
@@ -26,6 +26,33 @@ const dateFieldName = 'roomDate';
 const startTimeFieldName = 'roomStartTime';
 const endTimeFieldName = 'roomEndTime';
 
+const padDateTimeValue = (value: number) => String(value).padStart(2, '0');
+
+const formatDate = (value: Date) => {
+  const month = padDateTimeValue(value.getMonth());
+  const date = padDateTimeValue(value.getDate());
+  return `${value.getFullYear()}-${month}-${date}`;
+};
+
+const formatTime = (value: Date) => {
+  const hours = padDateTimeValue(value.getHours());
+  const minutes = padDateTimeValue(value.getMinutes());
+  return `${hours}:${minutes}`;
+};
+
+const parseScheduledStartTime = (scheduledStartTime: string, durationSec?: number) => {
+  const parsed = new Date(scheduledStartTime);
+  const parsedDuration = new Date(scheduledStartTime);
+  if (durationSec) {
+    parsedDuration.setSeconds(parsedDuration.getSeconds() + durationSec);
+  };
+  return {
+    date: formatDate(parsed),
+    startTime: formatTime(parsed),
+    ...(durationSec && { endTime: formatTime(parsedDuration) }),
+  };
+};
+
 enum CreationStep {
   Step1,
   Step2,
@@ -41,11 +68,13 @@ type RoomFields = {
 export type RoomQuestionListItem = Question & DragNDropListItem;
 
 interface RoomCreateProps {
+  editRoomId: string | null;
   open: boolean;
   onClose: () => void;
 }
 
 export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
+  editRoomId,
   open,
   onClose,
 }) => {
@@ -53,6 +82,12 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
   const navigate = useNavigate();
   const { apiMethodState, fetchData } = useApiMethod<Room, CreateRoomBody>(roomsApiDeclaration.create);
   const { process: { loading, error }, data: createdRoom } = apiMethodState;
+
+  const { apiMethodState: apiRoomMethodState, fetchData: fetchRoom } = useApiMethod<Room, Room['id']>(roomsApiDeclaration.getById);
+  const { process: { loading: loadingRoom, error: errorRoom }, data: room } = apiRoomMethodState;
+
+  const { apiMethodState: apiRoomEditMethodState, fetchData: fetchRoomEdit } = useApiMethod<Room, RoomEditBody>(roomsApiDeclaration.edit);
+  const { process: { loading: loadingRoomEdit, error: errorRoomEdit }, data: editedRoom } = apiRoomEditMethodState;
 
   const {
     apiMethodState: apiRoomInvitesState,
@@ -73,24 +108,45 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
   const [creationStep, setCreationStep] = useState<CreationStep>(CreationStep.Step1);
   const [questionsView, setQuestionsView] = useState(false);
 
-  const totalLoading = loading;
-  const totalError = error;
+  const totalLoading = loading || loadingRoom || loadingRoomEdit;
+  const totalError = error || errorRoom || errorRoomEdit;
 
   useEffect(() => {
-    if (!createdRoom) {
+    if (!editRoomId) {
+      return;
+    }
+    fetchRoom(editRoomId);
+  }, [editRoomId, fetchRoom]);
+
+  useEffect(() => {
+    if (!room) {
+      return;
+    }
+    const parsedScheduledStartTime = room.scheduledStartTime && parseScheduledStartTime(room.scheduledStartTime, room.timer.durationSec);
+    setRoomFields((rf) => ({
+      ...rf,
+      ...room,
+      date: parsedScheduledStartTime ? parsedScheduledStartTime.date : '',
+      startTime: parsedScheduledStartTime ? parsedScheduledStartTime.startTime : '',
+      endTime: parsedScheduledStartTime ? parsedScheduledStartTime.endTime || '' : '',
+    }));
+  }, [room]);
+
+  useEffect(() => {
+    if (!createdRoom && !editedRoom) {
       return;
     }
     setCreationStep(CreationStep.Step2);
-  }, [createdRoom, localizationCaptions, navigate]);
+  }, [createdRoom, editedRoom, localizationCaptions, navigate]);
 
   useEffect(() => {
-    if (!createdRoom) {
+    if (!createdRoom && !editedRoom) {
       return;
     }
     fetchRoomInvites({
-      roomId: createdRoom.id,
+      roomId: createdRoom?.id || editedRoom?.id || '',
     });
-  }, [createdRoom, fetchRoomInvites]);
+  }, [createdRoom, editedRoom, fetchRoomInvites]);
 
   const handleCreateRoom = () => {
     const roomDateStart = new Date(roomFields.date);
@@ -104,16 +160,24 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
       roomDateEnd.setMinutes(parseInt(roomEndTime[1]));
     }
     const duration = (roomDateEnd.getTime() - roomDateStart.getTime()) / 1000;
-    fetchData({
-      name: roomFields.name,
-      questions: selectedQuestions.map((question, index) => ({ id: question.id, order: index })),
-      experts: [],
-      examinees: [],
-      tags: [],
-      accessType: RoomAccessType.Private,
-      scheduleStartTime: roomDateStart.toISOString(),
-      duration,
-    });
+    if (editRoomId) {
+      fetchRoomEdit({
+        id: editRoomId,
+        name: roomFields.name,
+        questions: selectedQuestions.map((question, index) => ({ ...question, order: index })),
+      });
+    } else {
+      fetchData({
+        name: roomFields.name,
+        questions: selectedQuestions.map((question, index) => ({ id: question.id, order: index })),
+        experts: [],
+        examinees: [],
+        tags: [],
+        accessType: RoomAccessType.Private,
+        scheduleStartTime: roomDateStart.toISOString(),
+        duration,
+      });
+    }
   };
 
   const handleChangeField = (fieldName: keyof RoomFields) => (e: ChangeEvent<HTMLInputElement>) => {
@@ -259,7 +323,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     [CreationStep.Step2]: (
       <>
         <RoomInvitations
-          roomId={createdRoom?.id || ''}
+          roomId={createdRoom?.id || editedRoom?.id || ''}
           roomInvitesData={roomInvitesData}
           roomInvitesError={roomInvitesError}
           roomInvitesLoading={roomInvitesLoading}

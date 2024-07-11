@@ -28,6 +28,7 @@
 .max-h-20 { max-height: 20rem; }
 .z-50 { z-index: 50; }
 .translate-y-0\.25 { transform: translateY(0.25rem); }
+.rotate-90 { transform: rotate(90deg); }
 .rotate-180 { transform: rotate(180deg); }
 .shadow { box-shadow: 0px 4px 12px var(--shadow); }
 .text-left { text-align: left; }

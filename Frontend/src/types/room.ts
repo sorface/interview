@@ -15,6 +15,7 @@ export interface Room {
   participants: User[];
   tags: Tag[];
   roomStatus: RoomStatus;
+  scheduledStartTime?: string;
   timer: {
     durationSec: number;
     startTime?: string;
