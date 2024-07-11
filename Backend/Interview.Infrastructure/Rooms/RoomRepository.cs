@@ -151,12 +151,14 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                     Avatar = string.Empty,
                     Nickname = e.User.Nickname,
                     ParticipantType = e.Type.Name ?? string.Empty,
-                    Evaluation = e.User.RoomQuestionEvaluations.Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.RoomQuestion!.QuestionId == questionId).Select(rqe => new Analytics.AnalyticsUserQuestionEvaluation
-                    {
-                        Review = rqe.Review,
-                        Mark = rqe.Mark,
-                        State = rqe.State.EnumValue,
-                    }).FirstOrDefault(),
+                    Evaluation = e.User.RoomQuestionEvaluations
+                        .Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.RoomQuestion!.QuestionId == questionId)
+                        .Select(rqe => new Analytics.AnalyticsUserQuestionEvaluation
+                        {
+                            Review = rqe.Review,
+                            Mark = rqe.Mark,
+                        })
+                        .FirstOrDefault(),
                 })
                 .ToListAsync(ct);
         }

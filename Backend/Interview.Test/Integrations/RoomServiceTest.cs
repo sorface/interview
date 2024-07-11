@@ -427,7 +427,6 @@ public class RoomServiceTest
                             {
                                 Mark = 10,
                                 Review = "test test",
-                                State = EVRoomQuestionEvaluationState.Draft,
                             },
                         },
                     }
@@ -457,7 +456,6 @@ public class RoomServiceTest
                             {
                                 Mark = 5,
                                 Review = "test",
-                                State = EVRoomQuestionEvaluationState.Submitted,
                             },
                         },
                         new()

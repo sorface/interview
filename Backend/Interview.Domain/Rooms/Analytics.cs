@@ -22,8 +22,6 @@ public class Analytics
         public required string? Review { get; set; }
 
         public required int? Mark { get; set; }
-
-        public required EVRoomQuestionEvaluationState State { get; set; }
     }
 
     public class AnalyticsReactionSummary
