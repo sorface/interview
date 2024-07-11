@@ -399,7 +399,7 @@ public class RoomServiceTest
                             Nickname = users[0].Nickname,
                             Avatar = users[0].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Examinee.Name,
-                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                            Evaluation = null,
                         },
                         new()
                         {
@@ -407,7 +407,7 @@ public class RoomServiceTest
                             Nickname = users[1].Nickname,
                             Avatar = users[1].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Expert.Name,
-                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                            Evaluation = null,
                         },
                         new()
                         {
@@ -415,7 +415,7 @@ public class RoomServiceTest
                             Nickname = users[2].Nickname,
                             Avatar = users[2].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Viewer.Name,
-                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                            Evaluation = null,
                         },
                         new()
                         {
@@ -423,14 +423,11 @@ public class RoomServiceTest
                             Nickname = users[3].Nickname,
                             Avatar = users[3].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Viewer.Name,
-                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>
+                            Evaluation = new()
                             {
-                                new()
-                                {
-                                    Mark = 10,
-                                    Review = "test test",
-                                    State = EVRoomQuestionEvaluationState.Draft,
-                                }
+                                Mark = 10,
+                                Review = "test test",
+                                State = EVRoomQuestionEvaluationState.Draft,
                             },
                         },
                     }
@@ -448,7 +445,7 @@ public class RoomServiceTest
                             Nickname = users[0].Nickname,
                             Avatar = users[0].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Examinee.Name,
-                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                            Evaluation = null,
                         },
                         new()
                         {
@@ -456,14 +453,11 @@ public class RoomServiceTest
                             Nickname = users[1].Nickname,
                             Avatar = users[1].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Expert.Name,
-                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>
+                            Evaluation = new()
                             {
-                                new()
-                                {
-                                    Mark = 5,
-                                    Review = "test",
-                                    State = EVRoomQuestionEvaluationState.Submitted,
-                                },
+                                Mark = 5,
+                                Review = "test",
+                                State = EVRoomQuestionEvaluationState.Submitted,
                             },
                         },
                         new()
@@ -472,7 +466,7 @@ public class RoomServiceTest
                             Nickname = users[2].Nickname,
                             Avatar = users[2].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Viewer.Name,
-                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                            Evaluation = null,
                         },
                         new()
                         {
@@ -480,7 +474,7 @@ public class RoomServiceTest
                             Nickname = users[3].Nickname,
                             Avatar = users[3].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Viewer.Name,
-                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                            Evaluation = null,
                         },
                     }
                 },
@@ -497,7 +491,7 @@ public class RoomServiceTest
                             Nickname = users[0].Nickname,
                             Avatar = users[0].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Examinee.Name,
-                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                            Evaluation = null,
                         },
                         new()
                         {
@@ -505,7 +499,7 @@ public class RoomServiceTest
                             Nickname = users[1].Nickname,
                             Avatar = users[1].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Expert.Name,
-                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                            Evaluation = null,
                         },
                         new()
                         {
@@ -513,7 +507,7 @@ public class RoomServiceTest
                             Nickname = users[2].Nickname,
                             Avatar = users[2].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Viewer.Name,
-                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                            Evaluation = null,
                         },
                         new()
                         {
@@ -521,7 +515,7 @@ public class RoomServiceTest
                             Nickname = users[3].Nickname,
                             Avatar = users[3].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Viewer.Name,
-                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                            Evaluation = null,
                         },
                     },
                 },
@@ -538,7 +532,7 @@ public class RoomServiceTest
                             Nickname = users[0].Nickname,
                             Avatar = users[0].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Examinee.Name,
-                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                            Evaluation = null,
                         },
                         new()
                         {
@@ -546,7 +540,7 @@ public class RoomServiceTest
                             Nickname = users[1].Nickname,
                             Avatar = users[1].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Expert.Name,
-                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                            Evaluation = null,
                         },
                         new()
                         {
@@ -554,7 +548,7 @@ public class RoomServiceTest
                             Nickname = users[2].Nickname,
                             Avatar = users[2].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Viewer.Name,
-                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                            Evaluation = null,
                         },
                         new()
                         {
@@ -562,7 +556,7 @@ public class RoomServiceTest
                             Nickname = users[3].Nickname,
                             Avatar = users[3].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Viewer.Name,
-                            Evaluations = new List<Analytics.AnalyticsUserQuestionEvaluation>(),
+                            Evaluation = null,
                         },
                     },
                 }

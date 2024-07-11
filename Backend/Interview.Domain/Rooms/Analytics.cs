@@ -45,6 +45,6 @@ public class Analytics
 
         public required string ParticipantType { get; set; } = string.Empty;
 
-        public required List<AnalyticsUserQuestionEvaluation> Evaluations { get; set; }
+        public required AnalyticsUserQuestionEvaluation? Evaluation { get; set; }
     }
 }
