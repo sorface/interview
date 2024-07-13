@@ -19,6 +19,7 @@
 .cursor-pointer { cursor: pointer; }
 .cursor-move { cursor: move; }
 .absolute { position: absolute; }
+.relative { position: relative; }
 .overflow-auto { overflow: auto; }
 .overflow-hidden { overflow: hidden; }
 .w-7\.5 { width: 7.5rem; }
