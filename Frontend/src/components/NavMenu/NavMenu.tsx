@@ -39,7 +39,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
 
   const handleQuestionsClick: React.MouseEventHandler<HTMLAnchorElement> = (event) => {
     event.preventDefault();
-    setQuestionsClicked(true);
+    setQuestionsClicked(!questionsClicked);
   };
 
   const handleItemClick = () => {
@@ -58,6 +58,10 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
   };
 
   const handleCategoryClick = (category: Category) => {
+    if (category === selectedCategory) {
+      setSelectedCategory(null);
+      return;
+    }
     setSelectedCategory(category);
   };
 
