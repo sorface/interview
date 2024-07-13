@@ -128,7 +128,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
         <div className='nav-menu-page-overlay'></div>
       )}
       <div
-        className='nav-menu-container'
+        className='nav-menu-container relative'
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >

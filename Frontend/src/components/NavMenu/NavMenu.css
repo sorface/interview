@@ -134,7 +134,6 @@
 
 .nav-menu-overlay {
   position: absolute;
-  top: var(--margin);
   width: 16.375rem;
   height: var(--height);
   text-align: left;
@@ -148,7 +147,7 @@
 
 @keyframes slide {
   0% { left: 0rem; }
-  100% { left: calc(var(--width-expanded) + var(--menu-padding) * 2 + var(--margin) + 0.125rem); }
+  100% { left: calc(var(--width-expanded) + var(--menu-padding) * 2 + 0.125rem); }
 }
 
 .nav-menu-overlay-gap {
@@ -156,7 +155,7 @@
   top: var(--margin);
   height: var(--height);
   width: 0.125rem;
-  left: calc(var(--width-expanded) + var(--menu-padding) * 2 + var(--margin));
+  left: calc(var(--width-expanded) + var(--menu-padding) * 2);
   opacity: 0;
   z-index: 1;
 }
