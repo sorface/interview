@@ -5,6 +5,7 @@
 .self-start { align-self: flex-start; }
 .items-center { align-items: center; }
 .bg-form { background-color: var(--form-bg); }
+.hover\:bg-form:hover { background-color: var(--form-bg); }
 .bg-wrap { background-color: var(--wrap-bg); }
 .rounded-0\.75 { border-radius: 0.75rem; }
 .py-0\.5 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
@@ -13,6 +14,7 @@
 .px-1 { padding-left: 1rem; padding-right: 1rem; }
 .px-1\.5 { padding-left: 1.5rem; padding-right: 1.5rem; }
 .pr-0\.5 { padding-right: 0.5rem; }
+.pb-0\.25 { padding-bottom: 0.25rem; }
 .ml-auto { margin-left: auto; }
 .mr-0\.25 { margin-right: 0.25rem; }
 .mr-0\.5 { margin-right: 0.5rem; }
@@ -23,11 +25,13 @@
 .overflow-auto { overflow: auto; }
 .overflow-hidden { overflow: hidden; }
 .w-7\.5 { width: 7.5rem; }
+.w-13\.75 { width: 13.75rem; }
 .w-18\.125 { width: 18.125rem; }
 .h-1\.125 { height: 1.125rem; }
 .h-32\.25 { height: 32.25rem; }
 .max-h-20 { max-height: 20rem; }
 .z-50 { z-index: 50; }
+.translate-x--10\.375-y-0\.25 { transform: translate(-10.375rem, 0.25rem) !important; }
 .translate-y-0\.25 { transform: translateY(0.25rem); }
 .rotate-90 { transform: rotate(90deg); }
 .rotate-180 { transform: rotate(180deg); }
