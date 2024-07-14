@@ -1,18 +1,19 @@
 import React, { FunctionComponent, useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { GetQuestionsParams, questionsApiDeclaration } from '../../apiDeclarations';
-import { HeaderWithLink } from '../../components/HeaderWithLink/HeaderWithLink';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
-import { pathnames } from '../../constants';
+import { IconNames, pathnames } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Question } from '../../types/question';
 import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
-import { QustionsSearch } from '../../components/QustionsSearch/QustionsSearch';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
 import { QuestionItem } from '../../components/QuestionItem/QuestionItem';
 import { ContextMenu } from '../../components/ContextMenu/ContextMenu';
+import { Link } from 'react-router-dom';
+import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
 
 import './Questions.css';
 
@@ -23,7 +24,7 @@ export const Questions: FunctionComponent = () => {
   const localizationCaptions = useLocalizationCaptions();
   const navigate = useNavigate();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValueInput, setSearchValueInput] = useState('');
   const { category } = useParams();
 
   const { apiMethodState: questionsState, fetchData: fetchQuestios } = useApiMethod<Question[], GetQuestionsParams>(questionsApiDeclaration.getPage);
@@ -37,10 +38,10 @@ export const Questions: FunctionComponent = () => {
       PageNumber: pageNumber,
       PageSize: pageSize,
       tags: [],
-      value: searchValue,
+      value: searchValueInput,
       categoryId: category?.replace(':category', '') || '',
     });
-  }, [pageNumber, searchValue, archivedQuestion, category, fetchQuestios]);
+  }, [pageNumber, searchValueInput, archivedQuestion, category, fetchQuestios]);
 
   const handleNextPage = useCallback(() => {
     setPageNumber(pageNumber + 1);
@@ -61,6 +62,7 @@ export const Questions: FunctionComponent = () => {
         primary
         contextMenu={{
           position: 'right',
+          useButton: true,
           children: [
             <ContextMenu.Item
               title={localizationCaptions[LocalizationKey.Edit]}
@@ -78,16 +80,18 @@ export const Questions: FunctionComponent = () => {
 
   return (
     <MainContentWrapper className="questions-page">
-      <HeaderWithLink
-        linkVisible={true}
-        path={pathnames.questionsCreate}
-        linkCaption="+"
-        linkFloat="right"
+      <PageHeader
+        title={localizationCaptions[LocalizationKey.QuestionsPageName]}
+        searchValue={searchValueInput}
+        onSearchChange={setSearchValueInput}
       >
-        <QustionsSearch
-          onSearchChange={setSearchValue}
-        />
-      </HeaderWithLink>
+        <Link to={pathnames.questionsCreate}>
+        <button className='active h-2.5'>
+          <ThemedIcon name={IconNames.Add} />
+          {localizationCaptions[LocalizationKey.CreateQuestion]}
+        </button>
+        </Link>
+      </PageHeader>
       <ProcessWrapper
         loading={false}
         error={error || archiveError}
@@ -95,7 +99,7 @@ export const Questions: FunctionComponent = () => {
         <ItemsGrid
           currentData={questions}
           loading={loading}
-          triggerResetAccumData={`${searchValue}${category}${archivedQuestion}`}
+          triggerResetAccumData={`${searchValueInput}${category}${archivedQuestion}`}
           loaderClassName='question-item field-wrap'
           renderItem={createQuestionItem}
           nextPageAvailable={questions?.length === pageSize}

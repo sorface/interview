@@ -25,11 +25,3 @@
 .categories-page .items-grid .category-controls button {
   padding: 0rem 0.75rem;
 }
-
-.categories-page .categories-additional-filters {
-  display: flex;
-}
-
-.categories-page .categories-additional-filters label[for="showOnlyWithoutParent"] {
-  margin-right: 1rem;
-}

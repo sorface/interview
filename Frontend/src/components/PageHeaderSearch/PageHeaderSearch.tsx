@@ -1,15 +1,13 @@
-import { ChangeEventHandler, FunctionComponent } from 'react';
-import { LocalizationKey } from '../../localization';
-import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { ChangeEventHandler, FunctionComponent } from "react";
+import { useLocalizationCaptions } from "../../hooks/useLocalizationCaptions";
+import { LocalizationKey } from "../../localization";
 
-import './RoomsFilter.css';
-
-interface RoomsFilterProps {
+export interface PageHeaderSearchProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
 }
 
-export const RoomsFilter: FunctionComponent<RoomsFilterProps> = ({
+export const PageHeaderSearch: FunctionComponent<PageHeaderSearchProps> = ({
   searchValue,
   onSearchChange,
 }) => {
@@ -20,10 +18,9 @@ export const RoomsFilter: FunctionComponent<RoomsFilterProps> = ({
   };
 
   return (
-    <div className="rooms-filter flex items-center">
+    <div className="flex items-stretch h-2.5">
       <input
         type="text"
-        className="qustions-search-value "
         placeholder={localizationCaptions[LocalizationKey.SearchByName]}
         value={searchValue}
         onChange={handleSearchChange}
