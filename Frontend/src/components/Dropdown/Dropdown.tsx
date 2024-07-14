@@ -3,12 +3,14 @@ import { FunctionComponent, ReactNode, useEffect, useRef, useState } from 'react
 interface DropdownProps {
   toggleContent: ReactNode;
   toggleClassName?: string;
+  contentClassName?: string;
   children: ReactNode;
 }
 
 export const Dropdown: FunctionComponent<DropdownProps> = ({
   toggleContent,
   toggleClassName,
+  contentClassName,
   children,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -36,11 +38,11 @@ export const Dropdown: FunctionComponent<DropdownProps> = ({
   });
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} className='relative'>
       <button aria-expanded={open} className={toggleClassName} onClick={handleToggle}>
         {toggleContent}
       </button>
-      {open && <div className='absolute overflow-auto max-h-20 z-50 translate-y-0.25 shadow'>{children}</div>}
+      {open && <div className={`${contentClassName} absolute overflow-auto max-h-20 z-50 translate-y-0.25 shadow`}>{children}</div>}
     </div>
   );
 };

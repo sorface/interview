@@ -8,10 +8,13 @@ import { CodeEditor } from '../CodeEditor/CodeEditor';
 import { Gap } from '../Gap/Gap';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
+import { ContextMenu, ContextMenuProps } from '../ContextMenu/ContextMenu';
 
 interface QuestionItemProps {
   question: Question;
   checked?: boolean;
+  primary?: boolean;
+  contextMenu?: ContextMenuProps;
   onCheck?: (newValue: boolean) => void;
   onRemove?: (question: Question) => void;
 }
@@ -19,6 +22,8 @@ interface QuestionItemProps {
 export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
   question,
   checked,
+  primary,
+  contextMenu,
   onCheck,
   onRemove,
 }) => {
@@ -45,6 +50,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
         </Typography>
       </div>
       <div className='ml-auto'>
+        {contextMenu && <ContextMenu {...contextMenu} />}
         {hasCheckbox && <input type='checkbox' checked={checked} onChange={handleCheckboxChange} />}
         {onRemove && (
           <span onClick={handleRemove} className='cursor-pointer'>
@@ -59,7 +65,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
     <Accordion
       title={title}
       disabled={accordionDisabled}
-      className='bg-form rounded-0.75 py-1.25 px-1.5'
+      className={`${primary ? 'bg-wrap' : 'bg-form'} rounded-0.75 py-1.25 px-1.5`}
       classNameTitle='flex items-center'
     >
       {question.codeEditor && (

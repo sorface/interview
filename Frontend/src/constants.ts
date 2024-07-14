@@ -42,6 +42,7 @@ export const enum IconNames {
   Link = 'link',
   ChevronDown = 'chevron-down',
   Options = 'options',
+  EllipsisVertical = 'ellipsis-vertical',
 }
 
 export const enum IconThemePostfix {
