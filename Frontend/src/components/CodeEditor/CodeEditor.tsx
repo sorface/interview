@@ -25,6 +25,8 @@ interface CodeEditorProps {
   className?: string;
   readOnly?: boolean;
   value?: string | undefined;
+  scrollBeyondLastLine?: boolean;
+  alwaysConsumeMouseWheel?: boolean;
   onMount?: OnMount | undefined;
   onChange?: OnChange | undefined;
   onLanguageChange?: (language: CodeEditorLang) => void;
@@ -37,6 +39,8 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   className,
   readOnly,
   value,
+  scrollBeyondLastLine,
+  alwaysConsumeMouseWheel,
   onMount,
   onChange,
   onLanguageChange,
@@ -75,6 +79,10 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
           fontSize,
           quickSuggestions: false,
           readOnly,
+          scrollBeyondLastLine,
+          scrollbar: {
+            alwaysConsumeMouseWheel,
+          },
         }}
         language={language}
         theme={themeInUi === Theme.Dark ? 'vs-dark' : 'light'}

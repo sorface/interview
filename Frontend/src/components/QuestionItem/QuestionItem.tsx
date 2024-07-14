@@ -76,6 +76,8 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
             languages={[question.codeEditor.lang]}
             value={question.codeEditor.content}
             readOnly
+            scrollBeyondLastLine={false}
+            alwaysConsumeMouseWheel={false}
             className='h-32.25'
           />
         </>
@@ -107,6 +109,8 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
           languages={[(selectedAnswer.codeEditor && question.codeEditor) ? question.codeEditor.lang : CodeEditorLang.Plaintext]}
           value={selectedAnswer.content}
           readOnly
+          scrollBeyondLastLine={false}
+          alwaysConsumeMouseWheel={false}
           className='h-32.25'
         />
       )}
