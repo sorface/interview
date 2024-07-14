@@ -255,7 +255,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
         <h3>{localizationCaptions[LocalizationKey.JoiningRoom]} {roomName}</h3>
       </div>
       {screens[screen]}
-      <Link to={pathnames.rooms} className="enter-videochat-exit">
+      <Link to={pathnames.currentRooms} className="enter-videochat-exit">
         {localizationCaptions[LocalizationKey.Exit]}
       </Link>
     </Modal >

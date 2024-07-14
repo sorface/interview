@@ -411,7 +411,7 @@ export const Room: FunctionComponent = () => {
   if (wsClosed) {
     return (
       <MessagePage title={localizationCaptions[LocalizationKey.ConnectionError]} message={localizationCaptions[LocalizationKey.RoomConnectionError]}>
-        <Link to={pathnames.rooms}>
+        <Link to={pathnames.currentRooms}>
           <button>{localizationCaptions[LocalizationKey.Exit]}</button>
         </Link>
       </MessagePage>
@@ -594,7 +594,7 @@ export const Room: FunctionComponent = () => {
               )}
             </div>
             <div className="room-tools room-tools-right">
-              <Link to={pathnames.rooms}>
+              <Link to={pathnames.currentRooms}>
                 <button>{localizationCaptions[LocalizationKey.Exit]}</button>
               </Link>
             </div>
