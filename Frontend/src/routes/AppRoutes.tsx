@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react';
 import { Routes, Route, useLocation, matchPath } from 'react-router-dom';
 import { inviteParamName, pathnames } from '../constants';
 import { Home } from '../pages/Home/Home';
-import { Rooms } from '../pages/Rooms/Rooms';
+import { Rooms, RoomsPageMode } from '../pages/Rooms/Rooms';
 import { Questions } from '../pages/Questions/Questions';
 import { QuestionCreate } from '../pages/QuestionCreate/QuestionCreate';
 import { NotFound } from '../pages/NotFound/NotFound';
@@ -73,10 +73,17 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
                 </ProtectedRoute>
               }
             />
-            <Route path={pathnames.rooms}
+            <Route path={pathnames.currentRooms}
               element={
                 <ProtectedRoute allowed={authenticated}>
-                  <Rooms />
+                  <Rooms mode={RoomsPageMode.Current} />
+                </ProtectedRoute>
+              }
+            />
+            <Route path={pathnames.closedRooms}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <Rooms mode={RoomsPageMode.Closed} />
                 </ProtectedRoute>
               }
             />

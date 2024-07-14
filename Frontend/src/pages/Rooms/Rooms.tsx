@@ -23,7 +23,18 @@ const pageSize = 30;
 const initialPageNumber = 1;
 const searchDebounceMs = 300;
 
-export const Rooms: FunctionComponent = () => {
+export enum RoomsPageMode {
+  Current,
+  Closed,
+}
+
+interface RoomsProps {
+  mode: RoomsPageMode;
+}
+
+export const Rooms: FunctionComponent<RoomsProps> = ({
+  mode,
+}) => {
   const auth = useContext(AuthContext);
   const admin = checkAdmin(auth);
   const localizationCaptions = useLocalizationCaptions();
@@ -32,23 +43,21 @@ export const Rooms: FunctionComponent = () => {
   const { process: { loading, error }, data: rooms } = apiMethodState;
   const [searchValueInput, setSearchValueInput] = useState('');
   const [searchValue, setSearchValue] = useState('');
-  const [participating, setParticipating] = useState(false);
-  const [closed, setClosed] = useState(false);
+  const closed = mode === RoomsPageMode.Closed;
   const [createEditModalOpened, setCreateEditModalOpened] = useState(false);
   const [editingRoomId, setEditingRoomId] = useState<Room['id'] | null>(null);
   const [roomsUpdateTrigger, setRoomsUpdateTrigger] = useState(0);
 
   const updateRooms = useCallback(() => {
-    const participants = (auth?.id && participating) ? [auth?.id] : [];
     const statuses: RoomStatus[] = closed ? ['Close'] : ['New', 'Active', 'Review'];
     fetchData({
       PageSize: pageSize,
       PageNumber: pageNumber,
       Name: searchValue,
-      Participants: participants,
+      Participants: [auth?.id || ''],
       Statuses: statuses,
     });
-  }, [pageNumber, searchValue, auth?.id, participating, closed, fetchData]);
+  }, [pageNumber, searchValue, auth?.id, closed, fetchData]);
 
   useEffect(() => {
     updateRooms();
@@ -155,17 +164,9 @@ export const Rooms: FunctionComponent = () => {
       <Field>
         <div className='room-actions items-center'>
           <RoomsFilter
-            participating={participating}
-            closed={closed}
             searchValue={searchValueInput}
             onSearchChange={setSearchValueInput}
-            onParticipatingChange={setParticipating}
-            onClosedChange={setClosed}
           />
-          {/* <RoomsSearch
-          searchValue={searchValueInput}
-          onSearchChange={setSearchValueInput}
-        /> */}
           <button className='active' onClick={handleOpenCreateModal}>
             <ThemedIcon name={IconNames.Add} />
             {localizationCaptions[LocalizationKey.CreateRoom]}
@@ -179,7 +180,7 @@ export const Rooms: FunctionComponent = () => {
         <ItemsGrid
           currentData={rooms}
           loading={loading}
-          triggerResetAccumData={`${roomsUpdateTrigger}${searchValue}${participating}${closed}`}
+          triggerResetAccumData={`${roomsUpdateTrigger}${searchValue}${mode}${closed}`}
           loaderClassName='room-item-wrapper room-item-loader'
           renderItem={createRoomItem}
           nextPageAvailable={rooms?.length === pageSize}
