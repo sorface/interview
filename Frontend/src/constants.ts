@@ -46,6 +46,7 @@ export const enum IconNames {
   EllipsisVertical = 'ellipsis-vertical',
   Cube = 'cube',
   Golf = 'golf',
+  Exit = 'exit',
 }
 
 export const enum IconThemePostfix {

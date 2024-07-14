@@ -1,9 +1,10 @@
 import { FunctionComponent, ReactNode, useEffect, useRef, useState } from 'react';
 
-interface DropdownProps {
+export interface DropdownProps {
   toggleContent: ReactNode;
   toggleClassName?: string;
   contentClassName?: string;
+  useButton?: boolean;
   children: ReactNode;
 }
 
@@ -11,6 +12,7 @@ export const Dropdown: FunctionComponent<DropdownProps> = ({
   toggleContent,
   toggleClassName,
   contentClassName,
+  useButton,
   children,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -39,9 +41,15 @@ export const Dropdown: FunctionComponent<DropdownProps> = ({
 
   return (
     <div ref={containerRef} className='relative'>
-      <button aria-expanded={open} className={toggleClassName} onClick={handleToggle}>
-        {toggleContent}
-      </button>
+      {useButton ? (
+        <button aria-expanded={open} className={toggleClassName} onClick={handleToggle}>
+          {toggleContent}
+        </button>
+      ) : (
+        <div aria-expanded={open} className={toggleClassName} onClick={handleToggle}>
+          {toggleContent}
+        </div>
+      )}
       {open && <div className={`${contentClassName} absolute overflow-auto max-h-20 z-50 translate-y-0.25 shadow`}>{children}</div>}
     </div>
   );

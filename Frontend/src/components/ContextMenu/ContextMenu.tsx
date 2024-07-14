@@ -1,21 +1,27 @@
 import { FunctionComponent, ReactNode } from 'react';
 import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
 import { IconNames } from '../../constants';
-import { Dropdown } from '../Dropdown/Dropdown';
+import { Dropdown, DropdownProps } from '../Dropdown/Dropdown';
 import { Typography } from '../Typography/Typography';
 
 export interface ContextMenuProps {
   position?: 'left' | 'right';
+  toggleContent?: DropdownProps['toggleContent'];
+  useButton?: DropdownProps['useButton'];
   children: ReactNode;
 }
 
 const ContextMenuComponent: FunctionComponent<ContextMenuProps> = ({
   position,
+  toggleContent,
+  useButton,
   children,
 }) => {
+  const defaultToggleContent = <ThemedIcon name={IconNames.EllipsisVertical} />;
   return (
     <Dropdown
-      toggleContent={<ThemedIcon name={IconNames.EllipsisVertical} />}
+      toggleContent={toggleContent || defaultToggleContent}
+      useButton={useButton}
       contentClassName={`w-13.75 rounded-0.75 ${position === 'right' ? 'translate-x--10.375-y-0.25' : ''}`}
     >
       <div className='bg-wrap py-0.5'>

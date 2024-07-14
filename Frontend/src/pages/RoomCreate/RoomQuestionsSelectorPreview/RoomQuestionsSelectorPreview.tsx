@@ -23,6 +23,7 @@ export const RoomQuestionsSelectorPreview: FunctionComponent<RoomQuestionsSelect
   return (
     <div>
       <Dropdown
+        useButton
         toggleContent={
           <>
             {localizationCaptions[LocalizationKey.RoomSelectedQuestions]}: {qestions.length}
