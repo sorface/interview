@@ -132,6 +132,10 @@
   padding-top: 1rem;
 }
 
+.nav-menu .nav-menu-build {
+  width: var(--width-expanded);
+}
+
 .nav-menu-overlay {
   position: absolute;
   width: 16.375rem;
