@@ -8,6 +8,8 @@ import { LocalizationKey } from '../../localization';
 import { LocalizationCaption } from '../LocalizationCaption/LocalizationCaption';
 import { CategoriesList } from '../CategoriesList/CategoriesList';
 import { Category } from '../../types/category';
+import { Typography } from '../Typography/Typography';
+import { REACT_APP_BUILD_HASH } from '../../config';
 
 import './NavMenu.css';
 
@@ -168,6 +170,11 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
               {localizationCaptions[LocalizationKey.ThemeDark]}
               <ThemedIcon name={IconNames.ThemeSwitchDark} />
             </div>
+          </div>
+          <div className='nav-menu-build h-1.125 opacity-0.5'>
+            <Typography size='s' >
+              {localizationCaptions[LocalizationKey.BuildHash]}: {REACT_APP_BUILD_HASH}
+            </Typography>
           </div>
         </nav>
         {!!selectedCategory && (
