@@ -1,5 +1,7 @@
+using System.Linq.Expressions;
 using Interview.Domain.Rooms.RoomQuestionEvaluations;
 using Interview.Domain.Rooms.RoomQuestions;
+using Interview.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -7,6 +9,8 @@ namespace Interview.Domain.Database.Configurations;
 
 public class RoomQuestionEvaluationConfiguration : EntityTypeConfigurationBase<RoomQuestionEvaluation>
 {
+    protected override Expression<Func<User, IEnumerable<RoomQuestionEvaluation>?>>? CreatedByNavigation => user => user.RoomQuestionEvaluations;
+
     protected override void ConfigureCore(EntityTypeBuilder<RoomQuestionEvaluation> builder)
     {
         builder.ToTable("RoomQuestionEvaluation");
