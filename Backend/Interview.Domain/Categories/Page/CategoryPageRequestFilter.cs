@@ -7,4 +7,6 @@ public class CategoryPageRequestFilter
     public required string? Name { get; init; }
 
     public bool ShowOnlyWithoutParent { get; init; }
+
+    public Guid? EditingCategoryId { get; init; }
 }
