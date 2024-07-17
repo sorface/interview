@@ -12,6 +12,7 @@ import { Devices } from '../../hooks/useUserStreams';
 import { Loader } from '../../../../components/Loader/Loader';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
+import { Button } from '../../../../components/Button/Button';
 
 import './EnterVideoChatModal.css';
 
@@ -170,9 +171,9 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
           <Loader />
         ) : (
           viewerMode ? (
-            <button className="active" onClick={onClose}>{localizationCaptions[LocalizationKey.Join]}</button>
+            <Button variant='active' onClick={onClose}>{localizationCaptions[LocalizationKey.Join]}</Button>
           ) : (
-            <button onClick={handleSetupDevices}>{localizationCaptions[LocalizationKey.SetupDevices]}</button>
+            <Button onClick={handleSetupDevices}>{localizationCaptions[LocalizationKey.SetupDevices]}</Button>
           )
         )}
       </div>
@@ -230,7 +231,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
 
           </div >
         </div >
-        <button className="active" onClick={onClose}>{localizationCaptions[LocalizationKey.Join]}</button>
+        <Button variant='active' onClick={onClose}>{localizationCaptions[LocalizationKey.Join]}</Button>
       </div >
     ),
     [Screen.Error]: (

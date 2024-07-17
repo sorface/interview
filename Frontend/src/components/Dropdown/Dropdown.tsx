@@ -1,10 +1,12 @@
 import { FunctionComponent, ReactNode, useEffect, useRef, useState } from 'react';
+import { Button, ButtonProps } from '../Button/Button';
 
 export interface DropdownProps {
   toggleContent: ReactNode;
   toggleClassName?: string;
   contentClassName?: string;
   useButton?: boolean;
+  buttonVariant?: ButtonProps['variant'];
   children: ReactNode;
 }
 
@@ -13,6 +15,7 @@ export const Dropdown: FunctionComponent<DropdownProps> = ({
   toggleClassName,
   contentClassName,
   useButton,
+  buttonVariant,
   children,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -42,9 +45,9 @@ export const Dropdown: FunctionComponent<DropdownProps> = ({
   return (
     <div ref={containerRef} className='relative'>
       {useButton ? (
-        <button aria-expanded={open} className={toggleClassName} onClick={handleToggle}>
+        <Button aria-expanded={open} variant={buttonVariant} className={toggleClassName} onClick={handleToggle}>
           {toggleContent}
-        </button>
+        </Button>
       ) : (
         <div aria-expanded={open} className={toggleClassName} onClick={handleToggle}>
           {toggleContent}

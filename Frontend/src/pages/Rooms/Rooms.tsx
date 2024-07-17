@@ -15,6 +15,7 @@ import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
 import { UserAvatar } from '../../components/UserAvatar/UserAvatar';
 import { RoomCreate } from '../RoomCreate/RoomCreate';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { Button } from '../../components/Button/Button';
 
 import './Rooms.css';
 
@@ -162,10 +163,10 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
         searchValue={searchValueInput}
         onSearchChange={setSearchValueInput}
       >
-        <button className='active h-2.5' onClick={handleOpenCreateModal}>
+        <Button variant='active' className='h-2.5' onClick={handleOpenCreateModal}>
           <ThemedIcon name={IconNames.Add} />
           {localizationCaptions[LocalizationKey.CreateRoom]}
-        </button>
+        </Button>
       </PageHeader>
       <MainContentWrapper className='rooms-page'>
         {createEditModalOpened && (

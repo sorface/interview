@@ -11,6 +11,7 @@ import { Loader } from '../Loader/Loader';
 import { RoomCreateField } from '../../pages/RoomCreate/RoomCreateField/RoomCreateField';
 import { Typography } from '../Typography/Typography';
 import { Gap } from '../Gap/Gap';
+import { Button } from '../Button/Button';
 
 interface RoomInvitationsProps {
   roomId: string;
@@ -77,11 +78,11 @@ export const RoomInvitations: FunctionComponent<RoomInvitationsProps> = ({
                 <div>
                   <Typography size='m'>{participantTypeLocalization[roomInvite.participantType]}</Typography>
                   <Gap sizeRem={0.5} />
-                  <button
+                  <Button
                     onClick={() => handleCopyToClipboard(inviteUrlDispaly)}>
                     <ThemedIcon name={IconNames.Link} />
                     {localizationCaptions[LocalizationKey.InviteViaLink]}
-                  </button>
+                  </Button>
                 </div>
                 {!lastItem && <Gap sizeRem={0.5} />}
               </Fragment>

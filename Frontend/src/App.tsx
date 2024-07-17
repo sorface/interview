@@ -10,6 +10,7 @@ import { Field } from './components/FieldsBlock/Field';
 import { useCommunist } from './hooks/useCommunist';
 import { ThemeProvider } from './context/ThemeContext';
 import { LocalizationProvider } from './context/LocalizationContext';
+import { Button } from './components/Button/Button';
 
 import './App.css';
 
@@ -46,7 +47,7 @@ export const App: FunctionComponent = () => {
         <MainContentWrapper>
           <Field>
             <div>Failed to get user data: {error}</div>
-            <button onClick={handlePageReset}>Reset page</button>
+            <Button onClick={handlePageReset}>Reset page</Button>
           </Field>
         </MainContentWrapper>
       );

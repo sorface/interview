@@ -3,6 +3,7 @@ import { OpenIcon } from '../OpenIcon/OpenIcon';
 import { LocalizationKey } from '../../localization';
 import { RoomQuestion } from '../../types/room';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { Button } from '../Button/Button';
 
 import './ActiveQuestionSelector.css';
 
@@ -128,7 +129,7 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
               <div className="search-box" >
                 <input onChange={onSearch} value={searchValue} />
                 {searchValue && (
-                  <button onClick={handleCreate}>{localizationCaptions[LocalizationKey.CreateQuestion]}</button>
+                  <Button onClick={handleCreate}>{localizationCaptions[LocalizationKey.CreateQuestion]}</Button>
                 )}
               </div>
             </div>
@@ -148,11 +149,11 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
         )}
       </div>
       {options.length !== 0 && (
-        <button
+        <Button
           onClick={() => onItemClick(options[0])}
         >
           {localizationCaptions[LocalizationKey.NextRoomQuestion]}
-        </button>
+        </Button>
       )}
     </>
   );

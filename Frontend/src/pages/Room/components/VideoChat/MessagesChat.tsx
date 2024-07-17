@@ -5,6 +5,7 @@ import { Tab, Tabs } from '../../../../components/Tabs/Tabs';
 import { ThemeContext } from '../../../../context/ThemeContext';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
+import { Button } from '../../../../components/Button/Button';
 
 import './MessagesChat.css';
 
@@ -108,7 +109,7 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
             />
           </div>
           <div>
-            <button onClick={handleChatMessageSubmit}>{localizationCaptions[LocalizationKey.SendToChat]}</button>
+            <Button onClick={handleChatMessageSubmit}>{localizationCaptions[LocalizationKey.SendToChat]}</Button>
           </div>
         </div>
       )}

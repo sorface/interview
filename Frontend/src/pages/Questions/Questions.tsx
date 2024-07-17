@@ -14,6 +14,7 @@ import { ContextMenu } from '../../components/ContextMenu/ContextMenu';
 import { Link } from 'react-router-dom';
 import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { Button } from '../../components/Button/Button';
 
 import './Questions.css';
 
@@ -86,10 +87,10 @@ export const Questions: FunctionComponent = () => {
         onSearchChange={setSearchValueInput}
       >
         <Link to={pathnames.questionsCreate}>
-        <button className='active h-2.5'>
+        <Button variant='active' className='h-2.5'>
           <ThemedIcon name={IconNames.Add} />
           {localizationCaptions[LocalizationKey.CreateQuestion]}
-        </button>
+        </Button>
         </Link>
       </PageHeader>
       <ProcessWrapper
