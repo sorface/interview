@@ -8,6 +8,7 @@ import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
 import { IconNames, pathnames } from '../../constants';
 import { Link } from 'react-router-dom';
 import { useCommunist } from '../../hooks/useCommunist';
+import { Button } from '../Button/Button';
 
 export const PageHeaderUserAvatar: FunctionComponent = () => {
   const auth = useContext(AuthContext);
@@ -39,15 +40,15 @@ export const PageHeaderUserAvatar: FunctionComponent = () => {
           <div className='flex'>
             <div className='pr-1.5'>
               <Link to={pathnames.session}>
-                <button>
+                <Button variant='text'>
                   <ThemedIcon name={IconNames.Settings} />
-                </button>
+                </Button>
               </Link>
             </div>
             <div>
-              <button onClick={resetCommunist}>
+              <Button variant='text' onClick={resetCommunist}>
                 <ThemedIcon name={IconNames.Exit} />
-              </button>
+              </Button>
             </div>
           </div>
         </div>

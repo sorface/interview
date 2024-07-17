@@ -11,6 +11,7 @@ import { QuestionItem } from '../../../components/QuestionItem/QuestionItem';
 import { Gap } from '../../../components/Gap/Gap';
 import { RoomQuestionListItem } from '../RoomCreate';
 import { RoomQuestionsSelectorPreview } from '../RoomQuestionsSelectorPreview/RoomQuestionsSelectorPreview';
+import { Button } from '../../../components/Button/Button';
 
 interface RoomQuestionsSelectorProps {
   preSelected: RoomQuestionListItem[];
@@ -160,8 +161,8 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
         />
       )}
       <ModalFooter>
-        <button onClick={onCancel}>{localizationCaptions[LocalizationKey.Cancel]}</button>
-        <button className='active' onClick={handleSave}>{localizationCaptions[LocalizationKey.AddRoomQuestions]}</button>
+        <Button onClick={onCancel}>{localizationCaptions[LocalizationKey.Cancel]}</Button>
+        <Button variant='active' onClick={handleSave}>{localizationCaptions[LocalizationKey.AddRoomQuestions]}</Button>
       </ModalFooter>
     </div>
   )

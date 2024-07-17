@@ -8,6 +8,7 @@ import { IconNames, inviteParamName, pathnames } from '../../../../constants';
 import { UserType } from '../../../../types/user';
 import { ThemedIcon } from '../ThemedIcon/ThemedIcon';
 import { Loader } from '../../../../components/Loader/Loader';
+import { Button } from '../../../../components/Button/Button';
 
 import './Invitations.css';
 
@@ -64,12 +65,12 @@ export const Invitations: FunctionComponent<InvitationsProps> = ({
 
   return (
     <>
-      <button
+      <Button
         className='invitations-open'
         onClick={handleOpenModal}
       >
         <ThemedIcon name={IconNames.Settings} />
-      </button>
+      </Button>
       <Modal
         isOpen={modalOpen}
         contentLabel={localizationCaptions[LocalizationKey.Invitations]}
@@ -84,7 +85,7 @@ export const Invitations: FunctionComponent<InvitationsProps> = ({
       >
         <div className="action-modal-header">
           <h3>{localizationCaptions[LocalizationKey.Invitations]}</h3>
-          <button onClick={handleCloseModal}>X</button>
+          <Button onClick={handleCloseModal}>X</Button>
         </div>
         <div>
           {roomInvitesLoading && (
@@ -114,19 +115,19 @@ export const Invitations: FunctionComponent<InvitationsProps> = ({
                     onChange={() => { }}
                   />
                   <div className='invitations-modal-item-link-ations'>
-                    <button onClick={() => handleCopyToClipboard(inviteUrlDispaly)}><ThemedIcon name={IconNames.Clipboard} /></button>
-                    <button onClick={() => onGenerateInvite(roomInvite.participantType)}><ThemedIcon name={IconNames.Refresh} /></button>
+                    <Button onClick={() => handleCopyToClipboard(inviteUrlDispaly)}><ThemedIcon name={IconNames.Clipboard} /></Button>
+                    <Button onClick={() => onGenerateInvite(roomInvite.participantType)}><ThemedIcon name={IconNames.Refresh} /></Button>
                   </div>
                 </div>
               </div>
             );
           })}
-          <button
+          <Button
             className='invitations-modal-refresh-all'
             onClick={onGenerateAllInvites}
           >
             {localizationCaptions[LocalizationKey.RefreshAll]}<ThemedIcon name={IconNames.Refresh} />
-          </button>
+          </Button>
         </div>
       </Modal>
     </>

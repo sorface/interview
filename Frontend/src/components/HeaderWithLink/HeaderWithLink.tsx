@@ -1,6 +1,7 @@
 import React, { FunctionComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Field } from '../../components/FieldsBlock/Field';
+import { Button } from '../Button/Button';
 
 import './HeaderWithLink.css';
 
@@ -25,7 +26,7 @@ export const HeaderWithLink: FunctionComponent<HeaderWithLinkProps> = ({
     <Field className="header-with-link">
       {linkVisible && (
         <Link to={path}>
-          <button className={`button-link float-${linkFloat}`}>{linkCaption}</button>
+          <Button className={`button-link float-${linkFloat}`}>{linkCaption}</Button>
         </Link>
       )}
       {!!title && <span>{title}</span>}

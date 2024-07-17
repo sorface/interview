@@ -9,6 +9,7 @@ import { Gap } from '../Gap/Gap';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { ContextMenu, ContextMenuProps } from '../ContextMenu/ContextMenu';
+import { Button } from '../Button/Button';
 
 interface QuestionItemProps {
   question: Question;
@@ -50,7 +51,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
         </Typography>
       </div>
       <div className='ml-auto'>
-        {contextMenu && <ContextMenu {...contextMenu} />}
+        {contextMenu && <ContextMenu {...contextMenu} buttonVariant='text' />}
         {hasCheckbox && <input type='checkbox' checked={checked} onChange={handleCheckboxChange} />}
         {onRemove && (
           <span onClick={handleRemove} className='cursor-pointer'>
@@ -93,15 +94,16 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
         </>
       )}
       {question.answers.map(answer => (
-        <button
+        <Button
           key={answer.id}
-          className={`${answer === selectedAnswer ? 'active' : ''} mr-0.25`}
+          variant={answer === selectedAnswer ? 'active' : undefined}
+          className='mr-0.25'
           onClick={() => setSelectedAnswer(answer)}
         >
           <Typography size='m'>
             {answer.title}
           </Typography>
-        </button>
+        </Button>
       ))}
       {!!selectedAnswer && (
         <CodeEditor

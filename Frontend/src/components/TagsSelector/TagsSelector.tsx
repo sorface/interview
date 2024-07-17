@@ -4,6 +4,7 @@ import { OpenIcon } from '../OpenIcon/OpenIcon';
 import { TagsView } from '../TagsView/TagsView';
 import { LocalizationKey } from '../../localization';
 import { LocalizationCaption } from '../LocalizationCaption/LocalizationCaption';
+import { Button } from '../Button/Button';
 
 import './TagsSelector.css';
 
@@ -90,7 +91,7 @@ export const TagsSelector: FunctionComponent<TagsSelectorProps> = ({
             {onCreate && (
               <>
                 <input type="color" className="color-select" value={color} onChange={handleColorChange} />
-                <button onClick={handleCreate}>{<LocalizationCaption captionKey={LocalizationKey.Create} />}</button>
+                <Button onClick={handleCreate}>{<LocalizationCaption captionKey={LocalizationKey.Create} />}</Button>
               </>
             )}
           </div>

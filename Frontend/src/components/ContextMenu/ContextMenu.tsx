@@ -3,11 +3,13 @@ import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
 import { IconNames } from '../../constants';
 import { Dropdown, DropdownProps } from '../Dropdown/Dropdown';
 import { Typography } from '../Typography/Typography';
+import { ButtonProps } from '../Button/Button';
 
 export interface ContextMenuProps {
   position?: 'left' | 'right';
   toggleContent?: DropdownProps['toggleContent'];
   useButton?: DropdownProps['useButton'];
+  buttonVariant?: ButtonProps['variant'];
   children: ReactNode;
 }
 
@@ -15,6 +17,7 @@ const ContextMenuComponent: FunctionComponent<ContextMenuProps> = ({
   position,
   toggleContent,
   useButton,
+  buttonVariant,
   children,
 }) => {
   const defaultToggleContent = <ThemedIcon name={IconNames.EllipsisVertical} />;
@@ -22,7 +25,8 @@ const ContextMenuComponent: FunctionComponent<ContextMenuProps> = ({
     <Dropdown
       toggleContent={toggleContent || defaultToggleContent}
       useButton={useButton}
-      contentClassName={`w-13.75 rounded-0.75 ${position === 'right' ? 'translate-x--10.375-y-0.25' : ''}`}
+      buttonVariant={buttonVariant}
+      contentClassName={`w-13.75 rounded-0.75 ${position === 'right' ? 'translate-x--11.375-y-0.25' : ''}`}
     >
       <div className='bg-wrap py-0.5'>
         {children}

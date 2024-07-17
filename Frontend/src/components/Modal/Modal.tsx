@@ -1,9 +1,10 @@
 import { FunctionComponent, ReactNode } from 'react';
 import ModalInternal from 'react-modal';
+import { Button } from '../Button/Button';
+import { IconNames } from '../../constants';
+import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
 
 import './Modal.css';
-import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
-import { IconNames } from '../../constants';
 
 interface ModalProps {
   open: boolean;
@@ -34,9 +35,9 @@ export const Modal: FunctionComponent<ModalProps> = ({
     >
       <div className="modal-header">
         <h3>{contentLabel}</h3>
-        <button className="modal-close" onClick={onClose}>
+        <Button className="modal-close" onClick={onClose}>
           <ThemedIcon name={IconNames.Close} />
-        </button>
+        </Button>
       </div>
       <div className="modal-content">
         {children}

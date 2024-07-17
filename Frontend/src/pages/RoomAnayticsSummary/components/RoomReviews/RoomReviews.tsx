@@ -11,6 +11,7 @@ import { SubmitField } from '../../../../components/SubmitField/SubmitField';
 import { Field } from '../../../../components/FieldsBlock/Field';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
+import { Button } from '../../../../components/Button/Button';
 
 import './RoomReviews.css';
 
@@ -139,18 +140,18 @@ export const RoomReviews: FunctionComponent<RoomReviewsProps> = ({ roomId }) => 
             value={editingRoomReview.review}
             onInput={handleEditingRoomReviewValueChange}
           />
-          <button
+          <Button
             className="roomReview-edit-button"
             onClick={handleEditingRoomReviewSubmit}
           >
             ✔️
-          </button>
-          <button
+          </Button>
+          <Button
             className="roomReview-delete-button"
             onClick={handleRoomReviewEditClose}
           >
             ✖
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="roomReview-item">
@@ -162,17 +163,17 @@ export const RoomReviews: FunctionComponent<RoomReviewsProps> = ({ roomId }) => 
           </div>
           {(admin || auth?.id === roomReview.user.id) && (
             <>
-              <button
+              <Button
                 onClick={handleRoomReviewEdit(roomReview)}
               >
                 🖊️
-              </button>
-              <button
+              </Button>
+              <Button
                 className="roomReview-delete-button"
                 onClick={handleRoomReviewDelete(roomReview)}
               >
                 ❌
-              </button>
+              </Button>
             </>
           )}
         </div>

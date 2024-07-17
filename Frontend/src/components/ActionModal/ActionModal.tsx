@@ -2,6 +2,7 @@ import { FunctionComponent, useCallback, useState } from 'react';
 import Modal from 'react-modal';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { Button } from '../Button/Button';
 
 import './ActionModal.css';
 
@@ -48,11 +49,11 @@ export const ActionModal: FunctionComponent<ActionModalProps> = ({
 
   return (
     <>
-      <button
+      <Button
         onClick={handleOpenModal}
       >
         {openButtonCaption}
-      </button>
+      </Button>
       <Modal
         isOpen={modalOpen}
         contentLabel={localizationCaptions[LocalizationKey.CloseRoom]}
@@ -67,11 +68,11 @@ export const ActionModal: FunctionComponent<ActionModalProps> = ({
       >
         <div className="action-modal-header">
           <h3>{title}</h3>
-          <button onClick={handleCloseModal}>X</button>
+          <Button onClick={handleCloseModal}>X</Button>
         </div>
         <div className="action-modal-content">
-          <button onClick={onCallAction}>{localizationCaptions[LocalizationKey.Yes]}</button>
-          <button onClick={handleCloseModal}>{localizationCaptions[LocalizationKey.No]}</button>
+          <Button onClick={onCallAction}>{localizationCaptions[LocalizationKey.Yes]}</Button>
+          <Button onClick={handleCloseModal}>{localizationCaptions[LocalizationKey.No]}</Button>
         </div>
       </Modal>
     </>

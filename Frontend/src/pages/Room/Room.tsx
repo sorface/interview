@@ -40,6 +40,7 @@ import { UserType } from '../../types/user';
 import { useEventsState } from './hooks/useEventsState';
 import { RoomTimer } from './components/RoomTimer/RoomTimer';
 import { CodeEditorLang } from '../../types/question';
+import { Button } from '../../components/Button/Button';
 
 import './Room.css';
 
@@ -412,7 +413,7 @@ export const Room: FunctionComponent = () => {
     return (
       <MessagePage title={localizationCaptions[LocalizationKey.ConnectionError]} message={localizationCaptions[LocalizationKey.RoomConnectionError]}>
         <Link to={pathnames.currentRooms}>
-          <button>{localizationCaptions[LocalizationKey.Exit]}</button>
+          <Button>{localizationCaptions[LocalizationKey.Exit]}</Button>
         </Link>
       </MessagePage>
     );
@@ -595,7 +596,7 @@ export const Room: FunctionComponent = () => {
             </div>
             <div className="room-tools room-tools-right">
               <Link to={pathnames.currentRooms}>
-                <button>{localizationCaptions[LocalizationKey.Exit]}</button>
+                <Button>{localizationCaptions[LocalizationKey.Exit]}</Button>
               </Link>
             </div>
           </div>

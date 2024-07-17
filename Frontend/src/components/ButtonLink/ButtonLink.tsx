@@ -1,5 +1,6 @@
 import { FunctionComponent } from 'react';
 import { Link } from 'react-router-dom';
+import { Button } from '../Button/Button';
 
 import './ButtonLink.css';
 
@@ -14,7 +15,7 @@ export const ButtonLink: FunctionComponent<ButtonLinkPorps> = ({
 }) => {
   return (
     <Link to={path}>
-      <button className="button-link">{caption}</button>
+      <Button className="button-link">{caption}</Button>
     </Link>
   )
 };

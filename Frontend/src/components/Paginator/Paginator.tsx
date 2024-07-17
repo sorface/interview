@@ -2,6 +2,7 @@ import React, { FunctionComponent, MouseEventHandler } from 'react';
 import { Field } from '../FieldsBlock/Field';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { Button } from '../Button/Button';
 
 import './Paginator.css';
 
@@ -22,21 +23,21 @@ export const Paginator: FunctionComponent<PaginatorProps> = ({
 }) => {
   return (
     <Field className="paginator">
-      <button
+      <Button
         type="button"
         disabled={prevDisabled}
         onClick={onPrevClick}
       >
         &#60;
-      </button>
+      </Button>
       <span>{useLocalizationCaptions()[LocalizationKey.Page]}: {pageNumber}</span>
-      <button
+      <Button
         type="button"
         disabled={nextDisabled}
         onClick={onNextClick}
       >
         &#62;
-      </button>
+      </Button>
     </Field>
   );
 };

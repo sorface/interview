@@ -13,6 +13,7 @@ import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
 import { Category } from '../../types/category';
 import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { Button } from '../../components/Button/Button';
 
 import './Categories.css';
 
@@ -73,9 +74,9 @@ export const Categories: FunctionComponent = () => {
         {!category.parentId && <ThemedIcon name={IconNames.Clipboard} />}
         <div className="category-controls">
           <Link to={pathnames.categoriesEdit.replace(':id', category.id)}>
-            <button>
+            <Button>
               🖊️
-            </button>
+            </Button>
           </Link>
           <ActionModal
             openButtonCaption='📁'
@@ -98,10 +99,10 @@ export const Categories: FunctionComponent = () => {
         onSearchChange={setSearchValueInput}
       >
         <Link to={pathnames.categoriesCreate}>
-          <button className='active h-2.5'>
+          <Button variant='active' className='h-2.5'>
             <ThemedIcon name={IconNames.Add} />
             {localizationCaptions[LocalizationKey.CreateCategory]}
-          </button>
+          </Button>
         </Link>
       </PageHeader>
       <Field className='!mt-0'>

@@ -20,6 +20,7 @@ import { QuestionItem } from '../../components/QuestionItem/QuestionItem';
 import { RoomInvitations } from '../../components/RoomInvitations/RoomInvitations';
 import { RoomCreateField } from './RoomCreateField/RoomCreateField';
 import { Modal } from '../../components/Modal/Modal';
+import { Button } from '../../components/Button/Button';
 
 const nameFieldName = 'roomName';
 const dateFieldName = 'roomDate';
@@ -308,15 +309,15 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
               onItemsChange={setSelectedQuestions}
             />
             {!!selectedQuestions.length && <Gap sizeRem={1.5} />}
-            <button onClick={handleQuestionsViewOpen}>
+            <Button onClick={handleQuestionsViewOpen}>
               <ThemedIcon name={IconNames.Add} />
               {localizationCaptions[LocalizationKey.AddRoomQuestions]}
-            </button>
+            </Button>
           </RoomCreateField.Content>
         </RoomCreateField.Wrapper>
         <ModalFooter>
-          <button onClick={onClose}>{localizationCaptions[LocalizationKey.Cancel]}</button>
-          <button className='active' onClick={handleCreateRoom}>{localizationCaptions[LocalizationKey.Continue]}</button>
+          <Button onClick={onClose}>{localizationCaptions[LocalizationKey.Cancel]}</Button>
+          <Button variant='active' onClick={handleCreateRoom}>{localizationCaptions[LocalizationKey.Continue]}</Button>
         </ModalFooter>
       </>
     ),
@@ -329,7 +330,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
           roomInvitesLoading={roomInvitesLoading}
         />
         <ModalFooter>
-          <button className='active' onClick={onClose}>{localizationCaptions[LocalizationKey.Continue]}</button>
+          <Button variant='active' onClick={onClose}>{localizationCaptions[LocalizationKey.Continue]}</Button>
         </ModalFooter>
       </>
     ),

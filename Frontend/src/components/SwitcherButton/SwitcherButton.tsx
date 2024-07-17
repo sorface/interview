@@ -1,4 +1,6 @@
 import { FunctionComponent } from 'react';
+import { Button } from '../Button/Button';
+
 import './SwitcherButton.css';
 
 interface SwitcherButtonProps {
@@ -13,12 +15,12 @@ export const SwitcherButton: FunctionComponent<SwitcherButtonProps> = ({
   return (
     <div className='switcher-button'>
       {captions.map((caption, index) => (
-        <button
+        <Button
           key={caption}
-          className={`${index === activeIndex ? 'inverted' : ''}`}
+          variant={index === activeIndex ? 'inverted' : undefined}
         >
           {caption}
-        </button>
+        </Button>
       ))}
     </div>
   );
