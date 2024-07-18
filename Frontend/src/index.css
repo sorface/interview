@@ -1,4 +1,17 @@
 :root {
+  --blue-main: #0666E2;
+  --blue-light: #EBF2FF;
+  --blue-dark: #0058CA;
+  --dark: #24243A;
+  --grey3: #838AA4;
+  --grey2: #C3CBDF;
+  --grey1: #F5F6F8;
+  --white: #FFFFFF;
+  --red: #D91404;
+  --red-light: #F8E5E4;
+  --green-light: #E9F8E7;
+  --grey-active: #F1F3F8;
+
   --text: #ccc;
   --page-bg: #080808;
   --form-bg: var(--page-bg);
@@ -6,6 +19,10 @@
   --active: #b9221c;
   --disabled-icon: #b9221c;
   --active-nav-tab: #424242;
+  --nav-header-color: var(--text);
+  --nav-item-color: var(--text);
+  --nav-item-active-background: var(--active-nav-tab);
+  --nav-item-active-color: var(--text);
   --shadow: #100908;
   --bg: #400000;
   --bg-success: #103000;
@@ -17,11 +34,18 @@
   --button-border-color: #424242;
   --button-bg: #171717;
   --button-active-bg: #4096FF;
+  --button-active-bg-hover: #4096FF;
   --button-bg-active: var(--active);
   --button-hover-border-color: var(--text);
   --button-danger-border-color: var(--active);
-  --button-inverted-background-color: var(--text);
-  --button-inverted-color: var(--wrap-bg);
+  --button-inverted-background-color: var(--page-bg);
+  --button-inverted-color: var(--text);
+  --button-inverted-active-background-color: var(--text);
+  --button-inverted-active-color: var(--wrap-bg);
+  --modal-close-button-background: var(--button-border-color);
+  --modal-close-button-background-hover: var(--active);
+  --modal-close-button-text: var(--text);
+  --modal-close-button-text-hover: var(--text);
   --list-border-color: #444;
   --tab-border-color: var(--list-border-color);
   --active-tab-color: #5993FF;
@@ -30,6 +54,10 @@
   --fields-wrap-margin: 0rem 0rem;
   --nav-menu-margin-horizontal: -2.5rem;
   --chat-width: 19.5rem;
+  --tag-waiting-background: var(--button-border-color);
+  --tag-pending-background: var(--button-border-color);
+  --tag-closed-background: var(--button-border-color);
+  --tag-waitingForAction-background: var(--button-border-color);
   --fadeIn-animation: fadeIn 300ms;
   --fadeIn-animation-fast: fadeIn 100ms;
   --fadeOutUp-animation: 1s fadeOutUp both;
@@ -38,13 +66,35 @@
 
 :root[data-theme="Light"] {
   --text: #1F1F1F;
-  --page-bg: #F0F0F0;
+  --page-bg: var(--grey1);
   --wrap-bg: #FFF;
   --active-nav-tab: #D9D9D9;
-  --button-border-color: #D9D9D9;
-  --button-bg: #FFF;
+  --nav-header-color: var(--dark);
+  --nav-item-color: var(--grey3);
+  --nav-item-active-background: var(--dark);
+  --nav-item-active-color: var(--white);
   --bg-success: #00B96B;
   --shadow: rgba(200, 200, 200, 0.5);
+
+  --button-border-color: var(--grey2);
+  --button-bg: #FFF;
+  --button-active-bg: var(--blue-main);
+  --button-active-bg-hover: var(--blue-dark);
+  --button-bg-active: var(--active);
+  --button-hover-border-color: var(--grey3);
+  --button-danger-border-color: var(--active);
+  --button-inverted-background-color: var(--grey1);
+  --button-inverted-color: var(--dark);
+  --button-inverted-active-background-color: var(--dark);
+  --button-inverted-active-color: var(--white);
+  --modal-close-button-background: var(--grey1);
+  --modal-close-button-background-hover: var(--red);
+  --modal-close-button-text: var(--grey3);
+  --modal-close-button-text-hover: var(--white);
+  --tag-waiting-background: var(--blue-light);
+  --tag-pending-background: var(--green-light);
+  --tag-closed-background: var(--grey-active);
+  --tag-waitingForAction-background: var(--red-light);
 }
 
 :root[data-color-transition="enabled"] * {
@@ -62,8 +112,13 @@
 }
 
 @keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeOutUp {
