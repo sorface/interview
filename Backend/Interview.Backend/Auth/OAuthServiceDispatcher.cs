@@ -25,7 +25,7 @@ public class OAuthServiceDispatcher
         return _dictionaryService.ContainsKey(serviceId);
     }
 
-    public AuthorizationService GetAuthService(string serviceId)
+    public AuthorizationService? GetAuthService(string serviceId)
     {
         if (_dictionaryService.TryGetValue(serviceId, out var service))
         {

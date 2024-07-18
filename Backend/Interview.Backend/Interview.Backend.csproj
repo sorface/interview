@@ -7,15 +7,6 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>$(NoWarn);1591</NoWarn>
-
-        <OpenApiDocumentsDirectory>$(MSBuildProjectDirectory)</OpenApiDocumentsDirectory>
-        <OpenApiGenerateDocuments>true</OpenApiGenerateDocuments>
-        <OpenApiGenerateDocumentsOnBuild>true</OpenApiGenerateDocumentsOnBuild>
-    </PropertyGroup>
-    
-    <PropertyGroup>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <NoWarn>$(NoWarn);1591</NoWarn>
     </PropertyGroup>
     <PropertyGroup>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
