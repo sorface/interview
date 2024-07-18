@@ -17,7 +17,7 @@ export const SwitcherButton: FunctionComponent<SwitcherButtonProps> = ({
       {captions.map((caption, index) => (
         <Button
           key={caption}
-          variant={index === activeIndex ? 'inverted' : undefined}
+          variant={index === activeIndex ? 'invertedActive' : 'inverted'}
         >
           {caption}
         </Button>

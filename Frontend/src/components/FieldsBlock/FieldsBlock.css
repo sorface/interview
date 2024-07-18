@@ -10,7 +10,6 @@
 }
 
 .fields-block .fields-wrap {
-  background-color: var(--form-bg);
   margin: var(--fields-wrap-margin);
 }
 

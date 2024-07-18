@@ -4,7 +4,8 @@ button {
   font-size: 0.875rem;
   border: 1px solid var(--button-border-color);
   padding: 0.25rem 1rem;
-  min-height: 1.75rem;
+  min-width: 7.5rem;
+  min-height: 2.5rem;
   text-align: center;
   text-decoration: none;
   display: inline-flex;
@@ -20,8 +21,13 @@ button:hover {
 }
 
 button.active {
+  border: none;
   background-color: var(--button-active-bg);
   color: var(--button-bg);
+}
+
+button.active:hover {
+  background-color: var(--button-active-bg-hover);
 }
 
 button.danger {
@@ -31,6 +37,13 @@ button.danger {
 button.inverted {
   background-color: var(--button-inverted-background-color);
   color: var(--button-inverted-color);
+  border: none;
+}
+
+button.invertedActive {
+  background-color: var(--button-inverted-active-background-color);
+  color: var(--button-inverted-active-color);
+  border: none;
 }
 
 button:disabled,
@@ -45,4 +58,5 @@ button[disabled]:hover {
 
 button.text {
   border: none;
+  min-width: unset;
 }

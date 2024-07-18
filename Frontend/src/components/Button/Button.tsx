@@ -3,7 +3,7 @@ import { FunctionComponent, ReactNode } from 'react';
 import './Button.css';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'active' | 'danger' | 'inverted' | 'text';
+  variant?: 'active' | 'danger' | 'inverted' | 'invertedActive' | 'text';
   disabled?: boolean;
   children: ReactNode;
 }
