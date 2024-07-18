@@ -30,10 +30,6 @@ public class RoomReactionController : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(RoomQuestionReactionDetail), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<RoomQuestionReactionDetail>> CreateInRoom(
         [FromBody] RoomQuestionReactionCreateRequest request)
     {

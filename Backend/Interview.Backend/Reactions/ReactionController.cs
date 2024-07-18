@@ -29,9 +29,6 @@ public class ReactionController : ControllerBase
     [HttpGet]
     [Authorize]
     [ProducesResponseType(typeof(IPagedList<ReactionDetail>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
     public Task<IPagedList<ReactionDetail>> GetPage([FromQuery] PageRequest request) =>
         _reactionService.FindPageAsync(request.PageNumber, request.PageSize, HttpContext.RequestAborted);
 }

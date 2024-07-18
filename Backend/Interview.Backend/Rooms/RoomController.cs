@@ -39,10 +39,6 @@ public class RoomController : ControllerBase
     [HttpGet]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(RoomReviewDetail), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
     public Task<IPagedList<RoomPageDetail>> GetPage(
         [FromQuery] PageRequest request,
         [FromQuery] RoomPageDetailRequestFilter? filter)
@@ -62,10 +58,7 @@ public class RoomController : ControllerBase
     [Authorize]
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(RoomDetail), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
     public Task<RoomDetail> GetById(Guid id)
     {
         return _roomService.FindByIdAsync(id, HttpContext.RequestAborted);
@@ -126,7 +119,6 @@ public class RoomController : ControllerBase
     [Authorize]
     [HttpPost]
     [ProducesResponseType(typeof(RoomPageDetail), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<RoomPageDetail>> Create([FromBody] RoomCreateApiRequest request)
     {
         var domainRequest = new RoomCreateRequest
@@ -154,7 +146,6 @@ public class RoomController : ControllerBase
     [Authorize]
     [HttpPatch("{id:guid}")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
     public Task<RoomItem> PatchUpdate(Guid id, [FromBody] RoomUpdateRequest request)
     {
         return _roomService.UpdateAsync(id, request);
@@ -206,7 +197,6 @@ public class RoomController : ControllerBase
     [HttpPatch("{id:guid}/close")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> CloseRoom(Guid id)
     {
         await _roomService.CloseAsync(id, HttpContext.RequestAborted);
@@ -223,7 +213,6 @@ public class RoomController : ControllerBase
     [HttpPatch("{id:guid}/startReview")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> StartReviewRoom(Guid id)
     {
         await _roomService.StartReviewAsync(id, HttpContext.RequestAborted);
@@ -239,7 +228,6 @@ public class RoomController : ControllerBase
     [Authorize]
     [HttpPost("event")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> SendEvent(RoomEventApiRequest request)
     {
         var user = User.ToUser();
