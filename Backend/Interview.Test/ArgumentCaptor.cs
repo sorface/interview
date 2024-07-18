@@ -15,7 +15,7 @@ namespace Interview.Test
             return true;
         }
 
-        public required T Value { get; private set; }
+        public T Value { get; private set; } = default!;
     }
 }
 

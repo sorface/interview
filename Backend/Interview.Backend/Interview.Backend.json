@@ -25,7 +25,6 @@
             "name": "scheme",
             "in": "path",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string"
             }
@@ -33,7 +32,6 @@
           {
             "name": "redirectUri",
             "in": "query",
-            "style": "form",
             "schema": {
               "type": "string"
             }
@@ -41,7 +39,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "OK"
           },
           "400": {
             "description": "Bad Request",
@@ -98,7 +96,6 @@
             "in": "path",
             "description": "Category id.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -107,7 +104,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -189,7 +186,6 @@
             "in": "path",
             "description": "ID of the of category.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -218,7 +214,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -300,7 +296,7 @@
           {
             "name": "Filter.ParentId",
             "in": "query",
-            "style": "form",
+            "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -309,7 +305,7 @@
           {
             "name": "Filter.Name",
             "in": "query",
-            "style": "form",
+            "required": true,
             "schema": {
               "type": "string"
             }
@@ -317,7 +313,6 @@
           {
             "name": "Filter.ShowOnlyWithoutParent",
             "in": "query",
-            "style": "form",
             "schema": {
               "type": "boolean"
             }
@@ -325,7 +320,6 @@
           {
             "name": "Filter.EditingCategoryId",
             "in": "query",
-            "style": "form",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -334,7 +328,6 @@
           {
             "name": "Page.PageSize",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 30,
               "minimum": 1,
@@ -345,7 +338,6 @@
           {
             "name": "Page.PageNumber",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -356,7 +348,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -529,7 +521,7 @@
           {
             "name": "Filter.ParentId",
             "in": "query",
-            "style": "form",
+            "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -538,7 +530,7 @@
           {
             "name": "Filter.Name",
             "in": "query",
-            "style": "form",
+            "required": true,
             "schema": {
               "type": "string"
             }
@@ -546,7 +538,6 @@
           {
             "name": "Filter.ShowOnlyWithoutParent",
             "in": "query",
-            "style": "form",
             "schema": {
               "type": "boolean"
             }
@@ -554,7 +545,6 @@
           {
             "name": "Filter.EditingCategoryId",
             "in": "query",
-            "style": "form",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -563,7 +553,6 @@
           {
             "name": "Page.PageSize",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 30,
               "minimum": 1,
@@ -574,7 +563,6 @@
           {
             "name": "Page.PageNumber",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -585,7 +573,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -662,7 +650,6 @@
             "in": "path",
             "description": "Id category.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -671,7 +658,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -755,7 +742,6 @@
             "in": "path",
             "description": "Id category.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -764,7 +750,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -846,7 +832,6 @@
           {
             "name": "PageSize",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 30,
               "minimum": 1,
@@ -857,7 +842,6 @@
           {
             "name": "PageNumber",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -868,7 +852,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -1046,7 +1030,6 @@
             "in": "path",
             "description": "Id.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -1055,7 +1038,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1157,7 +1140,6 @@
             "in": "path",
             "description": "Event id.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -1186,7 +1168,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1273,7 +1255,6 @@
             "in": "path",
             "description": "Id.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string"
             }
@@ -1281,7 +1262,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1383,7 +1364,6 @@
           {
             "name": "Tags",
             "in": "query",
-            "style": "form",
             "schema": {
               "uniqueItems": true,
               "type": "array",
@@ -1396,7 +1376,6 @@
           {
             "name": "Value",
             "in": "query",
-            "style": "form",
             "schema": {
               "type": "string"
             }
@@ -1404,7 +1383,6 @@
           {
             "name": "CategoryId",
             "in": "query",
-            "style": "form",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -1413,7 +1391,6 @@
           {
             "name": "Page.PageSize",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 30,
               "minimum": 1,
@@ -1424,7 +1401,6 @@
           {
             "name": "Page.PageNumber",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -1435,7 +1411,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -1608,7 +1584,6 @@
           {
             "name": "PageSize",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 30,
               "minimum": 1,
@@ -1619,7 +1594,6 @@
           {
             "name": "PageNumber",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -1630,7 +1604,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -1704,7 +1678,6 @@
             "in": "path",
             "description": "Question ID.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -1713,7 +1686,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -1795,7 +1768,6 @@
             "in": "path",
             "description": "ID of the of question.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -1824,7 +1796,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -1908,7 +1880,6 @@
             "in": "path",
             "description": "ID of the of question.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -1917,7 +1888,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -2001,7 +1972,6 @@
             "in": "path",
             "description": "ID of the of question.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -2010,7 +1980,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -2094,7 +2064,6 @@
             "in": "path",
             "description": "ID of the of question.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -2103,7 +2072,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -2185,7 +2154,6 @@
           {
             "name": "PageSize",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 30,
               "minimum": 1,
@@ -2196,7 +2164,6 @@
           {
             "name": "PageNumber",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -2207,7 +2174,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -2298,7 +2265,6 @@
           {
             "name": "PageSize",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 30,
               "minimum": 1,
@@ -2309,7 +2275,6 @@
           {
             "name": "PageNumber",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -2320,7 +2285,6 @@
           {
             "name": "Name",
             "in": "query",
-            "style": "form",
             "schema": {
               "type": "string"
             }
@@ -2328,7 +2292,6 @@
           {
             "name": "Statuses",
             "in": "query",
-            "style": "form",
             "schema": {
               "uniqueItems": true,
               "type": "array",
@@ -2340,7 +2303,6 @@
           {
             "name": "Participants",
             "in": "query",
-            "style": "form",
             "schema": {
               "uniqueItems": true,
               "type": "array",
@@ -2353,7 +2315,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -2525,7 +2487,6 @@
             "in": "path",
             "description": "Id.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -2534,7 +2495,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -2636,7 +2597,6 @@
             "in": "path",
             "description": "Room id.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -2665,7 +2625,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -2752,7 +2712,6 @@
             "in": "path",
             "description": "Room id.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -2761,7 +2720,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -2865,7 +2824,6 @@
             "in": "path",
             "description": "Room id.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -2876,7 +2834,6 @@
             "in": "path",
             "description": "State type.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string"
             }
@@ -2904,7 +2861,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -3006,7 +2963,6 @@
             "in": "path",
             "description": "Room id.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -3017,7 +2973,6 @@
             "in": "path",
             "description": "State type.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string"
             }
@@ -3025,7 +2980,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -3129,7 +3084,6 @@
             "in": "path",
             "description": "Room id.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -3138,7 +3092,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -3242,7 +3196,6 @@
             "in": "path",
             "description": "Room id.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -3251,7 +3204,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -3355,7 +3308,6 @@
             "in": "path",
             "description": "room id.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -3364,7 +3316,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -3471,7 +3423,6 @@
             "in": "path",
             "description": "room id.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -3480,7 +3431,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -3603,7 +3554,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -3687,7 +3638,6 @@
             "in": "path",
             "description": "Room id.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -3725,7 +3675,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -3847,7 +3797,6 @@
             "in": "path",
             "description": "Room id.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -3856,7 +3805,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -3940,7 +3889,6 @@
             "in": "path",
             "description": "room id.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -3950,7 +3898,6 @@
             "name": "inviteId",
             "in": "query",
             "description": "invite id.",
-            "style": "form",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -3959,7 +3906,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -4073,7 +4020,6 @@
             "in": "path",
             "description": "room id.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -4082,7 +4028,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -4221,7 +4167,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -4333,7 +4279,6 @@
           {
             "name": "RoomId",
             "in": "query",
-            "style": "form",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -4342,7 +4287,6 @@
           {
             "name": "UserId",
             "in": "query",
-            "style": "form",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -4351,7 +4295,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -4567,7 +4511,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -4687,7 +4631,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -4759,7 +4703,6 @@
           {
             "name": "RoomId",
             "in": "query",
-            "style": "form",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -4768,7 +4711,6 @@
           {
             "name": "States",
             "in": "query",
-            "style": "form",
             "schema": {
               "uniqueItems": true,
               "type": "array",
@@ -4780,7 +4722,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -4854,7 +4796,6 @@
           {
             "name": "RoomId",
             "in": "query",
-            "style": "form",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -4863,7 +4804,6 @@
           {
             "name": "QuestionId",
             "in": "query",
-            "style": "form",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -4872,7 +4812,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -4960,7 +4900,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -5152,7 +5092,6 @@
           {
             "name": "Page.PageSize",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 30,
               "minimum": 1,
@@ -5163,7 +5102,6 @@
           {
             "name": "Page.PageNumber",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -5174,7 +5112,7 @@
           {
             "name": "Filter.RoomId",
             "in": "query",
-            "style": "form",
+            "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -5183,7 +5121,7 @@
           {
             "name": "Filter.State",
             "in": "query",
-            "style": "form",
+            "required": true,
             "schema": {
               "$ref": "#/components/schemas/Interview.Domain.Rooms.RoomReviews.EVRoomReviewState"
             }
@@ -5191,7 +5129,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -5356,7 +5294,6 @@
             "in": "path",
             "description": "Id review.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -5458,7 +5395,6 @@
             "name": "value",
             "in": "query",
             "description": "Tag value.",
-            "style": "form",
             "schema": {
               "type": "string"
             }
@@ -5466,7 +5402,6 @@
           {
             "name": "PageSize",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 30,
               "minimum": 1,
@@ -5477,7 +5412,6 @@
           {
             "name": "PageNumber",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -5488,7 +5422,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -5663,7 +5597,6 @@
             "in": "path",
             "description": "ID of the of tag.",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -5692,7 +5625,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -5773,7 +5706,6 @@
           {
             "name": "PageSize",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 30,
               "minimum": 1,
@@ -5784,7 +5716,6 @@
           {
             "name": "PageNumber",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -5795,7 +5726,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -5870,7 +5801,6 @@
             "name": "nickname",
             "in": "path",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string"
             }
@@ -5878,7 +5808,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -5959,7 +5889,6 @@
           {
             "name": "PageSize",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 30,
               "minimum": 1,
@@ -5970,7 +5899,6 @@
           {
             "name": "PageNumber",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -5982,7 +5910,6 @@
             "name": "role",
             "in": "path",
             "required": true,
-            "style": "simple",
             "schema": {
               "$ref": "#/components/schemas/Interview.Domain.Users.Roles.RoleNameType"
             }
@@ -5990,7 +5917,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -6074,7 +6001,6 @@
           {
             "name": "PageSize",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 30,
               "minimum": 1,
@@ -6085,7 +6011,6 @@
           {
             "name": "PageNumber",
             "in": "query",
-            "style": "form",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -6096,7 +6021,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -6178,7 +6103,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -6250,7 +6175,6 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -6259,7 +6183,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -6335,7 +6259,6 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "style": "simple",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -6363,7 +6286,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -6469,6 +6392,9 @@
         "description": "Serves as a class for getting data to display as a page."
       },
       "Interview.Backend.Responses.MessageResponse": {
+        "required": [
+          "message"
+        ],
         "type": "object",
         "properties": {
           "message": {
@@ -6580,6 +6506,9 @@
         "additionalProperties": false
       },
       "Interview.Backend.Rooms.UpsertRoomRequestApi": {
+        "required": [
+          "payload"
+        ],
         "type": "object",
         "properties": {
           "payload": {
@@ -6605,6 +6534,11 @@
         "additionalProperties": false
       },
       "Interview.Domain.Categories.Page.CategoryResponse": {
+        "required": [
+          "id",
+          "name",
+          "parentId"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -6624,6 +6558,12 @@
         "additionalProperties": false
       },
       "Interview.Domain.Events.Service.Create.AppEventCreateRequest": {
+        "required": [
+          "participantTypes",
+          "roles",
+          "stateful",
+          "type"
+        ],
         "type": "object",
         "properties": {
           "type": {
@@ -6651,6 +6591,13 @@
         "additionalProperties": false
       },
       "Interview.Domain.Events.Service.FindPage.AppEventItem": {
+        "required": [
+          "id",
+          "participantTypes",
+          "roles",
+          "stateful",
+          "type"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -6682,6 +6629,10 @@
         "additionalProperties": false
       },
       "Interview.Domain.Events.Service.Update.AppEventUpdateRequest": {
+        "required": [
+          "participantTypes",
+          "stateful"
+        ],
         "type": "object",
         "properties": {
           "type": {
@@ -6744,6 +6695,10 @@
         "additionalProperties": false
       },
       "Interview.Domain.Questions.CodeEditors.QuestionCodeEditorEditRequest": {
+        "required": [
+          "content",
+          "lang"
+        ],
         "type": "object",
         "properties": {
           "content": {
@@ -6758,6 +6713,10 @@
         "additionalProperties": false
       },
       "Interview.Domain.Questions.CodeEditors.QuestionCodeEditorResponse": {
+        "required": [
+          "content",
+          "lang"
+        ],
         "type": "object",
         "properties": {
           "content": {
@@ -6779,6 +6738,11 @@
         "type": "string"
       },
       "Interview.Domain.Questions.QuestionAnswers.QuestionAnswerCreateRequest": {
+        "required": [
+          "codeEditor",
+          "content",
+          "title"
+        ],
         "type": "object",
         "properties": {
           "title": {
@@ -6796,6 +6760,12 @@
         "additionalProperties": false
       },
       "Interview.Domain.Questions.QuestionAnswers.QuestionAnswerEditRequest": {
+        "required": [
+          "codeEditor",
+          "content",
+          "id",
+          "title"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -6818,6 +6788,12 @@
         "additionalProperties": false
       },
       "Interview.Domain.Questions.QuestionAnswers.QuestionAnswerResponse": {
+        "required": [
+          "codeEditor",
+          "content",
+          "id",
+          "title"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -6839,6 +6815,12 @@
         "additionalProperties": false
       },
       "Interview.Domain.Questions.QuestionCreateRequest": {
+        "required": [
+          "answers",
+          "categoryId",
+          "codeEditor",
+          "type"
+        ],
         "type": "object",
         "properties": {
           "value": {
@@ -6876,6 +6858,11 @@
         "additionalProperties": false
       },
       "Interview.Domain.Questions.QuestionEditRequest": {
+        "required": [
+          "answers",
+          "categoryId",
+          "codeEditor"
+        ],
         "type": "object",
         "properties": {
           "value": {
@@ -6910,6 +6897,12 @@
         "additionalProperties": false
       },
       "Interview.Domain.Questions.Records.FindPage.QuestionItem": {
+        "required": [
+          "answers",
+          "category",
+          "codeEditor",
+          "tags"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -6978,6 +6971,9 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.Analytics": {
+        "required": [
+          "questions"
+        ],
         "type": "object",
         "properties": {
           "questions": {
@@ -6991,6 +6987,9 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.AnalyticsSummary": {
+        "required": [
+          "questions"
+        ],
         "type": "object",
         "properties": {
           "questions": {
@@ -7004,6 +7003,10 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.AnalyticsSummaryExpert": {
+        "required": [
+          "nickname",
+          "reactionsSummary"
+        ],
         "type": "object",
         "properties": {
           "nickname": {
@@ -7021,6 +7024,12 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.AnalyticsSummaryQuestion": {
+        "required": [
+          "experts",
+          "id",
+          "value",
+          "viewers"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -7049,6 +7058,9 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.AnalyticsSummaryViewer": {
+        "required": [
+          "reactionsSummary"
+        ],
         "type": "object",
         "properties": {
           "reactionsSummary": {
@@ -7062,6 +7074,12 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.Analytics_AnalyticsQuestion": {
+        "required": [
+          "id",
+          "status",
+          "users",
+          "value"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -7087,6 +7105,11 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.Analytics_AnalyticsReactionSummary": {
+        "required": [
+          "count",
+          "id",
+          "type"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -7105,6 +7128,13 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.Analytics_AnalyticsUser": {
+        "required": [
+          "avatar",
+          "evaluation",
+          "id",
+          "nickname",
+          "participantType"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -7130,6 +7160,10 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.Analytics_AnalyticsUserQuestionEvaluation": {
+        "required": [
+          "mark",
+          "review"
+        ],
         "type": "object",
         "properties": {
           "review": {
@@ -7174,6 +7208,10 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.Records.Request.RoomQuestionRequest": {
+        "required": [
+          "id",
+          "order"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -7188,6 +7226,9 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.Records.Request.RoomUpdateRequest": {
+        "required": [
+          "questions"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -7234,6 +7275,11 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.Records.Response.Detail.RoomDetail": {
+        "required": [
+          "invites",
+          "owner",
+          "status"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -7279,6 +7325,9 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.Records.Response.Detail.RoomQuestionDetail": {
+        "required": [
+          "order"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -7330,6 +7379,9 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.Records.Response.Page.RoomPageDetail": {
+        "required": [
+          "roomStatus"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -7376,6 +7428,12 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.Records.Response.RoomInviteResponse": {
+        "required": [
+          "inviteId",
+          "max",
+          "participantType",
+          "used"
+        ],
         "type": "object",
         "properties": {
           "inviteId": {
@@ -7397,6 +7455,10 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.Records.Response.RoomStates.ActualRoomStateResponse": {
+        "required": [
+          "codeEditorContent",
+          "states"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -7450,6 +7512,10 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.Records.Response.RoomStates.RoomStateResponse": {
+        "required": [
+          "payload",
+          "type"
+        ],
         "type": "object",
         "properties": {
           "payload": {
@@ -7530,6 +7596,9 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.RoomQuestionEvaluations.Records.Response.QuestionEvaluationDetail": {
+        "required": [
+          "id"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -7606,6 +7675,12 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.RoomQuestions.Records.Response.RoomQuestionResponse": {
+        "required": [
+          "id",
+          "order",
+          "state",
+          "value"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -7689,6 +7764,13 @@
         "additionalProperties": false
       },
       "Interview.Domain.Rooms.RoomReviews.Records.RoomReviewDetail": {
+        "required": [
+          "id",
+          "review",
+          "roomId",
+          "state",
+          "userId"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -7728,6 +7810,11 @@
         "additionalProperties": false
       },
       "Interview.Domain.Tags.Records.Response.TagItem": {
+        "required": [
+          "hexValue",
+          "id",
+          "value"
+        ],
         "type": "object",
         "properties": {
           "id": {
