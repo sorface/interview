@@ -203,8 +203,8 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
       {
         id: `${Math.random()}`,
         codeEditor: false,
+        title: `${localizationCaptions[LocalizationKey.QuestionAnswerOptionDefaultName]} ${answers.length + 1}`,
         content: '',
-        title: '',
       },
     ]);
   };

@@ -186,6 +186,10 @@
   padding: 1rem 2rem;
 }
 
+.nav-menu-overlay .categories-list-item {
+  color: var(--nav-item-color);
+}
+
 .nav-menu-page-overlay {
   height: 100%;
   width: 100%;
