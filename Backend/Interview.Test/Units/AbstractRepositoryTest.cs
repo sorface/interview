@@ -1,5 +1,3 @@
-using FluentAssertions;
-using Interview.Domain;
 using Interview.Domain.Database;
 using Interview.Domain.Repository;
 using Microsoft.EntityFrameworkCore;

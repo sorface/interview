@@ -1,6 +1,5 @@
 using CSharpFunctionalExtensions;
 using Interview.Domain.Permissions;
-using Interview.Domain.Rooms.Service;
 using Interview.Domain.ServiceResults.Errors;
 using Interview.Domain.ServiceResults.Success;
 using Interview.Domain.Tags.Records.Response;

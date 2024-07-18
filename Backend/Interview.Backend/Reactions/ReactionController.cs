@@ -1,6 +1,3 @@
-using Interview.Backend.Auth;
-using Interview.Backend.Common;
-using Interview.Backend.Responses;
 using Interview.Domain;
 using Interview.Domain.Reactions.Records;
 using Interview.Domain.Reactions.Services;

@@ -1,4 +1,3 @@
-using Interview.Backend.Common;
 using Interview.Backend.Responses;
 using Interview.Domain.Categories;
 using Interview.Domain.Categories.Edit;

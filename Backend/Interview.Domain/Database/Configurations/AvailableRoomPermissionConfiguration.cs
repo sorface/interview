@@ -1,4 +1,3 @@
-using Interview.Domain.Permissions;
 using Interview.Domain.Rooms;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

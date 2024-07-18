@@ -1,6 +1,5 @@
 using Interview.Domain.Database;
 using Interview.Domain.Users;
-using Interview.Domain.Users.Permissions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Infrastructure.Users;

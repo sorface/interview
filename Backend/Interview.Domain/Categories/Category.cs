@@ -1,7 +1,6 @@
 using Interview.Domain.Database;
 using Interview.Domain.Questions;
 using Interview.Domain.Repository;
-using Interview.Domain.Rooms;
 using Interview.Domain.ServiceResults.Errors;
 using Microsoft.EntityFrameworkCore;
 

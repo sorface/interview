@@ -1,12 +1,10 @@
 using System.Net.Mime;
 using Interview.Backend.Auth;
-using Interview.Backend.Responses;
 using Interview.Backend.RoomEvaluations.Records;
 using Interview.Domain;
 using Interview.Domain.Rooms.RoomQuestionEvaluations.Records.Request;
 using Interview.Domain.Rooms.RoomQuestionEvaluations.Records.Response;
 using Interview.Domain.Rooms.RoomQuestionEvaluations.Services;
-using Interview.Domain.Rooms.RoomReviews.Records;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

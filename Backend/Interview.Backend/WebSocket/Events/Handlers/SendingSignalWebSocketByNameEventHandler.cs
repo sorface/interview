@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Interview.Backend.WebSocket.Events.ConnectionListener;
 using Interview.Domain.Events.Events;
 using Interview.Domain.Events.Events.Serializers;

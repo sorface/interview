@@ -2,10 +2,6 @@ using FluentAssertions;
 using Interview.Domain.Questions;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomQuestions;
-using Interview.Domain.Users;
-using Interview.Domain.Users.Roles;
-using Interview.Infrastructure.Users;
-using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Test.Integrations;
 

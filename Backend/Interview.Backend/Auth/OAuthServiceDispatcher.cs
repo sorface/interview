@@ -1,5 +1,3 @@
-using CSharpFunctionalExtensions;
-
 namespace Interview.Backend.Auth;
 
 public class OAuthServiceDispatcher

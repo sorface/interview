@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using NSpecifications;
 
 namespace Interview.Domain.Events.Storage;

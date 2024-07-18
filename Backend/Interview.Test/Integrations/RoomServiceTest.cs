@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Interview.Domain;
-using Interview.Domain.Categories;
 using Interview.Domain.Database;
 using Interview.Domain.Events.Storage;
 using Interview.Domain.Invites;
@@ -9,7 +8,6 @@ using Interview.Domain.Reactions;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Response;
-using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.RoomInvites;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomParticipants.Service;

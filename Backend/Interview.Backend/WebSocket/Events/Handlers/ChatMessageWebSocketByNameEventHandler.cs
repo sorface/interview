@@ -1,6 +1,5 @@
 using Interview.Domain.Events;
 using Interview.Domain.Events.Events;
-using Interview.Infrastructure.Chat;
 
 namespace Interview.Backend.WebSocket.Events.Handlers;
 

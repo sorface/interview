@@ -1,4 +1,3 @@
-using Interview.Backend.Auth;
 using Interview.Backend.Common;
 using Interview.Backend.Responses;
 using Interview.Domain;

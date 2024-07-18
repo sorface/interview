@@ -1,4 +1,3 @@
-using Interview.Backend.Auth;
 using Interview.Backend.Responses;
 using Interview.Domain.Rooms.RoomParticipants.Records.Request;
 using Interview.Domain.Rooms.RoomParticipants.Records.Response;

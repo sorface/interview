@@ -1,5 +1,3 @@
-using Interview.Backend.Auth;
-using Interview.Backend.Responses;
 using Interview.Domain.Rooms.RoomQuestions.Records;
 using Interview.Domain.Rooms.RoomQuestions.Records.Response;
 using Interview.Domain.Rooms.RoomQuestions.Services;

@@ -2,8 +2,6 @@ using Interview.Backend.Responses;
 using Interview.Backend.WebSocket.Configuration;
 using Interview.Domain.Users.Service;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
-using Microsoft.AspNetCore.DataProtection;
 
 namespace Interview.Backend.Auth;
 

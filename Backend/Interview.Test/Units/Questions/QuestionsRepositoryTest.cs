@@ -1,6 +1,5 @@
 using Interview.Domain.Database;
 using Interview.Domain.Questions;
-using Interview.Domain.Reactions;
 using Interview.Infrastructure.Questions;
 
 namespace Interview.Test.Units.Questions;
