@@ -17,9 +17,4 @@
       <ProjectReference Include="..\Interview.Infrastructure\Interview.Infrastructure.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Reference Include="Microsoft.AspNetCore.Http.Abstractions" />
-      <Reference Include="Microsoft.AspNetCore.Http.Features" />
-    </ItemGroup>
-
 </Project>
