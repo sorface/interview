@@ -6,11 +6,13 @@ export enum Theme {
   Dark = 'Dark',
 };
 
+export type ThemeInUi = Theme.Dark | Theme.Light;
+
 const defaultTheme = Theme.System;
 
 interface ThemeContextType {
   themeInSetting: Theme;
-  themeInUi: Theme;
+  themeInUi: ThemeInUi;
   setTheme: Dispatch<SetStateAction<Theme>>;
 }
 
@@ -75,7 +77,7 @@ export const ThemeProvider: FunctionComponent<ThemeProviderProps> = ({
   children,
 }) => {
   const [themeInSetting, setThemeInSetting] = useState<Theme>(getThemeInSetting);
-  const [themeInUi, setThemeInUi] = useState<Theme>(initThemeInUi(true));
+  const [themeInUi, setThemeInUi] = useState<ThemeInUi>(initThemeInUi(true));
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
