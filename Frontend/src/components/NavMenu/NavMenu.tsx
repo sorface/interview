@@ -99,12 +99,6 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
       icon: IconNames.Clipboard,
       onClick: handleItemClick,
     } : null,
-    {
-      path: pathnames.session,
-      caption: <LocalizationCaption captionKey={LocalizationKey.Settings} />,
-      icon: IconNames.Settings,
-      onClick: handleItemClick,
-    },
   ];
 
   const createMenuItem = (item: MenuItem) => {
