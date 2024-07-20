@@ -54,10 +54,6 @@
   --fields-wrap-margin: 0rem 0rem;
   --nav-menu-margin-horizontal: -2.5rem;
   --chat-width: 19.5rem;
-  --tag-waiting-background: var(--button-border-color);
-  --tag-pending-background: var(--button-border-color);
-  --tag-closed-background: var(--button-border-color);
-  --tag-waitingForAction-background: var(--button-border-color);
   --fadeIn-animation: fadeIn 300ms;
   --fadeIn-animation-fast: fadeIn 100ms;
   --fadeOutUp-animation: 1s fadeOutUp both;
@@ -91,10 +87,6 @@
   --modal-close-button-background-hover: var(--red);
   --modal-close-button-text: var(--grey3);
   --modal-close-button-text-hover: var(--white);
-  --tag-waiting-background: var(--blue-light);
-  --tag-pending-background: var(--green-light);
-  --tag-closed-background: var(--grey-active);
-  --tag-waitingForAction-background: var(--red-light);
 }
 
 :root[data-color-transition="enabled"] * {
