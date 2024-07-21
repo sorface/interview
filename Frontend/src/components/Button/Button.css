@@ -60,3 +60,11 @@ button.text {
   border: none;
   min-width: unset;
 }
+
+button.toolsPanel {
+  border: none;
+  min-width: unset;
+  padding: 0;
+  border-radius: unset;
+  opacity: 0.5;
+}
