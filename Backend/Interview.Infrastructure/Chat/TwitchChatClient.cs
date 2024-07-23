@@ -1,5 +1,3 @@
-using Interview.Domain.Events;
-using Interview.Domain.Events.Events;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;

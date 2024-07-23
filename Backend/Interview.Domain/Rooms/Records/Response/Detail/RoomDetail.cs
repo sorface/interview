@@ -6,13 +6,13 @@ public class RoomDetail
 
     public string? Name { get; set; }
 
-    public RoomUserDetail Owner { get; set; }
+    public required RoomUserDetail Owner { get; set; }
 
     public List<RoomUserDetail>? Participants { get; set; }
 
     public required EVRoomStatus Status { get; init; }
 
-    public List<RoomInviteResponse> Invites { get; init; }
+    public required List<RoomInviteResponse> Invites { get; init; }
 
     public EVRoomAccessType Type { get; init; }
 

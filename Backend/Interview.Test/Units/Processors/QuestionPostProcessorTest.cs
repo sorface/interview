@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using FluentAssertions;
-using Interview.Backend.WebSocket.Events.ConnectionListener;
 using Interview.Domain.Connections;
 using Interview.Domain.Events;
 using Interview.Domain.Events.DatabaseProcessors;

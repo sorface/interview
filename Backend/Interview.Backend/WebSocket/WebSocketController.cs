@@ -1,14 +1,11 @@
-using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.WebSockets;
-using System.Text;
 using Interview.Backend.Auth;
 using Interview.Backend.WebSocket.Events;
 using Interview.Backend.WebSocket.Events.ConnectionListener;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.Service;
 using Microsoft.AspNetCore.Mvc;
-using NSpecifications;
 
 namespace Interview.Backend.WebSocket;
 

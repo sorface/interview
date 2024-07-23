@@ -1,5 +1,4 @@
 using Interview.Domain.Rooms.Records.Response;
-using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.RoomParticipants;
 
 namespace Interview.Domain.Rooms.RoomInvites;

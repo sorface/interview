@@ -1,7 +1,6 @@
 using Interview.Domain.Database;
 using Interview.Domain.Invites;
 using Interview.Domain.Rooms.Records.Response;
-using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomParticipants.Service;
 using Microsoft.EntityFrameworkCore;

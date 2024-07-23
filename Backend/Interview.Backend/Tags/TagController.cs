@@ -1,4 +1,3 @@
-using Interview.Backend.Common;
 using Interview.Backend.Responses;
 using Interview.Domain;
 using Interview.Domain.Tags;
@@ -30,9 +29,6 @@ public class TagController : ControllerBase
     [HttpGet("tag")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(IPagedList<TagItem>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
     public Task<IPagedList<TagItem>> GetTagPage([FromQuery] string? value, [FromQuery] PageRequest request)
     {
         return _tagService.FindTagsPageAsync(value, request.PageNumber, request.PageSize, HttpContext.RequestAborted);
@@ -47,10 +43,7 @@ public class TagController : ControllerBase
     [HttpPost("tag")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(TagItem), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
     public Task<ActionResult<TagItem>> CreateTag(TagEditRequest request)
     {
         return _tagService.CreateTagAsync(request, HttpContext.RequestAborted).ToResponseAsync();
@@ -66,11 +59,7 @@ public class TagController : ControllerBase
     [HttpPut("tag/{id:guid}")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(TagItem), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
     public Task<ActionResult<TagItem>> UpdateTag(Guid id, TagEditRequest request)
     {
         return _tagService.UpdateTagAsync(id, request, HttpContext.RequestAborted).ToResponseAsync();

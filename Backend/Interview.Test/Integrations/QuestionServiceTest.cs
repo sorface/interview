@@ -17,7 +17,6 @@ using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.Users;
 using Interview.Infrastructure.Questions;
 using Interview.Infrastructure.RoomParticipants;
-using Interview.Infrastructure.RoomQuestions;
 using Interview.Infrastructure.Tags;
 using Microsoft.EntityFrameworkCore;
 using Moq;

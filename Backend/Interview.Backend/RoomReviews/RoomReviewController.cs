@@ -31,10 +31,6 @@ public class RoomReviewController : ControllerBase
     [HttpGet]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(List<RoomReviewDetail>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
     public Task<IPagedList<RoomReviewPageDetail>> FindPage([FromQuery] RoomReviewPageRequest request)
     {
         return _roomReviewService.FindPageAsync(request, HttpContext.RequestAborted);
@@ -49,10 +45,6 @@ public class RoomReviewController : ControllerBase
     [HttpPost]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(RoomReviewDetail), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<RoomReviewDetail>> Create([FromBody] RoomReviewCreateRequest request)
     {
         var user = HttpContext.User.ToUser();
@@ -77,10 +69,6 @@ public class RoomReviewController : ControllerBase
     [HttpPut("{id:guid}")]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(RoomReviewDetail), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
     public Task<RoomReviewDetail> Update([FromRoute] Guid id, [FromBody] RoomReviewUpdateRequest request)
     {
         return _roomReviewService.UpdateAsync(id, request, HttpContext.RequestAborted);

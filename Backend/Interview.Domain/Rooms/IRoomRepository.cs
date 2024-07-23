@@ -1,10 +1,7 @@
 using Interview.Domain.Repository;
-using Interview.Domain.RoomParticipants;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Response.Detail;
-using Interview.Domain.Rooms.Records.Response.Page;
 using Interview.Domain.Rooms.RoomParticipants;
-using X.PagedList;
 
 namespace Interview.Domain.Rooms;
 

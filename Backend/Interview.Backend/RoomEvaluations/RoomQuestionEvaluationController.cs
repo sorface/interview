@@ -1,12 +1,10 @@
 using System.Net.Mime;
 using Interview.Backend.Auth;
-using Interview.Backend.Responses;
 using Interview.Backend.RoomEvaluations.Records;
 using Interview.Domain;
 using Interview.Domain.Rooms.RoomQuestionEvaluations.Records.Request;
 using Interview.Domain.Rooms.RoomQuestionEvaluations.Records.Response;
 using Interview.Domain.Rooms.RoomQuestionEvaluations.Services;
-using Interview.Domain.Rooms.RoomReviews.Records;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,10 +25,6 @@ public class RoomQuestionEvaluationController : ControllerBase
     [HttpGet]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(QuestionEvaluationDetail), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
     public async Task<QuestionEvaluationDetail?> FindByRoomIdAndQuestionId([FromQuery] QuestionEvaluationGetRequestApi request)
     {
         var user = HttpContext.User.ToUser();
@@ -49,10 +43,6 @@ public class RoomQuestionEvaluationController : ControllerBase
     [HttpPost("merge")]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(QuestionEvaluationDetail), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
     public async Task<QuestionEvaluationDetail> Merge(QuestionEvaluationMergeRequestApi request)
     {
         var user = HttpContext.User.ToUser();

@@ -1,7 +1,6 @@
 using Interview.Domain.Database;
 using Interview.Domain.Questions;
 using Interview.Domain.Questions.Services;
-using Interview.Domain.Repository;
 using Interview.Domain.Rooms.RoomQuestions.Records;
 using Interview.Domain.Rooms.RoomQuestions.Records.Response;
 using Interview.Domain.Rooms.RoomQuestions.Services.Update;

@@ -5,8 +5,6 @@ using Interview.Domain.Rooms.Records.Response;
 using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.Records.Response.Page;
 using Interview.Domain.Rooms.RoomParticipants;
-using Interview.Domain.Rooms.RoomQuestionEvaluations;
-using Interview.Domain.Rooms.RoomQuestionReactions;
 using Interview.Domain.Tags.Records.Response;
 using Microsoft.EntityFrameworkCore;
 using X.PagedList;

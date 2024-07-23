@@ -1,6 +1,4 @@
-using Interview.Domain.Database;
 using Interview.Domain.Repository;
-using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Domain.Questions.QuestionAnswers;
 

@@ -1,6 +1,5 @@
 using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
-using Interview.Domain.Tags;
 
 namespace Interview.Domain.Questions;
 
