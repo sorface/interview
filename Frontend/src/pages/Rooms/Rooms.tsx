@@ -16,6 +16,8 @@ import { UserAvatar } from '../../components/UserAvatar/UserAvatar';
 import { RoomCreate } from '../RoomCreate/RoomCreate';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Button } from '../../components/Button/Button';
+import { Gap } from '../../components/Gap/Gap';
+import { Tag, TagState } from '../../components/Tag/Tag';
 
 import './Rooms.css';
 
@@ -104,6 +106,12 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
       Review: localizationCaptions[LocalizationKey.RoomStatusReview],
       Close: localizationCaptions[LocalizationKey.RoomStatusClose],
     };
+    const tagStates: Record<Room['roomStatus'], TagState> = {
+      New: TagState.Waiting,
+      Active: TagState.Pending,
+      Review: TagState.WaitingForAction,
+      Close: TagState.Closed,
+    };
 
     const roomSummary =
       room.roomStatus === 'Review' ||
@@ -118,9 +126,10 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
           <Link to={roomLink} >
             <div className='room-item'>
               <div className='room-status-wrapper'>
-                <div className='room-status'>
+                <Tag state={tagStates[room.roomStatus]}>
                   {roomStatusCaption[room.roomStatus]}
-                </div>
+                </Tag>
+                <Gap sizeRem={1.5} />
                 <div className='room-action-links'>
                   {admin && (
                     <>

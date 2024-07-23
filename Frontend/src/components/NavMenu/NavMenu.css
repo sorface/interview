@@ -21,11 +21,20 @@
   width: var(--width-expanded);
   font-size: var(--menu-font-size);
   background-color: var(--wrap-bg);
+  color: var(--nav-item-color);
   border-radius: 1.125rem;
   height: var(--height);
   overflow-x: hidden;
   align-items: stretch;
   z-index: 2;
+}
+
+.nav-menu h1 {
+  color: var(--nav-header-color);
+}
+
+.nav-menu a {
+  color: var(--nav-item-color);
 }
 
 .nav-menu .nav-menu-item {
@@ -103,10 +112,12 @@
 }
 
 .nav-menu .active {
-  background-color: var(--active-nav-tab);
+  background-color: var(--nav-item-active-background);
+  color: var(--nav-item-active-color);
 }
 
 .nav-menu .active.no-active {
+  color: unset;
   background-color: unset;
 }
 
@@ -173,6 +184,10 @@
 
 .nav-menu-overlay .categories-list {
   padding: 1rem 2rem;
+}
+
+.nav-menu-overlay .categories-list-item {
+  color: var(--nav-item-color);
 }
 
 .nav-menu-page-overlay {

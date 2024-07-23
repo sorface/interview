@@ -34,6 +34,7 @@ export const SwitchButton: FunctionComponent<SwitchButtonProps> = ({
   return (
     <div className="switch-button-container">
       <Button
+        variant='text'
         disabled={htmlDisabled}
         className={`switch-button ${(!enabled && disabledColor) ? 'switch-button-disabled' : ''}`}
         onClick={onClick}
