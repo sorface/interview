@@ -30,7 +30,7 @@ public class Question : ArchiveEntity
 
     public SEQuestionType Type { get; internal set; } = default!;
 
-    public Guid? CategoryId { get; internal set; }
+    public Guid? CategoryId { get; set; }
 
     public Category? Category { get; set; }
 }

@@ -9,6 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("oauth.json", true);
 builder.Configuration.AddJsonFile("events.json", true);
 builder.Configuration.AddEnvironmentVariables("INTERVIEW_BACKEND_");
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddJsonFile("initial.dev.db.json", true);
+}
 
 LogConfigurator.Configure(builder.Host);
 
@@ -40,20 +44,7 @@ async Task MigrateDbAsync(WebApplication webApplication)
     var applier = new EventApplier(app.Configuration);
     await applier.ApplyEventsAsync(appDbContext, CancellationToken.None);
 
-    var testUserId = Guid.Parse("b5a05f34-e44d-11ed-b49f-e8e34e3377ec");
-    if (!webApplication.Environment.IsDevelopment() || appDbContext.Users.Any(e => e.Id == testUserId))
-    {
-        return;
-    }
-
-    await appDbContext.Users.AddAsync(new User("TEST_BACKEND_DEV_USER", "d1731c50-e44d-11ed-905c-d08c09609150")
-    {
-        Id = testUserId,
-        Avatar = null,
-        Roles =
-        {
-            appDbContext.Roles.Find(RoleName.User.Id)!,
-        },
-    });
-    await appDbContext.SaveChangesAsync();
+    var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<DevDbInitializer>>();
+    var initializer = new DevDbInitializer(appDbContext, app.Environment, app.Configuration, logger);
+    await initializer.InitializeAsync(CancellationToken.None);
 }
