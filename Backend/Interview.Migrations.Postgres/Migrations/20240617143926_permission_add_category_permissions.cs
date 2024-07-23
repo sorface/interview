@@ -22,17 +22,17 @@ namespace Interview.Migrations.Postgres.Migrations
                     { new Guid("9001520d-b1d2-4ade-8f70-570d2b7efea1"), new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "FindCategoryPage", new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified) }
                 });
 
-            migrationBuilder.Sql(@"INSERT INTO PermissionUser
+            migrationBuilder.Sql(@"INSERT INTO ""PermissionUser""
 (
- UserId,
- PermissionsId
+ ""UserId"",
+ ""PermissionsId""
 )
 SELECT
-    ru.UserId,
+    ru.""UserId"",
     '9001520d-b1d2-4ade-8f70-570d2b7efea1'
-FROM RoleUser ru
-WHERE ru.RolesId = 'AB45A82B-AA1C-11ED-ABE8-F2B335A02EE9'
-  AND NOT EXISTS(SELECT 1 FROM PermissionUser pu WHERE pu.UserId = ru.UserId AND pu.PermissionsId = '9001520d-b1d2-4ade-8f70-570d2b7efea1')");
+FROM ""RoleUser"" ru
+WHERE ru.""RolesId"" = 'AB45A82B-AA1C-11ED-ABE8-F2B335A02EE9'
+  AND NOT EXISTS(SELECT 1 FROM ""PermissionUser"" pu WHERE pu.""UserId"" = ru.""UserId"" AND pu.""PermissionsId"" = '9001520d-b1d2-4ade-8f70-570d2b7efea1')");
         }
 
         /// <inheritdoc />

@@ -11,26 +11,26 @@ namespace Interview.Migrations.Postgres.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql(@"INSERT INTO RoomQuestions
+            migrationBuilder.Sql(@"INSERT INTO ""RoomQuestions""
 (
- Id,
- CreateDate,
- CreatedById,
- QuestionId,
- RoomId,
- State,
- UpdateDate
+ ""Id"",
+ ""CreateDate"",
+ ""CreatedById"",
+ ""QuestionId"",
+ ""RoomId"",
+ ""State"",
+ ""UpdateDate""
 )
 SELECT
-    q.Id,
-    q.CreateDate,
-    q.CreatedById,
-    q.Id,
-    q.RoomId,
+    q.""Id"",
+    q.""CreateDate"",
+    q.""CreatedById"",
+    q.""Id"",
+    q.""RoomId"",
     'Open',
-    q.UpdateDate
-FROM Questions AS q
-WHERE q.RoomId IS NOT NULL AND NOT EXISTS(SELECT 1 FROM RoomQuestions AS rq WHERE rq.RoomId = q.RoomId AND rq.QuestionId = rq.Id)");
+    q.""UpdateDate""
+FROM ""Questions"" AS q
+WHERE q.""RoomId"" IS NOT NULL AND NOT EXISTS(SELECT 1 FROM ""RoomQuestions"" AS rq WHERE rq.""RoomId"" = q.""RoomId"" AND rq.""QuestionId"" = rq.""Id"")");
 
             migrationBuilder.DropForeignKey(
                 name: "FK_Questions_Rooms_RoomId",
