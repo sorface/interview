@@ -40,6 +40,12 @@ button.inverted {
   border: none;
 }
 
+button.invertedAlternative {
+  background-color: var(--button-inverted-alternative-background-color);
+  color: var(--button-inverted-color);
+  border: none;
+}
+
 button.invertedActive {
   background-color: var(--button-inverted-active-background-color);
   color: var(--button-inverted-active-color);
@@ -67,4 +73,13 @@ button.toolsPanel {
   padding: 0;
   border-radius: unset;
   opacity: 0.5;
+}
+
+button.toolsPanelDanger {
+  border: none;
+  min-width: unset;
+  padding: 0;
+  border-radius: unset;
+  color: var(--button-inverted-active-color);
+  background-color: var(--red);
 }

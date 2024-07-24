@@ -2,8 +2,7 @@ import { FunctionComponent, MouseEventHandler, useCallback, useState } from 'rea
 import { ActiveQuestionSelector } from '../../../../components/ActiveQuestionSelector/ActiveQuestionSelector';
 import { Room, RoomQuestion } from '../../../../types/room';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
-import { Question, QuestionType } from '../../../../types/question';
-import { ChangeActiveQuestionBody, CreateRoomQuestionBody, roomQuestionApiDeclaration } from '../../../../apiDeclarations';
+import { ChangeActiveQuestionBody, roomQuestionApiDeclaration, roomsApiDeclaration } from '../../../../apiDeclarations';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 
@@ -12,13 +11,15 @@ import './ActiveQuestion.css';
 export interface ActiveQuestionProps {
   room: Room | null;
   roomQuestions: RoomQuestion[];
-  initialQuestionText?: string;
+  initialQuestion?: RoomQuestion;
+  readOnly: boolean;
 }
 
 export const ActiveQuestion: FunctionComponent<ActiveQuestionProps> = ({
   room,
   roomQuestions,
-  initialQuestionText,
+  initialQuestion,
+  readOnly,
 }) => {
   const [showClosedQuestions, setShowClosedQuestions] = useState(false);
   const localizationCaptions = useLocalizationCaptions();
@@ -32,12 +33,12 @@ export const ActiveQuestion: FunctionComponent<ActiveQuestionProps> = ({
   } = apiSendActiveQuestionState;
 
   const {
-    apiMethodState: apiCreateQuestionState,
-    fetchData: createRoomQuestion,
-  } = useApiMethod<unknown, CreateRoomQuestionBody>(roomQuestionApiDeclaration.createQuestion);
+    apiMethodState: apiRoomStartReviewMethodState,
+    fetchData: fetchRoomStartReview,
+  } = useApiMethod<unknown, Room['id']>(roomsApiDeclaration.startReview);
   const {
-    process: { loading: loadingCreateQuestion, error: errorCreateQuestion },
-  } = apiCreateQuestionState;
+    process: { loading: loadingRoomStartReview, error: errorRoomStartReview },
+  } = apiRoomStartReviewMethodState;
 
   const handleShowClosedQuestions: MouseEventHandler<HTMLInputElement> = useCallback((e) => {
     setShowClosedQuestions(e.currentTarget.checked);
@@ -53,44 +54,34 @@ export const ActiveQuestion: FunctionComponent<ActiveQuestionProps> = ({
     });
   }, [room, sendRoomActiveQuestion]);
 
-  const handleQuestionCreate = useCallback((question: Question['value']) => {
-    if (!room) {
-      throw new Error('Error sending reaction. Room not found.');
+  const handleStartReviewRoom = useCallback(() => {
+    if (!room?.id) {
+      throw new Error('Room id not found');
     }
-    createRoomQuestion({
-      roomId: room.id,
-      question: {
-        value: question,
-        tags: [],
-        type: QuestionType.Private,
-        categoryId: '',
-        answers: [],
-        codeEditor: null,
-      },
-      order: 0,
-    });
-  }, [room, createRoomQuestion]);
+    fetchRoomStartReview(room.id);
+  }, [room?.id, fetchRoomStartReview]);
 
   const openQuestionsIds = roomQuestions
     .filter(roomQuestion => roomQuestion.state === 'Open')
     .map(roomQuestion => roomQuestion.id);
 
   return (
-    <div className='active-question-container'>
+    <div className=''>
       <ActiveQuestionSelector
         showClosedQuestions={showClosedQuestions}
         questions={roomQuestions}
         openQuestions={openQuestionsIds}
-        initialQuestionText={initialQuestionText}
+        initialQuestion={initialQuestion}
         placeHolder={localizationCaptions[LocalizationKey.SelectActiveQuestion]}
+        readOnly={readOnly}
         onSelect={handleQuestionSelect}
         onShowClosedQuestions={handleShowClosedQuestions}
-        onCreate={handleQuestionCreate}
+        onStartReviewRoom={handleStartReviewRoom}
       />
       {loadingRoomActiveQuestion && <div>{localizationCaptions[LocalizationKey.SendingActiveQuestion]}...</div>}
-      {errorRoomActiveQuestion && <div>{localizationCaptions[LocalizationKey.ErrorSendingActiveQuestion]}...</div>}
-      {loadingCreateQuestion && <div>{localizationCaptions[LocalizationKey.CreatingRoomQuestion]}...</div>}
-      {errorCreateQuestion && <div>{localizationCaptions[LocalizationKey.ErrorCreatingRoomQuestion]}...</div>}
+      {errorRoomActiveQuestion && <div>{localizationCaptions[LocalizationKey.ErrorSendingActiveQuestion]}</div>}
+      {loadingRoomStartReview && <div>{localizationCaptions[LocalizationKey.CloseRoomLoading]}...</div>}
+      {errorRoomStartReview && <div>{localizationCaptions[LocalizationKey.Error]}: {errorRoomStartReview}</div>}
     </div>
   );
 };

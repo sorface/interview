@@ -172,6 +172,7 @@ export const enum LocalizationKey {
   RefreshAll,
   NextRoomQuestion,
   CopiedToClipboard,
+  Of,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -347,6 +348,7 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.RefreshAll]: 'Refresh all',
     [LocalizationKey.NextRoomQuestion]: 'Next question',
     [LocalizationKey.CopiedToClipboard]: 'Copied to clipboard',
+    [LocalizationKey.Of]: 'of',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -520,5 +522,6 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.RefreshAll]: 'Обновить все',
     [LocalizationKey.NextRoomQuestion]: 'Следующий вопрос',
     [LocalizationKey.CopiedToClipboard]: 'Скопировано в буфер обмена',
+    [LocalizationKey.Of]: 'из',
   },
 }

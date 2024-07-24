@@ -1,11 +1,8 @@
-import React, { FunctionComponent, useCallback } from 'react';
+import React, { Fragment, FunctionComponent, useCallback } from 'react';
 import { Reaction } from '../../types/reaction';
-import { SwitchButton } from '../../pages/Room/components/VideoChat/SwitchButton';
 import { EventName, IconNames, reactionIcon } from '../../constants';
-import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
-import { ReactionsFeed } from '../../pages/Room/hooks/useReactionsFeed';
-import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
-import { LocalizationKey } from '../../localization';
+import { RoomToolsPanel } from '../../pages/Room/components/RoomToolsPanel/RoomToolsPanel';
+import { Gap } from '../Gap/Gap';
 
 import './ReactionsList.css';
 
@@ -18,32 +15,27 @@ const ignoredReactions: string[] = [
 
 interface ReactionsListProps {
   reactions: Reaction[];
-  reactionsFeed: ReactionsFeed;
   loadingReactionName?: string | null;
   sortOrder: 1 | -1;
+  firstRounded?: boolean;
+  lastRounded?: boolean;
   onClick: (reaction: Reaction) => void;
 }
 
 export const ReactionsList: FunctionComponent<ReactionsListProps> = ({
   reactions,
-  reactionsFeed,
   loadingReactionName,
   sortOrder,
+  firstRounded,
+  lastRounded,
   onClick,
 }) => {
-  const localizationCaptions = useLocalizationCaptions();
-  const reactionLocalization: Record<string, string> = {
-    Like: localizationCaptions[LocalizationKey.Like],
-    Dislike: localizationCaptions[LocalizationKey.Dislike],
-    CodeEditor: localizationCaptions[LocalizationKey.CodeEditor],
-  }
-
   const handleReactionClick = useCallback((reaction: Reaction) => () => {
     onClick(reaction);
   }, [onClick]);
 
   return (
-    <div className='reactions-list'>
+    <>
       {reactions
         .filter(reaction => !ignoredReactions.includes(reaction.type.name))
         .sort((reaction1, reaction2) => {
@@ -55,23 +47,21 @@ export const ReactionsList: FunctionComponent<ReactionsListProps> = ({
           }
           return 0;
         })
-        .map(reaction => (
-          <div key={`${reaction.id}${reaction.type.name}`}>
-            {!!reactionsFeed[reaction.type.name] && (
-              <div key={reactionsFeed[reaction.type.name]} className='reaction-feed-item'>
-                <ThemedIcon name={reactionIcon[reaction.type.name] || IconNames.None} />
-              </div>
-            )}
-            <SwitchButton
+        .map((reaction, index, reacts) => (
+          <Fragment>
+            <RoomToolsPanel.SwitchButton
+              key={`${reaction.id}${reaction.type.name}`}
               enabled={true}
               loading={reaction.type.name === loadingReactionName}
               iconEnabledName={reactionIcon[reaction.type.name] || defaultIconName}
               iconDisabledName={reactionIcon[reaction.type.name] || defaultIconName}
-              subCaption={reactionLocalization[reaction.type.name] || reaction.type.name}
+              roundedTop={firstRounded && index === 0}
+              roundedBottom={lastRounded && index === reacts.length - 1}
               onClick={handleReactionClick(reaction)}
             />
-          </div>
+            {index !== reacts.length - 1 && (<Gap sizeRem={0.125} />)}
+          </Fragment>
         ))}
-    </div>
+    </>
   );
 };

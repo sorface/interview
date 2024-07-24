@@ -2,8 +2,18 @@ import { FunctionComponent, ReactNode } from 'react';
 
 import './Button.css';
 
+type Variant =
+  'active' |
+  'danger' |
+  'inverted' |
+  'invertedAlternative' |
+  'invertedActive' |
+  'text' |
+  'toolsPanel' |
+  'toolsPanelDanger';
+
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'active' | 'danger' | 'inverted' | 'invertedActive' | 'text' | 'toolsPanel';
+  variant?: Variant;
   disabled?: boolean;
   children: ReactNode;
 }

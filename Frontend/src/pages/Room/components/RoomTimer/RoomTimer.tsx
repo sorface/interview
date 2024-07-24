@@ -1,5 +1,8 @@
 import { FunctionComponent, useEffect, useState } from 'react';
 import { Room } from '../../../../types/room';
+import { ThemedIcon } from '../ThemedIcon/ThemedIcon';
+import { IconNames } from '../../../../constants';
+import { Gap } from '../../../../components/Gap/Gap';
 
 import './RoomTimer.css';
 
@@ -37,7 +40,9 @@ export const RoomTimer: FunctionComponent<Required<Room['timer']>> = ({
   }, [startTime, durationSec]);
 
   return (
-    <div className="room-timer">
+    <div className="room-timer flex items-center bg-wrap rounded-2">
+      <ThemedIcon name={IconNames.Time} />
+      <Gap sizeRem={0.25} horizontal />
       {formatTime(remainingTimeMs <= 0 ? 0 : remainingTimeMs)}
     </div>
   );

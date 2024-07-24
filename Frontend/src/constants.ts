@@ -47,6 +47,11 @@ export const enum IconNames {
   Cube = 'cube',
   Golf = 'golf',
   Exit = 'exit',
+  Call = 'call',
+  ReorderFour = 'reorder-four',
+  Stop = 'stop',
+  PersonAdd = 'person-add',
+  Time = 'time',
 }
 
 export const enum IconThemePostfix {
