@@ -80,7 +80,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         _db = db;
     }
 
-    public Task<IPagedList<RoomPageDetail>> FindPageAsync(RoomPageDetailRequestFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<IPagedList<RoomPageDetail>> FindPageAsync(RoomPageDetailRequestFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
         IQueryable<Room> queryable = _db.Rooms
             .Include(e => e.Participants)
@@ -123,8 +123,9 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             queryable = queryable.Where(e => e.Participants.Any(p => filter.Participants.Contains(p.User.Id)));
         }
 
-        return queryable
-            .Select(e => new RoomPageDetail
+        var tmpRes = await queryable
+            .AsSplitQuery()
+            .Select(e => new
             {
                 Id = e.Id,
                 Name = e.Name,
@@ -136,10 +137,22 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                     .ToList(),
                 RoomStatus = e.Status.EnumValue,
                 Tags = e.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
-                Timer = e.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)e.Timer.Duration.TotalSeconds, StartTime = e.Timer.ActualStartTime, },
+                Timer = e.Timer == null ? null : new { Duration = e.Timer.Duration, ActualStartTime = e.Timer.ActualStartTime, },
                 ScheduledStartTime = e.ScheduleStartTime,
             })
             .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
+
+        return tmpRes.ConvertAll(e => new RoomPageDetail
+        {
+            Id = e.Id,
+            Name = e.Name,
+            Questions = e.Questions,
+            Participants = e.Participants,
+            RoomStatus = e.RoomStatus,
+            Tags = e.Tags,
+            Timer = e.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)e.Timer.Duration.TotalSeconds, StartTime = e.Timer.ActualStartTime, },
+            ScheduledStartTime = e.ScheduledStartTime,
+        });
     }
 
     public async Task<RoomDetail> FindByIdAsync(Guid id, CancellationToken cancellationToken)
