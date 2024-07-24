@@ -1,5 +1,5 @@
 import { FunctionComponent, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, Navigate, useNavigate } from 'react-router-dom';
 import useWebSocket from 'react-use-websocket';
 import toast from 'react-hot-toast';
 import {
@@ -19,12 +19,10 @@ import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { useCommunist } from '../../hooks/useCommunist';
 import { RoomInvite, RoomParticipant, RoomQuestion, RoomState, Room as RoomType } from '../../types/room';
-import { ActionModal } from '../../components/ActionModal/ActionModal';
 import { Reactions } from './components/Reactions/Reactions';
 import { ActiveQuestion } from './components/ActiveQuestion/ActiveQuestion';
 import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
 import { VideoChat } from './components/VideoChat/VideoChat';
-import { SwitchButton } from './components/VideoChat/SwitchButton';
 import { Link } from 'react-router-dom';
 import { EnterVideoChatModal } from './components/VideoChat/EnterVideoChatModal';
 import { useUserStreams } from './hooks/useUserStreams';
@@ -33,7 +31,6 @@ import { useUnreadChatMessages } from './hooks/useUnreadChatMessages';
 import { useScreenStream } from './hooks/useScreenStream';
 import { LocalizationKey } from '../../localization';
 import { MessagePage } from '../../components/MessagePage/MessagePage';
-import { ThemedIcon } from './components/ThemedIcon/ThemedIcon';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Invitations } from './components/Invitations/Invitations';
 import { UserType } from '../../types/user';
@@ -41,12 +38,16 @@ import { useEventsState } from './hooks/useEventsState';
 import { RoomTimer } from './components/RoomTimer/RoomTimer';
 import { CodeEditorLang } from '../../types/question';
 import { Button } from '../../components/Button/Button';
+import { RoomToolsPanel } from './components/RoomToolsPanel/RoomToolsPanel';
+import { SwitcherButton } from '../../components/SwitcherButton/SwitcherButton';
+import { Gap } from '../../components/Gap/Gap';
 
 import './Room.css';
 
 const connectingReadyState = 0;
 
 export const Room: FunctionComponent = () => {
+  const navigate = useNavigate();
   const auth = useContext(AuthContext);
   const { getCommunist } = useCommunist();
   const communist = getCommunist();
@@ -65,6 +66,7 @@ export const Room: FunctionComponent = () => {
   const micDisabledAutomatically = useRef(false);
   const [recognitionEnabled, setRecognitionEnabled] = useState(false);
   const [peersLength, setPeersLength] = useState(0);
+  const [invitationsOpen, setInvitationsOpen] = useState(false);
   const {
     devices,
     userAudioStream,
@@ -98,14 +100,6 @@ export const Room: FunctionComponent = () => {
 
   const { apiMethodState, fetchData } = useApiMethod<RoomType, RoomType['id']>(roomsApiDeclaration.getById);
   const { process: { loading, error }, data: room } = apiMethodState;
-
-  const {
-    apiMethodState: apiRoomStartReviewMethodState,
-    fetchData: fetchRoomStartReview,
-  } = useApiMethod<unknown, RoomType['id']>(roomsApiDeclaration.startReview);
-  const {
-    process: { loading: roomStartReviewLoading, error: roomStartReviewError },
-  } = apiRoomStartReviewMethodState;
 
   const {
     apiMethodState: apiRoomQuestions,
@@ -311,17 +305,6 @@ export const Room: FunctionComponent = () => {
     updateQuestions();
   }, [id, currentQuestionId, updateQuestions]);
 
-  const handleStartReviewRoom = useCallback(() => {
-    if (!id) {
-      throw new Error('Room id not found');
-    }
-    fetchRoomStartReview(id);
-  }, [id, fetchRoomStartReview]);
-
-  const handleMessagesChatSwitch = () => {
-    setMessagesChatEnabled(!messagesChatEnabled);
-  };
-
   const handleScreenShare = () => {
     requestScreenStream();
   };
@@ -377,13 +360,22 @@ export const Room: FunctionComponent = () => {
     setRecognitionEnabled(!recognitionEnabled);
   }, [recognitionEnabled]);
 
-  const handleInvitesOpen = () => {
+  const handleSwitchMessagesChat = (index: number) => {
+    setMessagesChatEnabled(index === 0);
+  };
+
+  const handleInvitationsOpen = () => {
     if (!id) {
       throw new Error('Room id not found');
     }
     fetchRoomInvites({
       roomId: id,
     });
+    setInvitationsOpen(true);
+  };
+
+  const handleInvitationsClose = () => {
+    setInvitationsOpen(false);
   };
 
   const handleInviteGenerate = (participantType: UserType) => {
@@ -403,6 +395,85 @@ export const Room: FunctionComponent = () => {
     fetchGenerateRoomAllInvites({
       roomId: id,
     });
+  };
+
+  const handleLeaveRoom = () => {
+    navigate(pathnames.currentRooms);
+  };
+
+  const renderToolsPanel = () => {
+    return (
+      <RoomToolsPanel.Wrapper rightPos='18.5rem' bottomPos='1.5rem'>
+        <RoomToolsPanel.SwitchButton
+          enabled={micEnabled}
+          iconEnabledName={IconNames.MicOn}
+          iconDisabledName={IconNames.MicOff}
+          onClick={handleMicSwitch}
+          roundedTop
+        />
+        <Gap sizeRem={0.125} />
+        <RoomToolsPanel.SwitchButton
+          enabled={cameraEnabled}
+          iconEnabledName={IconNames.VideocamOn}
+          iconDisabledName={IconNames.VideocamOff}
+          onClick={handleCameraSwitch}
+          roundedBottom={recognitionNotSupported}
+        />
+        {!recognitionNotSupported && (
+          <>
+            <Gap sizeRem={0.125} />
+            <RoomToolsPanel.SwitchButton
+              enabled={recognitionEnabled}
+              htmlDisabled={!micEnabled}
+              iconEnabledName={IconNames.RecognitionOn}
+              iconDisabledName={IconNames.RecognitionOff}
+              onClick={handleVoiceRecognitionSwitch}
+              roundedBottom
+            />
+          </>
+        )}
+        {reactionsVisible && (
+          <>
+            <Gap sizeRem={1.5} />
+            <Reactions
+              room={room}
+              eventsState={eventsState}
+              roles={auth?.roles || []}
+              participantType={roomParticipant?.userType || null}
+            />
+          </>
+        )}
+        {!viewerMode && (
+          <>
+            <Gap sizeRem={0.125} />
+            <RoomToolsPanel.SwitchButton
+              enabled={true}
+              iconEnabledName={IconNames.TV}
+              iconDisabledName={IconNames.TV}
+              onClick={handleScreenShare}
+            />
+            <Gap sizeRem={0.125} />
+            <RoomToolsPanel.SwitchButton
+              enabled={true}
+              iconEnabledName={IconNames.PersonAdd}
+              iconDisabledName={IconNames.PersonAdd}
+              onClick={handleInvitationsOpen}
+              roundedBottom
+            />
+          </>
+        )}
+        <Gap sizeRem={1.5} />
+        <RoomToolsPanel.SwitchButton
+          enabled={true}
+          iconEnabledName={IconNames.Call}
+          iconDisabledName={IconNames.Call}
+          onClick={handleLeaveRoom}
+          roundedTop
+          roundedBottom
+          danger
+        />
+      </RoomToolsPanel.Wrapper>
+    );
   };
 
   if (roomInReview && id) {
@@ -439,6 +510,16 @@ export const Room: FunctionComponent = () => {
         onMicSwitch={handleMicSwitch}
         onCameraSwitch={handleCameraSwitch}
       />
+      <Invitations
+        open={invitationsOpen}
+        roomId={id || ''}
+        roomInvitesData={roomInvitesData}
+        roomInvitesError={roomInvitesError || generateRoomInviteError || generateRoomAllInvitesError}
+        roomInvitesLoading={roomInvitesLoading || generateRoomInviteLoading || generateRoomAllInvitesLoading}
+        onRequestClose={handleInvitationsClose}
+        onGenerateInvite={handleInviteGenerate}
+        onGenerateAllInvites={handleInvitesAllGenerate}
+      />
       <ProcessWrapper
         loading={loading}
         loadingPrefix={localizationCaptions[LocalizationKey.LoadingRoom]}
@@ -448,156 +529,72 @@ export const Room: FunctionComponent = () => {
       >
         <div className="room-page">
           <div className="room-page-main">
-            <div className="room-page-header">
+            <div className="room-page-header justify-between">
               <div>
                 <span
                   className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
                 >
-                  <div className='room-page-header-wrapper'>
-                    <h3>{room?.name}</h3>
-                    <span className='room-page-header-viewers'><ThemedIcon name={IconNames.People} /> {peersLength + 1}</span>
-                  </div>
-                  {viewerMode && (
-                    <div
-                      className="room-page-header-question-viewer"
-                    >
-                      {localizationCaptions[LocalizationKey.ActiveQuestion]}: {currentQuestion?.value}
+                  <div className='room-page-header-wrapper flex items-center'>
+                    <div className='w-2.375 pr-1'>
+                      <img className='w-2.375 h-2.375 rounded-0.375' src='/logo192.png' alt='site logo' />
                     </div>
-                  )}
+                    <h3>{room?.name}</h3>
+                  </div>
                 </span>
               </div>
-              {(viewerMode && !!(roomTimer?.startTime)) && (
-                <RoomTimer durationSec={roomTimer.durationSec} startTime={roomTimer.startTime} />
-              )}
-
-              {!viewerMode && (
-                <div className="reactions-field">
-                  <ActiveQuestion
-                    room={room}
-                    roomQuestions={roomQuestions || []}
-                    initialQuestionText={currentQuestion?.value}
-                  />
-                  {!!(roomTimer?.startTime) && (
+              <div className='flex'>
+                {!!roomTimer?.startTime && (
+                  <>
                     <RoomTimer durationSec={roomTimer.durationSec} startTime={roomTimer.startTime} />
-                  )}
-                </div>
-              )}
-              {!reactionsVisible && (
-                <div>{localizationCaptions[LocalizationKey.WaitingRoom]}</div>
-              )}
-              <div className={`actions-field ${viewerMode ? 'actions-field-viewer' : ''}`}>
-                {!viewerMode && (
-                  <Invitations
-                    roomId={id || ''}
-                    roomInvitesData={roomInvitesData}
-                    roomInvitesError={roomInvitesError || generateRoomInviteError || generateRoomAllInvitesError}
-                    roomInvitesLoading={roomInvitesLoading || generateRoomInviteLoading || generateRoomAllInvitesLoading}
-                    onOpen={handleInvitesOpen}
-                    onGenerateInvite={handleInviteGenerate}
-                    onGenerateAllInvites={handleInvitesAllGenerate}
-                  />
+                    <Gap sizeRem={0.5} horizontal />
+                  </>
                 )}
-                {!viewerMode && (
-                  <div className='start-room-review'>
-                    <ActionModal
-                      title={localizationCaptions[LocalizationKey.StartReviewRoomModalTitle]}
-                      openButtonCaption={localizationCaptions[LocalizationKey.StartReviewRoom]}
-                      loading={roomStartReviewLoading}
-                      loadingCaption={localizationCaptions[LocalizationKey.CloseRoomLoading]}
-                      error={roomStartReviewError}
-                      onAction={handleStartReviewRoom}
-                    />
-                  </div>
+                {!reactionsVisible && (
+                  <div>{localizationCaptions[LocalizationKey.WaitingRoom]}</div>
                 )}
+                <SwitcherButton
+                  captions={[
+                    `${localizationCaptions[LocalizationKey.Chat]} ${unreadChatMessages || ''}`,
+                    `${localizationCaptions[LocalizationKey.RoomParticipants]} ${peersLength + 1}`,
+                  ]}
+                  activeIndex={messagesChatEnabled ? 0 : 1}
+                  variant='alternative'
+                  onClick={handleSwitchMessagesChat}
+                />
               </div>
             </div>
             <div className="room-page-main-content">
-              {loadingRoomState && <div>{localizationCaptions[LocalizationKey.LoadingRoomState]}...</div>}
-              {errorRoomState && <div>{localizationCaptions[LocalizationKey.ErrorLoadingRoomState]}...</div>}
-              <VideoChat
-                roomState={roomState}
-                viewerMode={viewerMode}
-                lastWsMessage={lastMessage}
-                messagesChatEnabled={messagesChatEnabled}
-                codeEditorEnabled={codeEditorEnabled}
-                codeEditorLanguage={codeEditorLanguage}
-                userVideoStream={userVideoStream}
-                userAudioStream={userAudioStream}
-                screenStream={screenStream}
-                micDisabledAutomatically={micDisabledAutomatically}
-                onSendWsMessage={sendMessage}
-                onUpdatePeersLength={setPeersLength}
-                onMuteMic={muteMic}
-                onUnmuteMic={unmuteMic}
-              />
-            </div>
-          </div>
-          <div className="room-tools-container">
-            {!viewerMode && (
-              <div className="room-tools room-tools-left">
-                <SwitchButton
-                  enabled={micEnabled}
-                  iconEnabledName={IconNames.MicOn}
-                  iconDisabledName={IconNames.MicOff}
-                  disabledColor
-                  subCaption={localizationCaptions[LocalizationKey.Microphone]}
-                  onClick={handleMicSwitch}
-                />
-                <SwitchButton
-                  enabled={cameraEnabled}
-                  iconEnabledName={IconNames.VideocamOn}
-                  iconDisabledName={IconNames.VideocamOff}
-                  disabledColor
-                  subCaption={localizationCaptions[LocalizationKey.Camera]}
-                  onClick={handleCameraSwitch}
-                />
-                {recognitionNotSupported ? (
-                  <div>{localizationCaptions[LocalizationKey.VoiceRecognitionNotSupported]}</div>
-                ) : (
-                  <SwitchButton
-                    enabled={recognitionEnabled}
-                    htmlDisabled={!micEnabled}
-                    iconEnabledName={IconNames.RecognitionOn}
-                    iconDisabledName={IconNames.RecognitionOff}
-                    subCaption={localizationCaptions[LocalizationKey.VoiceRecognition]}
-                    disabledColor
-                    onClick={handleVoiceRecognitionSwitch}
-                  />
-                )}
-              </div>
-            )}
-            <div className="room-tools room-tools-center">
-              <SwitchButton
-                counter={unreadChatMessages}
-                enabled={!messagesChatEnabled}
-                iconEnabledName={IconNames.Chat}
-                iconDisabledName={IconNames.Chat}
-                subCaption={localizationCaptions[LocalizationKey.Chat]}
-                onClick={handleMessagesChatSwitch}
-              />
-              {reactionsVisible && (
-                <Reactions
-                  room={room}
-                  eventsState={eventsState}
-                  roles={auth?.roles || []}
-                  participantType={roomParticipant?.userType || null}
+              <div className='room-columns'>
+                {loadingRoomState && <div>{localizationCaptions[LocalizationKey.LoadingRoomState]}...</div>}
+                {errorRoomState && <div>{localizationCaptions[LocalizationKey.ErrorLoadingRoomState]}...</div>}
+                <div className='videochat-field !w-21 bg-wrap rounded-1.125'>
+                  <div className='py-1.5 px-1.25'>
+                    <ActiveQuestion
+                      room={room}
+                      roomQuestions={roomQuestions || []}
+                      initialQuestion={currentQuestion}
+                      readOnly={viewerMode}
+                    />
+                  </div>
+                </div>
+                <VideoChat
+                  roomState={roomState}
+                  viewerMode={viewerMode}
                   lastWsMessage={lastMessage}
+                  messagesChatEnabled={messagesChatEnabled}
+                  codeEditorEnabled={codeEditorEnabled}
+                  codeEditorLanguage={codeEditorLanguage}
+                  userVideoStream={userVideoStream}
+                  userAudioStream={userAudioStream}
+                  screenStream={screenStream}
+                  micDisabledAutomatically={micDisabledAutomatically}
+                  onSendWsMessage={sendMessage}
+                  onUpdatePeersLength={setPeersLength}
+                  onMuteMic={muteMic}
+                  onUnmuteMic={unmuteMic}
+                  renderToolsPanel={renderToolsPanel}
                 />
-              )}
-              {!viewerMode && (
-                <SwitchButton
-                  enabled={true}
-                  iconEnabledName={IconNames.TV}
-                  iconDisabledName={IconNames.TV}
-                  subCaption={localizationCaptions[LocalizationKey.ScreenShare]}
-                  onClick={handleScreenShare}
-                />
-              )}
-            </div>
-            <div className="room-tools room-tools-right">
-              <Link to={pathnames.currentRooms}>
-                <Button>{localizationCaptions[LocalizationKey.Exit]}</Button>
-              </Link>
+              </div>
             </div>
           </div>
         </div>

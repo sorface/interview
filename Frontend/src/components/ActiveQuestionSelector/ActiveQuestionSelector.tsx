@@ -1,9 +1,12 @@
 import React, { ChangeEventHandler, FunctionComponent, MouseEventHandler, useEffect, useRef, useState } from 'react';
-import { OpenIcon } from '../OpenIcon/OpenIcon';
 import { LocalizationKey } from '../../localization';
 import { RoomQuestion } from '../../types/room';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Button } from '../Button/Button';
+import { Gap } from '../Gap/Gap';
+import { Typography } from '../Typography/Typography';
+import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
+import { IconNames } from '../../constants';
 
 import './ActiveQuestionSelector.css';
 
@@ -11,25 +14,27 @@ const sortOption = (option1: RoomQuestion, option2: RoomQuestion) =>
   option1.order - option2.order;
 
 export interface ActiveQuestionSelectorProps {
-  initialQuestionText?: string;
+  initialQuestion?: RoomQuestion;
   placeHolder: string;
   showClosedQuestions: boolean;
   questions: RoomQuestion[];
   openQuestions: Array<RoomQuestion['id']>;
+  readOnly: boolean;
   onSelect: (question: RoomQuestion) => void;
   onShowClosedQuestions: MouseEventHandler<HTMLInputElement>;
-  onCreate: (value: RoomQuestion['value']) => void;
+  onStartReviewRoom: () => void;
 }
 
 export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorProps> = ({
-  initialQuestionText,
+  initialQuestion,
   placeHolder,
   showClosedQuestions,
   questions,
   openQuestions,
+  readOnly,
   onSelect,
   onShowClosedQuestions,
-  onCreate,
+  onStartReviewRoom,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [selectedValue, setSelectedValue] = useState<RoomQuestion | null>(null);
@@ -37,6 +42,7 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   const searchRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
   const localizationCaptions = useLocalizationCaptions();
+  const currentOrder = (selectedValue ? selectedValue.order : initialQuestion?.order) || 0;
 
   const isOpened = (question: RoomQuestion) => {
     return openQuestions.includes(question.id);
@@ -86,14 +92,17 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   });
 
   const handleInputClick: MouseEventHandler<HTMLDivElement> = () => {
+    if (readOnly) {
+      return;
+    }
     setShowMenu(!showMenu);
   };
 
   const getDisplay = () => {
-    if (!selectedValue && !initialQuestionText) {
+    if (!selectedValue && !initialQuestion) {
       return placeHolder;
     }
-    return `${localizationCaptions[LocalizationKey.ActiveQuestion]}: ${selectedValue?.value || initialQuestionText}`;
+    return `${selectedValue?.value || initialQuestion?.value}`;
   };
 
   const onItemClick = (option: RoomQuestion) => {
@@ -101,10 +110,7 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
     onSelect(option);
   };
 
-  const handleCreate = () => {
-    onCreate(searchValue);
-    setSearchValue('');
-  };
+  const handleNextQuestion = () => onItemClick(options[0]);
 
   const onSearch: ChangeEventHandler<HTMLInputElement> = (e) => {
     setSearchValue(e.target.value);
@@ -112,25 +118,32 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
 
   return (
     <>
-      <div className="activeQuestionSelector-container">
-        <div ref={inputRef} onClick={handleInputClick} className="activeQuestionSelector-input">
-          <div className="activeQuestionSelector-selected-value">{getDisplay()}</div>
-          <div className="activeQuestionSelector-tools">
-            <div className="activeQuestionSelector-tool">
-              <OpenIcon sizeRem={1.5} />
+      <div className="activeQuestionSelector-container relative">
+        <div ref={inputRef} onClick={handleInputClick} className="activeQuestionSelector-input cursor-pointer">
+          <ThemedIcon name={IconNames.ReorderFour} />
+          <Gap sizeRem={1} horizontal />
+          <div className="activeQuestionSelector-selected-value w-full flex items-center">
+            <div>
+              <Typography size='m'>
+                {localizationCaptions[LocalizationKey.RoomQuestions]}
+              </Typography>
+            </div>
+            <div className='ml-auto border border-button border-solid px-0.75 py-0.125 rounded-2'>
+              <Typography size='s'>
+                {`${currentOrder + 1} ${localizationCaptions[LocalizationKey.Of]} ${questions.length}`}
+              </Typography>
             </div>
           </div>
         </div>
+        <Gap sizeRem={1} />
+        <progress className='w-full h-0.125' value={currentOrder + 1} max={questions.length}></progress>
         {showMenu && (
-          <div className="activeQuestionSelector-menu">
+          <div className="activeQuestionSelector-menu text-left">
             <div ref={searchRef} className="activeQuestionSelector-search-panel">
               <span>{localizationCaptions[LocalizationKey.ShowClosedQuestions]}</span>
               <input type="checkbox" onClick={onShowClosedQuestions} />
               <div className="search-box" >
                 <input onChange={onSearch} value={searchValue} />
-                {searchValue && (
-                  <Button onClick={handleCreate}>{localizationCaptions[LocalizationKey.CreateQuestion]}</Button>
-                )}
               </div>
             </div>
             {options.length === 0 && (
@@ -148,12 +161,24 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
           </div>
         )}
       </div>
-      {options.length !== 0 && (
-        <Button
-          onClick={() => onItemClick(options[0])}
-        >
-          {localizationCaptions[LocalizationKey.NextRoomQuestion]}
-        </Button>
+      <Gap sizeRem={1} />
+      <div className='text-left'>
+        <Typography size='l' bold>
+          {getDisplay()}
+        </Typography>
+      </div>
+      {!readOnly && (
+        <>
+          <Gap sizeRem={0.75} />
+          <Button
+            className='w-full'
+            variant='active'
+            onClick={options.length !== 0 ? handleNextQuestion : onStartReviewRoom}
+          >
+            {localizationCaptions[options.length !== 0 ? LocalizationKey.NextRoomQuestion : LocalizationKey.StartReviewRoom]}
+            <ThemedIcon name={options.length !== 0 ? IconNames.ChevronForward : IconNames.Stop} />
+          </Button>
+        </>
       )}
     </>
   );

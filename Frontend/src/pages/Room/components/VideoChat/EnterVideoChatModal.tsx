@@ -265,7 +265,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
         },
       }}
     >
-      <div className="action-modal-header flex items-center px-0.5 py-0.5 h-4">
+      <div className="action-modal-header absolute flex items-center px-0.5 py-0.5 h-4">
         <div className='w-2.375 h-2.375 pr-1'>
           <img className='w-2.375 h-2.375 rounded-0.375' src='/logo192.png' alt='site logo' />
         </div>

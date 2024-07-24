@@ -1,12 +1,3 @@
-.activeQuestionSelector-container {
-  text-align: left;
-  border: 1px solid var(--button-border-color);
-  border-radius: var(--border-radius);
-  position: relative;
-  cursor: pointer;
-  background-color: var(--button-bg);
-}
-
 .activeQuestionSelector-container .no-questions {
   padding: 0.5rem;
 }
@@ -15,7 +6,6 @@
   height: 1.625rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   user-select: none;
   padding: 0rem 0.2rem;
   line-height: 1rem;
@@ -31,10 +21,6 @@
   max-height: 300px;
   background-color: var(--wrap-bg);
   z-index: 99;
-}
-
-.activeQuestionSelector-tools {
-  background-color: var(--button-bg);
 }
 
 .activeQuestionSelector-item {

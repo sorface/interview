@@ -39,6 +39,7 @@
   --button-hover-border-color: var(--text);
   --button-danger-border-color: var(--active);
   --button-inverted-background-color: var(--page-bg);
+  --button-inverted-alternative-background-color: var(--wrap-bg);
   --button-inverted-color: var(--text);
   --button-inverted-active-background-color: var(--text);
   --button-inverted-active-color: var(--wrap-bg);
@@ -80,6 +81,7 @@
   --button-hover-border-color: var(--grey3);
   --button-danger-border-color: var(--active);
   --button-inverted-background-color: var(--grey1);
+  --button-inverted-alternative-background-color: var(--white);
   --button-inverted-color: var(--dark);
   --button-inverted-active-background-color: var(--dark);
   --button-inverted-active-color: var(--white);
@@ -214,3 +216,14 @@ select {
 ion-icon {
   font-size: 1.25rem;
 }
+
+progress {
+  appearance: none;
+  display: block;
+}
+
+progress::-moz-progress-bar { background: var(--button-active-bg); }
+
+progress::-webkit-progress-bar {background-color: var(--wrap-bg);}
+progress::-webkit-progress-value {background-color: var(--button-active-bg) !important;}
+progress[value] {-webkit-appearance: none;}

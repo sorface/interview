@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { FunctionComponent, ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { SendMessage } from 'react-use-websocket';
 import Peer from 'simple-peer';
 import { AuthContext } from '../../../../context/AuthContext';
@@ -10,7 +10,6 @@ import { getAverageVolume } from './utils/getAverageVolume';
 import { createAudioAnalyser, frequencyBinCount } from './utils/createAudioAnalyser';
 import { limitLength } from './utils/limitLength';
 import { randomId } from './utils/randomId';
-import { Field } from '../../../../components/FieldsBlock/Field';
 import { RoomCodeEditor } from '../RoomCodeEditor/RoomCodeEditor';
 import { RoomState } from '../../../../types/room';
 import { parseWsMessage } from './utils/parseWsMessage';
@@ -51,6 +50,7 @@ interface VideoChatProps {
   onUpdatePeersLength: (length: number) => void;
   onMuteMic: () => void;
   onUnmuteMic: () => void;
+  renderToolsPanel: () => ReactElement;
 };
 
 interface PeerMeta {
@@ -109,6 +109,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   onUpdatePeersLength,
   onMuteMic,
   onUnmuteMic,
+  renderToolsPanel,
 }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
@@ -562,6 +563,8 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     } catch { }
   }, [userAudioStream, auth?.id]);
 
+  const needToRenderMainField = screenSharePeer || codeEditorEnabled;
+
   useEffect(() => {
     if (!userVideoStream) {
       return;
@@ -569,7 +572,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     if (userVideo.current) {
       userVideo.current.srcObject = userVideoStream;
     }
-  }, [userVideoStream]);
+  }, [userVideoStream, needToRenderMainField]);
 
   const handleTextMessageSubmit = (message: string) => {
     onSendWsMessage(JSON.stringify({
@@ -577,8 +580,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       Value: message,
     }));
   };
-
-  const needToRenderMainField = screenSharePeer || codeEditorEnabled;
 
   const renderMain = () => {
     if (screenSharePeer) {
@@ -595,13 +596,28 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         />
       );
     }
-    return <></>;
+    return (
+      <video
+        ref={userVideo}
+        className='videochat-video'
+        muted
+        autoPlay
+        playsInline
+      >
+        Video not supported
+      </video>
+    );
   };
 
   return (
-    <div className='room-columns'>
-      <Field className={`videochat-field ${needToRenderMainField ? '' : 'fullscreen'}`}>
-        <div className='videochat'>
+    <>
+      {renderToolsPanel()}
+      <div className='videochat-field videochat-field-main bg-wrap rounded-1.125'>
+        {renderMain()}
+      </div>
+
+      <div className='relative videochat-field bg-wrap rounded-1.125'>
+        <div className={`videochat ${messagesChatEnabled ? 'invisible' : 'visible'}`}>
           <VideochatParticipant
             order={3}
             viewer={false}
@@ -613,24 +629,25 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
               </Canvas>
             </div>
           </VideochatParticipant>
-          <VideochatParticipant
-            order={viewerMode ? viewerOrder - 1 : videoOrder[auth?.id || '']}
-            viewer={viewerMode}
-            avatar={auth?.avatar}
-            nickname={`${auth?.nickname} (${localizationCaptions[LocalizationKey.You]})`}
-            reaction={activeReactions[auth?.id || '']}
-          >
-            <video
-              ref={userVideo}
-              className='videochat-video'
-              muted
-              autoPlay
-              playsInline
+          {needToRenderMainField && (
+            <VideochatParticipant
+              order={viewerMode ? viewerOrder - 1 : videoOrder[auth?.id || '']}
+              viewer={viewerMode}
+              avatar={auth?.avatar}
+              nickname={`${auth?.nickname} (${localizationCaptions[LocalizationKey.You]})`}
+              reaction={activeReactions[auth?.id || '']}
             >
-              Video not supported
-            </video>
-          </VideochatParticipant>
-
+              <video
+                ref={userVideo}
+                className='videochat-video'
+                muted
+                autoPlay
+                playsInline
+              >
+                Video not supported
+              </video>
+            </VideochatParticipant>
+          )}
           {peers.filter(peer => !peer.screenShare).map(peer => (
             <VideochatParticipant
               key={peer.peerID}
@@ -644,21 +661,14 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             </VideochatParticipant>
           ))}
         </div>
-      </Field>
-      {needToRenderMainField && (
-        <Field className='videochat-field videochat-field-main'>
-          {renderMain()}
-        </Field>
-      )}
-      {!!messagesChatEnabled && (
-        <Field className='videochat-field videochat-field-chat'>
+
+        <div className={`absolute top-0 h-full bg-wrap ${messagesChatEnabled ? 'visible' : 'invisible'} z-1`}>
           <MessagesChat
-            transcripts={transcripts}
             textMessages={textMessages}
             onMessageSubmit={handleTextMessageSubmit}
           />
-        </Field>
-      )}
-    </div>
+        </div>
+      </div>
+    </>
   );
 };

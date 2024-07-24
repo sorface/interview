@@ -1,8 +1,3 @@
-.invitations-open {
-  padding: 0.25rem;
-  margin-right: 0.25rem;
-}
-
 .invitations-modal-item {
   display: flex;
   flex-direction: column;
@@ -14,13 +9,6 @@
 
 .invitations-modal-item-link-field {
   display: flex;
-}
-
-.invitations-modal-item-link {
-  width: 30rem;
-  border: none !important;
-  text-overflow: ellipsis;
-  margin-right: 1rem;
 }
 
 .invitations-modal-item-link-ations button {
