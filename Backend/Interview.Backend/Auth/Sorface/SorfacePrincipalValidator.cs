@@ -1,5 +1,4 @@
 using System.Globalization;
-using Bogus.DataSets;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
@@ -27,6 +26,11 @@ public class SorfacePrincipalValidator
         if (context is null)
         {
             throw new ArgumentNullException(nameof(context));
+        }
+
+        if (!context.HttpContext.Request.Path.StartsWithSegments("/api"))
+        {
+            return;
         }
 
         try
@@ -69,6 +73,7 @@ public class SorfacePrincipalValidator
             if (!active.GetBoolean())
             {
                 _logger.LogInformation(@"Token refresh operation has been with result {result}", result);
+                context.RejectPrincipal();
             }
         }
         catch (Exception e)
@@ -96,10 +101,10 @@ public class SorfacePrincipalValidator
 
         _logger.LogInformation(@"get exp {exp}", exp);
 
-        var expires = DateTime.Parse(exp, CultureInfo.InvariantCulture).ToUniversalTime();
+        var expTime = DateTime.Parse(exp, CultureInfo.InvariantCulture).ToUniversalTime();
 
-        _logger.LogInformation(@"utc exp {expires}", expires);
-        if (expires > DateTime.UtcNow)
+        _logger.LogInformation(@"utc exp {expires}", expTime);
+        if (expTime > DateTime.UtcNow)
         {
             _logger.Log(LogLevel.Information, "expires >= DateTime.UtcNow");
             return Result.None;
@@ -140,6 +145,7 @@ public class SorfacePrincipalValidator
             new AuthenticationToken { Name = ExpirationTokenName, Value = expirationValue },
         });
 
+        context.ShouldRenew = true;
         _logger.Log(LogLevel.Information, "Token refreshed");
 
         return Result.RefreshToken;
