@@ -6,3 +6,4 @@ Interview.Backend.sln.DotSettings.user
 Interview.Backend/Interview.Backend.csproj.user
 Interview.Backend/oauth.json
 Interview.Backend/database-conf
+Interview.Backend/logs
