@@ -26,6 +26,7 @@ using Interview.Infrastructure.Rooms;
 using Interview.Infrastructure.Tags;
 using Interview.Infrastructure.Users;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Interview.Test.Integrations;
 
@@ -1052,10 +1053,11 @@ public class RoomServiceTest
             new AppEventRepository(appDbContext),
             new RoomStateRepository(appDbContext),
             new EmptyEventStorage(),
-            new RoomInviteService(appDbContext, roomParticipantService),
+            new RoomInviteService(appDbContext, roomParticipantService, NullLogger<RoomInviteService>.Instance),
             userAccessor,
             roomParticipantService,
-            appDbContext);
+            appDbContext,
+            new NullLogger<RoomService>());
         return roomService;
     }
 }
