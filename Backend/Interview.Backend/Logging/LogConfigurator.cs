@@ -1,4 +1,5 @@
 using Serilog;
+using Serilog.Formatting.Json;
 
 namespace Interview.Backend.Logging;
 
@@ -27,7 +28,7 @@ public class LogConfigurator
                 var logFileName = Path.Combine(logFolder, "log.txt");
                 configuration
                     .WriteTo.Console()
-                    .WriteTo.File(logFileName, rollingInterval: RollingInterval.Day, fileSizeLimitBytes: 1048576, rollOnFileSizeLimit: true);
+                    .WriteTo.File(new JsonFormatter(), logFileName, rollingInterval: RollingInterval.Day, fileSizeLimitBytes: 1048576, rollOnFileSizeLimit: true);
             }
         });
     }
