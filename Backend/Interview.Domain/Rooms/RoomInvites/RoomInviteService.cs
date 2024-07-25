@@ -93,7 +93,7 @@ public class RoomInviteService : IRoomInviteService
 
                 _logger.LogInformation(
                     @"created participant room [id -> {participantId}, type -> {participantType}] for room [id -> {roomId}] and user [id -> {userId}]",
-                    participant!.Id, participant.Type, roomInvite.RoomById, userId);
+                    roomParticipant!.Id, roomParticipant.Type, roomInvite.RoomById, userId);
 
                 await UpdateInviteLimit(roomInvite, cancellationToken);
                 await _db.RoomParticipants.AddAsync(roomParticipant, cancellationToken);
@@ -102,10 +102,7 @@ public class RoomInviteService : IRoomInviteService
 
                 return new RoomInviteResponse
                 {
-                    InviteId = invite.Id,
-                    ParticipantType = roomInvite.ParticipantType!.EnumValue,
-                    Used = invite.UsesCurrent,
-                    Max = invite.UsesMax,
+                    InviteId = invite.Id, ParticipantType = roomInvite.ParticipantType!.EnumValue, Used = invite.UsesCurrent, Max = invite.UsesMax,
                 };
             }
 
@@ -114,10 +111,7 @@ public class RoomInviteService : IRoomInviteService
 
             return new RoomInviteResponse
             {
-                InviteId = invite.Id,
-                ParticipantType = roomInvite.ParticipantType!.EnumValue,
-                Used = invite.UsesCurrent,
-                Max = invite.UsesMax,
+                InviteId = invite.Id, ParticipantType = roomInvite.ParticipantType!.EnumValue, Used = invite.UsesCurrent, Max = invite.UsesMax,
             };
         }
         catch
@@ -149,10 +143,7 @@ public class RoomInviteService : IRoomInviteService
 
         return new RoomInviteResponse
         {
-            InviteId = invite.Id,
-            ParticipantType = newRoomInvite.ParticipantType!.EnumValue,
-            Used = invite.UsesCurrent,
-            Max = invite.UsesMax,
+            InviteId = invite.Id, ParticipantType = newRoomInvite.ParticipantType!.EnumValue, Used = invite.UsesCurrent, Max = invite.UsesMax,
         };
     }
 
