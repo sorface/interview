@@ -84,8 +84,11 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         _logger = logger;
     }
 
-    public async Task<IPagedList<RoomPageDetail>> FindPageAsync(RoomPageDetailRequestFilter filter, int pageNumber, int pageSize,
-                                                                CancellationToken cancellationToken = default)
+    public async Task<IPagedList<RoomPageDetail>> FindPageAsync(
+        RoomPageDetailRequestFilter filter,
+        int pageNumber,
+        int pageSize,
+        CancellationToken cancellationToken = default)
     {
         IQueryable<Room> queryable = _db.Rooms
             .Include(e => e.Participants)
