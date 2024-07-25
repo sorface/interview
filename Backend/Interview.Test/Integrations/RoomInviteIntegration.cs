@@ -164,7 +164,7 @@ namespace Interview.Test.Integrations
             Assert.NotNull(roomParticipant);
 
             roomParticipant.User.Id.Should().Be(participant.User.Id);
-            roomParticipant.Type.EnumValue.Should().Be(EVRoomParticipantType.Examinee);
+            roomParticipant.Type.EnumValue.Should().Be(roomInvite.ParticipantType.EnumValue);
             roomParticipant.Room.Id.Should().Be(room.Id);
         }
 
