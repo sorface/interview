@@ -22,6 +22,7 @@ using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
 using Interview.Domain.Users;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NSpecifications;
 using X.PagedList;
 using Entity = Interview.Domain.Repository.Entity;
@@ -44,6 +45,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     private readonly IRoomInviteService _roomInviteService;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly IRoomParticipantService _roomParticipantService;
+    private readonly ILogger<RoomService> _logger;
     private readonly AppDbContext _db;
 
     public RoomService(
@@ -61,7 +63,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         IRoomInviteService roomInviteService,
         ICurrentUserAccessor currentUserAccessor,
         IRoomParticipantService roomParticipantService,
-        AppDbContext db)
+        AppDbContext db,
+        ILogger<RoomService> logger)
     {
         _roomRepository = roomRepository;
         _questionRepository = questionRepository;
@@ -78,9 +81,11 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         _currentUserAccessor = currentUserAccessor;
         _roomParticipantService = roomParticipantService;
         _db = db;
+        _logger = logger;
     }
 
-    public async Task<IPagedList<RoomPageDetail>> FindPageAsync(RoomPageDetailRequestFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<IPagedList<RoomPageDetail>> FindPageAsync(RoomPageDetailRequestFilter filter, int pageNumber, int pageSize,
+                                                                CancellationToken cancellationToken = default)
     {
         IQueryable<Room> queryable = _db.Rooms
             .Include(e => e.Participants)
@@ -310,9 +315,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         return new RoomItem
         {
-            Id = foundRoom.Id,
-            Name = foundRoom.Name,
-            Tags = tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
+            Id = foundRoom.Id, Name = foundRoom.Name, Tags = tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
         };
     }
 
@@ -477,10 +480,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         state = new RoomState
         {
-            Payload = payload,
-            RoomId = roomId,
-            Type = type,
-            Room = null,
+            Payload = payload, RoomId = roomId, Type = type, Room = null,
         };
         await _roomStateRepository.CreateAsync(state, cancellationToken);
     }
@@ -527,10 +527,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             .Where(e => e.RoomById == roomId && e.InviteById != null && e.ParticipantType != null)
             .Select(e => new RoomInviteResponse
             {
-                InviteId = e.InviteById!.Value,
-                ParticipantType = e.ParticipantType!.EnumValue,
-                Max = e.Invite!.UsesMax,
-                Used = e.Invite.UsesCurrent,
+                InviteId = e.InviteById!.Value, ParticipantType = e.ParticipantType!.EnumValue, Max = e.Invite!.UsesMax, Used = e.Invite.UsesCurrent,
             })
             .ToListAsync(cancellationToken);
     }
@@ -600,6 +597,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
     public async Task<RoomInviteResponse> ApplyInvite(Guid roomId, Guid? invite, CancellationToken cancellationToken = default)
     {
+        using var loggerLocalScope = _logger.BeginScope("apply invite for room [id -> {roomId}] with invite [value -> {inviteId}]", roomId, invite);
+
+        _logger.LogInformation("search room for invite");
+
         var roomSpec = new Spec<Room>(room => room.Id == roomId);
 
         var room = await _roomRepository.FindFirstOrDefaultAsync(roomSpec, cancellationToken);
@@ -609,8 +610,11 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw NotFoundException.Create<Room>(roomId);
         }
 
+        _logger.LogInformation("room found");
+
         if (invite is not null)
         {
+            _logger.LogInformation("apply invite");
             return await _roomInviteService
                 .ApplyInvite(invite.Value, _currentUserAccessor.UserId!.Value, cancellationToken);
         }
@@ -620,19 +624,21 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw AccessDeniedException.CreateForAction("private room");
         }
 
+        _logger.LogInformation("room has open type");
+
         var participant = await _roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(
             roomId, _currentUserAccessor.UserId!.Value, cancellationToken);
 
         if (participant is not null)
         {
+            _logger.LogInformation("participant is not null and just return room invite");
             return new RoomInviteResponse
             {
-                ParticipantType = participant.Type.EnumValue,
-                InviteId = invite!.Value,
-                Max = 0,
-                Used = 0,
+                ParticipantType = participant.Type.EnumValue, InviteId = invite!.Value, Max = 0, Used = 0,
             };
         }
+
+        _logger.LogInformation("participant is null. will be created new");
 
         var user = await _userRepository.FindByIdAsync(_currentUserAccessor.UserId!.Value, cancellationToken);
 
@@ -641,19 +647,21 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw new NotFoundException("Current user not found");
         }
 
+        _logger.LogInformation("Create participant for user [id -> {userId}]", user.Id);
+
         var participants = await _roomParticipantService.CreateAsync(
             roomId,
             new[] { (user, room, SERoomParticipantType.Viewer) },
             cancellationToken);
         participant = participants.First();
+
         await _roomParticipantRepository.CreateAsync(participant, cancellationToken);
+
+        _logger.LogInformation("room participant [id -> {participantId}, type -> {participantType}] created", participant.Id, participant.Type.Name);
 
         return new RoomInviteResponse
         {
-            ParticipantType = participant.Type.EnumValue,
-            InviteId = invite!.Value,
-            Max = 0,
-            Used = 0,
+            ParticipantType = participant.Type.EnumValue, InviteId = invite!.Value, Max = 0, Used = 0,
         };
     }
 
