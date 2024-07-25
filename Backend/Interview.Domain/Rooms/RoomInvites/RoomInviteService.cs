@@ -102,7 +102,10 @@ public class RoomInviteService : IRoomInviteService
 
                 return new RoomInviteResponse
                 {
-                    InviteId = invite.Id, ParticipantType = roomInvite.ParticipantType!.EnumValue, Used = invite.UsesCurrent, Max = invite.UsesMax,
+                    InviteId = invite.Id,
+                    ParticipantType = roomInvite.ParticipantType!.EnumValue,
+                    Used = invite.UsesCurrent,
+                    Max = invite.UsesMax,
                 };
             }
 
@@ -111,7 +114,10 @@ public class RoomInviteService : IRoomInviteService
 
             return new RoomInviteResponse
             {
-                InviteId = invite.Id, ParticipantType = roomInvite.ParticipantType!.EnumValue, Used = invite.UsesCurrent, Max = invite.UsesMax,
+                InviteId = invite.Id,
+                ParticipantType = roomInvite.ParticipantType!.EnumValue,
+                Used = invite.UsesCurrent,
+                Max = invite.UsesMax,
             };
         }
         catch
@@ -143,7 +149,10 @@ public class RoomInviteService : IRoomInviteService
 
         return new RoomInviteResponse
         {
-            InviteId = invite.Id, ParticipantType = newRoomInvite.ParticipantType!.EnumValue, Used = invite.UsesCurrent, Max = invite.UsesMax,
+            InviteId = invite.Id,
+            ParticipantType = newRoomInvite.ParticipantType!.EnumValue,
+            Used = invite.UsesCurrent,
+            Max = invite.UsesMax,
         };
     }
 

@@ -14,7 +14,9 @@ using Interview.Domain.Rooms.Service;
 using Interview.Domain.Tags;
 using Interview.Domain.Users;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Serilog.Core;
 
 namespace Interview.Test.Units.Rooms;
 
@@ -52,7 +54,9 @@ public class RoomServiceTest
             roomInviteRepository.Object,
             new CurrentUserAccessor(),
             participantService.Object,
-            new AppDbContext(new DbContextOptionsBuilder<AppDbContext>().Options));
+            new AppDbContext(new DbContextOptionsBuilder<AppDbContext>().Options),
+            NullLogger<RoomService>.Instance
+        );
     }
 
     [Fact(DisplayName = "Patch update of room when request name is null")]
