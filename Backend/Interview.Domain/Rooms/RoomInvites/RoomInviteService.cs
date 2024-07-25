@@ -112,6 +112,12 @@ public class RoomInviteService : IRoomInviteService
                 };
             }
 
+            if (participant.Type != roomInvite.ParticipantType)
+            {
+                participant.Type = roomInvite.ParticipantType;
+                await _db.SaveChangesAsync(cancellationToken);
+            }
+
             // await UpdateInviteLimit(roomInvite, cancellationToken);
             await databaseContextTransaction.CommitAsync(cancellationToken);
 
