@@ -259,7 +259,7 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.MarkSmmary]: 'Mark smmary',
     [LocalizationKey.CloseRoom]: 'Close meeting',
     [LocalizationKey.WaitingRoom]: 'Waiting to start.',
-    [LocalizationKey.StartReviewRoom]: 'Start meeting review. 📔',
+    [LocalizationKey.StartReviewRoom]: 'Start meeting review.',
     [LocalizationKey.CloseRoomModalTitle]: 'Do you really want to close meeting?',
     [LocalizationKey.StartReviewRoomModalTitle]: 'Start filling out meeting report?',
     [LocalizationKey.CloseRoomLoading]: 'Closing meeting',
