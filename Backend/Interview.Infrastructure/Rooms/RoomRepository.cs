@@ -240,63 +240,6 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
             .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
 
-    public async Task<RoomDetail?> GetByIdAsync(Guid roomId, CancellationToken cancellationToken = default)
-    {
-        var res = await Set
-            .Include(e => e.Participants)
-            .Include(e => e.Configuration)
-            .Include(e => e.Timer)
-            .Select(e => new
-            {
-                Id = e.Id,
-                Name = e.Name,
-                Owner = new RoomUserDetail
-                {
-                    Id = e.CreatedBy!.Id,
-                    Nickname = e.CreatedBy!.Nickname,
-                    Avatar = e.CreatedBy!.Avatar,
-                },
-                Participants = e.Participants.Select(participant =>
-                        new RoomUserDetail
-                        {
-                            Id = participant.User.Id,
-                            Nickname = participant.User.Nickname,
-                            Avatar = participant.User.Avatar,
-                        })
-                    .ToList(),
-                Status = e.Status.EnumValue,
-                Invites = e.Invites.Select(roomInvite => new RoomInviteResponse()
-                {
-                    InviteId = roomInvite.InviteById!.Value,
-                    ParticipantType = roomInvite.ParticipantType!.EnumValue,
-                    Max = roomInvite.Invite!.UsesMax,
-                    Used = roomInvite.Invite.UsesCurrent,
-                })
-                    .ToList(),
-                Type = e.AccessType.EnumValue,
-                Timer = e.Timer == null ? null : new { Duration = e.Timer.Duration, ActualStartTime = e.Timer.ActualStartTime, },
-                ScheduledStartTime = e.ScheduleStartTime,
-            })
-            .FirstOrDefaultAsync(room => room.Id == roomId, cancellationToken: cancellationToken);
-        if (res is null)
-        {
-            return null;
-        }
-
-        return new RoomDetail
-        {
-            Id = res.Id,
-            Name = res.Name,
-            Owner = res.Owner,
-            Participants = res.Participants,
-            Status = res.Status,
-            Invites = res.Invites,
-            Type = res.Type,
-            Timer = res.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)res.Timer.Duration.TotalSeconds, StartTime = res.Timer.ActualStartTime },
-            ScheduledStartTime = res.ScheduledStartTime,
-        };
-    }
-
     protected override IQueryable<Room> ApplyIncludes(DbSet<Room> set)
         => Set
             .Include(e => e.Tags)

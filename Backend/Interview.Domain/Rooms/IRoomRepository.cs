@@ -14,6 +14,4 @@ public interface IRoomRepository : IRepository<Room>
     Task<bool> HasUserAsync(Guid roomId, Guid userId, CancellationToken cancellationToken = default);
 
     Task<RoomParticipant?> FindParticipantOrDefaultAsync(Guid roomId, Guid userId, CancellationToken cancellationToken = default);
-
-    Task<RoomDetail?> GetByIdAsync(Guid roomId, CancellationToken cancellationToken = default);
 }

@@ -31,14 +31,10 @@ namespace Interview.Domain.Rooms.Service;
 
 public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 {
-    private readonly IAppEventRepository _eventRepository;
-    private readonly IRoomStateRepository _roomStateRepository;
     private readonly IRoomRepository _roomRepository;
     private readonly IRoomQuestionRepository _roomQuestionRepository;
-    private readonly IQuestionRepository _questionRepository;
     private readonly IUserRepository _userRepository;
     private readonly IRoomEventDispatcher _roomEventDispatcher;
-    private readonly IRoomQuestionReactionRepository _roomQuestionReactionRepository;
     private readonly ITagRepository _tagRepository;
     private readonly IRoomParticipantRepository _roomParticipantRepository;
     private readonly IEventStorage _eventStorage;
@@ -51,14 +47,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     public RoomService(
         IRoomRepository roomRepository,
         IRoomQuestionRepository roomQuestionRepository,
-        IQuestionRepository questionRepository,
         IUserRepository userRepository,
         IRoomEventDispatcher roomEventDispatcher,
-        IRoomQuestionReactionRepository roomQuestionReactionRepository,
         ITagRepository tagRepository,
         IRoomParticipantRepository roomParticipantRepository,
-        IAppEventRepository eventRepository,
-        IRoomStateRepository roomStateRepository,
         IEventStorage eventStorage,
         IRoomInviteService roomInviteService,
         ICurrentUserAccessor currentUserAccessor,
@@ -67,14 +59,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         ILogger<RoomService> logger)
     {
         _roomRepository = roomRepository;
-        _questionRepository = questionRepository;
         _userRepository = userRepository;
         _roomEventDispatcher = roomEventDispatcher;
-        _roomQuestionReactionRepository = roomQuestionReactionRepository;
         _tagRepository = tagRepository;
         _roomParticipantRepository = roomParticipantRepository;
-        _eventRepository = eventRepository;
-        _roomStateRepository = roomStateRepository;
         _eventStorage = eventStorage;
         _roomQuestionRepository = roomQuestionRepository;
         _roomInviteService = roomInviteService;
@@ -165,14 +153,55 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
     public async Task<RoomDetail> FindByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        var room = await _roomRepository.GetByIdAsync(id, cancellationToken);
+        var res = await _db.Rooms
+            .Include(e => e.Participants)
+            .Include(e => e.Configuration)
+            .Include(e => e.Timer)
+            .Select(e => new
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Owner = new RoomUserDetail
+                {
+                    Id = e.CreatedBy!.Id,
+                    Nickname = e.CreatedBy!.Nickname,
+                    Avatar = e.CreatedBy!.Avatar,
+                },
+                Participants = e.Participants.Select(participant =>
+                        new RoomUserDetail
+                        {
+                            Id = participant.User.Id,
+                            Nickname = participant.User.Nickname,
+                            Avatar = participant.User.Avatar,
+                        })
+                    .ToList(),
+                Status = e.Status.EnumValue,
+                Invites = e.Invites.Select(roomInvite => new RoomInviteResponse()
+                {
+                    InviteId = roomInvite.InviteById!.Value,
+                    ParticipantType = roomInvite.ParticipantType!.EnumValue,
+                    Max = roomInvite.Invite!.UsesMax,
+                    Used = roomInvite.Invite.UsesCurrent,
+                })
+                    .ToList(),
+                Type = e.AccessType.EnumValue,
+                Timer = e.Timer == null ? null : new { Duration = e.Timer.Duration, ActualStartTime = e.Timer.ActualStartTime, },
+                ScheduledStartTime = e.ScheduleStartTime,
+            })
+            .FirstOrDefaultAsync(room => room.Id == id, cancellationToken: cancellationToken) ?? throw NotFoundException.Create<Room>(id);
 
-        if (room is null)
+        return new RoomDetail
         {
-            throw NotFoundException.Create<Room>(id);
-        }
-
-        return room;
+            Id = res.Id,
+            Name = res.Name,
+            Owner = res.Owner,
+            Participants = res.Participants,
+            Status = res.Status,
+            Invites = res.Invites,
+            Type = res.Type,
+            Timer = res.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)res.Timer.Duration.TotalSeconds, StartTime = res.Timer.ActualStartTime },
+            ScheduledStartTime = res.ScheduledStartTime,
+        };
     }
 
     public async Task<RoomPageDetail> CreateAsync(RoomCreateRequest request, CancellationToken cancellationToken = default)
@@ -207,7 +236,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         var room = new Room(name, request.AccessType) { Tags = tags, ScheduleStartTime = request.ScheduleStartTime, };
 
         var questions =
-            await FindByIdsOrErrorAsync(_questionRepository, request.Questions.Select(e => e.Id).ToList(), "questions", cancellationToken);
+            await FindByIdsOrErrorAsync(_db.Questions, request.Questions.Select(e => e.Id).ToList(), "questions", cancellationToken);
         var roomQuestions = questions
             .Join(request.Questions,
                 e => e.Id,
@@ -356,8 +385,9 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
     public async Task SendEventRequestAsync(IEventRequest request, CancellationToken cancellationToken = default)
     {
-        var eventSpecification = new Spec<AppEvent>(e => e.Type == request.Type);
-        var dbEvent = await _eventRepository.FindFirstOrDefaultAsync(eventSpecification, cancellationToken);
+        var dbEvent = await _db.AppEvent
+            .Include(appEvent => appEvent.Roles)
+            .FirstOrDefaultAsync(e => e.Type == request.Type, cancellationToken);
         if (dbEvent is null)
         {
             throw new NotFoundException($"Event not found by type {request.Type}");
@@ -449,11 +479,11 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         }
 
         var spec = new RoomReactionsSpecification(roomId);
-
-        var reactions = await _roomQuestionReactionRepository.FindDetailed(
-            spec,
-            ReactionTypeOnlyMapper.Instance,
-            cancellationToken);
+        var reactions = await _db.RoomQuestionReactions
+            .Include(e => e.Reaction)
+            .Where(spec)
+            .Select(ReactionTypeOnlyMapper.Instance.Expression)
+            .ToListAsync(cancellationToken);
 
         roomState.DislikeCount = reactions.Count(e => e == ReactionType.Dislike);
         roomState.LikeCount = reactions.Count(e => e == ReactionType.Like);
@@ -474,12 +504,11 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw new UserException("No room was found by id.");
         }
 
-        var spec = new Spec<RoomState>(e => e.RoomId == roomId && e.Type == type);
-        var state = await _roomStateRepository.FindFirstOrDefaultAsync(spec, cancellationToken);
+        var state = await _db.RoomStates.FirstOrDefaultAsync(e => e.RoomId == roomId && e.Type == type, cancellationToken);
         if (state is not null)
         {
             state.Payload = payload;
-            await _roomStateRepository.UpdateAsync(state, cancellationToken);
+            await _db.SaveChangesAsync(cancellationToken);
             return;
         }
 
@@ -490,7 +519,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             Type = type,
             Room = null,
         };
-        await _roomStateRepository.CreateAsync(state, cancellationToken);
+        await _db.RoomStates.AddAsync(state, cancellationToken);
+        await _db.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteRoomStateAsync(Guid roomId, string type, CancellationToken cancellationToken = default)
@@ -506,14 +536,14 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw new UserException("No room was found by id.");
         }
 
-        var spec = new Spec<RoomState>(e => e.RoomId == roomId && e.Type == type);
-        var state = await _roomStateRepository.FindFirstOrDefaultAsync(spec, cancellationToken);
+        var state = await _db.RoomStates.FirstOrDefaultAsync(e => e.RoomId == roomId && e.Type == type, cancellationToken);
         if (state is null)
         {
             throw new UserException($"No room state with type '{type}' was found");
         }
 
-        await _roomStateRepository.DeleteAsync(state, cancellationToken);
+        _db.RoomStates.Remove(state);
+        await _db.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<Analytics> GetAnalyticsAsync(RoomAnalyticsRequest request, CancellationToken cancellationToken = default)
@@ -694,11 +724,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         return participantType;
     }
 
-    private string FindNotFoundEntityIds<T>(IEnumerable<Guid> guids, IEnumerable<T> collection)
+    private string FormatNotFoundEntityIds<T>(IEnumerable<Guid> guids, IEnumerable<T> collection)
         where T : Entity
     {
         var notFoundEntityIds = guids.Except(collection.Select(entity => entity.Id));
-
         return string.Join(", ", notFoundEntityIds);
     }
 
@@ -706,9 +735,20 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         where T : Entity
     {
         var entities = await repository.FindByIdsAsync(ids, cancellationToken);
+        return FindByIdsOrError(entities, ids, entityName, cancellationToken);
+    }
 
-        var notFoundEntities = FindNotFoundEntityIds(ids, entities);
+    private async Task<List<T>> FindByIdsOrErrorAsync<T>(IQueryable<T> repository, ICollection<Guid> ids, string entityName, CancellationToken cancellationToken)
+        where T : Entity
+    {
+        var entities = await repository.Where(e => ids.Contains(e.Id)).ToListAsync(cancellationToken);
+        return FindByIdsOrError(entities, ids, entityName, cancellationToken);
+    }
 
+    private List<T> FindByIdsOrError<T>(List<T> entities, ICollection<Guid> ids, string entityName, CancellationToken cancellationToken)
+        where T : Entity
+    {
+        var notFoundEntities = FormatNotFoundEntityIds(ids, entities);
         if (!string.IsNullOrEmpty(notFoundEntities))
         {
             throw new NotFoundException($"Not found {entityName} with id [{notFoundEntities}]");

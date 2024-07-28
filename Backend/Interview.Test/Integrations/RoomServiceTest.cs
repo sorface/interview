@@ -1041,23 +1041,18 @@ public class RoomServiceTest
         }
 
         var roomRepository = new RoomRepository(appDbContext); var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext), userAccessor);
-        var roomService = new RoomService(
+        return new RoomService(
             roomRepository,
             new RoomQuestionRepository(appDbContext),
-            new QuestionRepository(appDbContext),
             new UserRepository(appDbContext),
             new EmptyRoomEventDispatcher(),
-            new RoomQuestionReactionRepository(appDbContext),
             new TagRepository(appDbContext),
             new RoomParticipantRepository(appDbContext),
-            new AppEventRepository(appDbContext),
-            new RoomStateRepository(appDbContext),
             new EmptyEventStorage(),
             new RoomInviteService(appDbContext, roomParticipantService, NullLogger<RoomInviteService>.Instance),
             userAccessor,
             roomParticipantService,
             appDbContext,
             new NullLogger<RoomService>());
-        return roomService;
     }
 }

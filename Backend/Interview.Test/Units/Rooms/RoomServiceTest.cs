@@ -33,23 +33,17 @@ public class RoomServiceTest
         var roomQuestionRepository = new Mock<IRoomQuestionRepository>();
         var userRepository = new Mock<IUserRepository>();
         var eventDispatcher = new Mock<IRoomEventDispatcher>();
-        var roomQuestionReactionRepository = new Mock<IRoomQuestionReactionRepository>();
         var tagRepository = new Mock<ITagRepository>();
-        var roomStateRepository = new Mock<IRoomStateRepository>();
         var roomInviteRepository = new Mock<IRoomInviteService>();
         var participantService = new Mock<IRoomParticipantService>();
 
         _roomService = new RoomService(
             _roomRepository.Object,
             roomQuestionRepository.Object,
-            questionRepository.Object,
             userRepository.Object,
             eventDispatcher.Object,
-            roomQuestionReactionRepository.Object,
             tagRepository.Object,
             new Mock<IRoomParticipantRepository>().Object,
-            new Mock<IAppEventRepository>().Object,
-            roomStateRepository.Object,
             new EmptyEventStorage(),
             roomInviteRepository.Object,
             new CurrentUserAccessor(),
