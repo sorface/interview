@@ -11,7 +11,7 @@
     <PropertyGroup>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <PackageReference Include="Ardalis.SmartEnum.SystemTextJson" Version="7.0.0" />
         <PackageReference Include="AspNet.Security.OAuth.Twitch" Version="7.0.4" />
@@ -29,10 +29,6 @@
         </PackageReference>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
         <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.6.2" />
-    <PropertyGroup>
-        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    </PropertyGroup>
-    
         <PackageReference Include="AspNet.Security.OAuth.Twitch" Version="7.0.4" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.20" />
         <PackageReference Include="IdentityModel" Version="7.0.0" />
