@@ -2,21 +2,23 @@ namespace Interview.Domain.Rooms.Records.Response.Detail;
 
 public class RoomDetail
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; set; }
 
-    public string? Name { get; set; }
+    public required string? Name { get; set; }
 
     public required RoomUserDetail Owner { get; set; }
 
-    public List<RoomUserDetail>? Participants { get; set; }
+    public required List<RoomUserDetail>? Participants { get; set; }
 
     public required EVRoomStatus Status { get; init; }
 
     public required List<RoomInviteResponse> Invites { get; init; }
 
-    public EVRoomAccessType Type { get; init; }
+    public required EVRoomAccessType Type { get; init; }
 
-    public RoomTimerDetail? Timer { get; init; }
+    public required RoomTimerDetail? Timer { get; init; }
 
-    public DateTime? ScheduledStartTime { get; init; }
+    public required DateTime? ScheduledStartTime { get; init; }
+
+    public required List<RoomQuestionDetail>? Questions { get; set; }
 }

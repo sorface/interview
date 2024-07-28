@@ -142,6 +142,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             .Include(e => e.Participants)
             .Include(e => e.Configuration)
             .Include(e => e.Timer)
+            .Include(e => e.Questions).ThenInclude(e => e.Question)
             .Select(e => new
             {
                 Id = e.Id,
@@ -172,6 +173,12 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 Type = e.AccessType.EnumValue,
                 Timer = e.Timer == null ? null : new { Duration = e.Timer.Duration, ActualStartTime = e.Timer.ActualStartTime, },
                 ScheduledStartTime = e.ScheduleStartTime,
+                Questions = e.Questions.Select(q => new RoomQuestionDetail
+                {
+                    Id = q.QuestionId,
+                    Order = q.Order,
+                    Value = q.Question!.Value,
+                }).ToList(),
             })
             .FirstOrDefaultAsync(room => room.Id == id, cancellationToken: cancellationToken) ?? throw NotFoundException.Create<Room>(id);
 
@@ -184,8 +191,15 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             Status = res.Status,
             Invites = res.Invites,
             Type = res.Type,
-            Timer = res.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)res.Timer.Duration.TotalSeconds, StartTime = res.Timer.ActualStartTime },
+            Timer = res.Timer == null
+                ? null
+                : new RoomTimerDetail
+                {
+                    DurationSec = (long)res.Timer.Duration.TotalSeconds,
+                    StartTime = res.Timer.ActualStartTime,
+                },
             ScheduledStartTime = res.ScheduledStartTime,
+            Questions = res.Questions,
         };
     }
 
