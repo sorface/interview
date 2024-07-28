@@ -1504,13 +1504,15 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ExternalId")
+                        .IsRequired()
+                        .HasMaxLength(36)
+                        .IsUnicode(true)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Nickname")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TwitchIdentity")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("UpdateDate")

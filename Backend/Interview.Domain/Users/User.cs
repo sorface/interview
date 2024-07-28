@@ -7,15 +7,15 @@ namespace Interview.Domain.Users;
 
 public class User : Entity
 {
-    public User(Guid id, string nickname, string twitchIdentity)
+    public User(Guid id, string nickname, string externalId)
         : base(id)
     {
         Nickname = nickname;
-        TwitchIdentity = twitchIdentity;
+        ExternalId = externalId;
     }
 
-    public User(string nickname, string twitchIdentity)
-        : this(Guid.Empty, nickname, twitchIdentity)
+    public User(string nickname, string externalId)
+        : this(Guid.Empty, nickname, externalId)
     {
     }
 
@@ -28,7 +28,7 @@ public class User : Entity
 
     public string? Avatar { get; set; }
 
-    public string TwitchIdentity { get; private set; }
+    public string ExternalId { get; private set; }
 
     public List<Role> Roles { get; private set; } = new List<Role>();
 

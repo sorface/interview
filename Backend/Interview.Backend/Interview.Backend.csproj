@@ -11,11 +11,12 @@
     <PropertyGroup>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <PackageReference Include="Ardalis.SmartEnum.SystemTextJson" Version="7.0.0" />
         <PackageReference Include="AspNet.Security.OAuth.Twitch" Version="7.0.4" />
         <PackageReference Include="Bogus" Version="34.0.2" />
+        <PackageReference Include="IdentityModel" Version="7.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.20" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.10" />
         <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.3.2" />
@@ -28,6 +29,14 @@
         </PackageReference>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
         <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.6.2" />
+        <PackageReference Include="AspNet.Security.OAuth.Twitch" Version="7.0.4" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.20" />
+        <PackageReference Include="IdentityModel" Version="7.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.2" />
+        <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
+        <PackageReference Include="Serilog.Formatting.Elasticsearch" Version="10.0.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.6.2" />
     </ItemGroup>
 
     <ItemGroup>
@@ -36,16 +45,10 @@
         </Content>
     </ItemGroup>
     
-
     <ItemGroup>
         <ProjectReference Include="..\Interview.DependencyInjection\Interview.DependencyInjection.csproj" />
         <ProjectReference Include="..\Interview.Infrastructure\Interview.Infrastructure.csproj" />
         <ProjectReference Include="..\Interview.Migrations.Postgres\Interview.Migrations.Postgres.csproj" />
         <ProjectReference Include="..\Interview.Migrations.Sqlite\Interview.Migrations.Sqlite.csproj" />
     </ItemGroup>
-    
-
-    
-    
-    
 </Project>

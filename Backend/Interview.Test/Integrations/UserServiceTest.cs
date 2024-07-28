@@ -45,9 +45,9 @@ public class UserServiceTest
         var userService = new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext),
             new AdminUsers(), new PermissionRepository(appDbContext), securityService);
         var user = new User("Dima", "1");
-        var upsertUser = await userService.UpsertByTwitchIdentityAsync(user);
+        var upsertUser = await userService.UpsertByExternalIdAsync(user);
 
-        var expectedUser = new User(entity.Id, user.Nickname, user.TwitchIdentity);
+        var expectedUser = new User(entity.Id, user.Nickname, user.ExternalId);
         expectedUser.UpdateCreateDate(user.CreateDate);
         expectedUser.Roles.AddRange(entity.Roles);
         expectedUser.Permissions.AddRange(entity.Permissions);
@@ -73,7 +73,7 @@ public class UserServiceTest
                 new PermissionRepository(appDbContext), securityService);
         var user = new User(nickname, "1");
 
-        var upsertUser = await userService.UpsertByTwitchIdentityAsync(user);
+        var upsertUser = await userService.UpsertByExternalIdAsync(user);
 
         var savedUser = await appDbContext.Users.SingleAsync(e => e.Id == upsertUser.Id);
         upsertUser.Should().BeEquivalentTo(savedUser);
@@ -97,7 +97,7 @@ public class UserServiceTest
         var user = new User("Dima", "1");
 
         var error = await Assert.ThrowsAsync<Domain.NotFoundException>(async () =>
-            await userService.UpsertByTwitchIdentityAsync(user));
+            await userService.UpsertByExternalIdAsync(user));
 
         error.Message.Should().NotBeNull().And.NotBeEmpty();
     }

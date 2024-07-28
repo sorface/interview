@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using AspNet.Security.OAuth.Twitch;
+using Interview.Backend.Auth.Sorface;
 
 namespace Interview.Backend.Auth;
 
@@ -18,20 +19,19 @@ public static class ClaimsPrincipalExt
 
     public static User? ToUser(this ClaimsPrincipal self)
     {
-        var twitchId = self.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier);
-        var nickname = self.Claims.FirstOrDefault(e => e.Type == ClaimTypes.Name);
+        var profileId = self.Claims.FirstOrDefault(e => e.Type == SorfaceClaimTypes.Claims.Profile.Id);
+        var nickname = self.Claims.FirstOrDefault(e => e.Type == SorfaceClaimTypes.Claims.Profile.Username);
 
-        if (twitchId == null || nickname == null)
+        if (profileId == null || nickname == null)
         {
             return null;
         }
 
         var id = self.Claims.FirstOrDefault(e => e.Type == UserClaimConstants.UserId);
 
-        var profileImage =
-            self.Claims.FirstOrDefault(e => e.Type == TwitchAuthenticationConstants.Claims.ProfileImageUrl);
+        var profileImage = self.Claims.FirstOrDefault(e => e.Type == SorfaceClaimTypes.Claims.Profile.Avatar);
 
-        var user = new User(nickname.Value, twitchId.Value);
+        var user = new User(nickname.Value, profileId.Value);
 
         if (id != null && Guid.TryParse(id.Value, out var typedId))
         {

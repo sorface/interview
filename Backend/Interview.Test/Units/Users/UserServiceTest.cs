@@ -36,7 +36,7 @@ public class UserServiceTest
         var user = new User("Dima", "1");
 
         _mockUserRepository.Setup(repository =>
-                repository.FindByTwitchIdentityAsync(user.TwitchIdentity, default))
+                repository.FindByExternalIdAsync(user.ExternalId, default))
             .Returns(() => Task.FromResult<User?>(null));
 
         _mockRoleRepository.Setup(repository =>
@@ -44,12 +44,12 @@ public class UserServiceTest
             .Returns(() => Task.FromResult<Role?>(null));
 
         var throwsAsync = await Assert.ThrowsAsync<Domain.NotFoundException>(
-            async () => await _userService.UpsertByTwitchIdentityAsync(user));
+            async () => await _userService.UpsertByExternalIdAsync(user));
 
         throwsAsync.Message.Should().NotBeNull().And.NotBeEmpty();
 
         _mockUserRepository.Verify(repository =>
-            repository.FindByTwitchIdentityAsync(user.TwitchIdentity, default), Times.Once);
+            repository.FindByExternalIdAsync(user.ExternalId, default), Times.Once);
         _mockRoleRepository.Verify(repository =>
             repository.FindByIdAsync(RoleName.User.Id, default), Times.Once);
         _mockUserRepository.Verify(repository =>

@@ -3,22 +3,6 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-ARG Database
-ARG ConnectionString
-ARG ClientId
-ARG ClientSecret
-ARG SwaggerPrefix
-ARG RedisConnectionString
-ARG UseRedis
-
-ENV INTERVIEW_BACKEND_ConnectionStrings__type ${Database}
-ENV INTERVIEW_BACKEND_ConnectionStrings__database ${ConnectionString}
-ENV INTERVIEW_BACKEND_OAuthServiceDispatcher__0__ClientId ${ClientId}
-ENV INTERVIEW_BACKEND_OAuthServiceDispatcher__0__ClientSecret ${ClientSecret}
-ENV INTERVIEW_BACKEND_SwaggerOption__RoutePrefix ${SwaggerPrefix}
-ENV INTERVIEW_BACKEND_EventStorage__RedisConnectionString ${RedisConnectionString}
-ENV INTERVIEW_BACKEND_EventStorage__UseRedis ${UseRedis}
-
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["Interview.Backend/Interview.Backend.csproj", "Interview.Backend/"]

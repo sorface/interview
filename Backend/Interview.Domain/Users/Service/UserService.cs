@@ -39,7 +39,7 @@ public sealed class UserService : IUserService
             Nickname = user.Nickname,
             Avatar = user.Avatar,
             Roles = user.Roles.Select(role => role.Name.Name).ToList(),
-            TwitchIdentity = user.TwitchIdentity,
+            TwitchIdentity = user.ExternalId,
         });
 
         return _userRepository.GetPageDetailedAsync(mapperUserDetail, pageNumber, pageSize, cancellationToken);
@@ -61,7 +61,7 @@ public sealed class UserService : IUserService
             Avatar = user.Avatar,
             Nickname = user.Nickname,
             Roles = user.Roles.Select(role => role.Name.Name).ToList(),
-            TwitchIdentity = user.TwitchIdentity,
+            TwitchIdentity = user.ExternalId,
         };
     }
 
@@ -89,7 +89,7 @@ public sealed class UserService : IUserService
         return Task.FromResult(new UserDetail()
         {
             Id = user.Id,
-            TwitchIdentity = user.TwitchIdentity,
+            TwitchIdentity = user.ExternalId,
             Nickname = user.Nickname,
             Avatar = user.Avatar,
             Roles = user.Roles.Select(role => role.Name.Name).ToList(),
@@ -97,9 +97,9 @@ public sealed class UserService : IUserService
         });
     }
 
-    public async Task<User> UpsertByTwitchIdentityAsync(User user, CancellationToken cancellationToken = default)
+    public async Task<User> UpsertByExternalIdAsync(User user, CancellationToken cancellationToken = default)
     {
-        var existingUser = await _userRepository.FindByTwitchIdentityAsync(user.TwitchIdentity, cancellationToken);
+        var existingUser = await _userRepository.FindByExternalIdAsync(user.ExternalId, cancellationToken);
         if (existingUser != null)
         {
             existingUser.Nickname = user.Nickname;
@@ -118,7 +118,7 @@ public sealed class UserService : IUserService
             throw new NotFoundException(ExceptionMessage.UserRoleNotFound());
         }
 
-        var insertUser = new User(user.Nickname, user.TwitchIdentity) { Avatar = user.Avatar };
+        var insertUser = new User(user.Nickname, user.ExternalId) { Avatar = user.Avatar };
 
         insertUser.Roles.Add(userRole);
 
@@ -145,7 +145,7 @@ public sealed class UserService : IUserService
             Nickname = user.Nickname,
             Avatar = user.Avatar,
             Roles = user.Roles.Select(role => role.Name.Name).ToList(),
-            TwitchIdentity = user.TwitchIdentity,
+            TwitchIdentity = user.ExternalId,
         });
 
         return _userRepository.GetPageAsync(spec, mapper, pageNumber, pageSize, cancellationToken);

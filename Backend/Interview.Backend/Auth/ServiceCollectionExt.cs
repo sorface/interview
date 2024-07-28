@@ -1,5 +1,5 @@
+using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Responses;
-using Interview.Backend.WebSocket.Configuration;
 using Interview.Domain.Users.Service;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
@@ -9,41 +9,56 @@ public static class ServiceCollectionExt
 {
     public static void AddAppAuth(this IServiceCollection self, AuthorizationService authorizationService)
     {
-        const string AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-
-        self.AddAuthentication(AuthenticationScheme)
-            .AddCookie(AuthenticationScheme, options =>
+        self.AddAuthentication(options =>
             {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = authorizationService.Id;
+            })
+            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+            {
+                options.Events.OnValidatePrincipal = context =>
+                {
+                    var sorfacePrincipalValidator = context.HttpContext.RequestServices.GetRequiredService<SorfacePrincipalValidator>();
+                    return sorfacePrincipalValidator.ValidateAsync(context);
+                };
+                options.Cookie.HttpOnly = false;
+                options.Cookie.Name = "_auth";
+
                 options.Events.OnRedirectToAccessDenied = context =>
                 {
                     context.Response.StatusCode = 403;
-                    context.Response.WriteAsJsonAsync(new MessageResponse
-                    {
-                        Message = "Forbidden",
-                    });
+                    context.Response.WriteAsJsonAsync(new MessageResponse { Message = "Forbidden", });
                     return Task.CompletedTask;
                 };
                 options.Events.OnRedirectToLogin = context =>
                 {
                     context.Response.StatusCode = 401;
-                    context.Response.WriteAsJsonAsync(new MessageResponse
-                    {
-                        Message = "Unauthorized",
-                    });
+                    context.Response.WriteAsJsonAsync(new MessageResponse { Message = "Unauthorized", });
                     return Task.CompletedTask;
                 };
-                options.Cookie.HttpOnly = false;
-                options.Cookie.Name = WebSocketAuthorizationOptions.DefaultCookieName;
-                options.Cookie.Domain = authorizationService.Domain;
-                options.ClaimsIssuer = authorizationService.ClaimsIssuer;
-                options.ExpireTimeSpan = TimeSpan.FromDays(10);
             })
-            .AddTwitch(authorizationService.Id, options =>
+            .AddSorface(authorizationService.Id, options =>
             {
                 options.ClientId = authorizationService.ClientId;
                 options.ClientSecret = authorizationService.ClientSecret;
+
+                options.ClaimsIssuer = authorizationService.Issuer;
+
                 options.CallbackPath = authorizationService.CallbackPath;
-                options.ClaimsIssuer = authorizationService.ClaimsIssuer;
+
+                options.AuthorizationEndpoint = authorizationService.AuthorizationEndPoint;
+                options.TokenEndpoint = authorizationService.TokenEndpoint;
+                options.UserInformationEndpoint = authorizationService.UserInformationEndpoint;
+
+                options.SaveTokens = true;
+
+                options.Scope.Add("scope.read");
+
+                if (authorizationService.CorrelationCookie is not null)
+                {
+                    options.CorrelationCookie = new CookieBuilder { Name = authorizationService.CorrelationCookie.Name, };
+                }
+
                 options.Events.OnTicketReceived += async context =>
                 {
                     var user = context.Principal?.ToUser();
@@ -53,10 +68,10 @@ public static class ServiceCollectionExt
                     }
 
                     var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
-                    var upsertUser = await userService.UpsertByTwitchIdentityAsync(user);
+                    var upsertUser = await userService.UpsertByExternalIdAsync(user);
+
                     context.Principal!.EnrichRolesWithId(upsertUser);
                 };
-                options.Scope.Clear();
             });
 
         self.AddAuthorization(options =>
