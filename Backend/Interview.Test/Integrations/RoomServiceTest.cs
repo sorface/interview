@@ -1040,14 +1040,15 @@ public class RoomServiceTest
             userAccessor.SetUser(user);
         }
 
-        var roomRepository = new RoomRepository(appDbContext); var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext), userAccessor);
-        return new RoomService(
-            roomRepository,
-            new RoomQuestionRepository(appDbContext),
-            new UserRepository(appDbContext),
-            new EmptyRoomEventDispatcher(),
-            new TagRepository(appDbContext),
+        var roomParticipantService = new RoomParticipantService(
             new RoomParticipantRepository(appDbContext),
+            new RoomRepository(appDbContext),
+            new UserRepository(appDbContext),
+            new AvailableRoomPermissionRepository(appDbContext),
+            userAccessor);
+        return new RoomService(
+            new RoomQuestionRepository(appDbContext),
+            new EmptyRoomEventDispatcher(),
             new EmptyEventStorage(),
             new RoomInviteService(appDbContext, roomParticipantService, NullLogger<RoomInviteService>.Instance),
             userAccessor,

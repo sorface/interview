@@ -48,13 +48,12 @@ public class RoomInviteIntegration
         appDbContext.RoomInvites.Add(roomInvite);
         await appDbContext.SaveChangesAsync();
 
-        var roomRepository = new RoomRepository(appDbContext);
         var userAccessor = new CurrentUserAccessor();
         {
             userAccessor.SetUser(user);
         }
         var roomParticipantService = CreateRoomParticipantService(appDbContext, userAccessor);
-        var roomService = CreateRoomService(roomRepository, appDbContext, roomParticipantService, userAccessor);
+        var roomService = CreateRoomService(appDbContext, roomParticipantService, userAccessor);
 
         await roomService.ApplyInvite(room.Id, invite.Id);
 
@@ -101,14 +100,13 @@ public class RoomInviteIntegration
 
         await transaction.CommitAsync();
 
-        var roomRepository = new RoomRepository(appDbContext);
         var userAccessor = new CurrentUserAccessor();
         {
             userAccessor.SetUser(user);
         }
 
         var roomParticipantService = CreateRoomParticipantService(appDbContext, userAccessor);
-        var roomService = CreateRoomService(roomRepository, appDbContext, roomParticipantService, userAccessor);
+        var roomService = CreateRoomService(appDbContext, roomParticipantService, userAccessor);
 
         await roomService.ApplyInvite(room.Id, invite.Id);
 
@@ -151,13 +149,12 @@ public class RoomInviteIntegration
         appDbContext.RoomInvites.Add(roomInvite);
         await appDbContext.SaveChangesAsync();
 
-        var roomRepository = new RoomRepository(appDbContext);
         var userAccessor = new CurrentUserAccessor();
         {
             userAccessor.SetUser(user);
         }
         var roomParticipantService = CreateRoomParticipantService(appDbContext, userAccessor);
-        var roomService = CreateRoomService(roomRepository, appDbContext, roomParticipantService, userAccessor);
+        var roomService = CreateRoomService(appDbContext, roomParticipantService, userAccessor);
 
         await roomService.ApplyInvite(room.Id, invite.Id);
 
@@ -188,18 +185,13 @@ public class RoomInviteIntegration
     }
 
     private static RoomService CreateRoomService(
-        RoomRepository roomRepository,
         AppDbContext appDbContext,
         RoomParticipantService roomParticipantService,
         CurrentUserAccessor userAccessor)
     {
         return new RoomService(
-            roomRepository,
             new RoomQuestionRepository(appDbContext),
-            new UserRepository(appDbContext),
             new EmptyRoomEventDispatcher(),
-            new TagRepository(appDbContext),
-            new RoomParticipantRepository(appDbContext),
             new EmptyEventStorage(),
             new RoomInviteService(appDbContext, roomParticipantService, NullLogger<RoomInviteService>.Instance),
             userAccessor,
