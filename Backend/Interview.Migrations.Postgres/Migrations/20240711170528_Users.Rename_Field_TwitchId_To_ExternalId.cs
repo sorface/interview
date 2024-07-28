@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -17,9 +17,9 @@ namespace Interview.Migrations.Postgres.Migrations
                 maxLength: 36,
                 nullable: false,
                 defaultValue: "");
-            
+
             migrationBuilder.Sql(@"UPDATE Users SET ExternalId = TwitchIdentity");
-            
+
             migrationBuilder.DropColumn(
                 name: "TwitchIdentity",
                 table: "Users");
@@ -34,9 +34,9 @@ namespace Interview.Migrations.Postgres.Migrations
                 type: "text",
                 nullable: false,
                 defaultValue: "");
-            
+
             migrationBuilder.Sql(@"UPDATE Users SET  TwitchIdentity = ExternalId");
-            
+
             migrationBuilder.DropColumn(
                 name: "ExternalId",
                 table: "Users");

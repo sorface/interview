@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -19,7 +19,7 @@ namespace Interview.Migrations.Sqlite.Migrations
                 defaultValue: "");
 
             migrationBuilder.Sql(@"UPDATE Users SET ExternalId = TwitchIdentity");
-            
+
             migrationBuilder.DropColumn(
                 name: "TwitchIdentity",
                 table: "Users");
@@ -34,9 +34,9 @@ namespace Interview.Migrations.Sqlite.Migrations
                 type: "TEXT",
                 nullable: false,
                 defaultValue: "");
-            
+
             migrationBuilder.Sql(@"UPDATE Users SET TwitchIdentity = ExternalId");
-            
+
             migrationBuilder.DropColumn(
                 name: "ExternalId",
                 table: "Users");
