@@ -1,9 +1,7 @@
+using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Responses;
-using Interview.Backend.WebSocket.Configuration;
 using Interview.Domain.Users.Service;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
 
 namespace Interview.Backend.Auth;
 
@@ -58,10 +56,7 @@ public static class ServiceCollectionExt
 
                 if (authorizationService.CorrelationCookie is not null)
                 {
-                    options.CorrelationCookie = new CookieBuilder
-                    {
-                        Name = authorizationService.CorrelationCookie.Name,
-                    };
+                    options.CorrelationCookie = new CookieBuilder { Name = authorizationService.CorrelationCookie.Name, };
                 }
 
                 options.Events.OnTicketReceived += async context =>
