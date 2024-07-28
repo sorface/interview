@@ -7,6 +7,8 @@ import { ThemeSwitch } from '../../components/ThemeSwitch/ThemeSwitch';
 import { LangSwitch } from '../../components/LangSwitch/LangSwitch';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { Button } from '../../components/Button/Button';
 
 import './Session.css';
 
@@ -36,7 +38,7 @@ export const Session: FunctionComponent = () => {
           <LangSwitch />
         </Field>
         <Field>
-          <button className="danger" onClick={handleLogOut}>{localizationCaptions[LocalizationKey.LogOut]}</button>
+          <Button variant='danger' onClick={handleLogOut}>{localizationCaptions[LocalizationKey.LogOut]}</Button>
         </Field>
       </>
     );
@@ -44,7 +46,9 @@ export const Session: FunctionComponent = () => {
 
   return (
     <MainContentWrapper>
-      <Field><h2>{localizationCaptions[LocalizationKey.Settings]}</h2></Field>
+      <PageHeader
+        title={localizationCaptions[LocalizationKey.Settings]}
+      />
       {renderAuth()}
     </MainContentWrapper>
   );

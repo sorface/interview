@@ -50,15 +50,14 @@ public class ServiceConfigurator
 
     public void AddServices(IServiceCollection serviceCollection)
     {
-        var corsOptions = _configuration.GetSection(nameof(CorsOptions)).Get<CorsOptions>() ??
-                            throw new InvalidOperationException(nameof(SwaggerOption));
+        var corsOptions = _configuration.GetSection(nameof(CorsOptions)).Get<CorsOptions>();
 
         serviceCollection.AddCors(options =>
         {
             options.AddPolicy("All", policy =>
             {
                 policy
-                    .WithOrigins(corsOptions.AllowedOrigins.ToArray())
+                    .WithOrigins(corsOptions?.AllowedOrigins.ToArray() ?? Array.Empty<string>())
                     .SetIsOriginAllowedToAllowWildcardSubdomains()
                     .AllowCredentials()
                     .AllowAnyMethod()
@@ -248,12 +247,13 @@ public class ServiceConfigurator
             options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
             options.CustomSchemaIds(type => (type.FullName ?? type.Name).Replace("+", "_"));
 
-            var swaggerOption = _configuration.GetSection(nameof(SwaggerOption)).Get<SwaggerOption>() ??
-                                throw new InvalidOperationException(nameof(SwaggerOption));
-            if (!string.IsNullOrEmpty(swaggerOption.RoutePrefix))
+            var swaggerOption = _configuration.GetSection(nameof(SwaggerOption)).Get<SwaggerOption>();
+            if (!string.IsNullOrEmpty(swaggerOption?.RoutePrefix))
             {
                 options.DocumentFilter<SwaggerDocumentFilter>(swaggerOption.RoutePrefix);
             }
+
+            options.OperationFilter<DefaultResponseCodesFilter>();
         });
     }
 }

@@ -2,6 +2,7 @@ import { FunctionComponent } from 'react';
 import { ThemedIcon } from '../ThemedIcon/ThemedIcon';
 import { IconNames } from '../../../../constants';
 import { Loader } from '../../../../components/Loader/Loader';
+import { Button } from '../../../../components/Button/Button';
 
 import './SwitchButton.css';
 
@@ -32,7 +33,8 @@ export const SwitchButton: FunctionComponent<SwitchButtonProps> = ({
 
   return (
     <div className="switch-button-container">
-      <button
+      <Button
+        variant='text'
         disabled={htmlDisabled}
         className={`switch-button ${(!enabled && disabledColor) ? 'switch-button-disabled' : ''}`}
         onClick={onClick}
@@ -49,7 +51,7 @@ export const SwitchButton: FunctionComponent<SwitchButtonProps> = ({
             </div>
           </div>
         )}
-      </button>
+      </Button>
       {!!subCaption && (
         <span className="switch-button-subcaption">{subCaption}</span>
       )}

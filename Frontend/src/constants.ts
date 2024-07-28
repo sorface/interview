@@ -2,7 +2,8 @@ export const inviteParamName = 'invite';
 
 export const pathnames = {
   home: '/:redirect?',
-  rooms: '/rooms',
+  currentRooms: '/rooms/current',
+  closedRooms: '/rooms/closed',
   roomsParticipants: '/rooms/participants/:id',
   room: `/room/:id/:${inviteParamName}?`,
   roomAnalyticsSummary: '/rooms/:id/analytics/summary',
@@ -42,6 +43,15 @@ export const enum IconNames {
   Link = 'link',
   ChevronDown = 'chevron-down',
   Options = 'options',
+  EllipsisVertical = 'ellipsis-vertical',
+  Cube = 'cube',
+  Golf = 'golf',
+  Exit = 'exit',
+  Call = 'call',
+  ReorderFour = 'reorder-four',
+  Stop = 'stop',
+  PersonAdd = 'person-add',
+  Time = 'time',
 }
 
 export const enum IconThemePostfix {

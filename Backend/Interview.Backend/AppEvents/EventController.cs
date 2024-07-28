@@ -1,4 +1,3 @@
-using Interview.Backend.Common;
 using Interview.Backend.Responses;
 using Interview.Domain;
 using Interview.Domain.Events.Service;
@@ -26,9 +25,6 @@ public class EventController : ControllerBase
     [HttpGet]
     [Produces("application/json")]
     [ProducesResponseType(typeof(IPagedList<QuestionItem>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
     public Task<IPagedList<AppEventItem>> GetPage([FromQuery] PageRequest request, [FromServices] IAppEventService service)
     {
         return service.FindPageAsync(request.PageNumber, request.PageSize, HttpContext.RequestAborted);
@@ -81,7 +77,6 @@ public class EventController : ControllerBase
     [Authorize]
     [HttpPost("")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
     public async Task<CreatedResult> Create([FromBody] AppEventCreateRequest request, [FromServices] IAppEventService service)
     {
         var result = await service.CreateAsync(request, HttpContext.RequestAborted);
@@ -98,7 +93,6 @@ public class EventController : ControllerBase
     [Authorize]
     [HttpPatch("{id:guid}")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
     public Task<AppEventItem> PatchUpdate(Guid id, [FromBody] AppEventUpdateRequest request, [FromServices] IAppEventService service)
     {
         return service.UpdateAsync(id, request, HttpContext.RequestAborted);

@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Interview.Domain.Events;
 using Interview.Domain.Events.Events;
 using Interview.Domain.Events.Events.Serializers;
 

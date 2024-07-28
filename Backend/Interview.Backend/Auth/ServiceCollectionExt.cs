@@ -1,4 +1,3 @@
-using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Responses;
 using Interview.Backend.WebSocket.Configuration;
 using Interview.Domain.Users.Service;

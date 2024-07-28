@@ -1,9 +1,6 @@
-using CSharpFunctionalExtensions;
 using Interview.Domain.Events.Service.Create;
 using Interview.Domain.Events.Service.FindPage;
 using Interview.Domain.Events.Service.Update;
-using Interview.Domain.ServiceResults.Errors;
-using Interview.Domain.ServiceResults.Success;
 using X.PagedList;
 
 namespace Interview.Domain.Events.Service;

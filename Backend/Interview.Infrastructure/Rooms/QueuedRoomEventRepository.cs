@@ -1,4 +1,3 @@
-using Interview.Domain;
 using Interview.Domain.Database;
 using Interview.Domain.Rooms;
 using Microsoft.EntityFrameworkCore;

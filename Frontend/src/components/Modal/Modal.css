@@ -27,17 +27,20 @@
 
 .modal .modal-close {
   margin-left: auto;
-  background-color: var(--button-border-color);
+  background-color: var(--modal-close-button-background);
   width: 3.75rem;
+  min-width: unset;
   height: 3.75rem;
   border-radius: 0;
   border-top-right-radius: 2rem;
   border: 0;
   padding: 0;
+  color: var(--modal-close-button-text);
 }
 
 .modal .modal-close:hover {
-  background-color: var(--active);
+  color: var(--modal-close-button-text-hover);
+  background-color: var(--modal-close-button-background-hover);
 }
 
 .modal .modal-content {

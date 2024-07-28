@@ -1,14 +1,21 @@
 import { FunctionComponent, ReactNode, useEffect, useRef, useState } from 'react';
+import { Button, ButtonProps } from '../Button/Button';
 
-interface DropdownProps {
+export interface DropdownProps {
   toggleContent: ReactNode;
   toggleClassName?: string;
+  contentClassName?: string;
+  useButton?: boolean;
+  buttonVariant?: ButtonProps['variant'];
   children: ReactNode;
 }
 
 export const Dropdown: FunctionComponent<DropdownProps> = ({
   toggleContent,
   toggleClassName,
+  contentClassName,
+  useButton,
+  buttonVariant,
   children,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -36,11 +43,17 @@ export const Dropdown: FunctionComponent<DropdownProps> = ({
   });
 
   return (
-    <div ref={containerRef}>
-      <button aria-expanded={open} className={toggleClassName} onClick={handleToggle}>
-        {toggleContent}
-      </button>
-      {open && <div className='absolute overflow-auto max-h-20 z-50 translate-y-0.25 shadow'>{children}</div>}
+    <div ref={containerRef} className='relative'>
+      {useButton ? (
+        <Button aria-expanded={open} variant={buttonVariant} className={toggleClassName} onClick={handleToggle}>
+          {toggleContent}
+        </Button>
+      ) : (
+        <div aria-expanded={open} className={toggleClassName} onClick={handleToggle}>
+          {toggleContent}
+        </div>
+      )}
+      {open && <div className={`${contentClassName} absolute overflow-auto max-h-20 z-50 translate-y-0.25 shadow`}>{children}</div>}
     </div>
   );
 };

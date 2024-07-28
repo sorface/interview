@@ -8,10 +8,14 @@ import { CodeEditor } from '../CodeEditor/CodeEditor';
 import { Gap } from '../Gap/Gap';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
+import { ContextMenu, ContextMenuProps } from '../ContextMenu/ContextMenu';
+import { Button } from '../Button/Button';
 
 interface QuestionItemProps {
   question: Question;
   checked?: boolean;
+  primary?: boolean;
+  contextMenu?: ContextMenuProps;
   onCheck?: (newValue: boolean) => void;
   onRemove?: (question: Question) => void;
 }
@@ -19,6 +23,8 @@ interface QuestionItemProps {
 export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
   question,
   checked,
+  primary,
+  contextMenu,
   onCheck,
   onRemove,
 }) => {
@@ -45,6 +51,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
         </Typography>
       </div>
       <div className='ml-auto'>
+        {contextMenu && <ContextMenu {...contextMenu} buttonVariant='text' />}
         {hasCheckbox && <input type='checkbox' checked={checked} onChange={handleCheckboxChange} />}
         {onRemove && (
           <span onClick={handleRemove} className='cursor-pointer'>
@@ -59,7 +66,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
     <Accordion
       title={title}
       disabled={accordionDisabled}
-      className='bg-form rounded-0.75 py-1.25 px-1.5'
+      className={`${primary ? 'bg-wrap' : 'bg-form'} rounded-0.75 py-1.25 px-1.5`}
       classNameTitle='flex items-center'
     >
       {question.codeEditor && (
@@ -70,6 +77,8 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
             languages={[question.codeEditor.lang]}
             value={question.codeEditor.content}
             readOnly
+            scrollBeyondLastLine={false}
+            alwaysConsumeMouseWheel={false}
             className='h-32.25'
           />
         </>
@@ -85,15 +94,16 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
         </>
       )}
       {question.answers.map(answer => (
-        <button
+        <Button
           key={answer.id}
-          className={`${answer === selectedAnswer ? 'active' : ''} mr-0.25`}
+          variant={answer === selectedAnswer ? 'active' : undefined}
+          className='mr-0.25'
           onClick={() => setSelectedAnswer(answer)}
         >
           <Typography size='m'>
             {answer.title}
           </Typography>
-        </button>
+        </Button>
       ))}
       {!!selectedAnswer && (
         <CodeEditor
@@ -101,6 +111,8 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
           languages={[(selectedAnswer.codeEditor && question.codeEditor) ? question.codeEditor.lang : CodeEditorLang.Plaintext]}
           value={selectedAnswer.content}
           readOnly
+          scrollBeyondLastLine={false}
+          alwaysConsumeMouseWheel={false}
           className='h-32.25'
         />
       )}

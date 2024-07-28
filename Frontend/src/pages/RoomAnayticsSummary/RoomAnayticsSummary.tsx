@@ -116,7 +116,7 @@ export const RoomAnayticsSummary: FunctionComponent = () => {
       <HeaderWithLink
         title={localizationCaptions[LocalizationKey.RoomAnayticsSummary]}
         linkVisible={true}
-        path={pathnames.rooms}
+        path={pathnames.currentRooms}
         linkCaption="<"
         linkFloat="left"
       />

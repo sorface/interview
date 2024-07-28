@@ -8,6 +8,8 @@ import { LocalizationKey } from '../../localization';
 import { LocalizationCaption } from '../LocalizationCaption/LocalizationCaption';
 import { CategoriesList } from '../CategoriesList/CategoriesList';
 import { Category } from '../../types/category';
+import { Typography } from '../Typography/Typography';
+import { REACT_APP_BUILD_HASH } from '../../config';
 
 import './NavMenu.css';
 
@@ -39,7 +41,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
 
   const handleQuestionsClick: React.MouseEventHandler<HTMLAnchorElement> = (event) => {
     event.preventDefault();
-    setQuestionsClicked(true);
+    setQuestionsClicked(!questionsClicked);
   };
 
   const handleItemClick = () => {
@@ -58,6 +60,10 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
   };
 
   const handleCategoryClick = (category: Category) => {
+    if (category === selectedCategory) {
+      setSelectedCategory(null);
+      return;
+    }
     setSelectedCategory(category);
   };
 
@@ -68,9 +74,15 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
 
   const items: Array<MenuItem | null> = [
     {
-      path: pathnames.rooms,
-      caption: <LocalizationCaption captionKey={LocalizationKey.RoomsPageName} />,
-      icon: IconNames.People,
+      path: pathnames.currentRooms,
+      caption: <LocalizationCaption captionKey={LocalizationKey.CurrentRoomsPageName} />,
+      icon: IconNames.Cube,
+      onClick: handleItemClick,
+    },
+    {
+      path: pathnames.closedRooms,
+      caption: <LocalizationCaption captionKey={LocalizationKey.ClosedRoomsPageName} />,
+      icon: IconNames.Golf,
       onClick: handleItemClick,
     },
     {
@@ -87,12 +99,6 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
       icon: IconNames.Clipboard,
       onClick: handleItemClick,
     } : null,
-    {
-      path: pathnames.session,
-      caption: <LocalizationCaption captionKey={LocalizationKey.Settings} />,
-      icon: IconNames.Settings,
-      onClick: handleItemClick,
-    },
   ];
 
   const createMenuItem = (item: MenuItem) => {
@@ -128,7 +134,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
         <div className='nav-menu-page-overlay'></div>
       )}
       <div
-        className='nav-menu-container'
+        className='nav-menu-container relative'
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
@@ -158,6 +164,11 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
               {localizationCaptions[LocalizationKey.ThemeDark]}
               <ThemedIcon name={IconNames.ThemeSwitchDark} />
             </div>
+          </div>
+          <div className='nav-menu-build h-1.125 opacity-0.5'>
+            <Typography size='s' >
+              {localizationCaptions[LocalizationKey.BuildHash]}: {REACT_APP_BUILD_HASH}
+            </Typography>
           </div>
         </nav>
         {!!selectedCategory && (

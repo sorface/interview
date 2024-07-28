@@ -80,7 +80,21 @@ public class CategoryService : ICategoryService
             return ServiceError.NotFound($"Not found category by id '{id}'");
         }
 
-        category.Name = request.Name.Trim();
+        if (request.ParentId is not null)
+        {
+            if (request.ParentId == id)
+            {
+                return ServiceError.Error("It is impossible to make a parent of a category of its own.");
+            }
+
+            var children = await GetAllChildrenAsync(id, cancellationToken);
+            if (children.Contains(request.ParentId.Value))
+            {
+                return ServiceError.Error("A child category cannot be specified as a parent category.");
+            }
+        }
+
+        category.Name = request.Name;
         category.ParentId = request.ParentId;
         await _db.SaveChangesAsync(cancellationToken);
         var response = CategoryResponse.Mapper.Map(category);
@@ -99,17 +113,17 @@ public class CategoryService : ICategoryService
         return CategoryResponse.Mapper.Map(result);
     }
 
-    private Task<IPagedList<CategoryResponse>> FindPageCoreAsync(bool archive, CategoryPageRequest request, CancellationToken cancellationToken)
+    private async Task<IPagedList<CategoryResponse>> FindPageCoreAsync(bool archive, CategoryPageRequest request, CancellationToken cancellationToken)
     {
-        var filter = BuildSpecification(archive, request);
-        return _db.Categories
+        var filter = await BuildSpecificationAsync(archive, request, cancellationToken);
+        return await _db.Categories
             .AsNoTracking()
             .Where(filter)
             .OrderBy(e => e.Name)
             .Select(CategoryResponse.Mapper.Expression)
             .ToPagedListAsync(request.Page.PageNumber, request.Page.PageSize, cancellationToken);
 
-        static ASpec<Category> BuildSpecification(bool archive, CategoryPageRequest request)
+        async Task<ASpec<Category>> BuildSpecificationAsync(bool archive, CategoryPageRequest request, CancellationToken cancellationToken)
         {
             ASpec<Category> res = new Spec<Category>(e => e.IsArchived == archive);
             if (request.Filter is null)
@@ -132,8 +146,43 @@ public class CategoryService : ICategoryService
                 res &= new Spec<Category>(e => e.Name.Contains(name));
             }
 
+            if (request.Filter.EditingCategoryId is not null)
+            {
+                var children = await GetAllChildrenAsync(request.Filter.EditingCategoryId.Value, cancellationToken);
+                res &= new Spec<Category>(e => !children.Contains(e.Id));
+            }
+
             return res;
         }
+    }
+
+    private async Task<HashSet<Guid>> GetAllChildrenAsync(Guid categoryId, CancellationToken cancellationToken)
+    {
+        var childrenList = await _db.Categories
+            .AsNoTracking()
+            .Where(e => e.ParentId == categoryId)
+            .Select(e => e.Id)
+            .ToListAsync(cancellationToken);
+        var children = childrenList.ToHashSet();
+        var actualParent = children;
+        while (actualParent.Count > 0)
+        {
+            var childrenNLevel = await _db.Categories
+                .AsNoTracking()
+                .Where(e => e.ParentId != null && actualParent.Contains(e.ParentId.Value))
+                .Select(e => e.Id)
+                .ToListAsync(cancellationToken);
+            actualParent = new HashSet<Guid>();
+            foreach (var id in childrenNLevel)
+            {
+                if (children.Add(id))
+                {
+                    actualParent.Add(id);
+                }
+            }
+        }
+
+        return children;
     }
 
     private Task<ServiceError?> EnsureValidAsync(CategoryEditRequest request, CancellationToken cancellationToken)

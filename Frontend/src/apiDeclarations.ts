@@ -120,12 +120,6 @@ export interface ChangeActiveQuestionBody {
   questionId: Question['id'];
 }
 
-export interface CreateRoomQuestionBody {
-  roomId: Room['id'];
-  question: CreateQuestionBody;
-  order: number;
-}
-
 export interface GetRoomQuestionsBody {
   RoomId: Room['id'];
   States: RoomQuestionState[];
@@ -135,11 +129,6 @@ export const roomQuestionApiDeclaration = {
   changeActiveQuestion: (body: ChangeActiveQuestionBody): ApiContractPut => ({
     method: 'PUT',
     baseUrl: '/room-questions/active-question',
-    body,
-  }),
-  createQuestion: (body: CreateRoomQuestionBody): ApiContractPost => ({
-    method: 'POST',
-    baseUrl: '/room-questions',
     body,
   }),
   getRoomQuestions: (params: GetRoomQuestionsBody): ApiContractGet => ({

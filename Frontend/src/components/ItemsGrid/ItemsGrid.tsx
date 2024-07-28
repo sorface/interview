@@ -48,7 +48,7 @@ export const ItemsGrid = <T extends object>({
 
   return (
     <>
-      <ul className="items-grid">
+      <ul className="items-grid m-0">
         {noRecords ? (
           <Field>
             <div className="items-grid-no-data">{localizationCaptions[LocalizationKey.NoRecords]}</div>

@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using AspNet.Security.OAuth.Twitch;
-using CSharpFunctionalExtensions;
 using Interview.Domain;
 
 namespace Interview.Backend.Auth

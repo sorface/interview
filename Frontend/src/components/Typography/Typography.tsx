@@ -3,7 +3,7 @@ import { FunctionComponent, ReactNode } from 'react';
 import './Typography.css';
 
 export interface TypographyProps {
-  size: 'm' | 's';
+  size: 'xl' | 'l' | 'm' | 's';
   bold?: boolean;
   children: ReactNode;
 }

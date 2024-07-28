@@ -18,6 +18,7 @@ import { Category } from '../../types/category';
 import { Gap } from '../../components/Gap/Gap';
 import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
 import { CodeEditor } from '../../components/CodeEditor/CodeEditor';
+import { Button } from '../../components/Button/Button';
 
 import './QuestionCreate.css';
 
@@ -202,8 +203,8 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
       {
         id: `${Math.random()}`,
         codeEditor: false,
+        title: `${localizationCaptions[LocalizationKey.QuestionAnswerOptionDefaultName]} ${answers.length + 1}`,
         content: '',
-        title: '',
       },
     ]);
   };
@@ -301,17 +302,17 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
           <input id="qestionText" name={valueFieldName} type="text" value={questionValue} onChange={handleQuestionValueChange} />
           <Gap sizeRem={0.75} />
           <div className='question-code-editor-controls'>
-            <button style={{ ...(codeEditor && { display: 'none' }) }} onClick={handleAddCodeEditor}>
+            <Button style={{ ...(codeEditor && { display: 'none' }) }} onClick={handleAddCodeEditor}>
               <ThemedIcon name={IconNames.Add} />
               {localizationCaptions[LocalizationKey.QuestionAddCodeEditor]}
-            </button>
+            </Button>
             <div style={{ ...(!codeEditor && { display: 'none' }) }}>
               {localizationCaptions[LocalizationKey.QuestionCodeEditor]}
             </div>
-            <button style={{ ...(!codeEditor && { display: 'none' }) }} onClick={handleRemoveCodeEditor}>
+            <Button style={{ ...(!codeEditor && { display: 'none' }) }} onClick={handleRemoveCodeEditor}>
               <ThemedIcon name={IconNames.Trash} />
               {localizationCaptions[LocalizationKey.QuestionRemoveCodeEditor]}
-            </button>
+            </Button>
           </div>
           {codeEditor && (
             <CodeEditor
@@ -335,10 +336,10 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
                   value={answer.title}
                   onChange={handleAnswerTitleChange(answer.id)}
                 />
-                <button onClick={handleAnswerDelete(answer.id)}>
+                <Button onClick={handleAnswerDelete(answer.id)}>
                   <ThemedIcon name={IconNames.Trash} />
                   {localizationCaptions[LocalizationKey.QuestionDeleteAnswerOption]}
-                </button>
+                </Button>
               </div>
               <CodeEditor
                 value={answer.content}
@@ -350,10 +351,10 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
             </div>
           ))}
           <Gap sizeRem={0.75} />
-          <button onClick={handleAddQuestionAnswer}>
+          <Button onClick={handleAddQuestionAnswer}>
             <ThemedIcon name={IconNames.Add} />
             {localizationCaptions[LocalizationKey.QuestionAddAnswerOption]}
-          </button>
+          </Button>
         </Field>
         {admin && (
           <Field>

@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react';
 import { Routes, Route, useLocation, matchPath } from 'react-router-dom';
 import { inviteParamName, pathnames } from '../constants';
 import { Home } from '../pages/Home/Home';
-import { Rooms } from '../pages/Rooms/Rooms';
+import { Rooms, RoomsPageMode } from '../pages/Rooms/Rooms';
 import { Questions } from '../pages/Questions/Questions';
 import { QuestionCreate } from '../pages/QuestionCreate/QuestionCreate';
 import { NotFound } from '../pages/NotFound/NotFound';
@@ -14,22 +14,14 @@ import { User } from '../types/user';
 import { Terms } from '../pages/Terms/Terms';
 import { RoomAnayticsSummary } from '../pages/RoomAnayticsSummary/RoomAnayticsSummary';
 import { NavMenu } from '../components/NavMenu/NavMenu';
-import { REACT_APP_BUILD_HASH } from '../config';
-import { LocalizationCaption } from '../components/LocalizationCaption/LocalizationCaption';
-import { LocalizationKey } from '../localization';
 import { Categories } from '../pages/Categories/Categories';
 import { checkAdmin } from '../utils/checkAdmin';
 import { CategoriesCreate } from '../pages/CategoriesCreate/CategoriesCreate';
+import { Gap } from '../components/Gap/Gap';
 
 interface AppRoutesProps {
   user: User | null;
 }
-
-const renderFooter = () => (
-  <footer>
-    <div><LocalizationCaption captionKey={LocalizationKey.BuildHash} />: {REACT_APP_BUILD_HASH}</div>
-  </footer>
-);
 
 export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
   user,
@@ -73,10 +65,17 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
                 </ProtectedRoute>
               }
             />
-            <Route path={pathnames.rooms}
+            <Route path={pathnames.currentRooms}
               element={
                 <ProtectedRoute allowed={authenticated}>
-                  <Rooms />
+                  <Rooms mode={RoomsPageMode.Current} />
+                </ProtectedRoute>
+              }
+            />
+            <Route path={pathnames.closedRooms}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <Rooms mode={RoomsPageMode.Closed} />
                 </ProtectedRoute>
               }
             />
@@ -131,8 +130,10 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
             />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          {!fullScreenPage && (
+            <Gap sizeRem={1.25} />
+          )}
         </div>
-        {!fullScreenPage && renderFooter()}
       </div>
     </>
   );

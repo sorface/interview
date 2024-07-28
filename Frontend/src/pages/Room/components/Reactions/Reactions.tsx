@@ -15,12 +15,10 @@ import { Room } from '../../../../types/room';
 import { Event } from '../../../../types/event';
 import { UserType } from '../../../../types/user';
 import { Loader } from '../../../../components/Loader/Loader';
-import { useReactionsFeed } from '../../hooks/useReactionsFeed';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { EventsState } from '../../hooks/useEventsState';
-
-import './Reactions.css';
+import { Gap } from '../../../../components/Gap/Gap';
 
 const reactionsPageSize = 30;
 const reactionsPageNumber = 1;
@@ -39,7 +37,6 @@ export interface ReactionsProps {
   eventsState: EventsState;
   roles: string[];
   participantType: UserType | null;
-  lastWsMessage: MessageEvent<any> | null;
 }
 
 export const Reactions: FunctionComponent<ReactionsProps> = ({
@@ -47,7 +44,6 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
   eventsState,
   roles,
   participantType,
-  lastWsMessage,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
   const {
@@ -84,9 +80,6 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
     process: { loading: loadingSendRoomEvent, error: errorSendRoomEvent },
   } = apiSendEventState;
 
-  const { reactionsFeed } = useReactionsFeed({
-    lastMessage: lastWsMessage,
-  });
   const [lastSendedReactionType, setLastSendedReactionType] = useState('');
 
   const reactionsSafe = reactions || [];
@@ -151,25 +144,25 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
   }
 
   return (
-    <div className='reactions'>
+    <>
       <ReactionsList
         sortOrder={-1}
         reactions={reactionsSafe}
         loadingReactionName={loadingRoomReaction ? lastSendedReactionType : null}
-        reactionsFeed={reactionsFeed}
+        firstRounded
         onClick={handleReactionClick}
       />
+      <Gap sizeRem={0.125} />
       <ReactionsList
         sortOrder={1}
         reactions={eventsReationsFiltered}
         loadingReactionName={loadingSendRoomEvent ? lastSendedReactionType : null}
-        reactionsFeed={reactionsFeed}
         onClick={handleEventClick}
       />
       {errorRoomReaction && <div>{localizationCaptions[LocalizationKey.ErrorSendingReaction]}</div>}
       {loadingRoomEvent && <div>{localizationCaptions[LocalizationKey.GetRoomEvent]}...</div>}
       {errorRoomEvent && <div>{localizationCaptions[LocalizationKey.ErrorGetRoomEvent]}</div>}
       {errorSendRoomEvent && <div>{localizationCaptions[LocalizationKey.ErrorSendingRoomEvent]}</div>}
-    </div>
+    </>
   );
 };

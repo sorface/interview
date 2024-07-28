@@ -1,10 +1,7 @@
 using Interview.Backend.Auth;
 using Interview.Backend.Errors;
-using Interview.Backend.Responses;
 using Interview.Backend.WebSocket.Configuration;
-using Interview.Domain.Users.Permissions;
 using Microsoft.AspNetCore.CookiePolicy;
-using Microsoft.Extensions.Options;
 
 namespace Interview.Backend;
 

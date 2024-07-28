@@ -1,4 +1,3 @@
-using System.Net.WebSockets;
 using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Domain.Rooms.RoomParticipants;
 

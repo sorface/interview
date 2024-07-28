@@ -1,12 +1,3 @@
-.active-question-container {
-  display: flex;
-  flex: 1;
-}
-
-.active-question-container .active-question-name {
-  font-size: 1.15rem;
-}
-
 .active-question-container .activeQuestionSelector-container {
   flex: 1;
 }

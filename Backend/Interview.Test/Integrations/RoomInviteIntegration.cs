@@ -16,6 +16,7 @@ using Interview.Infrastructure.Rooms;
 using Interview.Infrastructure.Tags;
 using Interview.Infrastructure.Users;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Interview.Test.Integrations
 {
@@ -64,10 +65,11 @@ namespace Interview.Test.Integrations
                 new AppEventRepository(appDbContext),
                 new RoomStateRepository(appDbContext),
                 new EmptyEventStorage(),
-                new RoomInviteService(appDbContext, roomParticipantService),
+                new RoomInviteService(appDbContext, roomParticipantService, NullLogger<RoomInviteService>.Instance),
                 userAccessor,
                 roomParticipantService,
-                appDbContext
+                appDbContext,
+                NullLogger<RoomService>.Instance
             );
 
             await roomService.ApplyInvite(room.Id, invite.Id);
@@ -140,10 +142,11 @@ namespace Interview.Test.Integrations
                 new AppEventRepository(appDbContext),
                 new RoomStateRepository(appDbContext),
                 new EmptyEventStorage(),
-                new RoomInviteService(appDbContext, roomParticipantService),
+                new RoomInviteService(appDbContext, roomParticipantService, NullLogger<RoomInviteService>.Instance),
                 userAccessor,
                 roomParticipantService,
-                appDbContext
+                appDbContext,
+                NullLogger<RoomService>.Instance
             );
 
             await roomService.ApplyInvite(room.Id, invite.Id);
@@ -161,7 +164,7 @@ namespace Interview.Test.Integrations
             Assert.NotNull(roomParticipant);
 
             roomParticipant.User.Id.Should().Be(participant.User.Id);
-            roomParticipant.Type.EnumValue.Should().Be(EVRoomParticipantType.Examinee);
+            roomParticipant.Type.EnumValue.Should().Be(roomInvite.ParticipantType.EnumValue);
             roomParticipant.Room.Id.Should().Be(room.Id);
         }
 
@@ -205,10 +208,11 @@ namespace Interview.Test.Integrations
                 new AppEventRepository(appDbContext),
                 new RoomStateRepository(appDbContext),
                 new EmptyEventStorage(),
-                new RoomInviteService(appDbContext, roomParticipantService),
+                new RoomInviteService(appDbContext, roomParticipantService, NullLogger<RoomInviteService>.Instance),
                 userAccessor,
                 roomParticipantService,
-                appDbContext
+                appDbContext,
+                new NullLogger<RoomService>()
             );
 
             await roomService.ApplyInvite(room.Id, invite.Id);

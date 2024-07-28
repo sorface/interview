@@ -1,9 +1,7 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using Interview.Domain.Categories;
 using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Repository;
-using Interview.Domain.Rooms;
 using Interview.Domain.Tags;
 
 namespace Interview.Domain.Questions;
@@ -30,9 +28,9 @@ public class Question : ArchiveEntity
 
     public List<QuestionAnswer> Answers { get; internal set; } = new();
 
-    public SEQuestionType Type { get; internal set; }
+    public SEQuestionType Type { get; internal set; } = default!;
 
-    public Guid? CategoryId { get; internal set; }
+    public Guid? CategoryId { get; set; }
 
     public Category? Category { get; set; }
 }

@@ -28,25 +28,9 @@
   display: inline-block;
 }
 
-.room-page .room-page-header-viewers {
-  display: inline-flex;
-  align-items: center;
-  padding-left: 0.5rem;
-  font-size: 1rem;
-  color: var(--active);
-}
-
-.room-page .room-page-header-viewers ion-icon {
-  font-size: 1.25rem;
-}
-
 .room-page .room-page-header-caption-viewer {
   width: 100%;
   flex-direction: column;
-}
-
-.room-page .room-page-header .reactions-field {
-  margin: 0rem 1rem;
 }
 
 .room-page .room-page-main {
@@ -60,44 +44,6 @@
 .room-page .room-page-main-content {
   flex: 1;
   min-height: 0;
-}
-
-.room-page .room-tools-container {
-  display: flex;
-  justify-content: center;
-  padding-bottom: 0.5rem;
-}
-
-.room-page .room-tools {
-  display: flex;
-}
-
-.room-page .room-tools .switch-button-container {
-  margin-right: 0.75rem;
-}
-
-.room-page .room-tools-left {
-  align-self: flex-start;
-}
-
-.room-page .room-tools-right {
-  height: 100%;
-  align-items: center;
-}
-
-.room-page .room-tools-right a {
-  display: flex;
-  align-items: center;
-  height: 100%;
-  text-decoration: none;
-}
-
-.room-page .room-tools-right button {
-  height: calc(100% - 1rem);
-}
-
-.room-page .room-tools-center {
-  margin: auto;
 }
 
 .room-page .room-title {
@@ -124,42 +70,13 @@
   margin-left: 8rem;
 }
 
-.room-page .reactions-field {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 0.25rem;
-  flex: 1;
-}
-
 .room-page .actions-field {
   display: inline-flex;
   width: calc(var(--chat-width) + 1.5rem);
   align-items: center;
 }
 
-.room-page .actions-field-viewer {
-  width: unset;
-  margin-left: auto;
-  padding-left: 0rem;
-}
-
-.room-page .start-room-review {
-  flex: 1;
-}
-
-.room-page .start-room-review button {
-  width: 100%;
-}
-
-.room-page .reactions-field .reaction-wrapper {
-  display: inline-block;
-  margin-left: 0.75rem;
-}
-
 .room-page .room-columns {
   display: flex;
   height: 100%;
 }
-

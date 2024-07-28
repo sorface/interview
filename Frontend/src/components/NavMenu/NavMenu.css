@@ -21,11 +21,20 @@
   width: var(--width-expanded);
   font-size: var(--menu-font-size);
   background-color: var(--wrap-bg);
+  color: var(--nav-item-color);
   border-radius: 1.125rem;
   height: var(--height);
   overflow-x: hidden;
   align-items: stretch;
   z-index: 2;
+}
+
+.nav-menu h1 {
+  color: var(--nav-header-color);
+}
+
+.nav-menu a {
+  color: var(--nav-item-color);
 }
 
 .nav-menu .nav-menu-item {
@@ -103,10 +112,12 @@
 }
 
 .nav-menu .active {
-  background-color: var(--active-nav-tab);
+  background-color: var(--nav-item-active-background);
+  color: var(--nav-item-active-color);
 }
 
 .nav-menu .active.no-active {
+  color: unset;
   background-color: unset;
 }
 
@@ -132,9 +143,12 @@
   padding-top: 1rem;
 }
 
+.nav-menu .nav-menu-build {
+  width: var(--width-expanded);
+}
+
 .nav-menu-overlay {
   position: absolute;
-  top: var(--margin);
   width: 16.375rem;
   height: var(--height);
   text-align: left;
@@ -148,7 +162,7 @@
 
 @keyframes slide {
   0% { left: 0rem; }
-  100% { left: calc(var(--width-expanded) + var(--menu-padding) * 2 + var(--margin) + 0.125rem); }
+  100% { left: calc(var(--width-expanded) + var(--menu-padding) * 2 + 0.125rem); }
 }
 
 .nav-menu-overlay-gap {
@@ -156,7 +170,7 @@
   top: var(--margin);
   height: var(--height);
   width: 0.125rem;
-  left: calc(var(--width-expanded) + var(--menu-padding) * 2 + var(--margin));
+  left: calc(var(--width-expanded) + var(--menu-padding) * 2);
   opacity: 0;
   z-index: 1;
 }
@@ -170,6 +184,10 @@
 
 .nav-menu-overlay .categories-list {
   padding: 1rem 2rem;
+}
+
+.nav-menu-overlay .categories-list-item {
+  color: var(--nav-item-color);
 }
 
 .nav-menu-page-overlay {

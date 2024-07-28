@@ -1,8 +1,6 @@
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using Interview.Domain.Events.Storage;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using NSpecifications;
 using Redis.OM;
 using Redis.OM.Modeling;

@@ -26,9 +26,6 @@ public class RoomInviteController : ControllerBase
     [Authorize]
     [HttpGet("{roomId:guid}")]
     [ProducesResponseType(typeof(RoomInviteResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
     public Task<List<RoomInviteResponse>> GetRoomInvites(Guid roomId)
     {
         return _roomService.GetInvitesAsync(roomId, HttpContext.RequestAborted);

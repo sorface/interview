@@ -1,5 +1,4 @@
 using CSharpFunctionalExtensions;
-using Interview.Domain.ServiceResults;
 using Interview.Domain.ServiceResults.Errors;
 using Interview.Domain.ServiceResults.Success;
 using Microsoft.AspNetCore.Mvc;

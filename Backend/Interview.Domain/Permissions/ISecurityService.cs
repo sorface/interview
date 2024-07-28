@@ -1,5 +1,4 @@
 using Interview.Domain.Rooms.RoomParticipants;
-using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Users;
 using Interview.Domain.Users.Roles;
 

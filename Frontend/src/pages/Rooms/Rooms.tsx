@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useCallback, useContext, useEffect, useState, MouseEvent } from 'react';
 import { Link, generatePath } from 'react-router-dom';
 import { GetRoomPageParams, roomsApiDeclaration } from '../../apiDeclarations';
-import { Field } from '../../components/FieldsBlock/Field';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { IconNames, pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
@@ -9,13 +8,16 @@ import { useApiMethod } from '../../hooks/useApiMethod';
 import { Room, RoomStatus } from '../../types/room';
 import { checkAdmin } from '../../utils/checkAdmin';
 import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
-import { RoomsFilter } from '../../components/RoomsFilter/RoomsFilter';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
 import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
 import { UserAvatar } from '../../components/UserAvatar/UserAvatar';
 import { RoomCreate } from '../RoomCreate/RoomCreate';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { Button } from '../../components/Button/Button';
+import { Gap } from '../../components/Gap/Gap';
+import { Tag, TagState } from '../../components/Tag/Tag';
 
 import './Rooms.css';
 
@@ -23,7 +25,18 @@ const pageSize = 30;
 const initialPageNumber = 1;
 const searchDebounceMs = 300;
 
-export const Rooms: FunctionComponent = () => {
+export enum RoomsPageMode {
+  Current,
+  Closed,
+}
+
+interface RoomsProps {
+  mode: RoomsPageMode;
+}
+
+export const Rooms: FunctionComponent<RoomsProps> = ({
+  mode,
+}) => {
   const auth = useContext(AuthContext);
   const admin = checkAdmin(auth);
   const localizationCaptions = useLocalizationCaptions();
@@ -32,23 +45,24 @@ export const Rooms: FunctionComponent = () => {
   const { process: { loading, error }, data: rooms } = apiMethodState;
   const [searchValueInput, setSearchValueInput] = useState('');
   const [searchValue, setSearchValue] = useState('');
-  const [participating, setParticipating] = useState(false);
-  const [closed, setClosed] = useState(false);
+  const closed = mode === RoomsPageMode.Closed;
   const [createEditModalOpened, setCreateEditModalOpened] = useState(false);
   const [editingRoomId, setEditingRoomId] = useState<Room['id'] | null>(null);
   const [roomsUpdateTrigger, setRoomsUpdateTrigger] = useState(0);
+  const pageTitle = mode === RoomsPageMode.Current ?
+    localizationCaptions[LocalizationKey.CurrentRoomsPageName] :
+    localizationCaptions[LocalizationKey.ClosedRoomsPageName];
 
   const updateRooms = useCallback(() => {
-    const participants = (auth?.id && participating) ? [auth?.id] : [];
     const statuses: RoomStatus[] = closed ? ['Close'] : ['New', 'Active', 'Review'];
     fetchData({
       PageSize: pageSize,
       PageNumber: pageNumber,
       Name: searchValue,
-      Participants: participants,
+      Participants: [auth?.id || ''],
       Statuses: statuses,
     });
-  }, [pageNumber, searchValue, auth?.id, participating, closed, fetchData]);
+  }, [pageNumber, searchValue, auth?.id, closed, fetchData]);
 
   useEffect(() => {
     updateRooms();
@@ -92,6 +106,12 @@ export const Rooms: FunctionComponent = () => {
       Review: localizationCaptions[LocalizationKey.RoomStatusReview],
       Close: localizationCaptions[LocalizationKey.RoomStatusClose],
     };
+    const tagStates: Record<Room['roomStatus'], TagState> = {
+      New: TagState.Waiting,
+      Active: TagState.Pending,
+      Review: TagState.WaitingForAction,
+      Close: TagState.Closed,
+    };
 
     const roomSummary =
       room.roomStatus === 'Review' ||
@@ -106,9 +126,10 @@ export const Rooms: FunctionComponent = () => {
           <Link to={roomLink} >
             <div className='room-item'>
               <div className='room-status-wrapper'>
-                <div className='room-status'>
+                <Tag state={tagStates[room.roomStatus]}>
                   {roomStatusCaption[room.roomStatus]}
-                </div>
+                </Tag>
+                <Gap sizeRem={1.5} />
                 <div className='room-action-links'>
                   {admin && (
                     <>
@@ -145,47 +166,39 @@ export const Rooms: FunctionComponent = () => {
   };
 
   return (
-    <MainContentWrapper className='rooms-page'>
-      {createEditModalOpened && (
-        <RoomCreate
-          editRoomId={editingRoomId || null}
-          open={createEditModalOpened}
-          onClose={handleCloseCreateEditModal} />
-      )}
-      <Field>
-        <div className='room-actions items-center'>
-          <RoomsFilter
-            participating={participating}
-            closed={closed}
-            searchValue={searchValueInput}
-            onSearchChange={setSearchValueInput}
-            onParticipatingChange={setParticipating}
-            onClosedChange={setClosed}
-          />
-          {/* <RoomsSearch
-          searchValue={searchValueInput}
-          onSearchChange={setSearchValueInput}
-        /> */}
-          <button className='active' onClick={handleOpenCreateModal}>
-            <ThemedIcon name={IconNames.Add} />
-            {localizationCaptions[LocalizationKey.CreateRoom]}
-          </button>
-        </div>
-      </Field>
-      <ProcessWrapper
-        loading={false}
-        error={error}
+    <>
+      <PageHeader
+        title={pageTitle}
+        searchValue={searchValueInput}
+        onSearchChange={setSearchValueInput}
       >
-        <ItemsGrid
-          currentData={rooms}
-          loading={loading}
-          triggerResetAccumData={`${roomsUpdateTrigger}${searchValue}${participating}${closed}`}
-          loaderClassName='room-item-wrapper room-item-loader'
-          renderItem={createRoomItem}
-          nextPageAvailable={rooms?.length === pageSize}
-          handleNextPage={handleNextPage}
-        />
-      </ProcessWrapper>
-    </MainContentWrapper>
+        <Button variant='active' className='h-2.5' onClick={handleOpenCreateModal}>
+          <ThemedIcon name={IconNames.Add} />
+          {localizationCaptions[LocalizationKey.CreateRoom]}
+        </Button>
+      </PageHeader>
+      <MainContentWrapper className='rooms-page'>
+        {createEditModalOpened && (
+          <RoomCreate
+            editRoomId={editingRoomId || null}
+            open={createEditModalOpened}
+            onClose={handleCloseCreateEditModal} />
+        )}
+        <ProcessWrapper
+          loading={false}
+          error={error}
+        >
+          <ItemsGrid
+            currentData={rooms}
+            loading={loading}
+            triggerResetAccumData={`${roomsUpdateTrigger}${searchValue}${mode}${closed}`}
+            loaderClassName='room-item-wrapper room-item-loader'
+            renderItem={createRoomItem}
+            nextPageAvailable={rooms?.length === pageSize}
+            handleNextPage={handleNextPage}
+          />
+        </ProcessWrapper>
+      </MainContentWrapper>
+    </>
   );
 };

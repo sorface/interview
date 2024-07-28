@@ -10,25 +10,27 @@ namespace Interview.Migrations.Postgres.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<bool>(
+            migrationBuilder.DropColumn(
+                name: "CodeEditor",
+                table: "QuestionAnswers");
+            migrationBuilder.AddColumn<bool>(
                 name: "CodeEditor",
                 table: "QuestionAnswers",
                 type: "boolean",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
+                nullable: false);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
+            migrationBuilder.DropColumn(
+                name: "CodeEditor",
+                table: "QuestionAnswers");
+            migrationBuilder.AddColumn<bool>(
                 name: "CodeEditor",
                 table: "QuestionAnswers",
                 type: "text",
-                nullable: false,
-                oldClrType: typeof(bool),
-                oldType: "boolean");
+                nullable: false);
         }
     }
 }

@@ -17,9 +17,9 @@ namespace Interview.Migrations.Postgres.Migrations
                 nullable: false,
                 defaultValue: 1,
                 comment: "Available values: [Private: 2, Public: 1]");
-            migrationBuilder.Sql(@"UPDATE Questions SET
-    Type = 2
-WHERE RoomId IS NOT NULL");
+            migrationBuilder.Sql(@"UPDATE ""Questions"" SET
+    ""Type"" = 2
+WHERE ""RoomId"" IS NOT NULL");
         }
 
         /// <inheritdoc />

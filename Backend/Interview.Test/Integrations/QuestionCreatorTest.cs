@@ -12,7 +12,6 @@ using Interview.Domain.RoomParticipants;
 using Interview.Domain.Rooms;
 using Interview.Domain.Users;
 using Interview.Infrastructure.Questions;
-using Interview.Infrastructure.RoomQuestions;
 using Interview.Infrastructure.Tags;
 using Moq;
 

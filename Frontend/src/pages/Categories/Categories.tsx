@@ -2,18 +2,18 @@ import React, { ChangeEventHandler, FunctionComponent, useCallback, useEffect, u
 import { Link } from 'react-router-dom';
 import { GetCategoriesParams, categoriesApiDeclaration } from '../../apiDeclarations';
 import { Field } from '../../components/FieldsBlock/Field';
-import { HeaderWithLink } from '../../components/HeaderWithLink/HeaderWithLink';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { IconNames, pathnames } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
-import { QustionsSearch } from '../../components/QustionsSearch/QustionsSearch';
 import { ActionModal } from '../../components/ActionModal/ActionModal';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
 import { Category } from '../../types/category';
 import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { Button } from '../../components/Button/Button';
 
 import './Categories.css';
 
@@ -23,7 +23,7 @@ const initialPageNumber = 1;
 export const Categories: FunctionComponent = () => {
   const localizationCaptions = useLocalizationCaptions();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValueInput, setSearchValueInput] = useState('');
   const [showOnlyWithoutParent, setShowOnlyWithoutParent] = useState(false);
   const [categoryParent, setCategoryParent] = useState('');
 
@@ -40,11 +40,11 @@ export const Categories: FunctionComponent = () => {
     fetchCategories({
       PageNumber: pageNumber,
       PageSize: pageSize,
-      name: searchValue,
+      name: searchValueInput,
       showOnlyWithoutParent,
       ...(categoryParent && { parentId: categoryParent }),
     });
-  }, [pageNumber, searchValue, archivedCategory, showOnlyWithoutParent, categoryParent, fetchCategories]);
+  }, [pageNumber, searchValueInput, archivedCategory, showOnlyWithoutParent, categoryParent, fetchCategories]);
 
   useEffect(() => {
     fetchRootCategories({
@@ -74,9 +74,9 @@ export const Categories: FunctionComponent = () => {
         {!category.parentId && <ThemedIcon name={IconNames.Clipboard} />}
         <div className="category-controls">
           <Link to={pathnames.categoriesEdit.replace(':id', category.id)}>
-            <button>
+            <Button>
               🖊️
-            </button>
+            </Button>
           </Link>
           <ActionModal
             openButtonCaption='📁'
@@ -93,25 +93,27 @@ export const Categories: FunctionComponent = () => {
 
   return (
     <MainContentWrapper className="categories-page">
-      <HeaderWithLink
-        linkVisible={true}
-        path={pathnames.categoriesCreate}
-        linkCaption="+"
-        linkFloat="right"
+      <PageHeader
+        title={localizationCaptions[LocalizationKey.CategoriesPageName]}
+        searchValue={searchValueInput}
+        onSearchChange={setSearchValueInput}
       >
-        <div>
-          <QustionsSearch
-            onSearchChange={setSearchValue}
-          />
-        </div>
-        <div className="categories-additional-filters">
+        <Link to={pathnames.categoriesCreate}>
+          <Button variant='active' className='h-2.5'>
+            <ThemedIcon name={IconNames.Add} />
+            {localizationCaptions[LocalizationKey.CreateCategory]}
+          </Button>
+        </Link>
+      </PageHeader>
+      <Field className='!mt-0'>
+        <div className="flex">
           <input
             id="showOnlyWithoutParent"
             type="checkbox"
             checked={showOnlyWithoutParent}
             onChange={handleOnlyWithoutParentChange}
           />
-          <label htmlFor="showOnlyWithoutParent">{localizationCaptions[LocalizationKey.RootCategories]}</label>
+          <label htmlFor="showOnlyWithoutParent" className='mr-1'>{localizationCaptions[LocalizationKey.RootCategories]}</label>
           <label htmlFor="parentID">{localizationCaptions[LocalizationKey.Category]}:</label>
           <select id="parentID" value={categoryParent} onChange={handleCategoryParentChange}>
             <option value=''>{localizationCaptions[LocalizationKey.NotSelected]}</option>
@@ -120,7 +122,7 @@ export const Categories: FunctionComponent = () => {
             ))}
           </select>
         </div>
-      </HeaderWithLink>
+      </Field>
       <ProcessWrapper
         loading={false}
         error={error || archiveError || rootCategoriesError}
@@ -128,7 +130,7 @@ export const Categories: FunctionComponent = () => {
         <ItemsGrid
           currentData={categories}
           loading={loading || rootCategoriesLoading}
-          triggerResetAccumData={`${searchValue}${showOnlyWithoutParent}${archivedCategory}${categoryParent}`}
+          triggerResetAccumData={`${searchValueInput}${showOnlyWithoutParent}${archivedCategory}${categoryParent}`}
           loaderClassName='category-item field-wrap'
           renderItem={createCategoryItem}
           nextPageAvailable={categories?.length === pageSize}

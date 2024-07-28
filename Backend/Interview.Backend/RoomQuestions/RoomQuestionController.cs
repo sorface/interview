@@ -1,5 +1,3 @@
-using Interview.Backend.Auth;
-using Interview.Backend.Responses;
 using Interview.Domain.Rooms.RoomQuestions.Records;
 using Interview.Domain.Rooms.RoomQuestions.Records.Response;
 using Interview.Domain.Rooms.RoomQuestions.Services;
@@ -28,10 +26,6 @@ public class RoomQuestionController : ControllerBase
     [HttpPut("active-question")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(RoomQuestionDetail), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
     public Task<RoomQuestionDetail> ChangeActiveQuestion(RoomQuestionChangeActiveRequest request)
     {
         return _roomQuestionService.ChangeActiveQuestionAsync(request, HttpContext.RequestAborted);
@@ -46,10 +40,6 @@ public class RoomQuestionController : ControllerBase
     [HttpGet]
     [Produces("application/json")]
     [ProducesResponseType(typeof(List<RoomQuestionResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status500InternalServerError)]
     public Task<List<RoomQuestionResponse>> FindRoomQuestions([FromQuery] RoomQuestionsRequest request)
     {
         return _roomQuestionService.FindQuestionsAsync(request);

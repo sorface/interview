@@ -3,6 +3,14 @@
   line-height: 150%;
 }
 
+.typography-xl {
+  font-size: 1.125rem;
+}
+
+.typography-l {
+  font-size: 1rem;
+}
+
 .typography-m {
   font-size: 0.875rem;
 }

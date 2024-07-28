@@ -5,7 +5,6 @@ using Interview.Domain.Rooms.Records.Response;
 using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.Records.Response.Page;
 using Interview.Domain.Rooms.RoomParticipants;
-using Interview.Domain.Rooms.RoomQuestionReactions;
 using Interview.Domain.Tags.Records.Response;
 using Microsoft.EntityFrameworkCore;
 using X.PagedList;
@@ -112,39 +111,17 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
             return null;
         }
 
-        var reactions = await GetRoomQuestionReactionAsync(request.RoomId, cancellationToken);
-
-        analytics.Reactions = GetReactions(reactions);
-
-        var questionReaction = reactions.ToLookup(e => e.RoomQuestion!.Question!.Id);
         foreach (var analyticsQuestion in analytics.Questions!)
         {
-            if (!questionReaction[analyticsQuestion.Id].Any())
-            {
-                continue;
-            }
-
-            analyticsQuestion.Users = await GetUsersAsync(questionReaction[analyticsQuestion.Id]);
+            analyticsQuestion.Users = await GetUsersByQuestionIdAsync(analyticsQuestion.Id, cancellationToken);
         }
 
         return analytics;
 
-        Task<List<RoomQuestionReaction>> GetRoomQuestionReactionAsync(Guid roomId, CancellationToken ct)
-        {
-            return Db.RoomQuestionReactions.AsNoTracking()
-                .Include(e => e.Sender)
-                .Include(e => e.Reaction)
-                .Include(e => e.RoomQuestion)
-                .ThenInclude(e => e!.Question)
-                .Where(e => e.RoomQuestion!.Room!.Id == roomId)
-                .ToListAsync(ct);
-        }
-
         Task<Analytics?> GetAnalyticsCoreAsync(Guid roomId, CancellationToken ct)
         {
             return Set.AsNoTracking()
-                .Include(e => e.Questions)
-                .ThenInclude(e => e.Question)
+                .Include(e => e.Questions).ThenInclude(e => e.Question)
                 .Include(e => e.Participants)
                 .Where(e => e.Id == roomId)
                 .Select(e => new Analytics
@@ -154,73 +131,34 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                         Id = q.Question!.Id,
                         Status = q.State!.Name,
                         Value = q.Question.Value,
+                        Users = null,
                     }).ToList(),
                 })
                 .FirstOrDefaultAsync(ct);
         }
 
-        List<Analytics.AnalyticsReactionSummary> GetReactions(List<RoomQuestionReaction> roomQuestionReactions)
+        Task<List<Analytics.AnalyticsUser>> GetUsersByQuestionIdAsync(Guid questionId, CancellationToken ct)
         {
-            return roomQuestionReactions
-                .Select(e => e.Reaction)
-                .GroupBy(e => (e!.Id, e.Type))
-                .Select(e => new Analytics.AnalyticsReactionSummary
-                {
-                    Id = e.Key.Id,
-                    Count = e.Count(),
-                    Type = e.Key.Type.Name,
-                })
-                .ToList();
-        }
-
-        async Task<List<Analytics.AnalyticsUser>> GetUsersAsync(IEnumerable<RoomQuestionReaction> roomReactions)
-        {
-            var users = reactions.Select(e => e.Sender!.Id).Distinct();
-
-            var participants = await Db.RoomParticipants.AsNoTracking()
+            return Db.RoomParticipants.AsNoTracking()
                 .Include(e => e.Room)
-                .Include(e => e.User)
-                .Where(e => e.Room.Id == request.RoomId && users.Contains(e.User.Id))
-                .ToDictionaryAsync(e => e.User.Id, cancellationToken);
-
-            return roomReactions
-                .GroupBy(e => e.Sender!.Id).Select(e =>
+                .Include(e => e.User).ThenInclude(e => e.RoomQuestionEvaluations.Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.RoomQuestion!.QuestionId == questionId))
+                .Where(e => e.Room.Id == request.RoomId)
+                .Select(e => new Analytics.AnalyticsUser
                 {
-                    var sender = e.First().Sender;
-                    participants.TryGetValue(sender!.Id, out var participant);
-                    return new Analytics.AnalyticsUser
-                    {
-                        Id = sender.Id,
-                        Avatar = string.Empty,
-                        Nickname = sender.Nickname,
-                        ParticipantType = participant?.Type.Name ?? string.Empty,
-                        Reactions = ToAnalyticsReaction(e),
-                        ReactionsSummary = ToAnalyticsReactionSummary(e),
-                    };
-                }).ToList();
-        }
-
-        static List<Analytics.AnalyticsReaction> ToAnalyticsReaction(IGrouping<Guid, RoomQuestionReaction> e)
-        {
-            return e.Select(roomQuestionReaction => new Analytics.AnalyticsReaction
-            {
-                Id = roomQuestionReaction.Reaction!.Id,
-                Type = roomQuestionReaction.Reaction.Type.Name,
-                CreatedAt = roomQuestionReaction.CreateDate,
-            }).ToList();
-        }
-
-        static List<Analytics.AnalyticsReactionSummary> ToAnalyticsReactionSummary(
-            IGrouping<Guid, RoomQuestionReaction> e)
-        {
-            return e.GroupBy(roomQuestionReaction =>
-                    (roomQuestionReaction.Reaction!.Id, roomQuestionReaction.Reaction.Type))
-                .Select(roomQuestionReactions => new Analytics.AnalyticsReactionSummary
-                {
-                    Id = roomQuestionReactions.Key.Id,
-                    Count = roomQuestionReactions.Count(),
-                    Type = roomQuestionReactions.Key.Type.Name,
-                }).ToList();
+                    Id = e.User.Id,
+                    Avatar = string.Empty,
+                    Nickname = e.User.Nickname,
+                    ParticipantType = e.Type.Name ?? string.Empty,
+                    Evaluation = e.User.RoomQuestionEvaluations
+                        .Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.RoomQuestion!.QuestionId == questionId)
+                        .Select(rqe => new Analytics.AnalyticsUserQuestionEvaluation
+                        {
+                            Review = rqe.Review,
+                            Mark = rqe.Mark,
+                        })
+                        .FirstOrDefault(),
+                })
+                .ToListAsync(ct);
         }
     }
 
@@ -250,8 +188,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
         CancellationToken cancellationToken = default)
     {
         IQueryable<Room> queryable = Set
-            .Include(e => e.Participants)
-            .ThenInclude(e => e.User)
+            .Include(e => e.Participants).ThenInclude(e => e.User)
             .Include(e => e.Questions)
             .Include(e => e.Configuration)
             .Include(e => e.Tags)
@@ -303,13 +240,13 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
             .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
 
-    public Task<RoomDetail?> GetByIdAsync(Guid roomId, CancellationToken cancellationToken = default)
+    public async Task<RoomDetail?> GetByIdAsync(Guid roomId, CancellationToken cancellationToken = default)
     {
-        return Set
+        var res = await Set
             .Include(e => e.Participants)
             .Include(e => e.Configuration)
             .Include(e => e.Timer)
-            .Select(e => new RoomDetail
+            .Select(e => new
             {
                 Id = e.Id,
                 Name = e.Name,
@@ -337,10 +274,27 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                 })
                     .ToList(),
                 Type = e.AccessType.EnumValue,
-                Timer = e.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)e.Timer.Duration.TotalSeconds, StartTime = e.Timer.ActualStartTime, },
+                Timer = e.Timer == null ? null : new { Duration = e.Timer.Duration, ActualStartTime = e.Timer.ActualStartTime, },
                 ScheduledStartTime = e.ScheduleStartTime,
             })
             .FirstOrDefaultAsync(room => room.Id == roomId, cancellationToken: cancellationToken);
+        if (res is null)
+        {
+            return null;
+        }
+
+        return new RoomDetail
+        {
+            Id = res.Id,
+            Name = res.Name,
+            Owner = res.Owner,
+            Participants = res.Participants,
+            Status = res.Status,
+            Invites = res.Invites,
+            Type = res.Type,
+            Timer = res.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)res.Timer.Duration.TotalSeconds, StartTime = res.Timer.ActualStartTime },
+            ScheduledStartTime = res.ScheduledStartTime,
+        };
     }
 
     protected override IQueryable<Room> ApplyIncludes(DbSet<Room> set)
