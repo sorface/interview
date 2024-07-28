@@ -18,7 +18,7 @@ namespace Interview.Migrations.Postgres.Migrations
                 nullable: false,
                 defaultValue: "");
 
-            migrationBuilder.Sql(@"UPDATE ""Users"" SET ExternalId = TwitchIdentity");
+            migrationBuilder.Sql(@"UPDATE ""Users"" SET  ""ExternalId"" =  ""TwitchIdentity""");
 
             migrationBuilder.DropColumn(
                 name: "TwitchIdentity",
@@ -35,7 +35,7 @@ namespace Interview.Migrations.Postgres.Migrations
                 nullable: false,
                 defaultValue: "");
 
-            migrationBuilder.Sql(@"UPDATE ""Users"" SET  TwitchIdentity = ExternalId");
+            migrationBuilder.Sql(@"UPDATE ""Users"" SET   ""TwitchIdentity"" =  ""ExternalId""");
 
             migrationBuilder.DropColumn(
                 name: "ExternalId",
