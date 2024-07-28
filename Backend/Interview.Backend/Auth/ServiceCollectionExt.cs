@@ -23,6 +23,7 @@ public static class ServiceCollectionExt
                 };
                 options.Cookie.HttpOnly = false;
                 options.Cookie.Name = "_auth";
+                options.Cookie.Domain = authorizationService.Domain;
 
                 options.Events.OnRedirectToAccessDenied = context =>
                 {
@@ -30,6 +31,7 @@ public static class ServiceCollectionExt
                     context.Response.WriteAsJsonAsync(new MessageResponse { Message = "Forbidden", });
                     return Task.CompletedTask;
                 };
+
                 options.Events.OnRedirectToLogin = context =>
                 {
                     context.Response.StatusCode = 401;
