@@ -77,3 +77,9 @@ export interface RoomQuestion {
   value: string;
   order: number;
 }
+
+export interface RoomQuestionEvaluation {
+  id: string;
+  mark: number;
+  review: string;
+}

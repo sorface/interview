@@ -2,7 +2,6 @@ import React, { ChangeEventHandler, FunctionComponent, MouseEventHandler, useEff
 import { LocalizationKey } from '../../localization';
 import { RoomQuestion } from '../../types/room';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
-import { Button } from '../Button/Button';
 import { Gap } from '../Gap/Gap';
 import { Typography } from '../Typography/Typography';
 import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
@@ -22,7 +21,6 @@ export interface ActiveQuestionSelectorProps {
   readOnly: boolean;
   onSelect: (question: RoomQuestion) => void;
   onShowClosedQuestions: MouseEventHandler<HTMLInputElement>;
-  onStartReviewRoom: () => void;
 }
 
 export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorProps> = ({
@@ -34,7 +32,6 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   readOnly,
   onSelect,
   onShowClosedQuestions,
-  onStartReviewRoom,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [selectedValue, setSelectedValue] = useState<RoomQuestion | null>(null);
@@ -110,8 +107,6 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
     onSelect(option);
   };
 
-  const handleNextQuestion = () => onItemClick(options[0]);
-
   const onSearch: ChangeEventHandler<HTMLInputElement> = (e) => {
     setSearchValue(e.target.value);
   };
@@ -167,19 +162,6 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
           {getDisplay()}
         </Typography>
       </div>
-      {!readOnly && (
-        <>
-          <Gap sizeRem={0.75} />
-          <Button
-            className='w-full'
-            variant='active'
-            onClick={options.length !== 0 ? handleNextQuestion : onStartReviewRoom}
-          >
-            {localizationCaptions[options.length !== 0 ? LocalizationKey.NextRoomQuestion : LocalizationKey.StartReviewRoom]}
-            <ThemedIcon name={options.length !== 0 ? IconNames.ChevronForward : IconNames.Stop} />
-          </Button>
-        </>
-      )}
     </>
   );
 };

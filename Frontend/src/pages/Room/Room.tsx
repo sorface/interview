@@ -18,9 +18,15 @@ import { EventName, IconNames, inviteParamName, pathnames } from '../../constant
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { useCommunist } from '../../hooks/useCommunist';
-import { RoomInvite, RoomParticipant, RoomQuestion, RoomState, Room as RoomType } from '../../types/room';
+import {
+  RoomInvite,
+  RoomParticipant,
+  RoomQuestion,
+  RoomState,
+  Room as RoomType,
+} from '../../types/room';
 import { Reactions } from './components/Reactions/Reactions';
-import { ActiveQuestion } from './components/ActiveQuestion/ActiveQuestion';
+import { RoomQuestionPanel } from './components/RoomQuestionPanel/RoomQuestionPanel';
 import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
 import { VideoChat } from './components/VideoChat/VideoChat';
 import { Link } from 'react-router-dom';
@@ -567,16 +573,12 @@ export const Room: FunctionComponent = () => {
               <div className='room-columns'>
                 {loadingRoomState && <div>{localizationCaptions[LocalizationKey.LoadingRoomState]}...</div>}
                 {errorRoomState && <div>{localizationCaptions[LocalizationKey.ErrorLoadingRoomState]}...</div>}
-                <div className='videochat-field !w-21 bg-wrap rounded-1.125'>
-                  <div className='py-1.5 px-1.25'>
-                    <ActiveQuestion
-                      room={room}
-                      roomQuestions={roomQuestions || []}
-                      initialQuestion={currentQuestion}
-                      readOnly={viewerMode}
-                    />
-                  </div>
-                </div>
+                <RoomQuestionPanel
+                  room={room}
+                  roomQuestions={roomQuestions || []}
+                  initialQuestion={currentQuestion}
+                  readOnly={!currentUserExpert}
+                />
                 <VideoChat
                   roomState={roomState}
                   viewerMode={viewerMode}

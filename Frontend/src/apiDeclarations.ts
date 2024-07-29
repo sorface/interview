@@ -138,6 +138,31 @@ export const roomQuestionApiDeclaration = {
   }),
 };
 
+export interface GetRoomQuestionEvaluationParams {
+  roomId: Room['id'];
+  questionId: Question['id'];
+}
+
+export interface MergeRoomQuestionEvaluationBody {
+  roomId: Room['id'];
+  questionId: Question['id'];
+  mark: number | null;
+  review: string;
+}
+
+export const roomQuestionEvaluationApiDeclaration = {
+  get: (urlParams: GetRoomQuestionEvaluationParams): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: '/room-evaluations',
+    urlParams,
+  }),
+  merge: (body: MergeRoomQuestionEvaluationBody): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: '/room-evaluations/merge',
+    body,
+  }),
+};
+
 export interface CreateQuestionBody {
   value: string;
   tags: Array<Tag['id']>

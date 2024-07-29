@@ -52,6 +52,7 @@ export const enum IconNames {
   Stop = 'stop',
   PersonAdd = 'person-add',
   Time = 'time',
+  CheckmarkDone = 'checkmark-done',
 }
 
 export const enum IconThemePostfix {

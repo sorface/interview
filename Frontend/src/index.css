@@ -227,3 +227,14 @@ progress::-moz-progress-bar { background: var(--button-active-bg); }
 progress::-webkit-progress-bar {background-color: var(--wrap-bg);}
 progress::-webkit-progress-value {background-color: var(--button-active-bg) !important;}
 progress[value] {-webkit-appearance: none;}
+
+textarea {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  border-color: var(--button-border-color);
+  resize: none;
+}
