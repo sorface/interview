@@ -32,6 +32,7 @@ export const RoomTimer: FunctionComponent<Required<Room['timer']>> = ({
     const updateTimer = () => {
       setRemainingTimeMs(endDate.getTime() - Date.now());
     };
+    updateTimer();
     const intervalId = setInterval(updateTimer, updateIntervalMs);
 
     return () => {
