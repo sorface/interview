@@ -19,6 +19,7 @@ export const enum LocalizationKey {
   Expert,
   Examinee,
   Save,
+  Saved,
   CreateQuestion,
   QuestionText,
   QuestionType,
@@ -173,6 +174,11 @@ export const enum LocalizationKey {
   NextRoomQuestion,
   CopiedToClipboard,
   Of,
+  RoomQuestionEvaluationTitle,
+  MarksGroupBad,
+  MarksGroupMedium,
+  MarksGroupGood,
+  MarksGroupPerfect,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -195,6 +201,7 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.Expert]: 'Expert',
     [LocalizationKey.Examinee]: 'Examinee',
     [LocalizationKey.Save]: 'Save',
+    [LocalizationKey.Saved]: 'Saved',
     [LocalizationKey.CreateQuestion]: 'Create question',
     [LocalizationKey.QuestionText]: 'Text',
     [LocalizationKey.QuestionType]: 'Type',
@@ -349,6 +356,11 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.NextRoomQuestion]: 'Next question',
     [LocalizationKey.CopiedToClipboard]: 'Copied to clipboard',
     [LocalizationKey.Of]: 'of',
+    [LocalizationKey.RoomQuestionEvaluationTitle]: 'Rate the answer',
+    [LocalizationKey.MarksGroupBad]: 'Bad',
+    [LocalizationKey.MarksGroupMedium]: 'Med.',
+    [LocalizationKey.MarksGroupGood]: 'Good',
+    [LocalizationKey.MarksGroupPerfect]: 'Perfect',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -369,6 +381,7 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.Expert]: 'Собеседующий',
     [LocalizationKey.Examinee]: 'Собеседуемый',
     [LocalizationKey.Save]: 'Сохранить',
+    [LocalizationKey.Saved]: 'Сохранено',
     [LocalizationKey.CreateQuestion]: 'Создать вопрос',
     [LocalizationKey.QuestionText]: 'Текст вопроса',
     [LocalizationKey.QuestionType]: 'Тип вопроса',
@@ -523,5 +536,10 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.NextRoomQuestion]: 'Следующий вопрос',
     [LocalizationKey.CopiedToClipboard]: 'Скопировано в буфер обмена',
     [LocalizationKey.Of]: 'из',
+    [LocalizationKey.RoomQuestionEvaluationTitle]: 'Оцените ответ',
+    [LocalizationKey.MarksGroupBad]: 'Плохо',
+    [LocalizationKey.MarksGroupMedium]: 'Удовлетв.',
+    [LocalizationKey.MarksGroupGood]: 'Хорошо',
+    [LocalizationKey.MarksGroupPerfect]: 'Отлично',
   },
 }

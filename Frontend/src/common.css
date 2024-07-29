@@ -7,6 +7,19 @@
 .self-start { align-self: flex-start; }
 .items-center { align-items: center; }
 .items-stretch { align-items: stretch; }
+.text-blue-main { color: var(--blue-main); }
+.text-blue-light { color: var(--blue-light); }
+.text-blue-dark { color: var(--blue-dark); }
+.text-dark { color: var(--dark); }
+.text-dark-0\.5 { color: color-mix(in srgb, var(--dark), transparent 50%); }
+.text-grey3 { color: var(--grey3); }
+.text-grey2 { color: var(--grey2); }
+.text-grey1 { color: var(--grey1); }
+.text-white { color: var(--white); }
+.text-red { color: var(--red); }
+.text-red-light { color: var(--red-light); }
+.text-green-light { color: var(--green-light); }
+.text-grey-active { color: var(--grey-active); }
 .bg-form { background-color: var(--form-bg); }
 .hover\:bg-form:hover { background-color: var(--form-bg); }
 .bg-wrap { background-color: var(--wrap-bg); }
@@ -46,7 +59,10 @@
 .rounded-2 { border-radius: 2rem; }
 .rounded-t-0\.75 { border-top-left-radius: 0.75rem !important; border-top-right-radius: 0.75rem !important; }
 .rounded-b-0\.75 { border-bottom-left-radius: 0.75rem !important; border-bottom-right-radius: 0.75rem !important; }
+.rounded-l-2 { border-top-left-radius: 2rem; border-bottom-left-radius: 2rem; }
+.rounded-r-2 { border-top-right-radius: 2rem; border-bottom-right-radius: 2rem; }
 .border-none { border: none; }
+.p-0\.375 { padding: 0.375rem; }
 .p-0\.625 { padding: 0.625rem; }
 .py-0\.125 { padding-top: 0.125rem; padding-bottom: 0.125rem; }
 .py-0\.5 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
@@ -84,8 +100,11 @@
 .top-0 { top: 0px; }
 .overflow-auto { overflow: auto; }
 .overflow-hidden { overflow: hidden; }
+.whitespace-nowrap { white-space: nowrap; }
 .min-w-fit { min-width: fit-content; }
+.min-h-unset { min-height: unset; }
 .w-full { width: 100%; }
+.w-1\.75 { width: 1.75rem; }
 .w-2\.25 { width: 2.25rem; }
 .w-2\.375 { width: 2.375rem; }
 .w-2\.5 { width: 2.5rem; }
@@ -100,10 +119,12 @@
 .h-full { height: 100%; }
 .h-0\.125 { height: 0.125rem; }
 .h-1\.125 { height: 1.125rem; }
+.h-1\.75 { height: 1.75rem; }
 .h-2\.25 { height: 2.25rem; }
 .h-2\.375 { height: 2.375rem; }
 .h-2\.5 { height: 2.5rem; }
 .h-4 { height: 4rem; }
+.h-6\.25 { height: 6.25rem; }
 .h-25 { height: 25rem; }
 .h-32\.25 { height: 32.25rem; }
 .max-h-20 { max-height: 20rem; }

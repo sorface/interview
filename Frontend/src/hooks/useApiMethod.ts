@@ -8,6 +8,7 @@ import { useCommunist } from './useCommunist';
 interface ApiMethodState<ResponseData = any> {
   process: {
     loading: boolean;
+    code: number | null;
     error: string | null;
   };
   data: ResponseData | null;
@@ -16,6 +17,7 @@ interface ApiMethodState<ResponseData = any> {
 const initialState: ApiMethodState = {
   process: {
     loading: false,
+    code: null,
     error: null,
   },
   data: null,
@@ -29,6 +31,9 @@ type ApiMethodAction = {
 } | {
   name: 'setError';
   payload: string;
+} | {
+  name: 'setCode';
+  payload: number;
 };
 
 const apiMethodReducer = (state: ApiMethodState, action: ApiMethodAction): ApiMethodState => {
@@ -38,6 +43,7 @@ const apiMethodReducer = (state: ApiMethodState, action: ApiMethodAction): ApiMe
         process: {
           loading: true,
           error: null,
+          code: null,
         },
         data: null,
       };
@@ -45,6 +51,7 @@ const apiMethodReducer = (state: ApiMethodState, action: ApiMethodAction): ApiMe
       return {
         ...state,
         process: {
+          ...state.process,
           loading: false,
           error: action.payload
         }
@@ -52,10 +59,19 @@ const apiMethodReducer = (state: ApiMethodState, action: ApiMethodAction): ApiMe
     case 'setData':
       return {
         process: {
+          ...state.process,
           loading: false,
           error: null,
         },
         data: action.payload
+      };
+      case 'setCode':
+      return {
+        ...state,
+        process: {
+          ...state.process,
+          code: action.payload,
+        },
       };
     default:
       return state;
@@ -138,6 +154,10 @@ export const useApiMethod = <ResponseData, RequestData = AnyObject>(apiContractC
         createFetchUrl(apiContract),
         createFetchRequestInit(apiContract),
       );
+      dispatch({
+        name: 'setCode',
+        payload: response.status,
+      });
       if (response.status === unauthorizedHttpCode) {
         deleteCommunist();
         navigate(pathnames.home.replace(':redirect?', ''));
