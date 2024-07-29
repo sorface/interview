@@ -53,9 +53,16 @@ export const Room: FunctionComponent = () => {
   const communist = getCommunist();
   let { id } = useParams();
   const { [inviteParamName]: inviteParam } = useParams();
-  const socketUrl = `${REACT_APP_WS_URL}/ws?Authorization=${communist}&roomId=${id}`;
-  const { lastMessage, readyState, sendMessage } = useWebSocket(socketUrl);
-  const wsClosed = readyState === 3 || readyState === 2;
+
+  const {
+    apiMethodState: apiApplyRoomInviteState,
+    fetchData: fetchApplyRoomInvite,
+  } = useApiMethod<RoomInvite, ApplyRoomInviteBody>(roomInviteApiDeclaration.apply);
+  const {
+    process: { loading: applyRoomInviteLoading, error: applyRoomInviteError },
+    data: applyRoomInviteData,
+  } = apiApplyRoomInviteState;
+
   const [roomInReview, setRoomInReview] = useState(false);
   const [reactionsVisible, setReactionsVisible] = useState(false);
   const [currentQuestionId, setCurrentQuestionId] = useState<RoomQuestion['id']>();
@@ -67,6 +74,18 @@ export const Room: FunctionComponent = () => {
   const [recognitionEnabled, setRecognitionEnabled] = useState(false);
   const [peersLength, setPeersLength] = useState(0);
   const [invitationsOpen, setInvitationsOpen] = useState(false);
+  const socketUrl = `${REACT_APP_WS_URL}/ws?Authorization=${communist}&roomId=${id}`;
+  const checkWebSocketReadyToConnect = () => {
+    if (!inviteParam) {
+      return true;
+    }
+    if (applyRoomInviteData) {
+      return true;
+    }
+    return false;
+  };
+  const { lastMessage, readyState, sendMessage } = useWebSocket(checkWebSocketReadyToConnect() ? socketUrl : null);
+  const wsClosed = readyState === 3 || readyState === 2;
   const {
     devices,
     userAudioStream,
@@ -125,15 +144,6 @@ export const Room: FunctionComponent = () => {
     process: { loading: roomInvitesLoading, error: roomInvitesError },
     data: roomInvitesData,
   } = apiRoomInvitesState;
-
-  const {
-    apiMethodState: apiApplyRoomInviteState,
-    fetchData: fetchApplyRoomInvite,
-  } = useApiMethod<RoomInvite, ApplyRoomInviteBody>(roomInviteApiDeclaration.apply);
-  const {
-    process: { loading: applyRoomInviteLoading, error: applyRoomInviteError },
-    data: applyRoomInviteData,
-  } = apiApplyRoomInviteState;
 
   const {
     apiMethodState: apiGenerateRoomInviteState,
