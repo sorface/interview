@@ -175,10 +175,10 @@ export const enum LocalizationKey {
   CopiedToClipboard,
   Of,
   RoomQuestionEvaluationTitle,
-  MargsGroupBad,
-  MargsGroupMedium,
-  MargsGroupGood,
-  MargsGroupPerfect,
+  MarksGroupBad,
+  MarksGroupMedium,
+  MarksGroupGood,
+  MarksGroupPerfect,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -357,10 +357,10 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.CopiedToClipboard]: 'Copied to clipboard',
     [LocalizationKey.Of]: 'of',
     [LocalizationKey.RoomQuestionEvaluationTitle]: 'Rate the answer',
-    [LocalizationKey.MargsGroupBad]: 'Bad',
-    [LocalizationKey.MargsGroupMedium]: 'Med.',
-    [LocalizationKey.MargsGroupGood]: 'Good',
-    [LocalizationKey.MargsGroupPerfect]: 'Perfect',
+    [LocalizationKey.MarksGroupBad]: 'Bad',
+    [LocalizationKey.MarksGroupMedium]: 'Med.',
+    [LocalizationKey.MarksGroupGood]: 'Good',
+    [LocalizationKey.MarksGroupPerfect]: 'Perfect',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -537,9 +537,9 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.CopiedToClipboard]: 'Скопировано в буфер обмена',
     [LocalizationKey.Of]: 'из',
     [LocalizationKey.RoomQuestionEvaluationTitle]: 'Оцените ответ',
-    [LocalizationKey.MargsGroupBad]: 'Плохо',
-    [LocalizationKey.MargsGroupMedium]: 'Удовлетв.',
-    [LocalizationKey.MargsGroupGood]: 'Хорошо',
-    [LocalizationKey.MargsGroupPerfect]: 'Отлично',
+    [LocalizationKey.MarksGroupBad]: 'Плохо',
+    [LocalizationKey.MarksGroupMedium]: 'Удовлетв.',
+    [LocalizationKey.MarksGroupGood]: 'Хорошо',
+    [LocalizationKey.MarksGroupPerfect]: 'Отлично',
   },
 }

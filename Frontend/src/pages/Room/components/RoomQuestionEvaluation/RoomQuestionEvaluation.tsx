@@ -38,19 +38,19 @@ export const RoomQuestionEvaluation: FunctionComponent<RoomQuestionEvaluationPor
   const markGroups = [
     {
       marks: [1, 2, 3],
-      caption: localizationCaptions[LocalizationKey.MargsGroupBad],
+      caption: localizationCaptions[LocalizationKey.MarksGroupBad],
     },
     {
       marks: [4, 5],
-      caption: localizationCaptions[LocalizationKey.MargsGroupMedium],
+      caption: localizationCaptions[LocalizationKey.MarksGroupMedium],
     },
     {
       marks: [6, 7, 8],
-      caption: localizationCaptions[LocalizationKey.MargsGroupGood],
+      caption: localizationCaptions[LocalizationKey.MarksGroupGood],
     },
     {
       marks: [9, 10],
-      caption: localizationCaptions[LocalizationKey.MargsGroupPerfect],
+      caption: localizationCaptions[LocalizationKey.MarksGroupPerfect],
     },
   ];
 
