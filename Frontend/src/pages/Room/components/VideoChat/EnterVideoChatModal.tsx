@@ -21,14 +21,15 @@ interface EnterVideoChatModalProps {
   loading: boolean;
   roomName?: string;
   devices: Devices;
-  setSelectedCameraId: React.Dispatch<React.SetStateAction<string | undefined>>,
-  setSelectedMicId: React.Dispatch<React.SetStateAction<string | undefined>>,
-  updateDevices: () => Promise<void>;
   error: string | null;
   userVideoStream: MediaStream | null;
   userAudioStream: MediaStream | null;
   micEnabled: boolean;
   cameraEnabled: boolean;
+  setSelectedCameraId: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setSelectedMicId: React.Dispatch<React.SetStateAction<string | undefined>>;
+  onRequestDevices: () => void;
+  updateDevices: () => Promise<void>;
   onClose: () => void;
   onMicSwitch: () => void;
   onCameraSwitch: () => void;
@@ -48,14 +49,15 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
   viewerMode,
   roomName,
   devices,
-  updateDevices,
-  setSelectedCameraId,
-  setSelectedMicId,
   error,
   userVideoStream,
   userAudioStream,
   micEnabled,
   cameraEnabled,
+  setSelectedCameraId,
+  setSelectedMicId,
+  onRequestDevices,
+  updateDevices,
   onClose,
   onMicSwitch,
   onCameraSwitch,
@@ -68,6 +70,10 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
   const requestRef = useRef<number>();
   const updateAnalyserTimeout = useRef(0);
   const audioAnalyser = useRef<AnalyserNode | null>(null);
+
+  useEffect(() => {
+    onRequestDevices();
+  }, [onRequestDevices]);
 
   useEffect(() => {
     if (!error) {

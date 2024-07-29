@@ -49,6 +49,10 @@ export const useUserStreams = () => {
     cameraStream: cameraEnabled ? userVideoStream : null,
   });
 
+  const requestDevices = useCallback(async () => {
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  }, []);
+
   const updateDevices = useCallback(async () => {
     const allDevices = await getDevices();
     const micDevices = allDevices.filter(device => device.kind === micDeviceKind);
@@ -184,12 +188,13 @@ export const useUserStreams = () => {
     devices,
     selectedCameraId,
     selectedMicId,
-    setSelectedCameraId,
-    setSelectedMicId,
     cameraEnabled,
     micEnabled,
     setCameraEnabled,
+    setSelectedCameraId,
+    setSelectedMicId,
     setMicEnabled,
+    requestDevices,
     updateDevices,
   };
 };
