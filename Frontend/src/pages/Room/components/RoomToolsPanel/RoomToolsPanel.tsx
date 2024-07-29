@@ -65,7 +65,7 @@ const SwitchButton: FunctionComponent<SwitchButtonProps> = ({
         {loading ? (
           <Loader />
         ) : (
-          <div className='absolute'>
+          <div className='absolute z-1'>
             <ThemedIcon name={iconName} />
           </div>
         )}
