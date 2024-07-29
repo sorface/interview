@@ -90,13 +90,14 @@ export const Room: FunctionComponent = () => {
     devices,
     userAudioStream,
     userVideoStream,
-    updateDevices,
-    setSelectedCameraId,
-    setSelectedMicId,
     cameraEnabled,
     micEnabled,
+    setSelectedCameraId,
+    setSelectedMicId,
     setCameraEnabled,
     setMicEnabled,
+    requestDevices,
+    updateDevices,
   } = useUserStreams();
   const { screenStream, requestScreenStream } = useScreenStream();
   const localizationCaptions = useLocalizationCaptions();
@@ -508,14 +509,15 @@ export const Room: FunctionComponent = () => {
         viewerMode={viewerMode}
         roomName={room?.name}
         devices={devices}
-        setSelectedCameraId={setSelectedCameraId}
-        setSelectedMicId={setSelectedMicId}
-        updateDevices={updateDevices}
         error={applyRoomInviteError && localizationCaptions[LocalizationKey.ErrorApplyRoomInvite]}
         userVideoStream={userVideoStream}
         userAudioStream={userAudioStream}
         micEnabled={micEnabled}
         cameraEnabled={cameraEnabled}
+        setSelectedCameraId={setSelectedCameraId}
+        setSelectedMicId={setSelectedMicId}
+        onRequestDevices={requestDevices}
+        updateDevices={updateDevices}
         onClose={handleWelcomeScreenClose}
         onMicSwitch={handleMicSwitch}
         onCameraSwitch={handleCameraSwitch}
