@@ -7,6 +7,7 @@
 .self-start { align-self: flex-start; }
 .items-center { align-items: center; }
 .items-stretch { align-items: stretch; }
+.items-baseline { align-items: baseline; }
 .text-blue-main { color: var(--blue-main); }
 .text-blue-light { color: var(--blue-light); }
 .text-blue-dark { color: var(--blue-dark); }
@@ -144,3 +145,4 @@
 .origin-bottom { transform-origin: bottom; }
 .transition-none { transition-property: none; }
 .\!transition { transition: background-color 300ms, border-color 300ms, transform 300ms !important; }
+.capitalize { text-transform: capitalize; }

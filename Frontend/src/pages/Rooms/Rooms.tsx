@@ -18,6 +18,9 @@ import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Button } from '../../components/Button/Button';
 import { Gap } from '../../components/Gap/Gap';
 import { Tag, TagState } from '../../components/Tag/Tag';
+import { Typography } from '../../components/Typography/Typography';
+import { padTime } from '../../utils/padTime';
+import { LocalizationContext } from '../../context/LocalizationContext';
 
 import './Rooms.css';
 
@@ -34,11 +37,33 @@ interface RoomsProps {
   mode: RoomsPageMode;
 }
 
+const formatScheduledStartTime = (scheduledStartTime: string, lang: string) => {
+  const date = new Date(scheduledStartTime);
+  const month = date.toLocaleString(lang, { month: 'long' });
+  return `${date.getDate()} ${month}`;
+};
+
+const formatScheduledStartDay = (scheduledStartTime: string, lang: string) => {
+  const date = new Date(scheduledStartTime);
+  const day = date.toLocaleString(lang, { weekday: 'short' });
+  return `${day}`;
+};
+
+const formatTime = (value: Date) => `${padTime(value.getHours())}:${padTime(value.getMinutes())}`;
+
+const formatDuration = (scheduledStartTime: string, durationSec: number) => {
+  const dateStart = new Date(scheduledStartTime);
+  const dateEnd = new Date(scheduledStartTime);
+  dateEnd.setSeconds(dateEnd.getSeconds() + durationSec);
+  return `${formatTime(dateStart)} - ${formatTime(dateEnd)}`;
+};
+
 export const Rooms: FunctionComponent<RoomsProps> = ({
   mode,
 }) => {
   const auth = useContext(AuthContext);
   const admin = checkAdmin(auth);
+  const { lang } = useContext(LocalizationContext);
   const localizationCaptions = useLocalizationCaptions();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const { apiMethodState, fetchData } = useApiMethod<Room[], GetRoomPageParams>(roomsApiDeclaration.getPage);
@@ -146,6 +171,30 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
               <div className='room-name'>
                 {room.name}
               </div>
+              {room.scheduledStartTime && (
+                <>
+                  <Gap sizeRem={0.75} />
+                  <div className='flex justify-between'>
+                    <div className='flex items-baseline'>
+                      <Typography size='s'>
+                        {formatScheduledStartTime(room.scheduledStartTime, lang)}
+                      </Typography>
+                      <Gap sizeRem={0.5} horizontal />
+                      <div className='capitalize opacity-0.5'>
+                        <Typography size='s'>
+                          {formatScheduledStartDay(room.scheduledStartTime, lang)}
+                        </Typography>
+                      </div>
+                    </div>
+                    {room.timer && (
+                      <Typography size='s'>
+                        {formatDuration(room.scheduledStartTime, room.timer.durationSec)}
+                      </Typography>
+                    )}
+                  </div>
+                </>
+              )}
+              <Gap sizeRem={1.75} />
               <div className='room-participants'>
                 {room.participants.map(roomParticipant => (
                   <div className='room-participant'>

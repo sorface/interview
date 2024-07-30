@@ -16,7 +16,7 @@ export interface Room {
   tags: Tag[];
   roomStatus: RoomStatus;
   scheduledStartTime?: string;
-  timer: {
+  timer?: {
     durationSec: number;
     startTime?: string;
   };

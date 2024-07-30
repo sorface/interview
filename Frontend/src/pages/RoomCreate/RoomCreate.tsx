@@ -21,23 +21,22 @@ import { RoomInvitations } from '../../components/RoomInvitations/RoomInvitation
 import { RoomCreateField } from './RoomCreateField/RoomCreateField';
 import { Modal } from '../../components/Modal/Modal';
 import { Button } from '../../components/Button/Button';
+import { padTime } from '../../utils/padTime';
 
 const nameFieldName = 'roomName';
 const dateFieldName = 'roomDate';
 const startTimeFieldName = 'roomStartTime';
 const endTimeFieldName = 'roomEndTime';
 
-const padDateTimeValue = (value: number) => String(value).padStart(2, '0');
-
 const formatDate = (value: Date) => {
-  const month = padDateTimeValue(value.getMonth());
-  const date = padDateTimeValue(value.getDate());
+  const month = padTime(value.getMonth());
+  const date = padTime(value.getDate());
   return `${value.getFullYear()}-${month}-${date}`;
 };
 
 const formatTime = (value: Date) => {
-  const hours = padDateTimeValue(value.getHours());
-  const minutes = padDateTimeValue(value.getMinutes());
+  const hours = padTime(value.getHours());
+  const minutes = padTime(value.getMinutes());
   return `${hours}:${minutes}`;
 };
 
@@ -123,7 +122,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     if (!room) {
       return;
     }
-    const parsedScheduledStartTime = room.scheduledStartTime && parseScheduledStartTime(room.scheduledStartTime, room.timer.durationSec);
+    const parsedScheduledStartTime = room.scheduledStartTime && parseScheduledStartTime(room.scheduledStartTime, room.timer?.durationSec);
     setRoomFields((rf) => ({
       ...rf,
       ...room,
