@@ -1,12 +1,10 @@
 import { FunctionComponent, useEffect, useState } from 'react';
-import { Room } from '../../../../types/room';
 import { ThemedIcon } from '../ThemedIcon/ThemedIcon';
 import { IconNames } from '../../../../constants';
 import { Gap } from '../../../../components/Gap/Gap';
+import { padTime } from '../../../../utils/padTime';
 
 const updateIntervalMs = 1000;
-
-const padTime = (value: number) => String(value).padStart(2, '0');
 
 const formatTime = (timeMs: number) => {
   const hours = Math.floor((timeMs / (1000 * 60 * 60)));
@@ -15,7 +13,12 @@ const formatTime = (timeMs: number) => {
   return `${padTime(hours)}:${padTime(minutes)}:${padTime(seconds)}`;
 };
 
-export const RoomTimer: FunctionComponent<Required<Room['timer']>> = ({
+interface RoomTimerProps {
+  startTime: string;
+  durationSec: number;
+}
+
+export const RoomTimer: FunctionComponent<RoomTimerProps> = ({
   startTime,
   durationSec,
 }) => {

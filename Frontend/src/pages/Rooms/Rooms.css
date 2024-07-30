@@ -1,7 +1,7 @@
 .rooms-page .items-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(17.125rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(17.125rem, 1fr));
 }
 
 .rooms-page .room-item-wrapper {
@@ -42,10 +42,6 @@
   background-color: var(--button-border-color);
   border-radius: var(--border-radius);
   padding: 0.125rem 0.375rem;
-}
-
-.room-item .room-name {
-  padding-bottom: 2.3125rem;
 }
 
 .room-item .room-participants {
