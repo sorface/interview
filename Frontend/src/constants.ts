@@ -6,6 +6,7 @@ export const pathnames = {
   closedRooms: '/rooms/closed',
   roomsParticipants: '/rooms/participants/:id',
   room: `/room/:id/:${inviteParamName}?`,
+  roomReview: '/rooms/:id/review',
   roomAnalyticsSummary: '/rooms/:id/analytics/summary',
   questions: '/questions/:category',
   questionsCreate: '/questions/create',
