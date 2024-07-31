@@ -1,4 +1,4 @@
-import React, { FunctionComponent, ReactElement, ReactNode, useState } from 'react';
+import React, { FunctionComponent, ReactElement, ReactNode, useEffect, useState } from 'react';
 import { NavLink, useNavigate, matchPath, useLocation } from 'react-router-dom';
 import { ThemeSwitchMini } from '../ThemeSwitchMini/ThemeSwitchMini';
 import { IconNames, pathnames } from '../../constants';
@@ -10,6 +10,7 @@ import { CategoriesList } from '../CategoriesList/CategoriesList';
 import { Category } from '../../types/category';
 import { Typography } from '../Typography/Typography';
 import { REACT_APP_BUILD_HASH } from '../../config';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 import './NavMenu.css';
 
@@ -38,6 +39,14 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
     { path: pathnames.questions, end: false, },
     location.pathname,
   );
+  const bigScreen = useMediaQuery('(min-width: 2048px)');
+
+  useEffect(() => {
+    if (!bigScreen) {
+      return;
+    }
+    setCollapsed(false);
+  }, [bigScreen]);
 
   const handleQuestionsClick: React.MouseEventHandler<HTMLAnchorElement> = (event) => {
     event.preventDefault();
@@ -54,6 +63,10 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
   };
 
   const handleMouseLeave = () => {
+    if (bigScreen) {
+      return;
+    }
+
     setCollapsed(true);
     setSelectedCategory(null);
     setQuestionsClicked(false);
@@ -69,6 +82,10 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
 
   const handleSubCategoryClick = (category: Category) => {
     navigate(pathnames.questions.replace(':category', category.id));
+    if (bigScreen) {
+      setSelectedCategory(null);
+      return;
+    }
     handleMouseLeave();
   };
 
