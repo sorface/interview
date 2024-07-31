@@ -1,0 +1,16 @@
+.room-participants {
+  display: flex;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.room-participant:first-child .user-avatar {
+  margin-left: 0;
+}
+
+.room-participant .user-avatar {
+  width: calc(2.1875rem - 2px);
+  height: calc(2.1875rem - 2px);
+  margin-left: -0.375rem;
+  border: 2px solid var(--wrap-bg);
+}

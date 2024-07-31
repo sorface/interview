@@ -10,6 +10,10 @@ export const enum LocalizationKey {
   RoomsPageName,
   QuestionsPageName,
   CategoriesPageName,
+  RoomReviewPageName,
+  CandidateOpinion,
+  CandidateMarks,
+  DoNotRate,
   UnauthorizedMessage,
   Page,
   LogOut,
@@ -179,6 +183,7 @@ export const enum LocalizationKey {
   MarksGroupMedium,
   MarksGroupGood,
   MarksGroupPerfect,
+  NotFound,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -192,6 +197,10 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.RoomsPageName]: 'Meetings',
     [LocalizationKey.QuestionsPageName]: 'Questions',
     [LocalizationKey.CategoriesPageName]: 'Categories',
+    [LocalizationKey.RoomReviewPageName]: 'Interview results',
+    [LocalizationKey.CandidateOpinion]: 'Your opinion about candidate',
+    [LocalizationKey.CandidateMarks]: 'Your assessments of the candidate and comments on questions',
+    [LocalizationKey.DoNotRate]: 'Do not rate',
     [LocalizationKey.UnauthorizedMessage]: 'Unauthorized',
     [LocalizationKey.Page]: 'Page',
     [LocalizationKey.LogOut]: 'Logout',
@@ -361,6 +370,7 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.MarksGroupMedium]: 'Med.',
     [LocalizationKey.MarksGroupGood]: 'Good',
     [LocalizationKey.MarksGroupPerfect]: 'Perfect',
+    [LocalizationKey.NotFound]: 'Not found',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -372,6 +382,10 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.RoomsPageName]: 'Встречи',
     [LocalizationKey.QuestionsPageName]: 'Вопросы',
     [LocalizationKey.CategoriesPageName]: 'Категории',
+    [LocalizationKey.RoomReviewPageName]: 'Результаты собеседования',
+    [LocalizationKey.CandidateOpinion]: 'Ваше мнение о кандидате',
+    [LocalizationKey.CandidateMarks]: 'Ваши оценки кандидата и комментарии к вопросам',
+    [LocalizationKey.DoNotRate]: 'Не оценивать',
     [LocalizationKey.UnauthorizedMessage]: 'Неавторизован',
     [LocalizationKey.Page]: 'Страница',
     [LocalizationKey.LogOut]: 'Выйти',
@@ -541,5 +555,6 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.MarksGroupMedium]: 'Удовлетв.',
     [LocalizationKey.MarksGroupGood]: 'Хорошо',
     [LocalizationKey.MarksGroupPerfect]: 'Отлично',
+    [LocalizationKey.NotFound]: 'Не найдено',
   },
 }

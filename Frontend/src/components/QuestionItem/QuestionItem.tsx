@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, ReactNode, useState } from 'react';
 import { CodeEditorLang, Question, QuestionAnswer } from '../../types/question';
 import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
 import { IconNames } from '../../constants';
@@ -14,8 +14,10 @@ import { Button } from '../Button/Button';
 interface QuestionItemProps {
   question: Question;
   checked?: boolean;
+  checkboxLabel?: ReactNode;
   primary?: boolean;
   contextMenu?: ContextMenuProps;
+  children?: ReactNode;
   onCheck?: (newValue: boolean) => void;
   onRemove?: (question: Question) => void;
 }
@@ -23,14 +25,16 @@ interface QuestionItemProps {
 export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
   question,
   checked,
+  checkboxLabel,
   primary,
   contextMenu,
+  children,
   onCheck,
   onRemove,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
   const hasCheckbox = typeof checked === 'boolean';
-  const accordionDisabled = question.answers.length === 0;
+  const accordionDisabled = question.answers.length === 0 && !children;
   const [selectedAnswer, setSelectedAnswer] = useState<QuestionAnswer | null>(
     question.answers ? question.answers[0] : null
   );
@@ -52,7 +56,16 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
       </div>
       <div className='ml-auto'>
         {contextMenu && <ContextMenu {...contextMenu} buttonVariant='text' />}
-        {hasCheckbox && <input type='checkbox' checked={checked} onChange={handleCheckboxChange} />}
+        {hasCheckbox && (
+          <>
+            <input id={`questionCheckbox${question.id}`} type='checkbox' checked={checked} onChange={handleCheckboxChange} />
+            {checkboxLabel && (
+              <label htmlFor={`questionCheckbox${question.id}`}>
+                {checkboxLabel}
+                </label>
+            )}
+          </>
+        )}
         {onRemove && (
           <span onClick={handleRemove} className='cursor-pointer'>
             <ThemedIcon name={IconNames.Trash} size='small' />
@@ -93,6 +106,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
           <Gap sizeRem={1} />
         </>
       )}
+      {children}
       {question.answers.map(answer => (
         <Button
           key={answer.id}
