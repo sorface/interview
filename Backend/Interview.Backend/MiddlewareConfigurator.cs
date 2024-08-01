@@ -44,8 +44,10 @@ public class MiddlewareConfigurator
             return func();
         });
 
+        _app.UseSession();
         _app.UseAuthentication();
         _app.UseAuthorization();
+
         _app.Use((context, func) =>
         {
             var upsertUser = context.User.ToUser();
