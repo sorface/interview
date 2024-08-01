@@ -110,7 +110,6 @@ public class ServiceConfigurator
         var sorfaceAuth = new OAuthServiceDispatcher(_configuration).GetAuthService("sorface");
 
         serviceCollection.AddSingleton(sorfaceAuth);
-
         serviceCollection.AddHttpClient();
         serviceCollection.AddSingleton<SorfacePrincipalValidator>();
         serviceCollection.AddSingleton<SorfaceTokenHandler>();
@@ -155,11 +154,7 @@ public class ServiceConfigurator
                     throw new InvalidOperationException("Unknown environment");
                 }
             },
-            TwitchTokenProviderOption = new TwitchTokenProviderOption
-            {
-                ClientSecret = sorfaceAuth.ClientSecret,
-                ClientId = sorfaceAuth.ClientId,
-            },
+            TwitchTokenProviderOption = new TwitchTokenProviderOption { ClientSecret = sorfaceAuth.ClientSecret, ClientId = sorfaceAuth.ClientId, },
             AdminUsers = adminUsers,
             EventStorageConfigurator = builder =>
             {
@@ -179,7 +174,13 @@ public class ServiceConfigurator
         };
 
         serviceCollection.AddAppServices(serviceOption);
-        serviceCollection.AddAppAuth(sorfaceAuth);
+
+        var redisConfiguration = _configuration.GetSection("EventStorage").GetValue<string>("RedisConnectionString");
+
+        if (redisConfiguration is not null)
+        {
+            serviceCollection.AddAppAuth(sorfaceAuth, redisConfiguration);
+        }
     }
 
     private void AddRateLimiter(IServiceCollection serviceCollection)
@@ -230,17 +231,8 @@ public class ServiceConfigurator
                 Title = "Open API",
                 Version = "v1",
                 Description = "Service Interface",
-                Contact = new OpenApiContact
-                {
-                    Name = "Vladislav Petyukevich",
-                    Url = new Uri("https://github.com/VladislavPetyukevich"),
-                    Email = "test@yandex.ru",
-                },
-                License = new OpenApiLicense
-                {
-                    Name = "Example License",
-                    Url = new Uri("https://example.com/license"),
-                },
+                Contact = new OpenApiContact { Name = "Vladislav Petyukevich", Url = new Uri("https://github.com/VladislavPetyukevich"), Email = "test@yandex.ru", },
+                License = new OpenApiLicense { Name = "Example License", Url = new Uri("https://example.com/license"), },
             });
 
             var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";

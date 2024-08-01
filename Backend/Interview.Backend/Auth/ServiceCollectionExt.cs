@@ -1,28 +1,42 @@
+using System.Diagnostics.Eventing.Reader;
 using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Responses;
 using Interview.Domain.Users.Service;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace Interview.Backend.Auth;
 
 public static class ServiceCollectionExt
 {
-    public static void AddAppAuth(this IServiceCollection self, AuthorizationService authorizationService)
+    public static void AddAppAuth(this IServiceCollection self, AuthorizationService authorizationService, string redisConfiguration)
     {
+        self.AddDistributedRedisCache(options =>
+            {
+                options.Configuration = redisConfiguration;
+                options.InstanceName = "sorface.interview.session.";
+            })
+            .AddSession();
+
+        self.AddSingleton<ITicketStore, DistributedCacheTicketStore>();
+
         self.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = authorizationService.Id;
             })
-            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+            .AddCookie(options =>
             {
                 options.Events.OnValidatePrincipal = context =>
                 {
                     var sorfacePrincipalValidator = context.HttpContext.RequestServices.GetRequiredService<SorfacePrincipalValidator>();
                     return sorfacePrincipalValidator.ValidateAsync(context);
                 };
+
+                options.SessionStore = self.BuildServiceProvider().GetRequiredService<ITicketStore>();
                 options.Cookie.HttpOnly = false;
-                options.Cookie.Name = "_auth";
+                options.Cookie.Name = "sorface.interview.session.id";
                 options.Cookie.Domain = authorizationService.Domain;
 
                 options.Events.OnRedirectToAccessDenied = context =>
@@ -31,7 +45,6 @@ public static class ServiceCollectionExt
                     context.Response.WriteAsJsonAsync(new MessageResponse { Message = "Forbidden", });
                     return Task.CompletedTask;
                 };
-
                 options.Events.OnRedirectToLogin = context =>
                 {
                     context.Response.StatusCode = 401;
