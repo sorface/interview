@@ -100,7 +100,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
 
   const [roomFields, setRoomFields] = useState<RoomFields>({
     name: '',
-    date: '',
+    date: formatDate(new Date()),
     startTime: '',
     endTime: '',
   });
