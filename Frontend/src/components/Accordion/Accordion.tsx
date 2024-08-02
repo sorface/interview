@@ -27,8 +27,8 @@ export const Accordion: FunctionComponent<AccordionProps> = ({
     <div className={className}>
       <div className={classNameTitle}>
         {!disabled && (
-          <span onClick={handleExpandCollapse} className={`cursor-pointer h-1.125 ${expanded ? 'rotate-180' : ''}`}>
-            <ThemedIcon name={IconNames.ChevronDown} size='small' />
+          <span onClick={handleExpandCollapse} className={`cursor-pointer h-1.125 ${expanded ? 'rotate-90' : ''}`}>
+            <ThemedIcon name={IconNames.ChevronForward} size='small' />
           </span>
         )}
         {title}
