@@ -144,6 +144,7 @@
 .text-center { text-align: center; }
 .opacity-0 { opacity: 0; }
 .opacity-0\.5 { opacity: 0.5; }
+.opacity-0\.65 { opacity: 0.65; }
 .backdrop-blur { backdrop-filter: blur(6px); }
 .origin-bottom { transform-origin: bottom; }
 .transition-none { transition-property: none; }

@@ -81,7 +81,11 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
   };
 
   const handleSubCategoryClick = (category: Category) => {
-    navigate(pathnames.questions.replace(':category', category.id));
+    const navigationUrl =
+      pathnames.questions
+        .replace(':rootCategory', selectedCategory?.id || '')
+        .replace(':subCategory', category.id);
+    navigate(navigationUrl);
     if (bigScreen) {
       setSelectedCategory(null);
       return;
