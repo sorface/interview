@@ -185,7 +185,6 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
             questions={roomQuestions}
             openQuestions={openQuestionsIds}
             initialQuestion={initialQuestion}
-            placeHolder={localizationCaptions[LocalizationKey.SelectActiveQuestion]}
             readOnly={readOnly}
             onSelect={handleQuestionSelect}
             onShowClosedQuestions={handleShowClosedQuestions}
@@ -202,7 +201,7 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
                 onChange={handleRoomQuestionEvaluationChange}
               />
             ) : (
-              <Loader />
+              !!initialQuestion && (<Loader />)
             )}
             <Gap sizeRem={1} />
             <div className='text-left h-1.125'>
@@ -227,7 +226,14 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
               variant='active'
               onClick={openQuestionsIds.length !== 0 ? handleNextQuestion : handleStartReviewRoom}
             >
-              {localizationCaptions[openQuestionsIds.length !== 0 ? LocalizationKey.NextRoomQuestion : LocalizationKey.StartReviewRoom]}
+              {!initialQuestion ?
+                localizationCaptions[LocalizationKey.StartRoom] :
+                localizationCaptions[
+                openQuestionsIds.length !== 0 ?
+                  LocalizationKey.NextRoomQuestion :
+                  LocalizationKey.StartReviewRoom
+                ]
+              }
               <ThemedIcon name={openQuestionsIds.length !== 0 ? IconNames.ChevronForward : IconNames.Stop} />
             </Button>
           </div>
