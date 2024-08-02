@@ -14,7 +14,6 @@ const sortOption = (option1: RoomQuestion, option2: RoomQuestion) =>
 
 export interface ActiveQuestionSelectorProps {
   initialQuestion?: RoomQuestion;
-  placeHolder: string;
   showClosedQuestions: boolean;
   loading: boolean;
   questions: RoomQuestion[];
@@ -26,7 +25,6 @@ export interface ActiveQuestionSelectorProps {
 
 export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorProps> = ({
   initialQuestion,
-  placeHolder,
   showClosedQuestions,
   loading,
   questions,
@@ -107,7 +105,7 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
 
   const getDisplay = () => {
     if (!selectedValue && !initialQuestion) {
-      return placeHolder;
+      return '';
     }
     return `${selectedValue?.value || initialQuestion?.value}`;
   };
@@ -135,7 +133,7 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
             </div>
             <div className='ml-auto border border-button border-solid px-0.75 py-0.125 rounded-2'>
               <Typography size='s'>
-                {`${currentOrder + 1} ${localizationCaptions[LocalizationKey.Of]} ${questionsCount}`}
+                {`${initialQuestion ? currentOrder + 1 : 0} ${localizationCaptions[LocalizationKey.Of]} ${questionsCount}`}
               </Typography>
             </div>
           </div>
