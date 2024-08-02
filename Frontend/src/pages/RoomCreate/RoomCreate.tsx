@@ -29,7 +29,7 @@ const startTimeFieldName = 'roomStartTime';
 const endTimeFieldName = 'roomEndTime';
 
 const formatDate = (value: Date) => {
-  const month = padTime(value.getMonth());
+  const month = padTime(value.getMonth() + 1);
   const date = padTime(value.getDate());
   return `${value.getFullYear()}-${month}-${date}`;
 };
