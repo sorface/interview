@@ -16,7 +16,7 @@ export interface Room {
   tags: Tag[];
   roomStatus: RoomStatus;
   scheduledStartTime?: string;
-  timer: {
+  timer?: {
     durationSec: number;
     startTime?: string;
   };
@@ -76,4 +76,10 @@ export interface RoomQuestion {
   state: RoomQuestionState;
   value: string;
   order: number;
+}
+
+export interface RoomQuestionEvaluation {
+  id: string;
+  mark: number;
+  review: string;
 }

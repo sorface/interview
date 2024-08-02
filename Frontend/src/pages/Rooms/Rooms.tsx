@@ -12,12 +12,13 @@ import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
 import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
-import { UserAvatar } from '../../components/UserAvatar/UserAvatar';
 import { RoomCreate } from '../RoomCreate/RoomCreate';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Button } from '../../components/Button/Button';
 import { Gap } from '../../components/Gap/Gap';
 import { Tag, TagState } from '../../components/Tag/Tag';
+import { RoomDateAndTime } from '../../components/RoomDateAndTime/RoomDateAndTime';
+import { RoomParticipants } from '../../components/RoomParticipants/RoomParticipants';
 
 import './Rooms.css';
 
@@ -117,7 +118,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
       room.roomStatus === 'Review' ||
       room.roomStatus === 'Close';
     const roomLink = roomSummary ?
-      generatePath(pathnames.roomAnalyticsSummary, { id: room.id }) :
+      generatePath(pathnames.roomReview, { id: room.id }) :
       generatePath(pathnames.room, { id: room.id });
 
     return (
@@ -146,18 +147,17 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
               <div className='room-name'>
                 {room.name}
               </div>
-              <div className='room-participants'>
-                {room.participants.map(roomParticipant => (
-                  <div className='room-participant'>
-                    {roomParticipant.avatar &&
-                      <UserAvatar
-                        src={roomParticipant.avatar}
-                        nickname={roomParticipant.nickname}
-                      />
-                    }
-                  </div>
-                ))}
-              </div>
+              {room.scheduledStartTime && (
+                <>
+                  <Gap sizeRem={0.75} />
+                  <RoomDateAndTime
+                    scheduledStartTime={room.scheduledStartTime}
+                    timer={room.timer}
+                  />
+                </>
+              )}
+              <Gap sizeRem={1.75} />
+              <RoomParticipants participants={room.participants} />
             </div>
           </Link>
         </li>

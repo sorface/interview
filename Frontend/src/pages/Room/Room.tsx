@@ -18,9 +18,15 @@ import { EventName, IconNames, inviteParamName, pathnames } from '../../constant
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { useCommunist } from '../../hooks/useCommunist';
-import { RoomInvite, RoomParticipant, RoomQuestion, RoomState, Room as RoomType } from '../../types/room';
+import {
+  RoomInvite,
+  RoomParticipant,
+  RoomQuestion,
+  RoomState,
+  Room as RoomType,
+} from '../../types/room';
 import { Reactions } from './components/Reactions/Reactions';
-import { ActiveQuestion } from './components/ActiveQuestion/ActiveQuestion';
+import { RoomQuestionPanel } from './components/RoomQuestionPanel/RoomQuestionPanel';
 import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
 import { VideoChat } from './components/VideoChat/VideoChat';
 import { Link } from 'react-router-dom';
@@ -53,9 +59,16 @@ export const Room: FunctionComponent = () => {
   const communist = getCommunist();
   let { id } = useParams();
   const { [inviteParamName]: inviteParam } = useParams();
-  const socketUrl = `${REACT_APP_WS_URL}/ws?Authorization=${communist}&roomId=${id}`;
-  const { lastMessage, readyState, sendMessage } = useWebSocket(socketUrl);
-  const wsClosed = readyState === 3 || readyState === 2;
+
+  const {
+    apiMethodState: apiApplyRoomInviteState,
+    fetchData: fetchApplyRoomInvite,
+  } = useApiMethod<RoomInvite, ApplyRoomInviteBody>(roomInviteApiDeclaration.apply);
+  const {
+    process: { loading: applyRoomInviteLoading, error: applyRoomInviteError },
+    data: applyRoomInviteData,
+  } = apiApplyRoomInviteState;
+
   const [roomInReview, setRoomInReview] = useState(false);
   const [reactionsVisible, setReactionsVisible] = useState(false);
   const [currentQuestionId, setCurrentQuestionId] = useState<RoomQuestion['id']>();
@@ -67,17 +80,30 @@ export const Room: FunctionComponent = () => {
   const [recognitionEnabled, setRecognitionEnabled] = useState(false);
   const [peersLength, setPeersLength] = useState(0);
   const [invitationsOpen, setInvitationsOpen] = useState(false);
+  const socketUrl = `${REACT_APP_WS_URL}/ws?Authorization=${communist}&roomId=${id}`;
+  const checkWebSocketReadyToConnect = () => {
+    if (!inviteParam) {
+      return true;
+    }
+    if (applyRoomInviteData) {
+      return true;
+    }
+    return false;
+  };
+  const { lastMessage, readyState, sendMessage } = useWebSocket(checkWebSocketReadyToConnect() ? socketUrl : null);
+  const wsClosed = readyState === 3 || readyState === 2;
   const {
     devices,
     userAudioStream,
     userVideoStream,
-    updateDevices,
-    setSelectedCameraId,
-    setSelectedMicId,
     cameraEnabled,
     micEnabled,
+    setSelectedCameraId,
+    setSelectedMicId,
     setCameraEnabled,
     setMicEnabled,
+    requestDevices,
+    updateDevices,
   } = useUserStreams();
   const { screenStream, requestScreenStream } = useScreenStream();
   const localizationCaptions = useLocalizationCaptions();
@@ -125,15 +151,6 @@ export const Room: FunctionComponent = () => {
     process: { loading: roomInvitesLoading, error: roomInvitesError },
     data: roomInvitesData,
   } = apiRoomInvitesState;
-
-  const {
-    apiMethodState: apiApplyRoomInviteState,
-    fetchData: fetchApplyRoomInvite,
-  } = useApiMethod<RoomInvite, ApplyRoomInviteBody>(roomInviteApiDeclaration.apply);
-  const {
-    process: { loading: applyRoomInviteLoading, error: applyRoomInviteError },
-    data: applyRoomInviteData,
-  } = apiApplyRoomInviteState;
 
   const {
     apiMethodState: apiGenerateRoomInviteState,
@@ -498,14 +515,15 @@ export const Room: FunctionComponent = () => {
         viewerMode={viewerMode}
         roomName={room?.name}
         devices={devices}
-        setSelectedCameraId={setSelectedCameraId}
-        setSelectedMicId={setSelectedMicId}
-        updateDevices={updateDevices}
         error={applyRoomInviteError && localizationCaptions[LocalizationKey.ErrorApplyRoomInvite]}
         userVideoStream={userVideoStream}
         userAudioStream={userAudioStream}
         micEnabled={micEnabled}
         cameraEnabled={cameraEnabled}
+        setSelectedCameraId={setSelectedCameraId}
+        setSelectedMicId={setSelectedMicId}
+        onRequestDevices={requestDevices}
+        updateDevices={updateDevices}
         onClose={handleWelcomeScreenClose}
         onMicSwitch={handleMicSwitch}
         onCameraSwitch={handleCameraSwitch}
@@ -567,16 +585,12 @@ export const Room: FunctionComponent = () => {
               <div className='room-columns'>
                 {loadingRoomState && <div>{localizationCaptions[LocalizationKey.LoadingRoomState]}...</div>}
                 {errorRoomState && <div>{localizationCaptions[LocalizationKey.ErrorLoadingRoomState]}...</div>}
-                <div className='videochat-field !w-21 bg-wrap rounded-1.125'>
-                  <div className='py-1.5 px-1.25'>
-                    <ActiveQuestion
-                      room={room}
-                      roomQuestions={roomQuestions || []}
-                      initialQuestion={currentQuestion}
-                      readOnly={viewerMode}
-                    />
-                  </div>
-                </div>
+                <RoomQuestionPanel
+                  room={room}
+                  roomQuestions={roomQuestions || []}
+                  initialQuestion={currentQuestion}
+                  readOnly={!currentUserExpert}
+                />
                 <VideoChat
                   roomState={roomState}
                   viewerMode={viewerMode}

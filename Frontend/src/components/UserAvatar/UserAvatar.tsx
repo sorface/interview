@@ -3,7 +3,7 @@ import { FunctionComponent } from 'react';
 import './UserAvatar.css';
 
 interface UserAvatarProps {
-  src: string;
+  src?: string;
   nickname: string;
   size?: 's' | 'm' | 'l';
 }
@@ -27,6 +27,17 @@ export const UserAvatar: FunctionComponent<UserAvatarProps> = ({
   size,
   ...restProps
 }) => {
+  if (!src) {
+    return (
+      <div
+        className={`bg-form flex items-center justify-center user-avatar ${getSizeClassName(size)}`}
+        {...restProps}
+      >
+        {nickname[0].toLocaleUpperCase()}
+      </div>
+    );
+  }
+
   return (
     <img
       src={src}
