@@ -56,12 +56,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                 .Select(e => new AnalyticsSummaryViewer
                 {
                     ReactionsSummary = e.GroupBy(t => (t.Reaction!.Id, t.Reaction.Type))
-                        .Select(t => new Analytics.AnalyticsReactionSummary
-                        {
-                            Id = t.Key.Id,
-                            Type = t.Key.Type.Name,
-                            Count = t.Count(),
-                        })
+                        .Select(t => new Analytics.AnalyticsReactionSummary { Id = t.Key.Id, Type = t.Key.Type.Name, Count = t.Count(), })
                         .ToList(),
                 })
                 .ToList();
@@ -73,12 +68,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                 {
                     Nickname = e.Key.Nickname,
                     ReactionsSummary = e.GroupBy(t => (t.Reaction!.Id, t.Reaction.Type))
-                        .Select(t => new Analytics.AnalyticsReactionSummary
-                        {
-                            Id = t.Key.Id,
-                            Type = t.Key.Type.Name,
-                            Count = t.Count(),
-                        })
+                        .Select(t => new Analytics.AnalyticsReactionSummary { Id = t.Key.Id, Type = t.Key.Type.Name, Count = t.Count(), })
                         .ToList(),
                 })
                 .ToList();
@@ -141,7 +131,8 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
         {
             return Db.RoomParticipants.AsNoTracking()
                 .Include(e => e.Room)
-                .Include(e => e.User).ThenInclude(e => e.RoomQuestionEvaluations.Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.RoomQuestion!.QuestionId == questionId))
+                .Include(e => e.User).ThenInclude(e =>
+                    e.RoomQuestionEvaluations.Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.RoomQuestion!.QuestionId == questionId))
                 .Where(e => e.Room.Id == request.RoomId)
                 .Select(e => new Analytics.AnalyticsUser
                 {
@@ -151,11 +142,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                     ParticipantType = e.Type.Name ?? string.Empty,
                     Evaluation = e.User.RoomQuestionEvaluations
                         .Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.RoomQuestion!.QuestionId == questionId)
-                        .Select(rqe => new Analytics.AnalyticsUserQuestionEvaluation
-                        {
-                            Review = rqe.Review,
-                            Mark = rqe.Mark,
-                        })
+                        .Select(rqe => new Analytics.AnalyticsUserQuestionEvaluation { Review = rqe.Review, Mark = rqe.Mark, })
                         .FirstOrDefault(),
                 })
                 .ToListAsync(ct);
@@ -227,12 +214,7 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
                     .Select(question => new RoomQuestionDetail { Id = question.Question!.Id, Value = question.Question.Value, Order = question.Order, })
                     .ToList(),
                 Participants = e.Participants.Select(participant =>
-                        new RoomUserDetail
-                        {
-                            Id = participant.User.Id,
-                            Nickname = participant.User.Nickname,
-                            Avatar = participant.User.Avatar,
-                        })
+                        new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, })
                     .ToList(),
                 RoomStatus = e.Status.EnumValue,
                 Tags = e.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
@@ -250,18 +232,14 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
             {
                 Id = e.Id,
                 Name = e.Name,
-                Owner = new RoomUserDetail
-                {
-                    Id = e.CreatedBy!.Id,
-                    Nickname = e.CreatedBy!.Nickname,
-                    Avatar = e.CreatedBy!.Avatar,
-                },
+                Owner = new RoomUserDetail { Id = e.CreatedBy!.Id, Nickname = e.CreatedBy!.Nickname, Avatar = e.CreatedBy!.Avatar, },
                 Participants = e.Participants.Select(participant =>
                         new RoomUserDetail
                         {
                             Id = participant.User.Id,
                             Nickname = participant.User.Nickname,
                             Avatar = participant.User.Avatar,
+                            Type = participant.Type.Name,
                         })
                     .ToList(),
                 Status = e.Status.EnumValue,
