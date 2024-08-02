@@ -57,7 +57,7 @@ export const enum IconNames {
 }
 
 export const enum IconThemePostfix {
-  Dark = '-sharp',
+  Dark = '-outline',
   Light = '-outline',
 }
 
