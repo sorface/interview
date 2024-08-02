@@ -16,6 +16,7 @@ export interface ActiveQuestionSelectorProps {
   initialQuestion?: RoomQuestion;
   placeHolder: string;
   showClosedQuestions: boolean;
+  loading: boolean;
   questions: RoomQuestion[];
   openQuestions: Array<RoomQuestion['id']>;
   readOnly: boolean;
@@ -27,6 +28,7 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   initialQuestion,
   placeHolder,
   showClosedQuestions,
+  loading,
   questions,
   openQuestions,
   readOnly,
@@ -39,7 +41,15 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   const searchRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
   const localizationCaptions = useLocalizationCaptions();
+  const [questionsCount, setQuestionsCount] = useState(0);
   const currentOrder = (selectedValue ? selectedValue.order : initialQuestion?.order) || 0;
+
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+    setQuestionsCount(questions.length);
+  }, [loading, questions.length]);
 
   const isOpened = (question: RoomQuestion) => {
     return openQuestions.includes(question.id);
@@ -125,13 +135,13 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
             </div>
             <div className='ml-auto border border-button border-solid px-0.75 py-0.125 rounded-2'>
               <Typography size='s'>
-                {`${currentOrder + 1} ${localizationCaptions[LocalizationKey.Of]} ${questions.length}`}
+                {`${currentOrder + 1} ${localizationCaptions[LocalizationKey.Of]} ${questionsCount}`}
               </Typography>
             </div>
           </div>
         </div>
         <Gap sizeRem={1} />
-        <progress className='w-full h-0.125' value={currentOrder + 1} max={questions.length}></progress>
+        <progress className='w-full h-0.125' value={currentOrder + 1} max={questionsCount}></progress>
         {showMenu && (
           <div className="activeQuestionSelector-menu text-left">
             <div ref={searchRef} className="activeQuestionSelector-search-panel">

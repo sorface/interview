@@ -132,6 +132,9 @@ export const Room: FunctionComponent = () => {
   } = useApiMethod<Array<RoomQuestion>, GetRoomQuestionsBody>(roomQuestionApiDeclaration.getRoomQuestions);
   const {
     data: roomQuestions,
+    process: {
+      loading: roomQuestionsLoading,
+    }
   } = apiRoomQuestions;
 
   const {
@@ -575,6 +578,7 @@ export const Room: FunctionComponent = () => {
                 {errorRoomState && <div>{localizationCaptions[LocalizationKey.ErrorLoadingRoomState]}...</div>}
                 <RoomQuestionPanel
                   room={room}
+                  roomQuestionsLoading={roomQuestionsLoading}
                   roomQuestions={roomQuestions || []}
                   initialQuestion={currentQuestion}
                   readOnly={!currentUserExpert}
