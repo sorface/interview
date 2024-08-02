@@ -29,6 +29,11 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
   const admin = checkAdmin(auth);
   const localizationCaptions = useLocalizationCaptions();
   const {
+    id,
+    rootCategory: rootCategoryParam,
+    subCategory: subCategoryParam,
+  } = useParams();
+  const {
     apiMethodState: questionState,
     fetchData: fetchCreateQuestion,
   } = useApiMethod<Question['id'], CreateQuestionBody>(questionsApiDeclaration.create);
@@ -53,11 +58,10 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
   const { process: { loading: subCategoriesLoading, error: subCategoriesError }, data: subCategories } = subCategoriesState;
 
   const navigate = useNavigate();
-  let { id } = useParams();
   const [questionValue, setQuestionValue] = useState('');
   const [type, setType] = useState<QuestionType>(QuestionType.Private);
-  const [rootCategory, setRootCategory] = useState('');
-  const [subCategory, setSubCategory] = useState('');
+  const [rootCategory, setRootCategory] = useState(rootCategoryParam || '');
+  const [subCategory, setSubCategory] = useState(subCategoryParam || '');
   const [codeEditor, setCodeEditor] = useState<Question['codeEditor'] | null>(null);
   const [answers, setAnswers] = useState<Question['answers']>([]);
 
@@ -277,7 +281,11 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
       <HeaderWithLink
         title={localizationCaptions[LocalizationKey.CreateQuestion]}
         linkVisible={true}
-        path={pathnames.questions}
+        path={
+          pathnames.questions
+            .replace(':rootCategory', rootCategory || '')
+            .replace(':subCategory', subCategory || '')
+        }
         linkCaption="<"
         linkFloat="left"
       />
