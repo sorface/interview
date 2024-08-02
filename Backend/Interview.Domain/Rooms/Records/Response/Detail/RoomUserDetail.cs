@@ -7,4 +7,6 @@ public class RoomUserDetail
     public string? Nickname { get; set; }
 
     public string? Avatar { get; set; }
+
+    public string? Type { get; set; }
 }

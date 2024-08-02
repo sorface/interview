@@ -141,7 +141,13 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                     .Select(question => new RoomQuestionDetail { Id = question.Question!.Id, Value = question.Question.Value, Order = question.Order, })
                     .ToList(),
                 Participants = e.Participants.Select(participant =>
-                        new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, })
+                        new RoomUserDetail
+                        {
+                            Id = participant.User.Id,
+                            Nickname = participant.User.Nickname,
+                            Avatar = participant.User.Avatar,
+                            Type = participant.Type.Name,
+                        })
                     .ToList(),
                 RoomStatus = e.Status.EnumValue,
                 Tags = e.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
@@ -249,7 +255,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 .Select(question => new RoomQuestionDetail { Id = question.Question!.Id, Value = question.Question.Value, Order = question.Order, })
                 .ToList(),
             Participants = room.Participants.Select(participant =>
-                    new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, })
+                    new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, Type = participant.Type.Name })
                 .ToList(),
             RoomStatus = room.Status.EnumValue,
             Tags = room.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
@@ -434,6 +440,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         }
 
         currentRoom.Status = SERoomStatus.Review;
+
+        await _roomQuestionRepository.CloseActiveQuestionAsync(roomId, cancellationToken);
 
         await _roomRepository.UpdateAsync(currentRoom, cancellationToken);
     }
