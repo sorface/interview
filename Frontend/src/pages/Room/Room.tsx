@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
 import { useParams, Navigate, useNavigate } from 'react-router-dom';
 import useWebSocket from 'react-use-websocket';
 import toast from 'react-hot-toast';
@@ -76,7 +76,6 @@ export const Room: FunctionComponent = () => {
   const [wsRoomTimer, setWsRoomTimer] = useState<RoomType['timer'] | null>(null);
   const [messagesChatEnabled, setMessagesChatEnabled] = useState(false);
   const [welcomeScreen, setWelcomeScreen] = useState(true);
-  const micDisabledAutomatically = useRef(false);
   const [recognitionEnabled, setRecognitionEnabled] = useState(false);
   const [peersLength, setPeersLength] = useState(0);
   const [invitationsOpen, setInvitationsOpen] = useState(false);
@@ -352,9 +351,6 @@ export const Room: FunctionComponent = () => {
   }, [setMicEnabled]);
 
   const handleMicSwitch = useCallback(() => {
-    if (micEnabled) {
-      micDisabledAutomatically.current = false;
-    }
     enableDisableMic(!micEnabled);
   }, [micEnabled, enableDisableMic]);
 
@@ -364,14 +360,6 @@ export const Room: FunctionComponent = () => {
     }
     setRecognitionEnabled(micEnabled);
   }, [welcomeScreen, viewerMode, micEnabled]);
-
-  const muteMic = useCallback(() => {
-    enableDisableMic(false);
-  }, [enableDisableMic]);
-
-  const unmuteMic = useCallback(() => {
-    enableDisableMic(true);
-  }, [enableDisableMic]);
 
   const handleVoiceRecognitionSwitch = useCallback(() => {
     setRecognitionEnabled(!recognitionEnabled);
@@ -601,11 +589,8 @@ export const Room: FunctionComponent = () => {
                   userVideoStream={userVideoStream}
                   userAudioStream={userAudioStream}
                   screenStream={screenStream}
-                  micDisabledAutomatically={micDisabledAutomatically}
                   onSendWsMessage={sendMessage}
                   onUpdatePeersLength={setPeersLength}
-                  onMuteMic={muteMic}
-                  onUnmuteMic={unmuteMic}
                   renderToolsPanel={renderToolsPanel}
                 />
               </div>

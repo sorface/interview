@@ -45,11 +45,8 @@ interface VideoChatProps {
   userVideoStream: MediaStream | null;
   userAudioStream: MediaStream | null;
   screenStream: MediaStream | null;
-  micDisabledAutomatically: React.MutableRefObject<boolean>;
   onSendWsMessage: SendMessage;
   onUpdatePeersLength: (length: number) => void;
-  onMuteMic: () => void;
-  onUnmuteMic: () => void;
   renderToolsPanel: () => ReactElement;
 };
 
@@ -104,11 +101,8 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   userVideoStream,
   userAudioStream,
   screenStream,
-  micDisabledAutomatically,
   onSendWsMessage,
   onUpdatePeersLength,
-  onMuteMic,
-  onUnmuteMic,
   renderToolsPanel,
 }) => {
   const auth = useContext(AuthContext);
@@ -247,7 +241,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     const updateAudioAnalyser = () => {
       const time = performance.now();
       const delta = time - prevTime;
-      let somebodyIsSpeaking = false;
       let newLouderUserId = '';
       let louderVolume = -1;
       const result: Record<string, number> = {};
@@ -256,9 +249,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         const averageVolume = getAverageVolume(frequencyData);
         if (averageVolume < audioVolumeThreshold) {
           continue;
-        }
-        if (auth?.id && (userId !== auth.id)) {
-          somebodyIsSpeaking = true;
         }
         if (averageVolume > louderVolume) {
           newLouderUserId = userId;
@@ -272,14 +262,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         prevTime = time;
         requestRef.current = requestAnimationFrame(updateAudioAnalyser);
         return;
-      }
-
-      const micEnabled = userAudioStream?.getAudioTracks().some(audioTrack => audioTrack.enabled);
-      if (somebodyIsSpeaking && micEnabled) {
-        micDisabledAutomatically.current = true;
-        onMuteMic();
-      } else if (!somebodyIsSpeaking && !micEnabled && micDisabledAutomatically.current) {
-        onUnmuteMic();
       }
 
       if (newLouderUserId && newLouderUserId !== louderUserId.current) {
@@ -302,7 +284,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       }
     };
 
-  }, [auth, louderUserId, userAudioStream, micDisabledAutomatically, onMuteMic, onUnmuteMic]);
+  }, [auth, louderUserId]);
 
   const addPeer = useCallback((incomingSignal: Peer.SignalData, callerID: string, screenShare?: boolean) => {
     const streams: MediaStream[] = [];
