@@ -20,6 +20,7 @@ const notFoundCode = 404;
 
 export interface RoomQuestionPanelProps {
   room: Room | null;
+  roomQuestionsLoading: boolean;
   roomQuestions: RoomQuestion[];
   initialQuestion?: RoomQuestion;
   readOnly: boolean;
@@ -27,6 +28,7 @@ export interface RoomQuestionPanelProps {
 
 export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
   room,
+  roomQuestionsLoading,
   roomQuestions,
   initialQuestion,
   readOnly,
@@ -179,6 +181,7 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
         <div className=''>
           <ActiveQuestionSelector
             showClosedQuestions={showClosedQuestions}
+            loading={roomQuestionsLoading}
             questions={roomQuestions}
             openQuestions={openQuestionsIds}
             initialQuestion={initialQuestion}
