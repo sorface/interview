@@ -34,7 +34,10 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
 }) => {
   const localizationCaptions = useLocalizationCaptions();
   const hasCheckbox = typeof checked === 'boolean';
-  const accordionDisabled = question.answers.length === 0 && !children;
+  const accordionDisabled =
+    question.answers.length === 0 &&
+    !question.codeEditor &&
+    !children;
   const [selectedAnswer, setSelectedAnswer] = useState<QuestionAnswer | null>(
     question.answers ? question.answers[0] : null
   );
