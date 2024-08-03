@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactNode, useState } from 'react';
+import { MouseEvent, FunctionComponent, ReactNode, useState } from 'react';
 import { CodeEditorLang, Question, QuestionAnswer } from '../../types/question';
 import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
 import { IconNames } from '../../constants';
@@ -43,6 +43,10 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
     onCheck?.(!checked);
   };
 
+  const handleCheckboxAreaClick = (e: MouseEvent) => {
+    e.stopPropagation();
+  };
+
   const handleRemove = () => {
     onRemove?.(question);
   };
@@ -57,14 +61,19 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
       <div className='ml-auto'>
         {contextMenu && <ContextMenu {...contextMenu} buttonVariant='text' />}
         {hasCheckbox && (
-          <>
-            <input id={`questionCheckbox${question.id}`} type='checkbox' checked={checked} onChange={handleCheckboxChange} />
+          <div onClick={handleCheckboxAreaClick}>
+            <input
+              id={`questionCheckbox${question.id}`}
+              type='checkbox'
+              checked={checked}
+              onChange={handleCheckboxChange}
+            />
             {checkboxLabel && (
               <label htmlFor={`questionCheckbox${question.id}`}>
                 {checkboxLabel}
-                </label>
+              </label>
             )}
-          </>
+          </div>
         )}
         {onRemove && (
           <span onClick={handleRemove} className='cursor-pointer'>
