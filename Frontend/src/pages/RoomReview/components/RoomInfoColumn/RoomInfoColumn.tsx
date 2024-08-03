@@ -17,7 +17,7 @@ export const RoomInfoColumn: FunctionComponent<RoomInfoColumnProps> = ({
         {header}
       </Typography>
       <Gap sizeRem={0.5} />
-      <Typography size='s'>
+      <Typography size='m'>
         {conent}
       </Typography>
     </div>

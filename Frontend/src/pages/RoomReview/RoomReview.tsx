@@ -42,6 +42,10 @@ export const RoomReview: FunctionComponent = () => {
     }
   } = apiRoomQuestions;
 
+  const examinee = room?.participants.find(
+    participant => participant.type === 'Examinee'
+  );
+
   useEffect(() => {
     if (!id) {
       throw new Error('Room id not found');
@@ -70,7 +74,7 @@ export const RoomReview: FunctionComponent = () => {
         )}
         <RoomInfoColumn
           header={localizationCaptions[LocalizationKey.Examinee]}
-          conent={localizationCaptions[LocalizationKey.NotFound]}
+          conent={examinee ? <span className='capitalize'>{examinee.nickname}</span> : localizationCaptions[LocalizationKey.NotFound]}
         />
         <RoomInfoColumn
           header={localizationCaptions[LocalizationKey.RoomParticipants]}
@@ -81,6 +85,7 @@ export const RoomReview: FunctionComponent = () => {
             header={localizationCaptions[LocalizationKey.RoomDateAndTime]}
             conent={
               <RoomDateAndTime
+                typographySize='m'
                 scheduledStartTime={room.scheduledStartTime}
                 timer={room.timer}
                 mini

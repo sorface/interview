@@ -151,6 +151,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
                 <>
                   <Gap sizeRem={0.75} />
                   <RoomDateAndTime
+                    typographySize='s'
                     scheduledStartTime={room.scheduledStartTime}
                     timer={room.timer}
                   />

@@ -12,7 +12,7 @@ export enum RoomAccessType {
 export interface Room {
   id: string;
   name: string;
-  participants: User[];
+  participants: RoomParticipant[];
   tags: Tag[];
   roomStatus: RoomStatus;
   scheduledStartTime?: string;
@@ -20,6 +20,10 @@ export interface Room {
     durationSec: number;
     startTime?: string;
   };
+}
+
+export interface RoomParticipant extends User {
+  type: UserType;
 }
 
 export type RoomStateType = 'CodeEditor';
