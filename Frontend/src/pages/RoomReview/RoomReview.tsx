@@ -1,4 +1,5 @@
 import { Fragment, FunctionComponent, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
@@ -15,6 +16,8 @@ import { QuestionItem } from '../../components/QuestionItem/QuestionItem';
 import { Question } from '../../types/question';
 import { RoomQuestionEvaluation } from '../Room/components/RoomQuestionEvaluation/RoomQuestionEvaluation';
 import { RoomParticipants } from '../../components/RoomParticipants/RoomParticipants';
+import { Button } from '../../components/Button/Button';
+import { toastSuccessOptions } from '../../constants';
 
 const createFakeQuestion = (roomQuestion: RoomQuestion): Question => ({
   ...roomQuestion,
@@ -42,6 +45,17 @@ export const RoomReview: FunctionComponent = () => {
     }
   } = apiRoomQuestions;
 
+  const {
+    apiMethodState: apiRoomCloseMethodState,
+    fetchData: fetchRoomClose,
+  } = useApiMethod<unknown, Room['id']>(roomsApiDeclaration.close);
+  const {
+    process: {
+      error: roomCloseError,
+      code: roomCloseCode,
+    },
+  } = apiRoomCloseMethodState;
+
   const examinee = room?.participants.find(
     participant => participant.type === 'Examinee'
   );
@@ -56,6 +70,27 @@ export const RoomReview: FunctionComponent = () => {
       States: ['Closed'],
     });
   }, [id, fetchData, getRoomQuestions]);
+
+  useEffect(() => {
+    if (roomCloseCode !== 200) {
+      return;
+    }
+    toast.success(localizationCaptions[LocalizationKey.Saved], toastSuccessOptions);
+  }, [roomCloseCode, localizationCaptions]);
+
+  useEffect(() => {
+    if (!roomCloseError) {
+      return;
+    }
+    toast.error(roomCloseError);
+  }, [roomCloseError]);
+
+  const handleCloseRoom = () => {
+    if (!id) {
+      throw new Error('Room id not found');
+    }
+    fetchRoomClose(id);
+  };
 
   if (loading || loadingRoomQuestions || !room || !roomQuestions) {
     return (
@@ -123,6 +158,10 @@ export const RoomReview: FunctionComponent = () => {
             {index !== roomQuestions.length - 1 && (<Gap sizeRem={0.25} />)}
           </Fragment>
         ))}
+      </div>
+      <Gap sizeRem={0.5} />
+      <div className='text-left bg-wrap px-1.5 py-1.75 rounded-0.75'>
+        <Button onClick={handleCloseRoom}>{localizationCaptions[LocalizationKey.CloseRoom]}</Button>
       </div>
     </>
   );

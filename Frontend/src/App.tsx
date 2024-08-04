@@ -73,6 +73,12 @@ export const App: FunctionComponent = () => {
               color: 'var(--text)',
             },
           },
+          error: {
+            style: {
+              background: 'var(--red)',
+              color: 'var(--text)',
+            },
+          },
         }}
       />
       <ThemeProvider>
