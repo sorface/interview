@@ -91,6 +91,14 @@ const removeDuplicates = (peersRef: React.MutableRefObject<PeerMeta[]>, newPeerM
     peer.peerID !== newPeerMeta.peerID ? true : peer.screenShare !== newPeerMeta.screenShare
   );
 
+const findUserByOrder = (videoOrder: Record<string, number>) => {
+  const lounderUser = Object.entries(videoOrder).find(([userId, order]) => order === 1);
+  if (lounderUser) {
+    return lounderUser[0];
+  }
+  return null;
+};
+
 export const VideoChat: FunctionComponent<VideoChatProps> = ({
   roomState,
   viewerMode,
@@ -578,16 +586,26 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         />
       );
     }
+    const userOrder1 = findUserByOrder(videoOrder);
+    if (!userOrder1 || userOrder1 === auth?.id) {
+      return (
+        <video
+          ref={userVideo}
+          className='videochat-video'
+          muted
+          autoPlay
+          playsInline
+        >
+          Video not supported
+        </video>
+      );
+    }
+    const userOrder1Peer = peers.find(peer => peer.targetUserId === userOrder1);
+    if (!userOrder1Peer) {
+      return <></>;
+    }
     return (
-      <video
-        ref={userVideo}
-        className='videochat-video'
-        muted
-        autoPlay
-        playsInline
-      >
-        Video not supported
-      </video>
+      <VideoChatVideo peer={userOrder1Peer.peer} />
     );
   };
 
@@ -611,7 +629,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
               </Canvas>
             </div>
           </VideochatParticipant>
-          {needToRenderMainField && (
+          {(needToRenderMainField && videoOrder[auth?.id || ''] === 1) && (
             <VideochatParticipant
               order={viewerMode ? viewerOrder - 1 : videoOrder[auth?.id || '']}
               viewer={viewerMode}
@@ -630,18 +648,25 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
               </video>
             </VideochatParticipant>
           )}
-          {peers.filter(peer => !peer.screenShare).map(peer => (
-            <VideochatParticipant
-              key={peer.peerID}
-              viewer={peer.participantType === 'Viewer'}
-              order={peer.participantType === 'Viewer' ? viewerOrder : videoOrder[peer.targetUserId]}
-              avatar={peer?.avatar}
-              nickname={peer?.nickname}
-              reaction={activeReactions[peer.peerID]}
-            >
-              <VideoChatVideo peer={peer.peer} />
-            </VideochatParticipant>
-          ))}
+          {peers
+            .filter(peer => {
+              if (needToRenderMainField && videoOrder[peer.targetUserId] === 1) {
+                return false;
+              }
+              return !peer.screenShare;
+            })
+            .map(peer => (
+              <VideochatParticipant
+                key={peer.peerID}
+                viewer={peer.participantType === 'Viewer'}
+                order={peer.participantType === 'Viewer' ? viewerOrder : videoOrder[peer.targetUserId]}
+                avatar={peer?.avatar}
+                nickname={peer?.nickname}
+                reaction={activeReactions[peer.peerID]}
+              >
+                <VideoChatVideo peer={peer.peer} />
+              </VideochatParticipant>
+            ))}
         </div>
 
         <div className={`absolute top-0 h-full bg-wrap ${messagesChatEnabled ? 'visible' : 'invisible'} z-1`}>
