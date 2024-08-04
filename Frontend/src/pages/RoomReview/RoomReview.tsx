@@ -18,6 +18,7 @@ import { RoomQuestionEvaluation } from '../Room/components/RoomQuestionEvaluatio
 import { RoomParticipants } from '../../components/RoomParticipants/RoomParticipants';
 import { Button } from '../../components/Button/Button';
 import { toastSuccessOptions } from '../../constants';
+import { InfoBlock } from '../../components/InfoBlock/InfoBlock';
 
 const createFakeQuestion = (roomQuestion: RoomQuestion): Question => ({
   ...roomQuestion,
@@ -103,7 +104,7 @@ export const RoomReview: FunctionComponent = () => {
       <PageHeader title={localizationCaptions[LocalizationKey.RoomReviewPageName]} />
       <h2 className='text-left'>{room.name}</h2>
       <Gap sizeRem={1} />
-      <div className='text-left flex justify-between bg-wrap px-1.5 py-1.75 rounded-0.75'>
+      <InfoBlock className='text-left flex justify-between'>
         {error && (
           <Typography size='m'>{localizationCaptions[LocalizationKey.Error]}: {error}</Typography>
         )}
@@ -128,15 +129,15 @@ export const RoomReview: FunctionComponent = () => {
             }
           />
         )}
-      </div>
+      </InfoBlock>
       <Gap sizeRem={0.5} />
-      <div className='text-left flex flex-col bg-wrap px-1.5 py-1.75 rounded-0.75'>
+      <InfoBlock className='text-left flex flex-col'>
         <Typography size='s' bold>{localizationCaptions[LocalizationKey.CandidateOpinion]}</Typography>
         <Gap sizeRem={1} />
         <textarea className='h-3.625' />
-      </div>
+      </InfoBlock>
       <Gap sizeRem={0.5} />
-      <div className='text-left bg-wrap px-1.5 py-1.75 rounded-0.75'>
+      <InfoBlock className='text-left'>
         <Typography size='xl' bold>{localizationCaptions[LocalizationKey.CandidateMarks]}</Typography>
         <Gap sizeRem={2} />
         {errorRoomQuestions && (
@@ -158,11 +159,11 @@ export const RoomReview: FunctionComponent = () => {
             {index !== roomQuestions.length - 1 && (<Gap sizeRem={0.25} />)}
           </Fragment>
         ))}
-      </div>
+      </InfoBlock>
       <Gap sizeRem={0.5} />
-      <div className='text-left bg-wrap px-1.5 py-1.75 rounded-0.75'>
+      <InfoBlock className='text-left'>
         <Button onClick={handleCloseRoom}>{localizationCaptions[LocalizationKey.CloseRoom]}</Button>
-      </div>
+      </InfoBlock>
     </>
   );
 };

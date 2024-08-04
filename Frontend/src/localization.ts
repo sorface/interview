@@ -185,6 +185,10 @@ export const enum LocalizationKey {
   MarksGroupGood,
   MarksGroupPerfect,
   NotFound,
+  AverageCandidateMark,
+  MarksForQuestions,
+  OpinionsAndMarks,
+  QuestionAnswerDetails,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -373,6 +377,10 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.MarksGroupGood]: 'Good',
     [LocalizationKey.MarksGroupPerfect]: 'Perfect',
     [LocalizationKey.NotFound]: 'Not found',
+    [LocalizationKey.AverageCandidateMark]: 'Average candidate score',
+    [LocalizationKey.MarksForQuestions]: 'Points for questions',
+    [LocalizationKey.OpinionsAndMarks]: 'Opinions and ratings',
+    [LocalizationKey.QuestionAnswerDetails]: 'Question answer details',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -559,5 +567,9 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.MarksGroupGood]: 'Хорошо',
     [LocalizationKey.MarksGroupPerfect]: 'Отлично',
     [LocalizationKey.NotFound]: 'Не найдено',
+    [LocalizationKey.AverageCandidateMark]: 'Средний балл кандидата',
+    [LocalizationKey.MarksForQuestions]: 'Баллы за вопросы',
+    [LocalizationKey.OpinionsAndMarks]: 'Мнения и оценки',
+    [LocalizationKey.QuestionAnswerDetails]: 'Детали ответа на вопрос',
   },
 }

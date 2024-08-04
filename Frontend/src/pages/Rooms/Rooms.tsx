@@ -26,6 +26,20 @@ const pageSize = 30;
 const initialPageNumber = 1;
 const searchDebounceMs = 300;
 
+const getRoomLink = (room: Room) => {
+  switch (room.roomStatus) {
+    case 'New':
+    case 'Active':
+      return generatePath(pathnames.room, { id: room.id });
+    case 'Review':
+      return generatePath(pathnames.roomReview, { id: room.id });
+    case 'Close':
+      return generatePath(pathnames.roomAnalytics, { id: room.id });
+    default:
+      return '';
+  }
+};
+
 export enum RoomsPageMode {
   Current,
   Closed,
@@ -114,12 +128,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
       Close: TagState.Closed,
     };
 
-    const roomSummary =
-      room.roomStatus === 'Review' ||
-      room.roomStatus === 'Close';
-    const roomLink = roomSummary ?
-      generatePath(pathnames.roomReview, { id: room.id }) :
-      generatePath(pathnames.room, { id: room.id });
+    const roomLink = getRoomLink(room);
 
     return (
       <div key={room.id} className='room-item-wrapper'>

@@ -8,6 +8,7 @@ interface AccordionProps {
   classNameTitle?: string;
   disabled?: boolean;
   children?: ReactNode;
+  onClick?: () => void;
 }
 
 export const Accordion: FunctionComponent<AccordionProps> = ({
@@ -16,18 +17,24 @@ export const Accordion: FunctionComponent<AccordionProps> = ({
   classNameTitle,
   disabled,
   children,
+  onClick,
 }) => {
   const [expanded, setExpanded] = useState(false);
+  const cursorPointer = !disabled || onClick;
 
-  const handleExpandCollapse = () => {
+  const handleOnClick = () => {
+    if (onClick) {
+      onClick();
+      return;
+    }
     setExpanded(!expanded);
   };
 
   return (
     <div className={className}>
       <div
-        className={`${classNameTitle} ${disabled ? '' : 'cursor-pointer'}`}
-        onClick={disabled ? undefined : handleExpandCollapse}
+        className={`${classNameTitle} ${cursorPointer ? 'cursor-pointer' : ''}`}
+        onClick={disabled && !onClick ? undefined : handleOnClick}
       >
         {!disabled && (
           <span className={`cursor-pointer h-1.125 ${expanded ? 'rotate-90' : ''}`}>

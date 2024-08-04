@@ -65,6 +65,10 @@ export const roomsApiDeclaration = {
     method: 'GET',
     baseUrl: `/rooms/${id}/state`,
   }),
+  analytics: (id: Room['id']): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: `/rooms/${id}/analytics`,
+  }),
   analyticsSummary: (id: Room['id']): ApiContractGet => ({
     method: 'GET',
     baseUrl: `/rooms/${id}/analytics/summary`,

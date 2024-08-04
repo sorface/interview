@@ -8,6 +8,7 @@ export const pathnames = {
   room: `/room/:id/:${inviteParamName}?`,
   roomReview: '/rooms/:id/review',
   roomAnalyticsSummary: '/rooms/:id/analytics/summary',
+  roomAnalytics: '/rooms/:id/analytics',
   questions: '/questions/:rootCategory/:subCategory',
   questionsCreate: '/questions/create/:rootCategory/:subCategory',
   questionsEdit: '/questions/edit/:id',
