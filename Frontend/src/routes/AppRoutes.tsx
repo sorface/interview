@@ -19,6 +19,7 @@ import { checkAdmin } from '../utils/checkAdmin';
 import { CategoriesCreate } from '../pages/CategoriesCreate/CategoriesCreate';
 import { Gap } from '../components/Gap/Gap';
 import { RoomReview } from '../pages/RoomReview/RoomReview';
+import { RoomAnaytics } from '../pages/RoomAnaytics/RoomAnaytics';
 
 interface AppRoutesProps {
   user: User | null;
@@ -63,6 +64,13 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <RoomAnayticsSummary />
+                </ProtectedRoute>
+              }
+            />
+            <Route path={pathnames.roomAnalytics}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <RoomAnaytics />
                 </ProtectedRoute>
               }
             />

@@ -1,5 +1,6 @@
 import { Question } from './question';
-import { User } from './user';
+import { RoomQuestion, RoomQuestionEvaluation } from './room';
+import { User, UserType } from './user';
 
 export interface AnalyticsQuestionsUserReactionSummary {
   id: string;
@@ -21,12 +22,26 @@ interface AnalyticsQuestionsViwer {
   reactionsSummary: AnalyticsQuestionsUserReactionSummary[];
 }
 
-export interface AnalyticsQuestions extends Question {
+export interface AnalyticsSummaryQuestions extends Question {
   status: string;
   viewers: AnalyticsQuestionsViwer[] | null;
   experts: AnalyticsQuestionsExpert[] | null;
 }
 
 export interface AnalyticsSummary {
+  questions: AnalyticsSummaryQuestions[];
+}
+
+export interface AnalyticsQuestions extends RoomQuestion {
+  users: Array<{
+    id: User['id'];
+    nickname: User['nickname'];
+    avatar?: User['avatar'];
+    participantType: UserType;
+    evaluation: Omit<RoomQuestionEvaluation, 'id'>;
+  }>;
+}
+
+export interface Analytics {
   questions: AnalyticsQuestions[];
 }
