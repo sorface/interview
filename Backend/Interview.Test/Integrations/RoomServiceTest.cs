@@ -918,6 +918,8 @@ public class RoomServiceTest
         await Assert.ThrowsAsync<NotFoundException>(() =>
             roomService.UpdateAsync(roomId, roomPatchUpdateRequest));
     }
+    
+    // TODO: ADDED UPDATE TIMER TESTS
 
     [Fact]
     public async Task Create_Room_With_Questions()
