@@ -197,7 +197,8 @@ public class RoomInviteIntegration
             userAccessor,
             roomParticipantService,
             appDbContext,
-            NullLogger<RoomService>.Instance
+            NullLogger<RoomService>.Instance,
+            new TestSystemClock()
         );
     }
 }

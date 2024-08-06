@@ -943,6 +943,7 @@ public class RoomServiceTest
             Tags = new HashSet<Guid>(),
             Name = "My room",
             AccessType = SERoomAccessType.Public,
+            ScheduleStartTime = new DateTime(2024, 1, 1, 0, 0, 0),
         };
 
         var createdRoom = await roomService.CreateAsync(roomCreateRequest, CancellationToken.None);
@@ -1040,6 +1041,8 @@ public class RoomServiceTest
             userAccessor.SetUser(user);
         }
 
+        var time = new TestSystemClock { UtcNow = new DateTimeOffset(2023, 1, 1, 0, 0, 0, TimeSpan.Zero), };
+
         var roomParticipantService = new RoomParticipantService(
             new RoomParticipantRepository(appDbContext),
             new RoomRepository(appDbContext),
@@ -1054,6 +1057,7 @@ public class RoomServiceTest
             userAccessor,
             roomParticipantService,
             appDbContext,
-            new NullLogger<RoomService>());
+            new NullLogger<RoomService>(),
+            time);
     }
 }

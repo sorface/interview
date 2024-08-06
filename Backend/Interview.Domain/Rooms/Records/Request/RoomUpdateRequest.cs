@@ -9,4 +9,6 @@ public class RoomUpdateRequest
     public required List<RoomQuestionRequest> Questions { get; init; }
 
     public DateTime ScheduleStartTime { get; set; }
+
+    public long? DurationSec { get; set; }
 }
