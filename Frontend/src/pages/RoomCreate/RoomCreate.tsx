@@ -208,9 +208,16 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
   const renderStatus = useCallback(() => {
     if (totalError) {
       return (
-        <Field>
-          <div>{localizationCaptions[LocalizationKey.Error]}: {totalError}</div>
-        </Field>
+        <>
+          <Typography size='m' error>
+            <div className='flex'>
+              <ThemedIcon name={IconNames.Information} />
+              <Gap sizeRem={0.25} horizontal />
+              {totalError}
+            </div>
+          </Typography>
+          <Gap sizeRem={1.25} />
+        </>
       );
     }
     if (totalLoading) {
@@ -221,7 +228,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
       );
     }
     return <></>;
-  }, [totalError, totalLoading, localizationCaptions]);
+  }, [totalError, totalLoading]);
 
   const renderQuestionItem = (question: Question, lastItem: boolean) => (
     <>
