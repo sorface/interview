@@ -853,14 +853,15 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     private static void EnsureValidScheduleStartTime(DateTime scheduleStartTime, DateTime? dbScheduleStartTime)
     {
         // Nothing has changed.
-        if (dbScheduleStartTime is not null && dbScheduleStartTime == scheduleStartTime)
+        if (dbScheduleStartTime == scheduleStartTime)
         {
             return;
         }
 
-        if (DateTime.UtcNow > scheduleStartTime)
+        var minDateTime = DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(15));
+        if (minDateTime > scheduleStartTime)
         {
-            throw new UserException("The scheduled start date must be greater than the current time");
+            throw new UserException("The scheduled start date must be greater than current time - 15 minutes");
         }
     }
 
