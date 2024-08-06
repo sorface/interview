@@ -189,6 +189,10 @@ export const enum LocalizationKey {
   MarksForQuestions,
   OpinionsAndMarks,
   QuestionAnswerDetails,
+  EmptyRoomNameError,
+  RoomEmptyStartTimeError,
+  RoomStartTimeMustBeGreaterError,
+  RoomEmptyQuestionsListError,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -381,6 +385,10 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.MarksForQuestions]: 'Points for questions',
     [LocalizationKey.OpinionsAndMarks]: 'Opinions and ratings',
     [LocalizationKey.QuestionAnswerDetails]: 'Question answer details',
+    [LocalizationKey.EmptyRoomNameError]: 'Please provide the meeting name',
+    [LocalizationKey.RoomEmptyStartTimeError]: 'Please enter meeting start time',
+    [LocalizationKey.RoomStartTimeMustBeGreaterError]: 'Meeting start time must be greater than the current time',
+    [LocalizationKey.RoomEmptyQuestionsListError]: 'Please add questions to the list of questions',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -571,5 +579,9 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.MarksForQuestions]: 'Баллы за вопросы',
     [LocalizationKey.OpinionsAndMarks]: 'Мнения и оценки',
     [LocalizationKey.QuestionAnswerDetails]: 'Детали ответа на вопрос',
+    [LocalizationKey.EmptyRoomNameError]: 'Пожалуйста, укажите имя встречи',
+    [LocalizationKey.RoomEmptyStartTimeError]: 'Пожалуйста, укажите время начала встречи',
+    [LocalizationKey.RoomStartTimeMustBeGreaterError]: 'Время начала встречи должно быть больше текущего времени',
+    [LocalizationKey.RoomEmptyQuestionsListError]: 'Пожалуйста, добавьте вопросы в список вопросов',
   },
 }
