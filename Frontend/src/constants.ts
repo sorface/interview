@@ -55,7 +55,7 @@ export const enum IconNames {
   PersonAdd = 'person-add-outline',
   Time = 'time-outline',
   CheckmarkDone = 'checkmark-done-outline',
-  Information = 'information-outline',
+  Information = 'information-circle-outline',
 }
 
 export const reactionIcon: Record<string, IconNames> = {
