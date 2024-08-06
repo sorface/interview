@@ -99,12 +99,12 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
         )}
         {onRemove && (
           <span onClick={handleRemove} className='cursor-pointer'>
-            <Icon name={IconNames.Trash} size='small' />
+            <Icon name={IconNames.Trash} />
           </span>
         )}
         {onClick && (
           <span className='opacity-0.5'>
-            <Icon name={IconNames.ChevronForward} size='small' />
+            <Icon name={IconNames.ChevronForward} />
           </span>
         )}
       </div>

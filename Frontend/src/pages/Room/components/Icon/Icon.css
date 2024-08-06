@@ -1,0 +1,25 @@
+.icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  contain: strict;
+  -webkit-box-sizing: content-box !important;
+  box-sizing: content-box !important;
+}
+
+.icon .icon-inner, .icon .icon-inner svg {
+  display: block;
+  height: 100%;
+  width: 100%;
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+.icon .icon-inner {
+  unicode-bidi: isolate;
+}
+
+.icon .icon-inner svg {
+  overflow-clip-margin: content-box;
+  overflow: hidden;
+}

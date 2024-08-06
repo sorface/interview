@@ -34,7 +34,7 @@
   padding-bottom: 1.5rem;
 }
 
-.room-item .room-status-wrapper ion-icon {
+.room-item .room-status-wrapper .icon {
   font-size: 1.125rem;
 }
 

@@ -1,16 +1,20 @@
 import { FunctionComponent } from 'react';
 import { IconNames } from '../../../../constants';
 
+import './Icon.css';
+
 interface ThemedIconProps {
   name: IconNames;
-  size?: 'small' | 'large';
 }
 
 export const Icon: FunctionComponent<ThemedIconProps> = ({
   name,
-  size,
 }) => {
   return (
-    <ion-icon name={`${name}`} size={size}></ion-icon>
+    <div className='icon' role='img'>
+      <div className='icon-inner'>
+        <svg><use href={`/icons-spritesheet.svg#${name}`} /></svg>
+      </div>
+    </div>
   );
 };
