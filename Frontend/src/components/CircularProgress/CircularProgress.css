@@ -1,7 +1,7 @@
 .circular-progress {
   --half-size: calc(var(--size) / 2);
   --radius: calc((var(--size) - var(--stroke-width)) / 2);
-  --circumference: calc(var(--radius) * pi * 2);
+  --circumference: calc(var(--radius) * var(--pi) * 2);
   --dash: calc((var(--progress) * var(--circumference)) / 100);
   animation: progress-animation 0.3s ease-in 0s 1 forwards;
 }
