@@ -38,7 +38,7 @@ export const Accordion: FunctionComponent<AccordionProps> = ({
       >
         {!disabled && (
           <span className={`cursor-pointer h-1.125 ${expanded ? 'rotate-90' : ''}`}>
-            <Icon name={IconNames.ChevronForward} size='small' />
+            <Icon name={IconNames.ChevronForward} />
           </span>
         )}
         {title}

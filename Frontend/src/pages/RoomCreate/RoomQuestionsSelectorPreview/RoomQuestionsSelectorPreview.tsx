@@ -27,7 +27,7 @@ export const RoomQuestionsSelectorPreview: FunctionComponent<RoomQuestionsSelect
         toggleContent={
           <>
             {localizationCaptions[LocalizationKey.RoomSelectedQuestions]}: {qestions.length}
-            <Icon name={IconNames.ChevronForward} size='small' />
+            <Icon name={IconNames.ChevronForward} />
           </>
         }
         toggleClassName='w-18.125 flex justify-between'
@@ -40,7 +40,7 @@ export const RoomQuestionsSelectorPreview: FunctionComponent<RoomQuestionsSelect
             >
               <div>{qestion.value}</div>
               <span onClick={() => onRemove(qestion)} className='cursor-pointer'>
-                <Icon name={IconNames.Trash} size='small' />
+                <Icon name={IconNames.Trash} />
               </span>
             </div>
           ))}

@@ -58,7 +58,7 @@
   animation: var(--fadeIn-animation);
 }
 
-.videochat-participant-viewer ion-icon {
+.videochat-participant-viewer .icon {
   font-size: 1.25rem;
 }
 
@@ -79,7 +79,7 @@
   margin-right: 0.5rem;
 }
 
-.videochat-participant ion-icon {
+.videochat-participant .icon {
   font-size: 1.5rem !important;
 }
 

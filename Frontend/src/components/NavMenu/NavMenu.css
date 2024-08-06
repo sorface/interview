@@ -95,7 +95,7 @@
   padding-left: 0;
 }
 
-.nav-menu ion-icon {
+.nav-menu .icon {
   width: var(--icon-width);
   min-width: var(--icon-width);
   font-size: var(--icon-width);
@@ -133,7 +133,7 @@
   padding-left: 2.0625rem;
 }
 
-.nav-menu .nav-menu-theme-switch ion-icon {
+.nav-menu .nav-menu-theme-switch .icon {
   padding-left: 1rem;
 }
 
