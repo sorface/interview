@@ -1,3 +1,6 @@
+.grid { display: grid; }
+.grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.gap-12 { gap: 3rem; }
 .flex { display: flex; }
 .flex-1 { flex: 1 1 0%; }
 .flex-col { flex-direction: column; }
@@ -21,6 +24,7 @@
 .text-red-light { color: var(--red-light); }
 .text-green-light { color: var(--green-light); }
 .text-grey-active { color: var(--grey-active); }
+.text-dark-orange { color: var(--dark-orange); }
 .bg-form { background-color: var(--form-bg); }
 .hover\:bg-form:hover { background-color: var(--form-bg); }
 .bg-wrap { background-color: var(--wrap-bg); }
@@ -38,6 +42,12 @@
 .bg-red-light { background-color: var(--red-light); }
 .bg-green-light { background-color: var(--green-light); }
 .bg-grey-active { background-color: var(--grey-active); }
+.bg-dark-orange { background-color: var(--dark-orange); }
+.bg-dark-blue { background-color: var(--dark-blue); }
+.bg-dark-green { background-color: var(--dark-green); }
+.bg-dark-orange-0\.25 { background-color: color-mix(in srgb, var(--dark-orange), transparent 75%); }
+.bg-dark-blue-0\.25 { background-color: color-mix(in srgb, var(--dark-blue), transparent 75%); }
+.bg-dark-green-0\.25 { background-color: color-mix(in srgb, var(--dark-green), transparent 75%); }
 .hover\:bg-blue-main:hover { background-color: var(--blue-main); }
 .hover\:bg-blue-light:hover { background-color: var(--blue-light); }
 .hover\:bg-blue-dark:hover { background-color: var(--blue-dark); }
@@ -77,6 +87,7 @@
 .px-1 { padding-left: 1rem; padding-right: 1rem; }
 .px-1\.25 { padding-left: 1.25rem; padding-right: 1.25rem; }
 .px-1\.5 { padding-left: 1.5rem; padding-right: 1.5rem; }
+.px-5 { padding-left: 5rem; padding-right: 5rem; }
 .pr-0\.25 { padding-right: 0.25rem; }
 .pr-0\.5 { padding-right: 0.5rem; }
 .pr-1 { padding-right: 1rem; }
@@ -117,6 +128,7 @@
 .w-18\.125 { width: 18.125rem; }
 .w-20 { width: 20rem; }
 .\!w-21 { width: 21rem !important; }
+.w-22 { width: 22rem; }
 .w-23\.125 { width: 23.125rem; }
 .w-25 { width: 25rem; }
 .h-full { height: 100%; }
@@ -144,6 +156,7 @@
 .text-center { text-align: center; }
 .opacity-0 { opacity: 0; }
 .opacity-0\.5 { opacity: 0.5; }
+.opacity-0\.65 { opacity: 0.65; }
 .backdrop-blur { backdrop-filter: blur(6px); }
 .origin-bottom { transform-origin: bottom; }
 .transition-none { transition-property: none; }

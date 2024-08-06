@@ -1,5 +1,5 @@
 import { FunctionComponent, ReactNode, useState } from 'react';
-import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';
 
 interface AccordionProps {
@@ -8,6 +8,7 @@ interface AccordionProps {
   classNameTitle?: string;
   disabled?: boolean;
   children?: ReactNode;
+  onClick?: () => void;
 }
 
 export const Accordion: FunctionComponent<AccordionProps> = ({
@@ -16,19 +17,28 @@ export const Accordion: FunctionComponent<AccordionProps> = ({
   classNameTitle,
   disabled,
   children,
+  onClick,
 }) => {
   const [expanded, setExpanded] = useState(false);
+  const cursorPointer = !disabled || onClick;
 
-  const handleExpandCollapse = () => {
+  const handleOnClick = () => {
+    if (onClick) {
+      onClick();
+      return;
+    }
     setExpanded(!expanded);
   };
 
   return (
     <div className={className}>
-      <div className={classNameTitle}>
+      <div
+        className={`${classNameTitle} ${cursorPointer ? 'cursor-pointer' : ''}`}
+        onClick={disabled && !onClick ? undefined : handleOnClick}
+      >
         {!disabled && (
-          <span onClick={handleExpandCollapse} className={`cursor-pointer h-1.125 ${expanded ? 'rotate-180' : ''}`}>
-            <ThemedIcon name={IconNames.ChevronDown} size='small' />
+          <span className={`cursor-pointer h-1.125 ${expanded ? 'rotate-90' : ''}`}>
+            <Icon name={IconNames.ChevronForward} size='small' />
           </span>
         )}
         {title}

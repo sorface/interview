@@ -1,5 +1,5 @@
 import { FunctionComponent, useEffect, useState } from 'react';
-import { ThemedIcon } from '../ThemedIcon/ThemedIcon';
+import { Icon } from '../Icon/Icon';
 import { IconNames } from '../../../../constants';
 import { Gap } from '../../../../components/Gap/Gap';
 import { padTime } from '../../../../utils/padTime';
@@ -44,7 +44,7 @@ export const RoomTimer: FunctionComponent<RoomTimerProps> = ({
 
   return (
     <div className="flex items-center justify-center px-1 py-0.625 bg-wrap rounded-2">
-      <ThemedIcon name={IconNames.Time} />
+      <Icon name={IconNames.Time} />
       <Gap sizeRem={0.25} horizontal />
       <div className='w-4 text-left'>
         {formatTime(remainingTimeMs <= 0 ? 0 : remainingTimeMs)}

@@ -1,4 +1,5 @@
 import { Fragment, FunctionComponent, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
@@ -15,6 +16,9 @@ import { QuestionItem } from '../../components/QuestionItem/QuestionItem';
 import { Question } from '../../types/question';
 import { RoomQuestionEvaluation } from '../Room/components/RoomQuestionEvaluation/RoomQuestionEvaluation';
 import { RoomParticipants } from '../../components/RoomParticipants/RoomParticipants';
+import { Button } from '../../components/Button/Button';
+import { toastSuccessOptions } from '../../constants';
+import { InfoBlock } from '../../components/InfoBlock/InfoBlock';
 
 const createFakeQuestion = (roomQuestion: RoomQuestion): Question => ({
   ...roomQuestion,
@@ -42,6 +46,21 @@ export const RoomReview: FunctionComponent = () => {
     }
   } = apiRoomQuestions;
 
+  const {
+    apiMethodState: apiRoomCloseMethodState,
+    fetchData: fetchRoomClose,
+  } = useApiMethod<unknown, Room['id']>(roomsApiDeclaration.close);
+  const {
+    process: {
+      error: roomCloseError,
+      code: roomCloseCode,
+    },
+  } = apiRoomCloseMethodState;
+
+  const examinee = room?.participants.find(
+    participant => participant.type === 'Examinee'
+  );
+
   useEffect(() => {
     if (!id) {
       throw new Error('Room id not found');
@@ -52,6 +71,27 @@ export const RoomReview: FunctionComponent = () => {
       States: ['Closed'],
     });
   }, [id, fetchData, getRoomQuestions]);
+
+  useEffect(() => {
+    if (roomCloseCode !== 200) {
+      return;
+    }
+    toast.success(localizationCaptions[LocalizationKey.Saved], toastSuccessOptions);
+  }, [roomCloseCode, localizationCaptions]);
+
+  useEffect(() => {
+    if (!roomCloseError) {
+      return;
+    }
+    toast.error(roomCloseError);
+  }, [roomCloseError]);
+
+  const handleCloseRoom = () => {
+    if (!id) {
+      throw new Error('Room id not found');
+    }
+    fetchRoomClose(id);
+  };
 
   if (loading || loadingRoomQuestions || !room || !roomQuestions) {
     return (
@@ -64,13 +104,13 @@ export const RoomReview: FunctionComponent = () => {
       <PageHeader title={localizationCaptions[LocalizationKey.RoomReviewPageName]} />
       <h2 className='text-left'>{room.name}</h2>
       <Gap sizeRem={1} />
-      <div className='text-left flex justify-between bg-wrap px-1.5 py-1.75 rounded-0.75'>
+      <InfoBlock className='text-left flex justify-between'>
         {error && (
           <Typography size='m'>{localizationCaptions[LocalizationKey.Error]}: {error}</Typography>
         )}
         <RoomInfoColumn
           header={localizationCaptions[LocalizationKey.Examinee]}
-          conent={localizationCaptions[LocalizationKey.NotFound]}
+          conent={examinee ? <span className='capitalize'>{examinee.nickname}</span> : localizationCaptions[LocalizationKey.NotFound]}
         />
         <RoomInfoColumn
           header={localizationCaptions[LocalizationKey.RoomParticipants]}
@@ -81,6 +121,7 @@ export const RoomReview: FunctionComponent = () => {
             header={localizationCaptions[LocalizationKey.RoomDateAndTime]}
             conent={
               <RoomDateAndTime
+                typographySize='m'
                 scheduledStartTime={room.scheduledStartTime}
                 timer={room.timer}
                 mini
@@ -88,15 +129,15 @@ export const RoomReview: FunctionComponent = () => {
             }
           />
         )}
-      </div>
+      </InfoBlock>
       <Gap sizeRem={0.5} />
-      <div className='text-left flex flex-col bg-wrap px-1.5 py-1.75 rounded-0.75'>
+      <InfoBlock className='text-left flex flex-col'>
         <Typography size='s' bold>{localizationCaptions[LocalizationKey.CandidateOpinion]}</Typography>
         <Gap sizeRem={1} />
         <textarea className='h-3.625' />
-      </div>
+      </InfoBlock>
       <Gap sizeRem={0.5} />
-      <div className='text-left bg-wrap px-1.5 py-1.75 rounded-0.75'>
+      <InfoBlock className='text-left'>
         <Typography size='xl' bold>{localizationCaptions[LocalizationKey.CandidateMarks]}</Typography>
         <Gap sizeRem={2} />
         {errorRoomQuestions && (
@@ -118,7 +159,11 @@ export const RoomReview: FunctionComponent = () => {
             {index !== roomQuestions.length - 1 && (<Gap sizeRem={0.25} />)}
           </Fragment>
         ))}
-      </div>
+      </InfoBlock>
+      <Gap sizeRem={0.5} />
+      <InfoBlock className='text-left'>
+        <Button onClick={handleCloseRoom}>{localizationCaptions[LocalizationKey.CloseRoom]}</Button>
+      </InfoBlock>
     </>
   );
 };

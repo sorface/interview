@@ -1,4 +1,6 @@
 :root {
+  --pi: 3.14159265358979;
+
   --blue-main: #0666E2;
   --blue-light: #EBF2FF;
   --blue-dark: #0058CA;
@@ -11,14 +13,18 @@
   --red-light: #F8E5E4;
   --green-light: #E9F8E7;
   --grey-active: #F1F3F8;
+  --dark-white: #FAFAFA;
+  --dark-orange: #E94D2B;
+  --dark-blue: #0666E2;
+  --dark-green: #3FA96A;
 
   --text: #ccc;
-  --page-bg: #080808;
+  --page-bg: #0B1529;
   --form-bg: var(--page-bg);
-  --wrap-bg: #171717;
+  --wrap-bg: #101E36;
   --active: #b9221c;
   --disabled-icon: #b9221c;
-  --active-nav-tab: #424242;
+  --active-nav-tab: #3A5281;
   --nav-header-color: var(--text);
   --nav-item-color: var(--text);
   --nav-item-active-background: var(--active-nav-tab);
@@ -33,7 +39,8 @@
   --menu-line-height: calc(var(--menu-font-size) * 1.4);
   --button-border-color: #424242;
   --button-bg: #171717;
-  --button-active-bg: #4096FF;
+  --button-active-color: var(--dark-white);
+  --button-active-bg: var(--blue-main);
   --button-active-bg-hover: #4096FF;
   --button-bg-active: var(--active);
   --button-hover-border-color: var(--text);
@@ -75,6 +82,7 @@
 
   --button-border-color: var(--grey2);
   --button-bg: #FFF;
+  --button-active-color: var(--button-bg);
   --button-active-bg: var(--blue-main);
   --button-active-bg-hover: var(--blue-dark);
   --button-bg-active: var(--active);

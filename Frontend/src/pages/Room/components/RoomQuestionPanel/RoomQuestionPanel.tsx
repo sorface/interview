@@ -9,7 +9,7 @@ import { Gap } from '../../../../components/Gap/Gap';
 import { RoomQuestionEvaluation, RoomQuestionEvaluationValue } from '../RoomQuestionEvaluation/RoomQuestionEvaluation';
 import { Loader } from '../../../../components/Loader/Loader';
 import { Typography } from '../../../../components/Typography/Typography';
-import { ThemedIcon } from '../ThemedIcon/ThemedIcon';
+import { Icon } from '../Icon/Icon';
 import { IconNames } from '../../../../constants';
 import { Button } from '../../../../components/Button/Button';
 
@@ -20,6 +20,7 @@ const notFoundCode = 404;
 
 export interface RoomQuestionPanelProps {
   room: Room | null;
+  roomQuestionsLoading: boolean;
   roomQuestions: RoomQuestion[];
   initialQuestion?: RoomQuestion;
   readOnly: boolean;
@@ -27,6 +28,7 @@ export interface RoomQuestionPanelProps {
 
 export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
   room,
+  roomQuestionsLoading,
   roomQuestions,
   initialQuestion,
   readOnly,
@@ -179,10 +181,10 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
         <div className=''>
           <ActiveQuestionSelector
             showClosedQuestions={showClosedQuestions}
+            loading={roomQuestionsLoading}
             questions={roomQuestions}
             openQuestions={openQuestionsIds}
             initialQuestion={initialQuestion}
-            placeHolder={localizationCaptions[LocalizationKey.SelectActiveQuestion]}
             readOnly={readOnly}
             onSelect={handleQuestionSelect}
             onShowClosedQuestions={handleShowClosedQuestions}
@@ -199,13 +201,13 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
                 onChange={handleRoomQuestionEvaluationChange}
               />
             ) : (
-              <Loader />
+              !!initialQuestion && (<Loader />)
             )}
             <Gap sizeRem={1} />
             <div className='text-left h-1.125'>
               {mergedRoomQuestionEvaluation && (
                 <Typography size='s'>
-                  <ThemedIcon name={IconNames.CheckmarkDone} />
+                  <Icon name={IconNames.CheckmarkDone} />
                   {localizationCaptions[LocalizationKey.Saved]}
                 </Typography>
               )}
@@ -224,8 +226,15 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
               variant='active'
               onClick={openQuestionsIds.length !== 0 ? handleNextQuestion : handleStartReviewRoom}
             >
-              {localizationCaptions[openQuestionsIds.length !== 0 ? LocalizationKey.NextRoomQuestion : LocalizationKey.StartReviewRoom]}
-              <ThemedIcon name={openQuestionsIds.length !== 0 ? IconNames.ChevronForward : IconNames.Stop} />
+              {!initialQuestion ?
+                localizationCaptions[LocalizationKey.StartRoom] :
+                localizationCaptions[
+                openQuestionsIds.length !== 0 ?
+                  LocalizationKey.NextRoomQuestion :
+                  LocalizationKey.StartReviewRoom
+                ]
+              }
+              <Icon name={openQuestionsIds.length !== 0 ? IconNames.ChevronForward : IconNames.Stop} />
             </Button>
           </div>
         </>

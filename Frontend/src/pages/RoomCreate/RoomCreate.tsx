@@ -14,7 +14,7 @@ import { SwitcherButton } from '../../components/SwitcherButton/SwitcherButton';
 import { ModalFooter } from '../../components/ModalFooter/ModalFooter';
 import { Gap } from '../../components/Gap/Gap';
 import { Typography } from '../../components/Typography/Typography';
-import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../Room/components/Icon/Icon';
 import { RoomQuestionsSelector } from './RoomQuestionsSelector/RoomQuestionsSelector';
 import { QuestionItem } from '../../components/QuestionItem/QuestionItem';
 import { RoomInvitations } from '../../components/RoomInvitations/RoomInvitations';
@@ -28,8 +28,10 @@ const dateFieldName = 'roomDate';
 const startTimeFieldName = 'roomStartTime';
 const endTimeFieldName = 'roomEndTime';
 
+const roomStartTimeShiftMinutes = 15;
+
 const formatDate = (value: Date) => {
-  const month = padTime(value.getMonth());
+  const month = padTime(value.getMonth() + 1);
   const date = padTime(value.getDate());
   return `${value.getFullYear()}-${month}-${date}`;
 };
@@ -100,16 +102,17 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
 
   const [roomFields, setRoomFields] = useState<RoomFields>({
     name: '',
-    date: '',
+    date: formatDate(new Date()),
     startTime: '',
     endTime: '',
   });
   const [selectedQuestions, setSelectedQuestions] = useState<RoomQuestionListItem[]>([]);
   const [creationStep, setCreationStep] = useState<CreationStep>(CreationStep.Step1);
   const [questionsView, setQuestionsView] = useState(false);
+  const [uiError, setUiError] = useState('');
 
   const totalLoading = loading || loadingRoom || loadingRoomEdit;
-  const totalError = error || errorRoom || errorRoomEdit;
+  const totalError = error || errorRoom || errorRoomEdit || uiError;
 
   useEffect(() => {
     if (!editRoomId) {
@@ -148,7 +151,42 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     });
   }, [createdRoom, editedRoom, fetchRoomInvites]);
 
+  const getUiError = () => {
+    if (!roomFields.name) {
+      return localizationCaptions[LocalizationKey.EmptyRoomNameError];
+    }
+    if (!roomFields.startTime) {
+      return localizationCaptions[LocalizationKey.RoomEmptyStartTimeError];
+    }
+    if (!roomFields.date) {
+      return localizationCaptions[LocalizationKey.RoomEmptyStartTimeError];
+    }
+    const roomDateStart = new Date(roomFields.date);
+    const roomStartTime = roomFields.startTime.split(':');
+    roomDateStart.setHours(parseInt(roomStartTime[0]));
+    roomDateStart.setMinutes(parseInt(roomStartTime[1]));
+    if (roomDateStart.getTime() < (Date.now() - 1000 * 60 * roomStartTimeShiftMinutes)) {
+      return localizationCaptions[LocalizationKey.RoomStartTimeMustBeGreaterError];
+    }
+    if (selectedQuestions.length === 0) {
+      return localizationCaptions[LocalizationKey.RoomEmptyQuestionsListError];
+    }
+    return '';
+  };
+
+  const validateRoomFields = () => {
+    const newUiError = getUiError();
+    setUiError(newUiError);
+    if (newUiError) {
+      return false;
+    }
+    return true;
+  };
+
   const handleCreateRoom = () => {
+    if (!validateRoomFields()) {
+      return;
+    }
     const roomDateStart = new Date(roomFields.date);
     const roomStartTime = roomFields.startTime.split(':');
     roomDateStart.setHours(parseInt(roomStartTime[0]));
@@ -208,9 +246,16 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
   const renderStatus = useCallback(() => {
     if (totalError) {
       return (
-        <Field>
-          <div>{localizationCaptions[LocalizationKey.Error]}: {totalError}</div>
-        </Field>
+        <>
+          <Typography size='m' error>
+            <div className='flex'>
+              <Icon name={IconNames.Information} />
+              <Gap sizeRem={0.25} horizontal />
+              {totalError}
+            </div>
+          </Typography>
+          <Gap sizeRem={1.25} />
+        </>
       );
     }
     if (totalLoading) {
@@ -221,7 +266,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
       );
     }
     return <></>;
-  }, [totalError, totalLoading, localizationCaptions]);
+  }, [totalError, totalLoading]);
 
   const renderQuestionItem = (question: Question, lastItem: boolean) => (
     <>
@@ -309,7 +354,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
             />
             {!!selectedQuestions.length && <Gap sizeRem={1.5} />}
             <Button onClick={handleQuestionsViewOpen}>
-              <ThemedIcon name={IconNames.Add} />
+              <Icon name={IconNames.Add} />
               {localizationCaptions[LocalizationKey.AddRoomQuestions]}
             </Button>
           </RoomCreateField.Content>

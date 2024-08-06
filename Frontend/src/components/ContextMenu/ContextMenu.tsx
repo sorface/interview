@@ -1,5 +1,5 @@
 import { FunctionComponent, ReactNode } from 'react';
-import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';
 import { Dropdown, DropdownProps } from '../Dropdown/Dropdown';
 import { Typography } from '../Typography/Typography';
@@ -20,7 +20,7 @@ const ContextMenuComponent: FunctionComponent<ContextMenuProps> = ({
   buttonVariant,
   children,
 }) => {
-  const defaultToggleContent = <ThemedIcon name={IconNames.EllipsisVertical} />;
+  const defaultToggleContent = <Icon name={IconNames.EllipsisVertical} />;
   return (
     <Dropdown
       toggleContent={toggleContent || defaultToggleContent}

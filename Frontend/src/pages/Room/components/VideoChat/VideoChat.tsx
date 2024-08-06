@@ -45,11 +45,8 @@ interface VideoChatProps {
   userVideoStream: MediaStream | null;
   userAudioStream: MediaStream | null;
   screenStream: MediaStream | null;
-  micDisabledAutomatically: React.MutableRefObject<boolean>;
   onSendWsMessage: SendMessage;
   onUpdatePeersLength: (length: number) => void;
-  onMuteMic: () => void;
-  onUnmuteMic: () => void;
   renderToolsPanel: () => ReactElement;
 };
 
@@ -94,6 +91,14 @@ const removeDuplicates = (peersRef: React.MutableRefObject<PeerMeta[]>, newPeerM
     peer.peerID !== newPeerMeta.peerID ? true : peer.screenShare !== newPeerMeta.screenShare
   );
 
+const findUserByOrder = (videoOrder: Record<string, number>) => {
+  const lounderUser = Object.entries(videoOrder).find(([userId, order]) => order === 1);
+  if (lounderUser) {
+    return lounderUser[0];
+  }
+  return null;
+};
+
 export const VideoChat: FunctionComponent<VideoChatProps> = ({
   roomState,
   viewerMode,
@@ -104,11 +109,8 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   userVideoStream,
   userAudioStream,
   screenStream,
-  micDisabledAutomatically,
   onSendWsMessage,
   onUpdatePeersLength,
-  onMuteMic,
-  onUnmuteMic,
   renderToolsPanel,
 }) => {
   const auth = useContext(AuthContext);
@@ -247,7 +249,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     const updateAudioAnalyser = () => {
       const time = performance.now();
       const delta = time - prevTime;
-      let somebodyIsSpeaking = false;
       let newLouderUserId = '';
       let louderVolume = -1;
       const result: Record<string, number> = {};
@@ -256,9 +257,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         const averageVolume = getAverageVolume(frequencyData);
         if (averageVolume < audioVolumeThreshold) {
           continue;
-        }
-        if (auth?.id && (userId !== auth.id)) {
-          somebodyIsSpeaking = true;
         }
         if (averageVolume > louderVolume) {
           newLouderUserId = userId;
@@ -272,14 +270,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         prevTime = time;
         requestRef.current = requestAnimationFrame(updateAudioAnalyser);
         return;
-      }
-
-      const micEnabled = userAudioStream?.getAudioTracks().some(audioTrack => audioTrack.enabled);
-      if (somebodyIsSpeaking && micEnabled) {
-        micDisabledAutomatically.current = true;
-        onMuteMic();
-      } else if (!somebodyIsSpeaking && !micEnabled && micDisabledAutomatically.current) {
-        onUnmuteMic();
       }
 
       if (newLouderUserId && newLouderUserId !== louderUserId.current) {
@@ -302,7 +292,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       }
     };
 
-  }, [auth, louderUserId, userAudioStream, micDisabledAutomatically, onMuteMic, onUnmuteMic]);
+  }, [auth, louderUserId]);
 
   const addPeer = useCallback((incomingSignal: Peer.SignalData, callerID: string, screenShare?: boolean) => {
     const streams: MediaStream[] = [];
@@ -596,16 +586,26 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         />
       );
     }
+    const userOrder1 = findUserByOrder(videoOrder);
+    if (!userOrder1 || userOrder1 === auth?.id) {
+      return (
+        <video
+          ref={userVideo}
+          className='videochat-video'
+          muted
+          autoPlay
+          playsInline
+        >
+          Video not supported
+        </video>
+      );
+    }
+    const userOrder1Peer = peers.find(peer => peer.targetUserId === userOrder1);
+    if (!userOrder1Peer) {
+      return <></>;
+    }
     return (
-      <video
-        ref={userVideo}
-        className='videochat-video'
-        muted
-        autoPlay
-        playsInline
-      >
-        Video not supported
-      </video>
+      <VideoChatVideo peer={userOrder1Peer.peer} />
     );
   };
 
@@ -629,7 +629,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
               </Canvas>
             </div>
           </VideochatParticipant>
-          {needToRenderMainField && (
+          {(needToRenderMainField && videoOrder[auth?.id || ''] === 1) && (
             <VideochatParticipant
               order={viewerMode ? viewerOrder - 1 : videoOrder[auth?.id || '']}
               viewer={viewerMode}
@@ -648,18 +648,25 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
               </video>
             </VideochatParticipant>
           )}
-          {peers.filter(peer => !peer.screenShare).map(peer => (
-            <VideochatParticipant
-              key={peer.peerID}
-              viewer={peer.participantType === 'Viewer'}
-              order={peer.participantType === 'Viewer' ? viewerOrder : videoOrder[peer.targetUserId]}
-              avatar={peer?.avatar}
-              nickname={peer?.nickname}
-              reaction={activeReactions[peer.peerID]}
-            >
-              <VideoChatVideo peer={peer.peer} />
-            </VideochatParticipant>
-          ))}
+          {peers
+            .filter(peer => {
+              if (needToRenderMainField && videoOrder[peer.targetUserId] === 1) {
+                return false;
+              }
+              return !peer.screenShare;
+            })
+            .map(peer => (
+              <VideochatParticipant
+                key={peer.peerID}
+                viewer={peer.participantType === 'Viewer'}
+                order={peer.participantType === 'Viewer' ? viewerOrder : videoOrder[peer.targetUserId]}
+                avatar={peer?.avatar}
+                nickname={peer?.nickname}
+                reaction={activeReactions[peer.peerID]}
+              >
+                <VideoChatVideo peer={peer.peer} />
+              </VideochatParticipant>
+            ))}
         </div>
 
         <div className={`absolute top-0 h-full bg-wrap ${messagesChatEnabled ? 'visible' : 'invisible'} z-1`}>

@@ -1,6 +1,6 @@
-import { FunctionComponent, ReactNode, useState } from 'react';
+import { MouseEvent, FunctionComponent, ReactNode, useState } from 'react';
 import { CodeEditorLang, Question, QuestionAnswer } from '../../types/question';
-import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';
 import { Typography } from '../Typography/Typography';
 import { Accordion } from '../Accordion/Accordion';
@@ -10,31 +10,39 @@ import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { ContextMenu, ContextMenuProps } from '../ContextMenu/ContextMenu';
 import { Button } from '../Button/Button';
+import { CircularProgress } from '../CircularProgress/CircularProgress';
 
 interface QuestionItemProps {
   question: Question;
   checked?: boolean;
   checkboxLabel?: ReactNode;
+  mark?: number;
   primary?: boolean;
   contextMenu?: ContextMenuProps;
   children?: ReactNode;
   onCheck?: (newValue: boolean) => void;
   onRemove?: (question: Question) => void;
+  onClick?: (question: Question) => void;
 }
 
 export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
   question,
   checked,
   checkboxLabel,
+  mark,
   primary,
   contextMenu,
   children,
   onCheck,
   onRemove,
+  onClick,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
   const hasCheckbox = typeof checked === 'boolean';
-  const accordionDisabled = question.answers.length === 0 && !children;
+  const accordionDisabled =
+    question.answers.length === 0 &&
+    !question.codeEditor &&
+    !children;
   const [selectedAnswer, setSelectedAnswer] = useState<QuestionAnswer | null>(
     question.answers ? question.answers[0] : null
   );
@@ -43,12 +51,30 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
     onCheck?.(!checked);
   };
 
+  const handleCheckboxAreaClick = (e: MouseEvent) => {
+    e.stopPropagation();
+  };
+
   const handleRemove = () => {
     onRemove?.(question);
   };
 
+  const handleOnClick = () => {
+    onClick?.(question);
+  };
+
   const title = (
     <>
+      {typeof mark === 'number' && (
+        <>
+          <CircularProgress
+            size='s'
+            value={mark * 10}
+            caption={mark.toFixed(1)}
+          />
+          <Gap sizeRem={1.5} horizontal />
+        </>
+      )}
       <div className={`${!accordionDisabled ? 'px-0.75' : ''}`}>
         <Typography size='m' bold>
           {question.value}
@@ -57,18 +83,28 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
       <div className='ml-auto'>
         {contextMenu && <ContextMenu {...contextMenu} buttonVariant='text' />}
         {hasCheckbox && (
-          <>
-            <input id={`questionCheckbox${question.id}`} type='checkbox' checked={checked} onChange={handleCheckboxChange} />
+          <div onClick={handleCheckboxAreaClick}>
+            <input
+              id={`questionCheckbox${question.id}`}
+              type='checkbox'
+              checked={checked}
+              onChange={handleCheckboxChange}
+            />
             {checkboxLabel && (
               <label htmlFor={`questionCheckbox${question.id}`}>
                 {checkboxLabel}
-                </label>
+              </label>
             )}
-          </>
+          </div>
         )}
         {onRemove && (
           <span onClick={handleRemove} className='cursor-pointer'>
-            <ThemedIcon name={IconNames.Trash} size='small' />
+            <Icon name={IconNames.Trash} size='small' />
+          </span>
+        )}
+        {onClick && (
+          <span className='opacity-0.5'>
+            <Icon name={IconNames.ChevronForward} size='small' />
           </span>
         )}
       </div>
@@ -81,6 +117,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
       disabled={accordionDisabled}
       className={`${primary ? 'bg-wrap' : 'bg-form'} rounded-0.75 py-1.25 px-1.5`}
       classNameTitle='flex items-center'
+      onClick={onClick ? handleOnClick : undefined}
     >
       {question.codeEditor && (
         <>

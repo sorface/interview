@@ -11,7 +11,7 @@ import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
-import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../Room/components/Icon/Icon';
 import { RoomCreate } from '../RoomCreate/RoomCreate';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Button } from '../../components/Button/Button';
@@ -25,6 +25,20 @@ import './Rooms.css';
 const pageSize = 30;
 const initialPageNumber = 1;
 const searchDebounceMs = 300;
+
+const getRoomLink = (room: Room) => {
+  switch (room.roomStatus) {
+    case 'New':
+    case 'Active':
+      return generatePath(pathnames.room, { id: room.id });
+    case 'Review':
+      return generatePath(pathnames.roomReview, { id: room.id });
+    case 'Close':
+      return generatePath(pathnames.roomAnalytics, { id: room.id });
+    default:
+      return '';
+  }
+};
 
 export enum RoomsPageMode {
   Current,
@@ -114,12 +128,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
       Close: TagState.Closed,
     };
 
-    const roomSummary =
-      room.roomStatus === 'Review' ||
-      room.roomStatus === 'Close';
-    const roomLink = roomSummary ?
-      generatePath(pathnames.roomReview, { id: room.id }) :
-      generatePath(pathnames.room, { id: room.id });
+    const roomLink = getRoomLink(room);
 
     return (
       <div key={room.id} className='room-item-wrapper'>
@@ -138,7 +147,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
                         className='room-edit-participants-link rotate-90'
                         onClick={handleOpenEditModal(room.id)}
                       >
-                        <ThemedIcon name={IconNames.Options} />
+                        <Icon name={IconNames.Options} />
                       </div>
                     </>
                   )}
@@ -151,6 +160,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
                 <>
                   <Gap sizeRem={0.75} />
                   <RoomDateAndTime
+                    typographySize='s'
                     scheduledStartTime={room.scheduledStartTime}
                     timer={room.timer}
                   />
@@ -173,7 +183,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
         onSearchChange={setSearchValueInput}
       >
         <Button variant='active' className='h-2.5' onClick={handleOpenCreateModal}>
-          <ThemedIcon name={IconNames.Add} />
+          <Icon name={IconNames.Add} />
           {localizationCaptions[LocalizationKey.CreateRoom]}
         </Button>
       </PageHeader>

@@ -1,5 +1,5 @@
 import { FunctionComponent, useContext } from 'react';
-import { Typography } from '../Typography/Typography';
+import { Typography, TypographyProps } from '../Typography/Typography';
 import { Gap } from '../Gap/Gap';
 import { Room } from '../../types/room';
 import { LocalizationContext } from '../../context/LocalizationContext';
@@ -7,6 +7,7 @@ import { padTime } from '../../utils/padTime';
 
 interface RoomDateAndTimeProps {
   scheduledStartTime: string;
+  typographySize: TypographyProps['size'];
   timer?: Room['timer'];
   mini?: boolean;
 }
@@ -34,6 +35,7 @@ const formatDuration = (scheduledStartTime: string, durationSec: number) => {
 
 export const RoomDateAndTime: FunctionComponent<RoomDateAndTimeProps> = ({
   scheduledStartTime,
+  typographySize,
   timer,
   mini,
 }) => {
@@ -42,12 +44,12 @@ export const RoomDateAndTime: FunctionComponent<RoomDateAndTimeProps> = ({
   return (
     <div className={`flex  ${!mini ? 'justify-between' : ''} items-baseline`}>
       <div className='flex items-baseline'>
-        <Typography size='s'>
+        <Typography size={typographySize}>
           {formatScheduledStartTime(scheduledStartTime, lang)}
         </Typography>
         <Gap sizeRem={0.5} horizontal />
         <div className='capitalize opacity-0.5'>
-          <Typography size='s'>
+          <Typography size={typographySize}>
             {formatScheduledStartDay(scheduledStartTime, lang)}
           </Typography>
         </div>
@@ -55,7 +57,7 @@ export const RoomDateAndTime: FunctionComponent<RoomDateAndTimeProps> = ({
       {timer && (
         <>
           {mini && (<Gap sizeRem={1} horizontal />)}
-          <Typography size='s'>
+          <Typography size={typographySize}>
             {formatDuration(scheduledStartTime, timer.durationSec)}
           </Typography>
         </>

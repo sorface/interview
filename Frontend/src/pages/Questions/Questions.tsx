@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { GetQuestionsParams, questionsApiDeclaration } from '../../apiDeclarations';
+import { GetQuestionsParams, categoriesApiDeclaration, questionsApiDeclaration } from '../../apiDeclarations';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { IconNames, pathnames } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
@@ -12,9 +12,13 @@ import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
 import { QuestionItem } from '../../components/QuestionItem/QuestionItem';
 import { ContextMenu } from '../../components/ContextMenu/ContextMenu';
 import { Link } from 'react-router-dom';
-import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../Room/components/Icon/Icon';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Button } from '../../components/Button/Button';
+import { Category } from '../../types/category';
+import { Typography } from '../../components/Typography/Typography';
+import { Gap } from '../../components/Gap/Gap';
+import { Loader } from '../../components/Loader/Loader';
 
 import './Questions.css';
 
@@ -26,7 +30,13 @@ export const Questions: FunctionComponent = () => {
   const navigate = useNavigate();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const [searchValueInput, setSearchValueInput] = useState('');
-  const { category } = useParams();
+  const { rootCategory, subCategory } = useParams();
+
+  const { apiMethodState: rootCategoryState, fetchData: fetchRootCategory } = useApiMethod<Category | null, Category['id']>(categoriesApiDeclaration.get);
+  const { process: { loading: rootCategoryLoading, error: rootCategoryError }, data: rootCategoryData } = rootCategoryState;
+
+  const { apiMethodState: subCategoryState, fetchData: fetchSubCategory } = useApiMethod<Category, Category['id']>(categoriesApiDeclaration.get);
+  const { process: { loading: subCategoryLoading, error: subCategoryError }, data: subCategoryData } = subCategoryState;
 
   const { apiMethodState: questionsState, fetchData: fetchQuestios } = useApiMethod<Question[], GetQuestionsParams>(questionsApiDeclaration.getPage);
   const { process: { loading, error }, data: questions } = questionsState;
@@ -34,15 +44,27 @@ export const Questions: FunctionComponent = () => {
   const { apiMethodState: archiveQuestionsState, fetchData: archiveQuestion } = useApiMethod<Question, Question['id']>(questionsApiDeclaration.archive);
   const { process: { loading: archiveLoading, error: archiveError }, data: archivedQuestion } = archiveQuestionsState;
 
+  const categoriesLoading = rootCategoryLoading || subCategoryLoading;
+  const categoriesError = rootCategoryError || subCategoryError;
+
   useEffect(() => {
     fetchQuestios({
       PageNumber: pageNumber,
       PageSize: pageSize,
       tags: [],
       value: searchValueInput,
-      categoryId: category?.replace(':category', '') || '',
+      categoryId: subCategory?.replace(':category', '') || '',
     });
-  }, [pageNumber, searchValueInput, archivedQuestion, category, fetchQuestios]);
+  }, [pageNumber, searchValueInput, archivedQuestion, subCategory, fetchQuestios]);
+
+  useEffect(() => {
+    if (rootCategory) {
+      fetchRootCategory(rootCategory);
+    }
+    if (subCategory) {
+      fetchSubCategory(subCategory);
+    }
+  }, [rootCategory, subCategory, fetchRootCategory, fetchSubCategory]);
 
   const handleNextPage = useCallback(() => {
     setPageNumber(pageNumber + 1);
@@ -86,26 +108,59 @@ export const Questions: FunctionComponent = () => {
         searchValue={searchValueInput}
         onSearchChange={setSearchValueInput}
       >
-        <Link to={pathnames.questionsCreate}>
-        <Button variant='active' className='h-2.5'>
-          <ThemedIcon name={IconNames.Add} />
-          {localizationCaptions[LocalizationKey.CreateQuestion]}
-        </Button>
+        <Link
+          to={
+            pathnames.questionsCreate
+              .replace(':rootCategory', rootCategory || '')
+              .replace(':subCategory', subCategory || '')
+          }
+        >
+          <Button variant='active' className='h-2.5'>
+            <Icon name={IconNames.Add} />
+            {localizationCaptions[LocalizationKey.CreateQuestion]}
+          </Button>
         </Link>
       </PageHeader>
       <ProcessWrapper
         loading={false}
         error={error || archiveError}
       >
-        <ItemsGrid
-          currentData={questions}
-          loading={loading}
-          triggerResetAccumData={`${searchValueInput}${category}${archivedQuestion}`}
-          loaderClassName='question-item field-wrap'
-          renderItem={createQuestionItem}
-          nextPageAvailable={questions?.length === pageSize}
-          handleNextPage={handleNextPage}
-        />
+        <>
+          <div className='flex items-center'>
+            {categoriesError && (
+              <Typography size='m'>
+                {localizationCaptions[LocalizationKey.Error]}: {categoriesError}
+              </Typography>
+            )}
+            {categoriesLoading ? (
+              <Loader />
+            ) : (
+              <>
+                <Typography size='m'>
+                  {rootCategoryData?.name}
+                </Typography>
+                <span className='flex opacity-0.65'>
+                  <Icon name={IconNames.ChevronForward} />
+                </span>
+                <span className='opacity-0.5'>
+                  <Typography size='m'>
+                    {subCategoryData?.name}
+                  </Typography>
+                </span>
+              </>
+            )}
+          </div>
+          <Gap sizeRem={1} />
+          <ItemsGrid
+            currentData={questions}
+            loading={loading}
+            triggerResetAccumData={`${searchValueInput}${subCategory}${archivedQuestion}`}
+            loaderClassName='question-item field-wrap'
+            renderItem={createQuestionItem}
+            nextPageAvailable={questions?.length === pageSize}
+            handleNextPage={handleNextPage}
+          />
+        </>
       </ProcessWrapper>
     </MainContentWrapper>
   );

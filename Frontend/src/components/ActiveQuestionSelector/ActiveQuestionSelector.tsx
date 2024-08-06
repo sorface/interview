@@ -4,7 +4,7 @@ import { RoomQuestion } from '../../types/room';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Gap } from '../Gap/Gap';
 import { Typography } from '../Typography/Typography';
-import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';
 
 import './ActiveQuestionSelector.css';
@@ -14,8 +14,8 @@ const sortOption = (option1: RoomQuestion, option2: RoomQuestion) =>
 
 export interface ActiveQuestionSelectorProps {
   initialQuestion?: RoomQuestion;
-  placeHolder: string;
   showClosedQuestions: boolean;
+  loading: boolean;
   questions: RoomQuestion[];
   openQuestions: Array<RoomQuestion['id']>;
   readOnly: boolean;
@@ -25,8 +25,8 @@ export interface ActiveQuestionSelectorProps {
 
 export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorProps> = ({
   initialQuestion,
-  placeHolder,
   showClosedQuestions,
+  loading,
   questions,
   openQuestions,
   readOnly,
@@ -39,7 +39,15 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   const searchRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
   const localizationCaptions = useLocalizationCaptions();
+  const [questionsCount, setQuestionsCount] = useState(0);
   const currentOrder = (selectedValue ? selectedValue.order : initialQuestion?.order) || 0;
+
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+    setQuestionsCount(questions.length);
+  }, [loading, questions.length]);
 
   const isOpened = (question: RoomQuestion) => {
     return openQuestions.includes(question.id);
@@ -97,7 +105,7 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
 
   const getDisplay = () => {
     if (!selectedValue && !initialQuestion) {
-      return placeHolder;
+      return '';
     }
     return `${selectedValue?.value || initialQuestion?.value}`;
   };
@@ -115,7 +123,7 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
     <>
       <div className="activeQuestionSelector-container relative">
         <div ref={inputRef} onClick={handleInputClick} className="activeQuestionSelector-input cursor-pointer">
-          <ThemedIcon name={IconNames.ReorderFour} />
+          <Icon name={IconNames.ReorderFour} />
           <Gap sizeRem={1} horizontal />
           <div className="activeQuestionSelector-selected-value w-full flex items-center">
             <div>
@@ -125,13 +133,13 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
             </div>
             <div className='ml-auto border border-button border-solid px-0.75 py-0.125 rounded-2'>
               <Typography size='s'>
-                {`${currentOrder + 1} ${localizationCaptions[LocalizationKey.Of]} ${questions.length}`}
+                {`${initialQuestion ? currentOrder + 1 : 0} ${localizationCaptions[LocalizationKey.Of]} ${questionsCount}`}
               </Typography>
             </div>
           </div>
         </div>
         <Gap sizeRem={1} />
-        <progress className='w-full h-0.125' value={currentOrder + 1} max={questions.length}></progress>
+        <progress className='w-full h-0.125' value={currentOrder + 1} max={questionsCount}></progress>
         {showMenu && (
           <div className="activeQuestionSelector-menu text-left">
             <div ref={searchRef} className="activeQuestionSelector-search-panel">
