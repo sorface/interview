@@ -1,6 +1,6 @@
 import { FunctionComponent } from "react";
 import { IconNames, reactionIcon } from "../../../../constants";
-import { ThemedIcon } from "../ThemedIcon/ThemedIcon";
+import { Icon } from "../Icon/Icon";
 
 import './ParticipantReactions.css';
 
@@ -17,7 +17,7 @@ export const ParticipantReactions: FunctionComponent<ParticipantReactionsProps> 
     <div className="participant-reactions">
       {!!reaction && (
         <span key={reaction} className="participant-reaction">
-          <ThemedIcon name={reactionIcon[reaction] || defaultIconName} />
+          <Icon name={reactionIcon[reaction] || defaultIconName} />
         </span>
       )}
     </div>

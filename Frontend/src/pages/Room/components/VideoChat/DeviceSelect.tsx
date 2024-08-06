@@ -1,6 +1,6 @@
 import { ChangeEvent, FunctionComponent, useEffect, useState } from 'react';
 import { IconNames } from '../../../../constants';
-import { ThemedIcon } from '../ThemedIcon/ThemedIcon';
+import { Icon } from '../Icon/Icon';
 
 interface DeviceSelectProps {
   devices: MediaDeviceInfo[];
@@ -36,7 +36,7 @@ export const DeviceSelect: FunctionComponent<DeviceSelectProps> = ({
     <>
       {icon && (
         <div className='pr-0.25'>
-          <ThemedIcon name={icon} />
+          <Icon name={icon} />
         </div>
       )}
       <select

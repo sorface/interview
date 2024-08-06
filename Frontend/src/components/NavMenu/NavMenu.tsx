@@ -2,7 +2,7 @@ import React, { FunctionComponent, ReactElement, ReactNode, useEffect, useState 
 import { NavLink, useNavigate, matchPath, useLocation } from 'react-router-dom';
 import { ThemeSwitchMini } from '../ThemeSwitchMini/ThemeSwitchMini';
 import { IconNames, pathnames } from '../../constants';
-import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { LocalizationCaption } from '../LocalizationCaption/LocalizationCaption';
@@ -135,7 +135,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
           {item.logo ? (
             <img className='site-logo' src={item.logo} alt='site logo' />
           ) : (
-            <ThemedIcon name={item.icon} />
+            <Icon name={item.icon} />
           )}
           <div
             className='nav-menu-item-caption move-transition'
@@ -183,7 +183,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
               style={{ width: collapsed ? '0rem' : 'var(--caption-width)' }}
             >
               {localizationCaptions[LocalizationKey.ThemeDark]}
-              <ThemedIcon name={IconNames.ThemeSwitchDark} />
+              <Icon name={IconNames.ThemeSwitchDark} />
             </div>
           </div>
           <div className='nav-menu-build h-1.125 opacity-0.5'>

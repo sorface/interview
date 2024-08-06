@@ -1,5 +1,5 @@
 import { FunctionComponent } from 'react';
-import { ThemedIcon } from '../ThemedIcon/ThemedIcon';
+import { Icon } from '../Icon/Icon';
 import { IconNames } from '../../../../constants';
 import { Loader } from '../../../../components/Loader/Loader';
 import { Button } from '../../../../components/Button/Button';
@@ -42,7 +42,7 @@ export const SwitchButton: FunctionComponent<SwitchButtonProps> = ({
         {loading ? (
           <Loader />
         ) : (
-          <ThemedIcon name={iconName} />
+          <Icon name={iconName} />
         )}
         {!!counter && (
           <div className="switch-button-counter-wrapper">

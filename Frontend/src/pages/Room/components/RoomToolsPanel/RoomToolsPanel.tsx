@@ -2,7 +2,7 @@ import { FunctionComponent, ReactNode } from 'react'
 import { IconNames } from '../../../../constants';
 import { Button } from '../../../../components/Button/Button';
 import { Loader } from '../../../../components/Loader/Loader';
-import { ThemedIcon } from '../ThemedIcon/ThemedIcon';
+import { Icon } from '../Icon/Icon';
 
 interface WrapperProps {
   rightPos?: string;
@@ -66,7 +66,7 @@ const SwitchButton: FunctionComponent<SwitchButtonProps> = ({
           <Loader />
         ) : (
           <div className='absolute z-1'>
-            <ThemedIcon name={iconName} />
+            <Icon name={iconName} />
           </div>
         )}
         {typeof progress === 'number' && (

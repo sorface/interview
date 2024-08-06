@@ -3,7 +3,7 @@ import { RoomQuestionListItem } from '../RoomCreate';
 import { useLocalizationCaptions } from '../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../localization';
 import { Dropdown } from '../../../components/Dropdown/Dropdown';
-import { ThemedIcon } from '../../Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../../Room/components/Icon/Icon';
 import { IconNames } from '../../../constants';
 
 const sortQestions = (qestion1: RoomQuestionListItem, qestion2: RoomQuestionListItem) =>
@@ -27,7 +27,7 @@ export const RoomQuestionsSelectorPreview: FunctionComponent<RoomQuestionsSelect
         toggleContent={
           <>
             {localizationCaptions[LocalizationKey.RoomSelectedQuestions]}: {qestions.length}
-            <ThemedIcon name={IconNames.ChevronForward} size='small' />
+            <Icon name={IconNames.ChevronForward} size='small' />
           </>
         }
         toggleClassName='w-18.125 flex justify-between'
@@ -40,7 +40,7 @@ export const RoomQuestionsSelectorPreview: FunctionComponent<RoomQuestionsSelect
             >
               <div>{qestion.value}</div>
               <span onClick={() => onRemove(qestion)} className='cursor-pointer'>
-                <ThemedIcon name={IconNames.Trash} size='small' />
+                <Icon name={IconNames.Trash} size='small' />
               </span>
             </div>
           ))}

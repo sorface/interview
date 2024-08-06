@@ -1,5 +1,5 @@
 import { FunctionComponent, ReactNode, useState } from 'react';
-import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';
 
 interface AccordionProps {
@@ -38,7 +38,7 @@ export const Accordion: FunctionComponent<AccordionProps> = ({
       >
         {!disabled && (
           <span className={`cursor-pointer h-1.125 ${expanded ? 'rotate-90' : ''}`}>
-            <ThemedIcon name={IconNames.ChevronForward} size='small' />
+            <Icon name={IconNames.ChevronForward} size='small' />
           </span>
         )}
         {title}

@@ -12,7 +12,7 @@ import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
 import { QuestionItem } from '../../components/QuestionItem/QuestionItem';
 import { ContextMenu } from '../../components/ContextMenu/ContextMenu';
 import { Link } from 'react-router-dom';
-import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../Room/components/Icon/Icon';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Button } from '../../components/Button/Button';
 import { Category } from '../../types/category';
@@ -116,7 +116,7 @@ export const Questions: FunctionComponent = () => {
           }
         >
           <Button variant='active' className='h-2.5'>
-            <ThemedIcon name={IconNames.Add} />
+            <Icon name={IconNames.Add} />
             {localizationCaptions[LocalizationKey.CreateQuestion]}
           </Button>
         </Link>
@@ -140,7 +140,7 @@ export const Questions: FunctionComponent = () => {
                   {rootCategoryData?.name}
                 </Typography>
                 <span className='flex opacity-0.65'>
-                  <ThemedIcon name={IconNames.ChevronForward} />
+                  <Icon name={IconNames.ChevronForward} />
                 </span>
                 <span className='opacity-0.5'>
                   <Typography size='m'>

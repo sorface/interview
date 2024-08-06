@@ -24,6 +24,7 @@
 .text-red-light { color: var(--red-light); }
 .text-green-light { color: var(--green-light); }
 .text-grey-active { color: var(--grey-active); }
+.text-dark-orange { color: var(--dark-orange); }
 .bg-form { background-color: var(--form-bg); }
 .hover\:bg-form:hover { background-color: var(--form-bg); }
 .bg-wrap { background-color: var(--wrap-bg); }

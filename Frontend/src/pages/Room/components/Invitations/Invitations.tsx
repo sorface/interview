@@ -7,7 +7,7 @@ import { LocalizationKey } from '../../../../localization';
 import { RoomInvite } from '../../../../types/room';
 import { IconNames, inviteParamName, pathnames, toastSuccessOptions } from '../../../../constants';
 import { UserType } from '../../../../types/user';
-import { ThemedIcon } from '../ThemedIcon/ThemedIcon';
+import { Icon } from '../Icon/Icon';
 import { Loader } from '../../../../components/Loader/Loader';
 import { Button } from '../../../../components/Button/Button';
 import { Gap } from '../../../../components/Gap/Gap';
@@ -99,10 +99,10 @@ export const Invitations: FunctionComponent<InvitationsProps> = ({
               <div className='invitations-modal-item-link-field'>
                 <div className='invitations-modal-item-link-ations'>
                   <Button onClick={() => handleCopyToClipboard(inviteUrlDispaly)}>
-                    <ThemedIcon name={IconNames.Link} />
+                    <Icon name={IconNames.Link} />
                     {localizationCaptions[LocalizationKey.InviteViaLink]}
                   </Button>
-                  <Button onClick={() => onGenerateInvite(roomInvite.participantType)}><ThemedIcon name={IconNames.Refresh} /></Button>
+                  <Button onClick={() => onGenerateInvite(roomInvite.participantType)}><Icon name={IconNames.Refresh} /></Button>
                 </div>
               </div>
             </div>
@@ -112,7 +112,7 @@ export const Invitations: FunctionComponent<InvitationsProps> = ({
           className='invitations-modal-refresh-all'
           onClick={onGenerateAllInvites}
         >
-          {localizationCaptions[LocalizationKey.RefreshAll]}<ThemedIcon name={IconNames.Refresh} />
+          {localizationCaptions[LocalizationKey.RefreshAll]}<Icon name={IconNames.Refresh} />
         </Button>
       </div>
     </Modal>

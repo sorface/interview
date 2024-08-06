@@ -5,7 +5,7 @@ import { RoomInvite } from '../../types/room';
 import { UserType } from '../../types/user';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
-import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames, inviteParamName, pathnames, toastSuccessOptions } from '../../constants';
 import { Loader } from '../Loader/Loader';
 import { RoomCreateField } from '../../pages/RoomCreate/RoomCreateField/RoomCreateField';
@@ -80,7 +80,7 @@ export const RoomInvitations: FunctionComponent<RoomInvitationsProps> = ({
                   <Gap sizeRem={0.5} />
                   <Button
                     onClick={() => handleCopyToClipboard(inviteUrlDispaly)}>
-                    <ThemedIcon name={IconNames.Link} />
+                    <Icon name={IconNames.Link} />
                     {localizationCaptions[LocalizationKey.InviteViaLink]}
                   </Button>
                 </div>

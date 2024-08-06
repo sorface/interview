@@ -11,7 +11,7 @@ import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
 import { Category } from '../../types/category';
-import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../Room/components/Icon/Icon';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Button } from '../../components/Button/Button';
 
@@ -71,7 +71,7 @@ export const Categories: FunctionComponent = () => {
     <li key={category.id}>
       <Field className="category-item">
         <span>{category.name}</span>
-        {!category.parentId && <ThemedIcon name={IconNames.Clipboard} />}
+        {!category.parentId && <Icon name={IconNames.Clipboard} />}
         <div className="category-controls">
           <Link to={pathnames.categoriesEdit.replace(':id', category.id)}>
             <Button>
@@ -100,7 +100,7 @@ export const Categories: FunctionComponent = () => {
       >
         <Link to={pathnames.categoriesCreate}>
           <Button variant='active' className='h-2.5'>
-            <ThemedIcon name={IconNames.Add} />
+            <Icon name={IconNames.Add} />
             {localizationCaptions[LocalizationKey.CreateCategory]}
           </Button>
         </Link>

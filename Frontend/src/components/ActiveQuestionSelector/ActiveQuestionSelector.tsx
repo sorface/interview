@@ -4,7 +4,7 @@ import { RoomQuestion } from '../../types/room';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Gap } from '../Gap/Gap';
 import { Typography } from '../Typography/Typography';
-import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';
 
 import './ActiveQuestionSelector.css';
@@ -123,7 +123,7 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
     <>
       <div className="activeQuestionSelector-container relative">
         <div ref={inputRef} onClick={handleInputClick} className="activeQuestionSelector-input cursor-pointer">
-          <ThemedIcon name={IconNames.ReorderFour} />
+          <Icon name={IconNames.ReorderFour} />
           <Gap sizeRem={1} horizontal />
           <div className="activeQuestionSelector-selected-value w-full flex items-center">
             <div>
