@@ -14,7 +14,7 @@ import { SwitcherButton } from '../../components/SwitcherButton/SwitcherButton';
 import { ModalFooter } from '../../components/ModalFooter/ModalFooter';
 import { Gap } from '../../components/Gap/Gap';
 import { Typography } from '../../components/Typography/Typography';
-import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../Room/components/Icon/Icon';
 import { RoomQuestionsSelector } from './RoomQuestionsSelector/RoomQuestionsSelector';
 import { QuestionItem } from '../../components/QuestionItem/QuestionItem';
 import { RoomInvitations } from '../../components/RoomInvitations/RoomInvitations';
@@ -211,7 +211,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         <>
           <Typography size='m' error>
             <div className='flex'>
-              <ThemedIcon name={IconNames.Information} />
+              <Icon name={IconNames.Information} />
               <Gap sizeRem={0.25} horizontal />
               {totalError}
             </div>
@@ -316,7 +316,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
             />
             {!!selectedQuestions.length && <Gap sizeRem={1.5} />}
             <Button onClick={handleQuestionsViewOpen}>
-              <ThemedIcon name={IconNames.Add} />
+              <Icon name={IconNames.Add} />
               {localizationCaptions[LocalizationKey.AddRoomQuestions]}
             </Button>
           </RoomCreateField.Content>

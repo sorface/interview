@@ -9,7 +9,7 @@ import { Gap } from '../../../../components/Gap/Gap';
 import { RoomQuestionEvaluation, RoomQuestionEvaluationValue } from '../RoomQuestionEvaluation/RoomQuestionEvaluation';
 import { Loader } from '../../../../components/Loader/Loader';
 import { Typography } from '../../../../components/Typography/Typography';
-import { ThemedIcon } from '../ThemedIcon/ThemedIcon';
+import { Icon } from '../Icon/Icon';
 import { IconNames } from '../../../../constants';
 import { Button } from '../../../../components/Button/Button';
 
@@ -207,7 +207,7 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
             <div className='text-left h-1.125'>
               {mergedRoomQuestionEvaluation && (
                 <Typography size='s'>
-                  <ThemedIcon name={IconNames.CheckmarkDone} />
+                  <Icon name={IconNames.CheckmarkDone} />
                   {localizationCaptions[LocalizationKey.Saved]}
                 </Typography>
               )}
@@ -234,7 +234,7 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
                   LocalizationKey.StartReviewRoom
                 ]
               }
-              <ThemedIcon name={openQuestionsIds.length !== 0 ? IconNames.ChevronForward : IconNames.Stop} />
+              <Icon name={openQuestionsIds.length !== 0 ? IconNames.ChevronForward : IconNames.Stop} />
             </Button>
           </div>
         </>

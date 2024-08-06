@@ -4,7 +4,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { ContextMenu } from '../ContextMenu/ContextMenu';
 import { Typography } from '../Typography/Typography';
 import { Gap } from '../Gap/Gap';
-import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames, pathnames } from '../../constants';
 import { Link } from 'react-router-dom';
 import { useCommunist } from '../../hooks/useCommunist';
@@ -41,13 +41,13 @@ export const PageHeaderUserAvatar: FunctionComponent = () => {
             <div className='pr-1.5'>
               <Link to={pathnames.session}>
                 <Button variant='text'>
-                  <ThemedIcon name={IconNames.Settings} />
+                  <Icon name={IconNames.Settings} />
                 </Button>
               </Link>
             </div>
             <div>
               <Button variant='text' onClick={resetCommunist}>
-                <ThemedIcon name={IconNames.Exit} />
+                <Icon name={IconNames.Exit} />
               </Button>
             </div>
           </div>

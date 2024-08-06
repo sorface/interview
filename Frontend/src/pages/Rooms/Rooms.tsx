@@ -11,7 +11,7 @@ import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
-import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../Room/components/Icon/Icon';
 import { RoomCreate } from '../RoomCreate/RoomCreate';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Button } from '../../components/Button/Button';
@@ -147,7 +147,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
                         className='room-edit-participants-link rotate-90'
                         onClick={handleOpenEditModal(room.id)}
                       >
-                        <ThemedIcon name={IconNames.Options} />
+                        <Icon name={IconNames.Options} />
                       </div>
                     </>
                   )}
@@ -183,7 +183,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
         onSearchChange={setSearchValueInput}
       >
         <Button variant='active' className='h-2.5' onClick={handleOpenCreateModal}>
-          <ThemedIcon name={IconNames.Add} />
+          <Icon name={IconNames.Add} />
           {localizationCaptions[LocalizationKey.CreateRoom]}
         </Button>
       </PageHeader>

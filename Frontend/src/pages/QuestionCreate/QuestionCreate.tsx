@@ -16,7 +16,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { checkAdmin } from '../../utils/checkAdmin';
 import { Category } from '../../types/category';
 import { Gap } from '../../components/Gap/Gap';
-import { ThemedIcon } from '../Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../Room/components/Icon/Icon';
 import { CodeEditor } from '../../components/CodeEditor/CodeEditor';
 import { Button } from '../../components/Button/Button';
 
@@ -311,14 +311,14 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
           <Gap sizeRem={0.75} />
           <div className='question-code-editor-controls'>
             <Button style={{ ...(codeEditor && { display: 'none' }) }} onClick={handleAddCodeEditor}>
-              <ThemedIcon name={IconNames.Add} />
+              <Icon name={IconNames.Add} />
               {localizationCaptions[LocalizationKey.QuestionAddCodeEditor]}
             </Button>
             <div style={{ ...(!codeEditor && { display: 'none' }) }}>
               {localizationCaptions[LocalizationKey.QuestionCodeEditor]}
             </div>
             <Button style={{ ...(!codeEditor && { display: 'none' }) }} onClick={handleRemoveCodeEditor}>
-              <ThemedIcon name={IconNames.Trash} />
+              <Icon name={IconNames.Trash} />
               {localizationCaptions[LocalizationKey.QuestionRemoveCodeEditor]}
             </Button>
           </div>
@@ -345,7 +345,7 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
                   onChange={handleAnswerTitleChange(answer.id)}
                 />
                 <Button onClick={handleAnswerDelete(answer.id)}>
-                  <ThemedIcon name={IconNames.Trash} />
+                  <Icon name={IconNames.Trash} />
                   {localizationCaptions[LocalizationKey.QuestionDeleteAnswerOption]}
                 </Button>
               </div>
@@ -360,7 +360,7 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
           ))}
           <Gap sizeRem={0.75} />
           <Button onClick={handleAddQuestionAnswer}>
-            <ThemedIcon name={IconNames.Add} />
+            <Icon name={IconNames.Add} />
             {localizationCaptions[LocalizationKey.QuestionAddAnswerOption]}
           </Button>
         </Field>

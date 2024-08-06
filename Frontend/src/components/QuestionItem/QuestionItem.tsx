@@ -1,6 +1,6 @@
 import { MouseEvent, FunctionComponent, ReactNode, useState } from 'react';
 import { CodeEditorLang, Question, QuestionAnswer } from '../../types/question';
-import { ThemedIcon } from '../../pages/Room/components/ThemedIcon/ThemedIcon';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';
 import { Typography } from '../Typography/Typography';
 import { Accordion } from '../Accordion/Accordion';
@@ -99,12 +99,12 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
         )}
         {onRemove && (
           <span onClick={handleRemove} className='cursor-pointer'>
-            <ThemedIcon name={IconNames.Trash} size='small' />
+            <Icon name={IconNames.Trash} size='small' />
           </span>
         )}
         {onClick && (
           <span className='opacity-0.5'>
-            <ThemedIcon name={IconNames.ChevronForward} size='small' />
+            <Icon name={IconNames.ChevronForward} size='small' />
           </span>
         )}
       </div>
