@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Interview.Domain.Database;
 using Interview.Domain.Events.Storage;
 using Interview.Domain.Invites;
 using Interview.Domain.Rooms;
@@ -18,219 +19,185 @@ using Interview.Infrastructure.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Interview.Test.Integrations
+namespace Interview.Test.Integrations;
+
+public class RoomInviteIntegration
 {
-    public class RoomInviteIntegration
+    [Fact(DisplayName = "using an invitation for a closed room that the user has not been in before")]
+    public async Task AccessRoomPrivateByInvite()
     {
-        [Fact(DisplayName = "using an invitation for a closed room that the user has not been in before")]
-        public async Task AccessRoomPrivateByInvite()
+        await using var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
+
+        var user = new User("devpav", Guid.NewGuid().ToString());
+
+        appDbContext.Users.Add(user);
+        await appDbContext.SaveChangesAsync();
+
+        var invite = new Invite(5);
+
+        appDbContext.Invites.Add(invite);
+        await appDbContext.SaveChangesAsync();
+
+        var room = new Room(name: "something", SERoomAccessType.Private);
+
+        appDbContext.Rooms.Add(room);
+        await appDbContext.SaveChangesAsync();
+
+        var roomInvite = new RoomInvite(invite, room, SERoomParticipantType.Expert);
+
+        appDbContext.RoomInvites.Add(roomInvite);
+        await appDbContext.SaveChangesAsync();
+
+        var userAccessor = new CurrentUserAccessor();
         {
-            await using var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
+            userAccessor.SetUser(user);
+        }
+        var roomParticipantService = CreateRoomParticipantService(appDbContext, userAccessor);
+        var roomService = CreateRoomService(appDbContext, roomParticipantService, userAccessor);
 
-            var user = new User("devpav", Guid.NewGuid().ToString());
+        await roomService.ApplyInvite(room.Id, invite.Id);
 
-            appDbContext.Users.Add(user);
-            await appDbContext.SaveChangesAsync();
+        var foundInvite = await appDbContext.Invites.FirstOrDefaultAsync(item => item.Id == invite.Id);
 
-            var invite = new Invite(5);
+        Assert.NotNull(foundInvite);
 
-            appDbContext.Invites.Add(invite);
-            await appDbContext.SaveChangesAsync();
+        foundInvite.UsesCurrent.Should().Be(1);
 
-            var room = new Room(name: "something", SERoomAccessType.Private);
+        var roomParticipant = await appDbContext.RoomParticipants.FirstOrDefaultAsync(participant =>
+            participant.Room.Id == room.Id
+        );
 
-            appDbContext.Rooms.Add(room);
-            await appDbContext.SaveChangesAsync();
+        Assert.NotNull(roomParticipant);
 
-            var roomInvite = new RoomInvite(invite, room, SERoomParticipantType.Expert);
+        roomParticipant.User.Id.Should().Be(user.Id);
+        roomParticipant.Type.EnumValue.Should().Be(EVRoomParticipantType.Expert);
+        roomParticipant.Room.Id.Should().Be(room.Id);
+    }
 
-            appDbContext.RoomInvites.Add(roomInvite);
-            await appDbContext.SaveChangesAsync();
+    [Fact(DisplayName = "using an invitation for a closed room that the user has previously been in")]
+    public async Task AccessRoomPrivateByInviteWhenUserAlreadyExistsInTheRoom()
+    {
+        await using var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
 
-            var roomRepository = new RoomRepository(appDbContext);
-            var userAccessor = new CurrentUserAccessor();
-            {
-                userAccessor.SetUser(user);
-            }
-            var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext), userAccessor);
-            var roomService = new RoomService(
-                roomRepository,
-                new RoomQuestionRepository(appDbContext),
-                new QuestionRepository(appDbContext),
-                new UserRepository(appDbContext),
-                new EmptyRoomEventDispatcher(),
-                new RoomQuestionReactionRepository(appDbContext),
-                new TagRepository(appDbContext),
-                new RoomParticipantRepository(appDbContext),
-                new AppEventRepository(appDbContext),
-                new RoomStateRepository(appDbContext),
-                new EmptyEventStorage(),
-                new RoomInviteService(appDbContext, roomParticipantService, NullLogger<RoomInviteService>.Instance),
-                userAccessor,
-                roomParticipantService,
-                appDbContext,
-                NullLogger<RoomService>.Instance
-            );
+        var transaction = await appDbContext.Database.BeginTransactionAsync();
 
-            await roomService.ApplyInvite(room.Id, invite.Id);
+        var user = new User("devpav", Guid.NewGuid().ToString());
 
-            var foundInvite = await appDbContext.Invites.FirstOrDefaultAsync(item => item.Id == invite.Id);
+        appDbContext.Users.Add(user);
+        var invite = new Invite(5);
 
-            Assert.NotNull(foundInvite);
+        appDbContext.Invites.Add(invite);
+        var room = new Room(name: "something", SERoomAccessType.Private);
 
-            foundInvite.UsesCurrent.Should().Be(1);
+        appDbContext.Rooms.Add(room);
+        var roomInvite = new RoomInvite(invite, room, SERoomParticipantType.Expert);
 
-            var roomParticipant = await appDbContext.RoomParticipants.FirstOrDefaultAsync(participant =>
-                participant.Room.Id == room.Id
-            );
+        appDbContext.RoomInvites.Add(roomInvite);
+        var participant = new RoomParticipant(user, room, SERoomParticipantType.Examinee);
 
-            Assert.NotNull(roomParticipant);
+        appDbContext.RoomParticipants.Add(participant);
+        await appDbContext.SaveChangesAsync();
 
-            roomParticipant.User.Id.Should().Be(user.Id);
-            roomParticipant.Type.EnumValue.Should().Be(EVRoomParticipantType.Expert);
-            roomParticipant.Room.Id.Should().Be(room.Id);
+        await transaction.CommitAsync();
+
+        var userAccessor = new CurrentUserAccessor();
+        {
+            userAccessor.SetUser(user);
         }
 
-        [Fact(DisplayName = "using an invitation for a closed room that the user has previously been in")]
-        public async Task AccessRoomPrivateByInviteWhenUserAlreadyExistsInTheRoom()
+        var roomParticipantService = CreateRoomParticipantService(appDbContext, userAccessor);
+        var roomService = CreateRoomService(appDbContext, roomParticipantService, userAccessor);
+
+        await roomService.ApplyInvite(room.Id, invite.Id);
+
+        var foundInvite = await appDbContext.Invites.FirstOrDefaultAsync(item => item.Id == invite.Id);
+
+        Assert.NotNull(foundInvite);
+
+        foundInvite.UsesCurrent.Should().Be(0);
+
+        var roomParticipant = await appDbContext.RoomParticipants.FirstOrDefaultAsync(itemParticipant =>
+            itemParticipant.Room.Id == room.Id
+        );
+
+        Assert.NotNull(roomParticipant);
+
+        roomParticipant.User.Id.Should().Be(participant.User.Id);
+        roomParticipant.Type.EnumValue.Should().Be(roomInvite.ParticipantType.EnumValue);
+        roomParticipant.Room.Id.Should().Be(room.Id);
+    }
+
+    [Fact(DisplayName = "using an invitation for a closed room that the user has previously been in")]
+    public async Task AccessRoomPrivateByInviteWhenInvitationLimited()
+    {
+        await using var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
+
+        var user = new User("devpav", Guid.NewGuid().ToString());
+
+        appDbContext.Users.Add(user);
+        var invite = new Invite(5) { UsesCurrent = 4 };
+        await appDbContext.SaveChangesAsync();
+
+        appDbContext.Invites.Add(invite);
+        var room = new Room(name: "something", SERoomAccessType.Private);
+        await appDbContext.SaveChangesAsync();
+
+        appDbContext.Rooms.Add(room);
+        var roomInvite = new RoomInvite(invite, room, SERoomParticipantType.Expert);
+        await appDbContext.SaveChangesAsync();
+
+        appDbContext.RoomInvites.Add(roomInvite);
+        await appDbContext.SaveChangesAsync();
+
+        var userAccessor = new CurrentUserAccessor();
         {
-            await using var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
-
-            var transaction = await appDbContext.Database.BeginTransactionAsync();
-
-            var user = new User("devpav", Guid.NewGuid().ToString());
-
-            appDbContext.Users.Add(user);
-            var invite = new Invite(5);
-
-            appDbContext.Invites.Add(invite);
-            var room = new Room(name: "something", SERoomAccessType.Private);
-
-            appDbContext.Rooms.Add(room);
-            var roomInvite = new RoomInvite(invite, room, SERoomParticipantType.Expert);
-
-            appDbContext.RoomInvites.Add(roomInvite);
-            var participant = new RoomParticipant(user, room, SERoomParticipantType.Examinee);
-
-            appDbContext.RoomParticipants.Add(participant);
-            await appDbContext.SaveChangesAsync();
-
-            await transaction.CommitAsync();
-
-            var roomRepository = new RoomRepository(appDbContext);
-            var userAccessor = new CurrentUserAccessor();
-            {
-                userAccessor.SetUser(user);
-            }
-
-            var roomParticipantService = new RoomParticipantService(
-                new RoomParticipantRepository(appDbContext),
-                new RoomRepository(appDbContext),
-                new UserRepository(appDbContext),
-                new AvailableRoomPermissionRepository(appDbContext),
-                userAccessor);
-
-            var roomService = new RoomService(
-                roomRepository,
-                new RoomQuestionRepository(appDbContext),
-                new QuestionRepository(appDbContext),
-                new UserRepository(appDbContext),
-                new EmptyRoomEventDispatcher(),
-                new RoomQuestionReactionRepository(appDbContext),
-                new TagRepository(appDbContext),
-                new RoomParticipantRepository(appDbContext),
-                new AppEventRepository(appDbContext),
-                new RoomStateRepository(appDbContext),
-                new EmptyEventStorage(),
-                new RoomInviteService(appDbContext, roomParticipantService, NullLogger<RoomInviteService>.Instance),
-                userAccessor,
-                roomParticipantService,
-                appDbContext,
-                NullLogger<RoomService>.Instance
-            );
-
-            await roomService.ApplyInvite(room.Id, invite.Id);
-
-            var foundInvite = await appDbContext.Invites.FirstOrDefaultAsync(item => item.Id == invite.Id);
-
-            Assert.NotNull(foundInvite);
-
-            foundInvite.UsesCurrent.Should().Be(0);
-
-            var roomParticipant = await appDbContext.RoomParticipants.FirstOrDefaultAsync(itemParticipant =>
-                itemParticipant.Room.Id == room.Id
-            );
-
-            Assert.NotNull(roomParticipant);
-
-            roomParticipant.User.Id.Should().Be(participant.User.Id);
-            roomParticipant.Type.EnumValue.Should().Be(roomInvite.ParticipantType.EnumValue);
-            roomParticipant.Room.Id.Should().Be(room.Id);
+            userAccessor.SetUser(user);
         }
+        var roomParticipantService = CreateRoomParticipantService(appDbContext, userAccessor);
+        var roomService = CreateRoomService(appDbContext, roomParticipantService, userAccessor);
 
-        [Fact(DisplayName = "using an invitation for a closed room that the user has previously been in")]
-        public async Task AccessRoomPrivateByInviteWhenInvitationLimited()
-        {
-            await using var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
+        await roomService.ApplyInvite(room.Id, invite.Id);
 
-            var user = new User("devpav", Guid.NewGuid().ToString());
+        var deletedRoom = await appDbContext.Invites.AnyAsync(item => item.Id == invite.Id);
 
-            appDbContext.Users.Add(user);
-            var invite = new Invite(5) { UsesCurrent = 4 };
-            await appDbContext.SaveChangesAsync();
+        Assert.False(deletedRoom);
 
-            appDbContext.Invites.Add(invite);
-            var room = new Room(name: "something", SERoomAccessType.Private);
-            await appDbContext.SaveChangesAsync();
+        var foundRoomInvite = await appDbContext.RoomInvites.FirstOrDefaultAsync(item => item.RoomById == room.Id);
 
-            appDbContext.Rooms.Add(room);
-            var roomInvite = new RoomInvite(invite, room, SERoomParticipantType.Expert);
-            await appDbContext.SaveChangesAsync();
+        Assert.NotNull(foundRoomInvite);
+        foundRoomInvite.ParticipantType.Should().Be(SERoomParticipantType.Expert);
 
-            appDbContext.RoomInvites.Add(roomInvite);
-            await appDbContext.SaveChangesAsync();
+        var generatedInvite = await appDbContext.Invites.FirstOrDefaultAsync(item => foundRoomInvite.InviteById == item.Id);
 
-            var roomRepository = new RoomRepository(appDbContext);
-            var userAccessor = new CurrentUserAccessor();
-            {
-                userAccessor.SetUser(user);
-            }
-            var roomParticipantService = new RoomParticipantService(new RoomParticipantRepository(appDbContext), new RoomRepository(appDbContext), new UserRepository(appDbContext), new AvailableRoomPermissionRepository(appDbContext), userAccessor);
-            var roomService = new RoomService(
-                roomRepository,
-                new RoomQuestionRepository(appDbContext),
-                new QuestionRepository(appDbContext),
-                new UserRepository(appDbContext),
-                new EmptyRoomEventDispatcher(),
-                new RoomQuestionReactionRepository(appDbContext),
-                new TagRepository(appDbContext),
-                new RoomParticipantRepository(appDbContext),
-                new AppEventRepository(appDbContext),
-                new RoomStateRepository(appDbContext),
-                new EmptyEventStorage(),
-                new RoomInviteService(appDbContext, roomParticipantService, NullLogger<RoomInviteService>.Instance),
-                userAccessor,
-                roomParticipantService,
-                appDbContext,
-                new NullLogger<RoomService>()
-            );
+        Assert.NotNull(generatedInvite);
 
-            await roomService.ApplyInvite(room.Id, invite.Id);
+        generatedInvite.UsesCurrent.Should().Be(0);
+    }
 
-            var deletedRoom = await appDbContext.Invites.AnyAsync(item => item.Id == invite.Id);
+    private static RoomParticipantService CreateRoomParticipantService(AppDbContext appDbContext, CurrentUserAccessor userAccessor)
+    {
+        return new RoomParticipantService(
+            new RoomParticipantRepository(appDbContext),
+            new RoomRepository(appDbContext),
+            new UserRepository(appDbContext),
+            new AvailableRoomPermissionRepository(appDbContext),
+            userAccessor);
+    }
 
-            Assert.False(deletedRoom);
-
-            var foundRoomInvite = await appDbContext.RoomInvites.FirstOrDefaultAsync(item => item.RoomById == room.Id);
-
-            Assert.NotNull(foundRoomInvite);
-            foundRoomInvite.ParticipantType.Should().Be(SERoomParticipantType.Expert);
-
-            var generatedInvite = await appDbContext.Invites.FirstOrDefaultAsync(item => foundRoomInvite.InviteById == item.Id);
-
-            Assert.NotNull(generatedInvite);
-
-            generatedInvite.UsesCurrent.Should().Be(0);
-        }
+    private static RoomService CreateRoomService(
+        AppDbContext appDbContext,
+        RoomParticipantService roomParticipantService,
+        CurrentUserAccessor userAccessor)
+    {
+        return new RoomService(
+            new RoomQuestionRepository(appDbContext),
+            new EmptyRoomEventDispatcher(),
+            new EmptyEventStorage(),
+            new RoomInviteService(appDbContext, roomParticipantService, NullLogger<RoomInviteService>.Instance),
+            userAccessor,
+            roomParticipantService,
+            appDbContext,
+            NullLogger<RoomService>.Instance
+        );
     }
 }
