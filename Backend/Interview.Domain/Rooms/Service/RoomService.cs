@@ -850,7 +850,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         };
     }
 
-    private static void EnsureValidScheduleStartTime(DateTime? scheduleStartTime, DateTime? dbScheduleStartTime)
+    private static void EnsureValidScheduleStartTime(DateTime scheduleStartTime, DateTime? dbScheduleStartTime)
     {
         // Nothing has changed.
         if (dbScheduleStartTime is not null && dbScheduleStartTime == scheduleStartTime)
@@ -858,7 +858,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             return;
         }
 
-        if (scheduleStartTime is not null && DateTime.UtcNow > scheduleStartTime)
+        if (DateTime.UtcNow > scheduleStartTime)
         {
             throw new UserException("The scheduled start date must be greater than the current time");
         }

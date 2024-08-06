@@ -16,5 +16,5 @@ public sealed class RoomCreateRequest
 
     public long? DurationSec { get; set; }
 
-    public DateTime? ScheduleStartTime { get; set; }
+    public DateTime ScheduleStartTime { get; set; }
 }
