@@ -230,10 +230,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             requestExperts = requestExperts.Concat(new[] { currentUserId }).ToList();
         }
 
-        if (request.ScheduleStartTime is not null && DateTime.UtcNow > request.ScheduleStartTime)
-        {
-            throw new UserException("The scheduled start date must be greater than the current time");
-        }
+        EnsureValidScheduleStartTime(request.ScheduleStartTime, null);
 
         var experts = await FindByIdsOrErrorAsync(_db.Users, requestExperts, "experts", cancellationToken);
         var examinees = await FindByIdsOrErrorAsync(_db.Users, request.Examinees, "examinees", cancellationToken);
@@ -315,6 +312,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw NotFoundException.Create<User>(roomId);
         }
 
+        EnsureValidScheduleStartTime(request.ScheduleStartTime, foundRoom.ScheduleStartTime);
+
         var tags = await Tag.EnsureValidTagsAsync(_db.Tag, request.Tags, cancellationToken);
 
         var requiredQuestions = request.Questions.Select(e => e.Id).ToHashSet();
@@ -346,6 +345,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             });
         }
 
+        foundRoom.ScheduleStartTime = request.ScheduleStartTime;
         foundRoom.Name = name;
         foundRoom.Tags.Clear();
         foundRoom.Tags.AddRange(tags);
@@ -848,6 +848,20 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             Max = 0,
             Used = 0,
         };
+    }
+
+    private static void EnsureValidScheduleStartTime(DateTime? scheduleStartTime, DateTime? dbScheduleStartTime)
+    {
+        // Nothing has changed.
+        if (dbScheduleStartTime is not null && dbScheduleStartTime == scheduleStartTime)
+        {
+            return;
+        }
+
+        if (scheduleStartTime is not null && DateTime.UtcNow > scheduleStartTime)
+        {
+            throw new UserException("The scheduled start date must be greater than the current time");
+        }
     }
 
     private async Task<RoomParticipant> EnsureParticipantTypeAsync(Guid roomId, Guid userId, CancellationToken cancellationToken)
