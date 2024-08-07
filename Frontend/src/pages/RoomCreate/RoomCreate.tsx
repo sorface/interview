@@ -203,6 +203,8 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         id: editRoomId,
         name: roomFields.name,
         questions: selectedQuestions.map((question, index) => ({ ...question, order: index })),
+        scheduleStartTime: roomDateStart.toISOString(),
+        durationSec: duration,
       });
     } else {
       fetchData({

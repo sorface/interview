@@ -614,7 +614,7 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasMaxLength(70)
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("ScheduleStartTime")
+                    b.Property<DateTime>("ScheduleStartTime")
                         .HasColumnType("TEXT");
 
                     b.Property<char>("Status")
@@ -1819,7 +1819,7 @@ namespace Interview.Migrations.Sqlite.Migrations
             modelBuilder.Entity("Interview.Domain.Rooms.RoomQuestionEvaluations.RoomQuestionEvaluation", b =>
                 {
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
-                        .WithMany()
+                        .WithMany("RoomQuestionEvaluations")
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2083,6 +2083,11 @@ namespace Interview.Migrations.Sqlite.Migrations
             modelBuilder.Entity("Interview.Domain.Rooms.RoomQuestions.RoomQuestion", b =>
                 {
                     b.Navigation("Evaluations");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Users.User", b =>
+                {
+                    b.Navigation("RoomQuestionEvaluations");
                 });
 #pragma warning restore 612, 618
         }

@@ -21,5 +21,5 @@ public class RoomCreateApiRequest
 
     public long? Duration { get; set; }
 
-    public DateTime? ScheduleStartTime { get; set; }
+    public DateTime ScheduleStartTime { get; set; }
 }

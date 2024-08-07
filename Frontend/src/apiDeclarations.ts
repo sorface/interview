@@ -47,6 +47,8 @@ export interface RoomEditBody {
   id: string;
   name: string;
   questions: Array<Omit<RoomQuestion, 'state'>>;
+  scheduleStartTime: Room['scheduledStartTime'];
+  durationSec?: number;
 }
 
 const eventsSearchLimit = 50;

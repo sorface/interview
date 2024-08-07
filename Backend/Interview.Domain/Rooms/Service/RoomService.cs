@@ -19,6 +19,7 @@ using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
 using Interview.Domain.Users;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Internal;
 using Microsoft.Extensions.Logging;
 using NSpecifications;
 using X.PagedList;
@@ -36,6 +37,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     private readonly IRoomParticipantService _roomParticipantService;
     private readonly ILogger<RoomService> _logger;
     private readonly AppDbContext _db;
+    private readonly ISystemClock _clock;
 
     public RoomService(
         IRoomQuestionRepository roomQuestionRepository,
@@ -45,7 +47,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         ICurrentUserAccessor currentUserAccessor,
         IRoomParticipantService roomParticipantService,
         AppDbContext db,
-        ILogger<RoomService> logger)
+        ILogger<RoomService> logger,
+        ISystemClock clock)
     {
         _roomEventDispatcher = roomEventDispatcher;
         _eventStorage = eventStorage;
@@ -55,6 +58,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         _roomParticipantService = roomParticipantService;
         _db = db;
         _logger = logger;
+        _clock = clock;
     }
 
     public async Task<IPagedList<RoomPageDetail>> FindPageAsync(
@@ -230,15 +234,17 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             requestExperts = requestExperts.Concat(new[] { currentUserId }).ToList();
         }
 
-        if (request.ScheduleStartTime is not null && DateTime.UtcNow > request.ScheduleStartTime)
-        {
-            throw new UserException("The scheduled start date must be greater than the current time");
-        }
+        EnsureValidScheduleStartTime(request.ScheduleStartTime, null);
 
         var experts = await FindByIdsOrErrorAsync(_db.Users, requestExperts, "experts", cancellationToken);
         var examinees = await FindByIdsOrErrorAsync(_db.Users, request.Examinees, "examinees", cancellationToken);
         var tags = await Tag.EnsureValidTagsAsync(_db.Tag, request.Tags, cancellationToken);
-        var room = new Room(name, request.AccessType) { Tags = tags, ScheduleStartTime = request.ScheduleStartTime, };
+        var room = new Room(name, request.AccessType)
+        {
+            Tags = tags,
+            ScheduleStartTime = request.ScheduleStartTime,
+            Timer = CreateRoomTimer(request.DurationSec),
+        };
 
         var questions =
             await FindByIdsOrErrorAsync(_db.Questions, request.Questions.Select(e => e.Id).ToList(), "questions", cancellationToken);
@@ -266,11 +272,6 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         var createdParticipants = await _roomParticipantService.CreateAsync(room.Id, participants, cancellationToken);
         room.Participants.AddRange(createdParticipants);
-
-        if (request.DurationSec is not null)
-        {
-            room.Timer = new RoomTimer { Duration = TimeSpan.FromSeconds(request.DurationSec.Value), };
-        }
 
         await _db.AddAsync(room, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
@@ -309,11 +310,14 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         var foundRoom = await _db.Rooms
             .Include(e => e.Questions)
             .Include(e => e.Tags)
+            .Include(e => e.Timer)
             .FirstOrDefaultAsync(e => e.Id == roomId, cancellationToken);
         if (foundRoom is null)
         {
             throw NotFoundException.Create<User>(roomId);
         }
+
+        EnsureValidScheduleStartTime(request.ScheduleStartTime, foundRoom.ScheduleStartTime);
 
         var tags = await Tag.EnsureValidTagsAsync(_db.Tag, request.Tags, cancellationToken);
 
@@ -346,6 +350,28 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             });
         }
 
+        if (request.DurationSec is null)
+        {
+            if (foundRoom.Timer is not null)
+            {
+                _db.RoomTimers.Remove(foundRoom.Timer);
+                foundRoom.Timer = null;
+            }
+        }
+        else
+        {
+            var timer = CreateRoomTimer(request.DurationSec);
+            if (foundRoom.Timer is null)
+            {
+                foundRoom.Timer = timer;
+            }
+            else
+            {
+                foundRoom.Timer.Duration = timer!.Duration;
+            }
+        }
+
+        foundRoom.ScheduleStartTime = request.ScheduleStartTime;
         foundRoom.Name = name;
         foundRoom.Tags.Clear();
         foundRoom.Tags.AddRange(tags);
@@ -848,6 +874,31 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             Max = 0,
             Used = 0,
         };
+    }
+
+    private static RoomTimer? CreateRoomTimer(long? durationSec)
+    {
+        if (durationSec is null)
+        {
+            return null;
+        }
+
+        return new RoomTimer { Duration = TimeSpan.FromSeconds(durationSec.Value), };
+    }
+
+    private void EnsureValidScheduleStartTime(DateTime scheduleStartTime, DateTime? dbScheduleStartTime)
+    {
+        // Nothing has changed.
+        if (dbScheduleStartTime == scheduleStartTime)
+        {
+            return;
+        }
+
+        var minDateTime = _clock.UtcNow.Subtract(TimeSpan.FromMinutes(15)).UtcDateTime;
+        if (minDateTime > scheduleStartTime)
+        {
+            throw new UserException("The scheduled start date must be greater than current time - 15 minutes");
+        }
     }
 
     private async Task<RoomParticipant> EnsureParticipantTypeAsync(Guid roomId, Guid userId, CancellationToken cancellationToken)

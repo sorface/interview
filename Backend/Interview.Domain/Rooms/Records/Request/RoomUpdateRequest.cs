@@ -7,4 +7,8 @@ public class RoomUpdateRequest
     public HashSet<Guid> Tags { get; set; } = new();
 
     public required List<RoomQuestionRequest> Questions { get; init; }
+
+    public DateTime ScheduleStartTime { get; set; }
+
+    public long? DurationSec { get; set; }
 }
