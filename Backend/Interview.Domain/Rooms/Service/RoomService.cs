@@ -367,7 +367,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             }
             else
             {
-                foundRoom.Timer.ActualStartTime = timer!.ActualStartTime;
+                foundRoom.Timer.Duration = timer!.Duration;
             }
         }
 

@@ -14,6 +14,7 @@ using Interview.Domain.Rooms.RoomParticipants.Service;
 using Interview.Domain.Rooms.RoomQuestionEvaluations;
 using Interview.Domain.Rooms.RoomQuestionReactions;
 using Interview.Domain.Rooms.RoomQuestions;
+using Interview.Domain.Rooms.RoomTimers;
 using Interview.Domain.Rooms.Service;
 using Interview.Domain.Users;
 using Interview.Domain.Users.Roles;
@@ -918,8 +919,112 @@ public class RoomServiceTest
         await Assert.ThrowsAsync<NotFoundException>(() =>
             roomService.UpdateAsync(roomId, roomPatchUpdateRequest));
     }
-    
-    // TODO: ADDED UPDATE TIMER TESTS
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(60)]
+    [InlineData(160)]
+    public async Task UpdateTimer_When_Timer_Should_Be_Created(long durationSec)
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+        var room = new Room("test", SERoomAccessType.Public);
+        appDbContext.Rooms.Add(room);
+        appDbContext.SaveChanges();
+        appDbContext.ChangeTracker.Clear();
+        var roomPatchUpdateRequest = new RoomUpdateRequest
+        {
+            Name = "test",
+            Questions = new List<RoomQuestionRequest>(),
+            DurationSec = durationSec
+        };
+
+        var roomService = CreateRoomService(appDbContext);
+
+        await roomService.UpdateAsync(room.Id, roomPatchUpdateRequest);
+
+        var actualRoom = await appDbContext.Rooms.Include(e => e.Timer).FirstOrDefaultAsync(e => e.Id == room.Id);
+
+        actualRoom.Should().NotBeNull();
+        actualRoom!.Timer.Should().NotBeNull();
+        actualRoom!.Timer!.Duration.Should().Be(TimeSpan.FromSeconds(durationSec));
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(60)]
+    [InlineData(160)]
+    public async Task UpdateTimer_When_Timer_Should_Be_Deleted(long durationSec)
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+        var room = new Room("test", SERoomAccessType.Public)
+        {
+            Timer = new RoomTimer
+            {
+                Duration = TimeSpan.FromSeconds(durationSec),
+            }
+        };
+        appDbContext.Rooms.Add(room);
+        appDbContext.SaveChanges();
+        appDbContext.ChangeTracker.Clear();
+        var initialTimeId = room.Timer!.Id;
+        var roomPatchUpdateRequest = new RoomUpdateRequest
+        {
+            Name = "test",
+            Questions = new List<RoomQuestionRequest>(),
+            DurationSec = null
+        };
+
+        var roomService = CreateRoomService(appDbContext);
+
+        await roomService.UpdateAsync(room.Id, roomPatchUpdateRequest);
+
+        var hasTime = await appDbContext.RoomTimers.AnyAsync(e => e.Id == initialTimeId);
+        var actualRoom = await appDbContext.Rooms.Include(e => e.Timer).FirstOrDefaultAsync(e => e.Id == room.Id);
+
+        actualRoom.Should().NotBeNull();
+        actualRoom!.Timer.Should().BeNull();
+        hasTime.Should().BeFalse();
+    }
+
+    [Theory]
+    [InlineData(60, 0)]
+    [InlineData(0, 60)]
+    [InlineData(500, 160)]
+    public async Task UpdateTimer_When_Timer_Should_Be_Updated(long initialDurationSec, long durationSec)
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+        var room = new Room("test", SERoomAccessType.Public)
+        {
+            Timer = new RoomTimer
+            {
+                Duration = TimeSpan.FromSeconds(initialDurationSec),
+            }
+        };
+        appDbContext.Rooms.Add(room);
+        appDbContext.SaveChanges();
+        appDbContext.ChangeTracker.Clear();
+        var initialTimeId = room.Timer!.Id;
+        var roomPatchUpdateRequest = new RoomUpdateRequest
+        {
+            Name = "test",
+            Questions = new List<RoomQuestionRequest>(),
+            DurationSec = durationSec
+        };
+
+        var roomService = CreateRoomService(appDbContext);
+
+        await roomService.UpdateAsync(room.Id, roomPatchUpdateRequest);
+
+        var actualRoom = await appDbContext.Rooms.Include(e => e.Timer).FirstOrDefaultAsync(e => e.Id == room.Id);
+
+        actualRoom.Should().NotBeNull();
+        actualRoom!.Timer.Should().NotBeNull();
+        actualRoom!.Timer!.Duration.Should().Be(TimeSpan.FromSeconds(durationSec));
+        actualRoom!.Timer!.Id.Should().Be(initialTimeId);
+    }
 
     [Fact]
     public async Task Create_Room_With_Questions()
