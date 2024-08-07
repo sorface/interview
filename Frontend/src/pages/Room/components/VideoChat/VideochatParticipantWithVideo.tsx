@@ -37,7 +37,7 @@ export const VideochatParticipantWithVideo: FunctionComponent<VideochatParticipa
         )}
         {nickname}
       </div>
-      <div>
+      <div className='h-full'>
         {children}
       </div>
     </div>
