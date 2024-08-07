@@ -6,7 +6,6 @@ import { IconNames, pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Room, RoomStatus } from '../../types/room';
-import { checkAdmin } from '../../utils/checkAdmin';
 import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
@@ -53,7 +52,6 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
   mode,
 }) => {
   const auth = useContext(AuthContext);
-  const admin = checkAdmin(auth);
   const localizationCaptions = useLocalizationCaptions();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const { apiMethodState, fetchData } = useApiMethod<Room[], GetRoomPageParams>(roomsApiDeclaration.getPage);
@@ -129,6 +127,9 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
     };
 
     const roomLink = getRoomLink(room);
+    const expertInRoom = !!room.participants.find(
+      roomParticipant => roomParticipant.type === 'Expert' && roomParticipant.id === auth?.id
+    );
 
     return (
       <div key={room.id} className='room-item-wrapper'>
@@ -141,7 +142,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
                 </Tag>
                 <Gap sizeRem={1.5} />
                 <div className='room-action-links'>
-                  {admin && (
+                  {expertInRoom && (
                     <>
                       <div
                         className='room-edit-participants-link rotate-90'
