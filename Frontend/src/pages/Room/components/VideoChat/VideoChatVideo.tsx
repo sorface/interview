@@ -1,5 +1,6 @@
-import { FunctionComponent, useEffect, useRef } from 'react';
+import { FunctionComponent, useEffect, useRef, useState } from 'react';
 import Peer from 'simple-peer';
+import { Loader } from '../../../../components/Loader/Loader';
 
 interface VideoChatVideoProps {
   peer: Peer.Instance;
@@ -10,6 +11,7 @@ export const VideoChatVideo: FunctionComponent<VideoChatVideoProps> = ({
 }) => {
   const refVideo = useRef<HTMLVideoElement>(null);
   const refAudio = useRef<HTMLVideoElement>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const handleStream = (stream: MediaStream) => {
@@ -23,6 +25,7 @@ export const VideoChatVideo: FunctionComponent<VideoChatVideoProps> = ({
       if (audioStream && refAudio.current) {
         refAudio.current.srcObject = stream;
       }
+      setLoading(false);
     };
     peer.on('stream', handleStream);
 
@@ -33,8 +36,16 @@ export const VideoChatVideo: FunctionComponent<VideoChatVideoProps> = ({
 
   return (
     <>
-      <video playsInline autoPlay ref={refVideo} className='videochat-video' />
-      <audio playsInline autoPlay ref={refAudio} />
+      {loading ? (
+        <div className='flex items-center h-full justify-center'>
+          <Loader />
+        </div>
+      ) : (
+        <>
+          <video playsInline autoPlay ref={refVideo} className='videochat-video' />
+          <audio playsInline autoPlay ref={refAudio} />
+        </>
+      )}
     </>
   );
 };
