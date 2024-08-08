@@ -58,7 +58,11 @@ public static class ServiceCollectionExt
 
                 if (authorizationService.CorrelationCookie is not null)
                 {
-                    options.CorrelationCookie = new CookieBuilder { Name = authorizationService.CorrelationCookie.Name, };
+                    options.CorrelationCookie = new CookieBuilder
+                    {
+                        Name = authorizationService.CorrelationCookie.Name,
+                        Domain = authorizationService.CorrelationCookie.Domain,
+                    };
                 }
 
                 options.Events.OnTicketReceived += async context =>
