@@ -308,6 +308,22 @@ public class RoomServiceTest
             new()
             {
                 RoomQuestionId = roomQuestion[1].Id,
+                CreatedById = users[0].Id,
+                Mark = 2,
+                Review = "test 2",
+                State = SERoomQuestionEvaluationState.Submitted,
+            },
+            new()
+            {
+                RoomQuestionId = roomQuestion[3].Id,
+                CreatedById = users[0].Id,
+                Mark = 10,
+                Review = "test 4444",
+                State = SERoomQuestionEvaluationState.Submitted,
+            },
+            new()
+            {
+                RoomQuestionId = roomQuestion[1].Id,
                 CreatedById = users[1].Id,
                 Mark = 5,
                 Review = "test",
@@ -432,7 +448,8 @@ public class RoomServiceTest
                                 Review = "test test",
                             },
                         },
-                    }
+                    },
+                    AverageMark = 10
                 },
                 new()
                 {
@@ -447,7 +464,11 @@ public class RoomServiceTest
                             Nickname = users[0].Nickname,
                             Avatar = users[0].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Examinee.Name,
-                            Evaluation = null,
+                            Evaluation = new()
+                            {
+                                Mark = 2,
+                                Review = "test 2",
+                            },
                         },
                         new()
                         {
@@ -477,7 +498,8 @@ public class RoomServiceTest
                             ParticipantType = SERoomParticipantType.Viewer.Name,
                             Evaluation = null,
                         },
-                    }
+                    },
+                    AverageMark = 3.5
                 },
                 new()
                 {
@@ -519,6 +541,7 @@ public class RoomServiceTest
                             Evaluation = null,
                         },
                     },
+                    AverageMark = 0,
                 },
                 new()
                 {
@@ -533,7 +556,11 @@ public class RoomServiceTest
                             Nickname = users[0].Nickname,
                             Avatar = users[0].Avatar ?? string.Empty,
                             ParticipantType = SERoomParticipantType.Examinee.Name,
-                            Evaluation = null,
+                            Evaluation = new()
+                            {
+                                Review = "test 4444",
+                                Mark = 10
+                            },
                         },
                         new()
                         {
@@ -560,7 +587,16 @@ public class RoomServiceTest
                             Evaluation = null,
                         },
                     },
+                    AverageMark = 10,
                 }
+            },
+            AverageMark = 5.25,
+            UserReview = new List<Analytics.AnalyticsUserAverageMark>
+            {
+                new() { UserId = users[0].Id, AverageMark = 6 },
+                new() { UserId = users[1].Id, AverageMark = 5 },
+                new() { UserId = users[2].Id, AverageMark = 0 },
+                new() { UserId = users[3].Id, AverageMark = 10 },
             }
         };
 

@@ -603,27 +603,66 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         foreach (var analyticsQuestion in analytics.Questions!)
         {
             analyticsQuestion.Users = await GetUsersByQuestionIdAsync(analyticsQuestion.Id, cancellationToken);
+            analyticsQuestion.AverageMark = analyticsQuestion.Users
+                .Where(e => e.Evaluation?.Mark is not null)
+                .Select(e => e.Evaluation!.Mark!.Value)
+                .DefaultIfEmpty(0)
+                .Average();
         }
 
         return analytics;
 
-        Task<Analytics?> GetAnalyticsCoreAsync(Guid roomId, CancellationToken ct)
+        async Task<Analytics?> GetAnalyticsCoreAsync(Guid roomId, CancellationToken ct)
         {
-            return _db.Rooms.AsNoTracking()
+            var res = await _db.Rooms.AsNoTracking()
                 .Include(e => e.Questions).ThenInclude(e => e.Question)
                 .Include(e => e.Participants)
                 .Where(e => e.Id == roomId)
                 .Select(e => new Analytics
                 {
-                    Questions = e.Questions.OrderBy(rq => rq.Order).Select(q => new Analytics.AnalyticsQuestion
-                    {
-                        Id = q.Question!.Id,
-                        Status = q.State!.Name,
-                        Value = q.Question.Value,
-                        Users = null,
-                    }).ToList(),
+                    Questions = e.Questions.OrderBy(rq => rq.Order)
+                        .Select(q => new Analytics.AnalyticsQuestion
+                        {
+                            Id = q.Question!.Id,
+                            Status = q.State!.Name,
+                            Value = q.Question.Value,
+                            Users = null,
+                            AverageMark = 0,
+                        })
+                        .ToList(),
+                    AverageMark = 0,
+                    UserReview = new List<Analytics.AnalyticsUserAverageMark>(),
                 })
                 .FirstOrDefaultAsync(ct);
+            if (res is null)
+            {
+                return null;
+            }
+
+            var userReview = await _db.RoomParticipants.AsNoTracking()
+                .Include(e => e.Room)
+                .Include(e => e.User)
+                .ThenInclude(e => e.RoomQuestionEvaluations.Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId))
+                .Where(e => e.Room.Id == request.RoomId)
+                .Select(e => new
+                {
+                    UserId = e.User.Id,
+                    AverageMarks = e.User.RoomQuestionEvaluations
+                        .Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId)
+                        .Select(rqe => rqe.Mark ?? 0)
+                        .ToList(),
+                })
+                .ToListAsync(cancellationToken);
+            res.UserReview = userReview
+                .Select(e => new Analytics.AnalyticsUserAverageMark
+                {
+                    UserId = e.UserId,
+                    AverageMark = e.AverageMarks.DefaultIfEmpty(0).Average(),
+                })
+                .ToList();
+            res.AverageMark = res.UserReview.Select(e => e.AverageMark).DefaultIfEmpty(0).Average();
+
+            return res;
         }
 
         Task<List<Analytics.AnalyticsUser>> GetUsersByQuestionIdAsync(Guid questionId, CancellationToken ct)
