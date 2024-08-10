@@ -57,7 +57,7 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   };
 
   return (
-    <div className={`code-editor overflow-hidden ${className}`}>
+    <div className={`code-editor flex flex-col overflow-hidden ${className}`}>
       <div className='code-editor-tools'>
         <select className='code-editor-tools-select' value={language} disabled={!onLanguageChange} onChange={handleLanguageChange}>
           {renderOptions(languages)}
@@ -66,24 +66,26 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
           {renderOptions(fontSizeOptions)}
         </select>
       </div>
-      <Editor
-        keepCurrentModel={true}
-        options={{
-          minimap: { enabled: false },
-          fontSize,
-          quickSuggestions: false,
-          readOnly,
-          scrollBeyondLastLine,
-          scrollbar: {
-            alwaysConsumeMouseWheel,
-          },
-        }}
-        language={language}
-        theme={themeInUi === Theme.Dark ? 'vs-dark' : 'light'}
-        value={value}
-        onChange={onChange}
-        onMount={onMount}
-      />
+      <div className='flex-1'>
+        <Editor
+          keepCurrentModel={true}
+          options={{
+            minimap: { enabled: false },
+            fontSize,
+            quickSuggestions: false,
+            readOnly,
+            scrollBeyondLastLine,
+            scrollbar: {
+              alwaysConsumeMouseWheel,
+            },
+          }}
+          language={language}
+          theme={themeInUi === Theme.Dark ? 'vs-dark' : 'light'}
+          value={value}
+          onChange={onChange}
+          onMount={onMount}
+        />
+      </div>
     </div>
   );
 };
