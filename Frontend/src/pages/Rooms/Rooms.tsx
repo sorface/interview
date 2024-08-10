@@ -241,6 +241,15 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
               nextPageAvailable={false}
               handleNextPage={handleNextPage}
             />
+            {!!(!loading && rooms?.length === 0) && (
+              <>
+                <Gap sizeRem={2.25} />
+                <Button className='h-2.5 text-grey3' onClick={handleOpenCreateModal}>
+                  <Icon name={IconNames.Add} />
+                  {localizationCaptions[LocalizationKey.CreateRoom]}
+                </Button>
+              </>
+            )}
           </div>
           {mode === RoomsPageMode.Home && (
             <div className='flex overflow-auto'>
