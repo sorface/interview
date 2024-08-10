@@ -81,7 +81,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
         </Typography>
       </div>
       <div className='ml-auto'>
-        {contextMenu && <ContextMenu {...contextMenu} buttonVariant='text' />}
+        {contextMenu && <div onClick={handleCheckboxAreaClick}><ContextMenu {...contextMenu} buttonVariant='text' /></div>}
         {hasCheckbox && (
           <div onClick={handleCheckboxAreaClick}>
             <input
@@ -132,7 +132,6 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
             className='h-32.25'
           />
         </>
-
       )}
       <Gap sizeRem={1.5} />
       {!!question.answers.length && (
