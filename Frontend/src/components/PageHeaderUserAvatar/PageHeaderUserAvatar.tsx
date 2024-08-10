@@ -24,6 +24,7 @@ export const PageHeaderUserAvatar: FunctionComponent = () => {
               nickname={auth?.nickname || ''}
               src={auth?.avatar || ''}
               size='m'
+              altarnativeBackgound
             />
           </div>
         }
