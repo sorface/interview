@@ -1,12 +1,12 @@
-import { Fragment, FunctionComponent, useEffect } from 'react';
+import { ChangeEvent, Fragment, FunctionComponent, useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useParams } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Room, RoomQuestion } from '../../types/room';
-import { GetRoomQuestionsBody, roomQuestionApiDeclaration, roomsApiDeclaration } from '../../apiDeclarations';
-import { useParams } from 'react-router-dom';
+import { AddRoomReviewBody, GetRoomQuestionsBody, roomQuestionApiDeclaration, roomReviewApiDeclaration, roomsApiDeclaration } from '../../apiDeclarations';
 import { Loader } from '../../components/Loader/Loader';
 import { Gap } from '../../components/Gap/Gap';
 import { RoomDateAndTime } from '../../components/RoomDateAndTime/RoomDateAndTime';
@@ -14,11 +14,14 @@ import { RoomInfoColumn } from './components/RoomInfoColumn/RoomInfoColumn';
 import { Typography } from '../../components/Typography/Typography';
 import { QuestionItem } from '../../components/QuestionItem/QuestionItem';
 import { Question } from '../../types/question';
+import { RoomReview as RoomReviewType } from '../../types/room';
 import { RoomQuestionEvaluation } from '../Room/components/RoomQuestionEvaluation/RoomQuestionEvaluation';
 import { RoomParticipants } from '../../components/RoomParticipants/RoomParticipants';
 import { Button } from '../../components/Button/Button';
 import { toastSuccessOptions } from '../../constants';
 import { InfoBlock } from '../../components/InfoBlock/InfoBlock';
+import { AuthContext } from '../../context/AuthContext';
+import { checkAdmin } from '../../utils/checkAdmin';
 
 const createFakeQuestion = (roomQuestion: RoomQuestion): Question => ({
   ...roomQuestion,
@@ -28,11 +31,20 @@ const createFakeQuestion = (roomQuestion: RoomQuestion): Question => ({
 });
 
 export const RoomReview: FunctionComponent = () => {
+  const auth = useContext(AuthContext);
+  const admin = checkAdmin(auth);
   const { id } = useParams();
   const localizationCaptions = useLocalizationCaptions();
+  const [roomReviewValue, setRoomReviewValue] = useState('');
 
   const { apiMethodState, fetchData } = useApiMethod<Room, Room['id']>(roomsApiDeclaration.getById);
   const { process: { loading, error }, data: room } = apiMethodState;
+
+  const {
+    apiMethodState: addRoomReviewState,
+    fetchData: fetchAddRoomReview,
+  } = useApiMethod<RoomReviewType, AddRoomReviewBody>(roomReviewApiDeclaration.addReview);
+  const { process: { loading: addRoomReviewLoading, error: addRoomReviewError }, data: addedRoomReview } = addRoomReviewState;
 
   const {
     apiMethodState: apiRoomQuestions,
@@ -80,17 +92,45 @@ export const RoomReview: FunctionComponent = () => {
   }, [roomCloseCode, localizationCaptions]);
 
   useEffect(() => {
+    if (!addedRoomReview) {
+      return;
+    }
+    toast.success(localizationCaptions[LocalizationKey.Saved], toastSuccessOptions);
+  }, [addedRoomReview, localizationCaptions]);
+
+  useEffect(() => {
     if (!roomCloseError) {
       return;
     }
     toast.error(roomCloseError);
   }, [roomCloseError]);
 
+  useEffect(() => {
+    if (!addRoomReviewError) {
+      return;
+    }
+    toast.error(addRoomReviewError);
+  }, [addRoomReviewError]);
+
   const handleCloseRoom = () => {
     if (!id) {
       throw new Error('Room id not found');
     }
     fetchRoomClose(id);
+  };
+
+  const handleSaveReview = () => {
+    if (!id) {
+      throw new Error('Room id not found');
+    }
+    fetchAddRoomReview({
+      roomId: id,
+      review: roomReviewValue,
+    });
+  };
+
+  const handleReviewChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setRoomReviewValue(event.target.value);
   };
 
   if (loading || loadingRoomQuestions || !room || !roomQuestions) {
@@ -134,7 +174,11 @@ export const RoomReview: FunctionComponent = () => {
       <InfoBlock className='text-left flex flex-col'>
         <Typography size='s' bold>{localizationCaptions[LocalizationKey.CandidateOpinion]}</Typography>
         <Gap sizeRem={1} />
-        <textarea className='h-3.625' />
+        <textarea
+          className='h-3.625'
+          value={roomReviewValue}
+          onInput={handleReviewChange}
+        />
       </InfoBlock>
       <Gap sizeRem={0.5} />
       <InfoBlock className='text-left'>
@@ -160,10 +204,31 @@ export const RoomReview: FunctionComponent = () => {
           </Fragment>
         ))}
       </InfoBlock>
-      <Gap sizeRem={0.5} />
-      <InfoBlock className='text-left'>
-        <Button onClick={handleCloseRoom}>{localizationCaptions[LocalizationKey.CloseRoom]}</Button>
-      </InfoBlock>
+      <Gap sizeRem={1.75} />
+      <div className='flex justify-end'>
+        {admin && (
+          <>
+            <Button
+              onClick={handleCloseRoom}
+            >
+              {localizationCaptions[LocalizationKey.CloseRoom]}
+            </Button>
+            <Gap sizeRem={1} horizontal />
+          </>
+        )}
+        <Button
+          variant='active'
+          onClick={handleSaveReview}
+        >
+          {addRoomReviewLoading ? (
+            <Loader />
+          ) : (
+            localizationCaptions[LocalizationKey.Save]
+          )}
+
+        </Button>
+      </div>
+      <Gap sizeRem={0.75} />
     </>
   );
 };

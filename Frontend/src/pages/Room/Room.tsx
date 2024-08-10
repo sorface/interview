@@ -485,7 +485,7 @@ export const Room: FunctionComponent = () => {
   };
 
   if (roomInReview && id) {
-    return <Navigate to={pathnames.roomAnalytics.replace(':id', id)} replace />;
+    return <Navigate to={pathnames.roomReview.replace(':id', id)} replace />;
   }
 
   if (wsClosed) {
