@@ -88,10 +88,12 @@ export const Questions: FunctionComponent = () => {
           useButton: true,
           children: [
             <ContextMenu.Item
+              key='ContextMenuItemEdit'
               title={localizationCaptions[LocalizationKey.Edit]}
               onClick={handleEditQuestion(question)}
             />,
             <ContextMenu.Item
+              key='ContextMenuItemArchive'
               title={archiveLoading ? localizationCaptions[LocalizationKey.ArchiveLoading] : localizationCaptions[LocalizationKey.Archive]}
               onClick={handlearchiveQuestion(question)}
             />,

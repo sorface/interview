@@ -1,4 +1,4 @@
-import React, { FunctionComponent, ReactElement, ReactNode, useEffect, useState } from 'react';
+import React, { Fragment, FunctionComponent, ReactElement, ReactNode, useEffect, useState } from 'react';
 import { NavLink, useNavigate, matchPath, useLocation } from 'react-router-dom';
 import { ThemeSwitchMini } from '../ThemeSwitchMini/ThemeSwitchMini';
 import { IconNames, pathnames } from '../../constants';
@@ -131,7 +131,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
   const createMenuItem = (item: MenuItem) => {
     const noActiveClassName = !item.forceActive && (item.logo || questionsClicked);
     return (
-      <>
+      <Fragment key={item.path}>
         <NavLink
           key={item.path}
           to={item.path}
@@ -151,7 +151,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
           </div>
         </NavLink>
         {!!item.subitem && item.subitem}
-      </>
+      </Fragment>
     );
   };
 
