@@ -14,7 +14,7 @@ export const RoomParticipants: FunctionComponent<RoomParticipantsProps> = ({
   return (
     <div className='room-participants'>
       {participants.map(roomParticipant => (
-        <div className='room-participant'>
+        <div key={roomParticipant.id} className='room-participant'>
           <UserAvatar
             src={roomParticipant.avatar}
             nickname={roomParticipant.nickname}
