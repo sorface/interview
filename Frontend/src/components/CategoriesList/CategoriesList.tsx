@@ -50,7 +50,7 @@ export const CategoriesList: FunctionComponent<CategoriesListProps> = ({
   };
 
   return (
-    <div className='categories-list'>
+    <div className='categories-list overflow-x-hidden overflow-y-auto'>
       {loading && <Loader />}
       {error && <span>{localizationCaptions[LocalizationKey.Error]}: {error}</span>}
       {data?.map(createCategoryItem)}

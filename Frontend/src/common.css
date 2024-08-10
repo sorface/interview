@@ -121,6 +121,8 @@
 .top-0 { top: 0px; }
 .overflow-auto { overflow: auto; }
 .overflow-hidden { overflow: hidden; }
+.overflow-y-auto { overflow-y: auto; }
+.overflow-x-hidden { overflow-x: hidden; }
 .whitespace-nowrap { white-space: nowrap; }
 .min-w-fit { min-width: fit-content; }
 .min-h-unset { min-height: unset; }

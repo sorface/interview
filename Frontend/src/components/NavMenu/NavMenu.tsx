@@ -51,6 +51,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
   const handleQuestionsClick: React.MouseEventHandler<HTMLAnchorElement> = (event) => {
     event.preventDefault();
     setQuestionsClicked(!questionsClicked);
+    setSelectedCategory(null);
   };
 
   const handleItemClick = () => {
@@ -170,7 +171,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
         >
           <NavLink
             to={pathnames.home.replace(':redirect?', '')}
-            className='nav-menu-item no-active move-transition'
+            className='nav-menu-item nav-menu-item-first no-active move-transition'
           >
             <img className='site-logo' src='/logo192.png' alt='site logo' />
             <h1
@@ -180,7 +181,9 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
               <LocalizationCaption captionKey={LocalizationKey.AppName} />
             </h1>
           </NavLink>
-          {items.map(item => item ? createMenuItem(item) : undefined)}
+          <div className='flex flex-col overflow-x-hidden overflow-y-auto'>
+            {items.map(item => item ? createMenuItem(item) : undefined)}
+          </div>
           <hr />
           <div className='nav-menu-item move-transition nav-menu-theme-switch'>
             <ThemeSwitchMini />
@@ -201,7 +204,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
         {!!selectedCategory && (
           <>
             <div className='nav-menu-overlay-gap'></div>
-            <div className='nav-menu-overlay'>
+            <div className='nav-menu-overlay flex flex-col'>
               <h4>{selectedCategory.name}</h4>
               <CategoriesList
                 parentId={selectedCategory.id}
