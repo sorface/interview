@@ -1,11 +1,9 @@
 import React, { FunctionComponent, useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { GetQuestionsParams, categoriesApiDeclaration, questionsApiDeclaration } from '../../apiDeclarations';
-import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { IconNames, pathnames } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Question } from '../../types/question';
-import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
@@ -104,7 +102,7 @@ export const Questions: FunctionComponent = () => {
   );
 
   return (
-    <MainContentWrapper className="questions-page">
+    <>
       <PageHeader
         title={localizationCaptions[LocalizationKey.QuestionsPageName]}
         searchValue={searchValueInput}
@@ -123,11 +121,8 @@ export const Questions: FunctionComponent = () => {
           </Button>
         </Link>
       </PageHeader>
-      <ProcessWrapper
-        loading={false}
-        error={error || archiveError}
-      >
-        <>
+      <div className='questions-page flex-1 overflow-auto'>
+        <div className='sticky top-0 bg-form z-1'>
           <div className='flex items-center'>
             {categoriesError && (
               <Typography size='m'>
@@ -153,18 +148,18 @@ export const Questions: FunctionComponent = () => {
             )}
           </div>
           <Gap sizeRem={1} />
-          <ItemsGrid
-            currentData={questions}
-            loading={loading}
-            error={error || archiveError}
-            triggerResetAccumData={`${searchValueInput}${subCategory}${archivedQuestion}`}
-            loaderClassName='question-item field-wrap'
-            renderItem={createQuestionItem}
-            nextPageAvailable={questions?.length === pageSize}
-            handleNextPage={handleNextPage}
-          />
-        </>
-      </ProcessWrapper>
-    </MainContentWrapper>
+        </div>
+        <ItemsGrid
+          currentData={questions}
+          loading={loading}
+          error={error || archiveError}
+          triggerResetAccumData={`${searchValueInput}${subCategory}${archivedQuestion}`}
+          loaderClassName='question-item field-wrap'
+          renderItem={createQuestionItem}
+          nextPageAvailable={questions?.length === pageSize}
+          handleNextPage={handleNextPage}
+        />
+      </div>
+    </>
   );
 };
