@@ -5,12 +5,17 @@ import { LocalizationKey } from '../../localization';
 import { useAccumData } from '../../hooks/useAccumData';
 import { Loader } from '../../components/Loader/Loader';
 import { InfinitePaginator } from '../../components/InfinitePaginator/InfinitePaginator';
+import { Typography } from '../Typography/Typography';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
+import { IconNames } from '../../constants';
+import { Gap } from '../Gap/Gap';
 
 import './ItemsGrid.css';
 
 interface ItemsGridProps<T extends object> {
   currentData: T[] | null;
   loading: boolean;
+  error: string | null;
   nextPageAvailable: boolean;
   triggerResetAccumData: string;
   loaderClassName?: string;
@@ -21,6 +26,7 @@ interface ItemsGridProps<T extends object> {
 export const ItemsGrid = <T extends object>({
   currentData,
   loading,
+  error,
   nextPageAvailable,
   triggerResetAccumData,
   loaderClassName,
@@ -49,6 +55,17 @@ export const ItemsGrid = <T extends object>({
   return (
     <>
       <ul className="items-grid m-0">
+        {!!error && (
+          <Typography size='m' error>
+            <div className='flex items-center'>
+              <Icon name={IconNames.Information} />
+              <Gap sizeRem={0.25} horizontal />
+              <div>
+              {localizationCaptions[LocalizationKey.Error]}: {error}
+              </div>
+            </div>
+          </Typography>
+        )}
         {noRecords ? (
           <Field>
             <div className="items-grid-no-data">{localizationCaptions[LocalizationKey.NoRecords]}</div>

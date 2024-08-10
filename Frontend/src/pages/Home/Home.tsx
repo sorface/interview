@@ -20,7 +20,7 @@ export const Home: FunctionComponent = () => {
   }
 
   if (auth) {
-    return <Navigate to={pathnames.currentRooms} replace />;
+    return <Navigate to={pathnames.highlightRooms} replace />;
   }
 
   return (

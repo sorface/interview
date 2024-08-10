@@ -154,6 +154,7 @@ export const Questions: FunctionComponent = () => {
           <ItemsGrid
             currentData={questions}
             loading={loading}
+            error={error || archiveError}
             triggerResetAccumData={`${searchValueInput}${subCategory}${archivedQuestion}`}
             loaderClassName='question-item field-wrap'
             renderItem={createQuestionItem}

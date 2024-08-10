@@ -14,7 +14,7 @@ export const MainContentWrapper: FunctionComponent<MainContentWrapperProps> =
     return (
       <FieldsBlock
         withMargin={withMargin}
-        className={className}
+        className={`${className} h-full`}
       >
         {children}
       </FieldsBlock>

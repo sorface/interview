@@ -81,6 +81,13 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
                 </ProtectedRoute>
               }
             />
+            <Route path={pathnames.highlightRooms}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <Rooms mode={RoomsPageMode.Home} />
+                </ProtectedRoute>
+              }
+            />
             <Route path={pathnames.currentRooms}
               element={
                 <ProtectedRoute allowed={authenticated}>
@@ -147,7 +154,7 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
             <Route path="*" element={<NotFound />} />
           </Routes>
           {!fullScreenPage && (
-            <Gap sizeRem={1.25} />
+            <Gap sizeRem={0.5} />
           )}
         </div>
       </div>

@@ -26,7 +26,7 @@
   height: var(--height);
   overflow-x: hidden;
   align-items: stretch;
-  z-index: 2;
+  z-index: 5;
 }
 
 .nav-menu h1 {
@@ -157,7 +157,7 @@
   padding: var(--menu-padding);
   background-color: var(--wrap-bg);
   animation: slide 0.35s forwards;
-  z-index: 1;
+  z-index: 3;
 }
 
 @keyframes slide {
@@ -172,7 +172,7 @@
   width: 0.125rem;
   left: calc(var(--width-expanded) + var(--menu-padding) * 2);
   opacity: 0;
-  z-index: 1;
+  z-index: 3;
 }
 
 .nav-menu-overlay h4 {
@@ -199,7 +199,7 @@
   background-color: var(--page-overlay-color);
   opacity: 0;
   animation: slide-opacity 0.35s forwards;
-  z-index: 1;
+  z-index: 2;
 }
 
 @keyframes slide-opacity {

@@ -10,6 +10,7 @@ interface RoomDateAndTimeProps {
   typographySize: TypographyProps['size'];
   timer?: Room['timer'];
   mini?: boolean;
+  secondary?: boolean;
 }
 
 const formatScheduledStartTime = (scheduledStartTime: string, lang: string) => {
@@ -38,17 +39,18 @@ export const RoomDateAndTime: FunctionComponent<RoomDateAndTimeProps> = ({
   typographySize,
   timer,
   mini,
+  secondary,
 }) => {
   const { lang } = useContext(LocalizationContext);
 
   return (
-    <div className={`flex  ${!mini ? 'justify-between' : ''} items-baseline`}>
+    <div className={`flex  ${!mini ? 'justify-between' : ''} ${secondary ? 'text-grey3' : ''} items-baseline`}>
       <div className='flex items-baseline'>
         <Typography size={typographySize}>
           {formatScheduledStartTime(scheduledStartTime, lang)}
         </Typography>
         <Gap sizeRem={0.5} horizontal />
-        <div className='capitalize opacity-0.5'>
+        <div className={`capitalize ${!secondary ? 'opacity-0.5' : ''}`}>
           <Typography size={typographySize}>
             {formatScheduledStartDay(scheduledStartTime, lang)}
           </Typography>

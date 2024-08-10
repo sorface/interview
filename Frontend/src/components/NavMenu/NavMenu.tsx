@@ -95,6 +95,12 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
 
   const items: Array<MenuItem | null> = [
     {
+      path: pathnames.highlightRooms,
+      caption: <LocalizationCaption captionKey={LocalizationKey.HighlightsRoomsPageName} />,
+      icon: IconNames.Home,
+      onClick: handleItemClick,
+    },
+    {
       path: pathnames.currentRooms,
       caption: <LocalizationCaption captionKey={LocalizationKey.CurrentRoomsPageName} />,
       icon: IconNames.Cube,
