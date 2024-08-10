@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useCallback, useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, generatePath } from 'react-router-dom';
 import { GetQuestionsParams, categoriesApiDeclaration, questionsApiDeclaration } from '../../apiDeclarations';
 import { IconNames, pathnames } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
@@ -42,6 +42,10 @@ export const Questions: FunctionComponent = () => {
   const { apiMethodState: archiveQuestionsState, fetchData: archiveQuestion } = useApiMethod<Question, Question['id']>(questionsApiDeclaration.archive);
   const { process: { loading: archiveLoading, error: archiveError }, data: archivedQuestion } = archiveQuestionsState;
 
+  const questionsCreateLink = generatePath(pathnames.questionsCreate, {
+    rootCategory: rootCategory || '',
+    subCategory: subCategory || '',
+  });
   const categoriesLoading = rootCategoryLoading || subCategoryLoading;
   const categoriesError = rootCategoryError || subCategoryError;
 
@@ -109,11 +113,7 @@ export const Questions: FunctionComponent = () => {
         onSearchChange={setSearchValueInput}
       >
         <Link
-          to={
-            pathnames.questionsCreate
-              .replace(':rootCategory', rootCategory || '')
-              .replace(':subCategory', subCategory || '')
-          }
+          to={questionsCreateLink}
         >
           <Button variant='active' className='h-2.5'>
             <Icon name={IconNames.Add} />
@@ -159,6 +159,19 @@ export const Questions: FunctionComponent = () => {
           nextPageAvailable={questions?.length === pageSize}
           handleNextPage={handleNextPage}
         />
+        {!!(!loading && questions?.length === 0) && (
+          <>
+            <Gap sizeRem={2.25} />
+            <Link
+              to={questionsCreateLink}
+            >
+              <Button className='h-2.5 text-grey3'>
+                <Icon name={IconNames.Add} />
+                {localizationCaptions[LocalizationKey.CreateQuestion]}
+              </Button>
+            </Link>
+          </>
+        )}
       </div>
     </>
   );

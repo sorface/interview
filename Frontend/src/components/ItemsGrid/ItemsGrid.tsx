@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Field } from '../../components/FieldsBlock/Field';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { useAccumData } from '../../hooks/useAccumData';
@@ -54,6 +53,14 @@ export const ItemsGrid = <T extends object>({
 
   return (
     <>
+      {noRecords && (
+        <div className="items-grid-no-data text-grey3">
+          <Gap sizeRem={7.25} />
+          <Typography size='m'>
+            {localizationCaptions[LocalizationKey.NoRecords]}
+          </Typography>
+        </div>
+      )}
       <ul className="items-grid m-0">
         {!!error && (
           <Typography size='m' error>
@@ -61,16 +68,12 @@ export const ItemsGrid = <T extends object>({
               <Icon name={IconNames.Information} />
               <Gap sizeRem={0.25} horizontal />
               <div>
-              {localizationCaptions[LocalizationKey.Error]}: {error}
+                {localizationCaptions[LocalizationKey.Error]}: {error}
               </div>
             </div>
           </Typography>
         )}
-        {noRecords ? (
-          <Field>
-            <div className="items-grid-no-data">{localizationCaptions[LocalizationKey.NoRecords]}</div>
-          </Field>
-        ) : (
+        {!noRecords && (
           accumData.map(renderItem)
         )}
         {(loading || !dataDisplayed) && loaders.map((loader, index) => (
