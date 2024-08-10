@@ -153,6 +153,7 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
         <ItemsGrid
           currentData={questions ? questions.map((q, index) => ({ ...q, order: index })) : null}
           loading={totalLoading}
+          error={null}
           triggerResetAccumData={`${rootCategory}${subCategory}`}
           loaderClassName='question-item field-wrap'
           renderItem={createQuestionItem}

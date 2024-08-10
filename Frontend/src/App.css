@@ -33,6 +33,9 @@
 
 .App-content {
   flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .App-content .field-wrap {

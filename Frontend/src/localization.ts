@@ -5,6 +5,7 @@ export const enum LocalizationKey {
   AppName,
   AppDescription,
   WelcomeMessage,
+  HighlightsRoomsPageName,
   CurrentRoomsPageName,
   ClosedRoomsPageName,
   RoomsPageName,
@@ -193,6 +194,7 @@ export const enum LocalizationKey {
   RoomEmptyStartTimeError,
   RoomStartTimeMustBeGreaterError,
   RoomEmptyQuestionsListError,
+  InterviewHistoryTitle,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -201,6 +203,7 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.AppName]: 'Interview Platform',
     [LocalizationKey.AppDescription]: 'Interactive interview platform with the ability to generate detailed reports.',
     [LocalizationKey.WelcomeMessage]: 'Welcome',
+    [LocalizationKey.HighlightsRoomsPageName]: 'Home',
     [LocalizationKey.CurrentRoomsPageName]: 'Current rooms',
     [LocalizationKey.ClosedRoomsPageName]: 'Closed rooms',
     [LocalizationKey.RoomsPageName]: 'Meetings',
@@ -389,12 +392,14 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.RoomEmptyStartTimeError]: 'Please enter meeting start time',
     [LocalizationKey.RoomStartTimeMustBeGreaterError]: 'Meeting start time must be greater than the current time',
     [LocalizationKey.RoomEmptyQuestionsListError]: 'Please add questions to the list of questions',
+    [LocalizationKey.InterviewHistoryTitle]: 'Interview history',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
     [LocalizationKey.AppName]: 'Interview Platform',
     [LocalizationKey.AppDescription]: 'Интерактивная платформа для проведения собеседований с возможностью составления детальных отчётов.',
     [LocalizationKey.WelcomeMessage]: 'Добро пожаловать',
+    [LocalizationKey.HighlightsRoomsPageName]: 'Главная',
     [LocalizationKey.CurrentRoomsPageName]: 'Актуальные комнаты',
     [LocalizationKey.ClosedRoomsPageName]: 'Завершенные комнаты',
     [LocalizationKey.RoomsPageName]: 'Встречи',
@@ -583,5 +588,6 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.RoomEmptyStartTimeError]: 'Пожалуйста, укажите время начала встречи',
     [LocalizationKey.RoomStartTimeMustBeGreaterError]: 'Время начала встречи должно быть больше текущего времени',
     [LocalizationKey.RoomEmptyQuestionsListError]: 'Пожалуйста, добавьте вопросы в список вопросов',
+    [LocalizationKey.InterviewHistoryTitle]: 'История собеседований',
   },
 }

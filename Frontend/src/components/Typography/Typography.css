@@ -23,6 +23,10 @@
   font-size: 0.75rem;
 }
 
+.typography-xs {
+  font-size: 0.625rem;
+}
+
 .typography-bold {
   font-weight: 600;
 }
