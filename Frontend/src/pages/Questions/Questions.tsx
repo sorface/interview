@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useCallback, useEffect, useState } from 'react';
-import { useParams, useNavigate, generatePath } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { GetQuestionsParams, categoriesApiDeclaration, questionsApiDeclaration } from '../../apiDeclarations';
-import { IconNames, pathnames } from '../../constants';
+import { IconNames } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Question } from '../../types/question';
 import { LocalizationKey } from '../../localization';
@@ -9,7 +9,6 @@ import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
 import { QuestionItem } from '../../components/QuestionItem/QuestionItem';
 import { ContextMenu } from '../../components/ContextMenu/ContextMenu';
-import { Link } from 'react-router-dom';
 import { Icon } from '../Room/components/Icon/Icon';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Button } from '../../components/Button/Button';
@@ -17,6 +16,7 @@ import { Category } from '../../types/category';
 import { Typography } from '../../components/Typography/Typography';
 import { Gap } from '../../components/Gap/Gap';
 import { Loader } from '../../components/Loader/Loader';
+import { QuestionCreate } from '../QuestionCreate/QuestionCreate';
 
 import './Questions.css';
 
@@ -25,9 +25,11 @@ const initialPageNumber = 1;
 
 export const Questions: FunctionComponent = () => {
   const localizationCaptions = useLocalizationCaptions();
-  const navigate = useNavigate();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const [searchValueInput, setSearchValueInput] = useState('');
+  const [createEditModalOpened, setCreateEditModalOpened] = useState(false);
+  const [editingQuestionId, setEditingQuestionId] = useState<Question['id'] | null>(null);
+  const [questionsUpdateTrigger, setQuestionsUpdateTrigger] = useState(0);
   const { rootCategory, subCategory } = useParams();
 
   const { apiMethodState: rootCategoryState, fetchData: fetchRootCategory } = useApiMethod<Category | null, Category['id']>(categoriesApiDeclaration.get);
@@ -42,10 +44,6 @@ export const Questions: FunctionComponent = () => {
   const { apiMethodState: archiveQuestionsState, fetchData: archiveQuestion } = useApiMethod<Question, Question['id']>(questionsApiDeclaration.archive);
   const { process: { loading: archiveLoading, error: archiveError }, data: archivedQuestion } = archiveQuestionsState;
 
-  const questionsCreateLink = generatePath(pathnames.questionsCreate, {
-    rootCategory: rootCategory || '',
-    subCategory: subCategory || '',
-  });
   const categoriesLoading = rootCategoryLoading || subCategoryLoading;
   const categoriesError = rootCategoryError || subCategoryError;
 
@@ -57,7 +55,7 @@ export const Questions: FunctionComponent = () => {
       value: searchValueInput,
       categoryId: subCategory?.replace(':category', '') || '',
     });
-  }, [pageNumber, searchValueInput, archivedQuestion, subCategory, fetchQuestios]);
+  }, [questionsUpdateTrigger, pageNumber, searchValueInput, archivedQuestion, subCategory, fetchQuestios]);
 
   useEffect(() => {
     if (rootCategory) {
@@ -72,9 +70,20 @@ export const Questions: FunctionComponent = () => {
     setPageNumber(pageNumber + 1);
   }, [pageNumber]);
 
-  const handleEditQuestion = (question: Question) => () => {
-    navigate(pathnames.questionsEdit.replace(':id', question.id));
-  };
+  const handleOpenCreateModal = () => {
+    setCreateEditModalOpened(true);
+  }
+
+  const handleOpenEditModal = (questionId: Question['id']) => () => {
+    setEditingQuestionId(questionId);
+    setCreateEditModalOpened(true);
+  }
+
+  const handleCloseCreateEditModal = () => {
+    setCreateEditModalOpened(false);
+    setEditingQuestionId(null);
+    setQuestionsUpdateTrigger((t) => t + 1);
+  }
 
   const handlearchiveQuestion = (question: Question) => () => {
     archiveQuestion(question.id);
@@ -92,7 +101,7 @@ export const Questions: FunctionComponent = () => {
             <ContextMenu.Item
               key='ContextMenuItemEdit'
               title={localizationCaptions[LocalizationKey.Edit]}
-              onClick={handleEditQuestion(question)}
+              onClick={handleOpenEditModal(question.id)}
             />,
             <ContextMenu.Item
               key='ContextMenuItemArchive'
@@ -112,15 +121,17 @@ export const Questions: FunctionComponent = () => {
         searchValue={searchValueInput}
         onSearchChange={setSearchValueInput}
       >
-        <Link
-          to={questionsCreateLink}
-        >
-          <Button variant='active' className='h-2.5'>
-            <Icon name={IconNames.Add} />
-            {localizationCaptions[LocalizationKey.CreateQuestion]}
-          </Button>
-        </Link>
+        <Button variant='active' className='h-2.5' onClick={handleOpenCreateModal}>
+          <Icon name={IconNames.Add} />
+          {localizationCaptions[LocalizationKey.CreateQuestion]}
+        </Button>
       </PageHeader>
+      {createEditModalOpened && (
+        <QuestionCreate
+          editQuestionId={editingQuestionId || null}
+          open={createEditModalOpened}
+          onClose={handleCloseCreateEditModal} />
+      )}
       <div className='questions-page flex-1 overflow-auto'>
         <div className='sticky top-0 bg-form z-1'>
           <div className='flex items-center'>
@@ -153,7 +164,7 @@ export const Questions: FunctionComponent = () => {
           currentData={questions}
           loading={loading}
           error={error || archiveError}
-          triggerResetAccumData={`${searchValueInput}${subCategory}${archivedQuestion}`}
+          triggerResetAccumData={`${questionsUpdateTrigger}${searchValueInput}${subCategory}${archivedQuestion}`}
           loaderClassName='question-item field-wrap'
           renderItem={createQuestionItem}
           nextPageAvailable={questions?.length === pageSize}
@@ -162,14 +173,10 @@ export const Questions: FunctionComponent = () => {
         {!!(!loading && questions?.length === 0) && (
           <>
             <Gap sizeRem={2.25} />
-            <Link
-              to={questionsCreateLink}
-            >
-              <Button className='h-2.5 text-grey3'>
-                <Icon name={IconNames.Add} />
-                {localizationCaptions[LocalizationKey.CreateQuestion]}
-              </Button>
-            </Link>
+            <Button className='h-2.5 text-grey3' onClick={handleOpenCreateModal}>
+              <Icon name={IconNames.Add} />
+              {localizationCaptions[LocalizationKey.CreateQuestion]}
+            </Button>
           </>
         )}
       </div>

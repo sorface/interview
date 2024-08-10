@@ -21,6 +21,7 @@
 .text-grey2 { color: var(--grey2); }
 .text-grey1 { color: var(--grey1); }
 .text-white { color: var(--white); }
+.hover\:text-red:hover { color: var(--red); }
 .text-red { color: var(--red); }
 .text-red-light { color: var(--red-light); }
 .text-green-light { color: var(--green-light); }
