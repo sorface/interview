@@ -1,13 +1,9 @@
-import React, { ChangeEvent, ChangeEventHandler, FormEvent, MouseEvent, FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
+import React, { ChangeEvent, ChangeEventHandler, MouseEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { CreateQuestionBody, GetCategoriesParams, UpdateQuestionBody, categoriesApiDeclaration, questionsApiDeclaration } from '../../apiDeclarations';
-import { Field } from '../../components/FieldsBlock/Field';
-import { HeaderWithLink } from '../../components/HeaderWithLink/HeaderWithLink';
 import { Loader } from '../../components/Loader/Loader';
-import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
-import { SubmitField } from '../../components/SubmitField/SubmitField';
-import { IconNames, pathnames, toastSuccessOptions } from '../../constants';
+import { IconNames, toastSuccessOptions } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { CodeEditorLang, Question, QuestionType } from '../../types/question';
 import { LocalizationKey } from '../../localization';
@@ -19,17 +15,30 @@ import { Gap } from '../../components/Gap/Gap';
 import { Icon } from '../Room/components/Icon/Icon';
 import { CodeEditor } from '../../components/CodeEditor/CodeEditor';
 import { Button } from '../../components/Button/Button';
+import { Modal } from '../../components/Modal/Modal';
+import { ModalFooter } from '../../components/ModalFooter/ModalFooter';
+import { Typography } from '../../components/Typography/Typography';
+import { QuestionCreateField } from './components/QuestionCreateField/QuestionCreateField';
 
 import './QuestionCreate.css';
 
 const valueFieldName = 'qestionText';
 
-export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) => {
+interface QuestionCreateProps {
+  editQuestionId: string | null;
+  open: boolean;
+  onClose: () => void;
+}
+
+export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
+  editQuestionId,
+  open,
+  onClose,
+}) => {
   const auth = useContext(AuthContext);
   const admin = checkAdmin(auth);
   const localizationCaptions = useLocalizationCaptions();
   const {
-    id,
     rootCategory: rootCategoryParam,
     subCategory: subCategoryParam,
   } = useParams();
@@ -57,7 +66,6 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
   const { apiMethodState: subCategoriesState, fetchData: fetchSubCategories } = useApiMethod<Category[], GetCategoriesParams>(categoriesApiDeclaration.getPage);
   const { process: { loading: subCategoriesLoading, error: subCategoriesError }, data: subCategories } = subCategoriesState;
 
-  const navigate = useNavigate();
   const [questionValue, setQuestionValue] = useState('');
   const [type, setType] = useState<QuestionType>(QuestionType.Private);
   const [rootCategory, setRootCategory] = useState(rootCategoryParam || '');
@@ -69,14 +77,11 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
   const totalError = error || questionError || updatingError || rootCategoriesError || subCategoriesError;
 
   useEffect(() => {
-    if (!edit) {
+    if (!editQuestionId) {
       return;
     }
-    if (!id) {
-      throw new Error('Question id not found');
-    }
-    fetchQuestion(id);
-  }, [edit, id, fetchQuestion]);
+    fetchQuestion(editQuestionId);
+  }, [editQuestionId, fetchQuestion]);
 
   useEffect(() => {
     fetchRootCategories({
@@ -110,24 +115,22 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
       return;
     }
     toast.success(localizationCaptions[LocalizationKey.QuestionCreatedSuccessfully], toastSuccessOptions);
-    navigate(pathnames.questions);
-  }, [createdQuestionId, localizationCaptions, navigate]);
+    onClose();
+  }, [createdQuestionId, localizationCaptions, onClose]);
 
   useEffect(() => {
     if (!updatedQuestionId) {
       return;
     }
     toast.success(localizationCaptions[LocalizationKey.QuestionUpdatedSuccessfully], toastSuccessOptions);
-    navigate(pathnames.questions);
-  }, [updatedQuestionId, localizationCaptions, navigate]);
+    onClose();
+  }, [updatedQuestionId, localizationCaptions, onClose]);
 
   const handleQuestionValueChange = (event: ChangeEvent<HTMLInputElement>) => {
     setQuestionValue(event.target.value);
   };
 
-  const handleSubmitCreate = useCallback(async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleSubmitCreate = () => {
     fetchCreateQuestion({
       value: questionValue,
       tags: [],
@@ -136,10 +139,9 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
       answers,
       codeEditor,
     });
-  }, [questionValue, type, subCategory, answers, codeEditor, fetchCreateQuestion]);
+  };
 
-  const handleSubmitEdit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmitEdit = () => {
     if (!question) {
       return;
     }
@@ -152,8 +154,7 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
       answers,
       codeEditor,
     });
-
-  }, [question, questionValue, type, subCategory, answers, codeEditor, fetchUpdateQuestion]);
+  };
 
   const handleTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setType(e.target.value as QuestionType);
@@ -261,120 +262,167 @@ export const QuestionCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }) 
   const renderStatus = () => {
     if (totalError) {
       return (
-        <Field>
-          <div>{localizationCaptions[LocalizationKey.Error]}: {totalError}</div>
-        </Field>
+        <>
+          <Typography size='m' error>
+            <div className='flex'>
+              <Icon name={IconNames.Information} />
+              <Gap sizeRem={0.25} horizontal />
+              {totalError}
+            </div>
+          </Typography>
+          <Gap sizeRem={0.5} />
+        </>
       );
     }
     if (totalLoading) {
       return (
-        <Field>
+        <>
           <Loader />
-        </Field>
+          <Gap sizeRem={0.5} />
+        </>
       );
     }
     return <></>;
   };
 
   return (
-    <MainContentWrapper className="question-create">
-      <HeaderWithLink
-        title={localizationCaptions[LocalizationKey.CreateQuestion]}
-        linkVisible={true}
-        path={
-          pathnames.questions
-            .replace(':rootCategory', rootCategory || '')
-            .replace(':subCategory', subCategory || '')
-        }
-        linkCaption="<"
-        linkFloat="left"
-      />
-      {renderStatus()}
-      <form onSubmit={edit ? handleSubmitEdit : handleSubmitCreate}>
-        <Field>
-          <select id="rootCategory" value={rootCategory} onChange={handleRootCategoryChange}>
-            <option value=''>{localizationCaptions[LocalizationKey.NotSelected]}</option>
-            {rootCategories?.map(rootCategory => (
-              <option key={rootCategory.id} value={rootCategory.id}>{rootCategory.name}</option>
-            ))}
-          </select>
-          <select id="subCategory" value={subCategory} onChange={handleSubCategoryChange}>
-            <option value=''>{localizationCaptions[LocalizationKey.NotSelected]}</option>
-            {subCategories?.map(subCategory => (
-              <option key={subCategory.id} value={subCategory.id}>{subCategory.name}</option>
-            ))}
-          </select>
-        </Field>
-        <Field>
-          <div><label htmlFor="qestionText">{localizationCaptions[LocalizationKey.QuestionText]}:</label></div>
-          <input id="qestionText" name={valueFieldName} type="text" value={questionValue} onChange={handleQuestionValueChange} />
-          <Gap sizeRem={0.75} />
-          <div className='question-code-editor-controls'>
-            <Button style={{ ...(codeEditor && { display: 'none' }) }} onClick={handleAddCodeEditor}>
-              <Icon name={IconNames.Add} />
-              {localizationCaptions[LocalizationKey.QuestionAddCodeEditor]}
-            </Button>
-            <div style={{ ...(!codeEditor && { display: 'none' }) }}>
+    <Modal
+      contentLabel={editQuestionId ? localizationCaptions[LocalizationKey.EditQuestion] : localizationCaptions[LocalizationKey.CreateQuestion]}
+      open={open}
+      onClose={onClose}
+    >
+      <div className="question-create text-left">
+        {renderStatus()}
+        <div className='flex'>
+          <QuestionCreateField.Wrapper className='flex-1'>
+            <QuestionCreateField.Label>
+              <label htmlFor="rootCategory">{localizationCaptions[LocalizationKey.Category]}</label>
+            </QuestionCreateField.Label>
+            <QuestionCreateField.Content className='flex'>
+              <select id="rootCategory" className='flex-1' value={rootCategory} onChange={handleRootCategoryChange}>
+                <option value=''>{localizationCaptions[LocalizationKey.NotSelected]}</option>
+                {rootCategories?.map(rootCategory => (
+                  <option key={rootCategory.id} value={rootCategory.id}>{rootCategory.name}</option>
+                ))}
+              </select>
+            </QuestionCreateField.Content>
+          </QuestionCreateField.Wrapper>
+          <Gap sizeRem={0.625} horizontal />
+          <QuestionCreateField.Wrapper className='flex-1'>
+            <QuestionCreateField.Label>
+              <label htmlFor="subCategory">{localizationCaptions[LocalizationKey.Subcategory]}</label>
+            </QuestionCreateField.Label>
+            <QuestionCreateField.Content className='flex'>
+              <select id="subCategory" className='flex-1' value={subCategory} onChange={handleSubCategoryChange}>
+                <option value=''>{localizationCaptions[LocalizationKey.NotSelected]}</option>
+                {subCategories?.map(subCategory => (
+                  <option key={subCategory.id} value={subCategory.id}>{subCategory.name}</option>
+                ))}
+              </select>
+            </QuestionCreateField.Content>
+          </QuestionCreateField.Wrapper>
+        </div>
+        <Gap sizeRem={1.5} />
+        <QuestionCreateField.Wrapper>
+          <QuestionCreateField.Label>
+            <label htmlFor="qestionText">{localizationCaptions[LocalizationKey.QuestionText]}:</label>
+          </QuestionCreateField.Label>
+          <QuestionCreateField.Content className='flex'>
+            <input id="qestionText" className='flex-1' name={valueFieldName} type="text" value={questionValue} onChange={handleQuestionValueChange} />
+          </QuestionCreateField.Content>
+        </QuestionCreateField.Wrapper>
+        <Gap sizeRem={1} />
+        <div className='question-code-editor-controls'>
+          <Button style={{ ...(codeEditor && { display: 'none' }) }} onClick={handleAddCodeEditor}>
+            <Icon name={IconNames.Add} />
+            {localizationCaptions[LocalizationKey.QuestionAddCodeEditor]}
+          </Button>
+          <div style={{ ...(!codeEditor && { display: 'none' }) }}>
+            <Typography size='m' bold>
               {localizationCaptions[LocalizationKey.QuestionCodeEditor]}
-            </div>
-            <Button style={{ ...(!codeEditor && { display: 'none' }) }} onClick={handleRemoveCodeEditor}>
-              <Icon name={IconNames.Trash} />
-              {localizationCaptions[LocalizationKey.QuestionRemoveCodeEditor]}
-            </Button>
+            </Typography>
           </div>
-          {codeEditor && (
+          <div
+            className='cursor-pointer hover:text-red text-grey3'
+            style={{ ...(!codeEditor && { display: 'none' }) }}
+            onClick={handleRemoveCodeEditor}
+          >
+            <Typography size='m'>
+              {localizationCaptions[LocalizationKey.QuestionRemoveCodeEditor]}
+            </Typography>
+          </div>
+        </div>
+        {codeEditor && (
+          <>
+            <Gap sizeRem={0.5} />
             <CodeEditor
               languages={Object.values(CodeEditorLang)}
               language={codeEditor.lang}
               value={codeEditor.content}
+              alwaysConsumeMouseWheel={false}
+              scrollBeyondLastLine={false}
               onLanguageChange={handleLanguageChange}
               onChange={handleCodeEditorChange}
             />
-          )}
-        </Field>
-        <Field>
-          <div>{localizationCaptions[LocalizationKey.QuestionAnswerOptions]}</div>
-          <Gap sizeRem={0.75} />
-          {answers.map(answer => (
-            <div key={answer.id}>
-              <div className='question-answer-controls'>
-                <input
-                  className='question-answer-name'
-                  placeholder={localizationCaptions[LocalizationKey.QuestionAnswerOptionName]}
-                  value={answer.title}
-                  onChange={handleAnswerTitleChange(answer.id)}
-                />
-                <Button onClick={handleAnswerDelete(answer.id)}>
-                  <Icon name={IconNames.Trash} />
-                  {localizationCaptions[LocalizationKey.QuestionDeleteAnswerOption]}
-                </Button>
-              </div>
-              <CodeEditor
-                value={answer.content}
-                language={(answer.codeEditor && codeEditor?.lang) ? codeEditor.lang : CodeEditorLang.Plaintext}
-                languages={codeEditor ? [CodeEditorLang.Plaintext, codeEditor.lang] : [CodeEditorLang.Plaintext]}
-                onLanguageChange={handleAnswerLanguageChange(answer.id)}
-                onChange={handleAnswerContentChange(answer.id)}
-              />
-            </div>
-          ))}
-          <Gap sizeRem={0.75} />
-          <Button onClick={handleAddQuestionAnswer}>
-            <Icon name={IconNames.Add} />
-            {localizationCaptions[LocalizationKey.QuestionAddAnswerOption]}
-          </Button>
-        </Field>
+          </>
+        )}
+        <Gap sizeRem={1.5} />
+        <div>
+          <QuestionCreateField.Wrapper>
+            <QuestionCreateField.Label>
+              {localizationCaptions[LocalizationKey.QuestionAnswerOptions]}
+            </QuestionCreateField.Label>
+            <QuestionCreateField.Content>
+              {answers.map(answer => (
+                <div key={answer.id}>
+                  <div className='question-answer-controls flex items-center'>
+                    <input
+                      type='text'
+                      className='question-answer-name'
+                      placeholder={localizationCaptions[LocalizationKey.QuestionAnswerOptionName]}
+                      value={answer.title}
+                      onChange={handleAnswerTitleChange(answer.id)}
+                    />
+                    <div className='cursor-pointer hover:text-red text-grey3' onClick={handleAnswerDelete(answer.id)}>
+                      <Typography size='m'>
+                        {localizationCaptions[LocalizationKey.QuestionDeleteAnswerOption]}
+                      </Typography>
+                    </div>
+                  </div>
+                  <Gap sizeRem={0.5} />
+                  <CodeEditor
+                    value={answer.content}
+                    language={(answer.codeEditor && codeEditor?.lang) ? codeEditor.lang : CodeEditorLang.Plaintext}
+                    languages={(codeEditor && codeEditor.lang !== CodeEditorLang.Plaintext) ? [CodeEditorLang.Plaintext, codeEditor.lang] : [CodeEditorLang.Plaintext]}
+                    alwaysConsumeMouseWheel={false}
+                    scrollBeyondLastLine={false}
+                    onLanguageChange={handleAnswerLanguageChange(answer.id)}
+                    onChange={handleAnswerContentChange(answer.id)}
+                  />
+                </div>
+              ))}
+              <Gap sizeRem={0.75} />
+              <Button onClick={handleAddQuestionAnswer}>
+                <Icon name={IconNames.Add} />
+                {localizationCaptions[LocalizationKey.QuestionAddAnswerOption]}
+              </Button>
+            </QuestionCreateField.Content>
+          </QuestionCreateField.Wrapper>
+        </div>
         {admin && (
-          <Field>
+          <div>
             <div><label htmlFor="qestionType">{localizationCaptions[LocalizationKey.QuestionType]}:</label></div>
             <select id="qestionType" value={type} onChange={handleTypeChange}>
               <option value={QuestionType.Private}>{localizationCaptions[LocalizationKey.QuestionTypePrivate]}</option>
               <option value={QuestionType.Public}>{localizationCaptions[LocalizationKey.QuestionTypePublic]}</option>
             </select>
-          </Field>
+          </div>
         )}
-        <SubmitField caption={localizationCaptions[LocalizationKey.Create]} />
-      </form>
-    </MainContentWrapper>
+        <ModalFooter>
+          <Button onClick={onClose}>{localizationCaptions[LocalizationKey.Cancel]}</Button>
+          <Button variant='active' onClick={editQuestionId ? handleSubmitEdit : handleSubmitCreate}>{localizationCaptions[LocalizationKey.Create]}</Button>
+        </ModalFooter>
+      </div>
+    </Modal>
   );
 };
