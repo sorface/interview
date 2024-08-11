@@ -55,5 +55,7 @@ public class Analytics
         public required Guid UserId { get; set; }
 
         public required double AverageMark { get; set; }
+
+        public required string Comment { get; set; } = string.Empty;
     }
 }

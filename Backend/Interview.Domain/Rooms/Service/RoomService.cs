@@ -651,6 +651,12 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                         .Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId)
                         .Select(rqe => rqe.Mark ?? 0)
                         .ToList(),
+                    Comment = _db.RoomReviews
+                        .Include(rr => rr.Room)
+                        .Include(rr => rr.User)
+                        .Where(rr => rr.Room!.Id == e.Room.Id && rr.User!.Id == e.User.Id)
+                        .Select(rr => rr.Review)
+                        .FirstOrDefault(),
                 })
                 .ToListAsync(cancellationToken);
             res.UserReview = userReview
@@ -658,6 +664,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 {
                     UserId = e.UserId,
                     AverageMark = e.AverageMarks.DefaultIfEmpty(0).Average(),
+                    Comment = e.Comment ?? string.Empty,
                 })
                 .ToList();
             res.AverageMark = res.UserReview.Select(e => e.AverageMark).DefaultIfEmpty(0).Average();

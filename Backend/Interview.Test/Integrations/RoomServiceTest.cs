@@ -14,6 +14,7 @@ using Interview.Domain.Rooms.RoomParticipants.Service;
 using Interview.Domain.Rooms.RoomQuestionEvaluations;
 using Interview.Domain.Rooms.RoomQuestionReactions;
 using Interview.Domain.Rooms.RoomQuestions;
+using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Rooms.RoomTimers;
 using Interview.Domain.Rooms.Service;
 using Interview.Domain.Users;
@@ -399,6 +400,18 @@ public class RoomServiceTest
         appDbContext.RoomQuestionReactions.AddRange(questionReactions);
         await appDbContext.SaveChangesAsync();
 
+        appDbContext.RoomReviews.AddRange(
+            new RoomReview(users[0], room1, SERoomReviewState.Closed)
+            {
+                Review = "test review",
+            },
+            new RoomReview(users[3], room1, SERoomReviewState.Open)
+            {
+                Review = "test review 22",
+            });
+        await appDbContext.SaveChangesAsync();
+        appDbContext.ChangeTracker.Clear();
+
         var roomService = CreateRoomService(appDbContext);
 
         var expectAnalytics = new Analytics
@@ -593,10 +606,10 @@ public class RoomServiceTest
             AverageMark = 5.25,
             UserReview = new List<Analytics.AnalyticsUserAverageMark>
             {
-                new() { UserId = users[0].Id, AverageMark = 6 },
-                new() { UserId = users[1].Id, AverageMark = 5 },
-                new() { UserId = users[2].Id, AverageMark = 0 },
-                new() { UserId = users[3].Id, AverageMark = 10 },
+                new() { UserId = users[0].Id, AverageMark = 6, Comment = "test review" },
+                new() { UserId = users[1].Id, AverageMark = 5, Comment = string.Empty },
+                new() { UserId = users[2].Id, AverageMark = 0, Comment = string.Empty },
+                new() { UserId = users[3].Id, AverageMark = 10, Comment = "test review 22" },
             }
         };
 
