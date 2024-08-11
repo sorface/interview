@@ -18,10 +18,11 @@ import { RoomReview as RoomReviewType } from '../../types/room';
 import { RoomQuestionEvaluation } from '../Room/components/RoomQuestionEvaluation/RoomQuestionEvaluation';
 import { RoomParticipants } from '../../components/RoomParticipants/RoomParticipants';
 import { Button } from '../../components/Button/Button';
-import { toastSuccessOptions } from '../../constants';
+import { roomReviewMaxLength, toastSuccessOptions } from '../../constants';
 import { InfoBlock } from '../../components/InfoBlock/InfoBlock';
 import { AuthContext } from '../../context/AuthContext';
 import { checkAdmin } from '../../utils/checkAdmin';
+import { Textarea } from '../../components/Textarea/Textarea';
 
 const createFakeQuestion = (roomQuestion: RoomQuestion): Question => ({
   ...roomQuestion,
@@ -174,8 +175,10 @@ export const RoomReview: FunctionComponent = () => {
       <InfoBlock className='text-left flex flex-col'>
         <Typography size='s' bold>{localizationCaptions[LocalizationKey.CandidateOpinion]}</Typography>
         <Gap sizeRem={1} />
-        <textarea
+        <Textarea
           className='h-3.625'
+          maxLength={roomReviewMaxLength}
+          showMaxLength={true}
           value={roomReviewValue}
           onInput={handleReviewChange}
         />
