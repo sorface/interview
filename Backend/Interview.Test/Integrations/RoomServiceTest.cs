@@ -606,10 +606,10 @@ public class RoomServiceTest
             AverageMark = 5.25,
             UserReview = new List<Analytics.AnalyticsUserAverageMark>
             {
-                new() { UserId = users[0].Id, AverageMark = 6, Comment = "test review" },
-                new() { UserId = users[1].Id, AverageMark = 5, Comment = string.Empty },
-                new() { UserId = users[2].Id, AverageMark = 0, Comment = string.Empty },
-                new() { UserId = users[3].Id, AverageMark = 10, Comment = "test review 22" },
+                new() { UserId = users[0].Id, AverageMark = 6, Comment = "test review", Nickname = users[0].Nickname, Avatar = users[0].Avatar },
+                new() { UserId = users[1].Id, AverageMark = 5, Comment = string.Empty, Nickname = users[1].Nickname, Avatar = users[1].Avatar },
+                new() { UserId = users[2].Id, AverageMark = 0, Comment = string.Empty, Nickname = users[2].Nickname, Avatar = users[2].Avatar },
+                new() { UserId = users[3].Id, AverageMark = 10, Comment = "test review 22", Nickname = users[3].Nickname, Avatar = users[3].Avatar },
             }
         };
 

@@ -657,14 +657,19 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                         .Where(rr => rr.Room!.Id == e.Room.Id && rr.User!.Id == e.User.Id)
                         .Select(rr => rr.Review)
                         .FirstOrDefault(),
+                    Nickname = e.User.Nickname,
+                    Avatar = e.User.Avatar,
                 })
                 .ToListAsync(cancellationToken);
             res.UserReview = userReview
                 .Select(e => new Analytics.AnalyticsUserAverageMark
                 {
                     UserId = e.UserId,
-                    AverageMark = e.AverageMarks.DefaultIfEmpty(0).Average(),
+                    AverageMark = e.AverageMarks.DefaultIfEmpty(0)
+                        .Average(),
                     Comment = e.Comment ?? string.Empty,
+                    Nickname = e.Nickname,
+                    Avatar = e.Avatar,
                 })
                 .ToList();
             res.AverageMark = res.UserReview.Select(e => e.AverageMark).DefaultIfEmpty(0).Average();

@@ -57,5 +57,9 @@ public class Analytics
         public required double AverageMark { get; set; }
 
         public required string Comment { get; set; } = string.Empty;
+
+        public required string Nickname { get; set; } = string.Empty;
+
+        public required string? Avatar { get; set; } = string.Empty;
     }
 }
