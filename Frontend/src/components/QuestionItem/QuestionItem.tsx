@@ -11,6 +11,7 @@ import { LocalizationKey } from '../../localization';
 import { ContextMenu, ContextMenuProps } from '../ContextMenu/ContextMenu';
 import { Button } from '../Button/Button';
 import { CircularProgress } from '../CircularProgress/CircularProgress';
+import { Checkbox } from '../Checkbox/Checkbox';
 
 interface QuestionItemProps {
   question: Question;
@@ -84,17 +85,12 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
         {contextMenu && <div onClick={handleCheckboxAreaClick}><ContextMenu {...contextMenu} buttonVariant='text' /></div>}
         {hasCheckbox && (
           <div onClick={handleCheckboxAreaClick}>
-            <input
+            <Checkbox
               id={`questionCheckbox${question.id}`}
-              type='checkbox'
               checked={checked}
+              label={checkboxLabel && (checkboxLabel)}
               onChange={handleCheckboxChange}
             />
-            {checkboxLabel && (
-              <label htmlFor={`questionCheckbox${question.id}`}>
-                {checkboxLabel}
-              </label>
-            )}
           </div>
         )}
         {onRemove && (
