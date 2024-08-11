@@ -6,6 +6,8 @@ import { Theme, ThemeInUi } from '../../../../context/ThemeContext';
 import { Typography } from '../../../../components/Typography/Typography';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../../localization';
+import { Textarea } from '../../../../components/Textarea/Textarea';
+import { roomReviewMaxLength } from '../../../../constants';
 
 export interface RoomQuestionEvaluationValue {
   mark: number | null;
@@ -100,8 +102,9 @@ export const RoomQuestionEvaluation: FunctionComponent<RoomQuestionEvaluationPor
       </div>
       <Gap sizeRem={1} />
       <div className='flex'>
-        <textarea
+        <Textarea
           className='flex-1 h-6.25'
+          maxLength={roomReviewMaxLength}
           value={value.review}
           onInput={handleReviewChange}
         />
