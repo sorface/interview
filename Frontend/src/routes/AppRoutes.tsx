@@ -4,7 +4,6 @@ import { inviteParamName, pathnames } from '../constants';
 import { Home } from '../pages/Home/Home';
 import { Rooms, RoomsPageMode } from '../pages/Rooms/Rooms';
 import { Questions } from '../pages/Questions/Questions';
-import { QuestionCreate } from '../pages/QuestionCreate/QuestionCreate';
 import { NotFound } from '../pages/NotFound/NotFound';
 import { Room } from '../pages/Room/Room';
 import { Session } from '../pages/Session/Session';
@@ -81,6 +80,13 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
                 </ProtectedRoute>
               }
             />
+            <Route path={pathnames.highlightRooms}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <Rooms mode={RoomsPageMode.Home} />
+                </ProtectedRoute>
+              }
+            />
             <Route path={pathnames.currentRooms}
               element={
                 <ProtectedRoute allowed={authenticated}>
@@ -92,20 +98,6 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <Rooms mode={RoomsPageMode.Closed} />
-                </ProtectedRoute>
-              }
-            />
-            <Route path={pathnames.questionsCreate}
-              element={
-                <ProtectedRoute allowed={authenticated}>
-                  <QuestionCreate edit={false} />
-                </ProtectedRoute>
-              }
-            />
-            <Route path={pathnames.questionsEdit}
-              element={
-                <ProtectedRoute allowed={authenticated}>
-                  <QuestionCreate edit={true} />
                 </ProtectedRoute>
               }
             />
@@ -147,7 +139,7 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
             <Route path="*" element={<NotFound />} />
           </Routes>
           {!fullScreenPage && (
-            <Gap sizeRem={1.25} />
+            <Gap sizeRem={0.5} />
           )}
         </div>
       </div>

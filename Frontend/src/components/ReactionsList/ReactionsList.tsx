@@ -48,7 +48,7 @@ export const ReactionsList: FunctionComponent<ReactionsListProps> = ({
           return 0;
         })
         .map((reaction, index, reacts) => (
-          <Fragment>
+          <Fragment key={reaction.id}>
             <RoomToolsPanel.SwitchButton
               key={`${reaction.id}${reaction.type.name}`}
               enabled={true}

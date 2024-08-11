@@ -10,6 +10,9 @@ export const Gap: FunctionComponent<GapProps> = ({
   horizontal,
 }) => {
   return (
-    <div style={{ [horizontal ? 'width' : 'height']: `${sizeRem}rem` }}></div>
+    <div
+      className='shrink-0'
+      style={{ [horizontal ? 'width' : 'height']: `${sizeRem}rem` }}
+    />
   );
 };

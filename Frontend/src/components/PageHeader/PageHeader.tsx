@@ -17,7 +17,7 @@ export const PageHeader: FunctionComponent<PageHeaderProps> = ({
   onSearchChange,
 }) => {
   return (
-    <div className='flex items-center h-4 py-0.5'>
+    <div className='flex items-center shrink-0 h-4 py-0.5'>
       <h1 className='m-0'>
         <Typography size='xl' bold>
           {title}

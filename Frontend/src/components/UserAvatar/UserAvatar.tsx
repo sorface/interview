@@ -5,6 +5,7 @@ import './UserAvatar.css';
 interface UserAvatarProps {
   src?: string;
   nickname: string;
+  altarnativeBackgound?: boolean;
   size?: 's' | 'm' | 'l';
 }
 
@@ -24,13 +25,14 @@ const getSizeClassName = (size: UserAvatarProps['size']) => {
 export const UserAvatar: FunctionComponent<UserAvatarProps> = ({
   src,
   nickname,
+  altarnativeBackgound,
   size,
   ...restProps
 }) => {
   if (!src) {
     return (
       <div
-        className={`bg-form flex items-center justify-center user-avatar ${getSizeClassName(size)}`}
+        className={`${altarnativeBackgound ? 'bg-wrap' : 'bg-form'} flex items-center justify-center user-avatar ${getSizeClassName(size)}`}
         {...restProps}
       >
         {nickname[0].toLocaleUpperCase()}

@@ -13,7 +13,7 @@ export const ToggleSwitch: FunctionComponent<ToggleSwitchProps> = ({
 }) => {
   return (
     <label className="toggle-switch">
-      <input type="checkbox" checked={toggled} onClick={onToggle} />
+      <input type="checkbox" checked={toggled} onChange={onToggle} />
       <span className="slider" />
     </label>
   );

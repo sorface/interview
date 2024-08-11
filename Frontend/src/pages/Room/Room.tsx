@@ -406,7 +406,7 @@ export const Room: FunctionComponent = () => {
   };
 
   const handleLeaveRoom = () => {
-    navigate(pathnames.currentRooms);
+    navigate(pathnames.highlightRooms);
   };
 
   const renderToolsPanel = () => {
@@ -485,13 +485,13 @@ export const Room: FunctionComponent = () => {
   };
 
   if (roomInReview && id) {
-    return <Navigate to={pathnames.roomAnalytics.replace(':id', id)} replace />;
+    return <Navigate to={pathnames.roomReview.replace(':id', id)} replace />;
   }
 
   if (wsClosed) {
     return (
       <MessagePage title={localizationCaptions[LocalizationKey.ConnectionError]} message={localizationCaptions[LocalizationKey.RoomConnectionError]}>
-        <Link to={pathnames.currentRooms}>
+        <Link to={pathnames.highlightRooms}>
           <Button>{localizationCaptions[LocalizationKey.Exit]}</Button>
         </Link>
       </MessagePage>

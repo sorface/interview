@@ -2,6 +2,7 @@ export const inviteParamName = 'invite';
 
 export const pathnames = {
   home: '/:redirect?',
+  highlightRooms: '/rooms/highlight',
   currentRooms: '/rooms/current',
   closedRooms: '/rooms/closed',
   roomsParticipants: '/rooms/participants/:id',
@@ -56,6 +57,8 @@ export const enum IconNames {
   Time = 'time-outline',
   CheckmarkDone = 'checkmark-done-outline',
   Information = 'information-circle-outline',
+  ChevronBack = 'chevron-back',
+  Home = 'home-outline',
 }
 
 export const reactionIcon: Record<string, IconNames> = {

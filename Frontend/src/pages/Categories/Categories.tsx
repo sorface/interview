@@ -130,6 +130,7 @@ export const Categories: FunctionComponent = () => {
         <ItemsGrid
           currentData={categories}
           loading={loading || rootCategoriesLoading}
+          error={error || archiveError || rootCategoriesError}
           triggerResetAccumData={`${searchValueInput}${showOnlyWithoutParent}${archivedCategory}${categoryParent}`}
           loaderClassName='category-item field-wrap'
           renderItem={createCategoryItem}

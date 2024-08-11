@@ -5,7 +5,7 @@ import { Theme } from '../../context/ThemeContext';
 import './Typography.css';
 
 export interface TypographyProps {
-  size: 'xxl' | 'xl' | 'l' | 'm' | 's';
+  size: 'xxl' | 'xl' | 'l' | 'm' | 's' | 'xs';
   bold?: boolean;
   error?: boolean;
   children: ReactNode;
