@@ -651,7 +651,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                         .Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId)
                         .Select(rqe => rqe.Mark ?? 0)
                         .ToList(),
-                    Comment = _db.RoomReviews
+                    Comment = _db.RoomReview
                         .Include(rr => rr.Room)
                         .Include(rr => rr.User)
                         .Where(rr => rr.Room!.Id == e.Room.Id && rr.User!.Id == e.User.Id)

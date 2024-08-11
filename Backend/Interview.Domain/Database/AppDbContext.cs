@@ -83,7 +83,7 @@ public class AppDbContext : DbContext
 
     public DbSet<RoomQuestionEvaluation> RoomQuestionEvaluation { get; private set; } = null!;
 
-    public DbSet<RoomReview> RoomReviews { get; private set; } = null!;
+    public DbSet<RoomReview> RoomReview { get; private set; } = null!;
 
     public override int SaveChanges()
     {
