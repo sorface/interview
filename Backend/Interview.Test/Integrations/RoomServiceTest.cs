@@ -400,7 +400,7 @@ public class RoomServiceTest
         appDbContext.RoomQuestionReactions.AddRange(questionReactions);
         await appDbContext.SaveChangesAsync();
 
-        appDbContext.RoomReviews.AddRange(
+        appDbContext.RoomReview.AddRange(
             new RoomReview(users[0], room1, SERoomReviewState.Closed)
             {
                 Review = "test review",
