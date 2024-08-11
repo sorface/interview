@@ -26,7 +26,7 @@ export const CalendarDay: FunctionComponent<CalendarDayProps> = ({
   const currentDayClassName = day?.valueOf() === currentDate.valueOf() ? currentDayThemedClassName : '';
 
   return (
-    <div className={`flex items-center justify-center w-1.875 h-1.875 rounded-full ${filledClassName} ${currentDayClassName}`}>
+    <div className={`flex items-center justify-center w-1.875 h-1.875 rounded-full ${currentDayClassName || filledClassName}`}>
       <Typography size='m'>
         {day?.getDate() || ''}
       </Typography>
