@@ -687,9 +687,6 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 .Select(e => new Analytics.AnalyticsUser
                 {
                     Id = e.User.Id,
-                    Avatar = string.Empty,
-                    Nickname = e.User.Nickname,
-                    ParticipantType = e.Type.Name ?? string.Empty,
                     Evaluation = e.User.RoomQuestionEvaluations
                         .Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.RoomQuestion!.QuestionId == questionId)
                         .Select(rqe => new Analytics.AnalyticsUserQuestionEvaluation

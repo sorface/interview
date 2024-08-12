@@ -43,12 +43,6 @@ public class Analytics
     {
         public required Guid Id { get; set; }
 
-        public required string Nickname { get; set; } = string.Empty;
-
-        public required string Avatar { get; set; } = string.Empty;
-
-        public required string ParticipantType { get; set; } = string.Empty;
-
         public required AnalyticsUserQuestionEvaluation? Evaluation { get; set; }
     }
 
