@@ -2,7 +2,7 @@ import { Fragment, FunctionComponent, useEffect, useState } from 'react';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { useParams } from 'react-router-dom';
 import { useApiMethod } from '../../hooks/useApiMethod';
-import { Analytics } from '../../types/analytics';
+import { Analytics, AnalyticsUserReview } from '../../types/analytics';
 import { roomsApiDeclaration } from '../../apiDeclarations';
 import { Room, RoomQuestion } from '../../types/room';
 import { InfoBlock } from '../../components/InfoBlock/InfoBlock';
@@ -20,6 +20,7 @@ import { Question } from '../../types/question';
 import { ReviewUserOpinion } from './components/ReviewUserOpinion/ReviewUserOpinion';
 import { ReviewUserGrid } from './components/ReviewUserGrid/ReviewUserGrid';
 import { Modal } from '../../components/Modal/Modal';
+import { User } from '../../types/user';
 
 const createFakeQuestion = (roomQuestion: RoomQuestion): Question => ({
   ...roomQuestion,
@@ -28,20 +29,23 @@ const createFakeQuestion = (roomQuestion: RoomQuestion): Question => ({
   codeEditor: null,
 });
 
-const generateRandomAverageMark = () =>
-  parseFloat(`${String(Math.random())[2]}.${String(Math.random())[2]}`);
-
-const generateRandomUserOpinion = () => ({
-  id: `user ${String(Math.random())[2]}`,
-  nickname: `user ${String(Math.random())[2]}`,
-  participantType: 'Expert' as const,
+const generateUserOpinion = (userReview: AnalyticsUserReview) => ({
+  id: userReview.userId,
+  nickname: userReview.nickname,
+  participantType: userReview.participantType,
   evaluation: {
-    mark: parseInt(`${String(Math.random())[2]}`),
-    review: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Doloremque rem quis nisi laborum ratione exercitationem aut ab quae omnis, qui minima dicta. Libero obcaecati ducimus consectetur iure porro eligendi quaerat!'
+    mark: userReview.averageMark,
+    review: userReview.comment,
   }
 });
 
-const fakeTotalMark = generateRandomAverageMark();
+const getAllUsers = (data: Analytics) => {
+  const users: Map<User['id'], AnalyticsUserReview> = new Map();
+  data.userReview.forEach(userReview => {
+    users.set(userReview.userId, userReview);
+  });
+  return users;
+};
 
 export const RoomAnaytics: FunctionComponent = () => {
   const localizationCaptions = useLocalizationCaptions();
@@ -61,6 +65,8 @@ export const RoomAnaytics: FunctionComponent = () => {
   } = roomApiMethodState;
 
   const totalError = error || roomError;
+
+  const allUsers = data ? getAllUsers(data) : new Map<User['id'], AnalyticsUserReview>();
 
   const examinee = room?.participants.find(
     participant => participant.type === 'Examinee'
@@ -100,6 +106,7 @@ export const RoomAnaytics: FunctionComponent = () => {
             <ReviewUserOpinion
               key={questionUser.id}
               user={questionUser}
+              allUsers={allUsers}
             />
           ))}
         </ReviewUserGrid>
@@ -148,8 +155,8 @@ export const RoomAnaytics: FunctionComponent = () => {
           </Typography>
           <Gap sizeRem={1} />
           <CircularProgress
-            value={fakeTotalMark * 10}
-            caption={fakeTotalMark.toFixed(1)}
+            value={data.averageMark * 10}
+            caption={data.averageMark.toFixed(1)}
             size='m'
           />
         </InfoBlock>
@@ -160,10 +167,11 @@ export const RoomAnaytics: FunctionComponent = () => {
           {localizationCaptions[LocalizationKey.OpinionsAndMarks]}
           <Gap sizeRem={2} />
           <ReviewUserGrid>
-            {Array.from({ length: 5 }).map(_ => (
+            {data.userReview.map((userReview) => (
               <ReviewUserOpinion
-                key={Math.random()}
-                user={generateRandomUserOpinion()}
+                key={userReview.userId}
+                user={generateUserOpinion(userReview)}
+                allUsers={allUsers}
               />
             ))}
           </ReviewUserGrid>
@@ -180,7 +188,7 @@ export const RoomAnaytics: FunctionComponent = () => {
             <Fragment key={question.id}>
               <QuestionItem
                 question={createFakeQuestion(question)}
-                mark={generateRandomAverageMark()}
+                mark={question.averageMark}
                 onClick={handleQuestionClick}
               />
               {index !== questions.length - 1 && (<Gap sizeRem={0.25} />)}

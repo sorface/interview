@@ -33,15 +33,24 @@ export interface AnalyticsSummary {
 }
 
 export interface AnalyticsQuestions extends RoomQuestion {
+  averageMark: number;
   users: Array<{
     id: User['id'];
-    nickname: User['nickname'];
-    avatar?: User['avatar'];
-    participantType: UserType;
     evaluation: Omit<RoomQuestionEvaluation, 'id'>;
   }>;
 }
 
+export interface AnalyticsUserReview {
+  userId: User['id'];
+  nickname: User['nickname'];
+  avatar?: User['avatar'];
+  participantType: UserType;
+  averageMark: number;
+  comment: string;
+}
+
 export interface Analytics {
+  averageMark: number;
   questions: AnalyticsQuestions[];
+  userReview: AnalyticsUserReview[];
 }

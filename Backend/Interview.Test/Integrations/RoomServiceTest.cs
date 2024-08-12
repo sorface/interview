@@ -14,6 +14,7 @@ using Interview.Domain.Rooms.RoomParticipants.Service;
 using Interview.Domain.Rooms.RoomQuestionEvaluations;
 using Interview.Domain.Rooms.RoomQuestionReactions;
 using Interview.Domain.Rooms.RoomQuestions;
+using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Rooms.RoomTimers;
 using Interview.Domain.Rooms.Service;
 using Interview.Domain.Users;
@@ -211,7 +212,8 @@ public class RoomServiceTest
             new("u1", "v1")
             {
                 Id = Guid.Parse("587A0279-4364-4940-BE4E-8DBEC08BA96C"),
-                Roles = { appDbContext.Roles.Find(RoleName.User.Id)! }
+                Roles = { appDbContext.Roles.Find(RoleName.User.Id)! },
+                Avatar = "dummy avatar 1"
             },
             new("u2", "v2")
             {
@@ -221,7 +223,8 @@ public class RoomServiceTest
             new("u3", "v3")
             {
                 Id = Guid.Parse("5A7A0279-4364-4940-BE4E-8DBEC08BA96C"),
-                Roles = { appDbContext.Roles.Find(RoleName.User.Id)! }
+                Roles = { appDbContext.Roles.Find(RoleName.User.Id)! },
+                Avatar = "dummy avatar 3"
             },
             new("u4", "v4")
             {
@@ -231,7 +234,8 @@ public class RoomServiceTest
             new("u5", "v5")
             {
                 Id = Guid.Parse("5C7A0279-4364-4940-BE4E-8DBEC08BA96C"),
-                Roles = { appDbContext.Roles.Find(RoleName.User.Id)! }
+                Roles = { appDbContext.Roles.Find(RoleName.User.Id)! },
+                Avatar = "dummy avatar 5"
             },
         };
         appDbContext.Users.AddRange(users);
@@ -286,7 +290,7 @@ public class RoomServiceTest
         {
             new(users[0], room1, SERoomParticipantType.Examinee)
             {
-                Id = Guid.Parse("C15AA6D4-FA7B-49CB-AFA2-EA4F900F2258")
+                Id = Guid.Parse("C15AA6D4-FA7B-49CB-AFA2-EA4F900F2258"),
             },
             new(users[1], room1, SERoomParticipantType.Expert)
             {
@@ -305,6 +309,22 @@ public class RoomServiceTest
 
         var roomQuestionEvaluation = new RoomQuestionEvaluation[]
         {
+            new()
+            {
+                RoomQuestionId = roomQuestion[1].Id,
+                CreatedById = users[0].Id,
+                Mark = 2,
+                Review = "test 2",
+                State = SERoomQuestionEvaluationState.Submitted,
+            },
+            new()
+            {
+                RoomQuestionId = roomQuestion[3].Id,
+                CreatedById = users[0].Id,
+                Mark = 10,
+                Review = "test 4444",
+                State = SERoomQuestionEvaluationState.Submitted,
+            },
             new()
             {
                 RoomQuestionId = roomQuestion[1].Id,
@@ -383,6 +403,18 @@ public class RoomServiceTest
         appDbContext.RoomQuestionReactions.AddRange(questionReactions);
         await appDbContext.SaveChangesAsync();
 
+        appDbContext.RoomReview.AddRange(
+            new RoomReview(users[0], room1, SERoomReviewState.Closed)
+            {
+                Review = "test review",
+            },
+            new RoomReview(users[3], room1, SERoomReviewState.Open)
+            {
+                Review = "test review 22",
+            });
+        await appDbContext.SaveChangesAsync();
+        appDbContext.ChangeTracker.Clear();
+
         var roomService = CreateRoomService(appDbContext);
 
         var expectAnalytics = new Analytics
@@ -399,40 +431,29 @@ public class RoomServiceTest
                         new()
                         {
                             Id = users[0].Id,
-                            Nickname = users[0].Nickname,
-                            Avatar = users[0].Avatar ?? string.Empty,
-                            ParticipantType = SERoomParticipantType.Examinee.Name,
                             Evaluation = null,
                         },
                         new()
                         {
                             Id = users[1].Id,
-                            Nickname = users[1].Nickname,
-                            Avatar = users[1].Avatar ?? string.Empty,
-                            ParticipantType = SERoomParticipantType.Expert.Name,
                             Evaluation = null,
                         },
                         new()
                         {
                             Id = users[2].Id,
-                            Nickname = users[2].Nickname,
-                            Avatar = users[2].Avatar ?? string.Empty,
-                            ParticipantType = SERoomParticipantType.Viewer.Name,
                             Evaluation = null,
                         },
                         new()
                         {
                             Id = users[3].Id,
-                            Nickname = users[3].Nickname,
-                            Avatar = users[3].Avatar ?? string.Empty,
-                            ParticipantType = SERoomParticipantType.Viewer.Name,
                             Evaluation = new()
                             {
                                 Mark = 10,
                                 Review = "test test",
                             },
                         },
-                    }
+                    },
+                    AverageMark = 10
                 },
                 new()
                 {
@@ -444,17 +465,15 @@ public class RoomServiceTest
                         new()
                         {
                             Id = users[0].Id,
-                            Nickname = users[0].Nickname,
-                            Avatar = users[0].Avatar ?? string.Empty,
-                            ParticipantType = SERoomParticipantType.Examinee.Name,
-                            Evaluation = null,
+                            Evaluation = new()
+                            {
+                                Mark = 2,
+                                Review = "test 2",
+                            },
                         },
                         new()
                         {
                             Id = users[1].Id,
-                            Nickname = users[1].Nickname,
-                            Avatar = users[1].Avatar ?? string.Empty,
-                            ParticipantType = SERoomParticipantType.Expert.Name,
                             Evaluation = new()
                             {
                                 Mark = 5,
@@ -464,20 +483,15 @@ public class RoomServiceTest
                         new()
                         {
                             Id = users[2].Id,
-                            Nickname = users[2].Nickname,
-                            Avatar = users[2].Avatar ?? string.Empty,
-                            ParticipantType = SERoomParticipantType.Viewer.Name,
                             Evaluation = null,
                         },
                         new()
                         {
                             Id = users[3].Id,
-                            Nickname = users[3].Nickname,
-                            Avatar = users[3].Avatar ?? string.Empty,
-                            ParticipantType = SERoomParticipantType.Viewer.Name,
                             Evaluation = null,
                         },
-                    }
+                    },
+                    AverageMark = 3.5
                 },
                 new()
                 {
@@ -489,36 +503,25 @@ public class RoomServiceTest
                         new()
                         {
                             Id = users[0].Id,
-                            Nickname = users[0].Nickname,
-                            Avatar = users[0].Avatar ?? string.Empty,
-                            ParticipantType = SERoomParticipantType.Examinee.Name,
                             Evaluation = null,
                         },
                         new()
                         {
                             Id = users[1].Id,
-                            Nickname = users[1].Nickname,
-                            Avatar = users[1].Avatar ?? string.Empty,
-                            ParticipantType = SERoomParticipantType.Expert.Name,
                             Evaluation = null,
                         },
                         new()
                         {
                             Id = users[2].Id,
-                            Nickname = users[2].Nickname,
-                            Avatar = users[2].Avatar ?? string.Empty,
-                            ParticipantType = SERoomParticipantType.Viewer.Name,
                             Evaluation = null,
                         },
                         new()
                         {
                             Id = users[3].Id,
-                            Nickname = users[3].Nickname,
-                            Avatar = users[3].Avatar ?? string.Empty,
-                            ParticipantType = SERoomParticipantType.Viewer.Name,
                             Evaluation = null,
                         },
                     },
+                    AverageMark = 0,
                 },
                 new()
                 {
@@ -530,37 +533,38 @@ public class RoomServiceTest
                         new()
                         {
                             Id = users[0].Id,
-                            Nickname = users[0].Nickname,
-                            Avatar = users[0].Avatar ?? string.Empty,
-                            ParticipantType = SERoomParticipantType.Examinee.Name,
-                            Evaluation = null,
+                            Evaluation = new()
+                            {
+                                Review = "test 4444",
+                                Mark = 10
+                            },
                         },
                         new()
                         {
                             Id = users[1].Id,
-                            Nickname = users[1].Nickname,
-                            Avatar = users[1].Avatar ?? string.Empty,
-                            ParticipantType = SERoomParticipantType.Expert.Name,
                             Evaluation = null,
                         },
                         new()
                         {
                             Id = users[2].Id,
-                            Nickname = users[2].Nickname,
-                            Avatar = users[2].Avatar ?? string.Empty,
-                            ParticipantType = SERoomParticipantType.Viewer.Name,
                             Evaluation = null,
                         },
                         new()
                         {
                             Id = users[3].Id,
-                            Nickname = users[3].Nickname,
-                            Avatar = users[3].Avatar ?? string.Empty,
-                            ParticipantType = SERoomParticipantType.Viewer.Name,
                             Evaluation = null,
                         },
                     },
+                    AverageMark = 10,
                 }
+            },
+            AverageMark = 5.25,
+            UserReview = new List<Analytics.AnalyticsUserAverageMark>
+            {
+                new() { UserId = users[0].Id, AverageMark = 6, Comment = "test review", Nickname = users[0].Nickname, Avatar = users[0].Avatar, ParticipantType = roomParticipants[0].Type.EnumValue },
+                new() { UserId = users[1].Id, AverageMark = 5, Comment = string.Empty, Nickname = users[1].Nickname, Avatar = users[1].Avatar, ParticipantType = roomParticipants[1].Type.EnumValue },
+                new() { UserId = users[2].Id, AverageMark = 0, Comment = string.Empty, Nickname = users[2].Nickname, Avatar = users[2].Avatar, ParticipantType = roomParticipants[2].Type.EnumValue },
+                new() { UserId = users[3].Id, AverageMark = 10, Comment = "test review 22", Nickname = users[3].Nickname, Avatar = users[3].Avatar, ParticipantType = roomParticipants[3].Type.EnumValue },
             }
         };
 

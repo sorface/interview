@@ -7,19 +7,19 @@ import { CircularProgress } from '../../../../components/CircularProgress/Circul
 import { Gap } from '../../../../components/Gap/Gap';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../../localization';
+import { AnalyticsUserReview } from '../../../../types/analytics';
 
 interface ReviewUserOpinionProps {
   user: {
     id: User['id'];
-    nickname: User['nickname'];
-    avatar?: User['avatar'];
-    participantType: UserType;
     evaluation: Omit<RoomQuestionEvaluation, 'id'>;
   };
+  allUsers: Map<User['id'], AnalyticsUserReview>;
 }
 
 export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
   user,
+  allUsers,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
   const participantTypeLocalization: { [key in UserType]: string } = {
@@ -27,17 +27,20 @@ export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
     Examinee: localizationCaptions[LocalizationKey.Examinee],
     Expert: localizationCaptions[LocalizationKey.Expert],
   };
+  const currentUser = allUsers.get(user.id);
 
   return (
     <div className='text-left'>
       <div className='flex justify-between'>
         <div className='flex'>
-          <UserAvatar size='m' nickname={user.nickname} src={user.avatar} />
+          <UserAvatar size='m' nickname={currentUser?.nickname || ''} src={currentUser?.avatar} />
           <Gap sizeRem={1} horizontal />
           <div className='flex flex-col'>
-            <Typography size='m' bold>{user.nickname}</Typography>
+            <Typography size='m' bold>{currentUser?.nickname}</Typography>
             <span className='opacity-0.5'>
-              <Typography size='m' bold>{participantTypeLocalization[user.participantType]}</Typography>
+              <Typography size='m' bold>
+                {currentUser && participantTypeLocalization[currentUser.participantType]}
+              </Typography>
             </span>
           </div>
         </div>

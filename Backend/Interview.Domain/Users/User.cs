@@ -1,4 +1,5 @@
 using Interview.Domain.Repository;
+using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomQuestionEvaluations;
 using Interview.Domain.Users.Permissions;
 using Interview.Domain.Users.Roles;
