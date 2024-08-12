@@ -135,7 +135,7 @@ public class RoomServiceTest
     }
 
     [Fact(DisplayName = "GetAnalytics should return valid analytics by roomId")]
-    public async Task etAnalytics_Should_Return_Valid_Analytics_By_RoomId()
+    public async Task GetAnalytics_Should_Return_Valid_Analytics_By_RoomId()
     {
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
