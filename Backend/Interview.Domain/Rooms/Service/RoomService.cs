@@ -642,7 +642,6 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             var userReview = await _db.RoomParticipants.AsNoTracking()
                 .Include(e => e.Room)
                 .Include(e => e.User).ThenInclude(e => e.RoomQuestionEvaluations.Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId))
-                .Include(e => e.User)
                 .Where(e => e.Room.Id == request.RoomId)
                 .Select(e => new
                 {
