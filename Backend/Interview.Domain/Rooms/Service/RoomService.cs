@@ -641,8 +641,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
             var userReview = await _db.RoomParticipants.AsNoTracking()
                 .Include(e => e.Room)
-                .Include(e => e.User)
-                .ThenInclude(e => e.RoomQuestionEvaluations.Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId))
+                .Include(e => e.User).ThenInclude(e => e.RoomQuestionEvaluations.Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId))
+                .Include(e => e.User).ThenInclude(e => e.RoomParticipants.Where(rp => rp.Room.Id == request.RoomId))
                 .Where(e => e.Room.Id == request.RoomId)
                 .Select(e => new
                 {
@@ -659,6 +659,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                         .FirstOrDefault(),
                     Nickname = e.User.Nickname,
                     Avatar = e.User.Avatar,
+                    ParticipantType = e.User.RoomParticipants
+                        .Where(rp => rp.Room.Id == e.Room.Id && rp.User.Id == e.User.Id)
+                        .Select(rp => rp.Type)
+                        .First(),
                 })
                 .ToListAsync(cancellationToken);
             res.UserReview = userReview
@@ -670,6 +674,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                     Comment = e.Comment ?? string.Empty,
                     Nickname = e.Nickname,
                     Avatar = e.Avatar,
+                    ParticipantType = e.ParticipantType.EnumValue,
                 })
                 .ToList();
             res.AverageMark = res.UserReview.Select(e => e.AverageMark).DefaultIfEmpty(0).Average();

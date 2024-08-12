@@ -1,3 +1,5 @@
+using Interview.Domain.Rooms.RoomParticipants;
+
 namespace Interview.Domain.Rooms;
 
 public class Analytics
@@ -55,6 +57,8 @@ public class Analytics
         public required Guid UserId { get; set; }
 
         public required double AverageMark { get; set; }
+
+        public required EVRoomParticipantType ParticipantType { get; set; }
 
         public required string Comment { get; set; } = string.Empty;
 

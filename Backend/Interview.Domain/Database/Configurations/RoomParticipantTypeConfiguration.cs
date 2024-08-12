@@ -25,5 +25,7 @@ public class RoomParticipantTypeConfiguration : EntityTypeConfigurationBase<Room
         builder
             .HasMany(e => e.Permissions)
             .WithOne();
+
+        builder.HasOne(e => e.User).WithMany(e => e.RoomParticipants);
     }
 }
