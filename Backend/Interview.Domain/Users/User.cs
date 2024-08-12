@@ -36,6 +36,4 @@ public class User : Entity
     public List<Permission> Permissions { get; private set; } = new List<Permission>();
 
     public List<RoomQuestionEvaluation> RoomQuestionEvaluations { get; private set; } = new List<RoomQuestionEvaluation>();
-
-    public List<RoomParticipant> RoomParticipants { get; private set; } = new List<RoomParticipant>();
 }
