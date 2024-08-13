@@ -3,12 +3,12 @@ import { IconNames } from '../../../../constants';
 
 import './Icon.css';
 
-interface ThemedIconProps {
+export interface IconProps {
   name: IconNames;
   size?: 'm' | 's';
 }
 
-export const Icon: FunctionComponent<ThemedIconProps> = ({
+export const Icon: FunctionComponent<IconProps> = ({
   name,
   size,
 }) => {

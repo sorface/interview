@@ -289,6 +289,7 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
     <Modal
       contentLabel={editQuestionId ? localizationCaptions[LocalizationKey.EditQuestion] : localizationCaptions[LocalizationKey.CreateQuestion]}
       open={open}
+      wide
       onClose={onClose}
     >
       <div className="question-create text-left">

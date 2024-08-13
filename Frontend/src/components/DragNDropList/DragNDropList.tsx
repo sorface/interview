@@ -8,7 +8,7 @@ export interface DragNDropListItem {
 
 interface DragNDropListProps<T extends DragNDropListItem> {
   items: T[];
-  renderItem: (item: T, lastItem: boolean) => ReactElement;
+  renderItem: (item: T, index: number) => ReactElement;
   onItemsChange: (items: T[]) => void;
 }
 
@@ -83,7 +83,7 @@ export const DragNDropList = <T extends DragNDropListItem>({
           onDragOver={(e) => handleDragOver(e, item)}
           onDrop={(e) => handleDrop(e, item)}
         >
-          {renderItem(item, index === items.length - 1)}
+          {renderItem(item, index)}
         </div>
       ))}
     </div>

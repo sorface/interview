@@ -61,9 +61,6 @@ export const RoomInvitations: FunctionComponent<RoomInvitationsProps> = ({
         <div>{localizationCaptions[LocalizationKey.Error]}: {roomInvitesError}</div>
       )}
       <RoomCreateField.Wrapper>
-        <RoomCreateField.Label className='self-start'>
-          <Typography size='m' bold>{localizationCaptions[LocalizationKey.RoomParticipants]}</Typography>
-        </RoomCreateField.Label>
         <RoomCreateField.Content>
           {!roomInvitesLoading && roomInvitesData?.sort(sortInvites).map((roomInvite, index) => {
             const lastItem = index === roomInvitesData.length - 1;
@@ -76,15 +73,18 @@ export const RoomInvitations: FunctionComponent<RoomInvitationsProps> = ({
             return (
               <Fragment key={roomInvite.inviteId}>
                 <div>
-                  <Typography size='m'>{participantTypeLocalization[roomInvite.participantType]}</Typography>
+                  <Typography size='m' bold>{participantTypeLocalization[roomInvite.participantType]}</Typography>
                   <Gap sizeRem={0.5} />
                   <Button
-                    onClick={() => handleCopyToClipboard(inviteUrlDispaly)}>
+                    variant='active2'
+                    onClick={() => handleCopyToClipboard(inviteUrlDispaly)}
+                  >
                     <Icon name={IconNames.Link} />
+                    <Gap sizeRem={0.5} horizontal />
                     {localizationCaptions[LocalizationKey.InviteViaLink]}
                   </Button>
                 </div>
-                {!lastItem && <Gap sizeRem={0.5} />}
+                {!lastItem && <Gap sizeRem={1.5} />}
               </Fragment>
             );
           })}
