@@ -387,8 +387,9 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
               onItemsChange={setSelectedQuestions}
             />
             {!!selectedQuestions.length && <Gap sizeRem={1.5} />}
-            <Button onClick={handleQuestionsViewOpen}>
-              <Icon name={IconNames.Add} />
+            <Button variant='active2' onClick={handleQuestionsViewOpen}>
+              <Icon size='s' name={IconNames.Add} />
+              <Gap sizeRem={0.5} horizontal />
               {localizationCaptions[LocalizationKey.AddRoomQuestions]}
             </Button>
           </RoomCreateField.Content>
