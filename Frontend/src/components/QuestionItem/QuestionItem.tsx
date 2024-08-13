@@ -19,7 +19,8 @@ interface QuestionItemProps {
   checkboxLabel?: ReactNode;
   mark?: number;
   primary?: boolean;
-  contextMenu?: ContextMenuProps;
+  contextMenu?: Omit<ContextMenuProps, 'toggleContent'>;
+  bgSelected?: boolean;
   children?: ReactNode;
   onCheck?: (newValue: boolean) => void;
   onRemove?: (question: Question) => void;
@@ -33,6 +34,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
   mark,
   primary,
   contextMenu,
+  bgSelected,
   children,
   onCheck,
   onRemove,
@@ -82,7 +84,19 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
         </Typography>
       </div>
       <div className='ml-auto'>
-        {contextMenu && <div onClick={handleCheckboxAreaClick}><ContextMenu {...contextMenu} buttonVariant='text' /></div>}
+        {contextMenu && (
+          <div onClick={handleCheckboxAreaClick}>
+            <ContextMenu
+              {...contextMenu}
+              toggleContent={(
+                <div className='text-grey2'>
+                  <Icon size='s' name={IconNames.EllipsisVertical} />
+                </div>
+              )}
+              buttonVariant='text'
+            />
+          </div>
+        )}
         {hasCheckbox && (
           <div onClick={handleCheckboxAreaClick}>
             <Checkbox
@@ -94,8 +108,8 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
           </div>
         )}
         {onRemove && (
-          <span onClick={handleRemove} className='cursor-pointer'>
-            <Icon name={IconNames.Trash} />
+          <span onClick={handleRemove} className='cursor-pointer text-grey3'>
+            <Icon size='s' name={IconNames.Trash} />
           </span>
         )}
         {onClick && (
@@ -111,7 +125,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
     <Accordion
       title={title}
       disabled={accordionDisabled}
-      className={`${primary ? 'bg-wrap' : 'bg-form'} rounded-0.75 py-1.25 px-1.5`}
+      className={`${primary ? 'bg-wrap' : 'bg-form'} ${bgSelected ? 'bg-blue-light' : ''} rounded-0.75 py-1.25 px-1.5`}
       classNameTitle='flex items-center'
       onClick={onClick ? handleOnClick : undefined}
     >

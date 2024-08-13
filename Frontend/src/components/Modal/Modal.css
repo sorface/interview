@@ -12,6 +12,10 @@
   z-index: 999;
 }
 
+.modal-wide {
+  width: 65rem;
+}
+
 .modal .modal-header {
   display: flex;
   flex-direction: row;
@@ -44,5 +48,5 @@
 }
 
 .modal .modal-content {
-  padding: 1rem;
+  padding: 0 1.5rem;
 }

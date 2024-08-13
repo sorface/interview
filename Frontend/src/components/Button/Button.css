@@ -30,6 +30,15 @@ button.active:hover {
   background-color: var(--button-active-bg-hover);
 }
 
+button.active2 {
+  background-color: var(--button-active2-bg);
+  border-color: var(--button-active2-bg);
+}
+
+button.active2:hover {
+  border-color: var(--button-hover-border-color);
+}
+
 button.danger {
   border-color: var(--button-danger-border-color);
 }

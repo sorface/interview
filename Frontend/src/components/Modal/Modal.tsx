@@ -9,6 +9,7 @@ import './Modal.css';
 interface ModalProps {
   open: boolean;
   contentLabel: string;
+  wide?: boolean;
   onClose: () => void;
   children: ReactNode;
 }
@@ -16,6 +17,7 @@ interface ModalProps {
 export const Modal: FunctionComponent<ModalProps> = ({
   open,
   contentLabel,
+  wide,
   children,
   onClose,
 }) => {
@@ -24,7 +26,7 @@ export const Modal: FunctionComponent<ModalProps> = ({
       isOpen={open}
       contentLabel={contentLabel}
       appElement={document.getElementById('root') || undefined}
-      className="modal"
+      className={`modal ${wide ? 'modal-wide' : ''} flex flex-col`}
       onRequestClose={onClose}
       style={{
         overlay: {
@@ -39,7 +41,7 @@ export const Modal: FunctionComponent<ModalProps> = ({
           <Icon name={IconNames.Close} />
         </Button>
       </div>
-      <div className="modal-content">
+      <div className="modal-content overflow-auto">
         {children}
       </div>
     </ModalInternal>

@@ -12,6 +12,9 @@ import { Gap } from '../../../components/Gap/Gap';
 import { RoomQuestionListItem } from '../RoomCreate';
 import { RoomQuestionsSelectorPreview } from '../RoomQuestionsSelectorPreview/RoomQuestionsSelectorPreview';
 import { Button } from '../../../components/Button/Button';
+import { RoomCreateField } from '../RoomCreateField/RoomCreateField';
+import { Typography } from '../../../components/Typography/Typography';
+import { Checkbox } from '../../../components/Checkbox/Checkbox';
 
 interface RoomQuestionsSelectorProps {
   preSelected: RoomQuestionListItem[];
@@ -65,6 +68,9 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
   }, [rootCategory, fetchSubCategories]);
 
   useEffect(() => {
+    if (!subCategory) {
+      return;
+    }
     fetchQuestios({
       PageNumber: pageNumber,
       PageSize: pageSize,
@@ -76,6 +82,7 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
 
   const handleRootCategoryChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
     setRootCategory(e.target.value);
+    setSubCategory('');
   };
 
   const handleSubCategoryChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
@@ -90,8 +97,9 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
     setPageNumber(pageNumber + 1);
   };
 
-  const handleQuestionCheck = (question: RoomQuestionListItem, checked: boolean) => {
-    if (checked) {
+  const handleQuestionCheck = (question: RoomQuestionListItem) => {
+    const checked = !!selectedQuestions.find(selectedQuestion => selectedQuestion.id === question.id);
+    if (!checked) {
       const newSelectedQuestions = [
         ...selectedQuestions,
         {
@@ -113,11 +121,24 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
 
   const createQuestionItem = (question: RoomQuestionListItem) => (
     <Fragment key={question.id}>
-      <QuestionItem
-        question={question}
-        checked={!!selectedQuestions.find(selectedQuestion => selectedQuestion.id === question.id)}
-        onCheck={(checked) => handleQuestionCheck(question, checked)}
-      />
+      <div className='flex'>
+        <div>
+          <Gap sizeRem={1.25} />
+          <Checkbox
+            id={question.id}
+            checked={!!selectedQuestions.find(selectedQuestion => selectedQuestion.id === question.id)}
+            onChange={() => handleQuestionCheck(question)}
+            label=''
+          />
+        </div>
+        <Gap sizeRem={0.5} horizontal />
+        <div className='flex-1'>
+          <QuestionItem
+            question={question}
+            bgSelected={!!selectedQuestions.find(selectedQuestion => selectedQuestion.id === question.id)}
+          />
+        </div>
+      </div>
       <Gap sizeRem={0.25} />
     </Fragment>
   );
@@ -125,31 +146,54 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
   return (
     <div>
       <div className='flex justify-between'>
-        <div>
-          <select id="rootCategory" value={rootCategory} onChange={handleRootCategoryChange}>
-            <option value=''>{localizationCaptions[LocalizationKey.NotSelected]}</option>
-            {rootCategories?.map(rootCategory => (
-              <option key={rootCategory.id} value={rootCategory.id}>{rootCategory.name}</option>
-            ))}
-          </select>
-          <select id="subCategory" value={subCategory} onChange={handleSubCategoryChange}>
-            <option value=''>{localizationCaptions[LocalizationKey.NotSelected]}</option>
-            {subCategories?.map(subCategory => (
-              <option key={subCategory.id} value={subCategory.id}>{subCategory.name}</option>
-            ))}
-          </select>
+        <div className='flex w-full'>
+          <RoomCreateField.Wrapper className='w-full max-w-15.75'>
+            <RoomCreateField.Label>
+              <label htmlFor="rootCategory"><Typography size='m' bold>{localizationCaptions[LocalizationKey.Category]}</Typography></label>
+            </RoomCreateField.Label>
+            <RoomCreateField.Content>
+              <select id="rootCategory" className='w-full' value={rootCategory} onChange={handleRootCategoryChange}>
+                <option value=''>{localizationCaptions[LocalizationKey.NotSelected]}</option>
+                {rootCategories?.map(rootCategory => (
+                  <option key={rootCategory.id} value={rootCategory.id}>{rootCategory.name}</option>
+                ))}
+              </select>
+            </RoomCreateField.Content>
+          </RoomCreateField.Wrapper>
+          <Gap sizeRem={1} horizontal />
+          <RoomCreateField.Wrapper className='w-full max-w-15.75'>
+            <RoomCreateField.Label>
+              <label htmlFor="subCategory"><Typography size='m' bold>{localizationCaptions[LocalizationKey.Subcategory]}</Typography></label>
+            </RoomCreateField.Label>
+            <RoomCreateField.Content>
+              <select id="subCategory" className='w-full' value={subCategory} disabled={!rootCategory} onChange={handleSubCategoryChange}>
+                <option value=''>{localizationCaptions[LocalizationKey.NotSelected]}</option>
+                {subCategories?.map(subCategory => (
+                  <option key={subCategory.id} value={subCategory.id}>{subCategory.name}</option>
+                ))}
+              </select>
+            </RoomCreateField.Content>
+          </RoomCreateField.Wrapper>
+          <RoomCreateField.Wrapper className='ml-auto'>
+            <RoomCreateField.Label>
+              <Gap sizeRem={1.25} />
+            </RoomCreateField.Label>
+            <RoomCreateField.Content>
+              <RoomQuestionsSelectorPreview
+                qestions={selectedQuestions}
+                onRemove={(qestion) => handleQuestionCheck(qestion)}
+              />
+            </RoomCreateField.Content>
+          </RoomCreateField.Wrapper>
         </div>
-        <RoomQuestionsSelectorPreview
-          qestions={selectedQuestions}
-          onRemove={(qestion) => handleQuestionCheck(qestion, false)}
-        />
       </div>
+      <Gap sizeRem={1.5} />
       {!!totalError && (
         <div>
           {localizationCaptions[LocalizationKey.Error]}: {totalError}
         </div>
       )}
-      {!!subCategory && (
+      {!!subCategory ? (
         <ItemsGrid
           currentData={questions ? questions.map((q, index) => ({ ...q, order: index })) : null}
           loading={totalLoading}
@@ -160,6 +204,16 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
           nextPageAvailable={questions?.length === pageSize}
           handleNextPage={handleNextPage}
         />
+      ) : (
+        <div className='flex flex-col items-center'>
+          <Gap sizeRem={5.375} />
+          <div className='w-38.375 text-center'>
+            <Typography size='xl' secondary>
+              {localizationCaptions[LocalizationKey.SelectCategorySubcategory]}
+            </Typography>
+          </div>
+          <Gap sizeRem={5.375} />
+        </div>
       )}
       <ModalFooter>
         <Button onClick={onCancel}>{localizationCaptions[LocalizationKey.Cancel]}</Button>

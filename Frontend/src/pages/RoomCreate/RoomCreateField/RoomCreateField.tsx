@@ -1,4 +1,5 @@
 import { FunctionComponent, ReactNode } from 'react';
+import { Gap } from '../../../components/Gap/Gap';
 
 interface RoomCreateFieldProps {
   className?: string;
@@ -10,7 +11,7 @@ export const Wrapper: FunctionComponent<RoomCreateFieldProps> = ({
   children,
 }) => {
   return (
-    <div className={`flex items-center ${className}`}>
+    <div className={`flex flex-col ${className}`}>
       {children}
     </div>
   );
@@ -21,9 +22,12 @@ export const Label: FunctionComponent<RoomCreateFieldProps> = ({
   children,
 }) => {
   return (
-    <div className={`w-7.5 pr-0.5 ${className}`}>
-      {children}
-    </div>
+    <>
+      <div className={`w-7.5 pr-0.5 ${className}`}>
+        {children}
+      </div>
+      <Gap sizeRem={0.5} />
+    </>
   );
 };
 
