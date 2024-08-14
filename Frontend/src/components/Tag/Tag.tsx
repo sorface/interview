@@ -17,10 +17,10 @@ interface TagProps {
 
 const themeClassNames: Record<ThemeInUi, Record<TagState, string>> = {
   [Theme.Dark]: {
-    [TagState.Waiting]: 'bg-dark-blue-0.25',
-    [TagState.Pending]: 'bg-dark-green-0.25',
-    [TagState.Closed]: 'bg-dark-orange-0.25',
-    [TagState.WaitingForAction]: 'bg-dark-orange-0.25',
+    [TagState.Waiting]: 'bg-dark-blue-0.25 text-dark-blue-light',
+    [TagState.Pending]: 'bg-dark-green-0.25 text-dark-green-light',
+    [TagState.Closed]: 'bg-dark-closed text-dark-closed-light',
+    [TagState.WaitingForAction]: 'bg-dark-orange-0.25 text-dark-orange-light',
   },
   [Theme.Light]: {
     [TagState.Waiting]: 'bg-blue-light',

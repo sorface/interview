@@ -27,6 +27,11 @@
 .text-green-light { color: var(--green-light); }
 .text-grey-active { color: var(--grey-active); }
 .text-dark-orange { color: var(--dark-orange); }
+.text-dark-grey4 { color: var(--dark-grey4); }
+.text-dark-orange-light { color: var(--dark-orange-light); }
+.text-dark-blue-light { color: var(--dark-blue-light); }
+.text-dark-green-light { color: var(--dark-green-light); }
+.text-dark-closed-light { color: var(--dark-closed-light); }
 .bg-form { background-color: var(--form-bg); }
 .hover\:bg-form:hover { background-color: var(--form-bg); }
 .bg-wrap { background-color: var(--wrap-bg); }
@@ -44,9 +49,11 @@
 .bg-red-light { background-color: var(--red-light); }
 .bg-green-light { background-color: var(--green-light); }
 .bg-grey-active { background-color: var(--grey-active); }
+.bg-dark-grey4 { background-color: var(--dark-grey4); }
 .bg-dark-orange { background-color: var(--dark-orange); }
 .bg-dark-blue { background-color: var(--dark-blue); }
 .bg-dark-green { background-color: var(--dark-green); }
+.bg-dark-closed { background-color: var(--dark-closed); }
 .bg-dark-orange-0\.25 { background-color: color-mix(in srgb, var(--dark-orange), transparent 75%); }
 .bg-dark-blue-0\.25 { background-color: color-mix(in srgb, var(--dark-blue), transparent 75%); }
 .bg-dark-green-0\.25 { background-color: color-mix(in srgb, var(--dark-green), transparent 75%); }
@@ -62,6 +69,7 @@
 .hover\:bg-red-light:hover { background-color: var(--red-light); }
 .hover\:bg-green-light:hover { background-color: var(--green-light); }
 .hover\:bg-grey-active:hover { background-color: var(--grey-active); }
+.hover\:bg-dark-history-hover:hover { background-color: var(--dark-history-hover); }
 .border { border-width: 1px; }
 .border-solid { border-style: solid; }
 .border-button { border-color: var(--button-border-color); }

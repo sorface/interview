@@ -36,11 +36,7 @@
 }
 
 .toggle-switch input:checked+.slider {
-  background-color: var(--bg-success);
-}
-
-.toggle-switch input:focus+.slider {
-  box-shadow: 0 0 1px var(--bg-success);
+  background-color: var(--slider-checked);
 }
 
 .toggle-switch input:checked+.slider:before {

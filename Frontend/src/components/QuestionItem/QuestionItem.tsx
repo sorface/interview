@@ -12,6 +12,8 @@ import { ContextMenu, ContextMenuProps } from '../ContextMenu/ContextMenu';
 import { Button } from '../Button/Button';
 import { CircularProgress } from '../CircularProgress/CircularProgress';
 import { Checkbox } from '../Checkbox/Checkbox';
+import { useThemeClassName } from '../../hooks/useThemeClassName';
+import { Theme } from '../../context/ThemeContext';
 
 interface QuestionItemProps {
   question: Question;
@@ -49,6 +51,10 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
   const [selectedAnswer, setSelectedAnswer] = useState<QuestionAnswer | null>(
     question.answers ? question.answers[0] : null
   );
+  const contextMenuIconClassName = useThemeClassName({
+    [Theme.Dark]: 'text-dark-grey4',
+    [Theme.Light]: 'text-grey2',
+  });
 
   const handleCheckboxChange = () => {
     onCheck?.(!checked);
@@ -89,7 +95,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
             <ContextMenu
               {...contextMenu}
               toggleContent={(
-                <div className='text-grey2'>
+                <div className={contextMenuIconClassName}>
                   <Icon size='s' name={IconNames.EllipsisVertical} />
                 </div>
               )}

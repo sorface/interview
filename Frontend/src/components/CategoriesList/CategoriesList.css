@@ -4,7 +4,6 @@
 
 .categories-list .categories-list-item {
   cursor: pointer;
-  padding-bottom: 0.75rem;
 }
 
 .categories-list .categories-list-item:hover {
