@@ -19,6 +19,7 @@ import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { EventsState } from '../../hooks/useEventsState';
 import { Gap } from '../../../../components/Gap/Gap';
+import { RoomToolsPanel } from '../RoomToolsPanel/RoomToolsPanel';
 
 const reactionsPageSize = 30;
 const reactionsPageNumber = 1;
@@ -145,20 +146,21 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
 
   return (
     <>
-      <ReactionsList
-        sortOrder={-1}
-        reactions={reactionsSafe}
-        loadingReactionName={loadingRoomReaction ? lastSendedReactionType : null}
-        firstRounded
-        onClick={handleReactionClick}
-      />
-      <Gap sizeRem={0.125} />
-      <ReactionsList
-        sortOrder={1}
-        reactions={eventsReationsFiltered}
-        loadingReactionName={loadingSendRoomEvent ? lastSendedReactionType : null}
-        onClick={handleEventClick}
-      />
+      <RoomToolsPanel.ButtonsGroupWrapper>
+        <ReactionsList
+          sortOrder={-1}
+          reactions={reactionsSafe}
+          loadingReactionName={loadingRoomReaction ? lastSendedReactionType : null}
+          onClick={handleReactionClick}
+        />
+        <Gap sizeRem={0.125} />
+        <ReactionsList
+          sortOrder={1}
+          reactions={eventsReationsFiltered}
+          loadingReactionName={loadingSendRoomEvent ? lastSendedReactionType : null}
+          onClick={handleEventClick}
+        />
+      </RoomToolsPanel.ButtonsGroupWrapper>
       {errorRoomReaction && <div>{localizationCaptions[LocalizationKey.ErrorSendingReaction]}</div>}
       {loadingRoomEvent && <div>{localizationCaptions[LocalizationKey.GetRoomEvent]}...</div>}
       {errorRoomEvent && <div>{localizationCaptions[LocalizationKey.ErrorGetRoomEvent]}</div>}
