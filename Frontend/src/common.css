@@ -81,6 +81,8 @@
 .rounded-2 { border-radius: 2rem; }
 .rounded-t-0\.75 { border-top-left-radius: 0.75rem !important; border-top-right-radius: 0.75rem !important; }
 .rounded-b-0\.75 { border-bottom-left-radius: 0.75rem !important; border-bottom-right-radius: 0.75rem !important; }
+.first-button\:rounded-t-0\.75 button:first-of-type { border-top-left-radius: 0.75rem !important; border-top-right-radius: 0.75rem !important; }
+.last-button\:rounded-b-0\.75 button:last-of-type { border-bottom-left-radius: 0.75rem !important; border-bottom-right-radius: 0.75rem !important; }
 .rounded-l-2 { border-top-left-radius: 2rem; border-bottom-left-radius: 2rem; }
 .rounded-r-2 { border-top-right-radius: 2rem; border-bottom-right-radius: 2rem; }
 .border-none { border: none; }
@@ -110,6 +112,7 @@
 .pr-2 { padding-right: 2rem; }
 .pr-4 { padding-right: 4rem; }
 .pb-0\.25 { padding-bottom: 0.25rem; }
+.pb-1\.5 { padding-bottom: 1.5rem; }
 .m-0 { margin: 0px; }
 .mt-auto { margin-top: auto; }
 .mb-auto { margin-bottom: auto; }
