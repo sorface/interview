@@ -15,7 +15,7 @@ export const CalendarDay: FunctionComponent<CalendarDayProps> = ({
   filledItemsStartDates,
 }) => {
   const filledThemedClassName = useThemeClassName({
-    [Theme.Dark]: 'bg-dark-blue-0.25',
+    [Theme.Dark]: 'bg-dark-grey4',
     [Theme.Light]: 'bg-blue-light',
   });
   const currentDayThemedClassName = useThemeClassName({

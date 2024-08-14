@@ -4,6 +4,8 @@ import { Gap } from '../Gap/Gap';
 import { Room } from '../../types/room';
 import { LocalizationContext } from '../../context/LocalizationContext';
 import { padTime } from '../../utils/padTime';
+import { useThemeClassName } from '../../hooks/useThemeClassName';
+import { Theme } from '../../context/ThemeContext';
 
 interface RoomDateAndTimeProps {
   scheduledStartTime: string;
@@ -42,15 +44,20 @@ export const RoomDateAndTime: FunctionComponent<RoomDateAndTimeProps> = ({
   secondary,
 }) => {
   const { lang } = useContext(LocalizationContext);
+  const themeSecondaryClassName = useThemeClassName({
+    [Theme.Dark]: 'text-dark-grey4',
+    [Theme.Light]: 'text-grey3',
+  });
+  const secondaryClassName = secondary ? themeSecondaryClassName : '';
 
   return (
-    <div className={`flex  ${!mini ? 'justify-between' : ''} ${secondary ? 'text-grey3' : ''} items-baseline`}>
+    <div className={`flex  ${!mini ? 'justify-between' : ''} ${secondaryClassName} items-baseline`}>
       <div className='flex items-baseline'>
         <Typography size={typographySize}>
           {formatScheduledStartTime(scheduledStartTime, lang)}
         </Typography>
         <Gap sizeRem={0.5} horizontal />
-        <div className={`capitalize ${!secondary ? 'opacity-0.5' : ''}`}>
+        <div className={`capitalize ${!secondary ? themeSecondaryClassName : ''}`}>
           <Typography size={typographySize}>
             {formatScheduledStartDay(scheduledStartTime, lang)}
           </Typography>

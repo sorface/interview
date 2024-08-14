@@ -182,7 +182,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
                         className='room-edit-participants-link rotate-90'
                         onClick={handleOpenEditModal(room.id)}
                       >
-                        <Icon name={IconNames.Options} />
+                        <Icon size='s' secondary name={IconNames.Options} />
                       </div>
                     </>
                   )}

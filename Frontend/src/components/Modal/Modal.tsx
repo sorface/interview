@@ -38,7 +38,7 @@ export const Modal: FunctionComponent<ModalProps> = ({
       <div className="modal-header">
         <h3>{contentLabel}</h3>
         <Button className="modal-close" onClick={onClose}>
-          <Icon name={IconNames.Close} />
+          <Icon secondary name={IconNames.Close} />
         </Button>
       </div>
       <div className="modal-content overflow-auto">

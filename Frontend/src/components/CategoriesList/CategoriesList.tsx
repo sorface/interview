@@ -5,6 +5,8 @@ import { GetCategoriesParams, categoriesApiDeclaration } from '../../apiDeclarat
 import { Loader } from '../Loader/Loader';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
+import { IconNames } from '../../constants';
 
 import './CategoriesList.css';
 
@@ -12,12 +14,14 @@ const pageSize = 30;
 const initialPageNumber = 1;
 
 interface CategoriesListProps {
+  activeId?: Category['id'] | null;
   parentId?: GetCategoriesParams['parentId'];
   showOnlyWithoutParent?: boolean;
   onCategoryClick: (category: Category) => void;
 }
 
 export const CategoriesList: FunctionComponent<CategoriesListProps> = ({
+  activeId,
   parentId,
   showOnlyWithoutParent,
   onCategoryClick,
@@ -41,17 +45,24 @@ export const CategoriesList: FunctionComponent<CategoriesListProps> = ({
       <div
         key={category.id}
         role='link'
-        className='categories-list-item'
+        className={`categories-list-item ${category.id === activeId ? 'active' : ''}`}
         onClick={() => onCategoryClick(category)}
       >
-        {category.name}
+        <span>{category.name}</span>
+        {!parentId && (
+          <Icon size='s' name={IconNames.ChevronForward} />
+        )}
       </div>
     )
   };
 
   return (
     <div className='categories-list overflow-x-hidden overflow-y-auto'>
-      {loading && <Loader />}
+      {loading && (
+        <div className='categories-list-item h-fit'>
+          <Loader />
+        </div>
+      )}
       {error && <span>{localizationCaptions[LocalizationKey.Error]}: {error}</span>}
       {data?.map(createCategoryItem)}
     </div>

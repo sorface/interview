@@ -119,7 +119,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
       icon: IconNames.Chat,
       forceActive: questionsClicked || !!questionsPath,
       onClick: handleQuestionsClick,
-      subitem: questionsClicked ? <CategoriesList showOnlyWithoutParent={true} onCategoryClick={handleCategoryClick} /> : null,
+      subitem: questionsClicked ? <CategoriesList showOnlyWithoutParent={true} activeId={selectedCategory?.id} onCategoryClick={handleCategoryClick} /> : null,
     },
     admin ? {
       path: pathnames.categories,
