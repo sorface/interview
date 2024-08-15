@@ -53,7 +53,7 @@ export const enum IconNames {
   Exit = 'exit-outline',
   Call = 'call-outline',
   ReorderFour = 'reorder-four-outline',
-  Stop = 'stop-outline',
+  Stop = 'stop-circle',
   PersonAdd = 'person-add-outline',
   Time = 'time-outline',
   CheckmarkDone = 'checkmark-done-outline',
