@@ -222,19 +222,28 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
             </div>
             <Gap sizeRem={1.8125} />
             <Button
-              className='w-full'
+              className='w-full flex items-center'
               variant='active'
               onClick={openQuestionsIds.length !== 0 ? handleNextQuestion : handleStartReviewRoom}
             >
-              {!initialQuestion ?
-                localizationCaptions[LocalizationKey.StartRoom] :
-                localizationCaptions[
-                openQuestionsIds.length !== 0 ?
-                  LocalizationKey.NextRoomQuestion :
-                  LocalizationKey.StartReviewRoom
-                ]
-              }
-              <Icon name={openQuestionsIds.length !== 0 ? IconNames.ChevronForward : IconNames.Stop} />
+              {roomQuestionsLoading || loadingRoomActiveQuestion || loadingRoomStartReview ? (
+                <Loader />
+              ) : (
+                <>
+                  <span>
+                    {!initialQuestion ?
+                      localizationCaptions[LocalizationKey.StartRoom] :
+                      localizationCaptions[
+                      openQuestionsIds.length !== 0 ?
+                        LocalizationKey.NextRoomQuestion :
+                        LocalizationKey.StartReviewRoom
+                      ]
+                    }
+                  </span>
+                  <Gap sizeRem={0.5} horizontal />
+                  <Icon name={openQuestionsIds.length !== 0 ? IconNames.ChevronForward : IconNames.Stop} />
+                </>
+              )}
             </Button>
           </div>
         </>
