@@ -26,7 +26,7 @@ public class RoomReviewRepository : EfRepository<RoomReview>, IRoomReviewReposit
             {
                 Id = e.Id,
                 RoomId = e.Room!.Id,
-                User = new RoomUserDetail { Id = e.User!.Id, Nickname = e.User.Nickname },
+                User = new RoomUserDetail { Id = e.User!.Id, Nickname = e.User.Nickname, Type = null, Avatar = e.User.Avatar },
                 Review = e.Review,
                 State = e.SeRoomReviewState.EnumValue,
             })

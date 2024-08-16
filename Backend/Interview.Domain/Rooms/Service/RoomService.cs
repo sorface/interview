@@ -162,6 +162,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                     Id = e.CreatedBy!.Id,
                     Nickname = e.CreatedBy!.Nickname,
                     Avatar = e.CreatedBy!.Avatar,
+                    Type = null,
                 },
                 Participants = e.Participants.Select(participant =>
                         new RoomUserDetail
@@ -169,6 +170,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                             Id = participant.User.Id,
                             Nickname = participant.User.Nickname,
                             Avatar = participant.User.Avatar,
+                            Type = participant.Type.Name,
                         })
                     .ToList(),
                 Status = e.Status.EnumValue,
