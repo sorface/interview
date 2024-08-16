@@ -100,27 +100,29 @@ public sealed class UserService : IUserService
     public async Task<User> UpsertByExternalIdAsync(User user, CancellationToken cancellationToken = default)
     {
         var existingUser = await _userRepository.FindByExternalIdAsync(user.ExternalId, cancellationToken);
+
+        var userRoles = await GetUserRolesAsync(user.Roles, cancellationToken);
+
         if (existingUser != null)
         {
             existingUser.Nickname = user.Nickname;
             existingUser.Avatar = user.Avatar;
 
+            existingUser.Roles.Clear();
+            existingUser.Roles.AddRange(userRoles);
+
             var permissions = await GetDefaultUserPermission(existingUser, cancellationToken);
             existingUser.Permissions.AddRange(permissions);
+
             await _userRepository.UpdateAsync(existingUser, cancellationToken);
+
             return existingUser;
-        }
-
-        var userRole = await GetUserRoleAsync(user.Nickname, cancellationToken);
-
-        if (userRole is null)
-        {
-            throw new NotFoundException(ExceptionMessage.UserRoleNotFound());
         }
 
         var insertUser = new User(user.Nickname, user.ExternalId) { Avatar = user.Avatar };
 
-        insertUser.Roles.Add(userRole);
+        insertUser.Roles.Clear();
+        insertUser.Roles.AddRange(userRoles);
 
         var defaultUserPermissions = await GetDefaultUserPermission(insertUser, cancellationToken);
         insertUser.Permissions.AddRange(defaultUserPermissions);
@@ -222,6 +224,12 @@ public sealed class UserService : IUserService
         var roleName = _adminUsers.IsAdmin(nickname) ? RoleName.Admin : RoleName.User;
 
         return _roleRepository.FindByIdAsync(roleName.Id, cancellationToken);
+    }
+
+    private Task<List<Role>> GetUserRolesAsync(IEnumerable<Role> roles, CancellationToken cancellationToken)
+    {
+        var roleNames = roles.Select(r => r.Name);
+        return _roleRepository.FindAsync(new Spec<Role>(role => roleNames.Contains(role.Name)), cancellationToken);
     }
 
     private Task<List<Permission>> GetDefaultUserPermission(User user, CancellationToken cancellationToken = default)
