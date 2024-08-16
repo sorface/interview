@@ -68,7 +68,7 @@ public static class ServiceCollectionExt
                 options.Events.OnTicketReceived += async context =>
                 {
                     var user = context.Principal?.ToUser();
-                    if (user == null)
+                    if (user is null)
                     {
                         return;
                     }
