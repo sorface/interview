@@ -12,7 +12,7 @@ import { AnalyticsUserReview } from '../../../../types/analytics';
 interface ReviewUserOpinionProps {
   user: {
     id: User['id'];
-    evaluation: Omit<RoomQuestionEvaluation, 'id'>;
+    evaluation?: Partial<Omit<RoomQuestionEvaluation, 'id'>>;
   };
   allUsers: Map<User['id'], AnalyticsUserReview>;
 }
@@ -45,16 +45,18 @@ export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
           </div>
         </div>
         <div>
-          <CircularProgress
-            value={user.evaluation.mark * 10}
-            caption={user.evaluation.mark.toFixed(1)}
+          {!!user.evaluation && (
+            <CircularProgress
+            value={user.evaluation.mark ? user.evaluation.mark * 10 : 0}
+            caption={user.evaluation.mark ? user.evaluation.mark.toFixed(1) : 0}
             size='s'
           />
+          )}
         </div>
       </div>
       <Gap sizeRem={1} />
       <Typography size='m'>
-        {user.evaluation.review}
+        {user.evaluation?.review}
       </Typography>
     </div>
   );

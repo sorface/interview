@@ -110,6 +110,8 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
         ...roomQuestionEvaluation,
         questionId: activeQuestion.id,
         roomId: roomId,
+        review: roomQuestionEvaluation.review || '',
+        mark: roomQuestionEvaluation.mark || null,
       });
     }, mergeRoomQuestionEvaluationDebounceMs);
 

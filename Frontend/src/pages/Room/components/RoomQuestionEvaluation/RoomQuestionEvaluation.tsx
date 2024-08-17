@@ -10,8 +10,8 @@ import { Textarea } from '../../../../components/Textarea/Textarea';
 import { roomReviewMaxLength } from '../../../../constants';
 
 export interface RoomQuestionEvaluationValue {
-  mark: number | null;
-  review: string;
+  mark?: number | null;
+  review?: string | null;
 }
 
 interface RoomQuestionEvaluationPorps {
@@ -105,7 +105,7 @@ export const RoomQuestionEvaluation: FunctionComponent<RoomQuestionEvaluationPor
         <Textarea
           className='flex-1 h-6.25'
           maxLength={roomReviewMaxLength}
-          value={value.review}
+          value={value.review || ''}
           onInput={handleReviewChange}
         />
       </div>
