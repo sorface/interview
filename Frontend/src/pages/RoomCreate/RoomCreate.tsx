@@ -55,7 +55,7 @@ const parseScheduledStartTime = (scheduledStartTime: string, durationSec?: numbe
   };
 };
 
-const getRoomDurationSec = (roomFields: RoomFields) => {
+const parseRoomDate = (roomFields: RoomFields) => {
   const roomDateStart = new Date(roomFields.date);
   const roomStartTime = roomFields.startTime.split(':');
   roomDateStart.setHours(parseInt(roomStartTime[0]));
@@ -70,7 +70,7 @@ const getRoomDurationSec = (roomFields: RoomFields) => {
     roomDateEnd.setDate(roomDateEnd.getDate() + 1);
   }
   const duration = (roomDateEnd.getTime() - roomDateStart.getTime()) / 1000;
-  return duration;
+  return { roomDateStart, duration };
 };
 
 const formatDuration = (durationSec: number) => {
@@ -130,6 +130,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     startTime: '',
     endTime: '',
   });
+  const parsedRoomDate = parseRoomDate(roomFields);
   const [selectedQuestions, setSelectedQuestions] = useState<RoomQuestionListItem[]>([]);
   const [creationStep, setCreationStep] = useState<CreationStep>(CreationStep.Step1);
   const [questionsView, setQuestionsView] = useState(false);
@@ -216,15 +217,13 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     if (!validateRoomFields()) {
       return;
     }
-    const roomDateStart = new Date(roomFields.date);
-    const duration = getRoomDurationSec(roomFields);
     if (editRoomId) {
       fetchRoomEdit({
         id: editRoomId,
         name: roomFields.name,
         questions: selectedQuestions.map((question, index) => ({ ...question, order: index })),
-        scheduleStartTime: roomDateStart.toISOString(),
-        durationSec: duration,
+        scheduleStartTime: parsedRoomDate.roomDateStart.toISOString(),
+        durationSec: parsedRoomDate.duration,
       });
     } else {
       fetchData({
@@ -234,8 +233,8 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         examinees: [],
         tags: [],
         accessType: RoomAccessType.Private,
-        scheduleStartTime: roomDateStart.toISOString(),
-        duration,
+        scheduleStartTime: parsedRoomDate.roomDateStart.toISOString(),
+        duration: parsedRoomDate.duration,
       });
     }
   };
@@ -368,7 +367,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
             {!!roomFields.endTime && (
               <Typography size='m'>
                 {localizationCaptions[LocalizationKey.RoomDuration]}:{' '}
-                {formatDuration(getRoomDurationSec(roomFields))}
+                {formatDuration(parsedRoomDate.duration)}
               </Typography>
             )}
           </RoomCreateField.Content>
