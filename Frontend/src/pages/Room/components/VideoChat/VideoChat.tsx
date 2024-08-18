@@ -24,6 +24,7 @@ import { checkIsAudioStream } from './utils/checkIsAudioStream';
 import { Canvas } from '@react-three/fiber';
 import { AiAssistantExperience } from '../AiAssistant/AiAssistantExperience';
 import { CodeEditorLang } from '../../../../types/question';
+import { usePeerStream } from '../../hooks/usePeerStream';
 
 import './VideoChat.css';
 
@@ -125,7 +126,9 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   const [transcripts, setTranscripts] = useState<Transcript[]>([]);
   const [textMessages, setTextMessages] = useState<Transcript[]>([]);
   const userVideo = useRef<HTMLVideoElement>(null);
+  const userVideoMainContent = useRef<HTMLVideoElement>(null);
   const [peers, setPeers] = useState<PeerMeta[]>([]);
+  const { peerToStream, addPeerStream, removePeerStream } = usePeerStream();
   const screenSharePeer = peers.find(peer => peer.screenShare);
   const peersRef = useRef<PeerMeta[]>([]);
   const userIdToAudioAnalyser = useRef<Record<string, AnalyserNode>>({});
@@ -377,6 +380,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
               screenShare: false,
             };
 
+            addPeerStream(newPeerMeta.peerID, peer, false);
             peer.on('stream', (stream) => {
               const audioStream = checkIsAudioStream(stream);
               if (!audioStream) {
@@ -403,6 +407,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
               screenShare: false,
             };
 
+            addPeerStream(newPeerMeta.peerID, peer, false);
             peer.on('stream', (stream) => {
               const audioStream = checkIsAudioStream(stream);
               if (!audioStream) {
@@ -435,6 +440,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           }
           if (viewerMode || screenShare) {
             const peer = addPeer(JSON.parse(parsedPayload.Signal), fromUser.Id, screenShare);
+            addPeerStream(fromUser.Id, peer, true);
             const newPeerMeta: PeerMeta = {
               peerID: fromUser.Id,
               nickname: fromUser.Nickname,
@@ -458,6 +464,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             break;
           }
           const peer = addPeer(JSON.parse(parsedPayload.Signal), fromUser.Id);
+          addPeerStream(fromUser.Id, peer, true);
           const newPeerMeta: PeerMeta = {
             peerID: fromUser.Id,
             nickname: fromUser.Nickname,
@@ -483,11 +490,16 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           const leftUserId = parsedPayload.Id;
           const leftUserPeer = peersRef.current.find(p => p.targetUserId === leftUserId);
           if (leftUserPeer) {
+            removePeerStream(leftUserPeer.peerID);
             leftUserPeer.peer.destroy();
           }
           const peersAfterLeft = peersRef.current.filter(p => p.targetUserId !== leftUserId);
           peersRef.current = peersAfterLeft;
           setPeers([...peersRef.current]);
+          setVideoOrder({
+            [auth.id]: 1,
+            [louderUserId.current]: 2,
+          });
           break;
         case 'receiving returned signal':
           const item = peersRef.current.find(p =>
@@ -503,7 +515,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     } catch (err) {
       console.error('parse ws message error: ', err);
     }
-  }, [auth, lastWsMessage, viewerMode, addPeer, createPeer]);
+  }, [auth, lastWsMessage, viewerMode, addPeer, createPeer, addPeerStream, removePeerStream]);
 
   useEffect(() => {
     if (!lastWsMessage) {
@@ -562,7 +574,16 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     if (userVideo.current) {
       userVideo.current.srcObject = userVideoStream;
     }
+    if (userVideoMainContent.current) {
+      userVideoMainContent.current.srcObject = userVideoStream;
+    }
   }, [userVideoStream, needToRenderMainField]);
+
+  useEffect(() => {
+    if (videoOrder[auth?.id || ''] === 1 && userVideoMainContent.current) {
+      userVideoMainContent.current.srcObject = userVideoStream;
+    }
+  }, [auth?.id, videoOrder, userVideoStream])
 
   const handleTextMessageSubmit = (message: string) => {
     onSendWsMessage(JSON.stringify({
@@ -572,9 +593,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   };
 
   const renderMain = () => {
-    if (screenSharePeer) {
-      return <VideoChatVideo peer={screenSharePeer.peer} />;
-    }
     if (codeEditorEnabled) {
       return (
         <RoomCodeEditor
@@ -590,7 +608,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     if (!userOrder1 || userOrder1 === auth?.id) {
       return (
         <video
-          ref={userVideo}
+          ref={userVideoMainContent}
           className='videochat-video'
           muted
           autoPlay
@@ -605,7 +623,9 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       return <></>;
     }
     return (
-      <VideoChatVideo peer={userOrder1Peer.peer} />
+      <VideoChatVideo
+        videoStream={peerToStream.get(userOrder1Peer.peerID)?.video}
+      />
     );
   };
 
@@ -629,32 +649,25 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
               </Canvas>
             </div>
           </VideochatParticipant>
-          {(needToRenderMainField && videoOrder[auth?.id || ''] === 1) && (
-            <VideochatParticipant
-              order={viewerMode ? viewerOrder - 1 : videoOrder[auth?.id || '']}
-              viewer={viewerMode}
-              avatar={auth?.avatar}
-              nickname={`${auth?.nickname} (${localizationCaptions[LocalizationKey.You]})`}
-              reaction={activeReactions[auth?.id || '']}
+          <VideochatParticipant
+            order={viewerMode ? viewerOrder - 1 : videoOrder[auth?.id || '']}
+            viewer={viewerMode}
+            avatar={auth?.avatar}
+            nickname={`${auth?.nickname} (${localizationCaptions[LocalizationKey.You]})`}
+            reaction={activeReactions[auth?.id || '']}
+          >
+            <video
+              ref={userVideo}
+              className='videochat-video'
+              muted
+              autoPlay
+              playsInline
             >
-              <video
-                ref={userVideo}
-                className='videochat-video'
-                muted
-                autoPlay
-                playsInline
-              >
-                Video not supported
-              </video>
-            </VideochatParticipant>
-          )}
+              Video not supported
+            </video>
+          </VideochatParticipant>
           {peers
-            .filter(peer => {
-              if (needToRenderMainField && videoOrder[peer.targetUserId] === 1) {
-                return false;
-              }
-              return !peer.screenShare;
-            })
+            .filter(peer => !peer.screenShare)
             .map(peer => (
               <VideochatParticipant
                 key={peer.peerID}
@@ -664,7 +677,11 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
                 nickname={peer?.nickname}
                 reaction={activeReactions[peer.peerID]}
               >
-                <VideoChatVideo peer={peer.peer} />
+                <VideoChatVideo
+                  loaded={peerToStream.get(peer.peerID)?.loaded}
+                  audioStream={peerToStream.get(peer.peerID)?.audio}
+                  videoStream={peerToStream.get(peer.peerID)?.video}
+                />
               </VideochatParticipant>
             ))}
         </div>
