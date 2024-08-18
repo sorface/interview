@@ -4,7 +4,7 @@ using Interview.Domain.Database;
 using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Questions.Records.FindPage;
-using Interview.Domain.RoomParticipants;
+using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
 using Interview.Domain.Users;
