@@ -2,6 +2,7 @@ using Interview.Domain.Permissions;
 using Interview.Domain.Rooms.RoomReviews.Records;
 using Interview.Domain.Rooms.RoomReviews.Response.Page;
 using Interview.Domain.Rooms.RoomReviews.Services;
+using Interview.Domain.Rooms.RoomReviews.Services.UserRoomReview;
 using X.PagedList;
 
 namespace Interview.Domain.Rooms.RoomReviews.Permissions;
@@ -17,6 +18,11 @@ public class RoomReviewServicePermissionAccessor : IRoomReviewService, IServiceD
         _roomReviewService = roomReviewService;
         _securityService = securityService;
         _repository = repository;
+    }
+
+    public Task<UserRoomReviewResponse?> GetUserRoomReviewAsync(UserRoomReviewRequest request, CancellationToken cancellationToken)
+    {
+        return _roomReviewService.GetUserRoomReviewAsync(request, cancellationToken);
     }
 
     public async Task<IPagedList<RoomReviewPageDetail>> FindPageAsync(RoomReviewPageRequest request, CancellationToken cancellationToken = default)

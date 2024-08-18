@@ -5,6 +5,7 @@ using Interview.Domain;
 using Interview.Domain.Rooms.RoomReviews.Records;
 using Interview.Domain.Rooms.RoomReviews.Response.Page;
 using Interview.Domain.Rooms.RoomReviews.Services;
+using Interview.Domain.Rooms.RoomReviews.Services.UserRoomReview;
 using Interview.Domain.ServiceResults.Success;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,25 @@ public class RoomReviewController : ControllerBase
     public Task<IPagedList<RoomReviewPageDetail>> FindPage([FromQuery] RoomReviewPageRequest request)
     {
         return _roomReviewService.FindPageAsync(request, HttpContext.RequestAborted);
+    }
+
+    /// <summary>
+    /// Getting a current user room reviews.
+    /// </summary>
+    /// <param name="roomId">Room id.</param>
+    /// <param name="currentUserAccessor">Current user accessor.</param>
+    /// <returns>Page.</returns>
+    [Authorize]
+    [HttpGet("{roomId:guid}/my")]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(UserRoomReviewResponse), StatusCodes.Status200OK)]
+    public Task<UserRoomReviewResponse?> GetMyReview(
+        Guid roomId,
+        [FromServices] ICurrentUserAccessor currentUserAccessor)
+    {
+        var userId = currentUserAccessor.GetUserIdOrThrow();
+        var request = new UserRoomReviewRequest { UserId = userId, RoomId = roomId, };
+        return _roomReviewService.GetUserRoomReviewAsync(request, HttpContext.RequestAborted);
     }
 
     /// <summary>

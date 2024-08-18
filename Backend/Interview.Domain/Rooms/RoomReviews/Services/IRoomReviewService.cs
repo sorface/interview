@@ -1,11 +1,15 @@
 using Interview.Domain.Rooms.RoomReviews.Records;
+using Interview.Domain.Rooms.RoomReviews.Response;
 using Interview.Domain.Rooms.RoomReviews.Response.Page;
+using Interview.Domain.Rooms.RoomReviews.Services.UserRoomReview;
 using X.PagedList;
 
 namespace Interview.Domain.Rooms.RoomReviews.Services;
 
 public interface IRoomReviewService : IService
 {
+    Task<UserRoomReviewResponse?> GetUserRoomReviewAsync(UserRoomReviewRequest request, CancellationToken cancellationToken);
+
     Task<IPagedList<RoomReviewPageDetail>> FindPageAsync(
         RoomReviewPageRequest request,
         CancellationToken cancellationToken = default);
