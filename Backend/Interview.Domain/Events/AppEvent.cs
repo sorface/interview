@@ -23,7 +23,7 @@ public class AppEvent : Entity
         {
             if (!SERoomParticipantType.TryFromName(participantName, out var participantType))
             {
-                throw new Exception($"Unknown participant type '{participantName}' for event '{eventType}'");
+                throw new UserException($"Unknown participant type '{participantName}' for event '{eventType}'");
             }
 
             participantTypes.Add(participantType);
