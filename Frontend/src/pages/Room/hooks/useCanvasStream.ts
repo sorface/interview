@@ -1,4 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Results } from '@mediapipe/selfie_segmentation';
+import { Camera } from '@mediapipe/camera_utils';
+import { useSelfieSegmentation } from './useSelfieSegmentation';
 
 interface UseCanvasStreamParams {
   enabled: boolean;
@@ -41,6 +44,51 @@ export const useCanvasStream = ({
   const [video, setVideo] = useState<HTMLVideoElement | null>(null);
   const requestRef = useRef<number>();
 
+  const onResults = useCallback((results: Results) => {
+    if (!context || !cameraStream || !video) {
+      return;
+    }
+    const canvasElement = context.canvas;
+    context.save();
+    context.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    context.drawImage(results.segmentationMask, 0, 0, canvasElement.width, canvasElement.height);
+
+    context.globalCompositeOperation = 'source-out';
+    context.fillStyle = '#000000F5';
+    context.fillRect(0, 0, canvasElement.width, canvasElement.height);
+
+    context.globalCompositeOperation = 'luminosity';
+    context.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+    context.restore();
+  }, [context, cameraStream, video]);
+
+  const selfieSegmentation = useSelfieSegmentation(onResults);
+
+  useEffect(() => {
+    if (!video || !cameraStream || !context) {
+      return;
+    }
+    const newCamera = new Camera(video, {
+      onFrame: async () => {
+        if (video && cameraStream && selfieSegmentation) {
+          await selfieSegmentation.send({ image: video });
+        }
+      },
+      width: video.width,
+      height: video.height,
+    });
+    newCamera.start();
+
+    return () => {
+      newCamera.stop().then(() => {
+        cameraStream.getTracks().forEach(track => track.stop());
+        fillLines(context, width, height);
+        fillNoCamera(context, width, height);
+      });
+    };
+  }, [video, context, width, height, cameraStream, selfieSegmentation]);
+
+
   useEffect(() => {
     if (!enabled) {
       return;
@@ -72,10 +120,10 @@ export const useCanvasStream = ({
     }
     const triggerCanvasUpdate = () => {
       if (cameraStream && video) {
-        context.drawImage(video, 0, 0, video.width, video.height);
-      } else {
-        context.fillRect(0, 0, 1, 1);
+        return;
       }
+      fillLines(context, width, height);
+      fillNoCamera(context, width, height);
       requestRef.current = requestAnimationFrame(triggerCanvasUpdate);
     };
     requestRef.current = requestAnimationFrame(triggerCanvasUpdate);
@@ -84,7 +132,7 @@ export const useCanvasStream = ({
         cancelAnimationFrame(requestRef.current);
       }
     };
-  }, [context, video, cameraStream]);
+  }, [context, video, width, height, cameraStream]);
 
   useEffect(() => {
     if (cameraStream && video && context) {
