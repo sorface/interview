@@ -6,7 +6,5 @@ public interface IRoomQuestionEvaluationRepository : IRepository<RoomQuestionEva
 {
     Task<RoomQuestionEvaluation?> FindByActiveQuestionRoomAsync(Guid roomId, Guid userId, CancellationToken cancellationToken);
 
-    Task<RoomQuestionEvaluation?> FindByQuestionIdAndRoomAsync(Guid roomId, Guid questionId, Guid userId, CancellationToken cancellationToken);
-
     Task SubmitAsync(Guid roomId, Guid userId, CancellationToken cancellationToken);
 }
