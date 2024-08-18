@@ -1,7 +1,8 @@
-import { FunctionComponent, ReactNode } from 'react';
+import { FunctionComponent, ReactNode, useContext } from 'react';
 import { Typography } from '../Typography/Typography';
 import { PageHeaderUserAvatar } from '../PageHeaderUserAvatar/PageHeaderUserAvatar';
 import { PageHeaderSearch, PageHeaderSearchProps } from '../PageHeaderSearch/PageHeaderSearch';
+import { AuthContext } from '../../context/AuthContext';
 
 interface PageHeaderProps {
   title: string;
@@ -16,6 +17,8 @@ export const PageHeader: FunctionComponent<PageHeaderProps> = ({
   searchValue,
   onSearchChange,
 }) => {
+  const auth = useContext(AuthContext);
+
   return (
     <div className='flex items-center shrink-0 h-4 py-0.5'>
       <h1 className='m-0'>
@@ -32,7 +35,7 @@ export const PageHeader: FunctionComponent<PageHeaderProps> = ({
             />
           </div>
         )}
-        <PageHeaderUserAvatar />
+        {auth && <PageHeaderUserAvatar />}
       </div>
       <div className='flex'>{children}</div>
     </div>

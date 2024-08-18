@@ -1,14 +1,13 @@
 import React, { FunctionComponent, useContext } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { Field } from '../../components/FieldsBlock/Field';
-import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { HomeAction } from './components/HomeContent/HomeAction';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
-
-import './Home.css';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { Gap } from '../../components/Gap/Gap';
+import { Typography } from '../../components/Typography/Typography';
 
 export const Home: FunctionComponent = () => {
   const auth = useContext(AuthContext);
@@ -24,19 +23,29 @@ export const Home: FunctionComponent = () => {
   }
 
   return (
-    <MainContentWrapper>
-      <Field>
-        <p>{localizationCaptions[LocalizationKey.AppDescription]}</p>
-        <div className="home-action">
-          <HomeAction />
+    <>
+      <PageHeader
+        title={localizationCaptions[LocalizationKey.AppName]}
+      />
+      <div>
+        <Gap sizeRem={7.25} />
+        <Typography size='l'>
+          {localizationCaptions[LocalizationKey.LoginRequired]}
+        </Typography>
+        <Gap sizeRem={2.25} />
+        <HomeAction />
+        <Gap sizeRem={0.5} />
+        <div>
+          <Typography size='s'>
+            {localizationCaptions[LocalizationKey.TermsOfUsageAcceptance]}
+          </Typography>
+          <Link to={pathnames.terms}>
+            <Typography size='s'>
+              {localizationCaptions[LocalizationKey.TermsOfUsage]}
+            </Typography>
+          </Link>
         </div>
-        <Link
-          className="home-terms-link"
-          to={pathnames.terms}
-        >
-          {localizationCaptions[LocalizationKey.TermsOfUsage]}
-        </Link>
-      </Field>
-    </MainContentWrapper>
+      </div>
+    </>
   );
 };
