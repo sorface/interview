@@ -1,4 +1,4 @@
-import React, { FunctionComponent, Fragment } from 'react';
+import React, { FunctionComponent, Fragment, useContext } from 'react';
 import terms from './terms.json';
 import { pathnames } from '../../constants';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
@@ -6,6 +6,7 @@ import { LocalizationKey } from '../../localization';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Typography } from '../../components/Typography/Typography';
 import { Gap } from '../../components/Gap/Gap';
+import { LocalizationContext } from '../../context/LocalizationContext';
 
 interface Term {
   title: string;
@@ -13,6 +14,7 @@ interface Term {
 }
 
 export const Terms: FunctionComponent = () => {
+  const { lang } = useContext(LocalizationContext);
   const localizationCaptions = useLocalizationCaptions();
 
   const interpolate =
@@ -56,10 +58,10 @@ export const Terms: FunctionComponent = () => {
         </Typography>
         <Gap sizeRem={1} />
         <Typography size='m'>
-          {terms.disclaimer}
+          {terms[lang].disclaimer}
         </Typography>
         <Gap sizeRem={2} />
-        {terms.items.map(renderTerm)}
+        {terms[lang].items.map(renderTerm)}
       </div>
     </>
   );
