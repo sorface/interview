@@ -216,7 +216,7 @@ export const questionsApiDeclaration = {
   update: (question: UpdateQuestionBody): ApiContractPut => ({
     method: 'PUT',
     baseUrl: `/questions/${question.id}`,
-    body: { value: question.value, tags: question.tags, categoryId: question.categoryId },
+    body: question,
   }),
   archive: (id: Question['id']): ApiContractPatch => ({
     method: 'PATCH',
