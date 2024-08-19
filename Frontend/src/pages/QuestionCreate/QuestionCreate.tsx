@@ -429,7 +429,9 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
         )}
         <ModalFooter>
           <Button onClick={onClose}>{localizationCaptions[LocalizationKey.Cancel]}</Button>
-          <Button variant='active' onClick={editQuestionId ? handleSubmitEdit : handleSubmitCreate}>{localizationCaptions[LocalizationKey.Create]}</Button>
+          <Button variant='active' onClick={editQuestionId ? handleSubmitEdit : handleSubmitCreate}>
+            {editQuestionId ? localizationCaptions[LocalizationKey.Save] : localizationCaptions[LocalizationKey.Create]}
+          </Button>
         </ModalFooter>
       </div>
     </Modal>
