@@ -9,7 +9,6 @@ using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Questions.Services;
 using Interview.Domain.Reactions;
-using Interview.Domain.RoomParticipants;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomQuestionReactions;

@@ -1,3 +1,5 @@
+using Interview.Domain.Questions.QuestionAnswers;
+
 namespace Interview.Domain.Rooms.Records.Response.Detail;
 
 public class RoomQuestionDetail
@@ -7,4 +9,6 @@ public class RoomQuestionDetail
     public string? Value { get; set; }
 
     public required int Order { get; set; }
+
+    public required List<QuestionAnswerResponse>? Answers { get; set; }
 }

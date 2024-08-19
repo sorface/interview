@@ -1,5 +1,6 @@
 using Interview.Domain.Database;
 using Interview.Domain.Questions;
+using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Questions.Services;
 using Interview.Domain.Rooms.RoomQuestions.Records;
 using Interview.Domain.Rooms.RoomQuestions.Records.Response;
@@ -189,10 +190,26 @@ public class RoomQuestionService : IRoomQuestionService
 
         var states = request.States.Select(e => RoomQuestionState.FromValue((int)e)).ToList();
         var questions = await _db.RoomQuestions
+            .Include(e => e.Question).ThenInclude(e => e.Answers)
             .AsNoTracking()
             .Where(rq => rq.Room!.Id == request.RoomId && states.Contains(rq.State!))
             .OrderBy(e => e.Order)
-            .Select(rq => new { Id = rq.Question!.Id, State = rq.State, Value = rq.Question.Value, Order = rq.Order })
+            .Select(rq => new
+            {
+                Id = rq.Question!.Id,
+                State = rq.State,
+                Value = rq.Question.Value,
+                Order = rq.Order,
+                Answers = rq.Question!.Answers
+                    .Select(a => new QuestionAnswerResponse
+                    {
+                        Id = a.Id,
+                        Content = a.Content,
+                        Title = a.Title,
+                        CodeEditor = a.CodeEditor,
+                    })
+                    .ToList(),
+            })
             .ToListAsync(cancellationToken);
         return questions.ConvertAll(e => new RoomQuestionResponse
         {
@@ -200,6 +217,7 @@ public class RoomQuestionService : IRoomQuestionService
             State = e.State!.EnumValue,
             Value = e.Value,
             Order = e.Order,
+            Answers = e.Answers,
         });
     }
 }

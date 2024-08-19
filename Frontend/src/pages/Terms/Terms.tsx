@@ -1,13 +1,12 @@
-import React, { FunctionComponent, Fragment } from 'react';
+import React, { FunctionComponent, Fragment, useContext } from 'react';
 import terms from './terms.json';
 import { pathnames } from '../../constants';
-import { FieldsBlock } from '../../components/FieldsBlock/FieldsBlock';
-import { Field } from '../../components/FieldsBlock/Field';
-import { HeaderWithLink } from '../../components/HeaderWithLink/HeaderWithLink';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
-
-import './Terms.css';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { Typography } from '../../components/Typography/Typography';
+import { Gap } from '../../components/Gap/Gap';
+import { LocalizationContext } from '../../context/LocalizationContext';
 
 interface Term {
   title: string;
@@ -15,6 +14,7 @@ interface Term {
 }
 
 export const Terms: FunctionComponent = () => {
+  const { lang } = useContext(LocalizationContext);
   const localizationCaptions = useLocalizationCaptions();
 
   const interpolate =
@@ -32,31 +32,37 @@ export const Terms: FunctionComponent = () => {
 
   const renderTerm = (term: Term, index: number) => (
     <Fragment key={term.title}>
-      <h3>{`${index + 1}. ${term.title}`}</h3>
-      <p>
+      <Typography size='xxl' bold>
+        {`${index + 1}. ${term.title}`}
+      </Typography>
+      <Gap sizeRem={1} />
+      <Typography size='m'>
         {interpolateAll(
           term.description,
           [/\[NAME\]/g, /\[NAME URL\]/g],
           [localizationCaptions[LocalizationKey.AppName], termsUrl],
         )}
-      </p>
+      </Typography>
+      <Gap sizeRem={2} />
     </Fragment>
   );
 
   return (
-    <FieldsBlock className="terms-of-use">
-      <HeaderWithLink
-        title={localizationCaptions[LocalizationKey.TermsOfUsage]}
-        linkVisible={true}
-        path={pathnames.home.replace(':redirect?', '')}
-        linkCaption="<"
-        linkFloat="left"
+    <>
+      <PageHeader
+        title={localizationCaptions[LocalizationKey.AppName]}
       />
-      <Field>
-        <h2>{localizationCaptions[LocalizationKey.TermsOfUsage]}</h2>
-        <p>{terms.disclaimer}</p>
-        {terms.items.map(renderTerm)}
-      </Field>
-    </FieldsBlock>
+      <div className='text-justify flex flex-col overflow-auto'>
+        <Typography size='xxl' bold>
+          {localizationCaptions[LocalizationKey.TermsOfUsage]}
+        </Typography>
+        <Gap sizeRem={1} />
+        <Typography size='m'>
+          {terms[lang].disclaimer}
+        </Typography>
+        <Gap sizeRem={2} />
+        {terms[lang].items.map(renderTerm)}
+      </div>
+    </>
   );
 };
