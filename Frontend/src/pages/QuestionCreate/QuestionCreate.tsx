@@ -289,6 +289,7 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
     <Modal
       contentLabel={editQuestionId ? localizationCaptions[LocalizationKey.EditQuestion] : localizationCaptions[LocalizationKey.CreateQuestion]}
       open={open}
+      wide
       onClose={onClose}
     >
       <div className="question-create text-left">
@@ -333,7 +334,7 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
         </QuestionCreateField.Wrapper>
         <Gap sizeRem={1} />
         <div className='question-code-editor-controls'>
-          <Button style={{ ...(codeEditor && { display: 'none' }) }} onClick={handleAddCodeEditor}>
+          <Button variant='active2' style={{ ...(codeEditor && { display: 'none' }) }} onClick={handleAddCodeEditor}>
             <Icon name={IconNames.Add} />
             {localizationCaptions[LocalizationKey.QuestionAddCodeEditor]}
           </Button>
@@ -402,7 +403,7 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
                 </div>
               ))}
               <Gap sizeRem={0.75} />
-              <Button onClick={handleAddQuestionAnswer}>
+              <Button variant='active2' onClick={handleAddQuestionAnswer}>
                 <Icon name={IconNames.Add} />
                 {localizationCaptions[LocalizationKey.QuestionAddAnswerOption]}
               </Button>

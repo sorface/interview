@@ -28,6 +28,22 @@ const Wrapper: FunctionComponent<WrapperProps> = ({
   );
 };
 
+interface ButtonsGroupWrapperProps {
+  noPaddingBottom?: boolean;
+  children: ReactNode;
+}
+
+const ButtonsGroupWrapper: FunctionComponent<ButtonsGroupWrapperProps> = ({
+  noPaddingBottom,
+  children,
+}) => {
+  return (
+    <div className={`flex flex-col ${noPaddingBottom ? '' : 'pb-1.5'} first-button:rounded-t-0.75 last-button:rounded-b-0.75`}>
+      {children}
+    </div>
+  );
+};
+
 interface SwitchButtonProps {
   enabled: boolean;
   danger?: boolean;
@@ -48,39 +64,38 @@ const SwitchButton: FunctionComponent<SwitchButtonProps> = ({
   iconEnabledName,
   loading,
   htmlDisabled,
-  roundedTop,
-  roundedBottom,
   progress,
   onClick,
 }) => {
   const iconName = enabled ? iconEnabledName : iconDisabledName;
 
   return (
-      <Button
-        variant={danger ? 'toolsPanelDanger' : 'toolsPanel'}
-        disabled={htmlDisabled}
-        className={`w-2.5 h-2.5 z-1 ${roundedTop ? 'rounded-t-0.75' : ''} ${roundedBottom ? 'rounded-b-0.75' : ''}`}
-        onClick={onClick}
-      >
-        {loading ? (
-          <Loader />
-        ) : (
-          <div className='absolute z-1'>
-            <Icon name={iconName} />
-          </div>
-        )}
-        {typeof progress === 'number' && (
-          <div
-            className='relative w-full h-full bg-grey3 origin-bottom'
-            style={{
-              transform: `scaleY(${Math.min(Math.max(progress, 0.01), 1).toFixed(2)})`,
-            }}
-          />)}
-      </Button>
+    <Button
+      variant={danger ? 'toolsPanelDanger' : 'toolsPanel'}
+      disabled={htmlDisabled}
+      className='w-2.5 h-2.5 z-1'
+      onClick={onClick}
+    >
+      {loading ? (
+        <Loader />
+      ) : (
+        <div className='absolute z-1'>
+          <Icon name={iconName} />
+        </div>
+      )}
+      {typeof progress === 'number' && (
+        <div
+          className='relative w-full h-full bg-grey3 origin-bottom'
+          style={{
+            transform: `scaleY(${Math.min(Math.max(progress, 0.01), 1).toFixed(2)})`,
+          }}
+        />)}
+    </Button>
   );
 };
 
 export const RoomToolsPanel = {
   Wrapper,
+  ButtonsGroupWrapper,
   SwitchButton,
 };

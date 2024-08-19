@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FunctionComponent, useCallback, useEffect, useState } from 'react';
+import React, { ChangeEvent, Fragment, FunctionComponent, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CreateRoomBody, RoomEditBody, RoomIdParam, roomInviteApiDeclaration, roomsApiDeclaration } from '../../apiDeclarations';
 import { Field } from '../../components/FieldsBlock/Field';
@@ -55,6 +55,30 @@ const parseScheduledStartTime = (scheduledStartTime: string, durationSec?: numbe
   };
 };
 
+const parseRoomDate = (roomFields: RoomFields) => {
+  const roomDateStart = new Date(roomFields.date);
+  const roomStartTime = roomFields.startTime.split(':');
+  roomDateStart.setHours(parseInt(roomStartTime[0]));
+  roomDateStart.setMinutes(parseInt(roomStartTime[1]));
+  const roomEndTime = roomFields.endTime.split(':');
+  const roomDateEnd = new Date(roomDateStart);
+  if (roomEndTime.length > 1) {
+    roomDateEnd.setHours(parseInt(roomEndTime[0]));
+    roomDateEnd.setMinutes(parseInt(roomEndTime[1]));
+  }
+  if (roomDateEnd < roomDateStart) {
+    roomDateEnd.setDate(roomDateEnd.getDate() + 1);
+  }
+  const duration = (roomDateEnd.getTime() - roomDateStart.getTime()) / 1000;
+  return { roomDateStart, duration };
+};
+
+const formatDuration = (durationSec: number) => {
+  const hours = Math.floor((durationSec / (60 * 60)));
+  const minutes = Math.floor((durationSec / 60) % 60);
+  return `${padTime(hours)}:${padTime(minutes)}`;
+};
+
 enum CreationStep {
   Step1,
   Step2,
@@ -106,10 +130,16 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     startTime: '',
     endTime: '',
   });
+  const parsedRoomDate = parseRoomDate(roomFields);
   const [selectedQuestions, setSelectedQuestions] = useState<RoomQuestionListItem[]>([]);
   const [creationStep, setCreationStep] = useState<CreationStep>(CreationStep.Step1);
   const [questionsView, setQuestionsView] = useState(false);
   const [uiError, setUiError] = useState('');
+  const modalTitle = questionsView ?
+    localizationCaptions[LocalizationKey.AddingRoomQuestions] :
+    editRoomId ?
+      localizationCaptions[LocalizationKey.EditRoom] :
+      localizationCaptions[LocalizationKey.NewRoom];
 
   const totalLoading = loading || loadingRoom || loadingRoomEdit;
   const totalError = error || errorRoom || errorRoomEdit || uiError;
@@ -187,24 +217,13 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     if (!validateRoomFields()) {
       return;
     }
-    const roomDateStart = new Date(roomFields.date);
-    const roomStartTime = roomFields.startTime.split(':');
-    roomDateStart.setHours(parseInt(roomStartTime[0]));
-    roomDateStart.setMinutes(parseInt(roomStartTime[1]));
-    const roomEndTime = roomFields.endTime.split(':');
-    const roomDateEnd = new Date(roomDateStart);
-    if (roomEndTime.length > 1) {
-      roomDateEnd.setHours(parseInt(roomEndTime[0]));
-      roomDateEnd.setMinutes(parseInt(roomEndTime[1]));
-    }
-    const duration = (roomDateEnd.getTime() - roomDateStart.getTime()) / 1000;
     if (editRoomId) {
       fetchRoomEdit({
         id: editRoomId,
         name: roomFields.name,
         questions: selectedQuestions.map((question, index) => ({ ...question, order: index })),
-        scheduleStartTime: roomDateStart.toISOString(),
-        durationSec: duration,
+        scheduleStartTime: parsedRoomDate.roomDateStart.toISOString(),
+        durationSec: parsedRoomDate.duration,
       });
     } else {
       fetchData({
@@ -214,8 +233,8 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         examinees: [],
         tags: [],
         accessType: RoomAccessType.Private,
-        scheduleStartTime: roomDateStart.toISOString(),
-        duration,
+        scheduleStartTime: parsedRoomDate.roomDateStart.toISOString(),
+        duration: parsedRoomDate.duration,
       });
     }
   };
@@ -270,11 +289,20 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     return <></>;
   }, [totalError, totalLoading]);
 
-  const renderQuestionItem = (question: Question, lastItem: boolean) => (
-    <>
-      <QuestionItem question={question} onRemove={handleQuestionRemove} />
-      {!lastItem && <Gap sizeRem={0.25} />}
-    </>
+  const renderQuestionItem = (question: RoomQuestionListItem, index: number) => (
+    <Fragment>
+      <div className='flex w-full'>
+        <div className='flex flex-col w-1.75 text-right text-grey2'>
+          <Gap sizeRem={1} />
+          <Typography size='xxl' bold>{index + 1}</Typography>
+        </div>
+        <Gap sizeRem={1} horizontal />
+        <div className='flex-1'>
+          <QuestionItem question={question} onRemove={handleQuestionRemove} />
+        </div>
+      </div>
+      {(index !== selectedQuestions.length - 1) && <Gap sizeRem={0.25} />}
+    </Fragment>
   );
 
   const stepView = {
@@ -296,22 +324,17 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
             />
           </RoomCreateField.Content>
         </RoomCreateField.Wrapper>
-        <RoomCreateField.Wrapper>
-          <RoomCreateField.Label>
-          </RoomCreateField.Label>
-          <RoomCreateField.Content className='px-1'>
-            <Typography size='s'>
-              {localizationCaptions[LocalizationKey.RoomNamePrompt]}
-            </Typography>
-          </RoomCreateField.Content>
-        </RoomCreateField.Wrapper>
-        <Gap sizeRem={2.25} />
-
+        <div className='px-1'>
+          <Typography size='s'>
+            {localizationCaptions[LocalizationKey.RoomNamePrompt]}
+          </Typography>
+        </div>
+        <Gap sizeRem={1.5} />
         <RoomCreateField.Wrapper>
           <RoomCreateField.Label>
             <label htmlFor="roomDate"><Typography size='m' bold>{localizationCaptions[LocalizationKey.RoomDateAndTime]}</Typography></label>
           </RoomCreateField.Label>
-          <RoomCreateField.Content>
+          <RoomCreateField.Content className='flex items-center'>
             <input
               id='roomDate'
               name={dateFieldName}
@@ -340,23 +363,32 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
               type='time'
               onChange={handleChangeField('endTime')}
             />
+            <Gap sizeRem={1.5} horizontal />
+            {!!roomFields.endTime && (
+              <Typography size='m'>
+                {localizationCaptions[LocalizationKey.RoomDuration]}:{' '}
+                {formatDuration(parsedRoomDate.duration)}
+              </Typography>
+            )}
           </RoomCreateField.Content>
         </RoomCreateField.Wrapper>
-        <Gap sizeRem={2.25} />
+        <Gap sizeRem={2} />
 
         <RoomCreateField.Wrapper>
           <RoomCreateField.Label className='self-start'>
-            <label htmlFor="roomDate"><Typography size='m' bold>{localizationCaptions[LocalizationKey.RoomQuestions]}</Typography></label>
+            <Typography size='m' bold>{localizationCaptions[LocalizationKey.RoomQuestions]}</Typography>
           </RoomCreateField.Label>
           <RoomCreateField.Content>
+            <Gap sizeRem={0.5} />
             <DragNDropList
               items={selectedQuestions}
               renderItem={renderQuestionItem}
               onItemsChange={setSelectedQuestions}
             />
             {!!selectedQuestions.length && <Gap sizeRem={1.5} />}
-            <Button onClick={handleQuestionsViewOpen}>
-              <Icon name={IconNames.Add} />
+            <Button variant='active2' onClick={handleQuestionsViewOpen}>
+              <Icon size='s' name={IconNames.Add} />
+              <Gap sizeRem={0.5} horizontal />
               {localizationCaptions[LocalizationKey.AddRoomQuestions]}
             </Button>
           </RoomCreateField.Content>
@@ -384,19 +416,24 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
 
   return (
     <Modal
-      contentLabel={questionsView ? localizationCaptions[LocalizationKey.AddingRoomQuestions] : localizationCaptions[LocalizationKey.NewRoom]}
+      contentLabel={modalTitle}
       open={open}
+      wide
       onClose={onClose}
     >
       <div className='text-left'>
-        <SwitcherButton
-          captions={[
-            localizationCaptions[LocalizationKey.CreateRoomStep1],
-            localizationCaptions[LocalizationKey.CreateRoomStep2],
-          ]}
-          activeIndex={creationStep}
-        />
-        <Gap sizeRem={2.25} />
+        {!questionsView && (
+          <>
+            <SwitcherButton
+              captions={[
+                localizationCaptions[LocalizationKey.CreateRoomStep1],
+                localizationCaptions[LocalizationKey.CreateRoomStep2],
+              ]}
+              activeIndex={creationStep}
+            />
+            <Gap sizeRem={2.25} />
+          </>
+        )}
         {renderStatus()}
         {questionsView ? (
           <RoomQuestionsSelector

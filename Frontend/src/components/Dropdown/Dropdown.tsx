@@ -1,9 +1,12 @@
 import { FunctionComponent, ReactNode, useEffect, useRef, useState } from 'react';
 import { Button, ButtonProps } from '../Button/Button';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
+import { IconNames } from '../../constants';
 
 export interface DropdownProps {
   toggleContent: ReactNode;
   toggleClassName?: string;
+  toggleIcon?: boolean;
   contentClassName?: string;
   useButton?: boolean;
   buttonVariant?: ButtonProps['variant'];
@@ -13,6 +16,7 @@ export interface DropdownProps {
 export const Dropdown: FunctionComponent<DropdownProps> = ({
   toggleContent,
   toggleClassName,
+  toggleIcon,
   contentClassName,
   useButton,
   buttonVariant,
@@ -47,6 +51,11 @@ export const Dropdown: FunctionComponent<DropdownProps> = ({
       {useButton ? (
         <Button aria-expanded={open} variant={buttonVariant} className={toggleClassName} onClick={handleToggle}>
           {toggleContent}
+          {toggleIcon && (
+            <span className={`cursor-pointer h-1.125 ${open ? 'rotate-90' : ''}`}>
+              <Icon size='s' name={IconNames.ChevronForward} />
+            </span>
+          )}
         </Button>
       ) : (
         <div aria-expanded={open} className={toggleClassName} onClick={handleToggle}>

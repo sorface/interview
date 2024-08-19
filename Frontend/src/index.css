@@ -5,6 +5,8 @@
   --blue-light: #EBF2FF;
   --blue-dark: #0058CA;
   --dark: #24243A;
+  --dark-dark1: #172849;
+  --dark-dark2: #101E36;
   --grey3: #838AA4;
   --grey2: #C3CBDF;
   --grey1: #F5F6F8;
@@ -13,22 +15,32 @@
   --red-light: #F8E5E4;
   --green-light: #E9F8E7;
   --grey-active: #F1F3F8;
+  --dark-grey4: #5A709C;
   --dark-white: #FAFAFA;
   --dark-orange: #E94D2B;
+  --dark-orange-light: #E09E6D;
   --dark-blue: #0666E2;
+  --dark-blue-light: #579EF9;
   --dark-green: #3FA96A;
+  --dark-green-light: #3FA96A;
+  --dark-closed: #273654;
+  --dark-closed-light: #8B9FC7;
+  --dark-history-hover: #152643;
+  --dark-active: #3A5281;
 
-  --text: #ccc;
+  --text: var(--dark-white);
   --page-bg: #0B1529;
   --form-bg: var(--page-bg);
   --wrap-bg: #101E36;
   --active: #b9221c;
   --disabled-icon: #b9221c;
-  --active-nav-tab: #3A5281;
+  --active-nav-tab: var(--dark-active);
   --nav-header-color: var(--text);
-  --nav-item-color: var(--text);
+  --nav-item-color: var(--dark-grey4);
+  --nav-item-color-hover-background: var(--dark-active);
   --nav-item-active-background: var(--active-nav-tab);
   --nav-item-active-color: var(--text);
+  --nav-category-item-active-color: var(--nav-item-active-color);
   --shadow: #100908;
   --bg: #400000;
   --bg-success: #103000;
@@ -37,10 +49,11 @@
   --progress-2: var(--form-bg);
   --menu-font-size: 1.15rem;
   --menu-line-height: calc(var(--menu-font-size) * 1.4);
-  --button-border-color: #424242;
-  --button-bg: #171717;
+  --button-border-color: var(--dark-white);
+  --button-bg: #293550;
   --button-active-color: var(--dark-white);
   --button-active-bg: var(--blue-main);
+  --button-active2-bg: var(--dark-active);
   --button-active-bg-hover: #4096FF;
   --button-bg-active: var(--active);
   --button-hover-border-color: var(--text);
@@ -50,7 +63,7 @@
   --button-inverted-color: var(--text);
   --button-inverted-active-background-color: var(--text);
   --button-inverted-active-color: var(--wrap-bg);
-  --modal-close-button-background: var(--button-border-color);
+  --modal-close-button-background: var(--dark-dark1);
   --modal-close-button-background-hover: var(--active);
   --modal-close-button-text: var(--text);
   --modal-close-button-text-hover: var(--text);
@@ -66,6 +79,9 @@
   --fadeIn-animation-fast: fadeIn 100ms;
   --fadeOutUp-animation: 1s fadeOutUp both;
   --page-overlay-color: rgba(36, 36, 58, 0.5);
+  --slider-checked: var(--blue-main);
+  --modal-bg: #293550;
+  --input-border-color: #424242;
 }
 
 :root[data-theme="Light"] {
@@ -75,14 +91,17 @@
   --active-nav-tab: #D9D9D9;
   --nav-header-color: var(--dark);
   --nav-item-color: var(--grey3);
+  --nav-item-color-hover-background: var(--grey-active);
   --nav-item-active-background: var(--dark);
   --nav-item-active-color: var(--white);
+  --nav-category-item-active-color: var(--nav-item-color);
   --bg-success: #00B96B;
   --shadow: rgba(200, 200, 200, 0.5);
 
   --button-border-color: var(--grey2);
   --button-bg: #FFF;
   --button-active-color: var(--button-bg);
+  --button-active2-bg: var(--blue-light);
   --button-active-bg: var(--blue-main);
   --button-active-bg-hover: var(--blue-dark);
   --button-bg-active: var(--active);
@@ -97,6 +116,9 @@
   --modal-close-button-background-hover: var(--red);
   --modal-close-button-text: var(--grey3);
   --modal-close-button-text-hover: var(--white);
+  --slider-checked: var(--bg-success);
+  --modal-bg: var(--wrap-bg);
+  --input-border-color: var(--grey2);
 }
 
 :root[data-color-transition="enabled"] * {
@@ -178,11 +200,13 @@ table td {
 
 textarea,
 input[type="text"],
-input[type="color"] {
+input[type="color"],
+input[type="date"],
+input[type="time"] {
   font-size: 0.875rem;
   color: var(--text);
   background-color: var(--wrap-bg);
-  border: 1px solid var(--button-border-color);
+  border: 1px solid var(--input-border-color);
   border-radius: 1.125rem;
   padding: 0.5rem 1rem;
 }
@@ -214,7 +238,7 @@ select {
   color: var(--text);
   margin-left: 6px;
   font-size: 0.875rem;
-  border: 1px solid var(--button-border-color);
+  border: 1px solid var(--input-border-color);
   border-radius: 2rem;
   padding: 0.5rem 1.25rem;
   cursor: pointer;
@@ -243,6 +267,6 @@ textarea {
   font-size: 0.875rem;
   padding: 0.5rem 1rem;
   border-radius: 1rem;
-  border-color: var(--button-border-color);
+  border-color: var(--input-border-color);
   resize: none;
 }

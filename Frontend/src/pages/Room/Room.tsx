@@ -412,37 +412,37 @@ export const Room: FunctionComponent = () => {
   const renderToolsPanel = () => {
     return (
       <RoomToolsPanel.Wrapper rightPos='18.5rem' bottomPos='1.5rem'>
-        <RoomToolsPanel.SwitchButton
-          enabled={micEnabled}
-          iconEnabledName={IconNames.MicOn}
-          iconDisabledName={IconNames.MicOff}
-          onClick={handleMicSwitch}
-          roundedTop
-        />
-        <Gap sizeRem={0.125} />
-        <RoomToolsPanel.SwitchButton
-          enabled={cameraEnabled}
-          iconEnabledName={IconNames.VideocamOn}
-          iconDisabledName={IconNames.VideocamOff}
-          onClick={handleCameraSwitch}
-          roundedBottom={recognitionNotSupported}
-        />
-        {!recognitionNotSupported && (
-          <>
+        {!viewerMode && (
+          <RoomToolsPanel.ButtonsGroupWrapper>
+            <RoomToolsPanel.SwitchButton
+              enabled={micEnabled}
+              iconEnabledName={IconNames.MicOn}
+              iconDisabledName={IconNames.MicOff}
+              onClick={handleMicSwitch}
+            />
             <Gap sizeRem={0.125} />
             <RoomToolsPanel.SwitchButton
-              enabled={recognitionEnabled}
-              htmlDisabled={!micEnabled}
-              iconEnabledName={IconNames.RecognitionOn}
-              iconDisabledName={IconNames.RecognitionOff}
-              onClick={handleVoiceRecognitionSwitch}
-              roundedBottom
+              enabled={cameraEnabled}
+              iconEnabledName={IconNames.VideocamOn}
+              iconDisabledName={IconNames.VideocamOff}
+              onClick={handleCameraSwitch}
             />
-          </>
+            {!recognitionNotSupported && (
+              <>
+                <Gap sizeRem={0.125} />
+                <RoomToolsPanel.SwitchButton
+                  enabled={recognitionEnabled}
+                  htmlDisabled={!micEnabled}
+                  iconEnabledName={IconNames.RecognitionOn}
+                  iconDisabledName={IconNames.RecognitionOff}
+                  onClick={handleVoiceRecognitionSwitch}
+                />
+              </>
+            )}
+          </RoomToolsPanel.ButtonsGroupWrapper>
         )}
         {reactionsVisible && (
           <>
-            <Gap sizeRem={1.5} />
             <Reactions
               room={room}
               eventsState={eventsState}
@@ -452,8 +452,7 @@ export const Room: FunctionComponent = () => {
           </>
         )}
         {!viewerMode && (
-          <>
-            <Gap sizeRem={0.125} />
+          <RoomToolsPanel.ButtonsGroupWrapper>
             <RoomToolsPanel.SwitchButton
               enabled={true}
               iconEnabledName={IconNames.TV}
@@ -466,20 +465,18 @@ export const Room: FunctionComponent = () => {
               iconEnabledName={IconNames.PersonAdd}
               iconDisabledName={IconNames.PersonAdd}
               onClick={handleInvitationsOpen}
-              roundedBottom
             />
-          </>
+          </RoomToolsPanel.ButtonsGroupWrapper>
         )}
-        <Gap sizeRem={1.5} />
-        <RoomToolsPanel.SwitchButton
-          enabled={true}
-          iconEnabledName={IconNames.Call}
-          iconDisabledName={IconNames.Call}
-          onClick={handleLeaveRoom}
-          roundedTop
-          roundedBottom
-          danger
-        />
+        <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
+          <RoomToolsPanel.SwitchButton
+            enabled={true}
+            iconEnabledName={IconNames.Call}
+            iconDisabledName={IconNames.Call}
+            onClick={handleLeaveRoom}
+            danger
+          />
+        </RoomToolsPanel.ButtonsGroupWrapper>
       </RoomToolsPanel.Wrapper>
     );
   };

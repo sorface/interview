@@ -16,7 +16,7 @@ export const Textarea: FunctionComponent<TextareaProps> = ({
       {showMaxLength && rest.maxLength && (
         <div className='text-grey3'>
           <Typography size='s'>
-            {rest.value.length} \ {rest.maxLength}
+            {rest.value?.length || 0} \ {rest.maxLength}
           </Typography>
         </div>
       )}

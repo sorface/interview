@@ -1,6 +1,5 @@
 import { FunctionComponent } from 'react';
 import { generatePath } from 'react-router-dom';
-import Modal from 'react-modal';
 import toast from 'react-hot-toast';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../../localization';
@@ -11,6 +10,8 @@ import { Icon } from '../Icon/Icon';
 import { Loader } from '../../../../components/Loader/Loader';
 import { Button } from '../../../../components/Button/Button';
 import { Gap } from '../../../../components/Gap/Gap';
+import { Modal } from '../../../../components/Modal/Modal';
+import { Typography } from '../../../../components/Typography/Typography';
 
 import './Invitations.css';
 
@@ -60,26 +61,16 @@ export const Invitations: FunctionComponent<InvitationsProps> = ({
 
   return (
     <Modal
-      isOpen={open}
+      open={open}
       contentLabel={localizationCaptions[LocalizationKey.Invitations]}
-      appElement={document.getElementById('root') || undefined}
-      className="action-modal"
-      onRequestClose={onRequestClose}
-      style={{
-        overlay: {
-          backgroundColor: 'rgba(0, 0, 0, 0.75)',
-          zIndex: 999,
-        },
-      }}
+      onClose={onRequestClose}
     >
-      <div className="action-modal-header">
-        <h3>{localizationCaptions[LocalizationKey.Invitations]}</h3>
-        <Button className='min-w-fit' onClick={onRequestClose}>X</Button>
-      </div>
       <div>
         {roomInvitesLoading && (
           <div className='invitations-modal-item'>
-            {localizationCaptions[LocalizationKey.RoomInvitesLoading]}...
+            <Typography size='m'>
+              {localizationCaptions[LocalizationKey.RoomInvitesLoading]}...
+            </Typography>
             <Loader />
           </div>
         )}
@@ -94,22 +85,22 @@ export const Invitations: FunctionComponent<InvitationsProps> = ({
           const inviteUrlDispaly = `${window.location.origin}${invitePath}`;
           return (
             <div key={roomInvite.inviteId} className='invitations-modal-item'>
-              <div className='invitations-modal-item-participantType'>{participantTypeLocalization[roomInvite.participantType]} ({roomInvite.used}/{roomInvite.max}):</div>
-              <Gap sizeRem={0.25} />
+              <Typography size='m'>{participantTypeLocalization[roomInvite.participantType]} ({roomInvite.used}/{roomInvite.max}):</Typography>
+              <Gap sizeRem={0.75} />
               <div className='invitations-modal-item-link-field'>
-                <div className='invitations-modal-item-link-ations'>
-                  <Button onClick={() => handleCopyToClipboard(inviteUrlDispaly)}>
-                    <Icon name={IconNames.Link} />
-                    {localizationCaptions[LocalizationKey.InviteViaLink]}
-                  </Button>
-                  <Button onClick={() => onGenerateInvite(roomInvite.participantType)}><Icon name={IconNames.Refresh} /></Button>
-                </div>
+                <Button variant='active2' onClick={() => handleCopyToClipboard(inviteUrlDispaly)}>
+                  <Icon name={IconNames.Link} />
+                  <Gap sizeRem={0.5} horizontal />
+                  {localizationCaptions[LocalizationKey.InviteViaLink]}
+                </Button>
+                <Button variant='text' onClick={() => onGenerateInvite(roomInvite.participantType)}><Icon name={IconNames.Refresh} /></Button>
               </div>
             </div>
           );
         })}
         <Button
           className='invitations-modal-refresh-all'
+          variant='active2'
           onClick={onGenerateAllInvites}
         >
           {localizationCaptions[LocalizationKey.RefreshAll]}<Icon name={IconNames.Refresh} />

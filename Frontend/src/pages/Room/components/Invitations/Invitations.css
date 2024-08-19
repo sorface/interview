@@ -11,18 +11,6 @@
   display: flex;
 }
 
-.invitations-modal-item-link-ations button {
-  padding: 0.25rem;
-}
-
-.invitations-modal-item-link-ations button .icon {
-  font-size: 1rem;
-}
-
-.invitations-modal-item-link-ations button:first-child {
-  margin-right: 0.25rem;
-}
-
 .invitations-modal-refresh-all {
   margin-bottom: 1.25rem;
 }

@@ -4,6 +4,7 @@ import './Button.css';
 
 type Variant =
   'active' |
+  'active2' |
   'danger' |
   'inverted' |
   'invertedAlternative' |

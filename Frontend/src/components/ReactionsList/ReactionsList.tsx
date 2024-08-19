@@ -17,8 +17,6 @@ interface ReactionsListProps {
   reactions: Reaction[];
   loadingReactionName?: string | null;
   sortOrder: 1 | -1;
-  firstRounded?: boolean;
-  lastRounded?: boolean;
   onClick: (reaction: Reaction) => void;
 }
 
@@ -26,8 +24,6 @@ export const ReactionsList: FunctionComponent<ReactionsListProps> = ({
   reactions,
   loadingReactionName,
   sortOrder,
-  firstRounded,
-  lastRounded,
   onClick,
 }) => {
   const handleReactionClick = useCallback((reaction: Reaction) => () => {
@@ -55,8 +51,6 @@ export const ReactionsList: FunctionComponent<ReactionsListProps> = ({
               loading={reaction.type.name === loadingReactionName}
               iconEnabledName={reactionIcon[reaction.type.name] || defaultIconName}
               iconDisabledName={reactionIcon[reaction.type.name] || defaultIconName}
-              roundedTop={firstRounded && index === 0}
-              roundedBottom={lastRounded && index === reacts.length - 1}
               onClick={handleReactionClick(reaction)}
             />
             {index !== reacts.length - 1 && (<Gap sizeRem={0.125} />)}

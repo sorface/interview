@@ -21,6 +21,25 @@ public class RoomQuestionEvaluationController : ControllerBase
         _roomQuestionEvaluationService = roomQuestionEvaluationService;
     }
 
+    /// <summary>
+    /// Getting a current user room evaluations.
+    /// </summary>
+    /// <param name="roomId">Room id.</param>
+    /// <param name="currentUserAccessor">Current user accessor.</param>
+    /// <returns>Page.</returns>
+    [Authorize]
+    [HttpGet("{roomId:guid}/my")]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(List<RoomQuestionEvaluationResponse>), StatusCodes.Status200OK)]
+    public Task<List<RoomQuestionEvaluationResponse>> GetMyEvaluations(
+        Guid roomId,
+        [FromServices] ICurrentUserAccessor currentUserAccessor)
+    {
+        var userId = currentUserAccessor.GetUserIdOrThrow();
+        var request = new UserRoomQuestionEvaluationsRequest { UserId = userId, RoomId = roomId, };
+        return _roomQuestionEvaluationService.GetUserRoomQuestionEvaluationsAsync(request, HttpContext.RequestAborted);
+    }
+
     [Authorize]
     [HttpGet]
     [Produces(MediaTypeNames.Application.Json)]

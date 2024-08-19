@@ -88,7 +88,7 @@ export const RoomAnaytics: FunctionComponent = () => {
     setOpenedQuestionDetails('');
   };
 
-  if (loading || roomLoading || !room || !data) {
+  if (loading || roomLoading) {
     return (
       <Loader />
     );
@@ -102,26 +102,35 @@ export const RoomAnaytics: FunctionComponent = () => {
         onClose={handleQuestionDetailsClose}
       >
         <ReviewUserGrid>
-          {data.questions.find(question => question.id === openedQuestionDetails)?.users.map(questionUser => (
-            <ReviewUserOpinion
-              key={questionUser.id}
-              user={questionUser}
-              allUsers={allUsers}
-            />
-          ))}
+          {data?.questions.find(question => question.id === openedQuestionDetails)?.users
+            .filter(questionUser => allUsers.get(questionUser.id)?.participantType === 'Expert')
+            .map(questionUser => {
+              if (!questionUser.evaluation) {
+                return undefined;
+              }
+              return (
+                <ReviewUserOpinion
+                  key={questionUser.id}
+                  user={questionUser}
+                  allUsers={allUsers}
+                />
+              );
+            })}
         </ReviewUserGrid>
         <Gap sizeRem={1} />
       </Modal>
 
-      <PageHeader title={`${localizationCaptions[LocalizationKey.RoomReviewPageName]} ${room.name}`} />
+      <PageHeader title={`${localizationCaptions[LocalizationKey.RoomReviewPageName]} ${room?.name}`} />
       <Gap sizeRem={1} />
+      {totalError && (
+        <div className='text-left'>
+          <Typography size='m' error>{localizationCaptions[LocalizationKey.Error]}: {totalError}</Typography>
+        </div>
+      )}
       <div className='flex text-left'>
         <InfoBlock className='flex-1'>
-          {totalError && (
-            <Typography size='m'>{localizationCaptions[LocalizationKey.Error]}: {totalError}</Typography>
-          )}
           <div className='flex'>
-            {room.scheduledStartTime && (
+            {room?.scheduledStartTime && (
               <RoomInfoColumn
                 header={localizationCaptions[LocalizationKey.RoomDateAndTime]}
                 conent={
@@ -144,7 +153,7 @@ export const RoomAnaytics: FunctionComponent = () => {
           <Gap sizeRem={2} />
           <RoomInfoColumn
             header={localizationCaptions[LocalizationKey.RoomParticipants]}
-            conent={<RoomParticipants participants={room.participants} />}
+            conent={<RoomParticipants participants={room?.participants || []} />}
             mini
           />
         </InfoBlock>
@@ -154,11 +163,13 @@ export const RoomAnaytics: FunctionComponent = () => {
             {localizationCaptions[LocalizationKey.AverageCandidateMark]}
           </Typography>
           <Gap sizeRem={1} />
-          <CircularProgress
-            value={data.averageMark * 10}
-            caption={data.averageMark.toFixed(1)}
-            size='m'
-          />
+          {!!data && (
+            <CircularProgress
+              value={data.averageMark * 10}
+              caption={data.averageMark.toFixed(1)}
+              size='m'
+            />
+          )}
         </InfoBlock>
       </div>
       <Gap sizeRem={0.5} />
@@ -167,13 +178,15 @@ export const RoomAnaytics: FunctionComponent = () => {
           {localizationCaptions[LocalizationKey.OpinionsAndMarks]}
           <Gap sizeRem={2} />
           <ReviewUserGrid>
-            {data.userReview.map((userReview) => (
-              <ReviewUserOpinion
-                key={userReview.userId}
-                user={generateUserOpinion(userReview)}
-                allUsers={allUsers}
-              />
-            ))}
+            {data?.userReview
+              .filter(userReview => allUsers.get(userReview.userId)?.participantType === 'Expert')
+              .map((userReview) => (
+                <ReviewUserOpinion
+                  key={userReview.userId}
+                  user={generateUserOpinion(userReview)}
+                  allUsers={allUsers}
+                />
+              ))}
           </ReviewUserGrid>
         </Typography>
       </InfoBlock>
@@ -183,7 +196,7 @@ export const RoomAnaytics: FunctionComponent = () => {
           {localizationCaptions[LocalizationKey.MarksForQuestions]}
         </Typography>
         <Gap sizeRem={2} />
-        {data.questions.map((question, index, questions) => {
+        {data?.questions.map((question, index, questions) => {
           return (
             <Fragment key={question.id}>
               <QuestionItem

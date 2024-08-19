@@ -35,7 +35,7 @@ export const CircularProgress: FunctionComponent<CircularProgressProps> = ({
         <circle stroke='var(--blue-main)' className='fg'></circle>
       </svg>
       <div className='circular-progress-caption'>
-        <Typography size={size === 'm' ? 'xxl' : 'm'}>{caption}</Typography>
+        <Typography size={size === 'm' ? 'xxxl' : 'm'}>{caption}</Typography>
       </div>
     </div>
   );

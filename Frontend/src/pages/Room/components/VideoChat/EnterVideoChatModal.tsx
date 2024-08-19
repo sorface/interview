@@ -206,22 +206,22 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
               Video not supported
             </video>
             <RoomToolsPanel.Wrapper>
-              <RoomToolsPanel.SwitchButton
-                enabled={micEnabled}
-                iconEnabledName={IconNames.MicOn}
-                iconDisabledName={IconNames.MicOff}
-                onClick={onMicSwitch}
-                roundedTop
-                progress={micVolume / 50}
-              />
-              <Gap sizeRem={0.125} />
-              <RoomToolsPanel.SwitchButton
-                enabled={cameraEnabled}
-                iconEnabledName={IconNames.VideocamOn}
-                iconDisabledName={IconNames.VideocamOff}
-                onClick={onCameraSwitch}
-                roundedBottom
-              />
+              <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
+                <RoomToolsPanel.SwitchButton
+                  enabled={micEnabled}
+                  iconEnabledName={IconNames.MicOn}
+                  iconDisabledName={IconNames.MicOff}
+                  onClick={onMicSwitch}
+                  progress={micVolume / 50}
+                />
+                <Gap sizeRem={0.125} />
+                <RoomToolsPanel.SwitchButton
+                  enabled={cameraEnabled}
+                  iconEnabledName={IconNames.VideocamOn}
+                  iconDisabledName={IconNames.VideocamOff}
+                  onClick={onCameraSwitch}
+                />
+              </RoomToolsPanel.ButtonsGroupWrapper>
             </RoomToolsPanel.Wrapper>
           </div>
         </div>

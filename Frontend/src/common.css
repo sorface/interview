@@ -27,6 +27,11 @@
 .text-green-light { color: var(--green-light); }
 .text-grey-active { color: var(--grey-active); }
 .text-dark-orange { color: var(--dark-orange); }
+.text-dark-grey4 { color: var(--dark-grey4); }
+.text-dark-orange-light { color: var(--dark-orange-light); }
+.text-dark-blue-light { color: var(--dark-blue-light); }
+.text-dark-green-light { color: var(--dark-green-light); }
+.text-dark-closed-light { color: var(--dark-closed-light); }
 .bg-form { background-color: var(--form-bg); }
 .hover\:bg-form:hover { background-color: var(--form-bg); }
 .bg-wrap { background-color: var(--wrap-bg); }
@@ -44,9 +49,11 @@
 .bg-red-light { background-color: var(--red-light); }
 .bg-green-light { background-color: var(--green-light); }
 .bg-grey-active { background-color: var(--grey-active); }
+.bg-dark-grey4 { background-color: var(--dark-grey4); }
 .bg-dark-orange { background-color: var(--dark-orange); }
 .bg-dark-blue { background-color: var(--dark-blue); }
 .bg-dark-green { background-color: var(--dark-green); }
+.bg-dark-closed { background-color: var(--dark-closed); }
 .bg-dark-orange-0\.25 { background-color: color-mix(in srgb, var(--dark-orange), transparent 75%); }
 .bg-dark-blue-0\.25 { background-color: color-mix(in srgb, var(--dark-blue), transparent 75%); }
 .bg-dark-green-0\.25 { background-color: color-mix(in srgb, var(--dark-green), transparent 75%); }
@@ -62,6 +69,7 @@
 .hover\:bg-red-light:hover { background-color: var(--red-light); }
 .hover\:bg-green-light:hover { background-color: var(--green-light); }
 .hover\:bg-grey-active:hover { background-color: var(--grey-active); }
+.hover\:bg-dark-history-hover:hover { background-color: var(--dark-history-hover); }
 .border { border-width: 1px; }
 .border-solid { border-style: solid; }
 .border-button { border-color: var(--button-border-color); }
@@ -73,6 +81,8 @@
 .rounded-2 { border-radius: 2rem; }
 .rounded-t-0\.75 { border-top-left-radius: 0.75rem !important; border-top-right-radius: 0.75rem !important; }
 .rounded-b-0\.75 { border-bottom-left-radius: 0.75rem !important; border-bottom-right-radius: 0.75rem !important; }
+.first-button\:rounded-t-0\.75 button:first-of-type { border-top-left-radius: 0.75rem !important; border-top-right-radius: 0.75rem !important; }
+.last-button\:rounded-b-0\.75 button:last-of-type { border-bottom-left-radius: 0.75rem !important; border-bottom-right-radius: 0.75rem !important; }
 .rounded-l-2 { border-top-left-radius: 2rem; border-bottom-left-radius: 2rem; }
 .rounded-r-2 { border-top-right-radius: 2rem; border-bottom-right-radius: 2rem; }
 .border-none { border: none; }
@@ -102,6 +112,7 @@
 .pr-2 { padding-right: 2rem; }
 .pr-4 { padding-right: 4rem; }
 .pb-0\.25 { padding-bottom: 0.25rem; }
+.pb-1\.5 { padding-bottom: 1.5rem; }
 .m-0 { margin: 0px; }
 .mt-auto { margin-top: auto; }
 .mb-auto { margin-bottom: auto; }
@@ -119,6 +130,7 @@
 .visible { visibility: visible; }
 .invisible { visibility: hidden; }
 .top-0 { top: 0px; }
+.bottom-0 { bottom: 0px; }
 .overflow-auto { overflow: auto; }
 .overflow-hidden { overflow: hidden; }
 .overflow-y-auto { overflow-y: auto; }
@@ -139,6 +151,7 @@
 .w-7\.5 { width: 7.5rem; }
 .w-9 { width: 9rem; }
 .w-13\.75 { width: 13.75rem; }
+.max-w-15\.75 { max-width: 15.75rem; }
 .w-17\.25 { width: 17.25rem; }
 .w-18\.125 { width: 18.125rem; }
 .w-20 { width: 20rem; }
@@ -146,6 +159,7 @@
 .w-22 { width: 22rem; }
 .w-23\.125 { width: 23.125rem; }
 .w-25 { width: 25rem; }
+.w-38\.375 { width: 38.375rem; }
 .h-fit { height: fit-content; }
 .h-full { height: 100%; }
 .h-0\.125 { height: 0.125rem; }
@@ -153,6 +167,7 @@
 .h-1\.375 { height: 1.375rem; }
 .h-1\.75 { height: 1.75rem; }
 .h-1\.875 { height: 1.875rem; }
+.h-2\.125 { height: 2.125rem; }
 .h-2\.25 { height: 2.25rem; }
 .h-2\.375 { height: 2.375rem; }
 .h-2\.5 { height: 2.5rem; }
@@ -165,6 +180,7 @@
 .h-full { height: 100%; }
 .z-1 { z-index: 1; }
 .z-50 { z-index: 50; }
+.translate-x--4\.25-y-0\.25 { transform: translate(-4.25rem, 0.25rem) !important; }
 .translate-x--11\.375-y-0\.25 { transform: translate(-11.375rem, 0.25rem) !important; }
 .translate-y-0\.25 { transform: translateY(0.25rem); }
 .rotate-90 { transform: rotate(90deg); }
@@ -172,6 +188,8 @@
 .shadow { box-shadow: 0px 4px 12px var(--shadow); }
 .text-left { text-align: left; }
 .text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-justify { text-align: justify; }
 .opacity-0 { opacity: 0; }
 .opacity-0\.5 { opacity: 0.5; }
 .opacity-0\.65 { opacity: 0.65; }

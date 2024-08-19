@@ -2,11 +2,11 @@ namespace Interview.Domain.Rooms.Records.Response.Detail;
 
 public class RoomUserDetail
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; set; }
 
-    public string? Nickname { get; set; }
+    public required string? Nickname { get; set; }
 
-    public string? Avatar { get; set; }
+    public required string? Avatar { get; set; }
 
-    public string? Type { get; set; }
+    public required string? Type { get; set; }
 }

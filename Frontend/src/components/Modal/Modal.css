@@ -6,10 +6,14 @@
   margin-right: auto;
   text-align: center;
   color: var(--text);
-  background-color: var(--wrap-bg);
+  background-color: var(--modal-bg);
   border-radius: 2rem;
   overflow: auto;
   z-index: 999;
+}
+
+.modal-wide {
+  width: 65rem;
 }
 
 .modal .modal-header {
@@ -23,6 +27,7 @@
 .modal .modal-header h3 {
   padding-left: 24px;
   padding-top: 15px;
+  font-weight: 600;
 }
 
 .modal .modal-close {
@@ -43,6 +48,14 @@
   background-color: var(--modal-close-button-background-hover);
 }
 
+.modal .modal-close svg {
+  transition: 0.3s;
+}
+
+.modal .modal-close:hover svg {
+  color: var(--white);
+}
+
 .modal .modal-content {
-  padding: 1rem;
+  padding: 0 1.5rem;
 }
