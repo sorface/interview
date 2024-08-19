@@ -69,4 +69,9 @@ public class EventType
     /// Feedback on the question in the room has been added
     /// </summary>
     public static readonly string RoomQuestionEvaluationAdded = "added_room_question_evaluation";
+
+    /// <summary>
+    /// Contains information about the current state of the code editor.
+    /// </summary>
+    public static readonly string RoomCodeEditorEnabled = "room-code-editor-enabled";
 }
