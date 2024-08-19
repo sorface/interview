@@ -646,6 +646,9 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Property<string>("CodeEditorContent")
                         .HasColumnType("text");
 
+                    b.Property<bool>("CodeEditorEnabled")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
 
