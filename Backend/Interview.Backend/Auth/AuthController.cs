@@ -63,7 +63,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("/logout")]
-    [ProducesResponseType(typeof(SignOutResult), 200)]
+    [ProducesResponseType(200)]
     [ProducesResponseType(typeof(string), 400)]
     public ActionResult SignOut()
     {
