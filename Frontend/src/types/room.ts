@@ -1,4 +1,4 @@
-import { Question } from './question';
+import { Question, QuestionAnswer } from './question';
 import { Tag } from './tag';
 import { User, UserType } from './user';
 
@@ -15,6 +15,7 @@ export interface Room {
   participants: RoomParticipant[];
   tags: Tag[];
   roomStatus: RoomStatus;
+  questions: Question[];
   scheduledStartTime: string;
   timer?: {
     durationSec: number;
@@ -80,6 +81,7 @@ export interface RoomQuestion {
   state: RoomQuestionState;
   value: string;
   order: number;
+  answers?: QuestionAnswer[];
 }
 
 export interface RoomQuestionEvaluation {

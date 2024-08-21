@@ -39,7 +39,7 @@ export interface Question {
   id: string;
   value: string;
   tags: Tag[];
-  codeEditor: {
+  codeEditor?: {
     content: string;
     lang: CodeEditorLang;
   } | null;

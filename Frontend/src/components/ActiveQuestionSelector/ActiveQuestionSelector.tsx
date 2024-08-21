@@ -6,6 +6,11 @@ import { Gap } from '../Gap/Gap';
 import { Typography } from '../Typography/Typography';
 import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';
+import { Modal } from '../Modal/Modal';
+import { ModalFooter } from '../ModalFooter/ModalFooter';
+import { Button } from '../Button/Button';
+import { QuestionAnswers } from '../QuestionAnswers/QuestionAnswers';
+import { Question } from '../../types/question';
 
 import './ActiveQuestionSelector.css';
 
@@ -16,6 +21,7 @@ export interface ActiveQuestionSelectorProps {
   initialQuestion?: RoomQuestion;
   showClosedQuestions: boolean;
   loading: boolean;
+  questionsDictionary: Question[];
   questions: RoomQuestion[];
   openQuestions: Array<RoomQuestion['id']>;
   readOnly: boolean;
@@ -27,6 +33,7 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   initialQuestion,
   showClosedQuestions,
   loading,
+  questionsDictionary,
   questions,
   openQuestions,
   readOnly,
@@ -40,7 +47,12 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   const inputRef = useRef<HTMLDivElement>(null);
   const localizationCaptions = useLocalizationCaptions();
   const [questionsCount, setQuestionsCount] = useState(0);
-  const currentOrder = (selectedValue ? selectedValue.order : initialQuestion?.order) || 0;
+  const currentQuestion = selectedValue || initialQuestion;
+  const currentQuestionInDictionary =
+    currentQuestion &&
+    questionsDictionary.find(q => q.id === currentQuestion.id);
+  const currentOrder = currentQuestion?.order || 0;
+  const [answersModalOpen, setAnswersModalOpen] = useState(false);
 
   useEffect(() => {
     if (loading) {
@@ -119,6 +131,14 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
     setSearchValue(e.target.value);
   };
 
+  const handleAnswersModalOpen = () => {
+    setAnswersModalOpen(true);
+  };
+
+  const handleAnswersModalClose = () => {
+    setAnswersModalOpen(false);
+  };
+
   return (
     <>
       <div className="activeQuestionSelector-container relative">
@@ -170,6 +190,28 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
           {getDisplay()}
         </Typography>
       </div>
+      {!!(!readOnly && currentQuestionInDictionary?.answers?.length) && (
+        <div className='cursor-pointer mt-auto text-right' onClick={handleAnswersModalOpen}>
+          <Typography size='s' secondary>{localizationCaptions[LocalizationKey.QuestionAnswerOptions]}</Typography>
+        </div>
+      )}
+      <Modal
+        contentLabel={localizationCaptions[LocalizationKey.QuestionAnswerOptions]}
+        open={answersModalOpen}
+        onClose={handleAnswersModalClose}
+      >
+        {currentQuestionInDictionary?.answers && (
+          <QuestionAnswers
+            answers={currentQuestionInDictionary.answers}
+            codeEditor={currentQuestionInDictionary.codeEditor}
+          />
+        )}
+        <ModalFooter>
+          <Button onClick={handleAnswersModalClose}>
+            {localizationCaptions[LocalizationKey.Close]}
+          </Button>
+        </ModalFooter>
+      </Modal>
     </>
   );
 };

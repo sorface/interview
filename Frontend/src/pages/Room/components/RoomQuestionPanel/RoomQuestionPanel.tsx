@@ -180,10 +180,11 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
   return (
     <div className='videochat-field !w-21 flex flex-col'>
       <div className='flex-1 py-1.5 px-1.25 bg-wrap rounded-1.125'>
-        <div className=''>
+        <div className='flex flex-col h-full'>
           <ActiveQuestionSelector
             showClosedQuestions={showClosedQuestions}
             loading={roomQuestionsLoading}
+            questionsDictionary={room?.questions || []}
             questions={roomQuestions}
             openQuestions={openQuestionsIds}
             initialQuestion={initialQuestion}
