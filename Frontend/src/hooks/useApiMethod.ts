@@ -1,9 +1,9 @@
-import { useCallback, useReducer } from 'react';
+import { useCallback, useEffect, useReducer } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { REACT_APP_BACKEND_URL } from '../config';
 import { pathnames } from '../constants';
 import { ApiContract } from '../types/apiContracts';
-import { useCommunist } from './useCommunist';
+import { useLogout } from './useLogout';
 
 interface ApiMethodState<ResponseData = any> {
   process: {
@@ -144,7 +144,23 @@ const getResponseError = (
 export const useApiMethod = <ResponseData, RequestData = AnyObject>(apiContractCall: (data: RequestData) => ApiContract) => {
   const [apiMethodState, dispatch] = useReducer(apiMethodReducer, initialState);
   const navigate = useNavigate();
-  const { deleteCommunist } = useCommunist();
+  const { logoutState, logout } = useLogout();
+  const { process: { logoutCode, logoutError } } = logoutState;
+
+  useEffect(() => {
+    if (!logoutCode) {
+      return;
+    }
+    navigate(pathnames.home.replace(':redirect?', ''));
+  }, [logoutCode, navigate]);
+
+  useEffect(() => {
+    if (!logoutError) {
+      return;
+    }
+    // TODO: Redirect to error page - https://github.com/sorface/interview-platform/issues/288
+    throw new Error(`Logout error: ${logoutError}`);
+  }, [logoutError]);
 
   const fetchData = useCallback(async (requestData: RequestData) => {
     dispatch({ name: 'startLoad' });
@@ -159,8 +175,7 @@ export const useApiMethod = <ResponseData, RequestData = AnyObject>(apiContractC
         payload: response.status,
       });
       if (response.status === unauthorizedHttpCode) {
-        deleteCommunist();
-        navigate(pathnames.home.replace(':redirect?', ''));
+        logout();
         return;
       }
 
@@ -176,7 +191,7 @@ export const useApiMethod = <ResponseData, RequestData = AnyObject>(apiContractC
         payload: err.message || `Failed to fetch ${apiContract.method} ${apiContract.baseUrl}`,
       });
     }
-  }, [apiContractCall, deleteCommunist, navigate]);
+  }, [apiContractCall, logout]);
 
   return {
     apiMethodState: apiMethodState as ApiMethodState<ResponseData>,
