@@ -122,6 +122,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                         Value = question.Question.Value,
                         Order = question.Order,
                         Answers = null,
+                        CodeEditor = null,
                     })
                     .ToList(),
                 Participants = e.Participants.Select(participant =>
@@ -160,6 +161,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             .Include(e => e.Configuration)
             .Include(e => e.Timer)
             .Include(e => e.Questions).ThenInclude(e => e.Question).ThenInclude(e => e!.Answers)
+            .Include(e => e.Questions).ThenInclude(e => e.Question).ThenInclude(e => e!.CodeEditor)
             .Select(e => new
             {
                 Id = e.Id,
@@ -203,7 +205,15 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                         Title = a.Title,
                         Content = a.Content,
                         CodeEditor = a.CodeEditor,
-                    }).ToList(),
+                    })
+                        .ToList(),
+                    CodeEditor = q.Question.CodeEditor == null
+                        ? null
+                        : new QuestionCodeEditorResponse
+                        {
+                            Content = q.Question.CodeEditor.Content,
+                            Lang = q.Question.CodeEditor.Lang,
+                        },
                 }).ToList(),
             })
             .FirstOrDefaultAsync(room => room.Id == id, cancellationToken: cancellationToken) ?? throw NotFoundException.Create<Room>(id);
@@ -304,6 +314,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                     Value = question.Question.Value,
                     Order = question.Order,
                     Answers = null,
+                    CodeEditor = null,
                 })
                 .ToList(),
             Participants = room.Participants.Select(participant =>
