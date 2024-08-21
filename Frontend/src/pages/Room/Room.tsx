@@ -17,7 +17,6 @@ import { REACT_APP_WS_URL } from '../../config';
 import { EventName, IconNames, inviteParamName, pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
-import { useCommunist } from '../../hooks/useCommunist';
 import {
   RoomInvite,
   RoomParticipant,
@@ -55,8 +54,6 @@ const connectingReadyState = 0;
 export const Room: FunctionComponent = () => {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
-  const { getCommunist } = useCommunist();
-  const communist = getCommunist();
   let { id } = useParams();
   const { [inviteParamName]: inviteParam } = useParams();
 
