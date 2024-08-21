@@ -8,8 +8,8 @@ import { useApiMethod } from '../../hooks/useApiMethod';
 import { Question } from '../../types/question';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
-import { Room, RoomAccessType, RoomInvite } from '../../types/room';
-import { DragNDropList, DragNDropListItem } from '../../components/DragNDropList/DragNDropList';
+import { Room, RoomAccessType, RoomInvite, RoomQuestionListItem } from '../../types/room';
+import { DragNDropList } from '../../components/DragNDropList/DragNDropList';
 import { SwitcherButton } from '../../components/SwitcherButton/SwitcherButton';
 import { ModalFooter } from '../../components/ModalFooter/ModalFooter';
 import { Gap } from '../../components/Gap/Gap';
@@ -22,6 +22,7 @@ import { RoomCreateField } from './RoomCreateField/RoomCreateField';
 import { Modal } from '../../components/Modal/Modal';
 import { Button } from '../../components/Button/Button';
 import { padTime } from '../../utils/padTime';
+import { sortRoomQestions } from '../../utils/sortRoomQestions';
 
 const nameFieldName = 'roomName';
 const dateFieldName = 'roomDate';
@@ -90,8 +91,6 @@ type RoomFields = {
   startTime: string;
   endTime: string;
 };
-
-export type RoomQuestionListItem = Question & DragNDropListItem;
 
 interface RoomCreateProps {
   editRoomId: string | null;
@@ -163,6 +162,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
       startTime: parsedScheduledStartTime ? parsedScheduledStartTime.startTime : '',
       endTime: parsedScheduledStartTime ? parsedScheduledStartTime.endTime || '' : '',
     }));
+    setSelectedQuestions(room.questions.sort(sortRoomQestions));
   }, [room]);
 
   useEffect(() => {

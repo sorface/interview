@@ -1,3 +1,4 @@
+import { DragNDropListItem } from '../components/DragNDropList/DragNDropList';
 import { Question, QuestionAnswer } from './question';
 import { Tag } from './tag';
 import { User, UserType } from './user';
@@ -15,13 +16,15 @@ export interface Room {
   participants: RoomParticipant[];
   tags: Tag[];
   roomStatus: RoomStatus;
-  questions: Question[];
+  questions: RoomQuestionListItem[];
   scheduledStartTime: string;
   timer?: {
     durationSec: number;
     startTime?: string;
   };
 }
+
+export type RoomQuestionListItem = Question & DragNDropListItem;
 
 export interface RoomParticipant extends User {
   type: UserType;

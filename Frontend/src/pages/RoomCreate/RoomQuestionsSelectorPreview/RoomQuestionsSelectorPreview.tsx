@@ -1,5 +1,5 @@
 import { FunctionComponent, MouseEvent } from 'react';
-import { RoomQuestionListItem } from '../RoomCreate';
+import { RoomQuestionListItem } from '../../../types/room';
 import { useLocalizationCaptions } from '../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../localization';
 import { Dropdown } from '../../../components/Dropdown/Dropdown';
@@ -7,9 +7,7 @@ import { Icon } from '../../Room/components/Icon/Icon';
 import { IconNames } from '../../../constants';
 import { Typography } from '../../../components/Typography/Typography';
 import { Gap } from '../../../components/Gap/Gap';
-
-const sortQestions = (qestion1: RoomQuestionListItem, qestion2: RoomQuestionListItem) =>
-  qestion1.order - qestion2.order;
+import { sortRoomQestions } from '../../../utils/sortRoomQestions';
 
 interface RoomQuestionsSelectorPreviewProps {
   qestions: RoomQuestionListItem[];
@@ -48,7 +46,7 @@ export const RoomQuestionsSelectorPreview: FunctionComponent<RoomQuestionsSelect
         contentClassName='translate-x--4.25-y-0.25'
       >
         <div className='w-18.125 rounded-0.75 bg-wrap shadow'>
-          {qestions.sort(sortQestions).map(qestion => (
+          {qestions.sort(sortRoomQestions).map(qestion => (
             <div
               key={qestion.id}
               className='flex items-center justify-between h-2.125 px-1 cursor-pointer hover:bg-grey-active'
