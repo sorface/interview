@@ -9,7 +9,7 @@ import { Question } from '../../../types/question';
 import { ItemsGrid } from '../../../components/ItemsGrid/ItemsGrid';
 import { QuestionItem } from '../../../components/QuestionItem/QuestionItem';
 import { Gap } from '../../../components/Gap/Gap';
-import { RoomQuestionListItem } from '../RoomCreate';
+import { RoomQuestionListItem } from '../../../types/room';
 import { RoomQuestionsSelectorPreview } from '../RoomQuestionsSelectorPreview/RoomQuestionsSelectorPreview';
 import { Button } from '../../../components/Button/Button';
 import { RoomCreateField } from '../RoomCreateField/RoomCreateField';
