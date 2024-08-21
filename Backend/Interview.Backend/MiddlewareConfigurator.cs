@@ -31,11 +31,7 @@ public class MiddlewareConfigurator
             HttpOnly = HttpOnlyPolicy.None,
         });
 
-        _app.UseWebSockets().UseWebSocketsAuthorization(new WebSocketAuthorizationOptions
-        {
-            CookieName = WebSocketAuthorizationOptions.DefaultCookieName,
-            WebSocketQueryName = "Authorization",
-        });
+        _app.UseWebSockets();
 
         _app.UseCors("All");
 

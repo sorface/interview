@@ -12,7 +12,8 @@ public static class ServiceCollectionExt
         self.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = authorizationService.Id;
+
+                // options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
             .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
             {
@@ -60,8 +61,7 @@ public static class ServiceCollectionExt
                 {
                     options.CorrelationCookie = new CookieBuilder
                     {
-                        Name = authorizationService.CorrelationCookie.Name,
-                        Domain = authorizationService.CorrelationCookie.Domain,
+                        Name = authorizationService.CorrelationCookie.Name, Domain = authorizationService.CorrelationCookie.Domain,
                     };
                 }
 

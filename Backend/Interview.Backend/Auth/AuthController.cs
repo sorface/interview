@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Interview.Backend.Auth;
@@ -59,5 +60,13 @@ public class AuthController : ControllerBase
                 return uri;
             }
         }
+    }
+
+    [HttpPost("/logout")]
+    [ProducesResponseType(typeof(SignOutResult), 200)]
+    [ProducesResponseType(typeof(string), 400)]
+    public ActionResult SignOut()
+    {
+        return SignOut(CookieAuthenticationDefaults.AuthenticationScheme);
     }
 }
