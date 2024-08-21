@@ -61,7 +61,8 @@ public static class ServiceCollectionExt
                 {
                     options.CorrelationCookie = new CookieBuilder
                     {
-                        Name = authorizationService.CorrelationCookie.Name, Domain = authorizationService.CorrelationCookie.Domain,
+                        Name = authorizationService.CorrelationCookie.Name,
+                        Domain = authorizationService.CorrelationCookie.Domain,
                     };
                 }
 

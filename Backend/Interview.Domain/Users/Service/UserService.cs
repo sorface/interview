@@ -219,13 +219,6 @@ public sealed class UserService : IUserService
         return new PermissionItem(storagePermission.Type, containsPermission);
     }
 
-    private Task<Role?> GetUserRoleAsync(string nickname, CancellationToken cancellationToken)
-    {
-        var roleName = _adminUsers.IsAdmin(nickname) ? RoleName.Admin : RoleName.User;
-
-        return _roleRepository.FindByIdAsync(roleName.Id, cancellationToken);
-    }
-
     private Task<List<Role>> GetUserRolesAsync(IEnumerable<Role> roles, CancellationToken cancellationToken)
     {
         var roleNames = roles.Select(r => r.Name);

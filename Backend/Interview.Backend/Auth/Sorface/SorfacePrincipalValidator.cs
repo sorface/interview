@@ -6,9 +6,6 @@ namespace Interview.Backend.Auth.Sorface;
 
 public class SorfacePrincipalValidator
 {
-    private const string AccessTokenName = "access_token";
-    private const string ExpirationTokenName = "expires_at";
-
     private readonly ILogger<SorfacePrincipalValidator> _logger;
     private readonly SorfaceTokenHandler _sorfaceTokenHandler;
 
