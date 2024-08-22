@@ -7,29 +7,33 @@ import { useGetMeApi } from './hooks/useGetMeApi';
 import { Loader } from './components/Loader/Loader';
 import { MainContentWrapper } from './components/MainContentWrapper/MainContentWrapper';
 import { Field } from './components/FieldsBlock/Field';
-import { useCommunist } from './hooks/useCommunist';
 import { ThemeProvider } from './context/ThemeContext';
 import { LocalizationProvider } from './context/LocalizationContext';
 import { Button } from './components/Button/Button';
+import { useLogout } from './hooks/useLogout';
 
 import './App.css';
 
 export const App: FunctionComponent = () => {
-  const { getCommunist, resetCommunist } = useCommunist();
-  const communist = getCommunist();
   const { getMeState, loadMe } = useGetMeApi();
+  const { logout, logoutState: { process: { logoutCode } } } = useLogout();
   const { process: { loading, error }, user } = getMeState;
-  const userWillLoad = communist && !user && !error;
+  const userWillLoad = !user && !error;
 
   useEffect(() => {
-    if (communist) {
-      loadMe();
-    }
-  }, [communist, loadMe]);
+    loadMe();
+  }, [loadMe]);
 
   const handlePageReset = useCallback(() => {
-    resetCommunist();
-  }, [resetCommunist]);
+    logout();
+  }, [logout]);
+
+  useEffect(() => {
+    if (!logoutCode || logoutCode !== 200) {
+      return;
+    }
+    window.location.reload();
+  }, [logoutCode]);
 
   const renderMainContent = useCallback(() => {
     if (loading || userWillLoad) {

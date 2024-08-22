@@ -1,4 +1,5 @@
-import { FunctionComponent, useContext } from 'react';
+import { FunctionComponent, useContext, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { UserAvatar } from '../UserAvatar/UserAvatar';
 import { AuthContext } from '../../context/AuthContext';
 import { ContextMenu } from '../ContextMenu/ContextMenu';
@@ -6,13 +7,20 @@ import { Typography } from '../Typography/Typography';
 import { Gap } from '../Gap/Gap';
 import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames, pathnames } from '../../constants';
-import { Link } from 'react-router-dom';
-import { useCommunist } from '../../hooks/useCommunist';
 import { Button } from '../Button/Button';
+import { useLogout } from '../../hooks/useLogout';
 
 export const PageHeaderUserAvatar: FunctionComponent = () => {
   const auth = useContext(AuthContext);
-  const { resetCommunist } = useCommunist();
+  const navigate = useNavigate();
+  const { logout, logoutState: { process: { logoutCode } } } = useLogout();
+
+  useEffect(() => {
+    if (!logoutCode || logoutCode !== 200) {
+      return;
+    }
+    navigate(pathnames.home.replace(':redirect?', ''));
+  }, [logoutCode, navigate]);
 
   return (
     <>
@@ -47,7 +55,7 @@ export const PageHeaderUserAvatar: FunctionComponent = () => {
               </Link>
             </div>
             <div>
-              <Button variant='text' onClick={resetCommunist}>
+              <Button variant='text' onClick={logout}>
                 <Icon name={IconNames.Exit} />
               </Button>
             </div>

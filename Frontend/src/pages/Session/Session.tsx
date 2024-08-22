@@ -1,25 +1,35 @@
-import React, { FunctionComponent, useCallback, useContext } from 'react';
+import React, { FunctionComponent, useCallback, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { Field } from '../../components/FieldsBlock/Field';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
-import { useCommunist } from '../../hooks/useCommunist';
+import { useLogout } from '../../hooks/useLogout';
 import { ThemeSwitch } from '../../components/ThemeSwitch/ThemeSwitch';
 import { LangSwitch } from '../../components/LangSwitch/LangSwitch';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Button } from '../../components/Button/Button';
+import { pathnames } from '../../constants';
 
 import './Session.css';
 
 export const Session: FunctionComponent = () => {
   const auth = useContext(AuthContext);
-  const { resetCommunist } = useCommunist();
+  const navigate = useNavigate();
+  const { logout, logoutState: { process: { logoutCode } } } = useLogout();
   const localizationCaptions = useLocalizationCaptions();
 
+  useEffect(() => {
+    if (!logoutCode || logoutCode !== 200) {
+      return;
+    }
+    navigate(pathnames.home.replace(':redirect?', ''));
+  }, [logoutCode, navigate]);
+
   const handleLogOut = useCallback(() => {
-    resetCommunist();
-  }, [resetCommunist]);
+    logout();
+  }, [logout]);
 
   const renderAuth = useCallback(() => {
     if (!auth) {
