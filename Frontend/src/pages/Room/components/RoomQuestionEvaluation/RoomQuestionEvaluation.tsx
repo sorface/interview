@@ -21,11 +21,11 @@ interface RoomQuestionEvaluationPorps {
 
 const themeClassNames: Record<ThemeInUi, Record<'active' | 'nonActive', string>> = {
   [Theme.Dark]: {
-    active: 'bg-blue-dark',
-    nonActive: 'bg-dark',
+    active: '!bg-dark-blue',
+    nonActive: 'bg-dark-grey4',
   },
   [Theme.Light]: {
-    active: 'text-white bg-dark',
+    active: 'text-white !bg-dark',
     nonActive: 'bg-blue-light',
   },
 };
