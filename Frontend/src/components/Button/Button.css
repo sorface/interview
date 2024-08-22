@@ -74,7 +74,7 @@ button[disabled]:hover {
 button.text {
   border: none;
   min-width: unset;
-  background-color: var(--wrap-bg);
+  background-color: inherit;
 }
 
 button.toolsPanel {
