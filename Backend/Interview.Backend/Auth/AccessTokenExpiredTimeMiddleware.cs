@@ -17,7 +17,7 @@ namespace Interview.Backend.Auth
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var expTimeString = await context.Response.HttpContext.GetTokenAsync(ExpirationTokenName);
+            var expTimeString = await context.GetTokenAsync(ExpirationTokenName);
 
             if (expTimeString is null)
             {
@@ -27,23 +27,9 @@ namespace Interview.Backend.Auth
 
             var expTime = ((DateTimeOffset)DateTime.Parse(expTimeString, CultureInfo.InvariantCulture).ToUniversalTime()).ToUnixTimeSeconds();
 
-            context.Response.OnStarting(() => OnStartingCallBack(context, _cookieName, expTime));
+            context.Response.Cookies.Append(_cookieName, expTime.ToString());
 
             await _next(context);
-        }
-
-        private Task OnStartingCallBack(HttpContext context, string cookieName, long expTime)
-        {
-            var cookieOptions = new CookieOptions()
-            {
-                Path = "/",
-                Expires = DateTimeOffset.UtcNow.AddHours(1),
-                IsEssential = true,
-                HttpOnly = false,
-                Secure = false,
-            };
-            context.Response.Cookies.Append(cookieName, expTime.ToString(), cookieOptions);
-            return Task.FromResult(0);
         }
     }
 

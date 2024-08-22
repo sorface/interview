@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Interview.Backend.Auth;
 
 [ApiController]
-[Route("/api")]
+[Route("api")]
 public class AuthController : ControllerBase
 {
     private readonly OAuthServiceDispatcher _oAuthDispatcher;
@@ -68,7 +68,7 @@ public class AuthController : ControllerBase
         }
     }
 
-    [HttpPost("/api/logout")]
+    [HttpPost("logout")]
     [ProducesResponseType(200)]
     [ProducesResponseType(typeof(string), 400)]
     public ActionResult SignOut()
@@ -77,7 +77,7 @@ public class AuthController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost("/api/refresh")]
+    [HttpPost("refresh")]
     [ProducesResponseType(200)]
     [ProducesResponseType(typeof(string), 400)]
     public Task<SorfacePrincipalValidator.Result> RefreshLogin()
