@@ -14,6 +14,10 @@ export interface Room {
   id: string;
   name: string;
   participants: RoomParticipant[];
+  owner: {
+    id: User['id'];
+    nickname: User['nickname'];
+  };
   tags: Tag[];
   roomStatus: RoomStatus;
   questions: RoomQuestionListItem[];
@@ -91,4 +95,11 @@ export interface RoomQuestionEvaluation {
   id: string;
   mark?: number;
   review?: string;
+}
+
+export interface MyRoomQuestionEvaluation {
+  id: string;
+  value: string;
+  order: number;
+  evaluation?: RoomQuestionEvaluation;
 }
