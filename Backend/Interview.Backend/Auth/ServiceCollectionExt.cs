@@ -31,13 +31,21 @@ public static class ServiceCollectionExt
             {
                 options.Events.OnValidatePrincipal = context =>
                 {
+                    var pathValue = context.Request.Path.Value;
+
+                    if (pathValue != null && pathValue.StartsWith("/api/refresh"))
+                    {
+                        return Task.CompletedTask;
+                    }
+
                     var sorfacePrincipalValidator = context.HttpContext.RequestServices.GetRequiredService<SorfacePrincipalValidator>();
                     return sorfacePrincipalValidator.ValidateAsync(context);
                 };
 
                 options.SessionStore = self.BuildServiceProvider().GetRequiredService<ITicketStore>();
-                options.Cookie.HttpOnly = false;
-                options.Cookie.Name = "sorface.interview.session.id";
+
+                options.Cookie.HttpOnly = true;
+                options.Cookie.Name = "_auth";
                 options.Cookie.Domain = authorizationService.Domain;
 
                 options.Events.OnRedirectToAccessDenied = context =>
@@ -74,8 +82,7 @@ public static class ServiceCollectionExt
                 {
                     options.CorrelationCookie = new CookieBuilder
                     {
-                        Name = authorizationService.CorrelationCookie.Name,
-                        Domain = authorizationService.CorrelationCookie.Domain,
+                        Name = authorizationService.CorrelationCookie.Name, Domain = authorizationService.CorrelationCookie.Domain,
                     };
                 }
 

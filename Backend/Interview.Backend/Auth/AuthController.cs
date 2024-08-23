@@ -1,5 +1,6 @@
 using Interview.Backend.Auth.Sorface;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Interview.Backend.Auth;
@@ -12,8 +13,8 @@ public class AuthController : ControllerBase
     private readonly ILogger<AuthController> _logger;
     private readonly SorfacePrincipalValidator _sorfacePrincipalValidator;
 
-    public AuthController(OAuthServiceDispatcher oAuthDispatcher, 
-                          ILogger<AuthController> logger, 
+    public AuthController(OAuthServiceDispatcher oAuthDispatcher,
+                          ILogger<AuthController> logger,
                           SorfacePrincipalValidator sorfacePrincipalValidator)
     {
         _oAuthDispatcher = oAuthDispatcher;
@@ -42,10 +43,7 @@ public class AuthController : ControllerBase
             return Results.BadRequest($"Redirect link {redirectUri} is not available");
         }
 
-        var authenticationProperties = new AuthenticationProperties
-        {
-            RedirectUri = redirectUri,
-        };
+        var authenticationProperties = new AuthenticationProperties { RedirectUri = redirectUri, };
 
         _logger.LogDebug("Before change");
         var signIn = Results.Challenge(authenticationProperties, authenticationSchemes: new List<string> { scheme });
@@ -74,12 +72,23 @@ public class AuthController : ControllerBase
         return SignOut(CookieAuthenticationDefaults.AuthenticationScheme);
     }
 
-    [Authorize]
     [HttpPost("refresh")]
     [ProducesResponseType(200)]
     [ProducesResponseType(typeof(string), 400)]
-    public Task<SorfacePrincipalValidator.Result> RefreshLogin()
+    public async Task<ActionResult> RefreshLogin()
     {
-        return _sorfacePrincipalValidator.RefreshTokenAsync(HttpContext);
+        if (HttpContext.User.ToUser() is null)
+        {
+            return BadRequest("principal not found");
+        }
+
+        var refreshTokenState = await _sorfacePrincipalValidator.RefreshTokenAsync(HttpContext);
+
+        if (refreshTokenState == SorfacePrincipalValidator.Result.RejectPrincipal)
+        {
+            return BadRequest("principal rejected");
+        }
+
+        return Ok();
     }
 }

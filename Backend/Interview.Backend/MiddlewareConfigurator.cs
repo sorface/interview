@@ -44,6 +44,7 @@ public class MiddlewareConfigurator
             return func();
         });
 
+        _app.UseAccessTokenExpiredTimeCookie("ate_t");
         _app.UseSession();
         _app.UseAuthentication();
         _app.UseAuthorization();
@@ -59,7 +60,6 @@ public class MiddlewareConfigurator
 
             return func();
         });
-        _app.UseAccessTokenExpiredTimeCookie("ate_t");
 
         _app.Use((context, func) =>
         {

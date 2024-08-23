@@ -78,15 +78,6 @@ public class SorfacePrincipalValidator
 
         _logger.LogInformation(@"get exp {exp}", exp);
 
-        var expTime = DateTime.Parse(exp, CultureInfo.InvariantCulture).ToUniversalTime();
-
-        _logger.LogInformation(@"utc exp {expires}", expTime);
-        if (expTime > DateTime.UtcNow)
-        {
-            _logger.Log(LogLevel.Information, "expires >= DateTime.UtcNow");
-            return Result.None;
-        }
-
         var refreshToken = await context.GetTokenAsync(RefreshTokenName);
 
         if (refreshToken is null)
@@ -122,17 +113,20 @@ public class SorfacePrincipalValidator
         var expirationValue = DateTime.UtcNow.AddSeconds(tokenResponse.ExpiresIn!.Value)
             .ToString("o", CultureInfo.InvariantCulture);
 
-        var authenticateResult = await context.AuthenticateAsync();
+        var authenticateResult = await context.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
         var authenticateResultProperties = authenticateResult?.Properties;
-        if (authenticateResultProperties is not null)
+
+        authenticateResultProperties?.StoreTokens(new[]
         {
-            authenticateResultProperties.StoreTokens(new[]
-            {
-                new AuthenticationToken { Name = RefreshTokenName, Value = tokenResponse.RefreshToken },
-                new AuthenticationToken { Name = AccessTokenName, Value = tokenResponse.AccessToken },
-                new AuthenticationToken { Name = ExpirationTokenName, Value = expirationValue },
-            });
+            new AuthenticationToken { Name = RefreshTokenName, Value = tokenResponse.RefreshToken },
+            new AuthenticationToken { Name = AccessTokenName, Value = tokenResponse.AccessToken },
+            new AuthenticationToken { Name = ExpirationTokenName, Value = expirationValue },
+        });
+
+        if (authenticateResult is not null)
+        {
+            await context.SignInAsync(authenticateResult.Principal!, authenticateResult.Properties);
         }
 
         _logger.Log(LogLevel.Information, "Token refreshed");

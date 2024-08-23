@@ -29,7 +29,7 @@ type RefreshAction = {
 };
 
 const refreshCookieName = 'ate_t';
-const refreshDeadlineShiftMinutes = 30;
+const refreshDeadlineShiftMinutes = 1;
 
 const refreshReducer = (state: RefreshState, action: RefreshAction): RefreshState => {
   switch (action.name) {
