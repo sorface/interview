@@ -7,6 +7,7 @@ export enum QuestionType {
 
 export enum CodeEditorLang {
   Plaintext = 'plaintext',
+  Markdown = 'markdown',
   C = 'c',
   Cpp = 'cpp',
   Csharp = 'csharp',
