@@ -1,5 +1,5 @@
-import { FunctionComponent, useContext, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { FunctionComponent, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import { UserAvatar } from '../UserAvatar/UserAvatar';
 import { AuthContext } from '../../context/AuthContext';
 import { ContextMenu } from '../ContextMenu/ContextMenu';
@@ -12,15 +12,7 @@ import { useLogout } from '../../hooks/useLogout';
 
 export const PageHeaderUserAvatar: FunctionComponent = () => {
   const auth = useContext(AuthContext);
-  const navigate = useNavigate();
-  const { logout, logoutState: { process: { logoutCode } } } = useLogout();
-
-  useEffect(() => {
-    if (!logoutCode || logoutCode !== 200) {
-      return;
-    }
-    navigate(pathnames.home.replace(':redirect?', ''));
-  }, [logoutCode, navigate]);
+  const { logout } = useLogout();
 
   return (
     <>

@@ -1,4 +1,4 @@
-import { useCallback, useReducer } from 'react';
+import { useCallback, useEffect, useReducer } from 'react';
 import { REACT_APP_BACKEND_URL } from '../config';
 
 interface LogoutState {
@@ -61,6 +61,14 @@ const logoutReducer = (state: LogoutState, action: LogoutAction): LogoutState =>
 
 export const useLogout = () => {
   const [logoutState, dispatch] = useReducer(logoutReducer, initialState);
+  const { process: { logoutCode } } = logoutState;
+
+  useEffect(() => {
+    if (!logoutCode || logoutCode !== 200) {
+      return;
+    }
+    window.location.reload();
+  }, [logoutCode]);
 
   const logout = useCallback(async () => {
     dispatch({ name: 'startLoad' });

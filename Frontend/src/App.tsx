@@ -17,7 +17,7 @@ import './App.css';
 
 export const App: FunctionComponent = () => {
   const { getMeState, loadMe } = useGetMeApi();
-  const { logout, logoutState: { process: { logoutCode } } } = useLogout();
+  const { logout } = useLogout();
   const { process: { loading, error, code }, user } = getMeState;
   const userWillLoad = !user && !error;
 
@@ -28,13 +28,6 @@ export const App: FunctionComponent = () => {
   const handlePageReset = useCallback(() => {
     logout();
   }, [logout]);
-
-  useEffect(() => {
-    if (!logoutCode || logoutCode !== 200) {
-      return;
-    }
-    window.location.reload();
-  }, [logoutCode]);
 
   const renderMainContent = () => {
     if (loading || userWillLoad) {

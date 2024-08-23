@@ -1,5 +1,4 @@
-import React, { FunctionComponent, useCallback, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { FunctionComponent, useCallback, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Field } from '../../components/FieldsBlock/Field';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
@@ -10,22 +9,13 @@ import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Button } from '../../components/Button/Button';
-import { pathnames } from '../../constants';
 
 import './Session.css';
 
 export const Session: FunctionComponent = () => {
   const auth = useContext(AuthContext);
-  const navigate = useNavigate();
-  const { logout, logoutState: { process: { logoutCode } } } = useLogout();
+  const { logout } = useLogout();
   const localizationCaptions = useLocalizationCaptions();
-
-  useEffect(() => {
-    if (!logoutCode || logoutCode !== 200) {
-      return;
-    }
-    navigate(pathnames.home.replace(':redirect?', ''));
-  }, [logoutCode, navigate]);
 
   const handleLogOut = useCallback(() => {
     logout();

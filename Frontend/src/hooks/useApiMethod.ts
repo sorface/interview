@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useReducer, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { REACT_APP_BACKEND_URL } from '../config';
-import { pathnames, unauthorizedHttpCode } from '../constants';
+import { unauthorizedHttpCode } from '../constants';
 import { ApiContract } from '../types/apiContracts';
 import { useLogout } from './useLogout';
 import { useRefresh } from './useRefresh';
@@ -145,18 +144,10 @@ export const useApiMethod = <ResponseData, RequestData = AnyObject>(apiContractC
   const [apiMethodState, dispatch] = useReducer(apiMethodReducer, initialState);
   const [requestData, setRequestData] = useState<RequestData | null>(null);
   const [needRefresh, setNeedRefresh] = useState(false);
-  const navigate = useNavigate();
   const { logoutState, logout } = useLogout();
-  const { process: { logoutCode, logoutError } } = logoutState;
+  const { process: { logoutError } } = logoutState;
   const { checkRefreshNecessity, refresh, refreshState } = useRefresh();
   const { process: { refreshCode, refreshError } } = refreshState;
-
-  useEffect(() => {
-    if (!logoutCode) {
-      return;
-    }
-    navigate(pathnames.home.replace(':redirect?', ''));
-  }, [logoutCode, navigate]);
 
   useEffect(() => {
     if (!logoutError) {
