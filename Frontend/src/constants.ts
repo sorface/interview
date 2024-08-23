@@ -77,3 +77,5 @@ export const enum EventName {
   CodeEditorLanguage = 'CodeEditorLanguage',
   CodeEditorCursor = 'CodeEditorCursor',
 }
+
+export const unauthorizedHttpCode = 401;

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useReducer, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { REACT_APP_BACKEND_URL } from '../config';
-import { pathnames } from '../constants';
+import { pathnames, unauthorizedHttpCode } from '../constants';
 import { ApiContract } from '../types/apiContracts';
 import { useLogout } from './useLogout';
 import { useRefresh } from './useRefresh';
@@ -78,7 +78,6 @@ const apiMethodReducer = (state: ApiMethodState, action: ApiMethodAction): ApiMe
       return state;
   }
 };
-const unauthorizedHttpCode = 401;
 
 const createUrlParam = (name: string, value: string) =>
   `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;

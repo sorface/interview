@@ -11,13 +11,14 @@ import { ThemeProvider } from './context/ThemeContext';
 import { LocalizationProvider } from './context/LocalizationContext';
 import { Button } from './components/Button/Button';
 import { useLogout } from './hooks/useLogout';
+import { unauthorizedHttpCode } from './constants';
 
 import './App.css';
 
 export const App: FunctionComponent = () => {
   const { getMeState, loadMe } = useGetMeApi();
   const { logout, logoutState: { process: { logoutCode } } } = useLogout();
-  const { process: { loading, error }, user } = getMeState;
+  const { process: { loading, error, code }, user } = getMeState;
   const userWillLoad = !user && !error;
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export const App: FunctionComponent = () => {
     window.location.reload();
   }, [logoutCode]);
 
-  const renderMainContent = useCallback(() => {
+  const renderMainContent = () => {
     if (loading || userWillLoad) {
       return (
         <MainContentWrapper>
@@ -46,7 +47,7 @@ export const App: FunctionComponent = () => {
         </MainContentWrapper>
       )
     }
-    if (error) {
+    if (error && code !== unauthorizedHttpCode) {
       return (
         <MainContentWrapper>
           <Field>
@@ -59,7 +60,7 @@ export const App: FunctionComponent = () => {
     return (
       <AppRoutes user={user} />
     );
-  }, [loading, userWillLoad, error, user, handlePageReset]);
+  };
 
   return (
     <BrowserRouter>

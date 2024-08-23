@@ -5,6 +5,7 @@ import { User } from '../types/user';
 interface GetMeState {
   process: {
     loading: boolean;
+    code: number | null;
     error: string | null;
   };
   user: User | null;
@@ -13,6 +14,7 @@ interface GetMeState {
 const initialState: GetMeState = {
   process: {
     loading: false,
+    code: null,
     error: null,
   },
   user: null,
@@ -26,6 +28,9 @@ type GetMeAction = {
 } | {
   name: 'setError';
   payload: string;
+} | {
+  name: 'setCode';
+  payload: number;
 };
 
 const getMeReducer = (state: GetMeState, action: GetMeAction): GetMeState => {
@@ -35,6 +40,7 @@ const getMeReducer = (state: GetMeState, action: GetMeAction): GetMeState => {
         process: {
           loading: true,
           error: null,
+          code: null,
         },
         user: null,
       };
@@ -42,6 +48,7 @@ const getMeReducer = (state: GetMeState, action: GetMeAction): GetMeState => {
       return {
         ...state,
         process: {
+          ...state.process,
           loading: false,
           error: action.payload
         }
@@ -49,10 +56,19 @@ const getMeReducer = (state: GetMeState, action: GetMeAction): GetMeState => {
     case 'setUser':
       return {
         process: {
+          ...state.process,
           loading: false,
           error: null,
         },
         user: action.payload
+      };
+    case 'setCode':
+      return {
+        ...state,
+        process: {
+          ...state.process,
+          code: action.payload,
+        },
       };
     default:
       return state;
@@ -67,6 +83,10 @@ export const useGetMeApi = () => {
     try {
       const response = await fetch(`${REACT_APP_BACKEND_URL}/users/self`, {
         credentials: 'include'
+      });
+      dispatch({
+        name: 'setCode',
+        payload: response.status,
       });
       if (!response.ok) {
         throw new Error('UserApi error');
