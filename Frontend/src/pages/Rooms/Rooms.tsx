@@ -147,13 +147,13 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
   };
 
   const createRoomItem = (room: Room) => {
-    const roomStatusCaption: Record<Room['roomStatus'], string> = {
+    const roomStatusCaption: Record<Room['status'], string> = {
       New: localizationCaptions[LocalizationKey.RoomStatusNew],
       Active: localizationCaptions[LocalizationKey.RoomStatusActive],
       Review: localizationCaptions[LocalizationKey.RoomStatusReview],
       Close: localizationCaptions[LocalizationKey.RoomStatusClose],
     };
-    const tagStates: Record<Room['roomStatus'], TagState> = {
+    const tagStates: Record<Room['status'], TagState> = {
       New: TagState.Waiting,
       Active: TagState.Pending,
       Review: TagState.WaitingForAction,
@@ -171,8 +171,8 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
           <Link to={roomLink}>
             <div className='room-item'>
               <div className='room-status-wrapper'>
-                <Tag state={tagStates[room.roomStatus]}>
-                  {roomStatusCaption[room.roomStatus]}
+                <Tag state={tagStates[room.status]}>
+                  {roomStatusCaption[room.status]}
                 </Tag>
                 <Gap sizeRem={1.5} />
                 <div className='room-action-links'>

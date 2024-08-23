@@ -3,7 +3,7 @@ import { Room } from '../types/room';
 import { pathnames } from '../constants';
 
 export const getRoomLink = (room: Room) => {
-  switch (room.roomStatus) {
+  switch (room.status) {
     case 'New':
     case 'Active':
       return generatePath(pathnames.room, { id: room.id });

@@ -250,7 +250,7 @@ export const Room: FunctionComponent = () => {
     if (!room) {
       return;
     }
-    if (room.roomStatus !== 'New') {
+    if (room.status !== 'New') {
       setReactionsVisible(true);
     }
   }, [room]);
@@ -287,8 +287,8 @@ export const Room: FunctionComponent = () => {
           }
           break;
         case 'ChangeRoomStatus':
-          const newStatus: RoomType['roomStatus'] = 'New';
-          const reviewStatus: RoomType['roomStatus'] = 'Review';
+          const newStatus: RoomType['status'] = 'New';
+          const reviewStatus: RoomType['status'] = 'Review';
           if (parsedData?.Value === reviewStatus) {
             setRoomInReview(true);
           }
