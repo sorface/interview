@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Results } from '@mediapipe/selfie_segmentation';
 import { Camera } from '@mediapipe/camera_utils';
 import { useSelfieSegmentation } from './useSelfieSegmentation';
+import { AuthContext } from '../../../context/AuthContext';
 
 interface UseCanvasStreamParams {
   enabled: boolean;
@@ -11,25 +12,17 @@ interface UseCanvasStreamParams {
   cameraStream: MediaStream | null;
 }
 
-const fillLines = (context: CanvasRenderingContext2D, width: number, height: number) => {
-  const lines = ['white', 'yellow', 'aqua', 'lime', 'fuchsia', 'red', 'blue'];
-  const lineWidth = Math.round(width / lines.length);
-  for (let i = lines.length; i--;) {
-    const lineColor = lines[i];
-    context.fillStyle = lineColor;
-    context.fillRect(i * lineWidth, 0, lineWidth, height);
-  }
-};
-
-const fillNoCamera = (context: CanvasRenderingContext2D, width: number, height: number) => {
+const fillNoCamera = (context: CanvasRenderingContext2D, nickname: string | null) => {
   context.fillStyle = 'black';
-  const paddingX = 14;
+  context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+
   const rectHeight = 24;
-  const paddingY = height / 2 - rectHeight;
-  context.fillRect(paddingX, paddingY, width - paddingX * 2, height - paddingY * 2);
+  const paddingY = context.canvas.height / 2 - rectHeight + 36;
+  const x = Math.round(context.canvas.width / 2);
   context.fillStyle = 'white';
-  context.font = 'bold 36px sans-serif';
-  context.fillText('NO CAMERA', paddingX * 2 + 10, paddingY + 36);
+  context.textAlign = 'center';
+  context.font = 'bold 26px sans-serif';
+  context.fillText(nickname || 'no camera', x, paddingY, context.canvas.width);
 };
 
 export const useCanvasStream = ({
@@ -39,6 +32,7 @@ export const useCanvasStream = ({
   frameRate,
   cameraStream,
 }: UseCanvasStreamParams) => {
+  const auth = useContext(AuthContext);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [canvasMediaStream, setMediaStream] = useState(new MediaStream());
   const [video, setVideo] = useState<HTMLVideoElement | null>(null);
@@ -82,11 +76,10 @@ export const useCanvasStream = ({
     return () => {
       newCamera.stop().then(() => {
         cameraStream.getTracks().forEach(track => track.stop());
-        fillLines(context, width, height);
-        fillNoCamera(context, width, height);
+        fillNoCamera(context, auth?.nickname || null);
       });
     };
-  }, [video, context, width, height, cameraStream, selfieSegmentation]);
+  }, [video, context, width, height, cameraStream, selfieSegmentation, auth?.nickname]);
 
 
   useEffect(() => {
@@ -107,12 +100,11 @@ export const useCanvasStream = ({
     const stream = canvas.captureStream(frameRate);
     const videoTrack = stream.getVideoTracks()[0];
     videoTrack.enabled = true;
-    fillLines(canvasContext, width, height);
-    fillNoCamera(canvasContext, width, height);
+    fillNoCamera(canvasContext, auth?.nickname || null);
     setVideo(newVideo);
     setContext(canvasContext);
     setMediaStream(new MediaStream([videoTrack]));
-  }, [frameRate, height, width, enabled]);
+  }, [frameRate, height, width, enabled, auth?.nickname]);
 
   useEffect(() => {
     if (!context) {
@@ -122,8 +114,7 @@ export const useCanvasStream = ({
       if (cameraStream && video) {
         return;
       }
-      fillLines(context, width, height);
-      fillNoCamera(context, width, height);
+      fillNoCamera(context, auth?.nickname || null);
       requestRef.current = requestAnimationFrame(triggerCanvasUpdate);
     };
     requestRef.current = requestAnimationFrame(triggerCanvasUpdate);
@@ -132,7 +123,7 @@ export const useCanvasStream = ({
         cancelAnimationFrame(requestRef.current);
       }
     };
-  }, [context, video, width, height, cameraStream]);
+  }, [context, video, cameraStream, auth?.nickname]);
 
   useEffect(() => {
     if (cameraStream && video && context) {
@@ -143,9 +134,8 @@ export const useCanvasStream = ({
     if (!context) {
       return;
     }
-    fillLines(context, width, height);
-    fillNoCamera(context, width, height);
-  }, [cameraStream, context, video, width, height]);
+    fillNoCamera(context, auth?.nickname || null);
+  }, [cameraStream, context, video, auth?.nickname]);
 
   return canvasMediaStream;
 };
