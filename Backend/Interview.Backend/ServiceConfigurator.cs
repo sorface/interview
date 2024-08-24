@@ -171,12 +171,9 @@ public class ServiceConfigurator
                     var redisPort = storageSection?.GetValue<int>("Port");
                     var redisPassword = storageSection?.GetValue<string>("Password");
 
-                    logger.LogInformation($@"Redis event storage url: redis://{redisUsername}:*************@{redisHost}:{redisPort}");
-                    logger.LogInformation($@"Redis session storage url: {redisHost}:{redisPort},password=*************");
-
                     builder.UseRedis($@"redis://{redisUsername}:{redisPassword}@{redisHost}:{redisPort}");
 
-                    serviceCollection.AddDistributedRedisCache(options =>
+                    serviceCollection.AddStackExchangeRedisCache(options =>
                     {
                         options.Configuration = $@"{redisHost}:{redisPort},password={redisPassword}";
                         options.InstanceName = "sorface.interview.session.";
