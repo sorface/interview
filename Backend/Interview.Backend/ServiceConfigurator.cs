@@ -17,9 +17,6 @@ using Interview.Infrastructure.Chat;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using Microsoft.IO;
 using Microsoft.OpenApi.Models;
 
@@ -121,6 +118,8 @@ public class ServiceConfigurator
         var adminUsers = _configuration.GetSection(nameof(AdminUsers))
             .Get<AdminUsers>() ?? throw new ArgumentException($"Not found \"{nameof(AdminUsers)}\" section");
 
+        var logger = serviceCollection.BuildServiceProvider().GetRequiredService<ILogger<ServiceConfigurator>>();
+
         var serviceOption = new DependencyInjectionAppServiceOption
         {
             DbConfigurator = optionsBuilder =>
@@ -169,8 +168,11 @@ public class ServiceConfigurator
                 {
                     var redisUsername = storageSection?.GetValue<string>("Username");
                     var redisHost = storageSection?.GetValue<string>("Host");
-                    var redisPort = storageSection?.GetValue<string>("Port");
+                    var redisPort = storageSection?.GetValue<int>("Port");
                     var redisPassword = storageSection?.GetValue<string>("Password");
+
+                    logger.LogInformation($@"Redis event storage url: redis://{redisUsername}:*************@{redisHost}:{redisPort}");
+                    logger.LogInformation($@"Redis session storage url: {redisHost}:{redisPort},password=*************");
 
                     builder.UseRedis($@"redis://{redisUsername}:{redisPassword}@{redisHost}:{redisPort}");
 
