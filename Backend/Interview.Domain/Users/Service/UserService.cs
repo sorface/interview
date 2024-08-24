@@ -101,7 +101,14 @@ public sealed class UserService : IUserService
     {
         var existingUser = await _userRepository.FindByExternalIdAsync(user.ExternalId, cancellationToken);
 
-        var userRoles = await GetUserRolesAsync(user.Roles, cancellationToken);
+        var roles = user.Roles.DefaultIfEmpty(new Role(RoleName.User));
+
+        var userRoles = await GetUserRolesAsync(roles, cancellationToken);
+
+        if (userRoles is null || !userRoles.Any())
+        {
+            throw new NotFoundException(ExceptionMessage.UserRoleNotFound());
+        }
 
         if (existingUser != null)
         {

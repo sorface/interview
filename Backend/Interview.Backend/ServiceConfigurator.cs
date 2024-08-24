@@ -163,7 +163,7 @@ public class ServiceConfigurator
             EventStorageConfigurator = builder =>
             {
                 var storageSection = _configuration.GetSection("EventStorage");
-                var useRedis = storageSection?.GetValue<bool?>("UseRedis") ?? false;
+                var useRedis = storageSection?.GetValue<bool?>("Enabled") ?? false;
 
                 if (useRedis)
                 {

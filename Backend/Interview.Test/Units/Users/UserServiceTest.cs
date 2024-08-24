@@ -40,8 +40,8 @@ public class UserServiceTest
             .Returns(() => Task.FromResult<User?>(null));
 
         _mockRoleRepository.Setup(repository =>
-                repository.FindByIdAsync(RoleName.User.Id, default))
-            .Returns(() => Task.FromResult<Role?>(null));
+                repository.FindAsync(It.IsAny<ISpecification<Role>>(), default))
+            .Returns(() => Task.FromResult<List<Role>>(new List<Role>()));
 
         var throwsAsync = await Assert.ThrowsAsync<Domain.NotFoundException>(
             async () => await _userService.UpsertByExternalIdAsync(user));
@@ -51,7 +51,7 @@ public class UserServiceTest
         _mockUserRepository.Verify(repository =>
             repository.FindByExternalIdAsync(user.ExternalId, default), Times.Once);
         _mockRoleRepository.Verify(repository =>
-            repository.FindByIdAsync(RoleName.User.Id, default), Times.Once);
+            repository.FindAsync(It.IsAny<ISpecification<Role>>(), default), Times.Once);
         _mockUserRepository.Verify(repository =>
             repository.CreateAsync(It.IsAny<User>(), default), Times.Never);
     }

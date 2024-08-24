@@ -72,6 +72,7 @@ public class UserServiceTest
             new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext), adminUsers,
                 new PermissionRepository(appDbContext), securityService);
         var user = new User(nickname, "1");
+        user.Roles.Add(new Role(expectedRoleName));
 
         var upsertUser = await userService.UpsertByExternalIdAsync(user);
 
@@ -96,8 +97,7 @@ public class UserServiceTest
             new AdminUsers(), new PermissionRepository(appDbContext), securityService);
         var user = new User("Dima", "1");
 
-        var error = await Assert.ThrowsAsync<Domain.NotFoundException>(async () =>
-            await userService.UpsertByExternalIdAsync(user));
+        var error = await Assert.ThrowsAsync<Domain.NotFoundException>(async () => await userService.UpsertByExternalIdAsync(user));
 
         error.Message.Should().NotBeNull().And.NotBeEmpty();
     }
