@@ -5,47 +5,24 @@ import { useApiMethod } from '../../../../hooks/useApiMethod';
 import { Reaction } from '../../../../types/reaction';
 import {
   PaginationUrlParams,
-  SendEventBody,
   SendReactionBody,
-  eventApiDeclaration,
   reactionsApiDeclaration,
   roomReactionApiDeclaration,
-  roomsApiDeclaration,
 } from '../../../../apiDeclarations';
 import { Room } from '../../../../types/room';
-import { Event } from '../../../../types/event';
-import { UserType } from '../../../../types/user';
 import { Loader } from '../../../../components/Loader/Loader';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
-import { EventsState } from '../../hooks/useEventsState';
-import { Gap } from '../../../../components/Gap/Gap';
-import { RoomToolsPanel } from '../RoomToolsPanel/RoomToolsPanel';
 
 const reactionsPageSize = 30;
 const reactionsPageNumber = 1;
 
-const eventToReaction = (event: Event): Reaction => ({
-  id: event.id,
-  type: {
-    id: event.id,
-    name: event.type,
-    value: 0,
-  }
-});
-
 export interface ReactionsProps {
   room: Room | null;
-  eventsState: EventsState;
-  roles: string[];
-  participantType: UserType | null;
 }
 
 export const Reactions: FunctionComponent<ReactionsProps> = ({
   room,
-  eventsState,
-  roles,
-  participantType,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
   const {
@@ -65,49 +42,16 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
     process: { loading: loadingRoomReaction, error: errorRoomReaction },
   } = apiRoomReactionState;
 
-  const {
-    apiMethodState: apiGetEventState,
-    fetchData: fetchRoomEvents,
-  } = useApiMethod<Event[], PaginationUrlParams>(eventApiDeclaration.get);
-  const {
-    process: { loading: loadingRoomEvent, error: errorRoomEvent },
-    data: events,
-  } = apiGetEventState;
-
-  const {
-    apiMethodState: apiSendEventState,
-    fetchData: sendRoomEvent,
-  } = useApiMethod<unknown, SendEventBody>(roomsApiDeclaration.sendEvent);
-  const {
-    process: { loading: loadingSendRoomEvent, error: errorSendRoomEvent },
-  } = apiSendEventState;
-
   const [lastSendedReactionType, setLastSendedReactionType] = useState('');
 
   const reactionsSafe = reactions || [];
-
-  const eventsReationsFiltered =
-    !events ?
-      [] :
-      events
-        .filter(event =>
-          event.roles.some(role => roles.includes(role)) &&
-          participantType &&
-          event.participantTypes.includes(participantType)
-        )
-        .map(eventToReaction);
-
 
   useEffect(() => {
     fetchReactions({
       PageSize: reactionsPageSize,
       PageNumber: reactionsPageNumber,
     });
-    fetchRoomEvents({
-      PageSize: reactionsPageSize,
-      PageNumber: reactionsPageNumber,
-    });
-  }, [room?.id, fetchReactions, fetchRoomEvents]);
+  }, [room?.id, fetchReactions]);
 
   useEffect(() => {
     if (!errorRoomReaction) {
@@ -115,20 +59,6 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
     }
     toast.error(localizationCaptions[LocalizationKey.ErrorSendingReaction]);
   }, [errorRoomReaction, localizationCaptions]);
-
-  useEffect(() => {
-    if (!errorRoomEvent) {
-      return;
-    }
-    toast.error(localizationCaptions[LocalizationKey.ErrorGetRoomEvent]);
-  }, [errorRoomEvent, localizationCaptions]);
-
-  useEffect(() => {
-    if (!errorSendRoomEvent) {
-      return;
-    }
-    toast.error(localizationCaptions[LocalizationKey.ErrorSendingRoomEvent]);
-  }, [errorSendRoomEvent, localizationCaptions]);
 
   const handleReactionClick = useCallback((reaction: Reaction) => {
     if (!room) {
@@ -141,19 +71,6 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
     });
     setLastSendedReactionType(reaction.type.name);
   }, [room, sendRoomReaction]);
-
-  const handleEventClick = useCallback((event: Reaction) => {
-    if (!room || !eventsState) {
-      throw new Error('Error sending reaction. Room not found.');
-    }
-    const prevEnabled = Boolean(eventsState[event.type.name]);
-    sendRoomEvent({
-      roomId: room.id,
-      type: event.type.name,
-      additionalData: { value: !prevEnabled },
-    });
-    setLastSendedReactionType(event.type.name);
-  }, [room, eventsState, sendRoomEvent]);
 
   if (errorReactions) {
     return (
@@ -168,22 +85,12 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
 
   return (
     <>
-      <RoomToolsPanel.ButtonsGroupWrapper>
-        <ReactionsList
-          sortOrder={-1}
-          reactions={reactionsSafe}
-          loadingReactionName={loadingRoomReaction ? lastSendedReactionType : null}
-          onClick={handleReactionClick}
-        />
-        <Gap sizeRem={0.125} />
-        <ReactionsList
-          sortOrder={1}
-          reactions={eventsReationsFiltered}
-          loadingReactionName={loadingSendRoomEvent ? lastSendedReactionType : null}
-          onClick={handleEventClick}
-        />
-      </RoomToolsPanel.ButtonsGroupWrapper>
-      {loadingRoomEvent && <div>{localizationCaptions[LocalizationKey.GetRoomEvent]}...</div>}
+      <ReactionsList
+        sortOrder={-1}
+        reactions={reactionsSafe}
+        loadingReactionName={loadingRoomReaction ? lastSendedReactionType : null}
+        onClick={handleReactionClick}
+      />
     </>
   );
 };

@@ -50,8 +50,11 @@ export interface RoomState {
   name: Room['name'];
   likeCount: number;
   dislikeCount: number;
-  codeEditorContent: string;
   activeQuestion: Question;
+  codeEditor: {
+    enabled: boolean;
+    content: string;
+  };
   states: RoomStateAdditional[];
 }
 
