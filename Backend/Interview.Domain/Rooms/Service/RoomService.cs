@@ -147,7 +147,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             Name = e.Name,
             Questions = e.Questions,
             Participants = e.Participants,
-            RoomStatus = e.RoomStatus,
+            Status = e.RoomStatus,
             Tags = e.Tags,
             Timer = e.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)e.Timer.Duration.TotalSeconds, StartTime = e.Timer.ActualStartTime, },
             ScheduledStartTime = e.ScheduledStartTime,
@@ -320,7 +320,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             Participants = room.Participants.Select(participant =>
                     new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, Type = participant.Type.Name })
                 .ToList(),
-            RoomStatus = room.Status.EnumValue,
+            Status = room.Status.EnumValue,
             Tags = room.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
             Timer = room.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)room.Timer.Duration.TotalSeconds, StartTime = room.Timer.ActualStartTime, },
             ScheduledStartTime = room.ScheduleStartTime,
