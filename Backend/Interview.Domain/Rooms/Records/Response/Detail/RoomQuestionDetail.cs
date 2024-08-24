@@ -11,4 +11,6 @@ public class RoomQuestionDetail
     public required int Order { get; set; }
 
     public required List<QuestionAnswerResponse>? Answers { get; set; }
+
+    public required QuestionCodeEditorResponse? CodeEditor { get; set; }
 }

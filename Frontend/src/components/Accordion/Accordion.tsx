@@ -7,6 +7,7 @@ interface AccordionProps {
   className?: string;
   classNameTitle?: string;
   disabled?: boolean;
+  openedByDefault?: boolean;
   children?: ReactNode;
   onClick?: () => void;
 }
@@ -16,10 +17,11 @@ export const Accordion: FunctionComponent<AccordionProps> = ({
   className,
   classNameTitle,
   disabled,
+  openedByDefault,
   children,
   onClick,
 }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(!!openedByDefault);
   const cursorPointer = !disabled || onClick;
 
   const handleOnClick = () => {

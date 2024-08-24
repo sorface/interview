@@ -5,7 +5,7 @@ import { CreateQuestionBody, GetCategoriesParams, UpdateQuestionBody, categories
 import { Loader } from '../../components/Loader/Loader';
 import { IconNames, toastSuccessOptions } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
-import { CodeEditorLang, Question, QuestionType } from '../../types/question';
+import { CodeEditorLang, Question, QuestionAnswer, QuestionType } from '../../types/question';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { AuthContext } from '../../context/AuthContext';
@@ -28,6 +28,10 @@ interface QuestionCreateProps {
   editQuestionId: string | null;
   open: boolean;
   onClose: () => void;
+}
+
+interface QuestionAnswerFrontend extends QuestionAnswer {
+  new?: boolean;
 }
 
 export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
@@ -71,7 +75,7 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
   const [rootCategory, setRootCategory] = useState(rootCategoryParam || '');
   const [subCategory, setSubCategory] = useState(subCategoryParam || '');
   const [codeEditor, setCodeEditor] = useState<Question['codeEditor'] | null>(null);
-  const [answers, setAnswers] = useState<Question['answers']>([]);
+  const [answers, setAnswers] = useState<QuestionAnswerFrontend[]>([]);
 
   const totalLoading = loading || updatingLoading || questionLoading || rootCategoriesLoading || subCategoriesLoading;
   const totalError = error || questionError || updatingError || rootCategoriesError || subCategoriesError;
@@ -145,13 +149,16 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
     if (!question) {
       return;
     }
+    const answersForRequest = answers.map(answer =>
+      answer.new ? { ...answer, new: undefined, id: undefined } : answer
+    );
     fetchUpdateQuestion({
       id: question.id,
       value: questionValue,
       tags: [],
       type,
       categoryId: subCategory,
-      answers,
+      answers: answersForRequest,
       codeEditor,
     });
   };
@@ -207,6 +214,7 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
       ...answers,
       {
         id: `${Math.random()}`,
+        new: true,
         codeEditor: false,
         title: `${localizationCaptions[LocalizationKey.QuestionAnswerOptionDefaultName]} ${answers.length + 1}`,
         content: '',
@@ -421,7 +429,9 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
         )}
         <ModalFooter>
           <Button onClick={onClose}>{localizationCaptions[LocalizationKey.Cancel]}</Button>
-          <Button variant='active' onClick={editQuestionId ? handleSubmitEdit : handleSubmitCreate}>{localizationCaptions[LocalizationKey.Create]}</Button>
+          <Button variant='active' onClick={editQuestionId ? handleSubmitEdit : handleSubmitCreate}>
+            {editQuestionId ? localizationCaptions[LocalizationKey.Save] : localizationCaptions[LocalizationKey.Create]}
+          </Button>
         </ModalFooter>
       </div>
     </Modal>

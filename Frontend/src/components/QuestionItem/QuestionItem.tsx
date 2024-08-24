@@ -17,6 +17,7 @@ import { Theme } from '../../context/ThemeContext';
 
 interface QuestionItemProps {
   question: Question;
+  openedByDefault?: boolean;
   checked?: boolean;
   checkboxLabel?: ReactNode;
   mark?: number;
@@ -31,6 +32,7 @@ interface QuestionItemProps {
 
 export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
   question,
+  openedByDefault,
   checked,
   checkboxLabel,
   mark,
@@ -131,6 +133,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
     <Accordion
       title={title}
       disabled={accordionDisabled}
+      openedByDefault={openedByDefault}
       className={`${primary ? 'bg-wrap' : 'bg-form'} ${bgSelected ? 'bg-blue-light' : ''} rounded-0.75 py-1.25 px-1.5`}
       classNameTitle='flex items-center'
       onClick={onClick ? handleOnClick : undefined}

@@ -40,6 +40,7 @@
 .bg-blue-light { background-color: var(--blue-light); }
 .bg-blue-dark { background-color: var(--blue-dark); }
 .bg-dark { background-color: var(--dark); }
+.\!bg-dark { background-color: var(--dark) !important; }
 .bg-dark-0\.5 { background-color: color-mix(in srgb, var(--dark), transparent 50%); }
 .bg-grey3 { background-color: var(--grey3); }
 .bg-grey2 { background-color: var(--grey2); }
@@ -50,8 +51,10 @@
 .bg-green-light { background-color: var(--green-light); }
 .bg-grey-active { background-color: var(--grey-active); }
 .bg-dark-grey4 { background-color: var(--dark-grey4); }
+.\!bg-dark-grey4 { background-color: var(--dark-grey4) !important; }
 .bg-dark-orange { background-color: var(--dark-orange); }
 .bg-dark-blue { background-color: var(--dark-blue); }
+.\!bg-dark-blue { background-color: var(--dark-blue) !important; }
 .bg-dark-green { background-color: var(--dark-green); }
 .bg-dark-closed { background-color: var(--dark-closed); }
 .bg-dark-orange-0\.25 { background-color: color-mix(in srgb, var(--dark-orange), transparent 75%); }

@@ -1,4 +1,5 @@
-import { Question } from './question';
+import { DragNDropListItem } from '../components/DragNDropList/DragNDropList';
+import { Question, QuestionAnswer } from './question';
 import { Tag } from './tag';
 import { User, UserType } from './user';
 
@@ -13,14 +14,21 @@ export interface Room {
   id: string;
   name: string;
   participants: RoomParticipant[];
+  owner: {
+    id: User['id'];
+    nickname: User['nickname'];
+  };
   tags: Tag[];
   roomStatus: RoomStatus;
+  questions: RoomQuestionListItem[];
   scheduledStartTime: string;
   timer?: {
     durationSec: number;
     startTime?: string;
   };
 }
+
+export type RoomQuestionListItem = Question & DragNDropListItem;
 
 export interface RoomParticipant extends User {
   type: UserType;
@@ -80,10 +88,18 @@ export interface RoomQuestion {
   state: RoomQuestionState;
   value: string;
   order: number;
+  answers?: QuestionAnswer[];
 }
 
 export interface RoomQuestionEvaluation {
   id: string;
   mark?: number;
   review?: string;
+}
+
+export interface MyRoomQuestionEvaluation {
+  id: string;
+  value: string;
+  order: number;
+  evaluation?: RoomQuestionEvaluation;
 }
