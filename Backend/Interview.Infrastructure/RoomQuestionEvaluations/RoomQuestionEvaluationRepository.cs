@@ -26,21 +26,6 @@ public class RoomQuestionEvaluationRepository : EfRepository<RoomQuestionEvaluat
             .FirstAsync(cancellationToken);
     }
 
-    public async Task<RoomQuestionEvaluation?> FindByQuestionIdAndRoomAsync(Guid roomId, Guid questionId, Guid userId, CancellationToken cancellationToken)
-    {
-        var roomQuestion = await Db.RoomQuestions
-            .Include(roomQuestion => roomQuestion.Room)
-            .Include(roomQuestion => roomQuestion.Question)
-            .Where(roomQuestion => roomQuestion.QuestionId == questionId && roomQuestion.RoomId == roomId)
-            .FirstAsync(cancellationToken);
-
-        return await ApplyIncludes(Set)
-            .Include(e => e.RoomQuestion)
-            .Include(e => e.CreatedBy)
-            .Where(e => e.RoomQuestionId == roomQuestion.Id && e.CreatedById == userId)
-            .FirstOrDefaultAsync(cancellationToken);
-    }
-
     public async Task SubmitAsync(Guid roomId, Guid userId, CancellationToken cancellationToken)
     {
         var transaction = await Db.Database.BeginTransactionAsync(cancellationToken);

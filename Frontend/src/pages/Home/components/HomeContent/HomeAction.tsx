@@ -7,7 +7,7 @@ import { Button } from '../../../../components/Button/Button';
 export const HomeAction: FunctionComponent = () => {
   return (
     <a href={`${REACT_APP_BACKEND_URL}/login/sorface?redirectUri=${encodeURIComponent(window.location.href)}`}>
-      <Button>{useLocalizationCaptions()[LocalizationKey.Login]}</Button>
+      <Button variant='active'>{useLocalizationCaptions()[LocalizationKey.Login]}</Button>
     </a>
   );
 };

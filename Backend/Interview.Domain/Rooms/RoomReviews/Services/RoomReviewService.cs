@@ -1,8 +1,12 @@
+using Interview.Domain.Database;
+using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomQuestionEvaluations;
 using Interview.Domain.Rooms.RoomReviews.Mappers;
 using Interview.Domain.Rooms.RoomReviews.Records;
 using Interview.Domain.Rooms.RoomReviews.Response.Page;
+using Interview.Domain.Rooms.RoomReviews.Services.UserRoomReview;
 using Interview.Domain.Users;
+using Microsoft.EntityFrameworkCore;
 using NSpecifications;
 using X.PagedList;
 
@@ -11,23 +15,41 @@ namespace Interview.Domain.Rooms.RoomReviews.Services;
 public class RoomReviewService : IRoomReviewService
 {
     private readonly IRoomReviewRepository _roomReviewRepository;
-
     private readonly IRoomRepository _roomRepository;
-
     private readonly IUserRepository _userRepository;
-
     private readonly IRoomQuestionEvaluationRepository _roomQuestionEvaluationRepository;
+    private readonly IRoomMembershipChecker _membershipChecker;
+    private readonly AppDbContext _db;
 
     public RoomReviewService(
         IRoomReviewRepository roomReviewRepository,
         IUserRepository userRepository,
         IRoomRepository roomRepository,
-        IRoomQuestionEvaluationRepository roomQuestionEvaluationRepository)
+        IRoomQuestionEvaluationRepository roomQuestionEvaluationRepository,
+        IRoomMembershipChecker membershipChecker,
+        AppDbContext db)
     {
         _roomReviewRepository = roomReviewRepository;
         _userRepository = userRepository;
         _roomRepository = roomRepository;
         _roomQuestionEvaluationRepository = roomQuestionEvaluationRepository;
+        _membershipChecker = membershipChecker;
+        _db = db;
+    }
+
+    public async Task<UserRoomReviewResponse?> GetUserRoomReviewAsync(UserRoomReviewRequest request, CancellationToken cancellationToken)
+    {
+        await _membershipChecker.EnsureUserMemberOfRoomAsync(request.UserId, request.RoomId, cancellationToken);
+        var review = await _db.RoomReview
+            .Include(e => e.Room)
+            .Include(e => e.User)
+            .AsNoTracking()
+            .Where(e => e.Room!.Id == request.RoomId && e.User!.Id == request.UserId)
+            .Select(e => new { State = e.SeRoomReviewState, Id = e.Id, Review = e.Review, })
+            .FirstOrDefaultAsync(cancellationToken);
+        return review is null
+            ? null
+            : new UserRoomReviewResponse { State = review.State.EnumValue, Review = review.Review, Id = review.Id };
     }
 
     public Task<IPagedList<RoomReviewPageDetail>> FindPageAsync(

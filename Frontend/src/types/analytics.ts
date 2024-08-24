@@ -36,7 +36,7 @@ export interface AnalyticsQuestions extends RoomQuestion {
   averageMark: number;
   users: Array<{
     id: User['id'];
-    evaluation: Omit<RoomQuestionEvaluation, 'id'>;
+    evaluation?: Omit<RoomQuestionEvaluation, 'id'>;
   }>;
 }
 

@@ -10,27 +10,29 @@ import { Textarea } from '../../../../components/Textarea/Textarea';
 import { roomReviewMaxLength } from '../../../../constants';
 
 export interface RoomQuestionEvaluationValue {
-  mark: number | null;
-  review: string;
+  mark?: number | null;
+  review?: string | null;
 }
 
 interface RoomQuestionEvaluationPorps {
+  readOnly?: boolean;
   value: RoomQuestionEvaluationValue;
   onChange: (newValue: RoomQuestionEvaluationValue) => void;
 }
 
 const themeClassNames: Record<ThemeInUi, Record<'active' | 'nonActive', string>> = {
   [Theme.Dark]: {
-    active: 'bg-blue-dark',
-    nonActive: 'bg-dark',
+    active: '!bg-dark-blue',
+    nonActive: 'bg-dark-grey4',
   },
   [Theme.Light]: {
-    active: 'text-white bg-dark',
+    active: 'text-white !bg-dark',
     nonActive: 'bg-blue-light',
   },
 };
 
 export const RoomQuestionEvaluation: FunctionComponent<RoomQuestionEvaluationPorps> = ({
+  readOnly,
   value,
   onChange,
 }) => {
@@ -57,6 +59,9 @@ export const RoomQuestionEvaluation: FunctionComponent<RoomQuestionEvaluationPor
   ];
 
   const handleMarkChange = (mark: number) => () => {
+    if (readOnly) {
+      return;
+    }
     onChange({
       ...value,
       mark,
@@ -64,6 +69,9 @@ export const RoomQuestionEvaluation: FunctionComponent<RoomQuestionEvaluationPor
   };
 
   const handleReviewChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    if (readOnly) {
+      return;
+    }
     onChange({
       ...value,
       review: event.target.value,
@@ -105,7 +113,8 @@ export const RoomQuestionEvaluation: FunctionComponent<RoomQuestionEvaluationPor
         <Textarea
           className='flex-1 h-6.25'
           maxLength={roomReviewMaxLength}
-          value={value.review}
+          readOnly={readOnly}
+          value={value.review || ''}
           onInput={handleReviewChange}
         />
       </div>

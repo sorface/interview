@@ -7,6 +7,7 @@ export enum QuestionType {
 
 export enum CodeEditorLang {
   Plaintext = 'plaintext',
+  Markdown = 'markdown',
   C = 'c',
   Cpp = 'cpp',
   Csharp = 'csharp',
@@ -39,7 +40,7 @@ export interface Question {
   id: string;
   value: string;
   tags: Tag[];
-  codeEditor: {
+  codeEditor?: {
     content: string;
     lang: CodeEditorLang;
   } | null;

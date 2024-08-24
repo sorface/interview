@@ -162,6 +162,10 @@ export const roomQuestionEvaluationApiDeclaration = {
     baseUrl: '/room-evaluations',
     urlParams,
   }),
+  getMy: (roomId: string): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: `/room-evaluations/${roomId}/my`,
+  }),
   merge: (body: MergeRoomQuestionEvaluationBody): ApiContractPost => ({
     method: 'POST',
     baseUrl: '/room-evaluations/merge',
@@ -216,7 +220,7 @@ export const questionsApiDeclaration = {
   update: (question: UpdateQuestionBody): ApiContractPut => ({
     method: 'PUT',
     baseUrl: `/questions/${question.id}`,
-    body: { value: question.value, tags: question.tags, categoryId: question.categoryId },
+    body: question,
   }),
   archive: (id: Question['id']): ApiContractPatch => ({
     method: 'PATCH',
@@ -328,6 +332,10 @@ export const roomReviewApiDeclaration = {
     method: 'GET',
     baseUrl: '/room-reviews',
     urlParams: params,
+  }),
+  getMy: (roomId: Room['id']): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: `/room-reviews/${roomId}/my`,
   }),
   update: (params: UpdateRoomReviewsParams): ApiContractPut => ({
     method: 'PUT',

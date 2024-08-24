@@ -1,4 +1,5 @@
 import { FunctionComponent, useCallback, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { ReactionsList } from '../../../../components/ReactionsList/ReactionsList';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
 import { Reaction } from '../../../../types/reaction';
@@ -108,6 +109,27 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
     });
   }, [room?.id, fetchReactions, fetchRoomEvents]);
 
+  useEffect(() => {
+    if (!errorRoomReaction) {
+      return;
+    }
+    toast.error(localizationCaptions[LocalizationKey.ErrorSendingReaction]);
+  }, [errorRoomReaction, localizationCaptions]);
+
+  useEffect(() => {
+    if (!errorRoomEvent) {
+      return;
+    }
+    toast.error(localizationCaptions[LocalizationKey.ErrorGetRoomEvent]);
+  }, [errorRoomEvent, localizationCaptions]);
+
+  useEffect(() => {
+    if (!errorSendRoomEvent) {
+      return;
+    }
+    toast.error(localizationCaptions[LocalizationKey.ErrorSendingRoomEvent]);
+  }, [errorSendRoomEvent, localizationCaptions]);
+
   const handleReactionClick = useCallback((reaction: Reaction) => {
     if (!room) {
       throw new Error('Error sending reaction. Room not found.');
@@ -161,10 +183,7 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
           onClick={handleEventClick}
         />
       </RoomToolsPanel.ButtonsGroupWrapper>
-      {errorRoomReaction && <div>{localizationCaptions[LocalizationKey.ErrorSendingReaction]}</div>}
       {loadingRoomEvent && <div>{localizationCaptions[LocalizationKey.GetRoomEvent]}...</div>}
-      {errorRoomEvent && <div>{localizationCaptions[LocalizationKey.ErrorGetRoomEvent]}</div>}
-      {errorSendRoomEvent && <div>{localizationCaptions[LocalizationKey.ErrorSendingRoomEvent]}</div>}
     </>
   );
 };

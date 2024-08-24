@@ -30,7 +30,7 @@ public class QuestionAnswer : Entity
 
         if (answers.Any(e => e.CodeEditor))
         {
-            throw new Exception("Code editor is not available for answer.");
+            throw new UserException("Code editor is not available for answer.");
         }
     }
 

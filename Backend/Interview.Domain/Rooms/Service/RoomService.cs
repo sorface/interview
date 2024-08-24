@@ -1,6 +1,7 @@
 using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Storage;
+using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Reactions;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Request.Transcription;
@@ -115,7 +116,14 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 Id = e.Id,
                 Name = e.Name,
                 Questions = e.Questions.OrderBy(rq => rq.Order)
-                    .Select(question => new RoomQuestionDetail { Id = question.Question!.Id, Value = question.Question.Value, Order = question.Order, })
+                    .Select(question => new RoomQuestionDetail
+                    {
+                        Id = question.Question!.Id,
+                        Value = question.Question.Value,
+                        Order = question.Order,
+                        Answers = null,
+                        CodeEditor = null,
+                    })
                     .ToList(),
                 Participants = e.Participants.Select(participant =>
                         new RoomUserDetail
@@ -152,7 +160,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             .Include(e => e.Participants)
             .Include(e => e.Configuration)
             .Include(e => e.Timer)
-            .Include(e => e.Questions).ThenInclude(e => e.Question)
+            .Include(e => e.Questions).ThenInclude(e => e.Question).ThenInclude(e => e!.Answers)
+            .Include(e => e.Questions).ThenInclude(e => e.Question).ThenInclude(e => e!.CodeEditor)
             .Select(e => new
             {
                 Id = e.Id,
@@ -190,6 +199,21 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                     Id = q.QuestionId,
                     Order = q.Order,
                     Value = q.Question!.Value,
+                    Answers = q.Question!.Answers.Select(a => new QuestionAnswerResponse
+                    {
+                        Id = a.Id,
+                        Title = a.Title,
+                        Content = a.Content,
+                        CodeEditor = a.CodeEditor,
+                    })
+                        .ToList(),
+                    CodeEditor = q.Question.CodeEditor == null
+                        ? null
+                        : new QuestionCodeEditorResponse
+                        {
+                            Content = q.Question.CodeEditor.Content,
+                            Lang = q.Question.CodeEditor.Lang,
+                        },
                 }).ToList(),
             })
             .FirstOrDefaultAsync(room => room.Id == id, cancellationToken: cancellationToken) ?? throw NotFoundException.Create<Room>(id);
@@ -284,7 +308,14 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             Id = room.Id,
             Name = room.Name,
             Questions = room.Questions.OrderBy(rq => rq.Order)
-                .Select(question => new RoomQuestionDetail { Id = question.Question!.Id, Value = question.Question.Value, Order = question.Order, })
+                .Select(question => new RoomQuestionDetail
+                {
+                    Id = question.Question!.Id,
+                    Value = question.Question.Value,
+                    Order = question.Order,
+                    Answers = null,
+                    CodeEditor = null,
+                })
                 .ToList(),
             Participants = room.Participants.Select(participant =>
                     new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, Type = participant.Type.Name })

@@ -61,7 +61,7 @@ public class RoomInviteService : IRoomInviteService
             if (roomInvite.Room is null)
             {
                 _logger.LogError("room invite not sync with something room's {inviteId}", inviteId);
-                throw new Exception("The invitation no longer belongs to the room");
+                throw new NotFoundException("The invitation no longer belongs to the room");
             }
 
             _logger.LogInformation("found room [id -> {roomId}] which joined for invite [id -> {inviteId}]", roomInvite.RoomById, inviteId);

@@ -102,13 +102,20 @@ export const RoomAnaytics: FunctionComponent = () => {
         onClose={handleQuestionDetailsClose}
       >
         <ReviewUserGrid>
-          {data?.questions.find(question => question.id === openedQuestionDetails)?.users.map(questionUser => (
-            <ReviewUserOpinion
-              key={questionUser.id}
-              user={questionUser}
-              allUsers={allUsers}
-            />
-          ))}
+          {data?.questions.find(question => question.id === openedQuestionDetails)?.users
+            .filter(questionUser => allUsers.get(questionUser.id)?.participantType === 'Expert')
+            .map(questionUser => {
+              if (!questionUser.evaluation) {
+                return undefined;
+              }
+              return (
+                <ReviewUserOpinion
+                  key={questionUser.id}
+                  user={questionUser}
+                  allUsers={allUsers}
+                />
+              );
+            })}
         </ReviewUserGrid>
         <Gap sizeRem={1} />
       </Modal>
@@ -171,13 +178,15 @@ export const RoomAnaytics: FunctionComponent = () => {
           {localizationCaptions[LocalizationKey.OpinionsAndMarks]}
           <Gap sizeRem={2} />
           <ReviewUserGrid>
-            {data?.userReview.map((userReview) => (
-              <ReviewUserOpinion
-                key={userReview.userId}
-                user={generateUserOpinion(userReview)}
-                allUsers={allUsers}
-              />
-            ))}
+            {data?.userReview
+              .filter(userReview => allUsers.get(userReview.userId)?.participantType === 'Expert')
+              .map((userReview) => (
+                <ReviewUserOpinion
+                  key={userReview.userId}
+                  user={generateUserOpinion(userReview)}
+                  allUsers={allUsers}
+                />
+              ))}
           </ReviewUserGrid>
         </Typography>
       </InfoBlock>

@@ -5,41 +5,60 @@ import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { useApiMethod } from '../../hooks/useApiMethod';
-import { Room, RoomQuestion } from '../../types/room';
-import { AddRoomReviewBody, GetRoomQuestionsBody, roomQuestionApiDeclaration, roomReviewApiDeclaration, roomsApiDeclaration } from '../../apiDeclarations';
+import { MyRoomQuestionEvaluation, Room, RoomQuestion } from '../../types/room';
+import {
+  AddRoomReviewBody,
+  GetRoomQuestionsBody,
+  roomQuestionApiDeclaration,
+  roomQuestionEvaluationApiDeclaration,
+  roomReviewApiDeclaration,
+  roomsApiDeclaration,
+} from '../../apiDeclarations';
 import { Loader } from '../../components/Loader/Loader';
 import { Gap } from '../../components/Gap/Gap';
 import { RoomDateAndTime } from '../../components/RoomDateAndTime/RoomDateAndTime';
 import { RoomInfoColumn } from './components/RoomInfoColumn/RoomInfoColumn';
 import { Typography } from '../../components/Typography/Typography';
-import { QuestionItem } from '../../components/QuestionItem/QuestionItem';
-import { Question } from '../../types/question';
 import { RoomReview as RoomReviewType } from '../../types/room';
-import { RoomQuestionEvaluation } from '../Room/components/RoomQuestionEvaluation/RoomQuestionEvaluation';
 import { RoomParticipants } from '../../components/RoomParticipants/RoomParticipants';
 import { Button } from '../../components/Button/Button';
-import { roomReviewMaxLength, toastSuccessOptions } from '../../constants';
+import { IconNames, roomReviewMaxLength, toastSuccessOptions } from '../../constants';
 import { InfoBlock } from '../../components/InfoBlock/InfoBlock';
 import { AuthContext } from '../../context/AuthContext';
-import { checkAdmin } from '../../utils/checkAdmin';
 import { Textarea } from '../../components/Textarea/Textarea';
+import { RoomReviewQuestionEvaluation } from './components/RoomReviewQuestionEvaluation/RoomReviewQuestionEvaluation';
+import { Modal } from '../../components/Modal/Modal';
+import { ModalFooter } from '../../components/ModalFooter/ModalFooter';
+import { ModalWarningContent } from '../../components/ModalWarningContent/ModalWarningContent';
 
-const createFakeQuestion = (roomQuestion: RoomQuestion): Question => ({
-  ...roomQuestion,
-  tags: [],
-  answers: [],
-  codeEditor: null,
-});
+export const sortMyRoomReviews = (r1: MyRoomQuestionEvaluation, r2: MyRoomQuestionEvaluation) =>
+  r1.order - r2.order;
 
 export const RoomReview: FunctionComponent = () => {
   const auth = useContext(AuthContext);
-  const admin = checkAdmin(auth);
   const { id } = useParams();
   const localizationCaptions = useLocalizationCaptions();
   const [roomReviewValue, setRoomReviewValue] = useState('');
+  const [saveModalOpen, setSaveModalOpen] = useState(false);
+  const [closeModalOpen, setCloseModalOpen] = useState(false);
 
   const { apiMethodState, fetchData } = useApiMethod<Room, Room['id']>(roomsApiDeclaration.getById);
   const { process: { loading, error }, data: room } = apiMethodState;
+
+  const {
+    apiMethodState: getMyQuestionEvaluationsState,
+    fetchData: fetchMyRoomQuestionEvaluations,
+  } = useApiMethod<MyRoomQuestionEvaluation[], Room['id']>(roomQuestionEvaluationApiDeclaration.getMy);
+  const {
+    process: { loading: myQuestionEvaluationsLoading, error: myQuestionEvaluationsError },
+    data: myQuestionEvaluations,
+  } = getMyQuestionEvaluationsState;
+
+  const {
+    apiMethodState: getMyRoomReviewState,
+    fetchData: fetchMyRoomReview,
+  } = useApiMethod<RoomReviewType, Room['id']>(roomReviewApiDeclaration.getMy);
+  const { process: { loading: myRoomReviewLoading, error: myRoomReviewError }, data: myRoomReview } = getMyRoomReviewState;
 
   const {
     apiMethodState: addRoomReviewState,
@@ -65,11 +84,13 @@ export const RoomReview: FunctionComponent = () => {
   } = useApiMethod<unknown, Room['id']>(roomsApiDeclaration.close);
   const {
     process: {
+      loading: roomCloseLoading,
       error: roomCloseError,
       code: roomCloseCode,
     },
   } = apiRoomCloseMethodState;
 
+  const totalError = error || myQuestionEvaluationsError || myRoomReviewError;
   const examinee = room?.participants.find(
     participant => participant.type === 'Examinee'
   );
@@ -83,12 +104,15 @@ export const RoomReview: FunctionComponent = () => {
       RoomId: id,
       States: ['Closed'],
     });
-  }, [id, fetchData, getRoomQuestions]);
+    fetchMyRoomReview(id);
+    fetchMyRoomQuestionEvaluations(id);
+  }, [id, fetchData, getRoomQuestions, fetchMyRoomReview, fetchMyRoomQuestionEvaluations]);
 
   useEffect(() => {
     if (roomCloseCode !== 200) {
       return;
     }
+    handleCloseCloseModal();
     toast.success(localizationCaptions[LocalizationKey.Saved], toastSuccessOptions);
   }, [roomCloseCode, localizationCaptions]);
 
@@ -96,6 +120,7 @@ export const RoomReview: FunctionComponent = () => {
     if (!addedRoomReview) {
       return;
     }
+    handleCloseSaveModal();
     toast.success(localizationCaptions[LocalizationKey.Saved], toastSuccessOptions);
   }, [addedRoomReview, localizationCaptions]);
 
@@ -131,10 +156,29 @@ export const RoomReview: FunctionComponent = () => {
   };
 
   const handleReviewChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    if (myRoomReview) {
+      return;
+    }
     setRoomReviewValue(event.target.value);
   };
 
-  if (loading || loadingRoomQuestions || !room || !roomQuestions) {
+  const handleOpenSaveModal = () => {
+    setSaveModalOpen(true);
+  };
+
+  const handleCloseSaveModal = () => {
+    setSaveModalOpen(false);
+  };
+
+  const handleOpenCloseModal = () => {
+    setCloseModalOpen(true);
+  };
+
+  const handleCloseCloseModal = () => {
+    setCloseModalOpen(false);
+  };
+
+  if (loading || loadingRoomQuestions || !room || !roomQuestions || myQuestionEvaluationsLoading || myRoomReviewLoading) {
     return (
       <Loader />
     );
@@ -143,95 +187,137 @@ export const RoomReview: FunctionComponent = () => {
   return (
     <>
       <PageHeader title={localizationCaptions[LocalizationKey.RoomReviewPageName]} />
-      <h2 className='text-left'>{room.name}</h2>
-      <Gap sizeRem={1} />
-      <InfoBlock className='text-left flex justify-between'>
-        {error && (
-          <Typography size='m'>{localizationCaptions[LocalizationKey.Error]}: {error}</Typography>
-        )}
-        <RoomInfoColumn
-          header={localizationCaptions[LocalizationKey.Examinee]}
-          conent={examinee ? <span className='capitalize'>{examinee.nickname}</span> : localizationCaptions[LocalizationKey.NotFound]}
-        />
-        <RoomInfoColumn
-          header={localizationCaptions[LocalizationKey.RoomParticipants]}
-          conent={<RoomParticipants participants={room.participants} />}
-        />
-        {room.scheduledStartTime && (
-          <RoomInfoColumn
-            header={localizationCaptions[LocalizationKey.RoomDateAndTime]}
-            conent={
-              <RoomDateAndTime
-                typographySize='m'
-                scheduledStartTime={room.scheduledStartTime}
-                timer={room.timer}
-                mini
-              />
-            }
-          />
-        )}
-      </InfoBlock>
-      <Gap sizeRem={0.5} />
-      <InfoBlock className='text-left flex flex-col'>
-        <Typography size='s' bold>{localizationCaptions[LocalizationKey.CandidateOpinion]}</Typography>
+      <div className='overflow-auto'>
+        <h2 className='text-left'>{room.name}</h2>
         <Gap sizeRem={1} />
-        <Textarea
-          className='h-3.625'
-          maxLength={roomReviewMaxLength}
-          showMaxLength={true}
-          value={roomReviewValue}
-          onInput={handleReviewChange}
-        />
-      </InfoBlock>
-      <Gap sizeRem={0.5} />
-      <InfoBlock className='text-left'>
-        <Typography size='xl' bold>{localizationCaptions[LocalizationKey.CandidateMarks]}</Typography>
-        <Gap sizeRem={2} />
-        {errorRoomQuestions && (
-          <Typography size='m'>{localizationCaptions[LocalizationKey.Error]}: {errorRoomQuestions}</Typography>
-        )}
-        {roomQuestions.map((roomQuestion, index) => (
-          <Fragment key={roomQuestion.id}>
-            <QuestionItem
-              question={createFakeQuestion(roomQuestion)}
-              checked={false}
-              checkboxLabel={<Typography size='m' bold>{localizationCaptions[LocalizationKey.DoNotRate]}</Typography>}
-              onCheck={() => { }}
-            >
-              <RoomQuestionEvaluation
-                value={{ mark: 5, review: 'NORM' }}
-                onChange={() => { }}
-              />
-            </QuestionItem>
-            {index !== roomQuestions.length - 1 && (<Gap sizeRem={0.25} />)}
-          </Fragment>
-        ))}
-      </InfoBlock>
-      <Gap sizeRem={1.75} />
-      <div className='flex justify-end'>
-        {admin && (
-          <>
-            <Button
-              onClick={handleCloseRoom}
-            >
-              {localizationCaptions[LocalizationKey.CloseRoom]}
-            </Button>
-            <Gap sizeRem={1} horizontal />
-          </>
-        )}
-        <Button
-          variant='active'
-          onClick={handleSaveReview}
-        >
-          {addRoomReviewLoading ? (
-            <Loader />
-          ) : (
-            localizationCaptions[LocalizationKey.Save]
+        <InfoBlock className='text-left flex justify-between'>
+          {totalError && (
+            <Typography size='m'>{localizationCaptions[LocalizationKey.Error]}: {totalError}</Typography>
           )}
-
-        </Button>
+          <RoomInfoColumn
+            header={localizationCaptions[LocalizationKey.Examinee]}
+            conent={examinee ? <span className='capitalize'>{examinee.nickname}</span> : localizationCaptions[LocalizationKey.NotFound]}
+          />
+          <RoomInfoColumn
+            header={localizationCaptions[LocalizationKey.RoomParticipants]}
+            conent={<RoomParticipants participants={room.participants} />}
+          />
+          {room.scheduledStartTime && (
+            <RoomInfoColumn
+              header={localizationCaptions[LocalizationKey.RoomDateAndTime]}
+              conent={
+                <RoomDateAndTime
+                  typographySize='m'
+                  scheduledStartTime={room.scheduledStartTime}
+                  timer={room.timer}
+                  mini
+                />
+              }
+            />
+          )}
+        </InfoBlock>
+        <Gap sizeRem={0.5} />
+        <InfoBlock className='text-left flex flex-col'>
+          <Typography size='s' bold>{localizationCaptions[LocalizationKey.CandidateOpinion]}</Typography>
+          <Gap sizeRem={1} />
+          <Textarea
+            className='h-3.625'
+            maxLength={roomReviewMaxLength}
+            showMaxLength={true}
+            readOnly={!!myRoomReview}
+            value={myRoomReview ? myRoomReview.review : roomReviewValue}
+            onInput={handleReviewChange}
+          />
+        </InfoBlock>
+        <Gap sizeRem={0.5} />
+        <InfoBlock className='text-left'>
+          <Typography size='xl' bold>{localizationCaptions[LocalizationKey.CandidateMarks]}</Typography>
+          <Gap sizeRem={2} />
+          {errorRoomQuestions && (
+            <Typography size='m'>{localizationCaptions[LocalizationKey.Error]}: {errorRoomQuestions}</Typography>
+          )}
+          {myQuestionEvaluations && myQuestionEvaluations.sort(sortMyRoomReviews).map((questionEvaluations, index) => (
+            <Fragment key={questionEvaluations.id}>
+              <RoomReviewQuestionEvaluation
+                roomId={room.id}
+                questionEvaluations={questionEvaluations}
+                readOnly={!!myRoomReview}
+              />
+              {index !== roomQuestions.length - 1 && (<Gap sizeRem={0.25} />)}
+            </Fragment>
+          ))}
+        </InfoBlock>
+        <Gap sizeRem={1.75} />
+        <Modal
+          contentLabel=''
+          open={saveModalOpen}
+          onClose={handleCloseSaveModal}
+        >
+          <ModalWarningContent
+            iconName={IconNames.HelpCircle}
+            captionLine1={localizationCaptions[LocalizationKey.SaveRoomQuestionEvaluationWarningLine1]}
+            captionLine2={localizationCaptions[LocalizationKey.SaveRoomQuestionEvaluationWarningLine2]}
+          />
+          <ModalFooter>
+            <Button onClick={handleCloseSaveModal}>{localizationCaptions[LocalizationKey.Cancel]}</Button>
+            <Button onClick={handleSaveReview} variant='active'>
+              {addRoomReviewLoading ? (
+                <Loader />
+              ) : (
+                localizationCaptions[LocalizationKey.Save]
+              )}
+            </Button>
+          </ModalFooter>
+        </Modal>
+        <Modal
+          contentLabel=''
+          open={closeModalOpen}
+          onClose={handleCloseCloseModal}
+        >
+          <ModalWarningContent
+            iconName={IconNames.HelpCircle}
+            captionLine1={localizationCaptions[LocalizationKey.CloseRoomWithoutQuestionEvaluationWarningLine1]}
+            captionLine2={localizationCaptions[LocalizationKey.CloseRoomWithoutQuestionEvaluationWarningLine2]}
+          />
+          <ModalFooter>
+            <Button onClick={handleCloseCloseModal}>{localizationCaptions[LocalizationKey.Cancel]}</Button>
+            <Button onClick={handleCloseRoom} variant='active'>
+              {roomCloseLoading ? (
+                <Loader />
+              ) : (
+                localizationCaptions[LocalizationKey.Save]
+              )}
+            </Button>
+          </ModalFooter>
+        </Modal>
+        <div className='flex justify-end'>
+          {(room.owner.id === auth?.id) && (
+            <>
+              <Button
+                onClick={handleOpenCloseModal}
+              >
+                {localizationCaptions[LocalizationKey.CloseRoomWithoutReview]}
+              </Button>
+              <Gap sizeRem={1} horizontal />
+            </>
+          )}
+          {myRoomReview ? (
+            <Typography size='s'>{localizationCaptions[LocalizationKey.RoomReviewAlreadyGiven]}</Typography>
+          ) : (
+            <Button
+              variant='active'
+              onClick={handleOpenSaveModal}
+            >
+              {addRoomReviewLoading ? (
+                <Loader />
+              ) : (
+                localizationCaptions[LocalizationKey.Save]
+              )}
+            </Button>
+          )}
+        </div>
+        <Gap sizeRem={0.75} />
       </div>
-      <Gap sizeRem={0.75} />
     </>
   );
 };
