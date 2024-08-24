@@ -2,42 +2,33 @@ using System.Globalization;
 using Interview.Backend.Auth.Sorface;
 using Microsoft.AspNetCore.Authentication;
 
-namespace Interview.Backend.Auth
+namespace Interview.Backend.Auth;
+
+public class AccessTokenExpiredTimeMiddleware
 {
-    public static class AccessTokenExpiredTimeMiddlewareExtensions
+    private readonly RequestDelegate _next;
+    private readonly string _cookieName;
+
+    public AccessTokenExpiredTimeMiddleware(RequestDelegate next, string cookieName)
     {
-        public static IApplicationBuilder UseAccessTokenExpiredTimeCookie(this IApplicationBuilder builder, string cookieName)
-        {
-            return builder.UseMiddleware<AccessTokenExpiredTimeMiddleware>(cookieName);
-        }
+        _next = next;
+        _cookieName = cookieName;
     }
 
-    public class AccessTokenExpiredTimeMiddleware
+    public async Task InvokeAsync(HttpContext context)
     {
-        private readonly RequestDelegate _next;
-        private readonly string _cookieName;
+        var expTimeString = await context.GetTokenAsync(SorfaceTokenDefaults.ExpirationTokenName);
 
-        public AccessTokenExpiredTimeMiddleware(RequestDelegate next, string cookieName)
+        if (expTimeString is null)
         {
-            _next = next;
-            _cookieName = cookieName;
-        }
-
-        public async Task InvokeAsync(HttpContext context)
-        {
-            var expTimeString = await context.GetTokenAsync(SorfaceTokenDefaults.ExpirationTokenName);
-
-            if (expTimeString is null)
-            {
-                await _next(context);
-                return;
-            }
-
-            var expTime = ((DateTimeOffset)DateTime.Parse(expTimeString, CultureInfo.InvariantCulture).ToUniversalTime()).ToUnixTimeSeconds();
-
-            context.Response.Cookies.Append(_cookieName, expTime.ToString());
-
             await _next(context);
+            return;
         }
+
+        var expTime = ((DateTimeOffset)DateTime.Parse(expTimeString, CultureInfo.InvariantCulture).ToUniversalTime()).ToUnixTimeSeconds();
+
+        context.Response.Cookies.Append(_cookieName, expTime.ToString());
+
+        await _next(context);
     }
 }
