@@ -1,11 +1,19 @@
 using System.Globalization;
+using Interview.Backend.Auth.Sorface;
 using Microsoft.AspNetCore.Authentication;
 
 namespace Interview.Backend.Auth
 {
+    public static class AccessTokenExpiredTimeMiddlewareExtensions
+    {
+        public static IApplicationBuilder UseAccessTokenExpiredTimeCookie(this IApplicationBuilder builder, string cookieName)
+        {
+            return builder.UseMiddleware<AccessTokenExpiredTimeMiddleware>(cookieName);
+        }
+    }
+
     public class AccessTokenExpiredTimeMiddleware
     {
-        private const string ExpirationTokenName = "expires_at";
         private readonly RequestDelegate _next;
         private readonly string _cookieName;
 
@@ -17,7 +25,7 @@ namespace Interview.Backend.Auth
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var expTimeString = await context.GetTokenAsync(ExpirationTokenName);
+            var expTimeString = await context.GetTokenAsync(SorfaceTokenDefaults.ExpirationTokenName);
 
             if (expTimeString is null)
             {
@@ -30,14 +38,6 @@ namespace Interview.Backend.Auth
             context.Response.Cookies.Append(_cookieName, expTime.ToString());
 
             await _next(context);
-        }
-    }
-
-    public static class AccessTokenExpiredTimeMiddlewareExtensions
-    {
-        public static IApplicationBuilder UseAccessTokenExpiredTimeCookie(this IApplicationBuilder builder, string cookieName)
-        {
-            return builder.UseMiddleware<AccessTokenExpiredTimeMiddleware>(cookieName);
         }
     }
 }

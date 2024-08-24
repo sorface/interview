@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Immutable;
 using System.Diagnostics.Eventing.Reader;
 using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Responses;
@@ -10,22 +12,17 @@ namespace Interview.Backend.Auth;
 
 public static class ServiceCollectionExt
 {
-    public static void AddAppAuth(this IServiceCollection self, AuthorizationService authorizationService, string redisConfiguration)
+    private static readonly List<string> DISABLEDVALIDATEPATHS = new()
     {
-        self.AddDistributedRedisCache(options =>
-            {
-                options.Configuration = redisConfiguration;
-                options.InstanceName = "sorface.interview.session.";
-            })
-            .AddSession();
+        "/api/refresh",
+        "/api/login",
+    };
 
-        self.AddSingleton<ITicketStore, DistributedCacheTicketStore>();
-
+    public static void AddAppAuth(this IServiceCollection self, AuthorizationService authorizationService)
+    {
         self.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-
-                // options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
             .AddCookie(options =>
             {
@@ -33,7 +30,7 @@ public static class ServiceCollectionExt
                 {
                     var pathValue = context.Request.Path.Value;
 
-                    if (pathValue != null && pathValue.StartsWith("/api/refresh"))
+                    if (pathValue != null && DISABLEDVALIDATEPATHS.Any(it => pathValue.StartsWith(it)))
                     {
                         return Task.CompletedTask;
                     }
@@ -45,7 +42,7 @@ public static class ServiceCollectionExt
                 options.SessionStore = self.BuildServiceProvider().GetRequiredService<ITicketStore>();
 
                 options.Cookie.HttpOnly = true;
-                options.Cookie.Name = "_auth";
+                options.Cookie.Name = "sorinv_session_id";
                 options.Cookie.Domain = authorizationService.Domain;
 
                 options.Events.OnRedirectToAccessDenied = context =>
@@ -82,7 +79,8 @@ public static class ServiceCollectionExt
                 {
                     options.CorrelationCookie = new CookieBuilder
                     {
-                        Name = authorizationService.CorrelationCookie.Name, Domain = authorizationService.CorrelationCookie.Domain,
+                        Name = authorizationService.CorrelationCookie.Name,
+                        Domain = authorizationService.CorrelationCookie.Domain,
                     };
                 }
 
