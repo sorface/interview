@@ -8,11 +8,13 @@ public class AccessTokenExpiredTimeMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly string _cookieName;
+    private readonly CookieOptions _cookieOptions;
 
-    public AccessTokenExpiredTimeMiddleware(RequestDelegate next, string cookieName)
+    public AccessTokenExpiredTimeMiddleware(RequestDelegate next, string cookieName, CookieOptions cookieOptions)
     {
         _next = next;
         _cookieName = cookieName;
+        _cookieOptions = cookieOptions;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -27,7 +29,7 @@ public class AccessTokenExpiredTimeMiddleware
 
         var expTime = ((DateTimeOffset)DateTime.Parse(expTimeString, CultureInfo.InvariantCulture).ToUniversalTime()).ToUnixTimeSeconds();
 
-        context.Response.Cookies.Append(_cookieName, expTime.ToString());
+        context.Response.Cookies.Append(_cookieName, expTime.ToString(), _cookieOptions);
 
         await _next(context);
     }
