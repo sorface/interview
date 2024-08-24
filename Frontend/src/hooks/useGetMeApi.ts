@@ -1,10 +1,12 @@
-import { useCallback, useReducer } from 'react';
+import { useCallback, useEffect, useReducer, useState } from 'react';
 import { REACT_APP_BACKEND_URL } from '../config';
 import { User } from '../types/user';
+import { useRefresh } from './useRefresh';
 
 interface GetMeState {
   process: {
     loading: boolean;
+    code: number | null;
     error: string | null;
   };
   user: User | null;
@@ -13,6 +15,7 @@ interface GetMeState {
 const initialState: GetMeState = {
   process: {
     loading: false,
+    code: null,
     error: null,
   },
   user: null,
@@ -26,6 +29,9 @@ type GetMeAction = {
 } | {
   name: 'setError';
   payload: string;
+} | {
+  name: 'setCode';
+  payload: number;
 };
 
 const getMeReducer = (state: GetMeState, action: GetMeAction): GetMeState => {
@@ -35,6 +41,7 @@ const getMeReducer = (state: GetMeState, action: GetMeAction): GetMeState => {
         process: {
           loading: true,
           error: null,
+          code: null,
         },
         user: null,
       };
@@ -42,6 +49,7 @@ const getMeReducer = (state: GetMeState, action: GetMeAction): GetMeState => {
       return {
         ...state,
         process: {
+          ...state.process,
           loading: false,
           error: action.payload
         }
@@ -49,10 +57,19 @@ const getMeReducer = (state: GetMeState, action: GetMeAction): GetMeState => {
     case 'setUser':
       return {
         process: {
+          ...state.process,
           loading: false,
           error: null,
         },
         user: action.payload
+      };
+    case 'setCode':
+      return {
+        ...state,
+        process: {
+          ...state.process,
+          code: action.payload,
+        },
       };
     default:
       return state;
@@ -60,13 +77,26 @@ const getMeReducer = (state: GetMeState, action: GetMeAction): GetMeState => {
 };
 
 export const useGetMeApi = () => {
+  const { refreshState: { process: { refreshCode, refreshError } }, refresh } = useRefresh();
   const [getMeState, dispatch] = useReducer(getMeReducer, initialState);
+  const [requestTrigger, setRequestTrigger] = useState<number | null>(null);
 
-  const loadMe = useCallback(async () => {
+  useEffect(() => {
+    if (!requestTrigger) {
+      return;
+    }
+    refresh();
+  }, [requestTrigger, refresh]);
+
+  const fetchLoadMe = useCallback(async () => {
     dispatch({ name: 'startLoad' });
     try {
       const response = await fetch(`${REACT_APP_BACKEND_URL}/users/self`, {
         credentials: 'include'
+      });
+      dispatch({
+        name: 'setCode',
+        payload: response.status,
       });
       if (!response.ok) {
         throw new Error('UserApi error');
@@ -79,6 +109,17 @@ export const useGetMeApi = () => {
         payload: err.message || 'Failed to get me',
       });
     }
+  }, []);
+
+  useEffect(() => {
+    if (!refreshCode && !refreshError) {
+      return;
+    }
+    fetchLoadMe();
+  }, [refreshCode, refreshError, fetchLoadMe]);
+
+  const loadMe = useCallback(() => {
+    setRequestTrigger(Date.now());
   }, []);
 
   return {

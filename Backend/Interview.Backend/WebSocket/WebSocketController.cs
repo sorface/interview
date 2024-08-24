@@ -3,8 +3,11 @@ using System.Net.WebSockets;
 using Interview.Backend.Auth;
 using Interview.Backend.WebSocket.Events;
 using Interview.Backend.WebSocket.Events.ConnectionListener;
+using Interview.Domain;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.Service;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Interview.Backend.WebSocket;
@@ -30,9 +33,24 @@ public class WebSocketController : ControllerBase
         _logger = logger;
     }
 
-    [Route("/ws")]
+    [Authorize]
+    [HttpGet("/ws")]
+    public async Task Get()
+    {
+        if (!HttpContext.WebSockets.IsWebSocketRequest)
+        {
+            throw new UserException("Protocol request error. Use the websocket protocol");
+        }
+
+        using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+
+        _logger.LogInformation("WebSocket connection established");
+
+        await ExecuteWebSocket(webSocket);
+    }
+
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task ExecuteWebSocket()
+    public async Task ExecuteWebSocket(System.Net.WebSockets.WebSocket webSocket)
     {
         if (!TryGetUser(out var user))
         {
@@ -40,11 +58,11 @@ public class WebSocketController : ControllerBase
         }
 
         var ct = HttpContext.RequestAborted;
-        using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
         WebSocketConnectDetail? detail = null;
         try
         {
             var roomIdentity = await ParseRoomIdAsync(webSocket, ct);
+
             if (roomIdentity is null)
             {
                 return;

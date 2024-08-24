@@ -92,7 +92,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
 
   useEffect(() => {
     updateRooms();
-  }, [updateRooms, roomsUpdateTrigger]);
+  }, [updateRooms, roomsUpdateTrigger, mode]);
 
   useEffect(() => {
     if (mode !== RoomsPageMode.Home) {
@@ -235,7 +235,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
               currentData={rooms}
               loading={loading}
               error={error}
-              triggerResetAccumData={`${roomsUpdateTrigger}${searchValue}${mode}${closed}`}
+              triggerResetAccumData={`${roomsUpdateTrigger}${searchValue}${mode}`}
               loaderClassName='room-item-wrapper room-item-loader'
               renderItem={createRoomItem}
               nextPageAvailable={false}

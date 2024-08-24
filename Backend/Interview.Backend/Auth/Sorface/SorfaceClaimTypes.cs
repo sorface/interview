@@ -23,6 +23,8 @@ public static class SorfaceClaimTypes
             public const string LastName = ClaimType2005Namespace + "/profile-lastname";
 
             public const string MiddleName = ClaimType2005Namespace + "/profile-middleName";
+
+            public const string Authorities = ClaimType2005Namespace + "/profile-authorities";
         }
     }
 }

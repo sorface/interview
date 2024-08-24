@@ -2,7 +2,7 @@ import React, { FunctionComponent, useCallback, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Field } from '../../components/FieldsBlock/Field';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
-import { useCommunist } from '../../hooks/useCommunist';
+import { useLogout } from '../../hooks/useLogout';
 import { ThemeSwitch } from '../../components/ThemeSwitch/ThemeSwitch';
 import { LangSwitch } from '../../components/LangSwitch/LangSwitch';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
@@ -14,12 +14,12 @@ import './Session.css';
 
 export const Session: FunctionComponent = () => {
   const auth = useContext(AuthContext);
-  const { resetCommunist } = useCommunist();
+  const { logout } = useLogout();
   const localizationCaptions = useLocalizationCaptions();
 
   const handleLogOut = useCallback(() => {
-    resetCommunist();
-  }, [resetCommunist]);
+    logout();
+  }, [logout]);
 
   const renderAuth = useCallback(() => {
     if (!auth) {
