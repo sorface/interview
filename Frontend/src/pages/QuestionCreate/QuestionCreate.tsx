@@ -420,6 +420,7 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
         </div>
         {admin && (
           <div>
+            <Gap sizeRem={1.5} />
             <div><label htmlFor="qestionType">{localizationCaptions[LocalizationKey.QuestionType]}:</label></div>
             <select id="qestionType" value={type} onChange={handleTypeChange}>
               <option value={QuestionType.Private}>{localizationCaptions[LocalizationKey.QuestionTypePrivate]}</option>
