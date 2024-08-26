@@ -65,6 +65,8 @@
 .bg-dark-dark1 { background-color: var(--dark-dark1); }
 .bg-dark-dark2 { background-color: var(--dark-dark2); }
 .bg-modal-bg { background-color: var(--modal-bg); }
+.bg-dark-input { background-color: var(--dark-input); }
+.bg-room-tools-panel-bg { background-color: var(--room-tools-panel-bg); }
 .hover\:bg-blue-main:hover { background-color: var(--blue-main); }
 .hover\:bg-blue-light:hover { background-color: var(--blue-light); }
 .hover\:bg-blue-dark:hover { background-color: var(--blue-dark); }
