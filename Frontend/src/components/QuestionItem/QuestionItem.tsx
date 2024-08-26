@@ -58,6 +58,11 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
     [Theme.Light]: 'text-grey2',
   });
 
+  const accordionClassName = useThemeClassName({
+    [Theme.Dark]: `${primary ? 'bg-dark-dark2' : 'bg-dark-disable'} ${bgSelected ? 'bg-dark-dark2' : ''}`,
+    [Theme.Light]: `${primary ? 'bg-white' : 'bg-grey1'} ${bgSelected ? '!bg-blue-light' : ''}`,
+  });
+
   const handleCheckboxChange = () => {
     onCheck?.(!checked);
   };
@@ -134,7 +139,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
       title={title}
       disabled={accordionDisabled}
       openedByDefault={openedByDefault}
-      className={`${primary ? 'bg-wrap' : 'bg-form'} ${bgSelected ? 'bg-blue-light' : ''} rounded-0.75 py-1.25 px-1.5`}
+      className={`${accordionClassName} rounded-0.75 py-1.25 px-1.5`}
       classNameTitle='flex items-center'
       onClick={onClick ? handleOnClick : undefined}
     >

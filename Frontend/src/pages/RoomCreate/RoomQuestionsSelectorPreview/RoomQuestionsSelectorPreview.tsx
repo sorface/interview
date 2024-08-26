@@ -8,6 +8,8 @@ import { IconNames } from '../../../constants';
 import { Typography } from '../../../components/Typography/Typography';
 import { Gap } from '../../../components/Gap/Gap';
 import { sortRoomQestions } from '../../../utils/sortRoomQestions';
+import { useThemeClassName } from '../../../hooks/useThemeClassName';
+import { Theme } from '../../../context/ThemeContext';
 
 interface RoomQuestionsSelectorPreviewProps {
   qestions: RoomQuestionListItem[];
@@ -19,6 +21,14 @@ export const RoomQuestionsSelectorPreview: FunctionComponent<RoomQuestionsSelect
   onRemove,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
+  const contentWrapperClassName = useThemeClassName({
+    [Theme.Dark]: 'bg-modal-bg',
+    [Theme.Light]: 'bg-white',
+  });
+  const itemClassName = useThemeClassName({
+    [Theme.Dark]: 'hover:bg-dark-active',
+    [Theme.Light]: 'hover:bg-grey-active',
+  });
 
   const handleRemoveClick = (qestion: RoomQuestionListItem) => (e: MouseEvent<HTMLSpanElement>) => {
     e.stopPropagation();
@@ -45,11 +55,11 @@ export const RoomQuestionsSelectorPreview: FunctionComponent<RoomQuestionsSelect
         toggleIcon
         contentClassName='translate-x--4.25-y-0.25'
       >
-        <div className='w-18.125 rounded-0.75 bg-wrap shadow'>
+        <div className={`w-18.125 rounded-0.75 shadow ${contentWrapperClassName}`}>
           {qestions.sort(sortRoomQestions).map(qestion => (
             <div
               key={qestion.id}
-              className='flex items-center justify-between h-2.125 px-1 cursor-pointer hover:bg-grey-active'
+              className={`flex items-center justify-between h-2.125 px-1 cursor-pointer ${itemClassName}`}
             >
               <Typography size='s'>{qestion.value}</Typography>
               <span onClick={handleRemoveClick(qestion)} className='text-grey2'>
