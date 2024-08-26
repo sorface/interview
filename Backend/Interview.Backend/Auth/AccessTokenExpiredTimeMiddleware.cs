@@ -19,6 +19,12 @@ public class AccessTokenExpiredTimeMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
+        if (context.WebSockets.IsWebSocketRequest)
+        {
+            await _next(context);
+            return;
+        }
+
         var expTimeString = await context.GetTokenAsync(SorfaceTokenDefaults.ExpirationTokenName);
 
         if (expTimeString is null)

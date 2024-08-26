@@ -13,7 +13,6 @@ using Interview.Backend.WebSocket.Events.ConnectionListener;
 using Interview.Backend.WebSocket.Events.Handlers;
 using Interview.DependencyInjection;
 using Interview.Domain.Rooms.RoomQuestions;
-using Interview.Infrastructure.Chat;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
@@ -157,7 +156,6 @@ public class ServiceConfigurator
                     throw new InvalidOperationException("Unknown environment");
                 }
             },
-            TwitchTokenProviderOption = new TwitchTokenProviderOption { ClientSecret = sorfaceAuth.ClientSecret, ClientId = sorfaceAuth.ClientId, },
             AdminUsers = adminUsers,
             EventStorageConfigurator = builder =>
             {
