@@ -180,15 +180,18 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
         </Button>
       ))}
       {!!selectedAnswer && (
-        <CodeEditor
-          language={(selectedAnswer.codeEditor && question.codeEditor) ? question.codeEditor.lang : CodeEditorLang.Plaintext}
-          languages={[(selectedAnswer.codeEditor && question.codeEditor) ? question.codeEditor.lang : CodeEditorLang.Plaintext]}
-          value={selectedAnswer.content}
-          readOnly
-          scrollBeyondLastLine={false}
-          alwaysConsumeMouseWheel={false}
-          className='h-32.25'
-        />
+        <>
+          <Gap sizeRem={1} />
+          <CodeEditor
+            language={(selectedAnswer.codeEditor && question.codeEditor) ? question.codeEditor.lang : CodeEditorLang.Plaintext}
+            languages={[(selectedAnswer.codeEditor && question.codeEditor) ? question.codeEditor.lang : CodeEditorLang.Plaintext]}
+            value={selectedAnswer.content}
+            readOnly
+            scrollBeyondLastLine={false}
+            alwaysConsumeMouseWheel={false}
+            className='h-32.25'
+          />
+        </>
       )}
     </Accordion>
   );
