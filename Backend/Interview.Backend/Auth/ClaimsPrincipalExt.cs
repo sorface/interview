@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using AspNet.Security.OAuth.Twitch;
 using Interview.Backend.Auth.Sorface;
+using X.PagedList;
 
 namespace Interview.Backend.Auth;
 
@@ -39,6 +40,23 @@ public static class ClaimsPrincipalExt
         }
 
         user.Avatar = profileImage?.Value;
+
+        var authoritiesClaim = self.Claims.FirstOrDefault(e => e.Type == SorfaceClaimTypes.Claims.Profile.Authorities);
+
+        if (authoritiesClaim is null)
+        {
+            return user;
+        }
+
+        var values = authoritiesClaim.Value;
+
+        var strings = values.Split(',');
+
+        foreach (var authority in strings)
+        {
+            var roleName = RoleName.FromName(authority, true);
+            user.Roles.Add(new Role(roleName));
+        }
 
         return user;
     }

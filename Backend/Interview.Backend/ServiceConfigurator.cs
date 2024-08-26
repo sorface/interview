@@ -14,6 +14,7 @@ using Interview.Backend.WebSocket.Events.Handlers;
 using Interview.DependencyInjection;
 using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Infrastructure.Chat;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IO;
@@ -110,13 +111,14 @@ public class ServiceConfigurator
         var sorfaceAuth = new OAuthServiceDispatcher(_configuration).GetAuthService("sorface");
 
         serviceCollection.AddSingleton(sorfaceAuth);
-
         serviceCollection.AddHttpClient();
         serviceCollection.AddSingleton<SorfacePrincipalValidator>();
-        serviceCollection.AddSingleton<SorfaceTokenHandler>();
+        serviceCollection.AddSingleton<SorfaceTokenService>();
 
         var adminUsers = _configuration.GetSection(nameof(AdminUsers))
             .Get<AdminUsers>() ?? throw new ArgumentException($"Not found \"{nameof(AdminUsers)}\" section");
+
+        var logger = serviceCollection.BuildServiceProvider().GetRequiredService<ILogger<ServiceConfigurator>>();
 
         var serviceOption = new DependencyInjectionAppServiceOption
         {
@@ -155,31 +157,42 @@ public class ServiceConfigurator
                     throw new InvalidOperationException("Unknown environment");
                 }
             },
-            TwitchTokenProviderOption = new TwitchTokenProviderOption
-            {
-                ClientSecret = sorfaceAuth.ClientSecret,
-                ClientId = sorfaceAuth.ClientId,
-            },
+            TwitchTokenProviderOption = new TwitchTokenProviderOption { ClientSecret = sorfaceAuth.ClientSecret, ClientId = sorfaceAuth.ClientId, },
             AdminUsers = adminUsers,
             EventStorageConfigurator = builder =>
             {
                 var storageSection = _configuration.GetSection("EventStorage");
-                var useRedis = storageSection?.GetValue<bool?>("UseRedis") ?? false;
+                var useRedis = storageSection?.GetValue<bool?>("Enabled") ?? false;
 
                 if (useRedis)
                 {
-                    var connectionString = storageSection?.GetValue<string>("RedisConnectionString");
-                    builder.UseRedis(connectionString ?? string.Empty);
+                    var redisUsername = storageSection?.GetValue<string>("Username");
+                    var redisHost = storageSection?.GetValue<string>("Host");
+                    var redisPort = storageSection?.GetValue<int>("Port");
+                    var redisPassword = storageSection?.GetValue<string>("Password");
+
+                    builder.UseRedis($@"redis://{redisUsername}:{redisPassword}@{redisHost}:{redisPort}");
+
+                    serviceCollection.AddStackExchangeRedisCache(options =>
+                    {
+                        options.Configuration = $@"{redisHost}:{redisPort},password={redisPassword}";
+                        options.InstanceName = "sorface.interview.session.";
+                    });
                 }
                 else
                 {
+                    serviceCollection.AddDistributedMemoryCache();
                     builder.UseEmpty();
                 }
             },
         };
 
         serviceCollection.AddAppServices(serviceOption);
-        serviceCollection.AddAppAuth(sorfaceAuth);
+
+        serviceCollection
+            .AddSingleton<ITicketStore, DistributedCacheTicketStore>()
+            .AddSession()
+            .AddAppAuth(sorfaceAuth);
     }
 
     private void AddRateLimiter(IServiceCollection serviceCollection)
@@ -230,17 +243,8 @@ public class ServiceConfigurator
                 Title = "Open API",
                 Version = "v1",
                 Description = "Service Interface",
-                Contact = new OpenApiContact
-                {
-                    Name = "Vladislav Petyukevich",
-                    Url = new Uri("https://github.com/VladislavPetyukevich"),
-                    Email = "test@yandex.ru",
-                },
-                License = new OpenApiLicense
-                {
-                    Name = "Example License",
-                    Url = new Uri("https://example.com/license"),
-                },
+                Contact = new OpenApiContact { Name = "Vladislav Petyukevich", Url = new Uri("https://github.com/VladislavPetyukevich"), Email = "test@yandex.ru", },
+                License = new OpenApiLicense { Name = "Example License", Url = new Uri("https://example.com/license"), },
             });
 
             var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";

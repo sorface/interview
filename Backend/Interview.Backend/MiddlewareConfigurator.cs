@@ -1,6 +1,8 @@
+using System.Globalization;
 using Interview.Backend.Auth;
 using Interview.Backend.Errors;
 using Interview.Backend.WebSocket.Configuration;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.CookiePolicy;
 
 namespace Interview.Backend;
@@ -25,17 +27,9 @@ public class MiddlewareConfigurator
 
         _app.UseHttpsRedirection();
 
-        _app.UseCookiePolicy(new CookiePolicyOptions
-        {
-            MinimumSameSitePolicy = SameSiteMode.Lax,
-            HttpOnly = HttpOnlyPolicy.None,
-        });
+        _app.UseCookiePolicy(new CookiePolicyOptions { MinimumSameSitePolicy = SameSiteMode.Lax, HttpOnly = HttpOnlyPolicy.None, });
 
-        _app.UseWebSockets().UseWebSocketsAuthorization(new WebSocketAuthorizationOptions
-        {
-            CookieName = WebSocketAuthorizationOptions.DefaultCookieName,
-            WebSocketQueryName = "Authorization",
-        });
+        _app.UseWebSockets();
 
         _app.UseCors("All");
 
@@ -50,8 +44,14 @@ public class MiddlewareConfigurator
             return func();
         });
 
+        var cookieExpTimeConfig = _app.Configuration.GetSection("AccessTokenExpiredTime");
+
+        _app.UseAccessTokenExpiredTimeCookie("ate_t", new CookieOptions { Domain = cookieExpTimeConfig.GetValue<string>("Domain"), Secure = true, });
+
+        _app.UseSession();
         _app.UseAuthentication();
         _app.UseAuthorization();
+
         _app.Use((context, func) =>
         {
             var upsertUser = context.User.ToUser();
@@ -63,6 +63,7 @@ public class MiddlewareConfigurator
 
             return func();
         });
+
         _app.Use((context, func) =>
         {
             var upsertUser = context.User.ToUser();

@@ -126,7 +126,7 @@ export const RoomAnayticsSummary: FunctionComponent = () => {
         loaders={loaders}
       >
         <>
-        {!!(admin && room?.roomStatus === 'Review') && (
+        {!!(admin && room?.status === 'Review') && (
             <Field>
               <ActionModal
                 title={localizationCaptions[LocalizationKey.CloseRoomModalTitle]}
@@ -138,7 +138,7 @@ export const RoomAnayticsSummary: FunctionComponent = () => {
               />
             </Field>
           )}
-          {!!(admin && room?.roomStatus === 'Close') && (
+          {!!(admin && room?.status === 'Close') && (
             <Field>
               <ActionModal
                 title={localizationCaptions[LocalizationKey.StartReviewRoomModalTitle]}

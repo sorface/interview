@@ -1,16 +1,20 @@
+using Interview.Backend.Auth.Sorface;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Interview.Backend.Auth;
 
 [ApiController]
-[Route("/api")]
+[Route("api")]
 public class AuthController : ControllerBase
 {
     private readonly OAuthServiceDispatcher _oAuthDispatcher;
     private readonly ILogger<AuthController> _logger;
 
-    public AuthController(OAuthServiceDispatcher oAuthDispatcher, ILogger<AuthController> logger)
+    public AuthController(OAuthServiceDispatcher oAuthDispatcher,
+                          ILogger<AuthController> logger,
+                          SorfacePrincipalValidator sorfacePrincipalValidator)
     {
         _oAuthDispatcher = oAuthDispatcher;
         _logger = logger;
@@ -37,10 +41,7 @@ public class AuthController : ControllerBase
             return Results.BadRequest($"Redirect link {redirectUri} is not available");
         }
 
-        var authenticationProperties = new AuthenticationProperties
-        {
-            RedirectUri = redirectUri,
-        };
+        var authenticationProperties = new AuthenticationProperties { RedirectUri = redirectUri, };
 
         _logger.LogDebug("Before change");
         var signIn = Results.Challenge(authenticationProperties, authenticationSchemes: new List<string> { scheme });
@@ -59,5 +60,39 @@ public class AuthController : ControllerBase
                 return uri;
             }
         }
+    }
+
+    [HttpPost("logout")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(string), 400)]
+    public Task SignOut()
+    {
+        return HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme, new AuthenticationProperties());
+    }
+
+    [HttpPost("refresh")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(string), 400)]
+    public async Task<ActionResult> RefreshPrincipalToken()
+    {
+        _logger.BeginScope("request refresh access");
+
+        _logger.LogInformation("token for principal");
+        if (HttpContext.User.ToUser() is null)
+        {
+            _logger.LogInformation("principal is null");
+            return BadRequest("principal not found");
+        }
+
+        _logger.LogInformation("create new access token");
+        var refreshTokenState = await HttpContext.RefreshTokenAsync(HttpContext.RequestAborted);
+
+        if (refreshTokenState != Result.RejectPrincipal)
+        {
+            return Ok();
+        }
+
+        _logger.LogInformation("principal rejected");
+        return BadRequest("principal rejected");
     }
 }

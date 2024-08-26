@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace Interview.Backend.Auth.Sorface;
 
-public class SorfaceTokenHandler
+public class SorfaceTokenService
 {
     private const string AnErrorOccurredWhileRetrievingTheUserProfile =
         "An error occurred while retrieving the user profile.";
@@ -16,7 +16,7 @@ public class SorfaceTokenHandler
     private readonly AuthorizationService _options;
     private readonly IHttpClientFactory _httpClientFactory;
 
-    public SorfaceTokenHandler(AuthorizationService options, IHttpClientFactory httpClientFactory)
+    public SorfaceTokenService(AuthorizationService options, IHttpClientFactory httpClientFactory)
     {
         _options = options;
         _httpClientFactory = httpClientFactory;

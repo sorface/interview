@@ -17,7 +17,6 @@ import { REACT_APP_WS_URL } from '../../config';
 import { EventName, IconNames, inviteParamName, pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
-import { useCommunist } from '../../hooks/useCommunist';
 import {
   RoomInvite,
   RoomParticipant,
@@ -56,8 +55,6 @@ const connectingReadyState = 0;
 export const Room: FunctionComponent = () => {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
-  const { getCommunist } = useCommunist();
-  const communist = getCommunist();
   let { id } = useParams();
   const { [inviteParamName]: inviteParam } = useParams();
 
@@ -80,7 +77,7 @@ export const Room: FunctionComponent = () => {
   const [recognitionEnabled, setRecognitionEnabled] = useState(false);
   const [peersLength, setPeersLength] = useState(0);
   const [invitationsOpen, setInvitationsOpen] = useState(false);
-  const socketUrl = `${REACT_APP_WS_URL}/ws?Authorization=${communist}&roomId=${id}`;
+  const socketUrl = `${REACT_APP_WS_URL}/ws?roomId=${id}`;
   const checkWebSocketReadyToConnect = () => {
     if (!inviteParam) {
       return true;
@@ -251,7 +248,7 @@ export const Room: FunctionComponent = () => {
     if (!room) {
       return;
     }
-    if (room.roomStatus !== 'New') {
+    if (room.status !== 'New') {
       setReactionsVisible(true);
     }
   }, [room]);
@@ -312,8 +309,8 @@ export const Room: FunctionComponent = () => {
           }
           break;
         case 'ChangeRoomStatus':
-          const newStatus: RoomType['roomStatus'] = 'New';
-          const reviewStatus: RoomType['roomStatus'] = 'Review';
+          const newStatus: RoomType['status'] = 'New';
+          const reviewStatus: RoomType['status'] = 'Review';
           if (parsedData?.Value === reviewStatus) {
             setRoomInReview(true);
           }

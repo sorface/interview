@@ -19,7 +19,7 @@ export interface Room {
     nickname: User['nickname'];
   };
   tags: Tag[];
-  roomStatus: RoomStatus;
+  status: RoomStatus;
   questions: RoomQuestionListItem[];
   scheduledStartTime: string;
   timer?: {

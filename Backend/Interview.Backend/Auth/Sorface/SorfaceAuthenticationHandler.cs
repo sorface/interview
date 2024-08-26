@@ -8,20 +8,20 @@ namespace Interview.Backend.Auth.Sorface;
 
 public class SorfaceAuthenticationHandler : OAuthHandler<SorfaceAuthenticationOptions>
 {
-    private readonly SorfaceTokenHandler _sorfaceTokenHandler;
+    private readonly SorfaceTokenService _sorfaceTokenService;
 
     public SorfaceAuthenticationHandler(IOptionsMonitor<SorfaceAuthenticationOptions> options,
                                         ILoggerFactory logger,
                                         UrlEncoder encoder,
                                         ISystemClock clock,
-                                        SorfaceTokenHandler sorfaceTokenHandler) : base(options, logger, encoder, clock)
+                                        SorfaceTokenService sorfaceTokenService) : base(options, logger, encoder, clock)
     {
-        _sorfaceTokenHandler = sorfaceTokenHandler;
+        _sorfaceTokenService = sorfaceTokenService;
     }
 
     protected override async Task<AuthenticationTicket> CreateTicketAsync(ClaimsIdentity identity, AuthenticationProperties properties, OAuthTokenResponse tokens)
     {
-        using var document = await _sorfaceTokenHandler.GetTokenPrincipalAsync(tokens.AccessToken, Context.RequestAborted);
+        using var document = await _sorfaceTokenService.GetTokenPrincipalAsync(tokens.AccessToken, Context.RequestAborted);
 
         var principal = new ClaimsPrincipal(identity);
 
