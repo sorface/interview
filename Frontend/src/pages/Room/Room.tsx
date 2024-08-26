@@ -408,7 +408,7 @@ export const Room: FunctionComponent = () => {
 
   const renderToolsPanel = () => {
     return (
-      <RoomToolsPanel.Wrapper rightPos='18.5rem' bottomPos='1.5rem'>
+      <RoomToolsPanel.Wrapper rightPos='21.5rem' bottomPos='1.5rem'>
         {!viewerMode && (
           <RoomToolsPanel.ButtonsGroupWrapper>
             <RoomToolsPanel.SwitchButton

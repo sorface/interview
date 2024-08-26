@@ -3,8 +3,8 @@
   margin-top: 0rem !important;
   margin-left: 0rem !important;
   margin-bottom: 0.5rem !important;
-  --videochat-video-size: 200px;
-  --videochat-video-size-big: 250px;
+  --videochat-video-size: 250px;
+  --videochat-video-size-big: 300px;
   width: var(--videochat-video-size-big);
   overflow-y: visible;
   overflow-x: hidden;
