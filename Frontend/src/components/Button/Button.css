@@ -83,6 +83,8 @@ button.toolsPanel {
   padding: 0;
   border-radius: unset;
   opacity: 0.5;
+  color: var(--dark);
+  background-color: var(--dark-white);
 }
 
 button.toolsPanelDanger {

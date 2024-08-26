@@ -29,6 +29,7 @@
   --dark-history-hover: #152643;
   --dark-active: #3A5281;
   --dark-disable: #182947;
+  --dark-input: #4C556B;
 
   --text: var(--dark-white);
   --page-bg: #0B1529;
@@ -63,7 +64,7 @@
   --button-inverted-background-color: var(--dark-dark-button);
   --button-inverted-alternative-background-color: var(--wrap-bg);
   --button-inverted-color: var(--text);
-  --button-inverted-active-background-color: var(--dark-dark2);
+  --button-inverted-active-background-color: var(--grey3);
   --button-inverted-active-color: var(--text);
   --modal-close-button-background: var(--dark-dark1);
   --modal-close-button-background-hover: var(--active);
@@ -84,6 +85,9 @@
   --slider-checked: var(--blue-main);
   --modal-bg: #293550;
   --input-border-color: #424242;
+  --room-tools-panel-bg: #0B152940;
+  --code-editor-tools-panel-bg: #233149;
+  --code-editor-select-border: var(--dark-input);
 }
 
 :root[data-theme="Light"] {
@@ -121,6 +125,8 @@
   --slider-checked: var(--bg-success);
   --modal-bg: var(--wrap-bg);
   --input-border-color: var(--grey2);
+  --code-editor-tools-panel-bg: var(--white);
+  --code-editor-select-border: var(--input-border-color);
 }
 
 :root[data-color-transition="enabled"] * {

@@ -5,10 +5,13 @@
 .code-editor .code-editor-tools {
   text-align: left;
   padding: 1rem 1.5rem;
+  background-color: var(--code-editor-tools-panel-bg);
 }
 
 .code-editor .code-editor-tools-select {
   margin-right: 0.25rem;
+  background-color: var(--code-editor-tools-panel-bg);
+  border-color: var(--code-editor-select-border);
 }
 
 .code-editor select {

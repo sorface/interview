@@ -57,7 +57,7 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   };
 
   return (
-    <div className={`code-editor flex flex-col overflow-hidden ${className}`}>
+    <div className={`code-editor flex flex-col rounded-1.125 overflow-hidden ${className}`}>
       <div className='code-editor-tools'>
         <select className='code-editor-tools-select' value={language} disabled={!onLanguageChange} onChange={handleLanguageChange}>
           {renderOptions(languages)}

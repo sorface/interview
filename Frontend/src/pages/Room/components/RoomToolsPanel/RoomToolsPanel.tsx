@@ -17,7 +17,7 @@ const Wrapper: FunctionComponent<WrapperProps> = ({
 }) => {
   return (
     <div
-      className='absolute flex flex-col p-0.625 w-2.5 rounded-1.25 bg-dark-0.5 backdrop-blur z-1'
+      className='absolute flex flex-col p-0.625 w-2.5 rounded-1.25 bg-room-tools-panel-bg backdrop-blur z-1'
       style={{
         right: rightPos || '0.5rem',
         bottom: bottomPos || '0.5rem',
