@@ -38,8 +38,6 @@ public static class ServiceCollectionExt
 
         self.AddScoped(typeof(ArchiveService<>));
 
-        self.AddSingleton(option.TwitchTokenProviderOption);
-
         self.Scan(selector =>
         {
             selector.FromAssemblies(typeof(UserRepository).Assembly, typeof(RoomQuestionReactionPostProcessor).Assembly)

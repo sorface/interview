@@ -23,7 +23,7 @@ public class WebSocketAuthorizationMiddleware
 
     public Task Invoke(HttpContext context)
     {
-        if (!context.WebSockets.IsWebSocketRequest)
+        if (!context.WebSockets.IsWebSocketRequest || context.Request.Cookies.ContainsKey(_options.CookieName))
         {
             return _next(context);
         }
@@ -56,7 +56,7 @@ public class WebSocketAuthorizationMiddleware
 
         public ICollection<string> Keys => this.Select(e => e.Key).ToList();
 
-        public string? this[string key] => _store[key];
+        public string? this[string key] => _store.TryGetValue(key, out var value) ? value : null;
 
         public IEnumerator<KeyValuePair<string, string>> GetEnumerator() => _store.GetEnumerator();
 

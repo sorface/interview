@@ -2,7 +2,6 @@ using FluentAssertions;
 using Interview.Backend;
 using Interview.DependencyInjection;
 using Interview.Domain.Users;
-using Interview.Infrastructure.Chat;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,7 +22,6 @@ namespace Interview.Test.Units
             var option = new DependencyInjectionAppServiceOption
             {
                 DbConfigurator = builder => builder.UseSqlite("DataSource=:memory:"),
-                TwitchTokenProviderOption = new TwitchTokenProviderOption(),
                 AdminUsers = new AdminUsers(),
                 EventStorageConfigurator = builder => builder.UseEmpty(),
             };
