@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Interview.Domain.Database;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomQuestionEvaluations.Records.Request;
@@ -50,18 +51,33 @@ public class RoomQuestionEvaluationService : IRoomQuestionEvaluationService
 
     public async Task<QuestionEvaluationDetail> FindByRoomIdAndQuestionIdAsync(QuestionEvaluationGetRequest request, CancellationToken cancellationToken)
     {
-        var evaluation = await FindQuestionEvaluation(request.RoomId, request.QuestionId, request.UserId, cancellationToken);
+        await ValidateQuestionEvaluation(request.RoomId, request.UserId, cancellationToken);
+        var evaluation = await _db.RoomQuestionEvaluation
+            .Include(e1 => e1.RoomQuestion)
+            .Where(e3 => e3.RoomQuestion!.QuestionId == request.QuestionId && e3.RoomQuestion!.RoomId == request.RoomId && e3.CreatedById == request.UserId)
+            .Select((Expression<Func<RoomQuestionEvaluation, QuestionEvaluationDetail>>)(e => new QuestionEvaluationDetail
+            {
+                Id = e.Id,
+                Mark = e.Mark != null ? e.Mark!.Value : null,
+                Review = e.Review,
+            }))
+            .FirstOrDefaultAsync(cancellationToken);
         if (evaluation is null)
         {
-            throw new NotFoundException($@"Evaluation not found by question id [{request.QuestionId}] and room id [{request.RoomId}]");
+            throw new NotFoundException($"Evaluation not found by question id [{request.QuestionId}] and room id [{request.RoomId}]");
         }
 
-        return new QuestionEvaluationDetail { Id = evaluation.Id, Mark = evaluation.Mark != null ? evaluation.Mark!.Value : null, Review = evaluation.Review, };
+        return evaluation;
     }
 
     public async Task<QuestionEvaluationDetail> MergeAsync(QuestionEvaluationMergeRequest mergeRequest, CancellationToken cancellationToken)
     {
-        var questionEvaluation = await FindQuestionEvaluation(mergeRequest.RoomId, mergeRequest.QuestionId, mergeRequest.UserId, cancellationToken);
+        await ValidateQuestionEvaluation(mergeRequest.RoomId, mergeRequest.UserId, cancellationToken);
+        var questionEvaluation = await _db.RoomQuestionEvaluation
+            .Include(e1 => e1.RoomQuestion)
+            .ThenInclude(e => e!.Room)
+            .Where(e3 => e3.RoomQuestion!.QuestionId == mergeRequest.QuestionId && e3.RoomQuestion!.RoomId == mergeRequest.RoomId && e3.CreatedById == mergeRequest.UserId)
+            .FirstOrDefaultAsync(cancellationToken);
         if (questionEvaluation is null)
         {
             var roomQuestion = await _roomQuestionRepository.FindFirstByQuestionIdAndRoomIdAsync(mergeRequest.QuestionId, mergeRequest.RoomId, cancellationToken);
@@ -83,28 +99,17 @@ public class RoomQuestionEvaluationService : IRoomQuestionEvaluationService
         }
         else
         {
-            if (questionEvaluation.State == SERoomQuestionEvaluationState.Submitted)
+            if (questionEvaluation.RoomQuestion?.Room?.Status == SERoomStatus.Close)
             {
-                throw new UserException("The evaluation cannot be changed, as it is approved");
+                throw new UserException("The user cannot change the evaluation because the room is closed.");
             }
 
             questionEvaluation.Review = mergeRequest.Review;
             questionEvaluation.Mark = mergeRequest.Mark;
-            _db.RoomQuestionEvaluation.Update(questionEvaluation);
             await _db.SaveChangesAsync(cancellationToken);
         }
 
         return new QuestionEvaluationDetail { Id = questionEvaluation.Id, Mark = questionEvaluation.Mark, Review = questionEvaluation.Review, };
-    }
-
-    private async Task<RoomQuestionEvaluation?> FindQuestionEvaluation(Guid roomId, Guid questionId, Guid userId, CancellationToken cancellationToken)
-    {
-        await ValidateQuestionEvaluation(roomId, userId, cancellationToken);
-        return await _db.RoomQuestionEvaluation
-            .Include(e => e.RoomQuestion)
-            .Include(e => e.CreatedBy)
-            .Where(e => e.RoomQuestion!.QuestionId == questionId && e.RoomQuestion!.RoomId == roomId && e.CreatedById == userId)
-            .FirstOrDefaultAsync(cancellationToken);
     }
 
     private async Task ValidateQuestionEvaluation(Guid roomId, Guid userId, CancellationToken cancellationToken)
