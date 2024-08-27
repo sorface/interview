@@ -90,7 +90,6 @@ public class ServiceConfigurator
         serviceCollection.AddHostedService<EventSenderJob>();
 
         serviceCollection.AddSingleton(new OAuthServiceDispatcher(_configuration));
-        serviceCollection.AddSingleton<UserClaimService>();
 
         AddWebSocketServices(serviceCollection);
 
