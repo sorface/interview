@@ -82,6 +82,7 @@ public static class ServiceCollectionExt
         self.AddScoped<ICurrentPermissionAccessor, CurrentPermissionAccessor>();
         self.AddEventServices(option);
         self.AddScoped<EventStorage2DatabaseService>();
+        self.AddScoped<RoomCodeEditorChangeEventHandler>();
         return self;
     }
 
