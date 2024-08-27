@@ -35,7 +35,8 @@ public class MiddlewareConfigurator
         {
             _app.UseWebSocketsAuthorization(new WebSocketAuthorizationOptions
             {
-                CookieName = WebSocketAuthorizationOptions.DefaultCookieName, WebSocketQueryName = "Authorization",
+                CookieName = WebSocketAuthorizationOptions.DefaultCookieName,
+                WebSocketQueryName = "Authorization",
             });
         }
 

@@ -48,7 +48,7 @@ public class WebSocketController : ControllerBase
 
         await ExecuteWebSocket(webSocket, CancellationToken.None);
     }
-    
+
     [ApiExplorerSettings(IgnoreApi = true)]
     public async Task ExecuteWebSocket(System.Net.WebSockets.WebSocket webSocket, CancellationToken ct)
     {
