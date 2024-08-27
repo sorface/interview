@@ -1,5 +1,5 @@
 import { ChangeEventHandler, FunctionComponent, useContext, useState } from 'react';
-import Editor, { OnChange, OnMount } from '@monaco-editor/react';
+import Editor, { OnChange, OnMount, BeforeMount, Monaco } from '@monaco-editor/react';
 import { CodeEditorLang } from '../../types/question';
 import { Theme, ThemeContext } from '../../context/ThemeContext';
 
@@ -56,8 +56,21 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
     onLanguageChange?.(event.target.value as CodeEditorLang);
   };
 
+  const handleBeforeMount: BeforeMount = (monaco: Monaco) => {
+    const theme = {
+      base: 'vs-dark' as const,
+      inherit: true,
+      rules: [],
+      colors: {
+        'editor.background': '#233149',
+        'editor.lineHighlightBackground': '#FFFFFF0F',
+      },
+    }
+    monaco.editor.defineTheme('my-dark', theme);
+  };
+
   return (
-    <div className={`code-editor flex flex-col overflow-hidden ${className}`}>
+    <div className={`code-editor flex flex-col rounded-1.125 overflow-hidden ${className}`}>
       <div className='code-editor-tools'>
         <select className='code-editor-tools-select' value={language} disabled={!onLanguageChange} onChange={handleLanguageChange}>
           {renderOptions(languages)}
@@ -80,10 +93,11 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
             },
           }}
           language={language}
-          theme={themeInUi === Theme.Dark ? 'vs-dark' : 'light'}
+          theme={themeInUi === Theme.Dark ? 'my-dark' : 'light'}
           value={value}
           onChange={onChange}
           onMount={onMount}
+          beforeMount={handleBeforeMount}
         />
       </div>
     </div>

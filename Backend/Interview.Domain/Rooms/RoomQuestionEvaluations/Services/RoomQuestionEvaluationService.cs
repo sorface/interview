@@ -103,7 +103,7 @@ public class RoomQuestionEvaluationService : IRoomQuestionEvaluationService
         return await _db.RoomQuestionEvaluation
             .Include(e => e.RoomQuestion)
             .Include(e => e.CreatedBy)
-            .Where(e => e.RoomQuestion!.QuestionId == questionId && e.CreatedById == userId)
+            .Where(e => e.RoomQuestion!.QuestionId == questionId && e.RoomQuestion!.RoomId == roomId && e.CreatedById == userId)
             .FirstOrDefaultAsync(cancellationToken);
     }
 

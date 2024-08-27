@@ -7,6 +7,7 @@
   --dark: #24243A;
   --dark-dark1: #172849;
   --dark-dark2: #101E36;
+  --dark-dark-button: #404B65;
   --grey3: #838AA4;
   --grey2: #C3CBDF;
   --grey1: #F5F6F8;
@@ -27,11 +28,13 @@
   --dark-closed-light: #8B9FC7;
   --dark-history-hover: #152643;
   --dark-active: #3A5281;
+  --dark-disable: #182947;
+  --dark-input: #4C556B;
 
   --text: var(--dark-white);
   --page-bg: #0B1529;
   --form-bg: var(--page-bg);
-  --wrap-bg: #101E36;
+  --wrap-bg: var(--dark-dark2);
   --active: #b9221c;
   --disabled-icon: #b9221c;
   --active-nav-tab: var(--dark-active);
@@ -58,11 +61,11 @@
   --button-bg-active: var(--active);
   --button-hover-border-color: var(--text);
   --button-danger-border-color: var(--active);
-  --button-inverted-background-color: var(--page-bg);
+  --button-inverted-background-color: var(--dark-dark-button);
   --button-inverted-alternative-background-color: var(--wrap-bg);
   --button-inverted-color: var(--text);
-  --button-inverted-active-background-color: var(--text);
-  --button-inverted-active-color: var(--wrap-bg);
+  --button-inverted-active-background-color: var(--grey3);
+  --button-inverted-active-color: var(--text);
   --modal-close-button-background: var(--dark-dark1);
   --modal-close-button-background-hover: var(--active);
   --modal-close-button-text: var(--text);
@@ -82,6 +85,9 @@
   --slider-checked: var(--blue-main);
   --modal-bg: #293550;
   --input-border-color: #424242;
+  --room-tools-panel-bg: #0B152940;
+  --code-editor-tools-panel-bg: #233149;
+  --code-editor-select-border: var(--dark-input);
 }
 
 :root[data-theme="Light"] {
@@ -119,6 +125,8 @@
   --slider-checked: var(--bg-success);
   --modal-bg: var(--wrap-bg);
   --input-border-color: var(--grey2);
+  --code-editor-tools-panel-bg: var(--white);
+  --code-editor-select-border: var(--input-border-color);
 }
 
 :root[data-color-transition="enabled"] * {

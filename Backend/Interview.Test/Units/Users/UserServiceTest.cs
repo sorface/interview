@@ -41,7 +41,7 @@ public class UserServiceTest
 
         _mockRoleRepository.Setup(repository =>
                 repository.FindAsync(It.IsAny<ISpecification<Role>>(), default))
-            .Returns(() => Task.FromResult<List<Role>>(new List<Role>()));
+            .Returns(() => Task.FromResult(new List<Role>()));
 
         var throwsAsync = await Assert.ThrowsAsync<Domain.NotFoundException>(
             async () => await _userService.UpsertByExternalIdAsync(user));

@@ -1,7 +1,5 @@
 using System.Security.Claims;
-using AspNet.Security.OAuth.Twitch;
 using Interview.Backend.Auth.Sorface;
-using X.PagedList;
 
 namespace Interview.Backend.Auth;
 

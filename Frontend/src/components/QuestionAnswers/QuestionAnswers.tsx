@@ -3,6 +3,9 @@ import { CodeEditorLang, Question, QuestionAnswer } from '../../types/question';
 import { Button } from '../Button/Button';
 import { Typography } from '../Typography/Typography';
 import { CodeEditor } from '../CodeEditor/CodeEditor';
+import { Gap } from '../Gap/Gap';
+import { useThemeClassName } from '../../hooks/useThemeClassName';
+import { Theme } from '../../context/ThemeContext';
 
 interface QuestionAnswersProps {
   answers: QuestionAnswer[];
@@ -13,6 +16,10 @@ export const QuestionAnswers: FunctionComponent<QuestionAnswersProps> = ({
   answers,
   codeEditor,
 }) => {
+  const buttonThemeActiveVariant = useThemeClassName({
+    [Theme.Light]: 'invertedActive' as const,
+    [Theme.Dark]: 'invertedAlternative' as const,
+  });
   const [selectedAnswer, setSelectedAnswer] = useState<QuestionAnswer | null>(null);
 
   useEffect(() => {
@@ -27,7 +34,7 @@ export const QuestionAnswers: FunctionComponent<QuestionAnswersProps> = ({
       {answers.map(answer => (
         <Button
           key={answer.id}
-          variant={answer === selectedAnswer ? 'active' : undefined}
+          variant={answer === selectedAnswer ? buttonThemeActiveVariant : 'inverted'}
           className='mr-0.25'
           onClick={() => setSelectedAnswer(answer)}
         >
@@ -37,15 +44,18 @@ export const QuestionAnswers: FunctionComponent<QuestionAnswersProps> = ({
         </Button>
       ))}
       {!!selectedAnswer && (
-        <CodeEditor
-          language={(selectedAnswer.codeEditor && codeEditor) ? codeEditor.lang : CodeEditorLang.Plaintext}
-          languages={[(selectedAnswer.codeEditor && codeEditor) ? codeEditor.lang : CodeEditorLang.Plaintext]}
-          value={selectedAnswer.content}
-          readOnly
-          scrollBeyondLastLine={false}
-          alwaysConsumeMouseWheel={false}
-          className='h-32.25'
-        />
+        <>
+          <Gap sizeRem={1} />
+          <CodeEditor
+            language={(selectedAnswer.codeEditor && codeEditor) ? codeEditor.lang : CodeEditorLang.Plaintext}
+            languages={[(selectedAnswer.codeEditor && codeEditor) ? codeEditor.lang : CodeEditorLang.Plaintext]}
+            value={selectedAnswer.content}
+            readOnly
+            scrollBeyondLastLine={false}
+            alwaysConsumeMouseWheel={false}
+            className='h-32.25'
+          />
+        </>
       )}
     </div>
   );

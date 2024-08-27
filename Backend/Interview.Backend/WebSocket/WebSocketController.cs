@@ -46,18 +46,17 @@ public class WebSocketController : ControllerBase
 
         _logger.LogInformation("WebSocket connection established");
 
-        await ExecuteWebSocket(webSocket);
+        await ExecuteWebSocket(webSocket, CancellationToken.None);
     }
 
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task ExecuteWebSocket(System.Net.WebSockets.WebSocket webSocket)
+    public async Task ExecuteWebSocket(System.Net.WebSockets.WebSocket webSocket, CancellationToken ct)
     {
         if (!TryGetUser(out var user))
         {
             return;
         }
 
-        var ct = HttpContext.RequestAborted;
         WebSocketConnectDetail? detail = null;
         try
         {
