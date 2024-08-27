@@ -23,7 +23,7 @@ interface RoomQuestionEvaluationPorps {
 const themeClassNames: Record<ThemeInUi, Record<'active' | 'nonActive', string>> = {
   [Theme.Dark]: {
     active: '!bg-dark-blue',
-    nonActive: 'bg-dark-grey4',
+    nonActive: 'bg-dark-input',
   },
   [Theme.Light]: {
     active: 'text-white !bg-dark',
@@ -102,7 +102,7 @@ export const RoomQuestionEvaluation: FunctionComponent<RoomQuestionEvaluationPor
                   </Button>
                 ))}
               </div>
-              <Typography size='s'>{markGroup.caption}</Typography>
+              <Typography size='s' secondary>{markGroup.caption}</Typography>
             </div>
             {markGroupIndex !== markGroups.length - 1 && (<Gap sizeRem={0.375} horizontal />)}
           </ Fragment>

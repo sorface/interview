@@ -22,9 +22,9 @@ export const CircularProgress: FunctionComponent<CircularProgressProps> = ({
       style={{ '--size': `${sizePx}px` } as React.CSSProperties}
     >
       <svg
-        width={`${sizePx}`}
-        height={`${sizePx}`}
-        viewBox={`0 0 ${sizePx} ${sizePx}`}
+        width={`${sizePx + 1}`}
+        height={`${sizePx + 1}`}
+        viewBox={`0 0 ${sizePx + 1} ${sizePx + 1}`}
         className='circular-progress'
         style={{
           '--end-progress': value,

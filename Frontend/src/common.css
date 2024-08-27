@@ -38,6 +38,7 @@
 .bg-button-border { background-color: var(--button-border-color) ;}
 .bg-blue-main { background-color: var(--blue-main); }
 .bg-blue-light { background-color: var(--blue-light); }
+.\!bg-blue-light { background-color: var(--blue-light) !important; }
 .bg-blue-dark { background-color: var(--blue-dark); }
 .bg-dark { background-color: var(--dark); }
 .\!bg-dark { background-color: var(--dark) !important; }
@@ -60,6 +61,12 @@
 .bg-dark-orange-0\.25 { background-color: color-mix(in srgb, var(--dark-orange), transparent 75%); }
 .bg-dark-blue-0\.25 { background-color: color-mix(in srgb, var(--dark-blue), transparent 75%); }
 .bg-dark-green-0\.25 { background-color: color-mix(in srgb, var(--dark-green), transparent 75%); }
+.bg-dark-disable { background-color: var(--dark-disable); }
+.bg-dark-dark1 { background-color: var(--dark-dark1); }
+.bg-dark-dark2 { background-color: var(--dark-dark2); }
+.bg-modal-bg { background-color: var(--modal-bg); }
+.bg-dark-input { background-color: var(--dark-input); }
+.bg-room-tools-panel-bg { background-color: var(--room-tools-panel-bg); }
 .hover\:bg-blue-main:hover { background-color: var(--blue-main); }
 .hover\:bg-blue-light:hover { background-color: var(--blue-light); }
 .hover\:bg-blue-dark:hover { background-color: var(--blue-dark); }
@@ -73,6 +80,7 @@
 .hover\:bg-green-light:hover { background-color: var(--green-light); }
 .hover\:bg-grey-active:hover { background-color: var(--grey-active); }
 .hover\:bg-dark-history-hover:hover { background-color: var(--dark-history-hover); }
+.hover\:bg-dark-active:hover { background-color: var(--dark-active); }
 .border { border-width: 1px; }
 .border-solid { border-style: solid; }
 .border-button { border-color: var(--button-border-color); }

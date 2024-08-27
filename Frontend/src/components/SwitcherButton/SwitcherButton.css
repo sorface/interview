@@ -9,8 +9,14 @@
   z-index: 1;
 }
 
+.switcher-button button:first-child {
+  padding-right: 1.5rem;
+}
+
 .switcher-button button:last-child {
-  transform: translateX(-0.5rem);
+  transform: translateX(-1rem);
+  padding-left: 1.5rem;
+  margin-right: -1rem;
 }
 
 .switcher-button button:last-child:not(.invertedActive) {

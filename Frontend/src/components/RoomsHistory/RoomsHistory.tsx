@@ -44,6 +44,13 @@ export const RoomsHistory: FunctionComponent<RoomsHistoryProps> = ({
           />
         ))}
       </div>
+      {rooms.length === 0 && (
+        <div className='h-full flex flex-col items-center justify-center'>
+          <Typography size='m' secondary>
+            {localizationCaptions[LocalizationKey.NoRecords]}
+          </Typography>
+        </div>
+      )}
       <Gap sizeRem={0.5} />
     </div>
   );
