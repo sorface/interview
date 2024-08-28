@@ -40,7 +40,8 @@ public static class ServiceCollectionExt
 
         self.Scan(selector =>
         {
-            selector.FromAssemblies(typeof(UserRepository).Assembly, typeof(RoomQuestionReactionPostProcessor).Assembly)
+            var assemblies = new[] { typeof(UserRepository).Assembly, typeof(RoomQuestionReactionPostProcessor).Assembly, typeof(RoomQuestionPreProcessor).Assembly };
+            selector.FromAssemblies(assemblies.Distinct())
                 .AddClasses(filter => filter.AssignableTo(typeof(IRepository<>)))
                 .AsImplementedInterfaces()
                 .WithScopedLifetime()
@@ -81,6 +82,7 @@ public static class ServiceCollectionExt
         self.AddScoped<ICurrentPermissionAccessor, CurrentPermissionAccessor>();
         self.AddEventServices(option);
         self.AddScoped<EventStorage2DatabaseService>();
+        self.AddScoped<RoomCodeEditorChangeEventHandler>();
         return self;
     }
 

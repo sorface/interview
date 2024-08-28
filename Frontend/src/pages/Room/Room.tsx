@@ -46,6 +46,7 @@ import { Button } from '../../components/Button/Button';
 import { RoomToolsPanel } from './components/RoomToolsPanel/RoomToolsPanel';
 import { SwitcherButton } from '../../components/SwitcherButton/SwitcherButton';
 import { Gap } from '../../components/Gap/Gap';
+import { parseWsMessage } from './components/VideoChat/utils/parseWsMessage';
 
 import './Room.css';
 
@@ -182,7 +183,7 @@ export const Room: FunctionComponent = () => {
 
   const roomTimer = wsRoomTimer || room?.timer;
   const eventsState = useEventsState({ roomState, lastWsMessage: lastMessage });
-  const codeEditorEnabled = !!eventsState[EventName.CodeEditor];
+  const [codeEditorEnabled, setCodeEditorEnabled] = useState(false);
   const codeEditorLanguage = String(eventsState[EventName.CodeEditorLanguage]) as CodeEditorLang;
 
   const currentUserExpert = roomParticipant?.userType === 'Expert';
@@ -251,6 +252,30 @@ export const Room: FunctionComponent = () => {
       setReactionsVisible(true);
     }
   }, [room]);
+
+  useEffect(() => {
+    if (!roomState) {
+      return;
+    }
+    setCodeEditorEnabled(roomState.codeEditor.enabled);
+  }, [roomState]);
+
+  useEffect(() => {
+    if (!lastMessage) {
+      return;
+    }
+    try {
+      const parsedMessage = parseWsMessage(lastMessage?.data);
+      const parsedPayload = parsedMessage?.Value;
+      switch (parsedMessage?.Type) {
+        case 'room-code-editor-enabled':
+          setCodeEditorEnabled(parsedPayload.Enabled);
+          break;
+        default:
+          break;
+      }
+    } catch { }
+  }, [lastMessage]);
 
   useEffect(() => {
     if (!room || !roomQuestions) {
@@ -323,6 +348,13 @@ export const Room: FunctionComponent = () => {
 
   const handleScreenShare = () => {
     requestScreenStream();
+  };
+
+  const handleCodeEditor = () => {
+    sendMessage(JSON.stringify({
+      Type: 'room-code-editor-enabled',
+      Value: JSON.stringify({ Enabled: !codeEditorEnabled }),
+    }));
   };
 
   const loaders = [
@@ -439,14 +471,22 @@ export const Room: FunctionComponent = () => {
           </RoomToolsPanel.ButtonsGroupWrapper>
         )}
         {reactionsVisible && (
-          <>
+          <RoomToolsPanel.ButtonsGroupWrapper>
             <Reactions
               room={room}
-              eventsState={eventsState}
-              roles={auth?.roles || []}
-              participantType={roomParticipant?.userType || null}
             />
-          </>
+            {!viewerMode && (
+              <>
+                <Gap sizeRem={0.125} />
+                <RoomToolsPanel.SwitchButton
+                  enabled={true}
+                  iconEnabledName={IconNames.CodeEditor}
+                  iconDisabledName={IconNames.CodeEditor}
+                  onClick={handleCodeEditor}
+                />
+              </>
+            )}
+          </RoomToolsPanel.ButtonsGroupWrapper>
         )}
         {!viewerMode && (
           <RoomToolsPanel.ButtonsGroupWrapper>

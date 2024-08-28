@@ -5,4 +5,6 @@ public class UpsertCodeStateRequest
     public required Guid RoomId { get; init; }
 
     public required string CodeEditorContent { get; init; }
+
+    public bool SaveChanges { get; set; } = true;
 }

@@ -110,11 +110,10 @@ public class AppDbContext : DbContext
     {
         private readonly AppDbContext _db;
         private readonly CancellationToken _cancellationToken;
-        private readonly List<Entity>? _addedEntities;
-        private readonly List<(Entity Original, Entity Current)>? _modifiedEntities;
 
         private readonly List<IEntityPreProcessor> _preProcessors;
         private readonly List<IEntityPostProcessor> _postProcessors;
+        private readonly MutableEntityState _entityState;
 
         public SaveCookie(AppDbContext db, CancellationToken cancellationToken)
         {
@@ -124,92 +123,94 @@ public class AppDbContext : DbContext
             _preProcessors = _db.Processors.PreProcessors;
             _postProcessors = _db.Processors.PostProcessors;
 
-            _addedEntities = FilterByState(EntityState.Added).ToList();
-            _modifiedEntities = FilterEntryByState(EntityState.Modified)
-                .Select(e =>
-                {
-                    var original = (Entity)e.OriginalValues.ToObject();
-                    return (original, e.Entity);
-                })
-                .ToList();
+            var (added, modifiedEntities) = GetChangedEntities();
+            _entityState = new MutableEntityState { Added = added, ModifiedEntities = modifiedEntities };
         }
 
         public void NotifyPreProcessors()
         {
-            if (_preProcessors.Count == 0 || (_addedEntities == null && _modifiedEntities == null))
+            if (_preProcessors.Count == 0 || !_entityState.HasEntries)
             {
                 return;
             }
 
             foreach (var preProcessor in _preProcessors)
             {
-                if (_addedEntities != null)
-                {
-                    preProcessor.ProcessAddedAsync(_addedEntities, _cancellationToken)
-                        .ConfigureAwait(false)
-                        .GetAwaiter()
-                        .GetResult();
-                }
+                preProcessor.ProcessAddedAsync(_entityState.Added, _cancellationToken)
+                    .ConfigureAwait(false)
+                    .GetAwaiter()
+                    .GetResult();
 
-                if (_modifiedEntities != null)
-                {
-                    preProcessor.ProcessModifiedAsync(_modifiedEntities, _cancellationToken)
-                        .ConfigureAwait(false)
-                        .GetAwaiter()
-                        .GetResult();
-                }
+                preProcessor.ProcessModifiedAsync(_entityState.ModifiedEntities, _cancellationToken)
+                    .ConfigureAwait(false)
+                    .GetAwaiter()
+                    .GetResult();
             }
+
+            var (added, modifiedEntities) = GetChangedEntities();
+            _entityState.Added = added;
+            _entityState.ModifiedEntities = modifiedEntities;
         }
 
         public async ValueTask NotifyPreProcessorsAsync()
         {
-            if (_preProcessors.Count == 0 || (_addedEntities == null && _modifiedEntities == null))
+            if (_preProcessors.Count == 0 || !_entityState.HasEntries)
             {
                 return;
             }
 
             foreach (var preProcessor in _preProcessors)
             {
-                if (_addedEntities != null)
-                {
-                    await preProcessor.ProcessAddedAsync(_addedEntities, _cancellationToken);
-                }
-
-                if (_modifiedEntities != null)
-                {
-                    await preProcessor.ProcessModifiedAsync(_modifiedEntities, _cancellationToken);
-                }
+                await preProcessor.ProcessAddedAsync(_entityState.Added, _cancellationToken);
+                await preProcessor.ProcessModifiedAsync(_entityState.ModifiedEntities, _cancellationToken);
             }
+
+            var (added, modifiedEntities) = GetChangedEntities();
+            _entityState.Added = added;
+            _entityState.ModifiedEntities = modifiedEntities;
         }
 
         public void Dispose()
         {
-            if (_postProcessors.Count == 0 || _addedEntities == null || _modifiedEntities == null)
+            if (_postProcessors.Count == 0 || !_entityState.HasEntries)
             {
                 return;
             }
 
             foreach (var processor in _postProcessors)
             {
-                processor.ProcessAddedAsync(_addedEntities, _cancellationToken).ConfigureAwait(false).GetAwaiter()
+                processor.ProcessAddedAsync(_entityState.Added, _cancellationToken).ConfigureAwait(false).GetAwaiter()
                     .GetResult();
-                processor.ProcessModifiedAsync(_modifiedEntities, _cancellationToken).ConfigureAwait(false).GetAwaiter()
+                processor.ProcessModifiedAsync(_entityState.ModifiedEntities, _cancellationToken).ConfigureAwait(false).GetAwaiter()
                     .GetResult();
             }
         }
 
         public async ValueTask DisposeAsync()
         {
-            if (_postProcessors.Count == 0 || _addedEntities == null || _modifiedEntities == null)
+            if (_postProcessors.Count == 0 || !_entityState.HasEntries)
             {
                 return;
             }
 
             foreach (var processor in _postProcessors)
             {
-                await processor.ProcessAddedAsync(_addedEntities, _cancellationToken);
-                await processor.ProcessModifiedAsync(_modifiedEntities, _cancellationToken);
+                await processor.ProcessAddedAsync(_entityState.Added, _cancellationToken);
+                await processor.ProcessModifiedAsync(_entityState.ModifiedEntities, _cancellationToken);
             }
+        }
+
+        private (List<Entity> Added, List<(Entity Original, Entity Entity)> ModifiedEntities) GetChangedEntities()
+        {
+            var addedEntities = FilterByState(EntityState.Added).ToList();
+            var modifiedEntities = FilterEntryByState(EntityState.Modified)
+                .Select(e =>
+                {
+                    var original = (Entity)e.OriginalValues.ToObject();
+                    return (original, e.Entity);
+                })
+                .ToList();
+            return (addedEntities, modifiedEntities);
         }
 
         private IEnumerable<Entity> FilterByState(EntityState entityState)
@@ -228,6 +229,15 @@ public class AppDbContext : DbContext
 
                 yield return entityEntry;
             }
+        }
+
+        private sealed class MutableEntityState
+        {
+            public required List<Entity> Added { get; set; }
+
+            public required List<(Entity Original, Entity Entity)> ModifiedEntities { get; set; }
+
+            public bool HasEntries => Added.Count > 0 || ModifiedEntities.Count > 0;
         }
     }
 }

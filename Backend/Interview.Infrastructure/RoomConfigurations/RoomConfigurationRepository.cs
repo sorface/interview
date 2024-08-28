@@ -32,6 +32,9 @@ public class RoomConfigurationRepository : EfRepository<RoomConfiguration>, IRoo
             room.Configuration.CodeEditorContent = request.CodeEditorContent;
         }
 
-        await Db.SaveChangesAsync(cancellationToken);
+        if (request.SaveChanges)
+        {
+            await Db.SaveChangesAsync(cancellationToken);
+        }
     }
 }

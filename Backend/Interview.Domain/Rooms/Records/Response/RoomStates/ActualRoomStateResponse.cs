@@ -15,7 +15,11 @@ public class ActualRoomStateResponse
             Value = q.Question!.Value,
             State = q.State!,
         }).FirstOrDefault(q => q.State == RoomQuestionState.Active),
-        CodeEditorContent = room.Configuration == null ? null : room.Configuration.CodeEditorContent,
+        CodeEditor = new CodeEditorStateResponse
+        {
+            Content = room.Configuration == null ? null : room.Configuration.CodeEditorContent,
+            Enabled = room.Configuration != null && room.Configuration.CodeEditorEnabled,
+        },
         States = room.RoomStates.Select(e => new RoomStateResponse
         {
             Payload = e.Payload,
@@ -33,7 +37,7 @@ public class ActualRoomStateResponse
 
     public int DislikeCount { get; set; }
 
-    public required string? CodeEditorContent { get; set; }
+    public required CodeEditorStateResponse CodeEditor { get; set; }
 
     public required List<RoomStateResponse> States { get; set; }
 }
