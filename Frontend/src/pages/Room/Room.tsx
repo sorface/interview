@@ -552,9 +552,6 @@ export const Room: FunctionComponent = () => {
                     <Gap sizeRem={0.5} horizontal />
                   </>
                 )}
-                {!reactionsVisible && (
-                  <div>{localizationCaptions[LocalizationKey.WaitingRoom]}</div>
-                )}
                 <SwitcherButton
                   captions={[
                     `${localizationCaptions[LocalizationKey.Chat]} ${unreadChatMessages || ''}`,
