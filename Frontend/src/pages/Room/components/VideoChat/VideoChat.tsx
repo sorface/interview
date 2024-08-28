@@ -61,7 +61,7 @@ interface PeerMeta {
   screenShare: boolean;
 }
 
-const createMessage = (body: { userNickname: string; value: string; }): Transcript => ({
+const createMessage = (body: { userNickname: string; value: string; createdAt: string; }): Transcript => ({
   frontendId: randomId(),
   ...body,
 });
@@ -77,11 +77,13 @@ const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string, toCh
       return createMessage({
         userNickname: chatMessageEventParsed.Nickname || 'Nickname not found',
         value: chatMessageEventParsed.Message,
+        createdAt: (new Date()).toISOString(),
       });
     } catch {
       return createMessage({
         userNickname: 'Message not found',
         value: '',
+        createdAt: (new Date()).toISOString(),
       });
     };
   }).reverse();
@@ -240,6 +242,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       createMessage({
         userNickname: localizationCaptions[LocalizationKey.ChatWelcomeMessageNickname],
         value: `${localizationCaptions[LocalizationKey.ChatWelcomeMessage]}, ${auth?.nickname}.`,
+        createdAt: (new Date()).toISOString(),
       }),
     ];
     setTextMessages(newTextMessages);
@@ -531,6 +534,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
               createMessage({
                 userNickname: parsedData.Value.Nickname,
                 value: parsedData.Value.Message,
+                createdAt: parsedData.CreatedAt,
               }),
             ],
             transcriptsMaxLength
@@ -543,6 +547,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
               createMessage({
                 userNickname: parsedData.Value.Nickname,
                 value: parsedData.Value.Message,
+                createdAt: parsedData.CreatedAt,
               }),
             ],
             transcriptsMaxLength
@@ -637,7 +642,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       </div>
 
       <div className='relative videochat-field bg-wrap rounded-1.125'>
-        <div className={`videochat ${messagesChatEnabled ? 'invisible' : 'visible'}`}>
+        <div className={`videochat ${messagesChatEnabled ? 'invisible h-full' : 'visible'}`}>
           <VideochatParticipant
             order={3}
             viewer={false}
@@ -686,7 +691,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             ))}
         </div>
 
-        <div className={`absolute top-0 h-full bg-wrap ${messagesChatEnabled ? 'visible' : 'invisible'} z-1`}>
+        <div className={`absolute top-0 h-full bg-wrap w-full ${messagesChatEnabled ? 'visible' : 'invisible'} z-1`}>
           <MessagesChat
             textMessages={textMessages}
             onMessageSubmit={handleTextMessageSubmit}
