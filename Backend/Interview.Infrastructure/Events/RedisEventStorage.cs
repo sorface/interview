@@ -86,6 +86,7 @@ public class RedisEventStorage : IEventStorage
             Payload = @event.Payload,
             Stateful = @event.Stateful,
             CreatedAt = @event.CreatedAt,
+            CreatedById = @event.CreatedById,
         };
         return redisEvent;
     }
@@ -118,6 +119,9 @@ public class RedisEventStorage : IEventStorage
 
         [Indexed(Sortable = true)]
         public required DateTime CreatedAt { get; set; }
+
+        [Indexed]
+        public required Guid CreatedById { get; set; }
     }
 
     private class Visitor<T> : ExpressionVisitor

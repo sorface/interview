@@ -43,7 +43,7 @@ public class ReturningSignalWebSocketByNameEventHandler : WebSocketByNameEventHa
 
         var receivingReturnedSignalPayload = new { Signal = payload.Signal, From = detail.UserId, ScreenShare = payload.ScreenShare };
         var strPayload = _serializer.SerializePayloadAsString(receivingReturnedSignalPayload);
-        var sendEvent = new RoomEvent(detail.RoomId, "receiving returned signal", strPayload, false);
+        var sendEvent = new RoomEvent(detail.RoomId, "receiving returned signal", strPayload, false, detail.UserId);
         var provider = new CachedRoomEventProvider(sendEvent, _serializer);
         foreach (var webSocket in connections)
         {

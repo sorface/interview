@@ -13,4 +13,6 @@ public interface IStorageEvent
     bool Stateful { get; }
 
     DateTime CreatedAt { get; }
+
+    Guid CreatedById { get; }
 }

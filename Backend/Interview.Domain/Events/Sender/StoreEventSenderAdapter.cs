@@ -20,14 +20,16 @@ public class StoreEventSenderAdapter : IEventSenderAdapter
     {
         await _root.SendAsync(provider, sender, cancellationToken);
 
+        var @event = provider.Event;
         var storageEvent = new StorageEvent
         {
-            Id = provider.Event.Id,
-            RoomId = provider.Event.RoomId,
-            Type = provider.Event.Type,
-            Payload = provider.Event.BuildStringPayload(),
-            Stateful = provider.Event.Stateful,
-            CreatedAt = provider.Event.CreatedAt,
+            Id = @event.Id,
+            RoomId = @event.RoomId,
+            Type = @event.Type,
+            Payload = @event.BuildStringPayload(),
+            Stateful = @event.Stateful,
+            CreatedAt = @event.CreatedAt,
+            CreatedById = @event.CreatedById,
         };
 
         await _eventStorage.AddAsync(storageEvent, cancellationToken);

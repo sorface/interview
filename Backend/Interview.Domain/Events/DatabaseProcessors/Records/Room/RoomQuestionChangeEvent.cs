@@ -5,8 +5,8 @@ namespace Interview.Domain.Events.DatabaseProcessors.Records.Room;
 
 public class RoomQuestionChangeEvent : RoomEvent<RoomQuestionChangeEventPayload>
 {
-    public RoomQuestionChangeEvent(Guid roomId, RoomQuestionChangeEventPayload? value)
-        : base(roomId, EventType.ChangeRoomQuestionState, value, false)
+    public RoomQuestionChangeEvent(Guid roomId, RoomQuestionChangeEventPayload? value, Guid createdById)
+        : base(roomId, EventType.ChangeRoomQuestionState, value, false, createdById)
     {
     }
 }

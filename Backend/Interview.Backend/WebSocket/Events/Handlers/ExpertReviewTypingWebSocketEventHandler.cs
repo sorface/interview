@@ -53,7 +53,7 @@ public class ExpertReviewTypingWebSocketEventHandler : WebSocketByNameEventHandl
         };
 
         var payloadStr = _serializer.SerializePayloadAsString(payloadForSerialization);
-        var sendEvent = new RoomEvent(detail.RoomId, "review-typing", payloadStr, false);
+        var sendEvent = new RoomEvent(detail.RoomId, "review-typing", payloadStr, false, detail.UserId);
         var provider = new CachedRoomEventProvider(sendEvent, _serializer);
         foreach (var webSocket in connections)
         {

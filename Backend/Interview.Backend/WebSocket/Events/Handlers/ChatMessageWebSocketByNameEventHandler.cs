@@ -20,7 +20,7 @@ public class ChatMessageWebSocketByNameEventHandler : WebSocketByNameEventHandle
     protected override Task HandleEventAsync(SocketEventDetail detail, string? message, CancellationToken cancellationToken)
     {
         var payload = new UserMessageEventPayload(message ?? string.Empty, detail.User.Nickname);
-        var @event = new RoomEvent<UserMessageEventPayload>(detail.RoomId, EventType.ChatMessage, payload, false);
+        var @event = new RoomEvent<UserMessageEventPayload>(detail.RoomId, EventType.ChatMessage, payload, false, detail.UserId);
         return _eventDispatcher.WriteAsync(@event, cancellationToken);
     }
 }

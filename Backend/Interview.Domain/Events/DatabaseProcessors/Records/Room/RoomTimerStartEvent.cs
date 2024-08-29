@@ -4,8 +4,8 @@ namespace Interview.Domain.Events.DatabaseProcessors.Records.Room;
 
 public class RoomTimerStartEvent : RoomEvent<RoomTimerStartEventPayload>
 {
-    public RoomTimerStartEvent(Guid roomId, RoomTimerStartEventPayload? value)
-        : base(roomId, EventType.StartRoomTimer, value, false)
+    public RoomTimerStartEvent(Guid roomId, RoomTimerStartEventPayload? value, Guid createdById)
+        : base(roomId, EventType.StartRoomTimer, value, false, createdById)
     {
     }
 }
