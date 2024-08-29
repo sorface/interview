@@ -1,6 +1,7 @@
 .typography {
   font-weight: 400;
   line-height: 150%;
+  overflow-wrap: break-word;
 }
 
 .typography-xxxl {
