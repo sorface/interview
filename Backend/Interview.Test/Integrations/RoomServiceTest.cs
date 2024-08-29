@@ -558,7 +558,7 @@ public class RoomServiceTest
                     AverageMark = 10,
                 }
             },
-            AverageMark = 5.25,
+            AverageMark = 7,
             UserReview = new List<Analytics.AnalyticsUserAverageMark>
             {
                 new() { UserId = users[0].Id, AverageMark = 6, Comment = "test review", Nickname = users[0].Nickname, Avatar = users[0].Avatar, ParticipantType = roomParticipants[0].Type.EnumValue },

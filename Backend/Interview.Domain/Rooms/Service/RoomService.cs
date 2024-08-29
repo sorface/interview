@@ -637,7 +637,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         {
             analyticsQuestion.Users = await GetUsersByQuestionIdAsync(analyticsQuestion.Id, cancellationToken);
             analyticsQuestion.AverageMark = analyticsQuestion.Users
-                .Where(e => e.Evaluation?.Mark is not null)
+                .Where(e => e.Evaluation?.Mark is not null && e.Evaluation.Mark.Value > 0)
                 .Select(e => e.Evaluation!.Mark!.Value)
                 .DefaultIfEmpty(0)
                 .Average();
@@ -680,7 +680,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 {
                     UserId = e.User.Id,
                     AverageMarks = e.User.RoomQuestionEvaluations
-                        .Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId)
+                        .Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.Mark != null && rqe.Mark > 0)
                         .Select(rqe => rqe.Mark ?? 0)
                         .ToList(),
                     Comment = _db.RoomReview
@@ -706,7 +706,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                     ParticipantType = e.ParticipantType.EnumValue,
                 })
                 .ToList();
-            res.AverageMark = res.UserReview.Select(e => e.AverageMark).DefaultIfEmpty(0).Average();
+            res.AverageMark = res.UserReview.Select(e => e.AverageMark)
+                .Where(e => e > 0)
+                .DefaultIfEmpty(0)
+                .Average();
 
             return res;
         }
