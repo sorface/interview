@@ -13,5 +13,5 @@ public class RoomQuestionChangeEvent : RoomEvent<RoomQuestionChangeEventPayload>
 
 public sealed record RoomQuestionChangeEventPayload(
     Guid QuestionId,
-    RoomQuestionState OldState,
-    RoomQuestionState NewState);
+    RoomQuestionStateType OldState,
+    RoomQuestionStateType NewState);

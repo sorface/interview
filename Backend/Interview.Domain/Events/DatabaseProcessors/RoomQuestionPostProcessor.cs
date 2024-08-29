@@ -39,7 +39,7 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
 
         var @event = new RoomQuestionChangeEvent(
             current.RoomId,
-            new RoomQuestionChangeEventPayload(current.QuestionId, original.State, current.State));
+            new RoomQuestionChangeEventPayload(current.QuestionId, original.State.EnumValue, current.State.EnumValue));
 
         await _eventDispatcher.WriteAsync(@event, cancellationToken);
 
