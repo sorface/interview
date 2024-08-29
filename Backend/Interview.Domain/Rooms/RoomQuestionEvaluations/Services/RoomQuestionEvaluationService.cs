@@ -30,21 +30,25 @@ public class RoomQuestionEvaluationService : IRoomQuestionEvaluationService
     public async Task<List<RoomQuestionEvaluationResponse>> GetUserRoomQuestionEvaluationsAsync(UserRoomQuestionEvaluationsRequest request, CancellationToken cancellationToken)
     {
         await _membershipChecker.EnsureUserMemberOfRoomAsync(request.UserId, request.RoomId, cancellationToken);
-        return await _db.RoomQuestionEvaluation.AsNoTracking()
-            .Include(e => e.RoomQuestion).ThenInclude(e => e!.Question)
-            .Where(e => e.RoomQuestion!.RoomId == request.RoomId && e.CreatedById == request.UserId && e.State == SERoomQuestionEvaluationState.Submitted)
-            .OrderBy(e => e.RoomQuestion!.Order)
+        return await _db.RoomQuestions
+            .Include(e => e.Question)
+            .Include(e => e.Evaluations)
+            .Where(e => e.RoomId == request.RoomId)
+            .OrderBy(e => e.Order)
             .Select(e => new RoomQuestionEvaluationResponse
             {
-                Id = e.RoomQuestion!.Question!.Id,
-                Value = e.RoomQuestion!.Question!.Value,
-                Order = e.RoomQuestion!.Order,
-                Evaluation = new QuestionEvaluationDetail
-                {
-                    Id = e.Id,
-                    Mark = e.Mark,
-                    Review = e.Review,
-                },
+                Id = e.Question!.Id,
+                Value = e.Question!.Value,
+                Order = e.Order,
+                Evaluation = e.Evaluations
+                    .Where(ev => ev.CreatedById == request.UserId && ev.State == SERoomQuestionEvaluationState.Submitted)
+                    .Select(ev => new QuestionEvaluationDetail
+                    {
+                        Id = ev.Id,
+                        Mark = ev.Mark,
+                        Review = ev.Review,
+                    })
+                    .FirstOrDefault(),
             })
             .ToListAsync(cancellationToken);
     }

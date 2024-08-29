@@ -8,5 +8,5 @@ public class RoomQuestionEvaluationResponse
 
     public required int Order { get; set; }
 
-    public required QuestionEvaluationDetail Evaluation { get; set; }
+    public required QuestionEvaluationDetail? Evaluation { get; set; }
 }

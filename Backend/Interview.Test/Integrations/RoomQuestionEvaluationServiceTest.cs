@@ -64,7 +64,23 @@ public class RoomQuestionEvaluationServiceTest
                         },
                     },
                 },
-                Array.Empty<RoomQuestionEvaluationResponse>(),
+                new RoomQuestionEvaluationResponse[]
+                {
+                    new()
+                    {
+                        Id = new Guid("D2E2260D-8FF6-47C7-B6AA-14D519315DB8"),
+                        Value = "r 2",
+                        Order = 2,
+                        Evaluation = null,
+                    },
+                    new()
+                    {
+                        Id = new Guid("846FB307-BB66-4642-94AC-93C1453F8597"),
+                        Value = "r 1",
+                        Order = 1,
+                        Evaluation = null,
+                    },
+                }
             };
             yield return new object[]
             {
@@ -111,6 +127,13 @@ public class RoomQuestionEvaluationServiceTest
                             Review = "Test 2",
                         },
                     },
+                    new()
+                    {
+                        Id = new Guid("846FB307-BB66-4642-94AC-93C1453F8597"),
+                        Value = "r 1",
+                        Order = 1,
+                        Evaluation = null,
+                    }
                 }
             };
             yield return new object[]
