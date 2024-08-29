@@ -206,6 +206,7 @@ export const enum LocalizationKey {
   RoomEmptyQuestionsListError,
   InterviewHistoryTitle,
   RoomReviewAlreadyGiven,
+  EmptyCommentQuestionEvaluation,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -415,6 +416,7 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.RoomEmptyQuestionsListError]: 'Please add questions to the list of questions',
     [LocalizationKey.InterviewHistoryTitle]: 'Interview history',
     [LocalizationKey.RoomReviewAlreadyGiven]: 'You have already given feedback on the interview. Waiting for evaluation from other participants.',
+    [LocalizationKey.EmptyCommentQuestionEvaluation]: 'Write a comment to answer the question',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -622,5 +624,6 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.RoomEmptyQuestionsListError]: 'Пожалуйста, добавьте вопросы в список вопросов',
     [LocalizationKey.InterviewHistoryTitle]: 'История собеседований',
     [LocalizationKey.RoomReviewAlreadyGiven]: 'Вы уже дали отзыв о собеседовании. Ожидание оценки от остальных участников.',
+    [LocalizationKey.EmptyCommentQuestionEvaluation]: 'Напишите комментарий  к ответу на вопрос',
   },
 }

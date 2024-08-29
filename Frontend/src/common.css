@@ -23,6 +23,7 @@
 .text-white { color: var(--white); }
 .hover\:text-red:hover { color: var(--red); }
 .text-red { color: var(--red); }
+.text-dark-red { color: var(--dark-red); }
 .text-red-light { color: var(--red-light); }
 .text-green-light { color: var(--green-light); }
 .text-grey-active { color: var(--grey-active); }
@@ -219,5 +220,7 @@
 .border-b-1 { border-bottom-width: 1px; }
 .border-grey-active { border-color: var(--grey-active); }
 .border-grey-3 { border-color: var(--grey3); }
+.border-red { border-color: var(--red); }
+.border-dark-red { border-color: var(--dark-red); }
 .border-b-solid { border-bottom-style: solid; }
 .no-underline { text-decoration-line: none; }
