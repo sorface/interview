@@ -71,14 +71,24 @@ public class RoomQuestionEvaluationServiceTest
                         Id = new Guid("D2E2260D-8FF6-47C7-B6AA-14D519315DB8"),
                         Value = "r 2",
                         Order = 2,
-                        Evaluation = null,
+                        Evaluation = new()
+                        {
+                            Id = new Guid("6B642B9B-FC99-47BF-820A-946F748871DE"),
+                            Mark = 2,
+                            Review = "Test 2",
+                        },
                     },
                     new()
                     {
                         Id = new Guid("846FB307-BB66-4642-94AC-93C1453F8597"),
                         Value = "r 1",
                         Order = 1,
-                        Evaluation = null,
+                        Evaluation = new()
+                        {
+                            Id = new Guid("6D9BE983-DC87-4D4B-94F6-292DF8AAEB98"),
+                            Mark = 10,
+                            Review = "Test",
+                        },
                     },
                 }
             };
@@ -132,7 +142,12 @@ public class RoomQuestionEvaluationServiceTest
                         Id = new Guid("846FB307-BB66-4642-94AC-93C1453F8597"),
                         Value = "r 1",
                         Order = 1,
-                        Evaluation = null,
+                        Evaluation = new()
+                        {
+                            Id = new Guid("6D9BE983-DC87-4D4B-94F6-292DF8AAEB98"),
+                            Mark = 10,
+                            Review = "Test",
+                        },
                     }
                 }
             };
