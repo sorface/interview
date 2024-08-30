@@ -94,6 +94,7 @@ export const RoomReviewQuestionEvaluation: FunctionComponent<RoomReviewQuestionE
       <RoomQuestionEvaluation
         readOnly={readOnly}
         value={actualRoomQuestionEvaluation}
+        validateComment
         onChange={handleRoomQuestionEvaluationChange}
       />
       <div className='text-left h-1.125'>

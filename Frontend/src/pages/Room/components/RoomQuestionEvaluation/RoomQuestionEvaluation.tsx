@@ -17,6 +17,7 @@ export interface RoomQuestionEvaluationValue {
 interface RoomQuestionEvaluationPorps {
   readOnly?: boolean;
   value: RoomQuestionEvaluationValue;
+  validateComment?: boolean;
   onChange: (newValue: RoomQuestionEvaluationValue) => void;
 }
 
@@ -34,11 +35,21 @@ const themeClassNames: Record<ThemeInUi, Record<'active' | 'nonActive', string>>
 export const RoomQuestionEvaluation: FunctionComponent<RoomQuestionEvaluationPorps> = ({
   readOnly,
   value,
+  validateComment,
   onChange,
 }) => {
   const commonButtonClassName = 'w-1.75 h-1.75 min-h-unset p-0.375';
   const themeClassName = useThemeClassName(themeClassNames);
   const localizationCaptions = useLocalizationCaptions();
+  const noValidComment = validateComment && value.mark !== 0 && !value.review;
+  const textareaNoValidClassName = useThemeClassName({
+    [Theme.Dark]: 'border-dark-red',
+    [Theme.Light]: 'border-red',
+  });
+  const noValidMessageClassName = useThemeClassName({
+    [Theme.Dark]: 'text-dark-red',
+    [Theme.Light]: 'text-red',
+  });
   const markGroups = [
     {
       marks: [1, 2, 3],
@@ -111,13 +122,20 @@ export const RoomQuestionEvaluation: FunctionComponent<RoomQuestionEvaluationPor
       <Gap sizeRem={1} />
       <div className='flex'>
         <Textarea
-          className='flex-1 h-6.25'
+          className={`flex-1 h-6.25 ${noValidComment ? textareaNoValidClassName : ''}`}
           maxLength={roomReviewMaxLength}
           readOnly={readOnly}
           value={value.review || ''}
           onInput={handleReviewChange}
         />
       </div>
+      {noValidComment && (
+        <div className={`text-right ${noValidMessageClassName}`}>
+          <Typography size='s'>
+            {localizationCaptions[LocalizationKey.EmptyCommentQuestionEvaluation]}
+          </Typography>
+        </div>
+      )}
     </div>
   )
 };
