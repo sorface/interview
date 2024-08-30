@@ -41,7 +41,7 @@ public class RoomQuestionEvaluationService : IRoomQuestionEvaluationService
                 Value = e.Question!.Value,
                 Order = e.Order,
                 Evaluation = e.Evaluations
-                    .Where(ev => ev.CreatedById == request.UserId && ev.State == SERoomQuestionEvaluationState.Submitted)
+                    .Where(ev => ev.CreatedById == request.UserId)
                     .Select(ev => new QuestionEvaluationDetail
                     {
                         Id = ev.Id,
