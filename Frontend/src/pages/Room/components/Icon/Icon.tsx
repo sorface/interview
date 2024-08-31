@@ -3,6 +3,7 @@ import { IconNames } from '../../../../constants';
 import { useThemeClassName } from '../../../../hooks/useThemeClassName';
 import { Theme } from '../../../../context/ThemeContext';
 
+import iconsSpritesheet from './icons-spritesheet.svg';
 import './Icon.css';
 
 export interface IconProps {
@@ -39,7 +40,7 @@ export const Icon: FunctionComponent<IconProps> = ({
   return (
     <div className={`icon ${sizeClassName} ${secondaryClassName}`} role='img'>
       <div className='icon-inner'>
-        <svg><use href={`/icons-spritesheet.svg#${name}`} /></svg>
+        <svg><use href={`${iconsSpritesheet}#${name}`} /></svg>
       </div>
     </div>
   );
