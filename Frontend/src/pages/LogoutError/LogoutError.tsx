@@ -21,7 +21,7 @@ export const LogoutError: FunctionComponent = () => {
   return (
     <div className='h-full flex flex-col items-center justify-center'>
       <Typography size='m' secondary>
-        {localizationCaptions[LocalizationKey.LogoutError]}
+        {localizationCaptions[LocalizationKey.LoadingAccountError]}
       </Typography>
       <Typography size='m' secondary>
         {localizationCaptions[LocalizationKey.WeAwareOfProblem]}
