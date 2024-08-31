@@ -19,6 +19,7 @@ import { CategoriesCreate } from '../pages/CategoriesCreate/CategoriesCreate';
 import { Gap } from '../components/Gap/Gap';
 import { RoomReview } from '../pages/RoomReview/RoomReview';
 import { RoomAnaytics } from '../pages/RoomAnaytics/RoomAnaytics';
+import { LogoutError } from '../pages/LogoutError/LogoutError';
 
 interface AppRoutesProps {
   user: User | null;
@@ -45,6 +46,7 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
           <Routes>
             <Route path={pathnames.home} element={<Home />} />
             <Route path={pathnames.terms} element={<Terms />} />
+            <Route path={pathnames.logoutError} element={<LogoutError />} />
             <Route path={pathnames.roomsParticipants}
               element={
                 <ProtectedRoute allowed={authenticated}>
