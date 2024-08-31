@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useReducer, useState } from 'react';
 import { REACT_APP_BACKEND_URL } from '../config';
-import { unauthorizedHttpCode } from '../constants';
+import { pathnames, unauthorizedHttpCode } from '../constants';
 import { ApiContract } from '../types/apiContracts';
 import { useLogout } from './useLogout';
 import { useRefresh } from './useRefresh';
+import { useNavigate } from 'react-router-dom';
 
 interface ApiMethodState<ResponseData = any> {
   process: {
@@ -141,6 +142,7 @@ const getResponseError = (
 }
 
 export const useApiMethod = <ResponseData, RequestData = AnyObject>(apiContractCall: (data: RequestData) => ApiContract) => {
+  const navigate = useNavigate();
   const [apiMethodState, dispatch] = useReducer(apiMethodReducer, initialState);
   const [requestData, setRequestData] = useState<RequestData | null>(null);
   const [needRefresh, setNeedRefresh] = useState(false);
@@ -153,9 +155,8 @@ export const useApiMethod = <ResponseData, RequestData = AnyObject>(apiContractC
     if (!logoutError) {
       return;
     }
-    // TODO: Redirect to error page - https://github.com/sorface/interview-platform/issues/288
-    throw new Error(`Logout error: ${logoutError}`);
-  }, [logoutError]);
+    navigate(pathnames.logoutError);
+  }, [logoutError, navigate]);
 
   useEffect(() => {
     if (!needRefresh) {
