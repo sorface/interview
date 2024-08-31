@@ -19,7 +19,7 @@ import { RoomQuestionsSelector } from './RoomQuestionsSelector/RoomQuestionsSele
 import { QuestionItem } from '../../components/QuestionItem/QuestionItem';
 import { RoomInvitations } from '../../components/RoomInvitations/RoomInvitations';
 import { RoomCreateField } from './RoomCreateField/RoomCreateField';
-import { Modal } from '../../components/Modal/Modal';
+import { ModalWithProgressWarning } from '../../components/ModalWithProgressWarning/ModalWithProgressWarning';
 import { Button } from '../../components/Button/Button';
 import { padTime } from '../../utils/padTime';
 import { sortRoomQestions } from '../../utils/sortRoomQestions';
@@ -415,7 +415,8 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
   };
 
   return (
-    <Modal
+    <ModalWithProgressWarning
+      warningCaption={localizationCaptions[LocalizationKey.CurrentRoomNotBeSaved]}
       contentLabel={modalTitle}
       open={open}
       wide
@@ -445,6 +446,6 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
           stepView[creationStep]
         }
       </div>
-    </Modal>
+    </ModalWithProgressWarning>
   );
 };

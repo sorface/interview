@@ -15,7 +15,7 @@ import { Gap } from '../../components/Gap/Gap';
 import { Icon } from '../Room/components/Icon/Icon';
 import { CodeEditor } from '../../components/CodeEditor/CodeEditor';
 import { Button } from '../../components/Button/Button';
-import { Modal } from '../../components/Modal/Modal';
+import { ModalWithProgressWarning } from '../../components/ModalWithProgressWarning/ModalWithProgressWarning';
 import { ModalFooter } from '../../components/ModalFooter/ModalFooter';
 import { Typography } from '../../components/Typography/Typography';
 import { QuestionCreateField } from './components/QuestionCreateField/QuestionCreateField';
@@ -294,7 +294,8 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
   };
 
   return (
-    <Modal
+    <ModalWithProgressWarning
+      warningCaption={localizationCaptions[LocalizationKey.CurrentQuestionNotBeSaved]}
       contentLabel={editQuestionId ? localizationCaptions[LocalizationKey.EditQuestion] : localizationCaptions[LocalizationKey.CreateQuestion]}
       open={open}
       wide
@@ -435,6 +436,6 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
           </Button>
         </ModalFooter>
       </div>
-    </Modal>
+    </ModalWithProgressWarning>
   );
 };
