@@ -46,6 +46,8 @@ export const enum LocalizationKey {
   Continue,
   Cancel,
   Close,
+  CloselWithoutSave,
+  Stay,
   Error,
   NotSelected,
   QuestionCreatedSuccessfully,
@@ -209,6 +211,8 @@ export const enum LocalizationKey {
   EmptyCommentQuestionEvaluation,
   LogoutError,
   WeAwareOfProblem,
+  CurrentQuestionNotBeSaved,
+  CurrentRoomNotBeSaved,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -258,6 +262,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.Continue]: 'Continue',
     [LocalizationKey.Cancel]: 'Cancel',
     [LocalizationKey.Close]: 'Close',
+    [LocalizationKey.CloselWithoutSave]: 'Exit without saving',
+    [LocalizationKey.Stay]: 'Stay',
     [LocalizationKey.Error]: 'Error',
     [LocalizationKey.NotSelected]: 'Not selected',
     [LocalizationKey.QuestionCreatedSuccessfully]: 'Question created successfully',
@@ -421,6 +427,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.EmptyCommentQuestionEvaluation]: 'Write a comment to answer the question',
     [LocalizationKey.LogoutError]: 'Failed to load user profile',
     [LocalizationKey.WeAwareOfProblem]: 'We are already aware of the problem and are working on a solution',
+    [LocalizationKey.CurrentQuestionNotBeSaved]: 'Current question will not be saved',
+    [LocalizationKey.CurrentRoomNotBeSaved]: 'Current room will not be saved',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -468,6 +476,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.Continue]: 'Дальше',
     [LocalizationKey.Cancel]: 'Отменить',
     [LocalizationKey.Close]: 'Закрыть',
+    [LocalizationKey.CloselWithoutSave]: 'Выйти без сохранения',
+    [LocalizationKey.Stay]: 'Остаться',
     [LocalizationKey.Error]: 'Ошибка',
     [LocalizationKey.NotSelected]: 'Не выбрано',
     [LocalizationKey.QuestionCreatedSuccessfully]: 'Вопрос успешно создан',
@@ -631,5 +641,7 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.EmptyCommentQuestionEvaluation]: 'Напишите комментарий  к ответу на вопрос',
     [LocalizationKey.LogoutError]: 'Не удалось загрузить профиль пользователя',
     [LocalizationKey.WeAwareOfProblem]: 'Мы уже знаем о проблеме и работаем над ее решением',
+    [LocalizationKey.CurrentQuestionNotBeSaved]: 'Текущий вопрос не будет сохранен',
+    [LocalizationKey.CurrentRoomNotBeSaved]: 'Текущая комната не будет сохранена',
   },
 }
