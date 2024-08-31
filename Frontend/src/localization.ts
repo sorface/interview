@@ -209,10 +209,11 @@ export const enum LocalizationKey {
   InterviewHistoryTitle,
   RoomReviewAlreadyGiven,
   EmptyCommentQuestionEvaluation,
-  LogoutError,
   WeAwareOfProblem,
   CurrentQuestionNotBeSaved,
   CurrentRoomNotBeSaved,
+  LoadingAccountError,
+  LoadingAccountErrorTitle,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -425,10 +426,11 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.InterviewHistoryTitle]: 'Interview history',
     [LocalizationKey.RoomReviewAlreadyGiven]: 'You have already given feedback on the interview. Waiting for evaluation from other participants.',
     [LocalizationKey.EmptyCommentQuestionEvaluation]: 'Write a comment to answer the question',
-    [LocalizationKey.LogoutError]: 'Failed to load user profile',
     [LocalizationKey.WeAwareOfProblem]: 'We are already aware of the problem and are working on a solution',
     [LocalizationKey.CurrentQuestionNotBeSaved]: 'Current question will not be saved',
     [LocalizationKey.CurrentRoomNotBeSaved]: 'Current room will not be saved',
+    [LocalizationKey.LoadingAccountError]: 'Failed to load user profile',
+    [LocalizationKey.LoadingAccountErrorTitle]: 'Account loading error',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -639,9 +641,10 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.InterviewHistoryTitle]: 'История собеседований',
     [LocalizationKey.RoomReviewAlreadyGiven]: 'Вы уже дали отзыв о собеседовании. Ожидание оценки от остальных участников.',
     [LocalizationKey.EmptyCommentQuestionEvaluation]: 'Напишите комментарий  к ответу на вопрос',
-    [LocalizationKey.LogoutError]: 'Не удалось загрузить профиль пользователя',
     [LocalizationKey.WeAwareOfProblem]: 'Мы уже знаем о проблеме и работаем над ее решением',
     [LocalizationKey.CurrentQuestionNotBeSaved]: 'Текущий вопрос не будет сохранен',
     [LocalizationKey.CurrentRoomNotBeSaved]: 'Текущая комната не будет сохранена',
+    [LocalizationKey.LoadingAccountError]: 'Не удалось загрузить профиль пользователя',
+    [LocalizationKey.LoadingAccountErrorTitle]: 'Ошибка загрузки профиля',
   },
 }
