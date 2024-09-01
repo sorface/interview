@@ -75,12 +75,12 @@ public static class ServiceCollectionExt
                 {
                     var cookieBuilder = new CookieBuilder();
 
-                    if (authorizationService.CorrelationCookie?.Name is not null)
+                    if (authorizationService.CorrelationCookie?.Name is not null && authorizationService.CorrelationCookie?.Name.Length > 0)
                     {
                         cookieBuilder.Name = authorizationService.CorrelationCookie.Name;
                     }
 
-                    if (authorizationService.CorrelationCookie?.Domain is not null)
+                    if (authorizationService.CorrelationCookie?.Domain is not null && authorizationService.CorrelationCookie?.Domain.Length > 0)
                     {
                         cookieBuilder.Domain = authorizationService.CorrelationCookie.Domain;
                     }
