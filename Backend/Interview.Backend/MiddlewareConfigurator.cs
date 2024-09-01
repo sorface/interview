@@ -53,22 +53,22 @@ public class MiddlewareConfigurator
             return func();
         });
 
-        var cookieExpTimeConfig = _app.Configuration.GetSection("AccessTokenExpiredTime");
-
-        _app.UseAccessTokenExpiredTimeCookie("ate_t", new CookieOptions { Domain = cookieExpTimeConfig.GetValue<string>("Domain"), Secure = true, });
-
-        _app.UseSession();
         _app.UseAuthentication();
         _app.UseAuthorization();
+        _app.UseSession();
+
+        var cookieExpTimeConfig = _app.Configuration.GetSection("AccessTokenExpiredTime");
+        _app.UseAccessTokenExpiredTimeCookie("ate_t", new CookieOptions { Domain = cookieExpTimeConfig.GetValue<string>("Domain"), Secure = true, });
 
         _app.Use((context, func) =>
         {
             var upsertUser = context.User.ToUser();
             logger.LogInformation(
-                "Request {Path} authorized user [{nickname} {id}]",
+                "Request {Path} authorized user [{nickname} {id}]. session id: {sessionId}",
                 context.Request.Path,
                 upsertUser?.Nickname,
-                upsertUser?.Id);
+                upsertUser?.Id,
+                context.Session.Id);
 
             return func();
         });
