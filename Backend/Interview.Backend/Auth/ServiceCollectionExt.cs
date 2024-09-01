@@ -1,14 +1,7 @@
-using System.Collections;
-using System.Collections.Immutable;
-using System.Diagnostics.Eventing.Reader;
 using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Responses;
 using Interview.Domain.Users.Service;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Caching.Distributed;
 
 namespace Interview.Backend.Auth;
 
@@ -75,12 +68,12 @@ public static class ServiceCollectionExt
                 {
                     var cookieBuilder = new CookieBuilder();
 
-                    if (authorizationService.CorrelationCookie?.Name is not null)
+                    if (authorizationService.CorrelationCookie?.Name is not null && authorizationService.CorrelationCookie?.Name.Length > 0)
                     {
                         cookieBuilder.Name = authorizationService.CorrelationCookie.Name;
                     }
 
-                    if (authorizationService.CorrelationCookie?.Domain is not null)
+                    if (authorizationService.CorrelationCookie?.Domain is not null && authorizationService.CorrelationCookie?.Domain.Length > 0)
                     {
                         cookieBuilder.Domain = authorizationService.CorrelationCookie.Domain;
                     }
