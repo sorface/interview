@@ -1,14 +1,7 @@
-using System.Collections;
-using System.Collections.Immutable;
-using System.Diagnostics.Eventing.Reader;
 using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Responses;
 using Interview.Domain.Users.Service;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Caching.Distributed;
 
 namespace Interview.Backend.Auth;
 
