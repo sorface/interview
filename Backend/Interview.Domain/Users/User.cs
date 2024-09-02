@@ -1,6 +1,7 @@
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomQuestionEvaluations;
+using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Users.Permissions;
 using Interview.Domain.Users.Roles;
 
@@ -35,5 +36,9 @@ public class User : Entity
 
     public List<Permission> Permissions { get; private set; } = new List<Permission>();
 
-    public List<RoomQuestionEvaluation> RoomQuestionEvaluations { get; private set; } = new List<RoomQuestionEvaluation>();
+    public List<RoomQuestionEvaluation> RoomQuestionEvaluations { get; private set; } = new();
+
+    public List<RoomReview> RoomReviews { get; private set; } = new();
+
+    public List<RoomParticipant> RoomParticipants { get; private set; } = new();
 }

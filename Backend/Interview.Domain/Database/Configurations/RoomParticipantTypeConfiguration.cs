@@ -10,7 +10,7 @@ public class RoomParticipantTypeConfiguration : EntityTypeConfigurationBase<Room
     protected override void ConfigureCore(EntityTypeBuilder<RoomParticipant> builder)
     {
         builder.HasOne<User>(participant => participant.User)
-            .WithMany()
+            .WithMany(user => user.RoomParticipants)
             .IsRequired();
 
         builder.HasOne<Room>(participant => participant.Room)

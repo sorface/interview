@@ -52,9 +52,7 @@ public class RoomReviewService : IRoomReviewService
             : new UserRoomReviewResponse { State = review.State.EnumValue, Review = review.Review, Id = review.Id };
     }
 
-    public Task<IPagedList<RoomReviewPageDetail>> FindPageAsync(
-        RoomReviewPageRequest request,
-        CancellationToken cancellationToken = default)
+    public Task<IPagedList<RoomReviewPageDetail>> FindPageAsync(RoomReviewPageRequest request, CancellationToken cancellationToken = default)
     {
         var specification = Spec<RoomReview>.Any;
         if (request.Filter.RoomId is not null)
@@ -75,8 +73,7 @@ public class RoomReviewService : IRoomReviewService
             cancellationToken);
     }
 
-    public async Task<RoomReviewDetail> CreateAsync(
-        RoomReviewCreateRequest request, Guid userId, CancellationToken cancellationToken = default)
+    public async Task<RoomReviewDetail> CreateAsync(RoomReviewCreateRequest request, Guid userId, CancellationToken cancellationToken = default)
     {
         var user = await _userRepository.FindByIdAsync(userId, cancellationToken);
 
@@ -102,11 +99,16 @@ public class RoomReviewService : IRoomReviewService
         await _roomReviewRepository.CreateAsync(roomReview, cancellationToken);
         await _roomQuestionEvaluationRepository.SubmitAsync(room.Id, user.Id, cancellationToken);
 
+        // if (await _roomRepository.IsReadyToClose(room.Id, cancellationToken))
+        // {
+        //     room.Status = SERoomStatus.Close;
+        //     await _roomRepository.UpdateAsync(room, cancellationToken);
+        // }
+
         return RoomReviewDetailMapper.Instance.Map(roomReview);
     }
 
-    public async Task<RoomReviewDetail> UpdateAsync(
-        Guid id, RoomReviewUpdateRequest request, CancellationToken cancellationToken = default)
+    public async Task<RoomReviewDetail> UpdateAsync(Guid id, RoomReviewUpdateRequest request, CancellationToken cancellationToken = default)
     {
         var roomReview = await _roomReviewRepository.FindByIdDetailedAsync(id, cancellationToken);
 
