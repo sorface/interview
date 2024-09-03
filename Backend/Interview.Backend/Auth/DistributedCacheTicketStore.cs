@@ -64,15 +64,15 @@ public class DistributedCacheTicketStore : ITicketStore
         return TicketSerializer.Default.Serialize(source);
     }
 
+    private static AuthenticationTicket? DeserializeFromBytes(byte[]? source)
+    {
+        return source is null ? null : TicketSerializer.Default.Deserialize(source)!;
+    }
+
     private Task SetupValue(string key, AuthenticationTicket ticket, CancellationToken cancellationToken)
     {
         var val = SerializeToBytes(ticket);
 
         return _distributedCache.SetAsync(key, val, DISTRIBUTEDCACHEENTRYOPTIONS, cancellationToken);
-    }
-
-    private AuthenticationTicket? DeserializeFromBytes(byte[]? source)
-    {
-        return source is null ? null : TicketSerializer.Default.Deserialize(source)!;
     }
 }
