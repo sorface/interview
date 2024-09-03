@@ -71,7 +71,7 @@ public class DistributedCacheTicketStore : ITicketStore
         return _distributedCache.SetAsync(key, val, DISTRIBUTEDCACHEENTRYOPTIONS, cancellationToken);
     }
 
-    private static AuthenticationTicket? DeserializeFromBytes(byte[]? source)
+    private AuthenticationTicket? DeserializeFromBytes(byte[]? source)
     {
         return source is null ? null : TicketSerializer.Default.Deserialize(source)!;
     }

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 namespace Interview.Backend.Auth
 {
     public class SemaphoreLockProvider<T>
+        where T : notnull
     {
         private static readonly ConcurrentDictionary<T, SemaphoreSlim> LOCKSTORE = new();
 
@@ -18,8 +19,8 @@ namespace Interview.Backend.Auth
         /// until it can enter the LockProvider
         /// </summary>
         /// <param name="id">the unique ID to perform the lock</param>
-        /// <param name="cancellationToken"></param>
-        /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous operation.</placeholder></returns>
+        /// <param name="cancellationToken">cancellationToken for aborted process</param>
+        /// <returns>A <see cref="Task"/>representing the asynchronous operation</returns>
         public async Task WaitAsync(T id, CancellationToken cancellationToken)
         {
             await LOCKSTORE.GetOrAdd(id, new SemaphoreSlim(1, 1)).WaitAsync(cancellationToken);
