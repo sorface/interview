@@ -242,7 +242,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
               nextPageAvailable={false}
               handleNextPage={handleNextPage}
             />
-            {!!(!loading && rooms?.length === 0) && (
+            {!!(!loading && (rooms?.length === 0 && pageNumber === 1)) && (
               <>
                 <Gap sizeRem={2.25} />
                 <Button className='h-2.5 text-grey3' onClick={handleOpenCreateModal}>
