@@ -1,16 +1,23 @@
 using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Responses;
+using Interview.Backend.Users;
 using Interview.Domain.Users.Service;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc.Controllers;
 
 namespace Interview.Backend.Auth;
 
 public static class ServiceCollectionExt
 {
-    private static readonly List<string> DISABLEDVALIDATEPATHS = new() { "/api/refresh", "/api/login", "/api/users/self", };
+    private static readonly Dictionary<Type, string[]> DISABLEDCONTROLLER = new()
+    {
+        [typeof(AuthController)] = new[] { nameof(AuthController.SignIn), nameof(AuthController.SignOut) },
+        [typeof(UserController)] = new[] { nameof(UserController.GetMyself) },
+    };
 
     public static void AddAppAuth(this IServiceCollection self, AuthorizationService authorizationService)
     {
+        self.AddSingleton<SemaphoreLockProvider<string>>();
         self.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -19,9 +26,10 @@ public static class ServiceCollectionExt
             {
                 options.Events.OnValidatePrincipal = context =>
                 {
-                    var pathValue = context.Request.Path.Value;
+                    var descriptor = context.HttpContext.GetEndpoint()?.Metadata.OfType<ControllerActionDescriptor>().FirstOrDefault();
 
-                    if (pathValue != null && DISABLEDVALIDATEPATHS.Any(it => pathValue.StartsWith(it)))
+                    if (descriptor != null && DISABLEDCONTROLLER.TryGetValue(descriptor.ControllerTypeInfo, out var exception) &&
+                        exception.Contains(descriptor.MethodInfo.Name))
                     {
                         return Task.CompletedTask;
                     }

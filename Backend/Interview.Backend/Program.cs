@@ -9,17 +9,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("oauth.json", true);
 builder.Configuration.AddJsonFile("events.json", true);
 builder.Configuration.AddEnvironmentVariables("INTERVIEW_BACKEND_");
-builder.Services.AddSession();
 
 if (builder.Environment.IsDevelopment())
 {
     builder.Configuration.AddJsonFile("initial.dev.db.json", true);
 }
 
-LogConfigurator.Configure(builder.Host);
-
 // Add services to the container.
 var serviceConfigurator = new ServiceConfigurator(builder.Environment, builder.Configuration);
+LogConfigurator.Configure(builder.Host, builder.Services);
 serviceConfigurator.AddServices(builder.Services);
 
 var app = builder.Build();
