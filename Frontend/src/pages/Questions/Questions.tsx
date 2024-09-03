@@ -170,7 +170,7 @@ export const Questions: FunctionComponent = () => {
           nextPageAvailable={questions?.length === pageSize}
           handleNextPage={handleNextPage}
         />
-        {!!(!loading && questions?.length === 0) && (
+        {!!(!loading && (questions?.length === 0 && pageNumber === 1)) && (
           <>
             <Gap sizeRem={2.25} />
             <Button className='h-2.5 text-grey3' onClick={handleOpenCreateModal}>
