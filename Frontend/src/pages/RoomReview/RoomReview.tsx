@@ -122,7 +122,8 @@ export const RoomReview: FunctionComponent = () => {
     }
     handleCloseSaveModal();
     toast.success(localizationCaptions[LocalizationKey.Saved], toastSuccessOptions);
-  }, [addedRoomReview, localizationCaptions]);
+    fetchMyRoomReview(id || '');
+  }, [id, addedRoomReview, localizationCaptions, fetchMyRoomReview]);
 
   useEffect(() => {
     if (!roomCloseError) {
