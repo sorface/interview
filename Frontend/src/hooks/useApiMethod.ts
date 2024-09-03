@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useReducer, useState } from 'react';
+import { useCallback, useEffect, useReducer } from 'react';
 import { REACT_APP_BACKEND_URL } from '../config';
 import { pathnames, unauthorizedHttpCode } from '../constants';
 import { ApiContract } from '../types/apiContracts';
 import { useLogout } from './useLogout';
-import { useRefresh } from './useRefresh';
 import { useNavigate } from 'react-router-dom';
 
 interface ApiMethodState<ResponseData = any> {
@@ -144,12 +143,8 @@ const getResponseError = (
 export const useApiMethod = <ResponseData, RequestData = AnyObject>(apiContractCall: (data: RequestData) => ApiContract) => {
   const navigate = useNavigate();
   const [apiMethodState, dispatch] = useReducer(apiMethodReducer, initialState);
-  const [requestData, setRequestData] = useState<RequestData | null>(null);
-  const [needRefresh, setNeedRefresh] = useState(false);
   const { logoutState, logout } = useLogout();
   const { process: { logoutError } } = logoutState;
-  const { checkRefreshNecessity, refresh, refreshState } = useRefresh();
-  const { process: { refreshCode, refreshError } } = refreshState;
 
   useEffect(() => {
     if (!logoutError) {
@@ -158,37 +153,8 @@ export const useApiMethod = <ResponseData, RequestData = AnyObject>(apiContractC
     navigate(pathnames.logoutError);
   }, [logoutError, navigate]);
 
-  useEffect(() => {
-    if (!needRefresh) {
-      return;
-    }
-    refresh();
-  }, [needRefresh, refresh]);
-
-  useEffect(() => {
-    if (!refreshCode) {
-      return;
-    }
-    if (refreshCode !== 200) {
-      logout();
-      return;
-    }
-    setNeedRefresh(false);
-  }, [refreshCode, logout]);
-
-  useEffect(() => {
-    if (!refreshError) {
-      return;
-    }
-    logout();
-  }, [refreshError, logout]);
-
-  useEffect(() => {
-    if (needRefresh || !requestData) {
-      return;
-    }
-    const performFetch = async () => {
-      dispatch({ name: 'startLoad' });
+  const fetchData = useCallback(async (requestData: RequestData) => {
+    dispatch({ name: 'startLoad' });
       const apiContract = apiContractCall(requestData);
       try {
         const response = await fetch(
@@ -216,14 +182,7 @@ export const useApiMethod = <ResponseData, RequestData = AnyObject>(apiContractC
           payload: err.message || `Failed to fetch ${apiContract.method} ${apiContract.baseUrl}`,
         });
       }
-    };
-    performFetch();
-  }, [needRefresh, requestData, apiContractCall, logout]);
-
-  const fetchData = useCallback((newRequestData: RequestData) => {
-    setRequestData(newRequestData);
-    setNeedRefresh(checkRefreshNecessity());
-  }, [checkRefreshNecessity]);
+  }, [apiContractCall, logout]);
 
   return {
     apiMethodState: apiMethodState as ApiMethodState<ResponseData>,
