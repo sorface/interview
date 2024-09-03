@@ -7,9 +7,7 @@ namespace Interview.Backend.Auth;
 public class DistributedCacheTicketStore : ITicketStore
 {
     private static readonly DistributedCacheEntryOptions DISTRIBUTEDCACHEENTRYOPTIONS = new() { SlidingExpiration = TimeSpan.FromDays(5), };
-
     private readonly IDistributedCache _distributedCache;
-
     private readonly ILogger<DistributedCacheTicketStore> _logger;
 
     public DistributedCacheTicketStore(IDistributedCache distributedCache,
