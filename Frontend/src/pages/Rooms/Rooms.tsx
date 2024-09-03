@@ -164,6 +164,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
     const expertInRoom = !!room.participants.find(
       roomParticipant => roomParticipant.type === 'Expert' && roomParticipant.id === auth?.id
     );
+    const canEditInStatus = room.status === 'New' || room.status === 'Active';
 
     return (
       <div key={room.id} className='room-item-wrapper'>
@@ -176,7 +177,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
                 </Tag>
                 <Gap sizeRem={1.5} />
                 <div className='room-action-links'>
-                  {expertInRoom && (
+                  {(expertInRoom && canEditInStatus) && (
                     <>
                       <div
                         className='room-edit-participants-link rotate-90'
