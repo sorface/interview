@@ -1,3 +1,4 @@
+using Interview.Domain.Rooms.RoomQuestions.AnswerDetail;
 using Interview.Domain.Rooms.RoomQuestions.Records;
 using Interview.Domain.Rooms.RoomQuestions.Records.Response;
 using Interview.Domain.Rooms.RoomQuestions.Services.Update;
@@ -7,6 +8,8 @@ namespace Interview.Domain.Rooms.RoomQuestions.Services;
 
 public interface IRoomQuestionService : IService
 {
+    Task<RoomQuestionAnswerDetailResponse> GetAnswerDetailsAsync(RoomQuestionAnswerDetailRequest request, CancellationToken cancellationToken);
+
     Task<ServiceResult> UpdateAsync(Guid roomId, List<RoomQuestionUpdateRequest> request, CancellationToken cancellationToken = default);
 
     Task<RoomQuestionDetail> ChangeActiveQuestionAsync(

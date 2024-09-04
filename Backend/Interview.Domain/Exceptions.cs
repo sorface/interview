@@ -31,6 +31,13 @@ public class NotFoundException : UserException
     {
     }
 
+    public static NotFoundException Create<T>(params (Guid Id, string EntityName)[] names)
+        where T : Entity
+    {
+        var namesList = string.Join(", ", names.Select(e => $"{e.EntityName}=`{e.Id}`"));
+        return new NotFoundException($"Not found '{typeof(T).Name}' by {namesList}");
+    }
+
     public static NotFoundException Create<T>(Guid id)
         where T : Entity
     {
