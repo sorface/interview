@@ -255,7 +255,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
           {mode === RoomsPageMode.Home && (
             <div className='flex overflow-auto'>
               <Gap sizeRem={1} horizontal />
-              <div className='flex flex-col overflow-auto'>
+              <div className='flex flex-col overflow-auto w-17.375'>
                 <Calendar
                   monthStartDate={monthStartDate}
                   currentDate={currentDate}

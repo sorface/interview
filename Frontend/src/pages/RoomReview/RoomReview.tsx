@@ -90,6 +90,10 @@ export const RoomReview: FunctionComponent = () => {
     },
   } = apiRoomCloseMethodState;
 
+  const participant = room?.participants.find(
+    participant => participant.id === auth?.id
+  );
+  const canWriteReview = participant?.type === 'Expert';
   const totalError = error || myQuestionEvaluationsError || myRoomReviewError;
   const examinee = room?.participants.find(
     participant => participant.type === 'Examinee'
@@ -218,11 +222,17 @@ export const RoomReview: FunctionComponent = () => {
           )}
         </InfoBlock>
         <Gap sizeRem={0.5} />
-        {myRoomReview ? (
+        {myRoomReview && (
           <InfoBlock className='text-left flex flex-col'>
             <Typography size='m' bold>{localizationCaptions[LocalizationKey.RoomReviewAlreadyGiven]}</Typography>
           </InfoBlock>
-        ) : (
+        )}
+        {!canWriteReview && (
+          <InfoBlock className='text-left flex flex-col'>
+            <Typography size='m' bold>{localizationCaptions[LocalizationKey.RoomReviewWaiting]}</Typography>
+          </InfoBlock>
+        )}
+        {(!myRoomReview && canWriteReview) && (
           <>
             <InfoBlock className='text-left flex flex-col'>
               <Typography size='s' bold>{localizationCaptions[LocalizationKey.CandidateOpinion]}</Typography>
@@ -309,7 +319,7 @@ export const RoomReview: FunctionComponent = () => {
               <Gap sizeRem={1} horizontal />
             </>
           )}
-          {!myRoomReview && (
+          {(!myRoomReview && canWriteReview) && (
             <Button
               variant='active'
               onClick={handleOpenSaveModal}
