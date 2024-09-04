@@ -95,7 +95,7 @@ export const Questions: FunctionComponent = () => {
         question={question}
         primary
         contextMenu={{
-          position: 'right',
+          position: 'bottom-right',
           useButton: true,
           children: [
             <ContextMenu.Item
