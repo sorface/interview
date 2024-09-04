@@ -47,6 +47,10 @@ import { RoomToolsPanel } from './components/RoomToolsPanel/RoomToolsPanel';
 import { SwitcherButton } from '../../components/SwitcherButton/SwitcherButton';
 import { Gap } from '../../components/Gap/Gap';
 import { parseWsMessage } from './components/VideoChat/utils/parseWsMessage';
+import { ContextMenu } from '../../components/ContextMenu/ContextMenu';
+import { Loader } from '../../components/Loader/Loader';
+import { Icon } from './components/Icon/Icon';
+import { Typography } from '../../components/Typography/Typography';
 
 import './Room.css';
 
@@ -180,6 +184,14 @@ export const Room: FunctionComponent = () => {
     process: { loading: loadingRoomState, error: errorRoomState },
     data: roomState,
   } = apiRoomStateState;
+
+  const {
+    apiMethodState: apiRoomStartReviewMethodState,
+    fetchData: fetchRoomStartReview,
+  } = useApiMethod<unknown, RoomType['id']>(roomsApiDeclaration.startReview);
+  const {
+    process: { loading: loadingRoomStartReview, error: errorRoomStartReview },
+  } = apiRoomStartReviewMethodState;
 
   const roomTimer = wsRoomTimer || room?.timer;
   const eventsState = useEventsState({ roomState, lastWsMessage: lastMessage });
@@ -438,6 +450,14 @@ export const Room: FunctionComponent = () => {
     navigate(pathnames.highlightRooms);
   };
 
+  const handleStartReviewRoom = () => {
+    if (!room?.id) {
+      console.warn('Room id not found');
+      return;
+    }
+    fetchRoomStartReview(room.id);
+  };
+
   const renderToolsPanel = () => {
     return (
       <RoomToolsPanel.Wrapper rightPos='21.5rem' bottomPos='1.5rem'>
@@ -506,13 +526,34 @@ export const Room: FunctionComponent = () => {
           </RoomToolsPanel.ButtonsGroupWrapper>
         )}
         <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
-          <RoomToolsPanel.SwitchButton
-            enabled={true}
-            iconEnabledName={IconNames.Call}
-            iconDisabledName={IconNames.Call}
-            onClick={handleLeaveRoom}
-            danger
-          />
+          <ContextMenu
+            toggleContent={
+              <RoomToolsPanel.SwitchButton
+                enabled={true}
+                iconEnabledName={IconNames.Call}
+                iconDisabledName={IconNames.Call}
+                onClick={() => { }}
+                danger
+              />
+            }
+            position='left'
+          >
+            {loadingRoomStartReview && (
+              <Loader />
+            )}
+            {errorRoomStartReview && (
+              <div className='flex items-center justify-center'>
+                <Typography size='m' error>
+                  <Icon name={IconNames.Information} />
+                </Typography>
+                <Typography size='m' error>
+                  {errorRoomStartReview}
+                </Typography>
+              </div>
+            )}
+            <ContextMenu.Item title='Завершить и оценить кандидата' onClick={handleStartReviewRoom} />
+            <ContextMenu.Item title='Выйти' onClick={handleLeaveRoom} />
+          </ContextMenu>
         </RoomToolsPanel.ButtonsGroupWrapper>
       </RoomToolsPanel.Wrapper>
     );
