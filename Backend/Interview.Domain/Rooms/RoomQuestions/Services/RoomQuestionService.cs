@@ -14,6 +14,7 @@ using Interview.Domain.Rooms.RoomQuestions.Records.Response;
 using Interview.Domain.Rooms.RoomQuestions.Services.Update;
 using Interview.Domain.ServiceResults.Success;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Internal;
 using NSpecifications;
 using QuestionCodeEditorResponse = Interview.Domain.Rooms.Records.Response.Detail.QuestionCodeEditorResponse;
 
@@ -27,6 +28,7 @@ public class RoomQuestionService : IRoomQuestionService
     private readonly IQuestionService _questionService;
     private readonly AppDbContext _db;
     private readonly IEventStorage _eventStorage;
+    private readonly ISystemClock _clock;
 
     public RoomQuestionService(
         IRoomQuestionRepository roomQuestionRepository,
@@ -34,7 +36,8 @@ public class RoomQuestionService : IRoomQuestionService
         IQuestionRepository questionRepository,
         IQuestionService questionService,
         AppDbContext db,
-        IEventStorage eventStorage)
+        IEventStorage eventStorage,
+        ISystemClock clock)
     {
         _roomQuestionRepository = roomQuestionRepository;
         _roomRepository = roomRepository;
@@ -42,6 +45,7 @@ public class RoomQuestionService : IRoomQuestionService
         _questionService = questionService;
         _db = db;
         _eventStorage = eventStorage;
+        _clock = clock;
     }
 
     public async Task<RoomQuestionAnswerDetailResponse> GetAnswerDetailsAsync(RoomQuestionAnswerDetailRequest request, CancellationToken cancellationToken)
@@ -68,7 +72,7 @@ public class RoomQuestionService : IRoomQuestionService
             throw NotFoundException.Create<RoomQuestion>((request.RoomId, "RoomId"), (request.QuestionId, "QuestionId"));
         }
 
-        await foreach (var (startActiveDate, endActiveDate) in GetActiveQuestionDateAsync(request, _eventStorage, cancellationToken))
+        await foreach (var (startActiveDate, endActiveDate) in GetActiveQuestionDateAsync(request, _eventStorage, _clock, cancellationToken))
         {
             var voiceRecognition = EventType.VoiceRecognition;
             var codeEditorChangeEventType = EventType.CodeEditorChange;
@@ -109,7 +113,7 @@ public class RoomQuestionService : IRoomQuestionService
         return roomQuestion;
 
         static async IAsyncEnumerable<(DateTime StartActiveDate, DateTime EndActiveDate)> GetActiveQuestionDateAsync(
-            RoomQuestionAnswerDetailRequest request, IEventStorage eventStorage, [EnumeratorCancellation] CancellationToken cancellationToken)
+            RoomQuestionAnswerDetailRequest request, IEventStorage eventStorage, ISystemClock clock, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             var changeRoomQuestionState = EventType.ChangeRoomQuestionState;
             var changedRooms = await eventStorage
@@ -137,7 +141,7 @@ public class RoomQuestionService : IRoomQuestionService
                     .Select(e => (DateTime?)e.CreateAt)
                     .FirstOrDefault();
 
-                yield return (minDate, endActiveDate ?? DateTime.UtcNow);
+                yield return (minDate, endActiveDate ?? clock.UtcNow.UtcDateTime);
             }
         }
     }

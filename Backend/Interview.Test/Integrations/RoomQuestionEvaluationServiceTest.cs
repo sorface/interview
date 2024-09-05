@@ -9,16 +9,9 @@ using Interview.Domain.Rooms.RoomQuestionEvaluations.Records.Request;
 using Interview.Domain.Rooms.RoomQuestionEvaluations.Records.Response;
 using Interview.Domain.Rooms.RoomQuestionEvaluations.Services;
 using Interview.Domain.Rooms.RoomQuestions;
-using Interview.Domain.Rooms.RoomReviews;
-using Interview.Domain.Rooms.RoomReviews.Services;
-using Interview.Domain.Rooms.RoomReviews.Services.UserRoomReview;
 using Interview.Domain.Users;
 using Interview.Infrastructure.RoomParticipants;
-using Interview.Infrastructure.RoomQuestionEvaluations;
 using Interview.Infrastructure.RoomQuestions;
-using Interview.Infrastructure.RoomReviews;
-using Interview.Infrastructure.Rooms;
-using Interview.Infrastructure.Users;
 
 namespace Interview.Test.Integrations;
 
