@@ -21,9 +21,10 @@ public class RoomQuestionServicePermissionAccessor : IRoomQuestionService, IServ
         _securityService = securityService;
     }
 
-    public Task<RoomQuestionAnswerDetailResponse> GetAnswerDetailsAsync(RoomQuestionAnswerDetailRequest request, CancellationToken cancellationToken)
+    public async Task<RoomQuestionAnswerDetailResponse> GetAnswerDetailsAsync(RoomQuestionAnswerDetailRequest request, CancellationToken cancellationToken)
     {
-        return _roomQuestionService.GetAnswerDetailsAsync(request, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.GetRoomQuestionAnswerDetails, cancellationToken);
+        return await _roomQuestionService.GetAnswerDetailsAsync(request, cancellationToken);
     }
 
     public async Task<ServiceResult> UpdateAsync(Guid roomId, List<RoomQuestionUpdateRequest> request, CancellationToken cancellationToken = default)
