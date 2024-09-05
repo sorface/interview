@@ -164,7 +164,7 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
           <div className="activeQuestionSelector-menu text-left">
             <div ref={searchRef} className="activeQuestionSelector-search-panel">
               <span>{localizationCaptions[LocalizationKey.ShowClosedQuestions]}</span>
-              <input type="checkbox" onClick={onShowClosedQuestions} />
+              <input type="checkbox" checked={showClosedQuestions} onClick={onShowClosedQuestions} />
               <div className="search-box" >
                 <input onChange={onSearch} value={searchValue} />
               </div>
