@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Interview.Domain.Database;
 using Interview.Domain.Events;
@@ -59,8 +60,7 @@ public class RoomQuestionService : IRoomQuestionService
                         Content = e.Question!.CodeEditor!.Content,
                         Lang = e.Question!.CodeEditor!.Lang,
                     },
-                AnswerCodeEditorContent = null,
-                Transcription = null,
+                Details = new List<RoomQuestionAnswerDetailResponse.Detail>(),
             })
             .FirstOrDefaultAsync(cancellationToken);
         if (roomQuestion == null)
@@ -68,44 +68,48 @@ public class RoomQuestionService : IRoomQuestionService
             throw NotFoundException.Create<RoomQuestion>((request.RoomId, "RoomId"), (request.QuestionId, "QuestionId"));
         }
 
-        var dates = await GetActiveQuestionDateAsync(request, cancellationToken, _eventStorage);
-        if (dates is not null)
+        await foreach (var (startActiveDate, endActiveDate) in GetActiveQuestionDateAsync(request, _eventStorage, cancellationToken))
         {
-            var (minDate, maxDate) = dates.Value;
             var voiceRecognition = EventType.VoiceRecognition;
             var codeEditorChangeEventType = EventType.CodeEditorChange;
             var res = await _eventStorage
-                .GetBySpecAsync(new Spec<IStorageEvent>(e => e.RoomId == request.RoomId && e.Type == voiceRecognition && e.CreatedAt >= minDate && e.CreatedAt <= maxDate), DefaultChunkSize, cancellationToken)
+                .GetBySpecAsync(new Spec<IStorageEvent>(e => e.RoomId == request.RoomId && e.Type == voiceRecognition && e.CreatedAt >= startActiveDate && e.CreatedAt <= endActiveDate), DefaultChunkSize, cancellationToken)
                 .ToListAsync(cancellationToken: cancellationToken);
-
-            roomQuestion.Transcription = res
-                .SelectMany(e => e)
-                .Select(e =>
-                {
-                    using var payloadAsJson = JsonDocument.Parse(e.Payload ?? "{}");
-                    return new QuestionDetailTranscriptionResponse
-                    {
-                        Id = e.Id,
-                        Payload = payloadAsJson.RootElement.GetProperty("Message").GetString(),
-                        CreatedAt = e.CreatedAt,
-                        User = new QuestionDetailTranscriptionUserResponse
-                        {
-                            Id = e.CreatedById,
-                            Nickname = payloadAsJson.RootElement.GetProperty("Nickname").GetString() ?? "Anonymous",
-                        },
-                    };
-                })
-                .ToList();
 
             var lastCodeEditorState = await _eventStorage
                 .GetLatestBySpecAsync(new Spec<IStorageEvent>(e => e.RoomId == request.RoomId && e.Type == codeEditorChangeEventType), 1, cancellationToken)
                 .FirstOrDefaultAsync(cancellationToken);
-            roomQuestion.AnswerCodeEditorContent = lastCodeEditorState?.Count > 0 ? lastCodeEditorState.MaxBy(e => e.CreatedAt)?.Payload : null;
+
+            roomQuestion.Details.Add(new RoomQuestionAnswerDetailResponse.Detail
+            {
+                Transcription = res
+                    .SelectMany(e => e)
+                    .Select(e =>
+                    {
+                        using var payloadAsJson = JsonDocument.Parse(e.Payload ?? "{}");
+                        return new QuestionDetailTranscriptionResponse
+                        {
+                            Id = e.Id,
+                            Payload = payloadAsJson.RootElement.GetProperty("Message").GetString(),
+                            CreatedAt = e.CreatedAt,
+                            User = new QuestionDetailTranscriptionUserResponse
+                            {
+                                Id = e.CreatedById,
+                                Nickname = payloadAsJson.RootElement.GetProperty("Nickname").GetString() ?? "Anonymous",
+                            },
+                        };
+                    })
+                    .ToList(),
+                AnswerCodeEditorContent = lastCodeEditorState?.Count > 0 ? lastCodeEditorState.MaxBy(e => e.CreatedAt)?.Payload : null,
+                StartActiveDate = startActiveDate,
+                EndActiveDate = endActiveDate,
+            });
         }
 
         return roomQuestion;
 
-        static async Task<(DateTime Min, DateTime Max)?> GetActiveQuestionDateAsync(RoomQuestionAnswerDetailRequest request, CancellationToken cancellationToken, IEventStorage eventStorage)
+        static async IAsyncEnumerable<(DateTime StartActiveDate, DateTime EndActiveDate)> GetActiveQuestionDateAsync(
+            RoomQuestionAnswerDetailRequest request, IEventStorage eventStorage, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             var changeRoomQuestionState = EventType.ChangeRoomQuestionState;
             var changedRooms = await eventStorage
@@ -120,22 +124,21 @@ public class RoomQuestionService : IRoomQuestionService
                     CreateAt = e.CreatedAt,
                 })
                 .ToList();
-            var startActiveDate = list
-                .Where(e => e.Payload is not null && e.Payload.QuestionId == request.QuestionId && e.Payload.NewState == RoomQuestionStateType.Active)
-                .Select(e => (DateTime?)e.CreateAt)
-                .FirstOrDefault();
-            if (startActiveDate is null)
+            foreach (var e in list)
             {
-                return null;
+                if (e.Payload is null || e.Payload.QuestionId != request.QuestionId || e.Payload.NewState != RoomQuestionStateType.Active)
+                {
+                    continue;
+                }
+
+                var minDate = e.CreateAt;
+                var endActiveDate = list
+                    .Where(e => e.Payload is not null && e.Payload.QuestionId == request.QuestionId && e.Payload.OldState == RoomQuestionStateType.Active && e.CreateAt > minDate)
+                    .Select(e => (DateTime?)e.CreateAt)
+                    .FirstOrDefault();
+
+                yield return (minDate, endActiveDate ?? DateTime.UtcNow);
             }
-
-            var minDate = startActiveDate.Value;
-            var endActiveDate = list
-                .Where(e => e.Payload is not null && e.Payload.QuestionId == request.QuestionId && e.Payload.OldState == RoomQuestionStateType.Active && e.CreateAt > minDate)
-                .Select(e => (DateTime?)e.CreateAt)
-                .FirstOrDefault();
-
-            return (minDate, endActiveDate ?? DateTime.UtcNow);
         }
     }
 

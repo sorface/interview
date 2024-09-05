@@ -6,7 +6,16 @@ public class RoomQuestionAnswerDetailResponse
 {
     public required QuestionCodeEditorResponse? CodeEditor { get; set; }
 
-    public required string? AnswerCodeEditorContent { get; set; }
+    public required List<Detail> Details { get; set; }
 
-    public required List<QuestionDetailTranscriptionResponse>? Transcription { get; set; }
+    public class Detail
+    {
+        public required string? AnswerCodeEditorContent { get; set; }
+
+        public required List<QuestionDetailTranscriptionResponse> Transcription { get; set; }
+
+        public required DateTime StartActiveDate { get; set; }
+
+        public required DateTime EndActiveDate { get; set; }
+    }
 }
