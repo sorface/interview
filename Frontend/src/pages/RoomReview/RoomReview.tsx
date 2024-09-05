@@ -327,7 +327,7 @@ export const RoomReview: FunctionComponent = () => {
               {addRoomReviewLoading ? (
                 <Loader />
               ) : (
-                localizationCaptions[LocalizationKey.Save]
+                localizationCaptions[LocalizationKey.RoomReviewSave]
               )}
             </Button>
           )}
