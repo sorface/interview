@@ -81,7 +81,7 @@ public class RoomQuestionService : IRoomQuestionService
                 .ToListAsync(cancellationToken: cancellationToken);
 
             var lastCodeEditorState = await _eventStorage
-                .GetLatestBySpecAsync(new Spec<IStorageEvent>(e => e.RoomId == request.RoomId && e.Type == codeEditorChangeEventType), 1, cancellationToken)
+                .GetLatestBySpecAsync(new Spec<IStorageEvent>(e => e.RoomId == request.RoomId && e.Type == codeEditorChangeEventType && e.CreatedAt >= startActiveDate && e.CreatedAt <= endActiveDate), 1, cancellationToken)
                 .FirstOrDefaultAsync(cancellationToken);
 
             roomQuestion.Details.Add(new RoomQuestionAnswerDetailResponse.Detail
