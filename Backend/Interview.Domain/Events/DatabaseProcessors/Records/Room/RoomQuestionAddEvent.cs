@@ -11,4 +11,4 @@ public class RoomQuestionAddEvent : RoomEvent<RoomQuestionAddEventPayload>
     }
 }
 
-public sealed record RoomQuestionAddEventPayload(Guid QuestionId, RoomQuestionState State);
+public sealed record RoomQuestionAddEventPayload(Guid QuestionId, RoomQuestionStateType State);

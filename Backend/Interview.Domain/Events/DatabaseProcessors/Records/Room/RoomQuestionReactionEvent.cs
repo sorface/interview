@@ -12,13 +12,7 @@ public class RoomQuestionReactionEvent : RoomEvent<RoomQuestionReactionPayload>
 
 public sealed class RoomQuestionReactionPayload
 {
-    public Guid UserId { get; }
+    public required Guid UserId { get; init; }
 
-    public string? Payload { get; }
-
-    public RoomQuestionReactionPayload(Guid userId, string? payload)
-    {
-        UserId = userId;
-        Payload = payload;
-    }
+    public required string? Payload { get; init; }
 }

@@ -23,7 +23,7 @@ public class RoomQuestionReactionPostProcessor : EntityPostProcessor<RoomQuestio
         var @event = new RoomQuestionReactionEvent(
             entity.RoomQuestion!.Room!.Id,
             entity.Reaction!.Type.Name,
-            new RoomQuestionReactionPayload(entity.Sender!.Id, entity.Payload),
+            new RoomQuestionReactionPayload { Payload = entity.Payload, UserId = entity.Sender!.Id },
             _currentUserAccessor.GetUserIdOrThrow());
 
         await _eventDispatcher.WriteAsync(@event, cancellationToken);

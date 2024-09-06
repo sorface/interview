@@ -19,7 +19,11 @@ public class VoiceRecognitionWebSocketByNameEventHandler : WebSocketByNameEventH
 
     protected override Task HandleEventAsync(SocketEventDetail detail, string? message, CancellationToken cancellationToken)
     {
-        var payload = new UserMessageEventPayload(message ?? string.Empty, detail.User.Nickname);
+        var payload = new UserMessageEventPayload
+        {
+            Message = message ?? string.Empty,
+            Nickname = detail.User.Nickname,
+        };
         var @event = new RoomEvent<UserMessageEventPayload>(detail.RoomId, EventType.VoiceRecognition, payload, false, detail.UserId);
         return _eventDispatcher.WriteAsync(@event, cancellationToken);
     }
@@ -29,13 +33,7 @@ public class VoiceRecognitionWebSocketByNameEventHandler : WebSocketByNameEventH
 public sealed class UserMessageEventPayload
 #pragma warning restore SA1402
 {
-    public string Message { get; }
+    public required string Message { get; init; }
 
-    public string Nickname { get; }
-
-    public UserMessageEventPayload(string message, string nickname)
-    {
-        Message = message;
-        Nickname = nickname;
-    }
+    public required string Nickname { get; init; }
 }

@@ -29,7 +29,7 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
 
     public override async ValueTask ProcessAddedAsync(RoomQuestion entity, CancellationToken cancellationToken)
     {
-        var @event = new RoomQuestionAddEvent(entity.RoomId, new RoomQuestionAddEventPayload(entity.QuestionId, entity.State), _currentUserAccessor.GetUserIdOrThrow());
+        var @event = new RoomQuestionAddEvent(entity.RoomId, new RoomQuestionAddEventPayload(entity.QuestionId, entity.State.EnumValue), _currentUserAccessor.GetUserIdOrThrow());
 
         await _eventDispatcher.WriteAsync(@event, cancellationToken);
     }
