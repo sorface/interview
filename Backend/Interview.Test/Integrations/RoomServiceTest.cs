@@ -668,7 +668,10 @@ public class RoomServiceTest
         var expectInvites = appDbContext.RoomInvites.Where(e => e.RoomById == checkRoom.Id)
             .Select(e => new RoomInviteResponse
             {
-                InviteId = e.InviteById!.Value, ParticipantType = e.ParticipantType!.EnumValue, Max = e.Invite!.UsesMax, Used = e.Invite!.UsesCurrent,
+                InviteId = e.InviteById!.Value,
+                ParticipantType = e.ParticipantType!.EnumValue,
+                Max = e.Invite!.UsesMax,
+                Used = e.Invite!.UsesCurrent,
             })
             .OrderBy(e => e.InviteId)
             .ToList();
@@ -714,10 +717,10 @@ public class RoomServiceTest
         var roomRepository = new RoomRepository(memoryDatabase);
 
         var isReadyToCloseAsync = await roomRepository.IsReadyToCloseAsync(room.Id, cancellationToken);
-        
+
         isReadyToCloseAsync.Should().BeTrue();
     }
-    
+
     [Fact(DisplayName = "Any participants of the room have not left the resulting feedback and the room is ready to close")]
     public async Task TestRoomIsNotReadyToCloseSuccess()
     {
@@ -752,7 +755,7 @@ public class RoomServiceTest
         var roomRepository = new RoomRepository(memoryDatabase);
 
         var isReadyToCloseAsync = await roomRepository.IsReadyToCloseAsync(room.Id, cancellationToken);
-        
+
         isReadyToCloseAsync.Should().BeFalse();
     }
 
@@ -773,7 +776,10 @@ public class RoomServiceTest
         var expectInvites = appDbContext.RoomInvites.Where(e => e.RoomById == checkRoom.Id)
             .Select(e => new RoomInviteResponse
             {
-                InviteId = e.InviteById!.Value, ParticipantType = e.ParticipantType!.EnumValue, Max = e.Invite!.UsesMax, Used = e.Invite!.UsesCurrent,
+                InviteId = e.InviteById!.Value,
+                ParticipantType = e.ParticipantType!.EnumValue,
+                Max = e.Invite!.UsesMax,
+                Used = e.Invite!.UsesCurrent,
             })
             .OrderBy(e => e.InviteId)
             .ToList();

@@ -238,7 +238,6 @@ public class RoomReviewServiceTest
         review?.State.Should().Be(SERoomReviewState.Open);
     }
 
-
     [Theory]
     [InlineData("", EVRoomReviewState.Closed)]
     [InlineData("", EVRoomReviewState.Open)]
