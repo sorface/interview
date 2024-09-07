@@ -56,7 +56,8 @@ public class RoomServiceTest
 
         var roomPatchUpdateRequest = new RoomUpdateRequest
         {
-            Name = "New_Value_Name_Room", Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } },
+            Name = "New_Value_Name_Room",
+            Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } },
         };
 
         _ = await roomService.UpdateAsync(savedRoom.Id, roomPatchUpdateRequest);
@@ -86,7 +87,8 @@ public class RoomServiceTest
 
         var roomPatchUpdateRequest = new RoomUpdateRequest
         {
-            Name = "New_Value_Name_Room", Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } },
+            Name = "New_Value_Name_Room",
+            Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } },
         };
 
         _ = await roomService.UpdateAsync(savedRoom.Id, roomPatchUpdateRequest);
@@ -679,7 +681,10 @@ public class RoomServiceTest
         var expectInvites = appDbContext.RoomInvites.Where(e => e.RoomById == checkRoom.Id)
             .Select(e => new RoomInviteResponse
             {
-                InviteId = e.InviteById!.Value, ParticipantType = e.ParticipantType!.EnumValue, Max = e.Invite!.UsesMax, Used = e.Invite!.UsesCurrent,
+                InviteId = e.InviteById!.Value,
+                ParticipantType = e.ParticipantType!.EnumValue,
+                Max = e.Invite!.UsesMax,
+                Used = e.Invite!.UsesCurrent,
             })
             .OrderBy(e => e.InviteId)
             .ToList();
@@ -708,7 +713,10 @@ public class RoomServiceTest
         var expectInvites = appDbContext.RoomInvites.Where(e => e.RoomById == checkRoom.Id)
             .Select(e => new RoomInviteResponse
             {
-                InviteId = e.InviteById!.Value, ParticipantType = e.ParticipantType!.EnumValue, Max = e.Invite!.UsesMax, Used = e.Invite!.UsesCurrent,
+                InviteId = e.InviteById!.Value,
+                ParticipantType = e.ParticipantType!.EnumValue,
+                Max = e.Invite!.UsesMax,
+                Used = e.Invite!.UsesCurrent,
             })
             .OrderBy(e => e.InviteId)
             .ToList();
@@ -752,7 +760,9 @@ public class RoomServiceTest
         appDbContext.ChangeTracker.Clear();
         var roomPatchUpdateRequest = new RoomUpdateRequest
         {
-            Name = "test", Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } }, DurationSec = durationSec
+            Name = "test",
+            Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } },
+            DurationSec = durationSec
         };
 
         var roomService = CreateRoomService(appDbContext);
@@ -785,7 +795,9 @@ public class RoomServiceTest
         var initialTimeId = room.Timer!.Id;
         var roomPatchUpdateRequest = new RoomUpdateRequest
         {
-            Name = "test", Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } }, DurationSec = null
+            Name = "test",
+            Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } },
+            DurationSec = null
         };
 
         var roomService = CreateRoomService(appDbContext);
@@ -819,7 +831,9 @@ public class RoomServiceTest
         var initialTimeId = room.Timer!.Id;
         var roomPatchUpdateRequest = new RoomUpdateRequest
         {
-            Name = "test", Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } }, DurationSec = durationSec
+            Name = "test",
+            Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } },
+            DurationSec = durationSec
         };
 
         var roomService = CreateRoomService(appDbContext);
