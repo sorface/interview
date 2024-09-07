@@ -15,7 +15,7 @@ public interface IRoomReviewService : IService
 
     Task<RoomReviewDetail> UpdateAsync(Guid id, RoomReviewUpdateRequest request, CancellationToken cancellationToken = default);
 
-    public Task<RoomReviewDetail> UpsertAsync(RoomReviewCreateRequest request, Guid userId, CancellationToken cancellationToken = default);
+    public Task<UpsertReviewResponse> UpsertAsync(RoomReviewCreateRequest request, Guid userId, CancellationToken cancellationToken = default);
 
     public Task CompleteAsync(RoomReviewCompletionRequest request, Guid userId, CancellationToken cancellationToken = default);
 }

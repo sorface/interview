@@ -44,13 +44,15 @@ public class RoomReviewServicePermissionAccessor : IRoomReviewService, IServiceD
         return await _roomReviewService.UpdateAsync(id, request, cancellationToken);
     }
 
-    public Task<RoomReviewDetail> UpsertAsync(RoomReviewCreateRequest request, Guid userId, CancellationToken cancellationToken = default)
+    public async Task<UpsertReviewResponse> UpsertAsync(RoomReviewCreateRequest request, Guid userId, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomReviewUpsert, cancellationToken);
+        return await _roomReviewService.UpsertAsync(request, userId, cancellationToken);
     }
 
-    public Task CompleteAsync(RoomReviewCompletionRequest request, Guid userId, CancellationToken cancellationToken = default)
+    public async Task CompleteAsync(RoomReviewCompletionRequest request, Guid userId, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomReviewCompletion, cancellationToken);
+        await _roomReviewService.CompleteAsync(request, userId, cancellationToken);
     }
 }

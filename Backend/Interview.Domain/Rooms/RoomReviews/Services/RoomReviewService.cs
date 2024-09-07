@@ -94,7 +94,7 @@ public class RoomReviewService : IRoomReviewService
         return RoomReviewDetailMapper.Instance.Map(roomReview);
     }
 
-    public async Task<RoomReviewDetail> UpsertAsync(RoomReviewCreateRequest request, Guid userId, CancellationToken cancellationToken = default)
+    public async Task<UpsertReviewResponse> UpsertAsync(RoomReviewCreateRequest request, Guid userId, CancellationToken cancellationToken = default)
     {
         var transaction = await _db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
 
@@ -102,11 +102,15 @@ public class RoomReviewService : IRoomReviewService
 
         var review = roomParticipant.Review;
 
+        var created = false;
+
         if (review is null)
         {
             review = new RoomReview(roomParticipant) { Review = request.Review };
 
             await _roomReviewRepository.CreateAsync(review, cancellationToken);
+
+            created = true;
         }
         else
         {
@@ -122,7 +126,7 @@ public class RoomReviewService : IRoomReviewService
 
         await transaction.CommitAsync(cancellationToken);
 
-        return RoomReviewDetailMapper.Instance.Map(review);
+        return RoomReviewDetailMapper.InstanceUpsert(created).Map(review);
     }
 
     public async Task CompleteAsync(RoomReviewCompletionRequest request, Guid userId, CancellationToken cancellationToken = default)

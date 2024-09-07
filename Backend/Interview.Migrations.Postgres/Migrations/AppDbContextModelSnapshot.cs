@@ -520,6 +520,13 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
+                            Id = new Guid("25c2bc73-39ea-4288-9756-cef28ddc4534"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("2a6f981e-f79e-4497-83d0-35018cbd24d3"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
                             Id = new Guid("bd3496e3-6e57-447e-a7df-744efff03de5"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("5f088b45-704f-4f61-b4c5-05bd08b80303"),
@@ -530,6 +537,13 @@ namespace Interview.Migrations.Postgres.Migrations
                             Id = new Guid("95d476a0-eb0e-470d-9c57-a0ec8a2e4cd6"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("220380d1-fd72-4004-aed4-22187e88b386"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("487c74cb-3502-4f1a-957a-cbcea5773702"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("695914fe-a627-4959-b8b9-e0413ba63755"),
                             UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
@@ -1317,6 +1331,13 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
+                            Id = new Guid("2a6f981e-f79e-4497-83d0-35018cbd24d3"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "RoomReviewCompletion",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
                             Id = new Guid("5f088b45-704f-4f61-b4c5-05bd08b80303"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "RoomReviewCreate",
@@ -1334,6 +1355,13 @@ namespace Interview.Migrations.Postgres.Migrations
                             Id = new Guid("220380d1-fd72-4004-aed4-22187e88b386"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "RoomReviewUpdate",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("695914fe-a627-4959-b8b9-e0413ba63755"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "RoomReviewUpsert",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new

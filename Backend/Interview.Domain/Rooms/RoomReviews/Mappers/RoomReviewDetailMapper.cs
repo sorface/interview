@@ -13,4 +13,17 @@ public abstract class RoomReviewDetailMapper
         Review = review.Review,
         State = review.State.Name,
     });
+
+    public static Mapper<RoomReview, UpsertReviewResponse> InstanceUpsert(bool isCreated)
+    {
+        return new Mapper<RoomReview, UpsertReviewResponse>(review => new UpsertReviewResponse
+        {
+            Id = review.Id,
+            RoomId = review.Participant.RoomId,
+            UserId = review.Participant.Id,
+            Review = review.Review,
+            State = review.State.Name,
+            Created = isCreated,
+        });
+    }
 }
