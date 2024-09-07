@@ -3,12 +3,14 @@ import { Button } from '../Button/Button';
 
 import './SwitcherButton.css';
 
+type ActiveIndex = 0 | 1;
+
 interface SwitcherButtonProps {
   captions: [string, string];
-  activeIndex: 0 | 1;
+  activeIndex: ActiveIndex;
   variant?: 'alternative';
   disabled?: boolean;
-  onClick?: (index: number) => void;
+  onClick?: (index: ActiveIndex) => void;
 }
 
 export const SwitcherButton: FunctionComponent<SwitcherButtonProps> = ({
@@ -26,7 +28,7 @@ export const SwitcherButton: FunctionComponent<SwitcherButtonProps> = ({
         <Button
           key={caption}
           variant={index === activeIndex ? 'invertedActive' : nonActiveVariant}
-          onClick={() => { onClick?.(index); }}
+          onClick={() => { onClick?.(index as ActiveIndex); }}
         >
           {caption}
         </Button>

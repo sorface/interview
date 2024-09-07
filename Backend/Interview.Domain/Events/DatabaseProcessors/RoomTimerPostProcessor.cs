@@ -2,6 +2,7 @@ using Interview.Domain.Database;
 using Interview.Domain.Database.Processors;
 using Interview.Domain.Events.DatabaseProcessors.Records.Room;
 using Interview.Domain.Rooms;
+using Interview.Domain.Users;
 using Microsoft.Extensions.Logging;
 
 namespace Interview.Domain.Events.DatabaseProcessors;
@@ -11,15 +12,18 @@ public class RoomTimerPostProcessor : EntityPostProcessor<Room>
     private readonly IRoomEventDispatcher _eventDispatcher;
     private readonly ILogger<RoomTimerPostProcessor> _logger;
     private readonly AppDbContext _db;
+    private readonly ICurrentUserAccessor _currentUserAccessor;
 
     public RoomTimerPostProcessor(
         IRoomEventDispatcher eventDispatcher,
         ILogger<RoomTimerPostProcessor> logger,
-        AppDbContext db)
+        AppDbContext db,
+        ICurrentUserAccessor currentUserAccessor)
     {
         _eventDispatcher = eventDispatcher;
         _logger = logger;
         _db = db;
+        _currentUserAccessor = currentUserAccessor;
     }
 
     public override async ValueTask ProcessModifiedAsync(
@@ -45,7 +49,7 @@ public class RoomTimerPostProcessor : EntityPostProcessor<Room>
             StartTime = current.Timer.ActualStartTime.Value,
         };
 
-        var @event = new RoomTimerStartEvent(current.Id, roomTimer);
+        var @event = new RoomTimerStartEvent(current.Id, roomTimer, _currentUserAccessor.GetUserIdOrThrow());
 
         await _eventDispatcher.WriteAsync(@event, cancellationToken);
     }

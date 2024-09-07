@@ -70,7 +70,7 @@ public class WebSocketReader
             return;
         }
 
-        await SaveEventAsync(room, deserializeResult, ct);
+        await SaveEventAsync(room, user, deserializeResult, ct);
         var socketEventDetail = new SocketEventDetail(
             scopedServiceProvider,
             webSocket,
@@ -131,7 +131,7 @@ public class WebSocketReader
         return deserializeResult;
     }
 
-    private ValueTask SaveEventAsync(Room room, WebSocketEvent deserializeResult, CancellationToken ct)
+    private ValueTask SaveEventAsync(Room room, User user, WebSocketEvent deserializeResult, CancellationToken ct)
     {
         var storageEvent = new StorageEvent
         {
@@ -141,6 +141,7 @@ public class WebSocketReader
             RoomId = room.Id,
             Stateful = false,
             Type = deserializeResult.Type,
+            CreatedById = user.Id,
         };
         return _eventStorage.AddAsync(storageEvent, ct);
     }

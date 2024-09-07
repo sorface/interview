@@ -106,7 +106,7 @@ public class ServiceConfigurator
 
     private void AddAppServices(IServiceCollection serviceCollection)
     {
-        var sorfaceAuth = new OAuthServiceDispatcher(_configuration).GetAuthService("sorface");
+        var sorfaceAuth = new OAuthServiceDispatcher(_configuration).GetAuthService("sorface") ?? throw new Exception("Not found \"sorface\" section");
 
         serviceCollection.AddSingleton(sorfaceAuth);
         serviceCollection.AddHttpClient();
@@ -115,8 +115,6 @@ public class ServiceConfigurator
 
         var adminUsers = _configuration.GetSection(nameof(AdminUsers))
             .Get<AdminUsers>() ?? throw new ArgumentException($"Not found \"{nameof(AdminUsers)}\" section");
-
-        var logger = serviceCollection.BuildServiceProvider().GetRequiredService<ILogger<ServiceConfigurator>>();
 
         var serviceOption = new DependencyInjectionAppServiceOption
         {

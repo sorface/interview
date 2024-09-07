@@ -4,8 +4,8 @@ namespace Interview.Domain.Events.DatabaseProcessors.Records.Question;
 
 public class RoomCodeEditorEnabledEvent : RoomEvent<RoomCodeEditorEnabledEvent.Payload>
 {
-    public RoomCodeEditorEnabledEvent(Guid roomId, Payload? value)
-        : base(roomId, EventType.RoomCodeEditorEnabled, value, false)
+    public RoomCodeEditorEnabledEvent(Guid roomId, Payload? value, Guid createdById)
+        : base(roomId, EventType.RoomCodeEditorEnabled, value, false, createdById)
     {
     }
 

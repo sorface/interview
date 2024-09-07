@@ -74,4 +74,9 @@ public class EventType
     /// Contains information about the current state of the code editor.
     /// </summary>
     public static readonly string RoomCodeEditorEnabled = "room-code-editor-enabled";
+
+    /// <summary>
+    /// Event sent when editing the code editor content.
+    /// </summary>
+    public static readonly string CodeEditorChange = "code";
 }

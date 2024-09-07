@@ -11,11 +11,13 @@ import { LocalizationKey } from '../../../../localization';
 import { Loader } from '../../../../components/Loader/Loader';
 import { QuestionItem } from '../../../../components/QuestionItem/QuestionItem';
 import { Question } from '../../../../types/question';
+import { Gap } from '../../../../components/Gap/Gap';
 
 interface RoomReviewQuestionEvaluationProps {
   roomId: string;
   questionEvaluations: MyRoomQuestionEvaluation;
   readOnly?: boolean;
+  onDetailsOpen: () => void;
 }
 
 const mergeRoomQuestionEvaluationDebounceMs = 1000;
@@ -35,6 +37,7 @@ export const RoomReviewQuestionEvaluation: FunctionComponent<RoomReviewQuestionE
   roomId,
   questionEvaluations,
   readOnly,
+  onDetailsOpen,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
   const [roomQuestionEvaluation, setRoomQuestionEvaluation] = useState<RoomQuestionEvaluationValue | null>(null);
@@ -108,6 +111,15 @@ export const RoomReviewQuestionEvaluation: FunctionComponent<RoomReviewQuestionE
         {errorMergeRoomQuestionEvaluation && (
           <div>{localizationCaptions[LocalizationKey.Error]}: {errorMergeRoomQuestionEvaluation}</div>
         )}
+      </div>
+      <Gap sizeRem={1.5} />
+      <div
+        className='text-right cursor-pointer'
+        onClick={onDetailsOpen}
+      >
+        <Typography size='s' secondary>
+          {localizationCaptions[LocalizationKey.QuestionAnswerDetails]}
+        </Typography>
       </div>
     </QuestionItem>
   );

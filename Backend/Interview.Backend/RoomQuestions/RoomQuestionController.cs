@@ -1,3 +1,5 @@
+using Interview.Backend.Responses;
+using Interview.Domain.Rooms.RoomQuestions.AnswerDetail;
 using Interview.Domain.Rooms.RoomQuestions.Records;
 using Interview.Domain.Rooms.RoomQuestions.Records.Response;
 using Interview.Domain.Rooms.RoomQuestions.Services;
@@ -42,6 +44,21 @@ public class RoomQuestionController : ControllerBase
     [ProducesResponseType(typeof(List<RoomQuestionResponse>), StatusCodes.Status200OK)]
     public Task<List<RoomQuestionResponse>> FindRoomQuestions([FromQuery] RoomQuestionsRequest request)
     {
-        return _roomQuestionService.FindQuestionsAsync(request);
+        return _roomQuestionService.FindQuestionsAsync(request, HttpContext.RequestAborted);
+    }
+
+    /// <summary>
+    /// Getting question answer detail.
+    /// </summary>
+    /// <param name="request">User Request.</param>
+    /// <returns>The page with the questions of the room.</returns>
+    [Authorize]
+    [HttpGet("answer")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(RoomQuestionAnswerDetailResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
+    public Task<RoomQuestionAnswerDetailResponse> GetAnswerQuestionDetailsAsync([FromQuery] RoomQuestionAnswerDetailRequest request)
+    {
+        return _roomQuestionService.GetAnswerDetailsAsync(request, HttpContext.RequestAborted);
     }
 }

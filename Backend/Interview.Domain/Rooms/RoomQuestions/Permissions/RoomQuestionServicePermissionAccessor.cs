@@ -1,4 +1,5 @@
 using Interview.Domain.Permissions;
+using Interview.Domain.Rooms.RoomQuestions.AnswerDetail;
 using Interview.Domain.Rooms.RoomQuestions.Records;
 using Interview.Domain.Rooms.RoomQuestions.Records.Response;
 using Interview.Domain.Rooms.RoomQuestions.Services;
@@ -18,6 +19,12 @@ public class RoomQuestionServicePermissionAccessor : IRoomQuestionService, IServ
     {
         _roomQuestionService = roomQuestionService;
         _securityService = securityService;
+    }
+
+    public async Task<RoomQuestionAnswerDetailResponse> GetAnswerDetailsAsync(RoomQuestionAnswerDetailRequest request, CancellationToken cancellationToken)
+    {
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.GetRoomQuestionAnswerDetails, cancellationToken);
+        return await _roomQuestionService.GetAnswerDetailsAsync(request, cancellationToken);
     }
 
     public async Task<ServiceResult> UpdateAsync(Guid roomId, List<RoomQuestionUpdateRequest> request, CancellationToken cancellationToken = default)

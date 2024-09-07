@@ -2,16 +2,19 @@ using Interview.Domain.Database.Processors;
 using Interview.Domain.Events.DatabaseProcessors.Records.Room;
 using Interview.Domain.Events.Events;
 using Interview.Domain.Rooms.RoomConfigurations;
+using Interview.Domain.Users;
 
 namespace Interview.Domain.Events.DatabaseProcessors;
 
 public class RoomConfigurationPostProcessor : EntityPostProcessor<RoomConfiguration>
 {
     private readonly IRoomEventDispatcher _eventDispatcher;
+    private readonly ICurrentUserAccessor _currentUserAccessor;
 
-    public RoomConfigurationPostProcessor(IRoomEventDispatcher eventDispatcher)
+    public RoomConfigurationPostProcessor(IRoomEventDispatcher eventDispatcher, ICurrentUserAccessor currentUserAccessor)
     {
         _eventDispatcher = eventDispatcher;
+        _currentUserAccessor = currentUserAccessor;
     }
 
     public override async ValueTask ProcessAddedAsync(RoomConfiguration entity, CancellationToken cancellationToken)
@@ -33,11 +36,11 @@ public class RoomConfigurationPostProcessor : EntityPostProcessor<RoomConfigurat
         }
     }
 
-    private static IRoomEvent? CreateEvent(RoomConfiguration current, RoomConfiguration? original)
+    private IRoomEvent? CreateEvent(RoomConfiguration current, RoomConfiguration? original)
     {
         if (original is null || original.CodeEditorContent != current.CodeEditorContent)
         {
-            return new RoomCodeEditorChangeEvent(current.Id, current.CodeEditorContent);
+            return new RoomCodeEditorChangeEvent(current.Id, current.CodeEditorContent, _currentUserAccessor.GetUserIdOrThrow());
         }
 
         return null;

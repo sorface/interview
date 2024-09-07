@@ -18,6 +18,7 @@ public sealed class SERoomParticipantType : SmartEnum<SERoomParticipantType>
         SEAvailableRoomPermission.RoomQuestionReactionCreate,
         SEAvailableRoomPermission.RoomQuestionFindGuids,
         SEAvailableRoomPermission.RoomReviewCreate,
+        SEAvailableRoomPermission.GetRoomQuestionAnswerDetails,
     });
 
     public static readonly SERoomParticipantType Expert = new("Expert", EVRoomParticipantType.Expert, new HashSet<SEAvailableRoomPermission>
@@ -48,6 +49,7 @@ public sealed class SERoomParticipantType : SmartEnum<SERoomParticipantType>
         SEAvailableRoomPermission.RoomInviteGenerate,
         SEAvailableRoomPermission.RoomQuestionEvaluationMerge,
         SEAvailableRoomPermission.RoomQuestionEvaluationFind,
+        SEAvailableRoomPermission.GetRoomQuestionAnswerDetails,
     });
 
     public static readonly SERoomParticipantType Examinee = new("Examinee", EVRoomParticipantType.Examinee, new HashSet<SEAvailableRoomPermission>
@@ -64,6 +66,7 @@ public sealed class SERoomParticipantType : SmartEnum<SERoomParticipantType>
         SEAvailableRoomPermission.RoomQuestionReactionCreate,
         SEAvailableRoomPermission.RoomQuestionFindGuids,
         SEAvailableRoomPermission.RoomReviewCreate,
+        SEAvailableRoomPermission.GetRoomQuestionAnswerDetails,
     });
 
     private SERoomParticipantType(string name, EVRoomParticipantType value, IReadOnlySet<SEAvailableRoomPermission> defaultRoomPermission)

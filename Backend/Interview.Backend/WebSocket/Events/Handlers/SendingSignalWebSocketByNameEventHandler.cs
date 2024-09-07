@@ -55,7 +55,7 @@ public class SendingSignalWebSocketByNameEventHandler : WebSocketByNameEventHand
             ScreenShare = payload.ScreenShare,
         };
         var payloadStr = _serializer.SerializePayloadAsString(payloadForSerialization);
-        var sendEvent = new RoomEvent(detail.RoomId, "user joined", payloadStr, false);
+        var sendEvent = new RoomEvent(detail.RoomId, "user joined", payloadStr, false, detail.UserId);
         var provider = new CachedRoomEventProvider(sendEvent, _serializer);
         foreach (var webSocket in connections)
         {
