@@ -65,7 +65,8 @@ public class RoomReviewController : ControllerBase
     [HttpPost]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(RoomReviewDetail), StatusCodes.Status201Created)]
-    public async Task<ActionResult<RoomReviewDetail>> Create([FromBody] RoomReviewCreateRequest request)
+    [ProducesResponseType(typeof(RoomReviewDetail), StatusCodes.Status200OK)]
+    public async Task<ActionResult<RoomReviewDetail>> UpsertAsync([FromBody] RoomReviewCreateRequest request)
     {
         var user = HttpContext.User.ToUser();
 

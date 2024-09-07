@@ -1,3 +1,4 @@
+using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Users;
 using Entity = Interview.Domain.Repository.Entity;
 
@@ -20,7 +21,13 @@ public class RoomParticipant : Entity
 
     public Room Room { get; set; } = null!;
 
+    public Guid UserId { get; set; }
+
+    public Guid RoomId { get; set; }
+
     public SERoomParticipantType Type { get; set; } = null!;
+
+    public RoomReview? Review { get; set; }
 
     public List<AvailableRoomPermission> Permissions { get; set; } = new();
 }

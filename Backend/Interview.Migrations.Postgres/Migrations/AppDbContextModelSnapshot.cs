@@ -878,10 +878,7 @@ namespace Interview.Migrations.Postgres.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("RoomId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("SeRoomReviewState")
+                    b.Property<string>("State")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
@@ -889,16 +886,9 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
-
-                    b.HasIndex("RoomId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("RoomReview");
                 });
@@ -1812,7 +1802,7 @@ namespace Interview.Migrations.Postgres.Migrations
                         .IsRequired();
 
                     b.HasOne("Interview.Domain.Users.User", "User")
-                        .WithMany()
+                        .WithMany("RoomParticipants")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1907,23 +1897,15 @@ namespace Interview.Migrations.Postgres.Migrations
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
-                    b.HasOne("Interview.Domain.Rooms.Room", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Interview.Domain.Users.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                    b.HasOne("Interview.Domain.Rooms.RoomParticipants.RoomParticipant", "Participant")
+                        .WithOne("Review")
+                        .HasForeignKey("Interview.Domain.Rooms.RoomReviews.RoomReview", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("Room");
-
-                    b.Navigation("User");
+                    b.Navigation("Participant");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.RoomState", b =>
@@ -2086,6 +2068,8 @@ namespace Interview.Migrations.Postgres.Migrations
             modelBuilder.Entity("Interview.Domain.Rooms.RoomParticipants.RoomParticipant", b =>
                 {
                     b.Navigation("Permissions");
+
+                    b.Navigation("Review");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.RoomQuestions.RoomQuestion", b =>
@@ -2095,6 +2079,8 @@ namespace Interview.Migrations.Postgres.Migrations
 
             modelBuilder.Entity("Interview.Domain.Users.User", b =>
                 {
+                    b.Navigation("RoomParticipants");
+
                     b.Navigation("RoomQuestionEvaluations");
                 });
 #pragma warning restore 612, 618

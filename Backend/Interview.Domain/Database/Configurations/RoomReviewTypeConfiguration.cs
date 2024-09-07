@@ -1,4 +1,5 @@
 using Interview.Domain.Rooms;
+using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Users;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -9,15 +10,7 @@ namespace Interview.Domain.Database.Configurations
     {
         protected override void ConfigureCore(EntityTypeBuilder<RoomReview> builder)
         {
-            builder.HasOne<User>(review => review.User)
-                .WithMany(user => user.RoomReviews)
-                .IsRequired();
-
-            builder.HasOne<Room>(review => review.Room)
-                .WithMany()
-                .IsRequired();
-
-            builder.Property(review => review.SeRoomReviewState)
+            builder.Property(review => review.State)
                 .HasConversion(state => state.Name, name => SERoomReviewState.FromName(name, false))
                 .HasMaxLength(10)
                 .IsRequired();

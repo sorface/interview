@@ -10,6 +10,10 @@ public class SEAvailableRoomPermission : SmartEnum<SEAvailableRoomPermission, Gu
 {
     public static readonly SEAvailableRoomPermission RoomReviewUpdate = new(SEPermission.RoomReviewUpdate, new Guid("95D476A0-EB0E-470D-9C57-A0EC8A2E4CD6"));
 
+    public static readonly SEAvailableRoomPermission RoomReviewUpsert = new(SEPermission.RoomReviewUpsert, new Guid("487C74CB-3502-4F1A-957A-CBCEA5773702"));
+
+    public static readonly SEAvailableRoomPermission RoomReviewCompletion = new(SEPermission.RoomReviewCompletion, new Guid("25C2BC73-39EA-4288-9756-CEF28DDC4534"));
+
     public static readonly SEAvailableRoomPermission QuestionCreate = new(SEPermission.QuestionCreate, new Guid("38CD9540-27F5-4482-A261-2A08F6D8CF30"));
 
     public static readonly SEAvailableRoomPermission RoomFindById = new(SEPermission.RoomFindById, new Guid("C68385EE-093A-457F-A03A-B1A53371C248"));

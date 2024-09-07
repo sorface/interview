@@ -38,7 +38,5 @@ public class User : Entity
 
     public List<RoomQuestionEvaluation> RoomQuestionEvaluations { get; private set; } = new();
 
-    public List<RoomReview> RoomReviews { get; private set; } = new();
-
     public List<RoomParticipant> RoomParticipants { get; private set; } = new();
 }
