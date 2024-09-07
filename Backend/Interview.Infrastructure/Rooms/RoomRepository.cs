@@ -42,13 +42,11 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
 
     public async Task<bool> IsReadyToCloseAsync(Guid roomId, CancellationToken cancellationToken)
     {
-        var reviews = await Db.RoomParticipants
+        return await Db.RoomParticipants
             .Include(participant => participant.Review)
             .Where(participant => participant.RoomId == roomId && participant.Type == SERoomParticipantType.Expert)
             .Select(participant => participant.Review)
-            .ToListAsync(cancellationToken);
-
-        return reviews.All(review => review != null && review.State == SERoomReviewState.Closed);
+            .AllAsync(review => review != null && review.State == SERoomReviewState.Closed, cancellationToken);
     }
 
     protected override IQueryable<Room> ApplyIncludes(DbSet<Room> set)
