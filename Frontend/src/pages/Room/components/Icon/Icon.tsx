@@ -3,12 +3,14 @@ import { IconNames } from '../../../../constants';
 import { useThemeClassName } from '../../../../hooks/useThemeClassName';
 import { Theme } from '../../../../context/ThemeContext';
 
+import iconsSpritesheet from './icons-spritesheet.svg';
 import './Icon.css';
 
 export interface IconProps {
   name: IconNames;
   size?: 'xxl' | 'm' | 's';
   secondary?: boolean;
+  danger?: boolean;
 }
 
 const getSizeClassName = (size: IconProps['size']) => {
@@ -28,6 +30,7 @@ export const Icon: FunctionComponent<IconProps> = ({
   name,
   size,
   secondary,
+  danger,
 }) => {
   const sizeClassName = getSizeClassName(size);
   const themeSecondaryClassName = useThemeClassName({
@@ -35,11 +38,16 @@ export const Icon: FunctionComponent<IconProps> = ({
     [Theme.Light]: 'text-grey3',
   });
   const secondaryClassName = secondary ? themeSecondaryClassName : '';
+  const themeDangerClassName = useThemeClassName({
+    [Theme.Dark]: '',
+    [Theme.Light]: 'text-red',
+  });
+  const dangerClassName = danger ? themeDangerClassName : '';
 
   return (
-    <div className={`icon ${sizeClassName} ${secondaryClassName}`} role='img'>
+    <div className={`icon ${sizeClassName} ${secondaryClassName} ${dangerClassName}`} role='img'>
       <div className='icon-inner'>
-        <svg><use href={`/icons-spritesheet.svg#${name}`} /></svg>
+        <svg><use href={`${iconsSpritesheet}#${name}`} /></svg>
       </div>
     </div>
   );

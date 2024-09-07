@@ -92,6 +92,10 @@ export const RoomReview: FunctionComponent = () => {
     },
   } = apiRoomCloseMethodState;
 
+  const participant = room?.participants.find(
+    participant => participant.id === auth?.id
+  );
+  const canWriteReview = participant?.type === 'Expert';
   const totalError = error || myQuestionEvaluationsError || myRoomReviewError;
   const examinee = room?.participants.find(
     participant => participant.type === 'Examinee'
@@ -124,7 +128,8 @@ export const RoomReview: FunctionComponent = () => {
     }
     handleCloseSaveModal();
     toast.success(localizationCaptions[LocalizationKey.Saved], toastSuccessOptions);
-  }, [addedRoomReview, localizationCaptions]);
+    fetchMyRoomReview(id || '');
+  }, [id, addedRoomReview, localizationCaptions, fetchMyRoomReview]);
 
   useEffect(() => {
     if (!roomCloseError) {
@@ -227,37 +232,50 @@ export const RoomReview: FunctionComponent = () => {
           )}
         </InfoBlock>
         <Gap sizeRem={0.5} />
-        <InfoBlock className='text-left flex flex-col'>
-          <Typography size='s' bold>{localizationCaptions[LocalizationKey.CandidateOpinion]}</Typography>
-          <Gap sizeRem={1} />
-          <Textarea
-            className='h-3.625'
-            maxLength={roomReviewMaxLength}
-            showMaxLength={true}
-            readOnly={!!myRoomReview}
-            value={myRoomReview ? myRoomReview.review : roomReviewValue}
-            onInput={handleReviewChange}
-          />
-        </InfoBlock>
-        <Gap sizeRem={0.5} />
-        <InfoBlock className='text-left'>
-          <Typography size='xl' bold>{localizationCaptions[LocalizationKey.CandidateMarks]}</Typography>
-          <Gap sizeRem={2} />
-          {errorRoomQuestions && (
-            <Typography size='m'>{localizationCaptions[LocalizationKey.Error]}: {errorRoomQuestions}</Typography>
-          )}
-          {myQuestionEvaluations && myQuestionEvaluations.sort(sortMyRoomReviews).map((questionEvaluations, index) => (
-            <Fragment key={questionEvaluations.id}>
-              <RoomReviewQuestionEvaluation
-                roomId={room.id}
-                questionEvaluations={questionEvaluations}
-                readOnly={!!myRoomReview}
-                onDetailsOpen={() => handleDetailsOpen(questionEvaluations.id)}
+        {myRoomReview && (
+          <InfoBlock className='text-left flex flex-col'>
+            <Typography size='m' bold>{localizationCaptions[LocalizationKey.RoomReviewAlreadyGiven]}</Typography>
+          </InfoBlock>
+        )}
+        {!canWriteReview && (
+          <InfoBlock className='text-left flex flex-col'>
+            <Typography size='m' bold>{localizationCaptions[LocalizationKey.RoomReviewWaiting]}</Typography>
+          </InfoBlock>
+        )}
+        {(!myRoomReview && canWriteReview) && (
+          <>
+            <InfoBlock className='text-left flex flex-col'>
+              <Typography size='s' bold>{localizationCaptions[LocalizationKey.CandidateOpinion]}</Typography>
+              <Gap sizeRem={1} />
+              <Textarea
+                className='h-3.625'
+                maxLength={roomReviewMaxLength}
+                showMaxLength={true}
+                value={roomReviewValue}
+                onInput={handleReviewChange}
               />
-              {index !== roomQuestions.length - 1 && (<Gap sizeRem={0.25} />)}
-            </Fragment>
-          ))}
-        </InfoBlock>
+            </InfoBlock>
+            <Gap sizeRem={0.5} />
+            <InfoBlock className='text-left'>
+              <Typography size='xl' bold>{localizationCaptions[LocalizationKey.CandidateMarks]}</Typography>
+              <Gap sizeRem={2} />
+              {errorRoomQuestions && (
+                <Typography size='m'>{localizationCaptions[LocalizationKey.Error]}: {errorRoomQuestions}</Typography>
+              )}
+              {myQuestionEvaluations && myQuestionEvaluations.sort(sortMyRoomReviews).map((questionEvaluations, index) => (
+                <Fragment key={questionEvaluations.id}>
+                  <RoomReviewQuestionEvaluation
+                    roomId={room.id}
+                    questionEvaluations={questionEvaluations}
+                    readOnly={!!myRoomReview}
+                    onDetailsOpen={() => handleDetailsOpen(questionEvaluations.id)}
+                  />
+                  {index !== roomQuestions.length - 1 && (<Gap sizeRem={0.25} />)}
+                </Fragment>
+              ))}
+            </InfoBlock>
+          </>
+        )}
         <Gap sizeRem={1.75} />
         <Modal
           open={!!openedAnswerDetailsId}
@@ -328,9 +346,7 @@ export const RoomReview: FunctionComponent = () => {
               <Gap sizeRem={1} horizontal />
             </>
           )}
-          {myRoomReview ? (
-            <Typography size='s'>{localizationCaptions[LocalizationKey.RoomReviewAlreadyGiven]}</Typography>
-          ) : (
+          {(!myRoomReview && canWriteReview) && (
             <Button
               variant='active'
               onClick={handleOpenSaveModal}
@@ -338,7 +354,7 @@ export const RoomReview: FunctionComponent = () => {
               {addRoomReviewLoading ? (
                 <Loader />
               ) : (
-                localizationCaptions[LocalizationKey.Save]
+                localizationCaptions[LocalizationKey.RoomReviewSave]
               )}
             </Button>
           )}

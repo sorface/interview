@@ -32,6 +32,19 @@ const themeClassNames: Record<ThemeInUi, Record<'active' | 'nonActive', string>>
   },
 };
 
+const checkIsCommentValid = (evaluation: RoomQuestionEvaluationValue) => {
+  if (typeof evaluation.mark !== 'number') {
+    return false;
+  }
+  if (evaluation.mark === 0) {
+    return true;
+  }
+  if (evaluation.mark < 9 && !evaluation.review) {
+    return false;
+  }
+  return true;
+};
+
 export const RoomQuestionEvaluation: FunctionComponent<RoomQuestionEvaluationPorps> = ({
   readOnly,
   value,
@@ -41,7 +54,7 @@ export const RoomQuestionEvaluation: FunctionComponent<RoomQuestionEvaluationPor
   const commonButtonClassName = 'w-1.75 h-1.75 min-h-unset p-0.375';
   const themeClassName = useThemeClassName(themeClassNames);
   const localizationCaptions = useLocalizationCaptions();
-  const noValidComment = validateComment && value.mark !== 0 && !value.review;
+  const noValidComment = validateComment ? !checkIsCommentValid(value) : false;
   const textareaNoValidClassName = useThemeClassName({
     [Theme.Dark]: 'border-dark-red',
     [Theme.Light]: 'border-red',

@@ -18,7 +18,9 @@ public class AuthorizationService
 
     public string ClaimsIssuer { get; set; } = string.Empty;
 
-    public string Domain { get; set; } = string.Empty;
+    public string CookieDomain { get; set; } = string.Empty;
+
+    public string CookieName { get; set; } = string.Empty;
 
     public PathString CallbackPath { get; set; } = PathString.Empty;
 

@@ -79,7 +79,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 e.Status == SERoomStatus.Review ? 2 :
                 e.Status == SERoomStatus.New ? 3 :
                 4)
-            .ThenByDescending(e => e.CreateDate);
+            .ThenBy(e => e.ScheduleStartTime);
         var filterName = filter.Name?.Trim().ToLower();
         if (!string.IsNullOrWhiteSpace(filterName))
         {
@@ -209,11 +209,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                         .ToList(),
                     CodeEditor = q.Question.CodeEditor == null
                         ? null
-                        : new QuestionCodeEditorResponse
-                        {
-                            Content = q.Question.CodeEditor.Content,
-                            Lang = q.Question.CodeEditor.Lang,
-                        },
+                        : new QuestionCodeEditorResponse { Content = q.Question.CodeEditor.Content, Lang = q.Question.CodeEditor.Lang, },
                 }).ToList(),
             })
             .FirstOrDefaultAsync(room => room.Id == id, cancellationToken: cancellationToken) ?? throw NotFoundException.Create<Room>(id);
@@ -229,11 +225,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             Type = res.Type,
             Timer = res.Timer == null
                 ? null
-                : new RoomTimerDetail
-                {
-                    DurationSec = (long)res.Timer.Duration.TotalSeconds,
-                    StartTime = res.Timer.ActualStartTime,
-                },
+                : new RoomTimerDetail { DurationSec = (long)res.Timer.Duration.TotalSeconds, StartTime = res.Timer.ActualStartTime, },
             ScheduledStartTime = res.ScheduledStartTime,
             Questions = res.Questions,
         };
@@ -265,15 +257,17 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         var experts = await FindByIdsOrErrorAsync(_db.Users, requestExperts, "experts", cancellationToken);
         var examinees = await FindByIdsOrErrorAsync(_db.Users, request.Examinees, "examinees", cancellationToken);
         var tags = await Tag.EnsureValidTagsAsync(_db.Tag, request.Tags, cancellationToken);
-        var room = new Room(name, request.AccessType)
+        var room = new Room(name, request.AccessType) { Tags = tags, ScheduleStartTime = request.ScheduleStartTime, Timer = CreateRoomTimer(request.DurationSec), };
+
+        var requiredQuestions = request.Questions.Select(e => e.Id).ToList();
+
+        if (requiredQuestions.Count == 0)
         {
-            Tags = tags,
-            ScheduleStartTime = request.ScheduleStartTime,
-            Timer = CreateRoomTimer(request.DurationSec),
-        };
+            throw new UserException("The room must contain at least one question");
+        }
 
         var questions =
-            await FindByIdsOrErrorAsync(_db.Questions, request.Questions.Select(e => e.Id).ToList(), "questions", cancellationToken);
+            await FindByIdsOrErrorAsync(_db.Questions, requiredQuestions, "questions", cancellationToken);
         var roomQuestions = questions
             .Join(request.Questions,
                 e => e.Id,
@@ -355,6 +349,12 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         var tags = await Tag.EnsureValidTagsAsync(_db.Tag, request.Tags, cancellationToken);
 
         var requiredQuestions = request.Questions.Select(e => e.Id).ToHashSet();
+
+        if (requiredQuestions.Count == 0)
+        {
+            throw new UserException("The room must contain at least one question");
+        }
+
         foundRoom.Questions.RemoveAll(e => !requiredQuestions.Contains(e.QuestionId));
         foreach (var (dbQuestions, order) in foundRoom.Questions
                      .Join(request.Questions,
@@ -718,18 +718,15 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         {
             return _db.RoomParticipants.AsNoTracking()
                 .Include(e => e.Room)
-                .Include(e => e.User).ThenInclude(e => e.RoomQuestionEvaluations.Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.RoomQuestion!.QuestionId == questionId))
+                .Include(e => e.User).ThenInclude(e =>
+                    e.RoomQuestionEvaluations.Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.RoomQuestion!.QuestionId == questionId))
                 .Where(e => e.Room.Id == request.RoomId)
                 .Select(e => new Analytics.AnalyticsUser
                 {
                     Id = e.User.Id,
                     Evaluation = e.User.RoomQuestionEvaluations
                         .Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.RoomQuestion!.QuestionId == questionId)
-                        .Select(rqe => new Analytics.AnalyticsUserQuestionEvaluation
-                        {
-                            Review = rqe.Review,
-                            Mark = rqe.Mark,
-                        })
+                        .Select(rqe => new Analytics.AnalyticsUserQuestionEvaluation { Review = rqe.Review, Mark = rqe.Mark, })
                         .FirstOrDefault(),
                 })
                 .ToListAsync(ct);
@@ -808,12 +805,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 .Select(e => new AnalyticsSummaryViewer
                 {
                     ReactionsSummary = e.GroupBy(t => (t.Reaction!.Id, t.Reaction.Type))
-                        .Select(t => new Analytics.AnalyticsReactionSummary
-                        {
-                            Id = t.Key.Id,
-                            Type = t.Key.Type.Name,
-                            Count = t.Count(),
-                        })
+                        .Select(t => new Analytics.AnalyticsReactionSummary { Id = t.Key.Id, Type = t.Key.Type.Name, Count = t.Count(), })
                         .ToList(),
                 })
                 .ToList();
@@ -825,12 +817,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 {
                     Nickname = e.Key.Nickname,
                     ReactionsSummary = e.GroupBy(t => (t.Reaction!.Id, t.Reaction.Type))
-                        .Select(t => new Analytics.AnalyticsReactionSummary
-                        {
-                            Id = t.Key.Id,
-                            Type = t.Key.Type.Name,
-                            Count = t.Count(),
-                        })
+                        .Select(t => new Analytics.AnalyticsReactionSummary { Id = t.Key.Id, Type = t.Key.Type.Name, Count = t.Count(), })
                         .ToList(),
                 })
                 .ToList();

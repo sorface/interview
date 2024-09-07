@@ -1,25 +1,23 @@
-using System.Collections;
-using System.Collections.Immutable;
-using System.Diagnostics.Eventing.Reader;
 using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Responses;
+using Interview.Backend.Users;
 using Interview.Domain.Users.Service;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.AspNetCore.Mvc.Controllers;
 
 namespace Interview.Backend.Auth;
 
 public static class ServiceCollectionExt
 {
-    private static readonly List<string> DISABLEDVALIDATEPATHS = new()
+    private static readonly Dictionary<Type, string[]> DISABLEDCONTROLLER = new()
     {
-        "/api/refresh",
-        "/api/login",
+        [typeof(AuthController)] = new[] { nameof(AuthController.SignIn), nameof(AuthController.SignOut) },
+        [typeof(UserController)] = new[] { nameof(UserController.GetMyself) },
     };
 
     public static void AddAppAuth(this IServiceCollection self, AuthorizationService authorizationService)
     {
+        self.AddSingleton<SemaphoreLockProvider<string>>();
         self.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -28,9 +26,10 @@ public static class ServiceCollectionExt
             {
                 options.Events.OnValidatePrincipal = context =>
                 {
-                    var pathValue = context.Request.Path.Value;
+                    var descriptor = context.HttpContext.GetEndpoint()?.Metadata.OfType<ControllerActionDescriptor>().FirstOrDefault();
 
-                    if (pathValue != null && DISABLEDVALIDATEPATHS.Any(it => pathValue.StartsWith(it)))
+                    if (descriptor != null && DISABLEDCONTROLLER.TryGetValue(descriptor.ControllerTypeInfo, out var exception) &&
+                        exception.Contains(descriptor.MethodInfo.Name))
                     {
                         return Task.CompletedTask;
                     }
@@ -40,10 +39,9 @@ public static class ServiceCollectionExt
                 };
 
                 options.SessionStore = self.BuildServiceProvider().GetRequiredService<ITicketStore>();
-
                 options.Cookie.HttpOnly = true;
-                options.Cookie.Name = "sorinv_session_id";
-                options.Cookie.Domain = authorizationService.Domain;
+                options.Cookie.Name = authorizationService.CookieName;
+                options.Cookie.Domain = authorizationService.CookieDomain;
 
                 options.Events.OnRedirectToAccessDenied = context =>
                 {
@@ -66,7 +64,6 @@ public static class ServiceCollectionExt
                 options.ClaimsIssuer = authorizationService.Issuer;
 
                 options.CallbackPath = authorizationService.CallbackPath;
-
                 options.AuthorizationEndpoint = authorizationService.AuthorizationEndPoint;
                 options.TokenEndpoint = authorizationService.TokenEndpoint;
                 options.UserInformationEndpoint = authorizationService.UserInformationEndpoint;
@@ -77,11 +74,19 @@ public static class ServiceCollectionExt
 
                 if (authorizationService.CorrelationCookie is not null)
                 {
-                    options.CorrelationCookie = new CookieBuilder
+                    var cookieBuilder = new CookieBuilder();
+
+                    if (authorizationService.CorrelationCookie?.Name is not null && authorizationService.CorrelationCookie?.Name.Length > 0)
                     {
-                        Name = authorizationService.CorrelationCookie.Name,
-                        Domain = authorizationService.CorrelationCookie.Domain,
-                    };
+                        cookieBuilder.Name = authorizationService.CorrelationCookie.Name;
+                    }
+
+                    if (authorizationService.CorrelationCookie?.Domain is not null && authorizationService.CorrelationCookie?.Domain.Length > 0)
+                    {
+                        cookieBuilder.Domain = authorizationService.CorrelationCookie.Domain;
+                    }
+
+                    options.CorrelationCookie = cookieBuilder;
                 }
 
                 options.Events.OnTicketReceived += async context =>

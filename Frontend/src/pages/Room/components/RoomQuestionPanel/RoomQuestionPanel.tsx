@@ -218,7 +218,6 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
               {totalErrorRoomQuestionEvaluation && (
                 <div>{localizationCaptions[LocalizationKey.Error]}: {totalErrorRoomQuestionEvaluation}</div>
               )}
-              {loadingRoomActiveQuestion && <div>{localizationCaptions[LocalizationKey.SendingActiveQuestion]}...</div>}
               {errorRoomActiveQuestion && <div>{localizationCaptions[LocalizationKey.ErrorSendingActiveQuestion]}</div>}
               {loadingRoomStartReview && <div>{localizationCaptions[LocalizationKey.CloseRoomLoading]}...</div>}
               {errorRoomStartReview && <div>{localizationCaptions[LocalizationKey.Error]}: {errorRoomStartReview}</div>}

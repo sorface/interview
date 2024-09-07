@@ -164,6 +164,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
     const expertInRoom = !!room.participants.find(
       roomParticipant => roomParticipant.type === 'Expert' && roomParticipant.id === auth?.id
     );
+    const canEditInStatus = room.status === 'New' || room.status === 'Active';
 
     return (
       <div key={room.id} className='room-item-wrapper'>
@@ -176,7 +177,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
                 </Tag>
                 <Gap sizeRem={1.5} />
                 <div className='room-action-links'>
-                  {expertInRoom && (
+                  {(expertInRoom && canEditInStatus) && (
                     <>
                       <div
                         className='room-edit-participants-link rotate-90'
@@ -241,7 +242,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
               nextPageAvailable={false}
               handleNextPage={handleNextPage}
             />
-            {!!(!loading && rooms?.length === 0) && (
+            {!!(!loading && (rooms?.length === 0 && pageNumber === 1)) && (
               <>
                 <Gap sizeRem={2.25} />
                 <Button className='h-2.5 text-grey3' onClick={handleOpenCreateModal}>
@@ -254,7 +255,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
           {mode === RoomsPageMode.Home && (
             <div className='flex overflow-auto'>
               <Gap sizeRem={1} horizontal />
-              <div className='flex flex-col overflow-auto'>
+              <div className='flex flex-col overflow-auto w-17.375'>
                 <Calendar
                   monthStartDate={monthStartDate}
                   currentDate={currentDate}

@@ -1,8 +1,6 @@
-using System.Globalization;
 using Interview.Backend.Auth;
 using Interview.Backend.Errors;
 using Interview.Backend.WebSocket.Configuration;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.CookiePolicy;
 
 namespace Interview.Backend;
@@ -53,22 +51,27 @@ public class MiddlewareConfigurator
             return func();
         });
 
-        var cookieExpTimeConfig = _app.Configuration.GetSection("AccessTokenExpiredTime");
-
-        _app.UseAccessTokenExpiredTimeCookie("ate_t", new CookieOptions { Domain = cookieExpTimeConfig.GetValue<string>("Domain"), Secure = true, });
-
-        _app.UseSession();
         _app.UseAuthentication();
         _app.UseAuthorization();
+
+        var cookieExpTimeConfig = _app.Configuration.GetSection("AccessTokenExpiredTime");
+        _app.UseAccessTokenExpiredTimeCookie("ate_t", new CookieOptions { Domain = cookieExpTimeConfig.GetValue<string>("Domain"), Secure = true, });
 
         _app.Use((context, func) =>
         {
             var upsertUser = context.User.ToUser();
             logger.LogInformation(
-                "Request {Path} authorized user [{nickname} {id}]",
+                "Request {Path} authorized user [{nickname} {id}] TIME: {time}",
                 context.Request.Path,
                 upsertUser?.Nickname,
-                upsertUser?.Id);
+                upsertUser?.Id,
+                UnixTime());
+
+            static long UnixTime()
+            {
+                var epochStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                return (DateTime.UtcNow - epochStart).Ticks * 100;
+            }
 
             return func();
         });

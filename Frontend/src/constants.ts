@@ -19,6 +19,7 @@ export const pathnames = {
   categories: '/categories',
   categoriesCreate: '/categories/create',
   categoriesEdit: '/categories/edit/:id',
+  logoutError: '/logoutError'
 };
 
 export const enum IconNames {

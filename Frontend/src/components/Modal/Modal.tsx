@@ -6,11 +6,12 @@ import { Icon } from '../../pages/Room/components/Icon/Icon';
 
 import './Modal.css';
 
-interface ModalProps {
+export interface ModalProps {
   open: boolean;
   contentLabel: string;
   wide?: boolean;
   onClose: () => void;
+  onRequestClose?: () => void;
   children: ReactNode;
 }
 
@@ -20,6 +21,7 @@ export const Modal: FunctionComponent<ModalProps> = ({
   wide,
   children,
   onClose,
+  onRequestClose,
 }) => {
   return (
     <ModalInternal
@@ -27,7 +29,7 @@ export const Modal: FunctionComponent<ModalProps> = ({
       contentLabel={contentLabel}
       appElement={document.getElementById('root') || undefined}
       className={`modal ${wide ? 'modal-wide' : ''} flex flex-col`}
-      onRequestClose={onClose}
+      onRequestClose={onRequestClose || onClose}
       style={{
         overlay: {
           backgroundColor: 'var(--page-overlay-color)',
