@@ -207,6 +207,9 @@ export const enum LocalizationKey {
   InterviewHistoryTitle,
   RoomReviewAlreadyGiven,
   EmptyCommentQuestionEvaluation,
+  QurstionTranscription,
+  QuestionCode,
+  AnswerCode,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -417,6 +420,9 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.InterviewHistoryTitle]: 'Interview history',
     [LocalizationKey.RoomReviewAlreadyGiven]: 'You have already given feedback on the interview. Waiting for evaluation from other participants.',
     [LocalizationKey.EmptyCommentQuestionEvaluation]: 'Write a comment to answer the question',
+    [LocalizationKey.QurstionTranscription]: 'Transcription of the answer',
+    [LocalizationKey.QuestionCode]: 'Question code',
+    [LocalizationKey.AnswerCode]: 'Answer code',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -625,5 +631,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.InterviewHistoryTitle]: 'История собеседований',
     [LocalizationKey.RoomReviewAlreadyGiven]: 'Вы уже дали отзыв о собеседовании. Ожидание оценки от остальных участников.',
     [LocalizationKey.EmptyCommentQuestionEvaluation]: 'Напишите комментарий  к ответу на вопрос',
+    [LocalizationKey.QurstionTranscription]: 'Транскрибация ответа',
+    [LocalizationKey.QuestionCode]: 'Код вопроса',
+    [LocalizationKey.AnswerCode]: 'Код ответа',
   },
 }

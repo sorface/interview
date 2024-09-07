@@ -1,5 +1,5 @@
 import { DragNDropListItem } from '../components/DragNDropList/DragNDropList';
-import { Question, QuestionAnswer } from './question';
+import { CodeEditorLang, Question, QuestionAnswer } from './question';
 import { Tag } from './tag';
 import { User, UserType } from './user';
 
@@ -105,4 +105,25 @@ export interface MyRoomQuestionEvaluation {
   value: string;
   order: number;
   evaluation?: RoomQuestionEvaluation;
+}
+
+export interface RoomQuestionAnswer {
+  codeEditor?: {
+    content: string;
+    lang: CodeEditorLang;
+  };
+  details: Array<{
+    answerCodeEditorContent: string;
+    endActiveDate: string;
+    startActiveDate: string;
+    transcription: Array<{
+      createdAt: string;
+      id: string;
+      payload: string;
+      user: {
+        id: string;
+        nickname: string;
+      };
+    }>;
+  }>;
 }

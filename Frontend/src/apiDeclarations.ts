@@ -131,6 +131,11 @@ export interface GetRoomQuestionsBody {
   States: RoomQuestionState[];
 }
 
+export interface GetAnswerParams {
+  roomId: Room['id'];
+  questionId: Question['id'];
+}
+
 export const roomQuestionApiDeclaration = {
   changeActiveQuestion: (body: ChangeActiveQuestionBody): ApiContractPut => ({
     method: 'PUT',
@@ -140,6 +145,11 @@ export const roomQuestionApiDeclaration = {
   getRoomQuestions: (params: GetRoomQuestionsBody): ApiContractGet => ({
     method: 'GET',
     baseUrl: '/room-questions',
+    urlParams: params,
+  }),
+  getAnswer: (params: GetAnswerParams): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: '/room-questions/answer',
     urlParams: params,
   }),
 };

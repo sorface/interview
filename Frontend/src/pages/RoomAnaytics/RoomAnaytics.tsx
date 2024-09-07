@@ -21,6 +21,7 @@ import { ReviewUserOpinion } from './components/ReviewUserOpinion/ReviewUserOpin
 import { ReviewUserGrid } from './components/ReviewUserGrid/ReviewUserGrid';
 import { Modal } from '../../components/Modal/Modal';
 import { User } from '../../types/user';
+import { RoomAnayticsDetails } from './components/RoomAnayticsDetails/RoomAnayticsDetails';
 
 const createFakeQuestion = (roomQuestion: RoomQuestion): Question => ({
   ...roomQuestion,
@@ -101,22 +102,12 @@ export const RoomAnaytics: FunctionComponent = () => {
         contentLabel={localizationCaptions[LocalizationKey.QuestionAnswerDetails]}
         onClose={handleQuestionDetailsClose}
       >
-        <ReviewUserGrid>
-          {data?.questions.find(question => question.id === openedQuestionDetails)?.users
-            .filter(questionUser => allUsers.get(questionUser.id)?.participantType === 'Expert')
-            .map(questionUser => {
-              if (!questionUser.evaluation) {
-                return undefined;
-              }
-              return (
-                <ReviewUserOpinion
-                  key={questionUser.id}
-                  user={questionUser}
-                  allUsers={allUsers}
-                />
-              );
-            })}
-        </ReviewUserGrid>
+        <RoomAnayticsDetails
+          allUsers={allUsers}
+          data={data}
+          openedQuestionDetails={openedQuestionDetails}
+          roomId={room?.id}
+        />
         <Gap sizeRem={1} />
       </Modal>
 

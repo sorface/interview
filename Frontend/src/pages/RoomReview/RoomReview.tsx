@@ -30,6 +30,7 @@ import { RoomReviewQuestionEvaluation } from './components/RoomReviewQuestionEva
 import { Modal } from '../../components/Modal/Modal';
 import { ModalFooter } from '../../components/ModalFooter/ModalFooter';
 import { ModalWarningContent } from '../../components/ModalWarningContent/ModalWarningContent';
+import { QuestionAnswerDetails } from '../../components/QuestionAnswerDetails/QuestionAnswerDetails';
 
 export const sortMyRoomReviews = (r1: MyRoomQuestionEvaluation, r2: MyRoomQuestionEvaluation) =>
   r1.order - r2.order;
@@ -41,6 +42,7 @@ export const RoomReview: FunctionComponent = () => {
   const [roomReviewValue, setRoomReviewValue] = useState('');
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [closeModalOpen, setCloseModalOpen] = useState(false);
+  const [openedAnswerDetailsId, setOpenedAnswerDetailsId] = useState<string | null>(null);
 
   const { apiMethodState, fetchData } = useApiMethod<Room, Room['id']>(roomsApiDeclaration.getById);
   const { process: { loading, error }, data: room } = apiMethodState;
@@ -178,6 +180,14 @@ export const RoomReview: FunctionComponent = () => {
     setCloseModalOpen(false);
   };
 
+  const handleDetailsOpen = (questionId: string) => {
+    setOpenedAnswerDetailsId(questionId);
+  };
+
+  const handleDetailsClose = () => {
+    setOpenedAnswerDetailsId(null);
+  };
+
   if (loading || loadingRoomQuestions || !room || !roomQuestions || myQuestionEvaluationsLoading || myRoomReviewLoading) {
     return (
       <Loader />
@@ -242,12 +252,29 @@ export const RoomReview: FunctionComponent = () => {
                 roomId={room.id}
                 questionEvaluations={questionEvaluations}
                 readOnly={!!myRoomReview}
+                onDetailsOpen={() => handleDetailsOpen(questionEvaluations.id)}
               />
               {index !== roomQuestions.length - 1 && (<Gap sizeRem={0.25} />)}
             </Fragment>
           ))}
         </InfoBlock>
         <Gap sizeRem={1.75} />
+        <Modal
+          open={!!openedAnswerDetailsId}
+          contentLabel={localizationCaptions[LocalizationKey.QuestionAnswerDetails]}
+          onClose={handleDetailsClose}
+        >
+          <QuestionAnswerDetails
+            roomId={room.id}
+            questionId={openedAnswerDetailsId || ''}
+            questionTitle={myQuestionEvaluations?.find(e => e.id === openedAnswerDetailsId)?.value || ''}
+          />
+          <ModalFooter>
+            <Button onClick={handleDetailsClose}>
+              {localizationCaptions[LocalizationKey.Close]}
+            </Button>
+          </ModalFooter>
+        </Modal>
         <Modal
           contentLabel=''
           open={saveModalOpen}
