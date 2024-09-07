@@ -79,7 +79,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 e.Status == SERoomStatus.Review ? 2 :
                 e.Status == SERoomStatus.New ? 3 :
                 4)
-            .ThenByDescending(e => e.CreateDate);
+            .ThenBy(e => e.ScheduleStartTime);
         var filterName = filter.Name?.Trim().ToLower();
         if (!string.IsNullOrWhiteSpace(filterName))
         {
