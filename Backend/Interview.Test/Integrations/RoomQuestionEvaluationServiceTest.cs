@@ -251,7 +251,7 @@ public class RoomQuestionEvaluationServiceTest
                         QuestionId = e.Id,
                         Room = null,
                         Question = null,
-                        State = RoomQuestionState.Open,
+                        State = RoomQuestionState.Closed,
                         Order = e.Order
                     },
                     Evaluation = e.Evaluation is null
@@ -302,7 +302,7 @@ public class RoomQuestionEvaluationServiceTest
                 QuestionId = question.Id,
                 Room = null,
                 Question = null,
-                State = RoomQuestionState.Open,
+                State = RoomQuestionState.Closed,
                 Order = 0
             });
             db.SaveChanges();
