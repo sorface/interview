@@ -193,5 +193,8 @@ public enum EVPermission
 
     [Description("Update room questions")]
     RoomQuestionUpdate,
+
+    [Description("Gets details on the question in the room questions")]
+    GetRoomQuestionAnswerDetails,
 #pragma warning restore SA1602
 }

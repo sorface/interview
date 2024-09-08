@@ -387,6 +387,13 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
+                            Id = new Guid("ba198396-d07a-4054-95d0-4fe0ba393ecd"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("edab0e5d-7ac2-4761-b47f-a5f41a9ae48c"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
                             Id = new Guid("38cd9540-27f5-4482-a261-2a08f6d8cf30"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("eac25c4b-28d5-4e22-93b2-5c3caf0f6922"),
@@ -1117,6 +1124,13 @@ namespace Interview.Migrations.Postgres.Migrations
                             Id = new Guid("bc98d0b8-b4a3-4b66-b8c1-db1fca0647e0"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "GetCategoryById",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("edab0e5d-7ac2-4761-b47f-a5f41a9ae48c"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "GetRoomQuestionAnswerDetails",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new

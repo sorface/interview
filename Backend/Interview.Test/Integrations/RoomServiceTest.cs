@@ -19,13 +19,9 @@ using Interview.Domain.Rooms.RoomTimers;
 using Interview.Domain.Rooms.Service;
 using Interview.Domain.Users;
 using Interview.Domain.Users.Roles;
-using Interview.Infrastructure.Events;
-using Interview.Infrastructure.Questions;
 using Interview.Infrastructure.RoomParticipants;
-using Interview.Infrastructure.RoomQuestionReactions;
 using Interview.Infrastructure.RoomQuestions;
 using Interview.Infrastructure.Rooms;
-using Interview.Infrastructure.Tags;
 using Interview.Infrastructure.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -46,12 +42,19 @@ public class RoomServiceTest
 
         appDbContext.Rooms.Add(savedRoom);
 
+        var question = new Question("question_value#1");
+        appDbContext.Questions.AddRange(question);
+
         await appDbContext.SaveChangesAsync();
 
         var roomRepository = new RoomRepository(appDbContext);
         var roomService = CreateRoomService(appDbContext);
 
-        var roomPatchUpdateRequest = new RoomUpdateRequest { Name = "New_Value_Name_Room", Questions = new List<RoomQuestionRequest>(), };
+        var roomPatchUpdateRequest = new RoomUpdateRequest
+        {
+            Name = "New_Value_Name_Room",
+            Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } },
+        };
 
         _ = await roomService.UpdateAsync(savedRoom.Id, roomPatchUpdateRequest);
 
@@ -68,15 +71,21 @@ public class RoomServiceTest
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
         var savedRoom = new Room(DefaultRoomName, SERoomAccessType.Public);
-
         appDbContext.Rooms.Add(savedRoom);
+
+        var question = new Question("question_value#1");
+        appDbContext.Questions.AddRange(question);
 
         await appDbContext.SaveChangesAsync();
 
         var roomRepository = new RoomRepository(appDbContext);
         var roomService = CreateRoomService(appDbContext);
 
-        var roomPatchUpdateRequest = new RoomUpdateRequest { Name = "New_Value_Name_Room", Questions = new List<RoomQuestionRequest>(), };
+        var roomPatchUpdateRequest = new RoomUpdateRequest
+        {
+            Name = "New_Value_Name_Room",
+            Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } },
+        };
 
         _ = await roomService.UpdateAsync(savedRoom.Id, roomPatchUpdateRequest);
 
@@ -815,9 +824,18 @@ public class RoomServiceTest
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
         var room = new Room("test", SERoomAccessType.Public);
         appDbContext.Rooms.Add(room);
+
+        var question = new Question("question_value#1");
+        appDbContext.Questions.AddRange(question);
+
         appDbContext.SaveChanges();
         appDbContext.ChangeTracker.Clear();
-        var roomPatchUpdateRequest = new RoomUpdateRequest { Name = "test", Questions = new List<RoomQuestionRequest>(), DurationSec = durationSec };
+        var roomPatchUpdateRequest = new RoomUpdateRequest
+        {
+            Name = "test",
+            Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } },
+            DurationSec = durationSec
+        };
 
         var roomService = CreateRoomService(appDbContext);
 
@@ -840,10 +858,19 @@ public class RoomServiceTest
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
         var room = new Room("test", SERoomAccessType.Public) { Timer = new RoomTimer { Duration = TimeSpan.FromSeconds(durationSec), } };
         appDbContext.Rooms.Add(room);
+
+        var question = new Question("question_value#1");
+        appDbContext.Questions.AddRange(question);
+
         appDbContext.SaveChanges();
         appDbContext.ChangeTracker.Clear();
         var initialTimeId = room.Timer!.Id;
-        var roomPatchUpdateRequest = new RoomUpdateRequest { Name = "test", Questions = new List<RoomQuestionRequest>(), DurationSec = null };
+        var roomPatchUpdateRequest = new RoomUpdateRequest
+        {
+            Name = "test",
+            Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } },
+            DurationSec = null
+        };
 
         var roomService = CreateRoomService(appDbContext);
 
@@ -867,10 +894,19 @@ public class RoomServiceTest
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
         var room = new Room("test", SERoomAccessType.Public) { Timer = new RoomTimer { Duration = TimeSpan.FromSeconds(initialDurationSec), } };
         appDbContext.Rooms.Add(room);
+
+        var question = new Question("question_value#1");
+        appDbContext.Questions.AddRange(question);
+
         appDbContext.SaveChanges();
         appDbContext.ChangeTracker.Clear();
         var initialTimeId = room.Timer!.Id;
-        var roomPatchUpdateRequest = new RoomUpdateRequest { Name = "test", Questions = new List<RoomQuestionRequest>(), DurationSec = durationSec };
+        var roomPatchUpdateRequest = new RoomUpdateRequest
+        {
+            Name = "test",
+            Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } },
+            DurationSec = durationSec
+        };
 
         var roomService = CreateRoomService(appDbContext);
 
@@ -1007,6 +1043,7 @@ public class RoomServiceTest
             new UserRepository(appDbContext),
             new AvailableRoomPermissionRepository(appDbContext),
             userAccessor);
+
         return new RoomService(
             new RoomQuestionRepository(appDbContext),
             new EmptyRoomEventDispatcher(),

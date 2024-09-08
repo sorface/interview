@@ -13,4 +13,6 @@ public class StorageEvent : IStorageEvent
     public required bool Stateful { get; set; }
 
     public required DateTime CreatedAt { get; init; }
+
+    public required Guid CreatedById { get; init; }
 }

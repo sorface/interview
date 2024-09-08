@@ -12,6 +12,8 @@ public interface IRoomEvent
 
     DateTime CreatedAt { get; }
 
+    Guid CreatedById { get; }
+
     string? BuildStringPayload();
 }
 

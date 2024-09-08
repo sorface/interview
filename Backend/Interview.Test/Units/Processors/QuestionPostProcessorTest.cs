@@ -7,6 +7,7 @@ using Interview.Domain.Events.DatabaseProcessors.Records.Question;
 using Interview.Domain.Events.Events;
 using Interview.Domain.Questions;
 using Interview.Domain.Repository;
+using Interview.Domain.Users;
 using Moq;
 
 namespace Interview.Test.Units.Processors;
@@ -21,10 +22,13 @@ public class QuestionPostProcessorTest
     {
         _roomEventDispatcher = new Mock<IRoomEventDispatcher>();
         _roomConnectionListener = new Mock<IActiveRoomSource>();
+        var user = new Mock<ICurrentUserAccessor>();
+        user.Setup(e => e.UserId).Returns(Guid.Parse("1D9958C2-7081-4B77-AE27-7F879A80CECA"));
 
         _questionPostProcessor = new QuestionPostProcessor(
             _roomEventDispatcher.Object,
-            _roomConnectionListener.Object
+            _roomConnectionListener.Object,
+            user.Object
         );
     }
 

@@ -3,6 +3,7 @@ using Interview.Domain.Events;
 using Interview.Domain.Events.DatabaseProcessors;
 using Interview.Domain.Events.DatabaseProcessors.Records.Room;
 using Interview.Domain.Rooms.RoomConfigurations;
+using Interview.Domain.Users;
 using Moq;
 
 namespace Interview.Test.Units.Processors;
@@ -15,7 +16,9 @@ public class RoomConfigurationPostProcessorTest
     public RoomConfigurationPostProcessorTest()
     {
         _dispatcher = new Mock<IRoomEventDispatcher>();
-        _roomConfigurationPostProcessor = new RoomConfigurationPostProcessor(_dispatcher.Object);
+        var user = new Mock<ICurrentUserAccessor>();
+        user.Setup(e => e.UserId).Returns(Guid.Parse("1D9958C2-7081-4B77-AE27-7F879A80CECA"));
+        _roomConfigurationPostProcessor = new RoomConfigurationPostProcessor(_dispatcher.Object, user.Object);
     }
 
     [Fact(DisplayName = "Sending an event about adding a room configuration")]

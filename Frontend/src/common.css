@@ -171,6 +171,7 @@
 .w-13\.75 { width: 13.75rem; }
 .max-w-15\.75 { max-width: 15.75rem; }
 .w-17\.25 { width: 17.25rem; }
+.w-17\.375 { width: 17.375rem; }
 .w-18\.125 { width: 18.125rem; }
 .w-20 { width: 20rem; }
 .\!w-21 { width: 21rem !important; }
@@ -201,6 +202,7 @@
 .z-50 { z-index: 50; }
 .translate-x--4\.25-y-0\.25 { transform: translate(-4.25rem, 0.25rem) !important; }
 .translate-x--11\.375-y-0\.25 { transform: translate(-11.375rem, 0.25rem) !important; }
+.translate-x--14\.25-y--6\.75 { transform: translate(-14.25rem, -6.75rem) !important; }
 .translate-y-0\.25 { transform: translateY(0.25rem); }
 .rotate-90 { transform: rotate(90deg); }
 .rotate-180 { transform: rotate(180deg); }

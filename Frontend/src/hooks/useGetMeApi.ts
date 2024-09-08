@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useReducer, useState } from 'react';
+import { useCallback, useReducer } from 'react';
 import { REACT_APP_BACKEND_URL } from '../config';
 import { User } from '../types/user';
-import { useRefresh } from './useRefresh';
 
 interface GetMeState {
   process: {
@@ -77,18 +76,9 @@ const getMeReducer = (state: GetMeState, action: GetMeAction): GetMeState => {
 };
 
 export const useGetMeApi = () => {
-  const { refreshState: { process: { refreshCode, refreshError } }, refresh } = useRefresh();
   const [getMeState, dispatch] = useReducer(getMeReducer, initialState);
-  const [requestTrigger, setRequestTrigger] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (!requestTrigger) {
-      return;
-    }
-    refresh();
-  }, [requestTrigger, refresh]);
-
-  const fetchLoadMe = useCallback(async () => {
+  const loadMe = useCallback(async () => {
     dispatch({ name: 'startLoad' });
     try {
       const response = await fetch(`${REACT_APP_BACKEND_URL}/users/self`, {
@@ -109,17 +99,6 @@ export const useGetMeApi = () => {
         payload: err.message || 'Failed to get me',
       });
     }
-  }, []);
-
-  useEffect(() => {
-    if (!refreshCode && !refreshError) {
-      return;
-    }
-    fetchLoadMe();
-  }, [refreshCode, refreshError, fetchLoadMe]);
-
-  const loadMe = useCallback(() => {
-    setRequestTrigger(Date.now());
   }, []);
 
   return {

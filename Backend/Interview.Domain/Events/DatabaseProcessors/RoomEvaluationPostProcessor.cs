@@ -3,19 +3,21 @@ using Interview.Domain.Database.Processors;
 using Interview.Domain.Events.DatabaseProcessors.Records.Room;
 using Interview.Domain.Events.Events;
 using Interview.Domain.Rooms.RoomQuestionEvaluations;
+using Interview.Domain.Users;
 
 namespace Interview.Domain.Events.DatabaseProcessors;
 
 public class RoomEvaluationPostProcessor : EntityPostProcessor<RoomQuestionEvaluation>
 {
     private readonly IRoomEventDispatcher _eventDispatcher;
-
     private readonly AppDbContext _databaseContext;
+    private readonly ICurrentUserAccessor _currentUserAccessor;
 
-    public RoomEvaluationPostProcessor(IRoomEventDispatcher eventDispatcher, AppDbContext databaseContext)
+    public RoomEvaluationPostProcessor(IRoomEventDispatcher eventDispatcher, AppDbContext databaseContext, ICurrentUserAccessor currentUserAccessor)
     {
         _eventDispatcher = eventDispatcher;
         _databaseContext = databaseContext;
+        _currentUserAccessor = currentUserAccessor;
     }
 
     public override async ValueTask ProcessAddedAsync(RoomQuestionEvaluation entity, CancellationToken cancellationToken)
@@ -23,7 +25,7 @@ public class RoomEvaluationPostProcessor : EntityPostProcessor<RoomQuestionEvalu
         await HandleEvent(entity, cancellationToken, (roomId, questionId) =>
         {
             var evaluationPayload = new RoomEvaluationAddEventPayload(questionId);
-            return new RoomEvaluationAddEvent(roomId, evaluationPayload);
+            return new RoomEvaluationAddEvent(roomId, evaluationPayload, _currentUserAccessor.GetUserIdOrThrow());
         });
     }
 
@@ -32,7 +34,7 @@ public class RoomEvaluationPostProcessor : EntityPostProcessor<RoomQuestionEvalu
         await HandleEvent(current, cancellationToken, (roomId, questionId) =>
         {
             var evaluationPayload = new RoomEvaluationChangeEventPayload(questionId);
-            return new RoomEvaluationChangeEvent(roomId, evaluationPayload);
+            return new RoomEvaluationChangeEvent(roomId, evaluationPayload, _currentUserAccessor.GetUserIdOrThrow());
         });
     }
 

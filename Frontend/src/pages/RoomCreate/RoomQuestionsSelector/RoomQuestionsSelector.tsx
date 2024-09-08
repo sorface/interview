@@ -86,6 +86,7 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
   };
 
   const handleSubCategoryChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+    setPageNumber(1);
     setSubCategory(e.target.value);
   };
 

@@ -2,6 +2,7 @@ using FluentAssertions;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Storage;
 using Interview.Domain.Rooms;
+using Interview.Domain.Users;
 using Interview.Infrastructure.Events;
 using Interview.Infrastructure.Rooms;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -18,6 +19,8 @@ public class EventStorage2DatabaseServiceTest
         var clock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(clock);
 
+        var user = new User("TEST", "ID");
+        appDbContext.Users.Add(user);
         var room1 = new Room("Test 1", SERoomAccessType.Public) { Status = SERoomStatus.Close, };
         appDbContext.Rooms.Add(room1);
         appDbContext.Rooms.Add(new Room("Test 2", SERoomAccessType.Public) { Status = SERoomStatus.Close, });
@@ -39,6 +42,7 @@ public class EventStorage2DatabaseServiceTest
                 Type = "Test 1",
                 CreatedAt = new DateTime(2000, 1, 15),
                 RoomId = room1.Id,
+                CreatedById = user.Id
             },
             new()
             {
@@ -48,6 +52,7 @@ public class EventStorage2DatabaseServiceTest
                 Type = "Test 2",
                 CreatedAt = new DateTime(2015, 12, 1),
                 RoomId = room1.Id,
+                CreatedById = user.Id
             },
             new()
             {
@@ -57,6 +62,7 @@ public class EventStorage2DatabaseServiceTest
                 Type = "Test 3",
                 CreatedAt = new DateTime(2023, 05, 04),
                 RoomId = room1.Id,
+                CreatedById = user.Id
             },
         }
             .OrderBy(e => e.Payload)

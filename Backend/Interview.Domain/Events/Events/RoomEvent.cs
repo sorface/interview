@@ -5,13 +5,13 @@ namespace Interview.Domain.Events.Events;
 
 public class RoomEvent : RoomEvent<string>
 {
-    public RoomEvent(Guid roomId, string type, string? value, bool stateful)
-        : base(roomId, type, value, stateful)
+    public RoomEvent(Guid roomId, string type, string? value, bool stateful, Guid createdById)
+        : base(roomId, type, value, stateful, createdById)
     {
     }
 
-    public RoomEvent(Guid id, Guid roomId, string type, string? value, bool stateful, DateTime createdAt)
-        : base(id, roomId, type, value, stateful, createdAt)
+    public RoomEvent(Guid id, Guid roomId, string type, string? value, bool stateful, DateTime createdAt, Guid createdById)
+        : base(id, roomId, type, value, stateful, createdAt, createdById)
     {
     }
 }
@@ -29,9 +29,11 @@ public class RoomEvent<T> : IRoomEvent<T>
 
     public DateTime CreatedAt { get; }
 
+    public Guid CreatedById { get; }
+
     public T? Value { get; }
 
-    public RoomEvent(Guid id, Guid roomId, string type, T? value, bool stateful, DateTime createdAt)
+    public RoomEvent(Guid id, Guid roomId, string type, T? value, bool stateful, DateTime createdAt, Guid createdById)
     {
         Id = id;
         RoomId = roomId;
@@ -39,10 +41,11 @@ public class RoomEvent<T> : IRoomEvent<T>
         Value = value;
         Stateful = stateful;
         CreatedAt = createdAt;
+        CreatedById = createdById;
     }
 
-    public RoomEvent(Guid roomId, string type, T? value, bool stateful)
-        : this(Guid.NewGuid(), roomId, type, value, stateful, DateTime.UtcNow)
+    public RoomEvent(Guid roomId, string type, T? value, bool stateful, Guid createdById)
+        : this(Guid.NewGuid(), roomId, type, value, stateful, DateTime.UtcNow, createdById)
     {
     }
 

@@ -169,6 +169,7 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
 
   const handleRootCategoryChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
     setRootCategory(e.target.value);
+    setSubCategory('');
   };
 
   const handleSubCategoryChange: ChangeEventHandler<HTMLSelectElement> = (e) => {

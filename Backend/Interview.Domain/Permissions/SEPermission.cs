@@ -406,6 +406,12 @@ public class SEPermission : SmartEnum<SEPermission>
             "Update room questions",
             EVPermission.RoomQuestionUpdate);
 
+    public static readonly SEPermission GetRoomQuestionAnswerDetails = new(
+        Guid.Parse("EDAB0E5D-7AC2-4761-B47F-A5F41A9AE48C"),
+        "GetRoomQuestionAnswerDetails",
+        "Gets details on the question in the room questions",
+        EVPermission.GetRoomQuestionAnswerDetails);
+
     public Guid Id { get; }
 
     public string Description { get; }
