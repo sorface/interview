@@ -88,7 +88,7 @@ public class RoomReviewController : ControllerBase
     /// <param name="currentUserAccessor">Current user accessor</param>
     /// <returns>Review details</returns>
     [Authorize]
-    [HttpPut("/upsert")]
+    [HttpPut("upsert")]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(UpsertReviewResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(UpsertReviewResponse), StatusCodes.Status200OK)]
