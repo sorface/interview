@@ -2,6 +2,7 @@ using Interview.Backend.Auth;
 using Interview.Backend.Errors;
 using Interview.Backend.WebSocket.Configuration;
 using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 namespace Interview.Backend;
 
@@ -33,8 +34,7 @@ public class MiddlewareConfigurator
         {
             _app.UseWebSocketsAuthorization(new WebSocketAuthorizationOptions
             {
-                CookieName = WebSocketAuthorizationOptions.DefaultCookieName,
-                WebSocketQueryName = "Authorization",
+                CookieName = WebSocketAuthorizationOptions.DefaultCookieName, WebSocketQueryName = "Authorization",
             });
         }
 
@@ -95,5 +95,8 @@ public class MiddlewareConfigurator
         _app.UseSwaggerUI();
 
         _app.MapControllers();
+
+        _app.MapHealthChecks("/actuator/health/liveness", new HealthCheckOptions { Predicate = r => r.Name.Contains("liveness"), });
+        _app.MapHealthChecks("/actuator/health/readiness");
     }
 }
