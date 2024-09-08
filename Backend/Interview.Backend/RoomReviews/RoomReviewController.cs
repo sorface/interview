@@ -57,7 +57,7 @@ public class RoomReviewController : ControllerBase
     }
 
     /// <summary>
-    /// Creating a review for a room.
+    /// Creating a review for a room
     /// </summary>
     /// <param name="request">User Request.</param>
     /// <returns>Review details.</returns>
@@ -65,7 +65,9 @@ public class RoomReviewController : ControllerBase
     [HttpPost]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(RoomReviewDetail), StatusCodes.Status201Created)]
-    public async Task<ActionResult<RoomReviewDetail>> Create([FromBody] RoomReviewCreateRequest request)
+    [ProducesResponseType(typeof(RoomReviewDetail), StatusCodes.Status200OK)]
+    [Obsolete("It is deprecated, please use /api/room-reviews/upsert instead.")]
+    public async Task<ActionResult<RoomReviewDetail>> CreateAsync([FromBody] RoomReviewCreateRequest request)
     {
         var user = HttpContext.User.ToUser();
 
@@ -80,7 +82,25 @@ public class RoomReviewController : ControllerBase
     }
 
     /// <summary>
-    /// Update a review by id.
+    /// Upsert a review for a room
+    /// </summary>
+    /// <param name="request">User Request.</param>
+    /// <param name="currentUserAccessor">Current user accessor</param>
+    /// <returns>Review details</returns>
+    [Authorize]
+    [HttpPut("upsert")]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(UpsertReviewResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(UpsertReviewResponse), StatusCodes.Status200OK)]
+    public async Task<ActionResult<UpsertReviewResponse>> UpsertAsync([FromBody] RoomReviewCreateRequest request, [FromServices] ICurrentUserAccessor currentUserAccessor)
+    {
+        var userId = currentUserAccessor.GetUserIdOrThrow();
+        var upsertResult = await _roomReviewService.UpsertAsync(request, userId, HttpContext.RequestAborted);
+        return (upsertResult.Created ? ServiceResult.Created(upsertResult) : ServiceResult.Ok(upsertResult)).ToActionResult();
+    }
+
+    /// <summary>
+    /// Update a review by id
     /// </summary>
     /// <param name="id">Id review.</param>
     /// <param name="request">User Request.</param>
@@ -89,8 +109,28 @@ public class RoomReviewController : ControllerBase
     [HttpPut("{id:guid}")]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(RoomReviewDetail), StatusCodes.Status201Created)]
+    [Obsolete("It is deprecated, please use /api/room-reviews/upsert instead.")]
     public Task<RoomReviewDetail> Update([FromRoute] Guid id, [FromBody] RoomReviewUpdateRequest request)
     {
         return _roomReviewService.UpdateAsync(id, request, HttpContext.RequestAborted);
+    }
+
+    /// <summary>
+    /// completion a review.
+    /// </summary>
+    /// <param name="request">User Request.</param>
+    /// <param name="currentUserAccessor">Current user accessor</param>
+    /// <returns>HTTP result</returns>
+    [Authorize]
+    [HttpPost("/complete")]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(RoomReviewDetail), StatusCodes.Status201Created)]
+    public async Task<ActionResult> CompleteAsync([FromBody] RoomReviewCompletionRequest request, [FromServices] ICurrentUserAccessor currentUserAccessor)
+    {
+        var userId = currentUserAccessor.GetUserIdOrThrow();
+
+        await _roomReviewService.CompleteAsync(request, userId, HttpContext.RequestAborted);
+
+        return ServiceResult.Ok().ToActionResult();
     }
 }

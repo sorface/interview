@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Interview.Domain.Database;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.Records.Request;
@@ -5,7 +6,9 @@ using Interview.Domain.Rooms.Records.Response;
 using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.Records.Response.Page;
 using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Tags.Records.Response;
+using Interview.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using X.PagedList;
 
@@ -35,6 +38,15 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
         return Db.RoomParticipants.FirstOrDefaultAsync(
             roomParticipant => roomParticipant.Room.Id == roomId && roomParticipant.User.Id == userId,
             cancellationToken);
+    }
+
+    public async Task<bool> IsReadyToCloseAsync(Guid roomId, CancellationToken cancellationToken)
+    {
+        return await Db.RoomParticipants
+            .Include(participant => participant.Review)
+            .Where(participant => participant.RoomId == roomId && participant.Type == SERoomParticipantType.Expert)
+            .Select(participant => participant.Review)
+            .AllAsync(review => review != null && review.State == SERoomReviewState.Closed, cancellationToken);
     }
 
     protected override IQueryable<Room> ApplyIncludes(DbSet<Room> set)

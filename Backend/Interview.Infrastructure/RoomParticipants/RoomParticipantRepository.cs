@@ -29,5 +29,6 @@ public class RoomParticipantRepository : EfRepository<RoomParticipant>, IRoomPar
     protected override IQueryable<RoomParticipant> ApplyIncludes(DbSet<RoomParticipant> set) => set
         .Include(participant => participant.Room)
         .Include(participant => participant.User)
+        .Include(participant => participant.Review)
         .Include(participant => participant.Permissions);
 }

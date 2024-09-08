@@ -3,6 +3,7 @@ using System;
 using Interview.Domain.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Interview.Migrations.Postgres.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240907050009_RoomReview.Add_Forenkey_Room_And_User")]
+    partial class RoomReviewAdd_Forenkey_Room_And_User
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -387,13 +390,6 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
-                            Id = new Guid("ba198396-d07a-4054-95d0-4fe0ba393ecd"),
-                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            PermissionId = new Guid("edab0e5d-7ac2-4761-b47f-a5f41a9ae48c"),
-                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
                             Id = new Guid("38cd9540-27f5-4482-a261-2a08f6d8cf30"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("eac25c4b-28d5-4e22-93b2-5c3caf0f6922"),
@@ -527,13 +523,6 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
-                            Id = new Guid("25c2bc73-39ea-4288-9756-cef28ddc4534"),
-                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            PermissionId = new Guid("2a6f981e-f79e-4497-83d0-35018cbd24d3"),
-                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
                             Id = new Guid("bd3496e3-6e57-447e-a7df-744efff03de5"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("5f088b45-704f-4f61-b4c5-05bd08b80303"),
@@ -544,13 +533,6 @@ namespace Interview.Migrations.Postgres.Migrations
                             Id = new Guid("95d476a0-eb0e-470d-9c57-a0ec8a2e4cd6"),
                             CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PermissionId = new Guid("220380d1-fd72-4004-aed4-22187e88b386"),
-                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("487c74cb-3502-4f1a-957a-cbcea5773702"),
-                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            PermissionId = new Guid("695914fe-a627-4959-b8b9-e0413ba63755"),
                             UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
@@ -1128,13 +1110,6 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
-                            Id = new Guid("edab0e5d-7ac2-4761-b47f-a5f41a9ae48c"),
-                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Type = "GetRoomQuestionAnswerDetails",
-                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
                             Id = new Guid("fcc9bbca-15c6-4221-8d2d-e052b8cd4385"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "PublicRoomCreate",
@@ -1345,13 +1320,6 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
-                            Id = new Guid("2a6f981e-f79e-4497-83d0-35018cbd24d3"),
-                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Type = "RoomReviewCompletion",
-                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
                             Id = new Guid("5f088b45-704f-4f61-b4c5-05bd08b80303"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "RoomReviewCreate",
@@ -1369,13 +1337,6 @@ namespace Interview.Migrations.Postgres.Migrations
                             Id = new Guid("220380d1-fd72-4004-aed4-22187e88b386"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "RoomReviewUpdate",
-                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = new Guid("695914fe-a627-4959-b8b9-e0413ba63755"),
-                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Type = "RoomReviewUpsert",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new

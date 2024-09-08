@@ -131,6 +131,18 @@ public class SEPermission : SmartEnum<SEPermission>
         "Review update",
         EVPermission.RoomReviewUpdate);
 
+    public static readonly SEPermission RoomReviewUpsert = new(
+        Guid.Parse("695914fe-a627-4959-b8b9-e0413ba63755"),
+        "RoomReviewUpsert",
+        "Review upsert",
+        EVPermission.RoomReviewUpsert);
+
+    public static readonly SEPermission RoomReviewCompletion = new(
+        Guid.Parse("2a6f981e-f79e-4497-83d0-35018cbd24d3"),
+        "RoomReviewCompletion",
+        "Review completion",
+        EVPermission.RoomReviewCompletion);
+
     public static readonly SEPermission RoomCreate = new(
         Guid.Parse("c4c21128-f672-47d0-b0f5-2b3ca53fc420"),
         "RoomCreate",

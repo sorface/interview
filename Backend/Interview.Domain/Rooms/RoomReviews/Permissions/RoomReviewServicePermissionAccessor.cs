@@ -40,7 +40,19 @@ public class RoomReviewServicePermissionAccessor : IRoomReviewService, IServiceD
     public async Task<RoomReviewDetail> UpdateAsync(Guid id, RoomReviewUpdateRequest request, CancellationToken cancellationToken = default)
     {
         var entity = await _repository.FindByIdDetailedAsync(id, cancellationToken);
-        await _securityService.EnsureRoomPermissionAsync(entity?.Room?.Id, SEPermission.RoomReviewUpdate, cancellationToken);
+        await _securityService.EnsureRoomPermissionAsync(entity?.Participant.RoomId, SEPermission.RoomReviewUpdate, cancellationToken);
         return await _roomReviewService.UpdateAsync(id, request, cancellationToken);
+    }
+
+    public async Task<UpsertReviewResponse> UpsertAsync(RoomReviewCreateRequest request, Guid userId, CancellationToken cancellationToken = default)
+    {
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomReviewUpsert, cancellationToken);
+        return await _roomReviewService.UpsertAsync(request, userId, cancellationToken);
+    }
+
+    public async Task CompleteAsync(RoomReviewCompletionRequest request, Guid userId, CancellationToken cancellationToken = default)
+    {
+        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomReviewCompletion, cancellationToken);
+        await _roomReviewService.CompleteAsync(request, userId, cancellationToken);
     }
 }
