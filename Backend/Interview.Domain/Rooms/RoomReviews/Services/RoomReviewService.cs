@@ -96,7 +96,7 @@ public class RoomReviewService : IRoomReviewService
 
     public async Task<UpsertReviewResponse> UpsertAsync(RoomReviewCreateRequest request, Guid userId, CancellationToken cancellationToken = default)
     {
-        var transaction = await _db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
+        await using var transaction = await _db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
 
         var roomParticipant = await FindParticipantWithValidateAsync(request.RoomId, userId, cancellationToken);
 
