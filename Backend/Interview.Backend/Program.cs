@@ -1,5 +1,6 @@
 using Interview.Backend;
 using Interview.Backend.AppEvents;
+using Interview.Backend.Healthy;
 using Interview.Backend.Logging;
 using Interview.Domain.Database;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -17,7 +18,10 @@ if (builder.Environment.IsDevelopment())
 
 // Add services to the container.
 var serviceConfigurator = new ServiceConfigurator(builder.Environment, builder.Configuration);
+
 LogConfigurator.Configure(builder.Host, builder.Services);
+HealthConfigurator.Configure(builder.Environment, builder.Services, builder.Configuration);
+
 serviceConfigurator.AddServices(builder.Services);
 
 var app = builder.Build();
