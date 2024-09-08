@@ -79,8 +79,6 @@ public class SorfacePrincipalValidator
                 {
                     _semaphoreLockProvider.Release(refreshToken);
                 }
-
-                await IntrospectToken(context);
             }
         }
         catch (Exception e)
