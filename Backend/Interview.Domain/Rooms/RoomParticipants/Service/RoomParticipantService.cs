@@ -54,7 +54,7 @@ public class RoomParticipantService : IRoomParticipantService
         RoomParticipantChangeStatusRequest request,
         CancellationToken cancellationToken = default)
     {
-        if (SERoomParticipantType.TryFromName(request.UserType, out var participantType) is false)
+        if (SERoomParticipantType.TryFromValue((int)request.UserType, out var participantType) is false)
         {
             throw new UserException("Type user not valid");
         }
@@ -138,7 +138,9 @@ public class RoomParticipantService : IRoomParticipantService
         CancellationToken cancellationToken = default)
     {
         var roomCreatorId = await GetRoomCreatorIdAsync(roomId, cancellationToken);
-        return await CreateCoreAsync(roomCreatorId, participants, cancellationToken);
+        var createdParticipants = await CreateCoreAsync(roomCreatorId, participants, cancellationToken);
+        await _roomParticipantRepository.CreateRangeAsync(createdParticipants, cancellationToken);
+        return createdParticipants;
     }
 
     private async Task<Guid?> GetRoomCreatorIdAsync(Guid roomId, CancellationToken cancellationToken)
@@ -168,7 +170,7 @@ public class RoomParticipantService : IRoomParticipantService
         var requiredPermissions = participantTypes
             .SelectMany(e => e.DefaultRoomPermission)
             .Select(e => e.Value)
-            .Concat(new[] { SEAvailableRoomPermission.RoomInviteGet.Value })
+            .Concat(SEAvailableRoomPermission.CreatorRoomAvailablePermissions.Select(e => e.Value))
             .ToHashSet();
         var specification = new Spec<AvailableRoomPermission>(e => requiredPermissions.Contains(e.Id));
         var availablePermissions = await _availableRoomPermissionRepository.FindAsync(specification, cancellationToken);
@@ -187,7 +189,10 @@ public class RoomParticipantService : IRoomParticipantService
             roomParticipant.Permissions.AddRange(defaultPermissionsMap[roomParticipant.Type]);
             if (roomCreatorId == roomParticipant.User.Id)
             {
-                roomParticipant.Permissions.Add(availablePermissionMap[SEAvailableRoomPermission.RoomInviteGet.Value]);
+                foreach (var creatorPermission in SEAvailableRoomPermission.CreatorRoomAvailablePermissions)
+                {
+                    roomParticipant.Permissions.Add(availablePermissionMap[creatorPermission.Value]);
+                }
             }
         }
     }

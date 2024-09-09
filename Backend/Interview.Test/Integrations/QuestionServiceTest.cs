@@ -565,7 +565,7 @@ public class QuestionServiceTest
     {
         await using var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
 
-        var transaction = await appDbContext.Database.BeginTransactionAsync();
+        await using var transaction = await appDbContext.Database.BeginTransactionAsync();
 
         var user = new User("nickname", "twitchChannel");
         appDbContext.Users.Add(user);

@@ -674,10 +674,10 @@ public class RoomServiceTest
         await appDbContext.SaveChangesAsync();
 
         var checkRoom = appDbContext.Rooms.AsEnumerable().OrderBy(_ => Guid.NewGuid()).First();
-        var expectInvites = appDbContext.RoomInvites.Where(e => e.RoomById == checkRoom.Id)
+        var expectInvites = appDbContext.RoomInvites.Where(e => e.RoomId == checkRoom.Id)
             .Select(e => new RoomInviteResponse
             {
-                InviteId = e.InviteById!.Value,
+                InviteId = e.InviteId,
                 ParticipantType = e.ParticipantType!.EnumValue,
                 Max = e.Invite!.UsesMax,
                 Used = e.Invite!.UsesCurrent,
@@ -782,10 +782,10 @@ public class RoomServiceTest
         await appDbContext.SaveChangesAsync();
 
         var checkRoom = appDbContext.Rooms.AsEnumerable().OrderBy(_ => Guid.NewGuid()).First();
-        var expectInvites = appDbContext.RoomInvites.Where(e => e.RoomById == checkRoom.Id)
+        var expectInvites = appDbContext.RoomInvites.Where(e => e.RoomId == checkRoom.Id)
             .Select(e => new RoomInviteResponse
             {
-                InviteId = e.InviteById!.Value,
+                InviteId = e.InviteId,
                 ParticipantType = e.ParticipantType!.EnumValue,
                 Max = e.Invite!.UsesMax,
                 Used = e.Invite!.UsesCurrent,

@@ -68,7 +68,7 @@ public class RoomParticipantServiceTest
         {
             RoomId = room.Id,
             UserId = user.Id,
-            UserType = newType.Name
+            UserType = newType.EnumValue
         };
         _ = await service.ChangeStatusAsync(changeStatusRequest);
 

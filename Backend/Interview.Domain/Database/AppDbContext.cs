@@ -21,6 +21,7 @@ using Interview.Domain.Users.Permissions;
 using Interview.Domain.Users.Roles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Internal;
 using RoomConfiguration = Interview.Domain.Rooms.RoomConfigurations.RoomConfiguration;
 
@@ -84,6 +85,41 @@ public class AppDbContext : DbContext
     public DbSet<RoomQuestionEvaluation> RoomQuestionEvaluation { get; private set; } = null!;
 
     public DbSet<RoomReview> RoomReview { get; private set; } = null!;
+
+    /// <summary>
+    /// Runs code within a transaction, taking into account previously created code.
+    /// </summary>
+    /// <param name="action">Action for transaction.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <typeparam name="TRes">Result type.</typeparam>
+    /// <returns>A <see cref="System.Threading.Tasks.Task"/> representing the asynchronous operation.</returns>
+    public async Task<TRes> RunTransactionAsync<TRes>(
+        Func<CancellationToken, Task<TRes>> action,
+        CancellationToken cancellationToken)
+    {
+        using var transaction = Database.CurrentTransaction is not null
+            ? EmptyDisposable.Instance
+            : await Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            var res = await action(cancellationToken);
+            if (transaction is IDbContextTransaction typedTransaction)
+            {
+                await typedTransaction.CommitAsync(cancellationToken);
+            }
+
+            return res;
+        }
+        catch (Exception)
+        {
+            if (transaction is IDbContextTransaction typedTransaction)
+            {
+                await typedTransaction.RollbackAsync(cancellationToken);
+            }
+
+            throw;
+        }
+    }
 
     public override int SaveChanges()
     {

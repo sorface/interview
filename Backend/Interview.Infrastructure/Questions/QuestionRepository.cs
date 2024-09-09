@@ -11,23 +11,24 @@ public class QuestionRepository : EfRepository<Question>, IQuestionRepository
     {
     }
 
-    public async Task DeletePermanentlyAsync(Question entity, CancellationToken cancellationToken = default)
+    public Task DeletePermanentlyAsync(Question entity, CancellationToken cancellationToken = default)
     {
-        var transaction = await Db.Database.BeginTransactionAsync(cancellationToken);
+        return Db.RunTransactionAsync(async _ =>
+        {
+            await Db.RoomQuestionReactions
+                .Where(roomQuestionReaction => roomQuestionReaction.RoomQuestion!.Question!.Id == entity.Id)
+                .ExecuteDeleteAsync(cancellationToken);
 
-        await Db.RoomQuestionReactions
-            .Where(roomQuestionReaction => roomQuestionReaction.RoomQuestion!.Question!.Id == entity.Id)
-            .ExecuteDeleteAsync(cancellationToken);
+            await Db.RoomQuestions
+                .Where(roomQuestion => roomQuestion.Question!.Id == entity.Id)
+                .ExecuteDeleteAsync(cancellationToken);
 
-        await Db.RoomQuestions
-            .Where(roomQuestion => roomQuestion.Question!.Id == entity.Id)
-            .ExecuteDeleteAsync(cancellationToken);
-
-        await Db.Questions
-            .Where(question => question.Id == entity.Id)
-            .ExecuteDeleteAsync(cancellationToken);
-
-        await transaction.CommitAsync(cancellationToken);
+            await Db.Questions
+                .Where(question => question.Id == entity.Id)
+                .ExecuteDeleteAsync(cancellationToken);
+            return DBNull.Value;
+        },
+        cancellationToken);
     }
 
     protected override IQueryable<Question> ApplyIncludes(DbSet<Question> set)

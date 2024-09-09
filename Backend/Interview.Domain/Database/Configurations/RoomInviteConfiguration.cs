@@ -11,11 +11,13 @@ public class RoomInviteConfiguration : EntityTypeConfigurationBase<RoomInvite>
     {
         builder.HasOne(entity => entity.Invite)
             .WithMany()
-            .HasForeignKey(entity => entity.InviteById)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasForeignKey(entity => entity.InviteId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired();
         builder.HasOne(entity => entity.Room)
             .WithMany(entity => entity.Invites)
-            .HasForeignKey(entity => entity.RoomById);
+            .HasForeignKey(entity => entity.RoomId)
+            .IsRequired();
         builder.Property(entity => entity.ParticipantType)
             .HasConversion(type => type!.Name, name => SERoomParticipantType.FromName(name, false))
             .HasDefaultValue(SERoomParticipantType.Viewer)

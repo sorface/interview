@@ -15,8 +15,8 @@ public class RoomInvite : Entity
 
     public RoomInvite(Guid invite, Guid room, SERoomParticipantType participantType)
     {
-        InviteById = invite;
-        RoomById = room;
+        InviteId = invite;
+        RoomId = room;
         ParticipantType = participantType;
     }
 
@@ -24,9 +24,9 @@ public class RoomInvite : Entity
     {
     }
 
-    public Guid? InviteById { get; set; }
+    public Guid InviteId { get; set; }
 
-    public Guid? RoomById { get; set; }
+    public Guid RoomId { get; set; }
 
     public Invite? Invite { get; set; }
 

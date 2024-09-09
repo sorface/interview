@@ -62,9 +62,12 @@ public class EventStorage2DatabaseService
         catch (Exception e)
         {
             _logger.LogError(e, "During process");
+            throw;
         }
-
-        _logger.LogInformation("End EventStorage2DatabaseService");
+        finally
+        {
+            _logger.LogInformation("End EventStorage2DatabaseService");
+        }
     }
 
     public async Task ProcessRoomAsync(Guid roomId, CancellationToken cancellationToken)

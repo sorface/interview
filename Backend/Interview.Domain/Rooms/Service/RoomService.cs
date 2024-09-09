@@ -185,7 +185,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 Status = e.Status.EnumValue,
                 Invites = e.Invites.Select(roomInvite => new RoomInviteResponse()
                 {
-                    InviteId = roomInvite.InviteById!.Value,
+                    InviteId = roomInvite.InviteId,
                     ParticipantType = roomInvite.ParticipantType!.EnumValue,
                     Max = roomInvite.Invite!.UsesMax,
                     Used = roomInvite.Invite.UsesCurrent,
@@ -290,35 +290,45 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             .Concat(examinees.Select(e => (e, room, SERoomParticipantType.Examinee)))
             .ToList();
 
-        var createdParticipants = await _roomParticipantService.CreateAsync(room.Id, participants, cancellationToken);
-        room.Participants.AddRange(createdParticipants);
-
-        await _db.AddAsync(room, cancellationToken);
-        await _db.SaveChangesAsync(cancellationToken);
-        await GenerateInvitesAsync(room.Id, cancellationToken);
-
-        return new RoomPageDetail
+        return await _db.RunTransactionAsync(async _ =>
         {
-            Id = room.Id,
-            Name = room.Name,
-            Questions = room.Questions.OrderBy(rq => rq.Order)
-                .Select(question => new RoomQuestionDetail
-                {
-                    Id = question.Question!.Id,
-                    Value = question.Question.Value,
-                    Order = question.Order,
-                    Answers = null,
-                    CodeEditor = null,
-                })
-                .ToList(),
-            Participants = room.Participants.Select(participant =>
-                    new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, Type = participant.Type.Name })
-                .ToList(),
-            Status = room.Status.EnumValue,
-            Tags = room.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
-            Timer = room.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)room.Timer.Duration.TotalSeconds, StartTime = room.Timer.ActualStartTime, },
-            ScheduledStartTime = room.ScheduleStartTime,
-        };
+            await _db.Rooms.AddAsync(room, cancellationToken);
+            await _db.SaveChangesAsync(cancellationToken);
+
+            await _roomParticipantService.CreateAsync(room.Id, participants, cancellationToken);
+
+            await GenerateInvitesAsync(room.Id, cancellationToken);
+
+            return new RoomPageDetail
+            {
+                Id = room.Id,
+                Name = room.Name,
+                Questions = room.Questions.OrderBy(rq => rq.Order)
+                    .Select(question => new RoomQuestionDetail
+                    {
+                        Id = question.Question!.Id,
+                        Value = question.Question.Value,
+                        Order = question.Order,
+                        Answers = null,
+                        CodeEditor = null,
+                    })
+                    .ToList(),
+                Participants = room.Participants.Select(participant =>
+                        new RoomUserDetail
+                        {
+                            Id = participant.User.Id,
+                            Nickname = participant.User.Nickname,
+                            Avatar = participant.User.Avatar,
+                            Type = participant.Type.Name,
+                        })
+                    .ToList(),
+                Status = room.Status.EnumValue,
+                Tags = room.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
+                Timer = room.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)room.Timer.Duration.TotalSeconds, StartTime = room.Timer.ActualStartTime, },
+                ScheduledStartTime = room.ScheduleStartTime,
+            };
+        },
+        cancellationToken);
     }
 
     public async Task<RoomItem> UpdateAsync(Guid roomId, RoomUpdateRequest? request, CancellationToken cancellationToken = default)
@@ -441,15 +451,16 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             return (currentRoom, participant);
         }
 
-        var participants = await _roomParticipantService.CreateAsync(
-            roomId,
-            new[] { (user, currentRoom, SERoomParticipantType.Viewer) },
-            cancellationToken);
-        participant = participants.First();
-        currentRoom.Participants.Add(participant);
-        _db.Rooms.Update(currentRoom);
-        await _db.SaveChangesAsync(cancellationToken);
-        return (currentRoom, participant);
+        return await _db.RunTransactionAsync(async _ =>
+        {
+            var participants = await _roomParticipantService.CreateAsync(
+                roomId,
+                new[] { (user, currentRoom, SERoomParticipantType.Viewer) },
+                cancellationToken);
+            participant = participants.First();
+            return (currentRoom, participant);
+        },
+        cancellationToken);
     }
 
     public async Task SendEventRequestAsync(IEventRequest request, CancellationToken cancellationToken = default)
@@ -734,10 +745,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     {
         return _db.RoomInvites.AsNoTracking()
             .Include(roomInvite => roomInvite.Invite)
-            .Where(e => e.RoomById == roomId && e.InviteById != null && e.ParticipantType != null)
+            .Where(e => e.RoomId == roomId && e.InviteId != null && e.ParticipantType != null)
             .Select(e => new RoomInviteResponse
             {
-                InviteId = e.InviteById!.Value,
+                InviteId = e.InviteId,
                 ParticipantType = e.ParticipantType!.EnumValue,
                 Max = e.Invite!.UsesMax,
                 Used = e.Invite.UsesCurrent,
@@ -897,17 +908,14 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         _logger.LogInformation("room has open type");
 
-        var participant = await _db.RoomParticipants
-            .Include(e => e.Room)
-            .Include(e => e.User)
-            .FirstOrDefaultAsync(e => e.Room.Id == roomId && e.User.Id == userId, cancellationToken);
+        var participant = await _db.RoomParticipants.FirstOrDefaultAsync(e => e.RoomId == roomId && e.UserId == userId, cancellationToken);
 
         if (participant is not null)
         {
             _logger.LogInformation("participant is not null and just return room invite");
             return new RoomInviteResponse
             {
-                ParticipantType = participant.Type.EnumValue,
+                ParticipantType = participant.Type!.EnumValue,
                 InviteId = invite!.Value,
                 Max = 0,
                 Used = 0,
@@ -925,24 +933,25 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         _logger.LogInformation("Create participant for user [id -> {userId}]", user.Id);
 
-        var participants = await _roomParticipantService.CreateAsync(
-            roomId,
-            new[] { (user, room, SERoomParticipantType.Viewer) },
-            cancellationToken);
-        participant = participants.First();
-
-        await _db.RoomParticipants.AddAsync(participant, cancellationToken);
-        await _db.SaveChangesAsync(cancellationToken);
-
-        _logger.LogInformation("room participant [id -> {participantId}, type -> {participantType}] created", participant.Id, participant.Type.Name);
-
-        return new RoomInviteResponse
+        return await _db.RunTransactionAsync(async _ =>
         {
-            ParticipantType = participant.Type.EnumValue,
-            InviteId = invite!.Value,
-            Max = 0,
-            Used = 0,
-        };
+            var participants = await _roomParticipantService.CreateAsync(
+                roomId,
+                new[] { (user, room, SERoomParticipantType.Viewer) },
+                cancellationToken);
+            participant = participants.First();
+
+            _logger.LogInformation("room participant [id -> {participantId}, type -> {participantType}] created", participant.Id, participant.Type.Name);
+
+            return new RoomInviteResponse
+            {
+                ParticipantType = participant.Type.EnumValue,
+                InviteId = invite!.Value,
+                Max = 0,
+                Used = 0,
+            };
+        },
+        cancellationToken);
     }
 
     private static RoomTimer? CreateRoomTimer(long? durationSec)

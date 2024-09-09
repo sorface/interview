@@ -75,7 +75,7 @@ public class RoomInviteIntegration
     {
         await using var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
 
-        var transaction = await appDbContext.Database.BeginTransactionAsync();
+        await using var transaction = await appDbContext.Database.BeginTransactionAsync();
 
         var user = new User("devpav", Guid.NewGuid().ToString());
 
@@ -119,7 +119,7 @@ public class RoomInviteIntegration
         Assert.NotNull(roomParticipant);
 
         roomParticipant.User.Id.Should().Be(participant.User.Id);
-        roomParticipant.Type.EnumValue.Should().Be(roomInvite.ParticipantType.EnumValue);
+        roomParticipant.Type.EnumValue.Should().Be(roomInvite.ParticipantType!.EnumValue);
         roomParticipant.Room.Id.Should().Be(room.Id);
     }
 
@@ -158,12 +158,12 @@ public class RoomInviteIntegration
 
         Assert.False(deletedRoom);
 
-        var foundRoomInvite = await appDbContext.RoomInvites.FirstOrDefaultAsync(item => item.RoomById == room.Id);
+        var foundRoomInvite = await appDbContext.RoomInvites.FirstOrDefaultAsync(item => item.RoomId == room.Id);
 
         Assert.NotNull(foundRoomInvite);
         foundRoomInvite.ParticipantType.Should().Be(SERoomParticipantType.Expert);
 
-        var generatedInvite = await appDbContext.Invites.FirstOrDefaultAsync(item => foundRoomInvite.InviteById == item.Id);
+        var generatedInvite = await appDbContext.Invites.FirstOrDefaultAsync(item => foundRoomInvite.InviteId == item.Id);
 
         Assert.NotNull(generatedInvite);
 

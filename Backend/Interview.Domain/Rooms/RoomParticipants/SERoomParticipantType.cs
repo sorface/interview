@@ -79,7 +79,7 @@ public sealed class SERoomParticipantType : SmartEnum<SERoomParticipantType>
 
     public EVRoomParticipantType EnumValue => (EVRoomParticipantType)Value;
 
-    public static SERoomParticipantType FromEnum(EVRoomParticipantType participantType) => List.First(it => it.Value.Equals((int)participantType));
+    public static SERoomParticipantType FromEnum(EVRoomParticipantType participantType) => FromValue((int)participantType);
 
     public IReadOnlySet<SEAvailableRoomPermission> DefaultRoomPermission { get; }
 }
