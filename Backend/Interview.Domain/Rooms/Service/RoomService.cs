@@ -316,7 +316,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 Participants = room.Participants.Select(participant =>
                         new RoomUserDetail
                         {
-                            Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, Type = participant.Type.Name
+                            Id = participant.User.Id,
+                            Nickname = participant.User.Nickname,
+                            Avatar = participant.User.Avatar,
+                            Type = participant.Type.Name,
                         })
                     .ToList(),
                 Status = room.Status.EnumValue,

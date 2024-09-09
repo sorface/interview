@@ -1,4 +1,4 @@
-﻿namespace Interview.Domain;
+namespace Interview.Domain;
 
 /// <summary>
 /// The class represents an empty object implementing the <see cref="IDisposable"/> interface.

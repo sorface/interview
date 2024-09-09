@@ -69,11 +69,11 @@ public class SorfacePrincipalValidator
 
                 try
                 {
-                    _logger.LogDebug($@"Start refresh ACCESS_TOKEN with lock");
+                    _logger.LogDebug($"Start refresh ACCESS_TOKEN with lock");
 
                     await RefreshAccessTokenAsync(context, refreshToken, context.HttpContext.RequestAborted);
 
-                    _logger.LogDebug($@"End refresh ACCESS_TOKEN unlock");
+                    _logger.LogDebug($"End refresh ACCESS_TOKEN unlock");
                 }
                 finally
                 {
@@ -108,12 +108,12 @@ public class SorfacePrincipalValidator
 
         if (!active.GetBoolean())
         {
-            _logger.LogInformation(@"Token refresh operation has been with result {result}", tokenPrincipal);
+            _logger.LogInformation("Token refresh operation has been with result {result}", tokenPrincipal);
             context.RejectPrincipal();
             return;
         }
 
-        _logger.LogDebug($@"Access token success introspected");
+        _logger.LogDebug("Access token success introspected");
     }
 
     private async Task RefreshAccessTokenAsync(CookieValidatePrincipalContext context, string refreshToken, CancellationToken cancellationToken)

@@ -120,7 +120,6 @@ public class RoomInviteService : IRoomInviteService
             }
 
             // await UpdateInviteLimit(roomInvite, cancellationToken);
-
             return new RoomInviteResponse
             {
                 InviteId = invite.Id,
