@@ -18,7 +18,14 @@ public class EventStorage2DatabaseBackgroundService : BackgroundService
             await using (var scope = _scopeFactory.CreateAsyncScope())
             {
                 var service = scope.ServiceProvider.GetRequiredService<EventStorage2DatabaseService>();
-                await service.ProcessAsync(stoppingToken);
+                try
+                {
+                    await service.ProcessAsync(stoppingToken);
+                }
+                catch
+                {
+                    // ignore
+                }
             }
 
             await Task.Delay(TimeSpan.FromMinutes(20), stoppingToken);
