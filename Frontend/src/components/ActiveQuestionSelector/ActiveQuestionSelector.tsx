@@ -1,4 +1,4 @@
-import React, { ChangeEventHandler, FunctionComponent, MouseEventHandler, useEffect, useRef, useState } from 'react';
+import React, { Fragment, FunctionComponent, MouseEventHandler, useEffect, useState } from 'react';
 import { LocalizationKey } from '../../localization';
 import { RoomQuestion } from '../../types/room';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
@@ -19,32 +19,25 @@ const sortOption = (option1: RoomQuestion, option2: RoomQuestion) =>
 
 export interface ActiveQuestionSelectorProps {
   initialQuestion?: RoomQuestion;
-  showClosedQuestions: boolean;
   loading: boolean;
   questionsDictionary: Question[];
   questions: RoomQuestion[];
   openQuestions: Array<RoomQuestion['id']>;
   readOnly: boolean;
   onSelect: (question: RoomQuestion) => void;
-  onShowClosedQuestions: MouseEventHandler<HTMLInputElement>;
 }
 
 export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorProps> = ({
   initialQuestion,
-  showClosedQuestions,
   loading,
   questionsDictionary,
   questions,
   openQuestions,
   readOnly,
   onSelect,
-  onShowClosedQuestions,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [selectedValue, setSelectedValue] = useState<RoomQuestion | null>(null);
-  const [searchValue, setSearchValue] = useState("");
-  const searchRef = useRef<HTMLInputElement>(null);
-  const inputRef = useRef<HTMLDivElement>(null);
   const localizationCaptions = useLocalizationCaptions();
   const [questionsCount, setQuestionsCount] = useState(0);
   const [closedQuestionsCount, setClosedQuestionsCount] = useState(0);
@@ -67,49 +60,6 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
     return openQuestions.includes(question.id);
   }
 
-  const questionsFiltered = questions.filter(
-    question => showClosedQuestions ? !isOpened(question) : isOpened(question)
-  );
-
-  const getOptions = () => {
-    if (!searchValue) {
-      return questionsFiltered;
-    }
-
-    return questionsFiltered.filter(
-      (question) =>
-        question.value.toLowerCase().indexOf(searchValue.toLowerCase()) >= 0
-    );
-  };
-
-  const options = getOptions();
-
-  useEffect(() => {
-    setSearchValue("");
-    if (showMenu && searchRef.current) {
-      searchRef.current.focus();
-    }
-  }, [showMenu]);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (!e.target) {
-        return;
-      }
-      const inputRefContainsTarget = inputRef.current?.contains(e.target as any);
-      const searchRefTarget = searchRef.current?.contains(e.target as any);
-      const shouldClose = !inputRefContainsTarget && !searchRefTarget;
-      if (shouldClose) {
-        setShowMenu(false);
-      }
-    };
-
-    window.addEventListener('click', handler);
-    return () => {
-      window.removeEventListener('click', handler);
-    };
-  });
-
   const handleInputClick: MouseEventHandler<HTMLDivElement> = () => {
     if (readOnly) {
       return;
@@ -126,11 +76,8 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
 
   const onItemClick = (option: RoomQuestion) => {
     setSelectedValue(option);
+    setShowMenu(false);
     onSelect(option);
-  };
-
-  const onSearch: ChangeEventHandler<HTMLInputElement> = (e) => {
-    setSearchValue(e.target.value);
   };
 
   const handleAnswersModalOpen = () => {
@@ -144,8 +91,8 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   return (
     <>
       <div className="activeQuestionSelector-container relative">
-        <div ref={inputRef} onClick={handleInputClick} className="activeQuestionSelector-input cursor-pointer">
-          <Icon name={IconNames.ReorderFour} />
+        <div onClick={handleInputClick} className="activeQuestionSelector-input cursor-pointer">
+          <Icon name={showMenu ? IconNames.ChevronBack : IconNames.ReorderFour} />
           <Gap sizeRem={1} horizontal />
           <div className="activeQuestionSelector-selected-value w-full flex items-center">
             <div>
@@ -163,35 +110,45 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
         <Gap sizeRem={1} />
         <progress className='w-full h-0.125' value={closedQuestionsCount} max={questionsCount}></progress>
         {showMenu && (
-          <div className="activeQuestionSelector-menu text-left">
-            <div ref={searchRef} className="activeQuestionSelector-search-panel">
-              <span>{localizationCaptions[LocalizationKey.ShowClosedQuestions]}</span>
-              <input type="checkbox" checked={showClosedQuestions} onClick={onShowClosedQuestions} />
-              <div className="search-box" >
-                <input onChange={onSearch} value={searchValue} />
-              </div>
-            </div>
-            {options.length === 0 && (
+          <div className="text-left">
+            {questions.length === 0 && (
               <div className='no-questions'>{localizationCaptions[LocalizationKey.NoQuestionsSelector]}</div>
             )}
-            {options.sort(sortOption).map((option) => (
-              <div
-                onClick={() => onItemClick(option)}
-                key={option.value}
-                className={`activeQuestionSelector-item ${!isOpened(option) && 'closed'}`}
-              >
-                {option.value}
-              </div>
+            <Gap sizeRem={1} />
+            {questions.sort(sortOption).map((question, index, allQuestions) => (
+              <Fragment key={question.id}>
+                <div
+                  key={question.value}
+                  className='flex cursor-pointer'
+                  onClick={() => onItemClick(question)}
+                >
+                  <Typography size='m'>{question.order + 1}.</Typography>
+                  <Gap sizeRem={1.125} horizontal />
+                  <Typography size='m'>{question.value}</Typography>
+                  {!isOpened(question) && (
+                    <div className='ml-auto text-dark-green-light'>
+                      <Icon size='s' name={IconNames.Checkmark} />
+                    </div>
+                  )}
+                </div>
+                {(index !== allQuestions.length - 1) && (
+                  <Gap sizeRem={0.5} />
+                )}
+              </Fragment>
             ))}
           </div>
         )}
       </div>
-      <Gap sizeRem={1} />
-      <div className='text-left'>
-        <Typography size='l' bold>
-          {getDisplay()}
-        </Typography>
-      </div>
+      {!showMenu && (
+        <>
+          <Gap sizeRem={1} />
+          <div className='text-left'>
+            <Typography size='l' bold>
+              {getDisplay()}
+            </Typography>
+          </div>
+        </>
+      )}
       {!!(!readOnly && currentQuestionInDictionary?.answers?.length) && (
         <div className='cursor-pointer mt-auto text-right' onClick={handleAnswersModalOpen}>
           <Typography size='s' secondary>{localizationCaptions[LocalizationKey.QuestionAnswerOptions]}</Typography>
