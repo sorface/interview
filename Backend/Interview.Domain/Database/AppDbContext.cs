@@ -91,6 +91,7 @@ public class AppDbContext : DbContext
     /// </summary>
     /// <param name="action">Action for transaction.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
+    /// <typeparam name="TRes">Result type.</typeparam>
     /// <returns>A <see cref="System.Threading.Tasks.Task"/> representing the asynchronous operation.</returns>
     public async Task<TRes> RunTransactionAsync<TRes>(
         Func<CancellationToken, Task<TRes>> action,
