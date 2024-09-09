@@ -68,5 +68,7 @@ public class SEAvailableRoomPermission : SmartEnum<SEAvailableRoomPermission, Gu
         Permission = name;
     }
 
+    public static readonly SEAvailableRoomPermission[] CreatorRoomAvailablePermissions = new[] { RoomInviteGet, };
+
     public SEPermission Permission { get; }
 }

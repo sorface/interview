@@ -11,10 +11,12 @@ public class RoomParticipantTypeConfiguration : EntityTypeConfigurationBase<Room
     {
         builder.HasOne<User>(participant => participant.User)
             .WithMany()
+            .HasForeignKey(e => e.UserId)
             .IsRequired();
 
         builder.HasOne<Room>(participant => participant.Room)
             .WithMany(room => room.Participants)
+            .HasForeignKey(e => e.RoomId)
             .IsRequired();
 
         builder.Property(romeUser => romeUser.Type)

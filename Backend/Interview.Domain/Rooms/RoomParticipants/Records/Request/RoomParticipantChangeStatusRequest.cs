@@ -6,5 +6,5 @@ public class RoomParticipantChangeStatusRequest
 
     public Guid UserId { get; set; }
 
-    public string UserType { get; set; } = string.Empty;
+    public EVRoomParticipantType UserType { get; set; }
 }

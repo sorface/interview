@@ -18,7 +18,11 @@ public class RoomParticipant : Entity
 
     public User User { get; set; } = null!;
 
+    public Guid UserId { get; set; }
+
     public Room Room { get; set; } = null!;
+
+    public Guid RoomId { get; set; }
 
     public SERoomParticipantType Type { get; set; } = null!;
 
