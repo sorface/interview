@@ -26,32 +26,26 @@ public class RoomQuestionEvaluationRepository : EfRepository<RoomQuestionEvaluat
             .FirstAsync(cancellationToken);
     }
 
-    public async Task SubmitAsync(Guid roomId, Guid userId, CancellationToken cancellationToken)
+    public Task SubmitAsync(Guid roomId, Guid userId, CancellationToken cancellationToken)
     {
-        await using var transaction = await Db.Database.BeginTransactionAsync(cancellationToken);
+        return Db.RunTransactionAsync(async _ =>
+            {
+                var roomQuestionEvaluations = ApplyIncludes(Set)
+                    .Include(evaluation => evaluation.RoomQuestion)
+                    .Include(evaluation => evaluation.CreatedBy)
+                    .Where(evaluation => evaluation.RoomQuestion!.RoomId == roomId && evaluation.CreatedById == userId);
 
-        try
-        {
-            var roomQuestionEvaluations = ApplyIncludes(Set)
-                .Include(evaluation => evaluation.RoomQuestion)
-                .Include(evaluation => evaluation.CreatedBy)
-                .Where(evaluation => evaluation.RoomQuestion!.RoomId == roomId && evaluation.CreatedById == userId);
+                await roomQuestionEvaluations.ForEachAsync(evaluation =>
+                    {
+                        evaluation.State = SERoomQuestionEvaluationState.Submitted;
+                    },
+                    cancellationToken);
 
-            await roomQuestionEvaluations.ForEachAsync(evaluation =>
-                {
-                    evaluation.State = SERoomQuestionEvaluationState.Submitted;
-                },
-                cancellationToken);
-
-            // todo: not work batch update
-            // await roomQuestionEvaluations.ExecuteUpdateAsync(property => property.SetProperty(e => e.State, evaluation => SERoomQuestionEvaluationState.Submitted), cancellationToken);
-            await Db.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+                // todo: not work batch update
+                // await roomQuestionEvaluations.ExecuteUpdateAsync(property => property.SetProperty(e => e.State, evaluation => SERoomQuestionEvaluationState.Submitted), cancellationToken);
+                await Db.SaveChangesAsync(cancellationToken);
+                return DBNull.Value;
+            },
+            cancellationToken);
     }
 }

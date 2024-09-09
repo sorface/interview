@@ -677,7 +677,7 @@ public class RoomServiceTest
         var expectInvites = appDbContext.RoomInvites.Where(e => e.RoomId == checkRoom.Id)
             .Select(e => new RoomInviteResponse
             {
-                InviteId = e.InviteId!.Value,
+                InviteId = e.InviteId,
                 ParticipantType = e.ParticipantType!.EnumValue,
                 Max = e.Invite!.UsesMax,
                 Used = e.Invite!.UsesCurrent,
@@ -709,7 +709,7 @@ public class RoomServiceTest
         var expectInvites = appDbContext.RoomInvites.Where(e => e.RoomId == checkRoom.Id)
             .Select(e => new RoomInviteResponse
             {
-                InviteId = e.InviteId!.Value,
+                InviteId = e.InviteId,
                 ParticipantType = e.ParticipantType!.EnumValue,
                 Max = e.Invite!.UsesMax,
                 Used = e.Invite!.UsesCurrent,

@@ -11,11 +11,9 @@ public class QuestionRepository : EfRepository<Question>, IQuestionRepository
     {
     }
 
-    public async Task DeletePermanentlyAsync(Question entity, CancellationToken cancellationToken = default)
+    public Task DeletePermanentlyAsync(Question entity, CancellationToken cancellationToken = default)
     {
-        await using var transaction = await Db.Database.BeginTransactionAsync(cancellationToken);
-
-        try
+        return Db.RunTransactionAsync(async _ =>
         {
             await Db.RoomQuestionReactions
                 .Where(roomQuestionReaction => roomQuestionReaction.RoomQuestion!.Question!.Id == entity.Id)
@@ -28,14 +26,9 @@ public class QuestionRepository : EfRepository<Question>, IQuestionRepository
             await Db.Questions
                 .Where(question => question.Id == entity.Id)
                 .ExecuteDeleteAsync(cancellationToken);
-
-            await transaction.CommitAsync(cancellationToken);
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+            return DBNull.Value;
+        },
+        cancellationToken);
     }
 
     protected override IQueryable<Question> ApplyIncludes(DbSet<Question> set)

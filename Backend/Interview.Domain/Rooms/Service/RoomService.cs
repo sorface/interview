@@ -290,8 +290,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             .Concat(examinees.Select(e => (e, room, SERoomParticipantType.Examinee)))
             .ToList();
 
-        await using var databaseContextTransaction = await _db.Database.BeginTransactionAsync(cancellationToken);
-        try
+        return await _db.RunTransactionAsync(async _ =>
         {
             await _db.Rooms.AddAsync(room, cancellationToken);
             await _db.SaveChangesAsync(cancellationToken);
@@ -299,7 +298,6 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             await _roomParticipantService.CreateAsync(room.Id, participants, cancellationToken);
 
             await GenerateInvitesAsync(room.Id, cancellationToken);
-            await databaseContextTransaction.CommitAsync(cancellationToken);
 
             return new RoomPageDetail
             {
@@ -316,19 +314,18 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                     })
                     .ToList(),
                 Participants = room.Participants.Select(participant =>
-                        new RoomUserDetail { Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, Type = participant.Type.Name })
+                        new RoomUserDetail
+                        {
+                            Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, Type = participant.Type.Name
+                        })
                     .ToList(),
                 Status = room.Status.EnumValue,
                 Tags = room.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
                 Timer = room.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)room.Timer.Duration.TotalSeconds, StartTime = room.Timer.ActualStartTime, },
                 ScheduledStartTime = room.ScheduleStartTime,
             };
-        }
-        catch
-        {
-            await databaseContextTransaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+        },
+        cancellationToken);
     }
 
     public async Task<RoomItem> UpdateAsync(Guid roomId, RoomUpdateRequest? request, CancellationToken cancellationToken = default)
@@ -451,22 +448,16 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             return (currentRoom, participant);
         }
 
-        await using var databaseContextTransaction = await _db.Database.BeginTransactionAsync(cancellationToken);
-        try
+        return await _db.RunTransactionAsync(async _ =>
         {
             var participants = await _roomParticipantService.CreateAsync(
                 roomId,
                 new[] { (user, currentRoom, SERoomParticipantType.Viewer) },
                 cancellationToken);
             participant = participants.First();
-            await databaseContextTransaction.CommitAsync(cancellationToken);
             return (currentRoom, participant);
-        }
-        catch
-        {
-            await databaseContextTransaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+        },
+        cancellationToken);
     }
 
     public async Task SendEventRequestAsync(IEventRequest request, CancellationToken cancellationToken = default)
@@ -942,15 +933,13 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         _logger.LogInformation("Create participant for user [id -> {userId}]", user.Id);
 
-        await using var databaseContextTransaction = await _db.Database.BeginTransactionAsync(cancellationToken);
-        try
+        return await _db.RunTransactionAsync(async _ =>
         {
             var participants = await _roomParticipantService.CreateAsync(
                 roomId,
                 new[] { (user, room, SERoomParticipantType.Viewer) },
                 cancellationToken);
             participant = participants.First();
-            await databaseContextTransaction.CommitAsync(cancellationToken);
 
             _logger.LogInformation("room participant [id -> {participantId}, type -> {participantType}] created", participant.Id, participant.Type.Name);
 
@@ -961,12 +950,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 Max = 0,
                 Used = 0,
             };
-        }
-        catch
-        {
-            await databaseContextTransaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+        },
+        cancellationToken);
     }
 
     private static RoomTimer? CreateRoomTimer(long? durationSec)

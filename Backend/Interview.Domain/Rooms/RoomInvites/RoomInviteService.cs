@@ -72,9 +72,7 @@ public class RoomInviteService : IRoomInviteService
 
         _logger.LogInformation("User with id [{userId}] for invite found {inviteId}", user.Id, inviteId);
 
-        await using var databaseContextTransaction = await _db.Database.BeginTransactionAsync(cancellationToken);
-
-        try
+        return await _db.RunTransactionAsync(async _ =>
         {
             var participant = await _db.RoomParticipants
                 .Include(e => e.Room)
@@ -99,9 +97,7 @@ public class RoomInviteService : IRoomInviteService
                     userId);
 
                 await UpdateInviteLimit(roomInvite, cancellationToken);
-                await _db.RoomParticipants.AddAsync(roomParticipant, cancellationToken);
                 await _db.SaveChangesAsync(cancellationToken);
-                await databaseContextTransaction.CommitAsync(cancellationToken);
 
                 return new RoomInviteResponse
                 {
@@ -124,7 +120,6 @@ public class RoomInviteService : IRoomInviteService
             }
 
             // await UpdateInviteLimit(roomInvite, cancellationToken);
-            await databaseContextTransaction.CommitAsync(cancellationToken);
 
             return new RoomInviteResponse
             {
@@ -133,12 +128,8 @@ public class RoomInviteService : IRoomInviteService
                 Used = invite.UsesCurrent,
                 Max = invite.UsesMax,
             };
-        }
-        catch
-        {
-            await databaseContextTransaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+        },
+        cancellationToken);
     }
 
     public async Task<RoomInviteResponse> GenerateAsync(
