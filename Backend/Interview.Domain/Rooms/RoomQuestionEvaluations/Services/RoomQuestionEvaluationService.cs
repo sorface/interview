@@ -33,7 +33,7 @@ public class RoomQuestionEvaluationService : IRoomQuestionEvaluationService
         return await _db.RoomQuestions
             .Include(e => e.Question)
             .Include(e => e.Evaluations)
-            .Where(e => e.RoomId == request.RoomId)
+            .Where(e => e.RoomId == request.RoomId && e.State == RoomQuestionState.Closed)
             .OrderBy(e => e.Order)
             .Select(e => new RoomQuestionEvaluationResponse
             {

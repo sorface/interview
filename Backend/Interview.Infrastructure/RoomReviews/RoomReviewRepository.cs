@@ -15,29 +15,35 @@ public class RoomReviewRepository : EfRepository<RoomReview>, IRoomReviewReposit
     {
     }
 
-    public Task<IPagedList<RoomReviewPageDetail>> GetDetailedPageAsync(ISpecification<RoomReview> specification, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public Task<IPagedList<RoomReviewPageDetail>> GetDetailedPageAsync(ISpecification<RoomReview> specification,
+                                                                       int pageNumber,
+                                                                       int pageSize,
+                                                                       CancellationToken cancellationToken = default)
     {
         return Set
             .AsNoTracking()
-            .Include(e => e.Room)
-            .Include(e => e.User)
+            .Include(e => e.Participant)
             .Where(specification.Expression)
             .Select(e => new RoomReviewPageDetail
             {
                 Id = e.Id,
-                RoomId = e.Room!.Id,
-                User = new RoomUserDetail { Id = e.User!.Id, Nickname = e.User.Nickname, Type = null, Avatar = e.User.Avatar },
+                RoomId = e.Participant.RoomId,
+                User = new RoomUserDetail { Id = e.Participant.User.Id, Nickname = e.Participant.User.Nickname, Type = null, Avatar = e.Participant.User.Avatar },
                 Review = e.Review,
-                State = e.SeRoomReviewState.EnumValue,
+                State = e.State.EnumValue,
             })
             .OrderBy(e => e.Id)
             .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
 
+    public Task<RoomReview?> FindByParticipantIdAsync(Guid participantId, CancellationToken cancellationToken = default)
+    {
+        return ApplyIncludes(Set).FirstOrDefaultAsync(review => review.Id == participantId, cancellationToken);
+    }
+
     protected override IQueryable<RoomReview> ApplyIncludes(DbSet<RoomReview> set)
     {
-        return set
-            .Include(it => it.Room)
-            .Include(it => it.User);
+        return set.Include(it => it.Participant)
+            .Include(it => it.Participant.Room);
     }
 }

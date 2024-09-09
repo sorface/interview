@@ -685,7 +685,9 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
             var userReview = await _db.RoomParticipants.AsNoTracking()
                 .Include(e => e.Room)
-                .Include(e => e.User).ThenInclude(e => e.RoomQuestionEvaluations.Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId))
+                .Include(e => e.User)
+                .ThenInclude(e => e.RoomQuestionEvaluations.Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId))
+                .Include(participant => participant.Review)
                 .Where(e => e.Room.Id == request.RoomId)
                 .Select(e => new
                 {
@@ -694,12 +696,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                         .Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.Mark != null && rqe.Mark > 0)
                         .Select(rqe => rqe.Mark ?? 0)
                         .ToList(),
-                    Comment = _db.RoomReview
-                        .Include(rr => rr.Room)
-                        .Include(rr => rr.User)
-                        .Where(rr => rr.Room!.Id == e.Room.Id && rr.User!.Id == e.User.Id)
-                        .Select(rr => rr.Review)
-                        .FirstOrDefault(),
+                    Comment = e.Review!.Review,
                     Nickname = e.User.Nickname,
                     Avatar = e.User.Avatar,
                     ParticipantType = e.Type,

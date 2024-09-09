@@ -1,5 +1,6 @@
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Users;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,13 +11,18 @@ public class RoomParticipantTypeConfiguration : EntityTypeConfigurationBase<Room
     protected override void ConfigureCore(EntityTypeBuilder<RoomParticipant> builder)
     {
         builder.HasOne<User>(participant => participant.User)
-            .WithMany()
-            .HasForeignKey(e => e.UserId)
+            .WithMany(user => user.RoomParticipants)
+            .HasForeignKey(participant => participant.UserId)
             .IsRequired();
+
+        builder
+            .HasOne<RoomReview>(participant => participant.Review)
+            .WithOne(review => review.Participant)
+            .HasForeignKey<RoomReview>(review => review.Id);
 
         builder.HasOne<Room>(participant => participant.Room)
             .WithMany(room => room.Participants)
-            .HasForeignKey(e => e.RoomId)
+            .HasForeignKey(participant => participant.RoomId)
             .IsRequired();
 
         builder.Property(romeUser => romeUser.Type)

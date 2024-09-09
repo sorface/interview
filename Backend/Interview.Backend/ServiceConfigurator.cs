@@ -125,24 +125,17 @@ public class ServiceConfigurator
                     ?.ToLower()
                     .Trim();
                 var customDb = !string.IsNullOrWhiteSpace(database);
-                if ((_environment.IsDevelopment() && !customDb) ||
-                    "sqlite".Equals(
-                        database,
-                        StringComparison.InvariantCultureIgnoreCase))
+
+                if ((_environment.IsDevelopment() && !customDb) || "sqlite".Equals(database, StringComparison.InvariantCultureIgnoreCase))
                 {
                     optionsBuilder.UseSqlite(
                         connectionString,
                         builder => builder.MigrationsAssembly(typeof(Migrations.Sqlite.AppDbContextFactory).Assembly
                             .FullName));
                 }
-                else if ((_environment.IsPreProduction() && !customDb) ||
-                         "postgres".Equals(
-                             database,
-                             StringComparison.InvariantCultureIgnoreCase))
+                else if ((_environment.IsPreProduction() && !customDb) || "postgres".Equals(database, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    AppContext.SetSwitch(
-                        "Npgsql.EnableLegacyTimestampBehavior",
-                        true);
+                    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
                     optionsBuilder.UseNpgsql(
                         connectionString,
                         builder => builder.MigrationsAssembly(typeof(Migrations.Postgres.AppDbContextFactory).Assembly
@@ -156,29 +149,22 @@ public class ServiceConfigurator
             AdminUsers = adminUsers,
             EventStorageConfigurator = builder =>
             {
-                var storageSection = _configuration.GetSection("EventStorage");
-                var useRedis = storageSection?.GetValue<bool?>("Enabled") ?? false;
-
-                if (useRedis)
-                {
-                    var redisUsername = storageSection?.GetValue<string>("Username");
-                    var redisHost = storageSection?.GetValue<string>("Host");
-                    var redisPort = storageSection?.GetValue<int>("Port");
-                    var redisPassword = storageSection?.GetValue<string>("Password");
-
-                    builder.UseRedis($@"redis://{redisUsername}:{redisPassword}@{redisHost}:{redisPort}");
-
-                    serviceCollection.AddStackExchangeRedisCache(options =>
+                RedisEnvironmentConfigure.Configure(_configuration,
+                    (host, port, username, password) =>
                     {
-                        options.Configuration = $@"{redisHost}:{redisPort},password={redisPassword}";
-                        options.InstanceName = "sorface.interview.session.";
+                        builder.UseRedis($@"redis://{username}:{password}@{host}:{port}");
+
+                        serviceCollection.AddStackExchangeRedisCache(options =>
+                        {
+                            options.Configuration = $@"{host}:{port},password={password}";
+                            options.InstanceName = "sorface.interview.session.";
+                        });
+                    },
+                    () =>
+                    {
+                        serviceCollection.AddDistributedMemoryCache();
+                        builder.UseEmpty();
                     });
-                }
-                else
-                {
-                    serviceCollection.AddDistributedMemoryCache();
-                    builder.UseEmpty();
-                }
             },
         };
 

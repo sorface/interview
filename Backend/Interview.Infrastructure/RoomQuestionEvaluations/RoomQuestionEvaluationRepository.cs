@@ -26,26 +26,21 @@ public class RoomQuestionEvaluationRepository : EfRepository<RoomQuestionEvaluat
             .FirstAsync(cancellationToken);
     }
 
-    public Task SubmitAsync(Guid roomId, Guid userId, CancellationToken cancellationToken)
+    public async Task SubmitAsync(Guid roomId, Guid userId, CancellationToken cancellationToken)
     {
-        return Db.RunTransactionAsync(async _ =>
+        var roomQuestionEvaluations = ApplyIncludes(Set)
+            .Include(evaluation => evaluation.RoomQuestion)
+            .Include(evaluation => evaluation.CreatedBy)
+            .Where(evaluation => evaluation.RoomQuestion!.RoomId == roomId && evaluation.CreatedById == userId);
+
+        await roomQuestionEvaluations.ForEachAsync(evaluation =>
             {
-                var roomQuestionEvaluations = ApplyIncludes(Set)
-                    .Include(evaluation => evaluation.RoomQuestion)
-                    .Include(evaluation => evaluation.CreatedBy)
-                    .Where(evaluation => evaluation.RoomQuestion!.RoomId == roomId && evaluation.CreatedById == userId);
-
-                await roomQuestionEvaluations.ForEachAsync(evaluation =>
-                    {
-                        evaluation.State = SERoomQuestionEvaluationState.Submitted;
-                    },
-                    cancellationToken);
-
-                // todo: not work batch update
-                // await roomQuestionEvaluations.ExecuteUpdateAsync(property => property.SetProperty(e => e.State, evaluation => SERoomQuestionEvaluationState.Submitted), cancellationToken);
-                await Db.SaveChangesAsync(cancellationToken);
-                return DBNull.Value;
+                evaluation.State = SERoomQuestionEvaluationState.Submitted;
             },
             cancellationToken);
+
+        // todo: not work batch update
+        // await roomQuestionEvaluations.ExecuteUpdateAsync(property => property.SetProperty(e => e.State, evaluation => SERoomQuestionEvaluationState.Submitted), cancellationToken);
+        await Db.SaveChangesAsync(cancellationToken);
     }
 }

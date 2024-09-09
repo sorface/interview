@@ -65,6 +65,12 @@ public enum EVPermission
     [Description("Review update")]
     RoomReviewUpdate,
 
+    [Description("Review upsert")]
+    RoomReviewUpsert,
+
+    [Description("Review completion")]
+    RoomReviewCompletion,
+
     [Description("Creating a new room")]
     RoomCreate,
 

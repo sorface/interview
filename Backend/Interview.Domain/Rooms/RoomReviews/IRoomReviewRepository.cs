@@ -7,5 +7,10 @@ namespace Interview.Domain.Rooms.RoomReviews;
 
 public interface IRoomReviewRepository : IRepository<RoomReview>
 {
-    Task<IPagedList<RoomReviewPageDetail>> GetDetailedPageAsync(ISpecification<RoomReview> specification, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+    Task<IPagedList<RoomReviewPageDetail>> GetDetailedPageAsync(ISpecification<RoomReview> specification,
+                                                                int pageNumber,
+                                                                int pageSize,
+                                                                CancellationToken cancellationToken = default);
+
+    Task<RoomReview?> FindByParticipantIdAsync(Guid participantId, CancellationToken cancellationToken = default);
 }
