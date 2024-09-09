@@ -148,7 +148,6 @@ export const enum LocalizationKey {
   Warning,
   CallRecording,
   VoiceRecognitionNotSupported,
-  VoiceRecognition,
   Archive,
   ArchiveLoading,
   NoQuestionsSelector,
@@ -163,7 +162,6 @@ export const enum LocalizationKey {
   ScreenShare,
   Exit,
   ChatTab,
-  RecognitionTab,
   Theme,
   ThemeSystem,
   ThemeLight,
@@ -217,6 +215,8 @@ export const enum LocalizationKey {
   CurrentRoomNotBeSaved,
   LoadingAccountError,
   LoadingAccountErrorTitle,
+  Opinions,
+  Transcription,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -368,7 +368,6 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.Warning]: 'WARNING!',
     [LocalizationKey.CallRecording]: 'The meeting is being recorded',
     [LocalizationKey.VoiceRecognitionNotSupported]: 'Voice recognition is not supported by your browser',
-    [LocalizationKey.VoiceRecognition]: 'Transcription',
     [LocalizationKey.Archive]: 'Archive',
     [LocalizationKey.ArchiveLoading]: 'Archiving...',
     [LocalizationKey.NoQuestionsSelector]: 'No questions available',
@@ -383,7 +382,6 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.ScreenShare]: 'Screen share',
     [LocalizationKey.Exit]: 'Leave',
     [LocalizationKey.ChatTab]: 'Chat',
-    [LocalizationKey.RecognitionTab]: 'Transcription',
     [LocalizationKey.Theme]: 'Theme',
     [LocalizationKey.ThemeSystem]: 'System',
     [LocalizationKey.ThemeLight]: 'Light theme',
@@ -437,6 +435,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.CurrentRoomNotBeSaved]: 'Current room will not be saved',
     [LocalizationKey.LoadingAccountError]: 'Failed to load user profile',
     [LocalizationKey.LoadingAccountErrorTitle]: 'Account loading error',
+    [LocalizationKey.Opinions]: 'Opinions',
+    [LocalizationKey.Transcription]: 'Transcription',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -586,7 +586,6 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.Warning]: 'ВНИМАНИЕ!',
     [LocalizationKey.CallRecording]: 'Встреча записывается',
     [LocalizationKey.VoiceRecognitionNotSupported]: 'Распознавание голоса не поддерживается вашим браузером',
-    [LocalizationKey.VoiceRecognition]: 'Транскрипция',
     [LocalizationKey.Archive]: 'В архив',
     [LocalizationKey.ArchiveLoading]: 'Ахивирование...',
     [LocalizationKey.NoQuestionsSelector]: 'Нет доступных вопросов',
@@ -601,7 +600,6 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.ScreenShare]: 'Демонстрация',
     [LocalizationKey.Exit]: 'Выйти',
     [LocalizationKey.ChatTab]: 'Чат',
-    [LocalizationKey.RecognitionTab]: 'Транскрипция',
     [LocalizationKey.Theme]: 'Тема оформления',
     [LocalizationKey.ThemeSystem]: 'Системная',
     [LocalizationKey.ThemeLight]: 'Светлая тема',
@@ -655,5 +653,7 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.CurrentRoomNotBeSaved]: 'Текущая комната не будет сохранена',
     [LocalizationKey.LoadingAccountError]: 'Не удалось загрузить профиль пользователя',
     [LocalizationKey.LoadingAccountErrorTitle]: 'Ошибка загрузки профиля',
+    [LocalizationKey.Opinions]: 'Мнения',
+    [LocalizationKey.Transcription]: 'Транскрибация',
   },
 }
