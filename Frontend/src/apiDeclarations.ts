@@ -332,6 +332,15 @@ export interface UpdateRoomReviewsParams {
   state: RoomReview['state'];
 }
 
+export interface UpsertRoomReviewsBody {
+  roomId: Room['id'];
+  review: string;
+}
+
+export interface CompleteRoomReviewsBody {
+  roomId: Room['id'];
+}
+
 export const roomReviewApiDeclaration = {
   addReview: (body: AddRoomReviewBody): ApiContractPost => ({
     method: 'POST',
@@ -351,6 +360,16 @@ export const roomReviewApiDeclaration = {
     method: 'PUT',
     baseUrl: `/room-reviews/${params.id}`,
     body: { review: params.review, state: params.state },
+  }),
+  upsert: (body: UpsertRoomReviewsBody): ApiContractPut => ({
+    method: 'PUT',
+    baseUrl: '/room-reviews/upsert',
+    body,
+  }),
+  complete: (body: CompleteRoomReviewsBody): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: '/room-reviews/complete',
+    body,
   }),
 };
 

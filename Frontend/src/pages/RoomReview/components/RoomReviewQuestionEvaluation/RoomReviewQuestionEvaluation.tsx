@@ -109,7 +109,7 @@ export const RoomReviewQuestionEvaluation: FunctionComponent<RoomReviewQuestionE
         )}
         {loadingMergeRoomQuestionEvaluation && (<Loader />)}
         {errorMergeRoomQuestionEvaluation && (
-          <div>{localizationCaptions[LocalizationKey.Error]}: {errorMergeRoomQuestionEvaluation}</div>
+          <Typography size='s' error>{localizationCaptions[LocalizationKey.Error]}: {errorMergeRoomQuestionEvaluation}</Typography>
         )}
       </div>
       <Gap sizeRem={1.5} />
