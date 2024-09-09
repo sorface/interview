@@ -11,8 +11,7 @@ namespace Interview.Migrations.Sqlite.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql(@"
-                UPDATE RoomReview
+            migrationBuilder.Sql(@"UPDATE RoomReview
                     SET Id = PARTICIPANT.Id 
                     FROM RoomReview ROOM_REVIEW
                     INNER JOIN RoomParticipants PARTICIPANT ON PARTICIPANT.RoomId = ROOM_REVIEW.RoomId AND PARTICIPANT.UserId = ROOM_REVIEW.UserId
