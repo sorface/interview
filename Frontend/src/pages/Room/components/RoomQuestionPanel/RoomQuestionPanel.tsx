@@ -1,4 +1,4 @@
-import { FunctionComponent, MouseEventHandler, useCallback, useEffect, useState } from 'react';
+import { FunctionComponent, useCallback, useEffect, useState } from 'react';
 import { ActiveQuestionSelector } from '../../../../components/ActiveQuestionSelector/ActiveQuestionSelector';
 import { Room, RoomQuestion, RoomQuestionEvaluation as RoomQuestionEvaluationType } from '../../../../types/room';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
@@ -33,7 +33,6 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
   initialQuestion,
   readOnly,
 }) => {
-  const [showClosedQuestions, setShowClosedQuestions] = useState(false);
   const localizationCaptions = useLocalizationCaptions();
   const [roomQuestionEvaluation, setRoomQuestionEvaluation] = useState<RoomQuestionEvaluationValue | null>(null);
 
@@ -137,10 +136,6 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
     });
   }, [responseCodeRoomQuestionEvaluation])
 
-  const handleShowClosedQuestions: MouseEventHandler<HTMLInputElement> = useCallback((e) => {
-    setShowClosedQuestions(e.currentTarget.checked);
-  }, []);
-
   const handleQuestionSelect = useCallback((question: RoomQuestion) => {
     if (!room) {
       throw new Error('Error sending reaction. Room not found.');
@@ -182,7 +177,6 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
       <div className='flex-1 py-1.5 px-1.25 bg-wrap rounded-1.125'>
         <div className='flex flex-col h-full'>
           <ActiveQuestionSelector
-            showClosedQuestions={showClosedQuestions}
             loading={roomQuestionsLoading}
             questionsDictionary={room?.questions || []}
             questions={roomQuestions}
@@ -190,7 +184,6 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
             initialQuestion={initialQuestion}
             readOnly={readOnly}
             onSelect={handleQuestionSelect}
-            onShowClosedQuestions={handleShowClosedQuestions}
           />
         </div>
       </div>

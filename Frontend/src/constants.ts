@@ -63,6 +63,7 @@ export const enum IconNames {
   Home = 'home-outline',
   HelpCircle = 'help-circle-outline',
   PaperPlane = 'paper-plane-outline',
+  Checkmark = 'checkmark',
 }
 
 export const reactionIcon: Record<string, IconNames> = {
