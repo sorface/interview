@@ -47,7 +47,8 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   const inputRef = useRef<HTMLDivElement>(null);
   const localizationCaptions = useLocalizationCaptions();
   const [questionsCount, setQuestionsCount] = useState(0);
-  const currentQuestion = selectedValue || initialQuestion;
+  const [closedQuestionsCount, setClosedQuestionsCount] = useState(0);
+  const currentQuestion = initialQuestion || selectedValue;
   const currentQuestionInDictionary =
     currentQuestion &&
     questionsDictionary.find(q => q.id === currentQuestion.id);
@@ -59,7 +60,8 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
       return;
     }
     setQuestionsCount(questions.length);
-  }, [loading, questions.length]);
+    setClosedQuestionsCount(questions.length - openQuestions.length);
+  }, [loading, questions.length, openQuestions.length]);
 
   const isOpened = (question: RoomQuestion) => {
     return openQuestions.includes(question.id);
@@ -119,7 +121,7 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
     if (!selectedValue && !initialQuestion) {
       return '';
     }
-    return `${selectedValue?.value || initialQuestion?.value}`;
+    return `${currentOrder + 1}. ${selectedValue?.value || initialQuestion?.value}`;
   };
 
   const onItemClick = (option: RoomQuestion) => {
@@ -153,13 +155,13 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
             </div>
             <div className='ml-auto border border-button border-solid px-0.75 py-0.125 rounded-2'>
               <Typography size='s'>
-                {`${initialQuestion ? currentOrder + 1 : 0} ${localizationCaptions[LocalizationKey.Of]} ${questionsCount}`}
+                {`${closedQuestionsCount} ${localizationCaptions[LocalizationKey.Of]} ${questionsCount}`}
               </Typography>
             </div>
           </div>
         </div>
         <Gap sizeRem={1} />
-        <progress className='w-full h-0.125' value={currentOrder + 1} max={questionsCount}></progress>
+        <progress className='w-full h-0.125' value={closedQuestionsCount} max={questionsCount}></progress>
         {showMenu && (
           <div className="activeQuestionSelector-menu text-left">
             <div ref={searchRef} className="activeQuestionSelector-search-panel">
