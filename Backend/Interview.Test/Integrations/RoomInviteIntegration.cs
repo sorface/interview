@@ -119,7 +119,7 @@ public class RoomInviteIntegration
         Assert.NotNull(roomParticipant);
 
         roomParticipant.User.Id.Should().Be(participant.User.Id);
-        roomParticipant.Type.EnumValue.Should().Be(roomInvite.ParticipantType.EnumValue);
+        roomParticipant.Type.EnumValue.Should().Be(roomInvite.ParticipantType!.EnumValue);
         roomParticipant.Room.Id.Should().Be(room.Id);
     }
 
