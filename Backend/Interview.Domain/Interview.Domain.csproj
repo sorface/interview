@@ -10,9 +10,9 @@
         <PackageReference Include="Ardalis.SmartEnum" Version="7.0.0" />
         <PackageReference Include="Ardalis.SmartEnum.SystemTextJson" Version="7.0.0" />
         <PackageReference Include="CSharpFunctionalExtensions" Version="2.37.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.10" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.10" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.20" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.20" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
         <PackageReference Include="NSpecifications" Version="1.1.0" />
         <PackageReference Include="System.Linq.Async" Version="6.0.1" />
         <PackageReference Include="X.PagedList" Version="8.4.3" />
