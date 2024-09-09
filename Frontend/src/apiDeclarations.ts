@@ -2,7 +2,7 @@ import { ApiContractGet, ApiContractPatch, ApiContractPost, ApiContractPut } fro
 import { Question, QuestionType } from './types/question';
 import { Tag } from './types/tag';
 import { Reaction } from './types/reaction';
-import { Room, RoomAccessType, RoomInvite, RoomQuestion, RoomQuestionState, RoomReview, RoomStateAdditionalStatefulPayload, RoomStatus } from './types/room';
+import { Room, RoomAccessType, RoomInvite, RoomQuestion, RoomQuestionState, RoomStateAdditionalStatefulPayload, RoomStatus } from './types/room';
 import { User, UserType } from './types/user';
 import { Category } from './types/category';
 
@@ -315,21 +315,10 @@ export const roomParticipantApiDeclaration = {
   }),
 };
 
-export interface AddRoomReviewBody {
-  roomId: Room['id'],
-  review: string;
-}
-
 export interface GetRoomReviewsParams {
   'Page.PageSize': number;
   'Page.PageNumber': number;
   'Filter.RoomId': Room['id'],
-}
-
-export interface UpdateRoomReviewsParams {
-  id: RoomReview['id'];
-  review: RoomReview['review'];
-  state: RoomReview['state'];
 }
 
 export interface UpsertRoomReviewsBody {
@@ -342,11 +331,6 @@ export interface CompleteRoomReviewsBody {
 }
 
 export const roomReviewApiDeclaration = {
-  addReview: (body: AddRoomReviewBody): ApiContractPost => ({
-    method: 'POST',
-    baseUrl: '/room-reviews',
-    body,
-  }),
   getPage: (params: GetRoomReviewsParams): ApiContractGet => ({
     method: 'GET',
     baseUrl: '/room-reviews',
@@ -355,11 +339,6 @@ export const roomReviewApiDeclaration = {
   getMy: (roomId: Room['id']): ApiContractGet => ({
     method: 'GET',
     baseUrl: `/room-reviews/${roomId}/my`,
-  }),
-  update: (params: UpdateRoomReviewsParams): ApiContractPut => ({
-    method: 'PUT',
-    baseUrl: `/room-reviews/${params.id}`,
-    body: { review: params.review, state: params.state },
   }),
   upsert: (body: UpsertRoomReviewsBody): ApiContractPut => ({
     method: 'PUT',
