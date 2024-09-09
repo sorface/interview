@@ -11,7 +11,7 @@ public static class ServiceCollectionExt
 {
     private static readonly Dictionary<Type, string[]> DISABLEDCONTROLLER = new()
     {
-        [typeof(AuthController)] = new[] { nameof(AuthController.SignIn), nameof(AuthController.SignOut) },
+        [typeof(AuthController)] = new[] { nameof(AuthController.SignIn), nameof(AuthController.SignOutImpl) },
         [typeof(UserController)] = new[] { nameof(UserController.GetMyself) },
     };
 

@@ -17,7 +17,7 @@ namespace Interview.Migrations.Postgres.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.10")
+                .HasAnnotation("ProductVersion", "7.0.20")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -698,7 +698,7 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("InviteById")
+                    b.Property<Guid>("InviteId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("ParticipantType")
@@ -708,7 +708,7 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasColumnType("character varying(10)")
                         .HasDefaultValue("Viewer");
 
-                    b.Property<Guid?>("RoomById")
+                    b.Property<Guid>("RoomId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("UpdateDate")
@@ -718,9 +718,9 @@ namespace Interview.Migrations.Postgres.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("InviteById");
+                    b.HasIndex("InviteId");
 
-                    b.HasIndex("RoomById");
+                    b.HasIndex("RoomId");
 
                     b.ToTable("RoomInvites");
                 });
@@ -1817,12 +1817,15 @@ namespace Interview.Migrations.Postgres.Migrations
 
                     b.HasOne("Interview.Domain.Invites.Invite", "Invite")
                         .WithMany()
-                        .HasForeignKey("InviteById")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("InviteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Interview.Domain.Rooms.Room", "Room")
                         .WithMany("Invites")
-                        .HasForeignKey("RoomById");
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("CreatedBy");
 
