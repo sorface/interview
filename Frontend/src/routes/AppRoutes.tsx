@@ -11,7 +11,6 @@ import { RoomParticipants } from '../pages/RoomParticipants/RoomParticipants';
 import { ProtectedRoute } from './ProtectedRoute';
 import { User } from '../types/user';
 import { Terms } from '../pages/Terms/Terms';
-import { RoomAnayticsSummary } from '../pages/RoomAnayticsSummary/RoomAnayticsSummary';
 import { NavMenu } from '../components/NavMenu/NavMenu';
 import { Categories } from '../pages/Categories/Categories';
 import { checkAdmin } from '../utils/checkAdmin';
@@ -58,13 +57,6 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <RoomReview />
-                </ProtectedRoute>
-              }
-            />
-            <Route path={pathnames.roomAnalyticsSummary}
-              element={
-                <ProtectedRoute allowed={authenticated}>
-                  <RoomAnayticsSummary />
                 </ProtectedRoute>
               }
             />
