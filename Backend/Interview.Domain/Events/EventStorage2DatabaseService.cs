@@ -86,6 +86,7 @@ public class EventStorage2DatabaseService
                 Payload = e.Payload,
                 CreateDate = e.CreatedAt,
                 UpdateDate = e.CreatedAt,
+                EventSenderId = e.CreatedById,
             });
             await _roomEventRepository.CreateRangeAsync(dbEvents, cancellationToken);
 

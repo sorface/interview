@@ -119,6 +119,9 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("EventSenderId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Payload")
                         .HasColumnType("TEXT");
 
@@ -138,6 +141,8 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("EventSenderId");
 
                     b.HasIndex("RoomId");
 
@@ -1665,6 +1670,10 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
+                    b.HasOne("Interview.Domain.Users.User", "EventSender")
+                        .WithMany()
+                        .HasForeignKey("EventSenderId");
+
                     b.HasOne("Interview.Domain.Rooms.Room", "Room")
                         .WithMany()
                         .HasForeignKey("RoomId")
@@ -1672,6 +1681,8 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("EventSender");
 
                     b.Navigation("Room");
                 });
