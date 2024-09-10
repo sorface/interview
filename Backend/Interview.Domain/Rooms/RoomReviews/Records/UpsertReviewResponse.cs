@@ -15,5 +15,5 @@ public class UpsertReviewResponse
     public required string State { get; init; }
 
     [JsonIgnore]
-    public required bool Created { get; init; }
+    public bool Created { get; init; }
 }
