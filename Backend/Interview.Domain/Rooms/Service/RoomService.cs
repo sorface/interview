@@ -354,6 +354,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw NotFoundException.Create<User>(roomId);
         }
 
+        EnsureAvailableRoomEdit(foundRoom);
         EnsureValidScheduleStartTime(request.ScheduleStartTime, foundRoom.ScheduleStartTime);
 
         var tags = await Tag.EnsureValidTagsAsync(_db.Tag, request.Tags, cancellationToken);
@@ -437,6 +438,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw NotFoundException.Create<Room>(roomId);
         }
 
+        EnsureAvailableRoomEdit(currentRoom);
         var user = await _db.Users.FirstOrDefaultAsync(e => e.Id == userId, cancellationToken);
         if (user is null)
         {
@@ -512,45 +514,14 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     /// <param name="roomId">Room id.</param>
     /// <param name="cancellationToken">Token.</param>
     /// <returns>Result.</returns>
-    public async Task CloseAsync(Guid roomId, CancellationToken cancellationToken = default)
+    public Task CloseAsync(Guid roomId, CancellationToken cancellationToken = default)
     {
-        var currentRoom = await _db.Rooms.FirstOrDefaultAsync(e => e.Id == roomId, cancellationToken);
-        if (currentRoom == null)
-        {
-            throw NotFoundException.Create<Room>(roomId);
-        }
-
-        if (currentRoom.Status == SERoomStatus.Close)
-        {
-            throw new UserException("Room already closed");
-        }
-
-        await _roomQuestionRepository.CloseActiveQuestionAsync(roomId, cancellationToken);
-
-        currentRoom.Status = SERoomStatus.Close;
-
-        _db.Rooms.Update(currentRoom);
-        await _db.SaveChangesAsync(cancellationToken);
+        return UpdateRoomStatusAsync(roomId, SERoomStatus.Close, cancellationToken);
     }
 
-    public async Task StartReviewAsync(Guid roomId, CancellationToken cancellationToken)
+    public Task StartReviewAsync(Guid roomId, CancellationToken cancellationToken)
     {
-        var currentRoom = await _db.Rooms.FirstOrDefaultAsync(e => e.Id == roomId, cancellationToken);
-        if (currentRoom is null)
-        {
-            throw NotFoundException.Create<Room>(roomId);
-        }
-
-        if (currentRoom.Status == SERoomStatus.Review)
-        {
-            throw new UserException("Room already reviewed");
-        }
-
-        currentRoom.Status = SERoomStatus.Review;
-
-        await _roomQuestionRepository.CloseActiveQuestionAsync(roomId, cancellationToken);
-        _db.Rooms.Update(currentRoom);
-        await _db.SaveChangesAsync(cancellationToken);
+        return UpdateRoomStatusAsync(roomId, SERoomStatus.Review, cancellationToken);
     }
 
     public async Task<ActualRoomStateResponse> GetActualStateAsync(Guid roomId, CancellationToken cancellationToken = default)
@@ -588,12 +559,13 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw new UserException("The type cannot be empty.");
         }
 
-        var hasRoom = await _db.Rooms.AnyAsync(e => e.Id == roomId, cancellationToken);
-        if (!hasRoom)
+        var room = await _db.Rooms.FirstOrDefaultAsync(e => e.Id == roomId, cancellationToken);
+        if (room is null)
         {
-            throw new UserException("No room was found by id.");
+            throw NotFoundException.Create<Room>(roomId);
         }
 
+        EnsureAvailableRoomEdit(room);
         var state = await _db.RoomStates.FirstOrDefaultAsync(e => e.RoomId == roomId && e.Type == type, cancellationToken);
         if (state is not null)
         {
@@ -620,11 +592,13 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw new UserException("The type cannot be empty.");
         }
 
-        var hasRoom = await _db.Rooms.AnyAsync(e => e.Id == roomId, cancellationToken);
-        if (!hasRoom)
+        var room = await _db.Rooms.FirstOrDefaultAsync(e => e.Id == roomId, cancellationToken);
+        if (room is null)
         {
-            throw new UserException("No room was found by id.");
+            throw NotFoundException.Create<Room>(roomId);
         }
+
+        EnsureAvailableRoomEdit(room);
 
         var state = await _db.RoomStates.FirstOrDefaultAsync(e => e.RoomId == roomId && e.Type == type, cancellationToken);
         if (state is null)
@@ -892,6 +866,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             throw NotFoundException.Create<Room>(roomId);
         }
 
+        EnsureAvailableRoomEdit(room);
         _logger.LogInformation("room found");
 
         if (invite is not null)
@@ -962,6 +937,39 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         }
 
         return new RoomTimer { Duration = TimeSpan.FromSeconds(durationSec.Value), };
+    }
+
+    private async Task UpdateRoomStatusAsync(Guid roomId, SERoomStatus status, CancellationToken cancellationToken)
+    {
+        var currentRoom = await _db.Rooms.FirstOrDefaultAsync(e => e.Id == roomId, cancellationToken);
+        if (currentRoom is null)
+        {
+            throw NotFoundException.Create<Room>(roomId);
+        }
+
+        if (currentRoom.Status == status)
+        {
+            throw new UserException($"Room already in '{status}' status");
+        }
+
+        await _db.RunTransactionAsync(async _ =>
+            {
+                currentRoom.Status = status;
+
+                await _roomQuestionRepository.CloseActiveQuestionAsync(roomId, cancellationToken);
+                _db.Rooms.Update(currentRoom);
+                await _db.SaveChangesAsync(cancellationToken);
+                return DBNull.Value;
+            },
+            cancellationToken);
+    }
+
+    private void EnsureAvailableRoomEdit(Room room)
+    {
+        if (room.Status == SERoomStatus.Close || room.Status == SERoomStatus.Review)
+        {
+            throw new UserException("The room is in a status where it cannot be changed.");
+        }
     }
 
     private void EnsureValidScheduleStartTime(DateTime scheduleStartTime, DateTime? dbScheduleStartTime)
