@@ -23,7 +23,7 @@ public class SecurityServiceTest
             {
                 foreach (var availablePermission in participantType.DefaultRoomPermission)
                 {
-                    yield return new object[] { participantType, availablePermission.Permission };
+                    yield return new object[] { participantType, availablePermission };
                 }
             }
         }
@@ -35,9 +35,10 @@ public class SecurityServiceTest
         {
             foreach (var participantType in SERoomParticipantType.List)
             {
-                foreach (var notAvailablePermission in SEAvailableRoomPermission.List.Except(participantType.DefaultRoomPermission))
+                foreach (var notAvailablePermission in SEPermission.List.Where(it => !it.Equals(SEPermission.Unknown))
+                             .Except(participantType.DefaultRoomPermission))
                 {
-                    yield return new object[] { participantType, notAvailablePermission.Permission };
+                    yield return new object[] { participantType, notAvailablePermission };
                 }
             }
         }
@@ -102,8 +103,8 @@ public class SecurityServiceTest
             new RoomParticipantRepository(db),
             new RoomRepository(db),
             new UserRepository(db),
-            new AvailableRoomPermissionRepository(db),
-            new CurrentUserAccessor()
+            new CurrentUserAccessor(),
+            new PermissionRepository(db)
         );
     }
 

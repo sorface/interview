@@ -122,7 +122,7 @@ public class RoomReviewController : ControllerBase
     /// <param name="currentUserAccessor">Current user accessor</param>
     /// <returns>HTTP result</returns>
     [Authorize]
-    [HttpPost("/complete")]
+    [HttpPost("complete")]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(RoomReviewDetail), StatusCodes.Status201Created)]
     public async Task<ActionResult> CompleteAsync([FromBody] RoomReviewCompletionRequest request, [FromServices] ICurrentUserAccessor currentUserAccessor)

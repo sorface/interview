@@ -105,7 +105,7 @@ public class RoomParticipantServiceTest
         participant.User.Id.Should().Be(user.Id);
         // ReSharper disable once EntityFramework.NPlusOne.IncompleteDataUsage
         participant.Type.Should().Be(type);
-        var defaultRoomPermission = type.DefaultRoomPermission.Select(e => e.Value).ToHashSet();
+        var defaultRoomPermission = type.DefaultRoomPermission.Select(e => e.Id).ToHashSet();
         participant.Permissions.Should()
             .HaveCount(defaultRoomPermission.Count)
             .And
@@ -118,8 +118,8 @@ public class RoomParticipantServiceTest
             new RoomParticipantRepository(db),
             new RoomRepository(db),
             new UserRepository(db),
-            new AvailableRoomPermissionRepository(db),
-            new CurrentUserAccessor()
+            new CurrentUserAccessor(),
+            new PermissionRepository(db)
         );
     }
 }

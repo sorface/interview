@@ -1,4 +1,5 @@
 using Interview.Domain.Permissions;
+using Interview.Domain.Rooms.RoomParticipants;
 using Entity = Interview.Domain.Repository.Entity;
 
 namespace Interview.Domain.Users.Permissions;
@@ -17,4 +18,6 @@ public class Permission : Entity
     }
 
     public SEPermission Type { get; set; }
+
+    public List<RoomParticipant> Participants = new();
 }

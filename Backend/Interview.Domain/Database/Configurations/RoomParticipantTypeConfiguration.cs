@@ -2,6 +2,7 @@ using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Users;
+using Interview.Domain.Users.Permissions;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Interview.Domain.Database.Configurations;
@@ -31,7 +32,12 @@ public class RoomParticipantTypeConfiguration : EntityTypeConfigurationBase<Room
             .IsRequired();
 
         builder
-            .HasMany(e => e.Permissions)
-            .WithOne();
+            .HasMany(participant => participant.Permissions)
+            .WithMany(permission => permission.Participants)
+            .UsingEntity(
+                "RoomParticipantPermission",
+                l => l.HasOne(typeof(Permission)).WithMany().HasForeignKey("FK_PERMISSION_ID").HasPrincipalKey(nameof(Permission.Id)),
+                r => r.HasOne(typeof(RoomParticipant)).WithMany().HasForeignKey("FK_PARTICIPANT_ID").HasPrincipalKey(nameof(RoomParticipant.Id)),
+                j => j.HasKey("FK_PERMISSION_ID", "FK_PARTICIPANT_ID"));
     }
 }

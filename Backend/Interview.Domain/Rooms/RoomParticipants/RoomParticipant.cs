@@ -1,5 +1,6 @@
 using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Users;
+using Interview.Domain.Users.Permissions;
 using Entity = Interview.Domain.Repository.Entity;
 
 namespace Interview.Domain.Rooms.RoomParticipants;
@@ -29,5 +30,5 @@ public class RoomParticipant : Entity
 
     public RoomReview? Review { get; set; }
 
-    public List<AvailableRoomPermission> Permissions { get; set; } = new();
+    public List<Permission> Permissions { get; set; } = new();
 }

@@ -1,7 +1,9 @@
+using Interview.Domain.Permissions;
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms.RoomParticipants.Records.Request;
 using Interview.Domain.Rooms.RoomParticipants.Records.Response;
 using Interview.Domain.Users;
+using Interview.Domain.Users.Permissions;
 using NSpecifications;
 
 namespace Interview.Domain.Rooms.RoomParticipants.Service;
@@ -11,21 +13,21 @@ public class RoomParticipantService : IRoomParticipantService
     private readonly IRoomParticipantRepository _roomParticipantRepository;
     private readonly IRoomRepository _roomRepository;
     private readonly IUserRepository _userRepository;
-    private readonly IAvailableRoomPermissionRepository _availableRoomPermissionRepository;
     private readonly ICurrentUserAccessor _currentUserAccessor;
+    private readonly IPermissionRepository _permissionRepository;
 
     public RoomParticipantService(
         IRoomParticipantRepository roomParticipantRepository,
         IRoomRepository roomRepository,
         IUserRepository userRepository,
-        IAvailableRoomPermissionRepository availableRoomPermissionRepository,
-        ICurrentUserAccessor currentUserAccessor)
+        ICurrentUserAccessor currentUserAccessor,
+        IPermissionRepository permissionRepository)
     {
         _roomParticipantRepository = roomParticipantRepository;
         _roomRepository = roomRepository;
         _userRepository = userRepository;
-        _availableRoomPermissionRepository = availableRoomPermissionRepository;
         _currentUserAccessor = currentUserAccessor;
+        _permissionRepository = permissionRepository;
     }
 
     public async Task<RoomParticipantDetail> FindByRoomIdAndUserIdAsync(
@@ -167,22 +169,24 @@ public class RoomParticipantService : IRoomParticipantService
         var participantTypes = participants
             .Select(e => e.Type)
             .ToHashSet();
+
         var requiredPermissions = participantTypes
             .SelectMany(e => e.DefaultRoomPermission)
-            .Select(e => e.Value)
-            .Concat(SEAvailableRoomPermission.CreatorRoomAvailablePermissions.Select(e => e.Value))
+            .Select(e => e.Id)
+            .Concat(new[] { SEPermission.RoomInviteGet.Id })
             .ToHashSet();
-        var specification = new Spec<AvailableRoomPermission>(e => requiredPermissions.Contains(e.Id));
-        var availablePermissions = await _availableRoomPermissionRepository.FindAsync(specification, cancellationToken);
-        var availablePermissionMap = availablePermissions
-            .ToDictionary(e => e.Id);
+
+        var permissions = await _permissionRepository.FindByIdsAsync(requiredPermissions, cancellationToken);
+        var permissionMap = permissions.ToDictionary(e => e.Id);
+
         var defaultPermissionsMap = participantTypes
             .Select(e =>
             {
-                var availableRoomPermissions = e.DefaultRoomPermission.Select(p => availablePermissionMap[p.Value]).ToList();
+                var availableRoomPermissions = e.DefaultRoomPermission.Select(p => permissionMap[p.Id]).ToList();
                 return (ParticipantType: e, DefaultPermissions: availableRoomPermissions);
             })
             .ToDictionary(e => e.ParticipantType, e => e.DefaultPermissions);
+
         foreach (var roomParticipant in participants)
         {
             roomParticipant.Permissions.Clear();
@@ -191,7 +195,7 @@ public class RoomParticipantService : IRoomParticipantService
             {
                 foreach (var creatorPermission in SEAvailableRoomPermission.CreatorRoomAvailablePermissions)
                 {
-                    roomParticipant.Permissions.Add(availablePermissionMap[creatorPermission.Value]);
+                    roomParticipant.Permissions.Add(permissionMap[creatorPermission.Permission.Id]);
                 }
             }
         }

@@ -1,77 +1,78 @@
 using Ardalis.SmartEnum;
+using Interview.Domain.Permissions;
 
 namespace Interview.Domain.Rooms.RoomParticipants;
 
 public sealed class SERoomParticipantType : SmartEnum<SERoomParticipantType>
 {
-    public static readonly SERoomParticipantType Viewer = new("Viewer", EVRoomParticipantType.Viewer, new HashSet<SEAvailableRoomPermission>
+    public static readonly SERoomParticipantType Viewer = new("Viewer", EVRoomParticipantType.Viewer, new HashSet<SEPermission>
     {
-        SEAvailableRoomPermission.RoomReviewUpdate,
-        SEAvailableRoomPermission.QuestionCreate,
-        SEAvailableRoomPermission.RoomFindById,
-        SEAvailableRoomPermission.RoomSendEventRequest,
-        SEAvailableRoomPermission.RoomGetState,
-        SEAvailableRoomPermission.TranscriptionGet,
-        SEAvailableRoomPermission.RoomGetAnalyticsSummary,
-        SEAvailableRoomPermission.RoomGetAnalytics,
-        SEAvailableRoomPermission.RoomParticipantFindByRoomIdAndUserId,
-        SEAvailableRoomPermission.RoomQuestionReactionCreate,
-        SEAvailableRoomPermission.RoomQuestionFindGuids,
-        SEAvailableRoomPermission.RoomReviewCreate,
-        SEAvailableRoomPermission.GetRoomQuestionAnswerDetails,
+        SEPermission.RoomReviewUpdate,
+        SEPermission.QuestionCreate,
+        SEPermission.RoomFindById,
+        SEPermission.RoomSendEventRequest,
+        SEPermission.RoomGetState,
+        SEPermission.TranscriptionGet,
+        SEPermission.RoomGetAnalyticsSummary,
+        SEPermission.RoomGetAnalytics,
+        SEPermission.RoomParticipantFindByRoomIdAndUserId,
+        SEPermission.RoomQuestionReactionCreate,
+        SEPermission.RoomQuestionFindGuids,
+        SEPermission.RoomReviewCreate,
+        SEPermission.GetRoomQuestionAnswerDetails,
     });
 
-    public static readonly SERoomParticipantType Expert = new("Expert", EVRoomParticipantType.Expert, new HashSet<SEAvailableRoomPermission>
+    public static readonly SERoomParticipantType Expert = new("Expert", EVRoomParticipantType.Expert, new HashSet<SEPermission>
     {
-        SEAvailableRoomPermission.RoomReviewUpdate,
-        SEAvailableRoomPermission.QuestionCreate,
-        SEAvailableRoomPermission.RoomFindById,
-        SEAvailableRoomPermission.RoomUpdate,
-        SEAvailableRoomPermission.RoomAddParticipant,
-        SEAvailableRoomPermission.RoomSendEventRequest,
-        SEAvailableRoomPermission.RoomClose,
-        SEAvailableRoomPermission.RoomStartReview,
-        SEAvailableRoomPermission.RoomGetState,
-        SEAvailableRoomPermission.TranscriptionGet,
-        SEAvailableRoomPermission.RoomGetAnalyticsSummary,
-        SEAvailableRoomPermission.RoomGetAnalytics,
-        SEAvailableRoomPermission.DeleteRoomState,
-        SEAvailableRoomPermission.UpsertRoomState,
-        SEAvailableRoomPermission.RoomParticipantCreate,
-        SEAvailableRoomPermission.RoomParticipantChangeStatus,
-        SEAvailableRoomPermission.RoomParticipantFindByRoomIdAndUserId,
-        SEAvailableRoomPermission.RoomQuestionReactionCreate,
-        SEAvailableRoomPermission.RoomQuestionFindGuids,
-        SEAvailableRoomPermission.RoomQuestionCreate,
-        SEAvailableRoomPermission.RoomQuestionUpdate,
-        SEAvailableRoomPermission.RoomQuestionChangeActiveQuestion,
-        SEAvailableRoomPermission.RoomReviewCreate,
-        SEAvailableRoomPermission.RoomInviteGenerate,
-        SEAvailableRoomPermission.RoomQuestionEvaluationMerge,
-        SEAvailableRoomPermission.RoomQuestionEvaluationFind,
-        SEAvailableRoomPermission.RoomReviewCompletion,
-        SEAvailableRoomPermission.RoomReviewUpsert,
-        SEAvailableRoomPermission.GetRoomQuestionAnswerDetails,
+        SEPermission.RoomReviewUpdate,
+        SEPermission.QuestionCreate,
+        SEPermission.RoomFindById,
+        SEPermission.RoomUpdate,
+        SEPermission.RoomAddParticipant,
+        SEPermission.RoomSendEventRequest,
+        SEPermission.RoomClose,
+        SEPermission.RoomStartReview,
+        SEPermission.RoomGetState,
+        SEPermission.TranscriptionGet,
+        SEPermission.RoomGetAnalyticsSummary,
+        SEPermission.RoomGetAnalytics,
+        SEPermission.DeleteRoomState,
+        SEPermission.UpsertRoomState,
+        SEPermission.RoomParticipantCreate,
+        SEPermission.RoomParticipantChangeStatus,
+        SEPermission.RoomParticipantFindByRoomIdAndUserId,
+        SEPermission.RoomQuestionReactionCreate,
+        SEPermission.RoomQuestionFindGuids,
+        SEPermission.RoomQuestionCreate,
+        SEPermission.RoomQuestionUpdate,
+        SEPermission.RoomQuestionChangeActiveQuestion,
+        SEPermission.RoomReviewCreate,
+        SEPermission.RoomInviteGenerate,
+        SEPermission.RoomQuestionEvaluationMerge,
+        SEPermission.RoomQuestionEvaluationFind,
+        SEPermission.RoomReviewCompletion,
+        SEPermission.RoomReviewUpsert,
+        SEPermission.GetRoomQuestionAnswerDetails,
     });
 
-    public static readonly SERoomParticipantType Examinee = new("Examinee", EVRoomParticipantType.Examinee, new HashSet<SEAvailableRoomPermission>
+    public static readonly SERoomParticipantType Examinee = new("Examinee", EVRoomParticipantType.Examinee, new HashSet<SEPermission>
     {
-        SEAvailableRoomPermission.RoomReviewUpdate,
-        SEAvailableRoomPermission.QuestionCreate,
-        SEAvailableRoomPermission.RoomFindById,
-        SEAvailableRoomPermission.RoomSendEventRequest,
-        SEAvailableRoomPermission.RoomGetState,
-        SEAvailableRoomPermission.TranscriptionGet,
-        SEAvailableRoomPermission.RoomGetAnalyticsSummary,
-        SEAvailableRoomPermission.RoomGetAnalytics,
-        SEAvailableRoomPermission.RoomParticipantFindByRoomIdAndUserId,
-        SEAvailableRoomPermission.RoomQuestionReactionCreate,
-        SEAvailableRoomPermission.RoomQuestionFindGuids,
-        SEAvailableRoomPermission.RoomReviewCreate,
-        SEAvailableRoomPermission.GetRoomQuestionAnswerDetails,
+        SEPermission.RoomReviewUpdate,
+        SEPermission.QuestionCreate,
+        SEPermission.RoomFindById,
+        SEPermission.RoomSendEventRequest,
+        SEPermission.RoomGetState,
+        SEPermission.TranscriptionGet,
+        SEPermission.RoomGetAnalyticsSummary,
+        SEPermission.RoomGetAnalytics,
+        SEPermission.RoomParticipantFindByRoomIdAndUserId,
+        SEPermission.RoomQuestionReactionCreate,
+        SEPermission.RoomQuestionFindGuids,
+        SEPermission.RoomReviewCreate,
+        SEPermission.GetRoomQuestionAnswerDetails,
     });
 
-    private SERoomParticipantType(string name, EVRoomParticipantType value, IReadOnlySet<SEAvailableRoomPermission> defaultRoomPermission)
+    private SERoomParticipantType(string name, EVRoomParticipantType value, IReadOnlySet<SEPermission> defaultRoomPermission)
         : base(name, (int)value)
     {
         DefaultRoomPermission = defaultRoomPermission;
@@ -81,5 +82,5 @@ public sealed class SERoomParticipantType : SmartEnum<SERoomParticipantType>
 
     public static SERoomParticipantType FromEnum(EVRoomParticipantType participantType) => FromValue((int)participantType);
 
-    public IReadOnlySet<SEAvailableRoomPermission> DefaultRoomPermission { get; }
+    public IReadOnlySet<SEPermission> DefaultRoomPermission { get; }
 }

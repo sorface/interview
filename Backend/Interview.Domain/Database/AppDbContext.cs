@@ -74,8 +74,6 @@ public class AppDbContext : DbContext
 
     public DbSet<RoomTimer> RoomTimers { get; private set; } = null!;
 
-    public DbSet<AvailableRoomPermission> AvailableRoomPermission { get; private set; } = null!;
-
     public DbSet<Category> Categories { get; private set; } = null!;
 
     public DbSet<QuestionAnswer> QuestionAnswers { get; private set; } = null!;
