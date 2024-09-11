@@ -346,6 +346,250 @@ namespace Interview.Migrations.Sqlite.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Interview.Domain.Rooms.AvailableRoomPermission", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("PermissionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("RoomParticipantId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("PermissionId");
+
+                    b.HasIndex("RoomParticipantId");
+
+                    b.ToTable("AvailableRoomPermission");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("4dc0b8e6-4c1d-46e9-b181-5d2a31e7bdb5"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("1f6c85db-c2a0-4096-8ead-a292397ab4e5"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("ba198396-d07a-4054-95d0-4fe0ba393ecd"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("edab0e5d-7ac2-4761-b47f-a5f41a9ae48c"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("38cd9540-27f5-4482-a261-2a08f6d8cf30"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("eac25c4b-28d5-4e22-93b2-5c3caf0f6922"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("d40a2c28-3a84-47f3-9981-88bdf50bb4ca"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("7c4d9ac2-72e7-466a-bcff-68f3ee0bc65e"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("ad9b444a-67b7-4b85-b592-8578e569b12a"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("5ac11db0-b079-40ab-b32b-a02243a451b3"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("c68385ee-093a-457f-a03a-b1a53371c248"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("6938365f-752d-453e-b0be-93facac0c5b8"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("6cf93811-c44a-4b86-86a1-18d72df7e1a0"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("a63b2ca5-304b-40a0-8e82-665a3327e407"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("6b3985bf-05dd-47e7-b894-781e28428596"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("b7ad620a-0614-494a-89ca-623e47b7415a"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("3b1a04f3-8d35-4608-87fb-1d83d76cd99d"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("97b2411a-b9d4-49cb-9525-0e31b7d35496"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("95f1f088-6931-4914-92c1-c1f1d7d75a18"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("c1f43ca8-21f1-41e6-9794-e7d44156bf73"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("07dea11a-65a4-4826-ab4f-9d2cdfaa72f3"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("b530321a-a51a-4a36-8afd-6e8a8dbae248"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("b9ad0f66-08c6-4f95-900c-94750f1ada6b"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("9ce5949f-a7b9-489c-8b04-bd6724aff687"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("556d9330-9ff3-46a9-913b-28543fd213e4"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("d1916ab5-462e-41d7-ae46-f1ce27d514d4"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("a1acbade-3835-4a9e-9729-56067af66d53"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("4c3386da-cbb2-4493-86e8-036e8802782d"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("241f76f2-3746-4ee4-9191-a64ba3b3a86e"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("4f7a0200-9fe1-4d04-9bcc-6ed668d07828"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("4157604c-fde9-45cf-b79e-09b7fde71833"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("a115f072-638a-4472-8cc3-4cf04da67cfc"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("49cb7cd3-7329-4098-9ac1-c3972ba09138"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("7b231e25-446a-418c-9281-4eb453dd4893"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("0c24de0f-6fe3-4d95-81fb-e9e7542852f7"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("d74df965-84d3-4bcc-af1b-13f5c6299fa7"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("369f0b92-915c-4334-bdac-6e82fb3c0c74"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("150f05e3-8d73-45e9-8ecd-6187f7b96461"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("5efeace0-78ca-4616-aee0-9f08574132ce"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("1bb49aa7-1305-427c-9523-e9687392d385"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("be526dee-9c74-44bb-af6b-1b2298fa1197"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("4f39059a-e69f-4494-9b48-54e3a6aea2f3"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("25c2bc73-39ea-4288-9756-cef28ddc4534"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("2a6f981e-f79e-4497-83d0-35018cbd24d3"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("bd3496e3-6e57-447e-a7df-744efff03de5"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("5f088b45-704f-4f61-b4c5-05bd08b80303"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("95d476a0-eb0e-470d-9c57-a0ec8a2e4cd6"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("220380d1-fd72-4004-aed4-22187e88b386"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("487c74cb-3502-4f1a-957a-cbcea5773702"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("695914fe-a627-4959-b8b9-e0413ba63755"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("48eb3b31-6632-4b4d-b36d-f61c68865c9d"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("882ffc55-3439-4d0b-8add-ba79e2a7df45"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("9acecc78-79ca-41b1-960e-a4eb9cf03a2c"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("7df4ea9b-ded5-4a1d-a8ea-e92e6bd85269"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("aa3f81ec-9a87-493f-a7d5-fa4ca6e75bf7"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("b5c4eb71-50c8-4c13-a144-0496ce56e095"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("8d3c4087-b34d-48f7-ba2a-b1a85f69fe95"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("9f020c9e-e0b4-4e6d-9fb3-38ba44cfa3f9"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("209a47f7-f1c5-439c-8de5-7792c08b7ce2"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PermissionId = new Guid("0827aeef-bcc1-4412-b584-0de4694422ce"),
+                            UpdateDate = new DateTime(2024, 3, 2, 15, 0, 0, 0, DateTimeKind.Utc)
+                        });
+                });
+
             modelBuilder.Entity("Interview.Domain.Rooms.QueuedRoomEvent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1366,21 +1610,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.ToTable("RoleUser");
                 });
 
-            modelBuilder.Entity("RoomParticipantPermission", b =>
-                {
-                    b.Property<Guid>("FK_PERMISSION_ID")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("FK_PARTICIPANT_ID")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("FK_PERMISSION_ID", "FK_PARTICIPANT_ID");
-
-                    b.HasIndex("FK_PARTICIPANT_ID");
-
-                    b.ToTable("RoomParticipantPermission");
-                });
-
             modelBuilder.Entity("RoomTag", b =>
                 {
                     b.Property<Guid>("RoomId")
@@ -1522,6 +1751,27 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasForeignKey("CreatedById");
 
                     b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Rooms.AvailableRoomPermission", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Users.Permissions.Permission", "Permission")
+                        .WithMany()
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Interview.Domain.Rooms.RoomParticipants.RoomParticipant", null)
+                        .WithMany("Permissions")
+                        .HasForeignKey("RoomParticipantId");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Permission");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.QueuedRoomEvent", b =>
@@ -1824,21 +2074,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RoomParticipantPermission", b =>
-                {
-                    b.HasOne("Interview.Domain.Rooms.RoomParticipants.RoomParticipant", null)
-                        .WithMany()
-                        .HasForeignKey("FK_PARTICIPANT_ID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Interview.Domain.Users.Permissions.Permission", null)
-                        .WithMany()
-                        .HasForeignKey("FK_PERMISSION_ID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("RoomTag", b =>
                 {
                     b.HasOne("Interview.Domain.Rooms.Room", null)
@@ -1883,6 +2118,8 @@ namespace Interview.Migrations.Sqlite.Migrations
 
             modelBuilder.Entity("Interview.Domain.Rooms.RoomParticipants.RoomParticipant", b =>
                 {
+                    b.Navigation("Permissions");
+
                     b.Navigation("Review");
                 });
 
