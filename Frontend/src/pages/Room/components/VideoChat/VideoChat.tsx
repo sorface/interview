@@ -46,7 +46,8 @@ interface VideoChatProps {
   codeEditorLanguage: CodeEditorLang;
   userVideoStream: MediaStream | null;
   userAudioStream: MediaStream | null;
-  screenStream: MediaStream | null;
+  // ScreenShare
+  // screenStream: MediaStream | null;
   onSendWsMessage: SendMessage;
   onUpdatePeersLength: (length: number) => void;
   renderToolsPanel: () => ReactElement;
@@ -112,7 +113,8 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   codeEditorLanguage,
   userVideoStream,
   userAudioStream,
-  screenStream,
+  // ScreenShare
+  // screenStream,
   onSendWsMessage,
   onUpdatePeersLength,
   renderToolsPanel,
@@ -162,11 +164,12 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
 
     const streams: MediaStream[] = [];
     userAudioStream && streams.push(userAudioStream);
-    if (screenShare) {
-      screenStream && streams.push(screenStream);
-    } else {
-      userVideoStream && streams.push(userVideoStream);
-    }
+    // ScreenShare
+    // if (screenShare) {
+    //   screenStream && streams.push(screenStream);
+    // } else {
+    userVideoStream && streams.push(userVideoStream);
+    // }
 
     const peer = new Peer({
       initiator: true,
@@ -192,34 +195,35 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     });
 
     return peer;
-  }, [userAudioStream, userVideoStream, screenStream, viewerMode, onSendWsMessage]);
+  }, [userAudioStream, userVideoStream, viewerMode, onSendWsMessage]);
 
-  useEffect(() => {
-    if (screenStream && auth?.id) {
-      try {
-        peersRef.current.forEach(peer => {
-          if (peer.targetUserId === auth.id) {
-            return;
-          }
-          const newPeer = createPeer(peer.targetUserId, false, true);
-          const newPeerMeta: PeerMeta = {
-            peerID: peer.targetUserId,
-            nickname: peer.nickname,
-            avatar: peer.avatar,
-            targetUserId: peer.targetUserId,
-            participantType: peer.participantType,
-            peer: newPeer,
-            screenShare: true,
-          };
+  // ScreenShare  
+  // useEffect(() => {
+  //   if (screenStream && auth?.id) {
+  //     try {
+  //       peersRef.current.forEach(peer => {
+  //         if (peer.targetUserId === auth.id) {
+  //           return;
+  //         }
+  //         const newPeer = createPeer(peer.targetUserId, false, true);
+  //         const newPeerMeta: PeerMeta = {
+  //           peerID: peer.targetUserId,
+  //           nickname: peer.nickname,
+  //           avatar: peer.avatar,
+  //           targetUserId: peer.targetUserId,
+  //           participantType: peer.participantType,
+  //           peer: newPeer,
+  //           screenShare: true,
+  //         };
 
-          peersRef.current.push(newPeerMeta);
-          setPeers([...peersRef.current]);
-        });
-      } catch (e) {
-        console.error('add screenStream error: ', e);
-      }
-    }
-  }, [auth, screenStream, createPeer]);
+  //         peersRef.current.push(newPeerMeta);
+  //         setPeers([...peersRef.current]);
+  //       });
+  //     } catch (e) {
+  //       console.error('add screenStream error: ', e);
+  //     }
+  //   }
+  // }, [auth, screenStream, createPeer]);
 
   useEffect(() => {
     onUpdatePeersLength(peers.filter(peer => !peer.screenShare).length);
