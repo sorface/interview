@@ -21,8 +21,9 @@ import { useReactionsStatus } from '../../hooks/useReactionsStatus';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { checkIsAudioStream } from './utils/checkIsAudioStream';
-import { Canvas } from '@react-three/fiber';
-import { AiAssistantExperience } from '../AiAssistant/AiAssistantExperience';
+// AiAssistant
+// import { Canvas } from '@react-three/fiber';
+// import { AiAssistantExperience } from '../AiAssistant/AiAssistantExperience';
 import { CodeEditorLang } from '../../../../types/question';
 import { usePeerStream } from '../../hooks/usePeerStream';
 
@@ -125,7 +126,8 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   const {
     data: roomEventsSearch,
   } = apiRoomEventsSearchState;
-  const [transcripts, setTranscripts] = useState<Transcript[]>([]);
+  // AiAssistant
+  // const [transcripts, setTranscripts] = useState<Transcript[]>([]);
   const [textMessages, setTextMessages] = useState<Transcript[]>([]);
   const userVideo = useRef<HTMLVideoElement>(null);
   const userVideoMainContent = useRef<HTMLVideoElement>(null);
@@ -237,7 +239,8 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     if (!roomEventsSearch) {
       return;
     }
-    const newTranscripts = getChatMessageEvents(roomEventsSearch, 'VoiceRecognition', false);
+    // AiAssistant
+    // const newTranscripts = getChatMessageEvents(roomEventsSearch, 'VoiceRecognition', false);
     const newTextMessages = [
       ...getChatMessageEvents(roomEventsSearch, 'ChatMessage', true),
       createMessage({
@@ -247,7 +250,8 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       }),
     ];
     setTextMessages(newTextMessages);
-    setTranscripts(newTranscripts);
+    // AiAssistant
+    // setTranscripts(newTranscripts);
   }, [roomEventsSearch, auth?.nickname, localizationCaptions]);
 
   useEffect(() => {
@@ -539,19 +543,20 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             transcriptsMaxLength
           ));
           break;
-        case 'VoiceRecognition':
-          setTranscripts(transcripts => limitLength(
-            [
-              ...transcripts,
-              createMessage({
-                userNickname: parsedData.Value.Nickname,
-                value: parsedData.Value.Message,
-                createdAt: parsedData.CreatedAt,
-              }),
-            ],
-            transcriptsMaxLength
-          ));
-          break;
+        // AiAssistant
+        // case 'VoiceRecognition':
+        //   setTranscripts(transcripts => limitLength(
+        //     [
+        //       ...transcripts,
+        //       createMessage({
+        //         userNickname: parsedData.Value.Nickname,
+        //         value: parsedData.Value.Message,
+        //         createdAt: parsedData.CreatedAt,
+        //       }),
+        //     ],
+        //     transcriptsMaxLength
+        //   ));
+        //   break;
         default:
           break;
       }
@@ -643,7 +648,8 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
 
       <div className='relative videochat-field bg-wrap rounded-1.125'>
         <div className={`videochat ${messagesChatEnabled ? 'invisible h-full' : 'visible'}`}>
-          <VideochatParticipant
+          {/* AiAssistant */}
+          {/* <VideochatParticipant
             order={3}
             viewer={false}
             nickname={localizationCaptions[LocalizationKey.AiAssistantName]}
@@ -653,7 +659,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
                 <AiAssistantExperience lastTranscription={transcripts[transcripts.length - 1]} />
               </Canvas>
             </div>
-          </VideochatParticipant>
+          </VideochatParticipant> */}
           <VideochatParticipant
             order={viewerMode ? viewerOrder - 1 : videoOrder[auth?.id || '']}
             viewer={viewerMode}

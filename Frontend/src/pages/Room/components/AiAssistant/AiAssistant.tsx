@@ -212,6 +212,4 @@ const AiAssistantComponent:FunctionComponent<GroupProps & HrAvatarProps> = (prop
   )
 }
 
-useGLTF.preload(modelUrl)
-
 export const AiAssistant = memo(AiAssistantComponent);
