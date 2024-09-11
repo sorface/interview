@@ -33,7 +33,8 @@ import { EnterVideoChatModal } from './components/VideoChat/EnterVideoChatModal'
 import { useUserStreams } from './hooks/useUserStreams';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useUnreadChatMessages } from './hooks/useUnreadChatMessages';
-import { useScreenStream } from './hooks/useScreenStream';
+// ScreenShare
+// import { useScreenStream } from './hooks/useScreenStream';
 import { LocalizationKey } from '../../localization';
 import { MessagePage } from '../../components/MessagePage/MessagePage';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
@@ -106,7 +107,8 @@ export const Room: FunctionComponent = () => {
     requestDevices,
     updateDevices,
   } = useUserStreams();
-  const { screenStream, requestScreenStream } = useScreenStream();
+  // ScreenShare
+  // const { screenStream, requestScreenStream } = useScreenStream();
   const localizationCaptions = useLocalizationCaptions();
 
   const handleVoiceRecognition = (transcript: string) => {
@@ -358,9 +360,10 @@ export const Room: FunctionComponent = () => {
     updateQuestions();
   }, [id, currentQuestionId, updateQuestions]);
 
-  const handleScreenShare = () => {
-    requestScreenStream();
-  };
+  // ScreenShare
+  // const handleScreenShare = () => {
+  //   requestScreenStream();
+  // };
 
   const handleCodeEditor = () => {
     sendMessage(JSON.stringify({
@@ -510,12 +513,13 @@ export const Room: FunctionComponent = () => {
         )}
         {!viewerMode && (
           <RoomToolsPanel.ButtonsGroupWrapper>
-            <RoomToolsPanel.SwitchButton
+            {/* ScreenShare */}
+            {/* <RoomToolsPanel.SwitchButton
               enabled={true}
               iconEnabledName={IconNames.TV}
               iconDisabledName={IconNames.TV}
               onClick={handleScreenShare}
-            />
+            /> */}
             <Gap sizeRem={0.125} />
             <RoomToolsPanel.SwitchButton
               enabled={true}
@@ -664,7 +668,8 @@ export const Room: FunctionComponent = () => {
                   codeEditorLanguage={codeEditorLanguage}
                   userVideoStream={userVideoStream}
                   userAudioStream={userAudioStream}
-                  screenStream={screenStream}
+                  // ScreenShare
+                  // screenStream={screenStream}
                   onSendWsMessage={sendMessage}
                   onUpdatePeersLength={setPeersLength}
                   renderToolsPanel={renderToolsPanel}
