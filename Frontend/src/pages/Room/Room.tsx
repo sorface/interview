@@ -511,7 +511,7 @@ export const Room: FunctionComponent = () => {
             )}
           </RoomToolsPanel.ButtonsGroupWrapper>
         )}
-        {!viewerMode && (
+        {currentUserExpert && (
           <RoomToolsPanel.ButtonsGroupWrapper>
             {/* ScreenShare */}
             {/* <RoomToolsPanel.SwitchButton
@@ -536,7 +536,7 @@ export const Room: FunctionComponent = () => {
                 enabled={true}
                 iconEnabledName={IconNames.Call}
                 iconDisabledName={IconNames.Call}
-                onClick={() => { }}
+                onClick={currentUserExpert ? () => { } : handleLeaveRoom}
                 danger
               />
             }
@@ -555,8 +555,10 @@ export const Room: FunctionComponent = () => {
                 </Typography>
               </div>
             )}
-            <ContextMenu.Item title='Завершить и оценить кандидата' onClick={handleStartReviewRoom} />
-            <ContextMenu.Item title='Выйти' onClick={handleLeaveRoom} />
+            {currentUserExpert && (
+              <ContextMenu.Item title={localizationCaptions[LocalizationKey.CompleteAndEvaluateCandidate]} onClick={handleStartReviewRoom} />
+            )}
+            <ContextMenu.Item title={localizationCaptions[LocalizationKey.Exit]} onClick={handleLeaveRoom} />
           </ContextMenu>
         </RoomToolsPanel.ButtonsGroupWrapper>
       </RoomToolsPanel.Wrapper>
@@ -652,13 +654,15 @@ export const Room: FunctionComponent = () => {
               <div className='room-columns'>
                 {loadingRoomState && <div>{localizationCaptions[LocalizationKey.LoadingRoomState]}...</div>}
                 {errorRoomState && <div>{localizationCaptions[LocalizationKey.ErrorLoadingRoomState]}...</div>}
-                <RoomQuestionPanel
-                  room={room}
-                  roomQuestionsLoading={roomQuestionsLoading}
-                  roomQuestions={roomQuestions || []}
-                  initialQuestion={currentQuestion}
-                  readOnly={!currentUserExpert}
-                />
+                {(currentUserExpert || viewerMode) && (
+                  <RoomQuestionPanel
+                    room={room}
+                    roomQuestionsLoading={roomQuestionsLoading}
+                    roomQuestions={roomQuestions || []}
+                    initialQuestion={currentQuestion}
+                    readOnly={!currentUserExpert}
+                  />
+                )}
                 <VideoChat
                   roomState={roomState}
                   viewerMode={viewerMode}
