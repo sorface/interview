@@ -176,7 +176,6 @@ public class RoomInviteIntegration
             new RoomParticipantRepository(appDbContext),
             new RoomRepository(appDbContext),
             new UserRepository(appDbContext),
-            new AvailableRoomPermissionRepository(appDbContext),
             userAccessor,
             new PermissionRepository(appDbContext));
     }

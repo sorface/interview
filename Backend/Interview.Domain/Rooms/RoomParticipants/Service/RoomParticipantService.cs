@@ -13,7 +13,6 @@ public class RoomParticipantService : IRoomParticipantService
     private readonly IRoomParticipantRepository _roomParticipantRepository;
     private readonly IRoomRepository _roomRepository;
     private readonly IUserRepository _userRepository;
-    private readonly IAvailableRoomPermissionRepository _availableRoomPermissionRepository;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly IPermissionRepository _permissionRepository;
 
@@ -21,14 +20,12 @@ public class RoomParticipantService : IRoomParticipantService
         IRoomParticipantRepository roomParticipantRepository,
         IRoomRepository roomRepository,
         IUserRepository userRepository,
-        IAvailableRoomPermissionRepository availableRoomPermissionRepository,
         ICurrentUserAccessor currentUserAccessor,
         IPermissionRepository permissionRepository)
     {
         _roomParticipantRepository = roomParticipantRepository;
         _roomRepository = roomRepository;
         _userRepository = userRepository;
-        _availableRoomPermissionRepository = availableRoomPermissionRepository;
         _currentUserAccessor = currentUserAccessor;
         _permissionRepository = permissionRepository;
     }

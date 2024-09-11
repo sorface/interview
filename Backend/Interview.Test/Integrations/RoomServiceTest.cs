@@ -1041,7 +1041,6 @@ public class RoomServiceTest
             new RoomParticipantRepository(appDbContext),
             new RoomRepository(appDbContext),
             new UserRepository(appDbContext),
-            new AvailableRoomPermissionRepository(appDbContext),
             userAccessor,
             new PermissionRepository(appDbContext));
 

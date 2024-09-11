@@ -346,33 +346,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Interview.Domain.Rooms.AvailableRoomPermission", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("PermissionId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("PermissionId");
-
-                    b.ToTable("AvailableRoomPermission");
-                });
-
             modelBuilder.Entity("Interview.Domain.Rooms.QueuedRoomEvent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1549,23 +1522,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasForeignKey("CreatedById");
 
                     b.Navigation("CreatedBy");
-                });
-
-            modelBuilder.Entity("Interview.Domain.Rooms.AvailableRoomPermission", b =>
-                {
-                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById");
-
-                    b.HasOne("Interview.Domain.Users.Permissions.Permission", "Permission")
-                        .WithMany()
-                        .HasForeignKey("PermissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Permission");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.QueuedRoomEvent", b =>

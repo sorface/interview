@@ -118,7 +118,6 @@ public class RoomParticipantServiceTest
             new RoomParticipantRepository(db),
             new RoomRepository(db),
             new UserRepository(db),
-            new AvailableRoomPermissionRepository(db),
             new CurrentUserAccessor(),
             new PermissionRepository(db)
         );
