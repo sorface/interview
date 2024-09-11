@@ -584,7 +584,7 @@ export const Room: FunctionComponent = () => {
       <EnterVideoChatModal
         open={welcomeScreen}
         loading={loading || roomParticipantLoading || roomParticipantWillLoaded || applyRoomInviteLoading || readyState === connectingReadyState}
-        viewerMode={viewerMode}
+        viewerMode={roomParticipant ? viewerMode : true}
         roomName={room?.name}
         devices={devices}
         error={applyRoomInviteError && localizationCaptions[LocalizationKey.ErrorApplyRoomInvite]}
