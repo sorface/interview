@@ -507,7 +507,7 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.ErrorGetRoomEvent]: 'Ошибка в получении событий',
     [LocalizationKey.ErrorSendingRoomEvent]: 'Ошибка в отправке собтия',
     [LocalizationKey.TermsOfUsageAcceptance]: 'Входя, вы подтверждаете, что прочитали, поняли и соглашаетесь с ',
-    [LocalizationKey.TermsOfUsage]: 'Условия использования',
+    [LocalizationKey.TermsOfUsage]: 'Условиями использования',
     [LocalizationKey.Login]: 'Войти',
     [LocalizationKey.LikeTable]: '👍',
     [LocalizationKey.DislikeTable]: '👎',
