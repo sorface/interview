@@ -35,7 +35,7 @@ public class SecurityServiceTest
         {
             foreach (var participantType in SERoomParticipantType.List)
             {
-                foreach (var notAvailablePermission in SEPermission.List.Where(it =>  !it.Equals(SEPermission.Unknown))
+                foreach (var notAvailablePermission in SEPermission.List.Where(it => !it.Equals(SEPermission.Unknown))
                              .Except(participantType.DefaultRoomPermission))
                 {
                     yield return new object[] { participantType, notAvailablePermission };
