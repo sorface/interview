@@ -72,8 +72,11 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
   const audioAnalyser = useRef<AnalyserNode | null>(null);
 
   useEffect(() => {
+    if (viewerMode) {
+      return;
+    }
     onRequestDevices();
-  }, [onRequestDevices]);
+  }, [viewerMode, onRequestDevices]);
 
   useEffect(() => {
     if (!error) {
