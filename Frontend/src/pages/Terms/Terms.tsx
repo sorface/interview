@@ -52,7 +52,7 @@ export const Terms: FunctionComponent = () => {
       <PageHeader
         title={localizationCaptions[LocalizationKey.AppName]}
       />
-      <div className='text-justify flex flex-col overflow-auto'>
+      <div className='text-left flex flex-col overflow-auto'>
         <Typography size='xxl' bold>
           {localizationCaptions[LocalizationKey.TermsOfUsage]}
         </Typography>
