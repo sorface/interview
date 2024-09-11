@@ -217,6 +217,7 @@ export const enum LocalizationKey {
   LoadingAccountErrorTitle,
   Opinions,
   Transcription,
+  CompleteAndEvaluateCandidate,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -437,6 +438,7 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.LoadingAccountErrorTitle]: 'Account loading error',
     [LocalizationKey.Opinions]: 'Opinions',
     [LocalizationKey.Transcription]: 'Transcription',
+    [LocalizationKey.CompleteAndEvaluateCandidate]: 'Complete and evaluate candidate',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -655,5 +657,6 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.LoadingAccountErrorTitle]: 'Ошибка загрузки профиля',
     [LocalizationKey.Opinions]: 'Мнения',
     [LocalizationKey.Transcription]: 'Транскрибация',
+    [LocalizationKey.CompleteAndEvaluateCandidate]: 'Завершить и оценить кандидата',
   },
 }
