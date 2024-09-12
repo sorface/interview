@@ -11,6 +11,7 @@ import { SwitcherButton } from '../SwitcherButton/SwitcherButton';
 import { CodeEditor } from '../CodeEditor/CodeEditor';
 import { CodeEditorLang } from '../../types/question';
 import { Theme, ThemeContext } from '../../context/ThemeContext';
+import { Button } from '../Button/Button';
 
 interface QuestionAnswerDetailsProps {
   roomId: string;
@@ -29,7 +30,8 @@ export const QuestionAnswerDetails: FunctionComponent<QuestionAnswerDetailsProps
   const { process: { loading, error }, data } = apiMethodState;
   const [codeQuestionTab, setCodeQuestionTab] = useState<0 | 1>(0);
   const answerCodeEditorContent = data?.details[data?.details.length - 1]?.answerCodeEditorContent;
-  const codeEditorValue = codeQuestionTab === 0 ?
+  const hasCodeEditorContent = !!(typeof data?.codeEditor === 'string');
+  const codeEditorValue = (codeQuestionTab === 0) && hasCodeEditorContent ?
     data?.codeEditor?.content || '' :
     answerCodeEditorContent;
 
@@ -63,17 +65,28 @@ export const QuestionAnswerDetails: FunctionComponent<QuestionAnswerDetailsProps
       <Gap sizeRem={2.25} />
       {(data?.codeEditor || answerCodeEditorContent) && (
         <>
-          <SwitcherButton
-            captions={[
-              localizationCaptions[LocalizationKey.QuestionCode],
-              localizationCaptions[LocalizationKey.AnswerCode],
-            ]}
-            activeIndex={codeQuestionTab}
-            {...(themeInUi === Theme.Dark && {
-              variant: 'alternative',
-            })}
-            onClick={setCodeQuestionTab}
-          />
+          {hasCodeEditorContent ? (
+            <>
+              <SwitcherButton
+                captions={[
+                  localizationCaptions[LocalizationKey.QuestionCode],
+                  localizationCaptions[LocalizationKey.AnswerCode],
+                ]}
+                activeIndex={codeQuestionTab}
+                {...(themeInUi === Theme.Dark && {
+                  variant: 'alternative',
+                })}
+                onClick={setCodeQuestionTab}
+              />
+            </>
+          ) : (
+            <Button
+              variant='invertedActive'
+              className='w-fit'
+            >
+              {localizationCaptions[LocalizationKey.AnswerCode]}
+            </Button>
+          )}
           <Gap sizeRem={1} />
           <div className='h-32.25'>
             <CodeEditor
