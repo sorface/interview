@@ -212,7 +212,6 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
                 <div>{localizationCaptions[LocalizationKey.Error]}: {totalErrorRoomQuestionEvaluation}</div>
               )}
               {errorRoomActiveQuestion && <div>{localizationCaptions[LocalizationKey.ErrorSendingActiveQuestion]}</div>}
-              {loadingRoomStartReview && <div>{localizationCaptions[LocalizationKey.CloseRoomLoading]}...</div>}
               {errorRoomStartReview && <div>{localizationCaptions[LocalizationKey.Error]}: {errorRoomStartReview}</div>}
             </div>
             <Gap sizeRem={1.8125} />
