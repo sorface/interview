@@ -583,7 +583,7 @@ export const Room: FunctionComponent = () => {
     <MainContentWrapper withMargin className="room-wrapper">
       <EnterVideoChatModal
         open={welcomeScreen}
-        loading={loading || roomParticipantLoading || roomParticipantWillLoaded || applyRoomInviteLoading || readyState === connectingReadyState}
+        loading={loading || loadingRoomState || roomParticipantLoading || roomParticipantWillLoaded || applyRoomInviteLoading || readyState === connectingReadyState}
         viewerMode={roomParticipant ? viewerMode : true}
         roomName={room?.name}
         devices={devices}
@@ -652,7 +652,6 @@ export const Room: FunctionComponent = () => {
             </div>
             <div className="room-page-main-content">
               <div className='room-columns'>
-                {loadingRoomState && <div>{localizationCaptions[LocalizationKey.LoadingRoomState]}...</div>}
                 {errorRoomState && <div>{localizationCaptions[LocalizationKey.ErrorLoadingRoomState]}...</div>}
                 {(currentUserExpert || viewerMode) && (
                   <RoomQuestionPanel
