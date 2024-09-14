@@ -36,6 +36,8 @@ export const Categories: FunctionComponent = () => {
   const { apiMethodState: archiveCategoryState, fetchData: archiveCategory } = useApiMethod<Category, Category['id']>(categoriesApiDeclaration.archive);
   const { process: { loading: archiveLoading, error: archiveError }, data: archivedCategory } = archiveCategoryState;
 
+  const triggerResetAccumData = `${searchValueInput}${showOnlyWithoutParent}${archivedCategory}${categoryParent}`;
+
   useEffect(() => {
     fetchCategories({
       PageNumber: pageNumber,
@@ -54,6 +56,10 @@ export const Categories: FunctionComponent = () => {
       showOnlyWithoutParent: true,
     });
   }, [archivedCategory, fetchRootCategories]);
+
+  useEffect(() => {
+    setPageNumber(initialPageNumber);
+  }, [triggerResetAccumData]);
 
   const handleNextPage = useCallback(() => {
     setPageNumber(pageNumber + 1);
@@ -131,7 +137,7 @@ export const Categories: FunctionComponent = () => {
           currentData={categories}
           loading={loading || rootCategoriesLoading}
           error={error || archiveError || rootCategoriesError}
-          triggerResetAccumData={`${searchValueInput}${showOnlyWithoutParent}${archivedCategory}${categoryParent}`}
+          triggerResetAccumData={triggerResetAccumData}
           loaderClassName='category-item field-wrap'
           renderItem={createCategoryItem}
           nextPageAvailable={categories?.length === pageSize}

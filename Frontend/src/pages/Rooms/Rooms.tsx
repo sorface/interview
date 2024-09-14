@@ -65,6 +65,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
   const [monthStartDate, setMonthStartDate] = useState(initialMonthStartDate);
   const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const roomDates = rooms ? rooms.map(room => new Date(room.scheduledStartTime)) : [];
+  const triggerResetAccumData = `${roomsUpdateTrigger}${searchValue}${mode}`;
 
   const getPageTitle = () => {
     switch (mode) {
@@ -93,6 +94,11 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
   useEffect(() => {
     updateRooms();
   }, [updateRooms, roomsUpdateTrigger, mode]);
+
+  useEffect(() => {
+    setPageNumber(initialPageNumber);
+  }, [triggerResetAccumData]);
+
 
   useEffect(() => {
     if (mode !== RoomsPageMode.Home) {
@@ -236,7 +242,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
               currentData={rooms}
               loading={loading}
               error={error}
-              triggerResetAccumData={`${roomsUpdateTrigger}${searchValue}${mode}`}
+              triggerResetAccumData={triggerResetAccumData}
               loaderClassName='room-item-wrapper room-item-loader'
               renderItem={createRoomItem}
               nextPageAvailable={false}

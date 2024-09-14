@@ -46,6 +46,7 @@ export const Questions: FunctionComponent = () => {
 
   const categoriesLoading = rootCategoryLoading || subCategoryLoading;
   const categoriesError = rootCategoryError || subCategoryError;
+  const triggerResetAccumData = `${questionsUpdateTrigger}${searchValueInput}${subCategory}${archivedQuestion}`;
 
   useEffect(() => {
     fetchQuestios({
@@ -56,6 +57,10 @@ export const Questions: FunctionComponent = () => {
       categoryId: subCategory?.replace(':category', '') || '',
     });
   }, [questionsUpdateTrigger, pageNumber, searchValueInput, archivedQuestion, subCategory, fetchQuestios]);
+
+  useEffect(() => {
+    setPageNumber(initialPageNumber);
+  }, [triggerResetAccumData]);
 
   useEffect(() => {
     if (rootCategory) {
@@ -164,7 +169,7 @@ export const Questions: FunctionComponent = () => {
           currentData={questions}
           loading={loading}
           error={error || archiveError}
-          triggerResetAccumData={`${questionsUpdateTrigger}${searchValueInput}${subCategory}${archivedQuestion}`}
+          triggerResetAccumData={triggerResetAccumData}
           loaderClassName='question-item field-wrap'
           renderItem={createQuestionItem}
           nextPageAvailable={questions?.length === pageSize}
