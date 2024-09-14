@@ -58,7 +58,7 @@ export const CategoriesList: FunctionComponent<CategoriesListProps> = ({
   };
 
   return (
-    <div className='categories-list overflow-x-hidden overflow-y-auto'>
+    <div className='categories-list overflow-x-hidden overflow-y-auto min-h-4'>
       {loading && (
         <div className='categories-list-item h-fit'>
           <Loader />
@@ -67,7 +67,7 @@ export const CategoriesList: FunctionComponent<CategoriesListProps> = ({
       {error && <span>{localizationCaptions[LocalizationKey.Error]}: {error}</span>}
       {data?.map(createCategoryItem)}
       {!parentId && (
-        <div className='categories-list-item h-fit'>
+        <div className='categories-list-item'>
           <Link to={pathnames.questionsArchive}>
             {localizationCaptions[LocalizationKey.QuestionsArchive]}
           </Link>
