@@ -1,4 +1,5 @@
 import { FunctionComponent, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Category } from '../../types/category';
 import { GetCategoriesParams, categoriesApiDeclaration } from '../../apiDeclarations';
@@ -6,7 +7,7 @@ import { Loader } from '../Loader/Loader';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { Icon } from '../../pages/Room/components/Icon/Icon';
-import { IconNames } from '../../constants';
+import { IconNames, pathnames } from '../../constants';
 
 import './CategoriesList.css';
 
@@ -65,6 +66,13 @@ export const CategoriesList: FunctionComponent<CategoriesListProps> = ({
       )}
       {error && <span>{localizationCaptions[LocalizationKey.Error]}: {error}</span>}
       {data?.map(createCategoryItem)}
+      {!parentId && (
+        <div className='categories-list-item h-fit'>
+          <Link to={pathnames.questionsArchive}>
+            {localizationCaptions[LocalizationKey.QuestionsArchive]}
+          </Link>
+        </div>
+      )}
     </div>
   );
 };

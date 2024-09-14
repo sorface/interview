@@ -19,6 +19,7 @@ import { Gap } from '../components/Gap/Gap';
 import { RoomReview } from '../pages/RoomReview/RoomReview';
 import { RoomAnaytics } from '../pages/RoomAnaytics/RoomAnaytics';
 import { LogoutError } from '../pages/LogoutError/LogoutError';
+import { QuestionsArchive } from '../pages/QuestionsArchive/QuestionsArchive';
 
 interface AppRoutesProps {
   user: User | null;
@@ -92,6 +93,13 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <Rooms mode={RoomsPageMode.Closed} />
+                </ProtectedRoute>
+              }
+            />
+            <Route path={pathnames.questionsArchive}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <QuestionsArchive />
                 </ProtectedRoute>
               }
             />

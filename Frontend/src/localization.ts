@@ -150,6 +150,8 @@ export const enum LocalizationKey {
   VoiceRecognitionNotSupported,
   Archive,
   ArchiveLoading,
+  Unarchive,
+  UnarchiveLoading,
   NoQuestionsSelector,
   Join,
   JoiningRoom,
@@ -219,6 +221,7 @@ export const enum LocalizationKey {
   Opinions,
   Transcription,
   CompleteAndEvaluateCandidate,
+  QuestionsArchive,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -372,6 +375,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.VoiceRecognitionNotSupported]: 'Voice recognition is not supported by your browser',
     [LocalizationKey.Archive]: 'Archive',
     [LocalizationKey.ArchiveLoading]: 'Archiving...',
+    [LocalizationKey.Unarchive]: 'Unarchive',
+    [LocalizationKey.UnarchiveLoading]: 'Unarchiving...',
     [LocalizationKey.NoQuestionsSelector]: 'No questions available',
     [LocalizationKey.Join]: 'Join',
     [LocalizationKey.JoiningRoom]: 'Ready to join?',
@@ -441,6 +446,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.Opinions]: 'Opinions',
     [LocalizationKey.Transcription]: 'Transcription',
     [LocalizationKey.CompleteAndEvaluateCandidate]: 'Complete and evaluate candidate',
+    [LocalizationKey.QuestionsArchive]: 'Questions archive',
+    
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -592,6 +599,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.VoiceRecognitionNotSupported]: 'Распознавание голоса не поддерживается вашим браузером',
     [LocalizationKey.Archive]: 'В архив',
     [LocalizationKey.ArchiveLoading]: 'Ахивирование...',
+    [LocalizationKey.Unarchive]: 'Разархивировать',
+    [LocalizationKey.UnarchiveLoading]: 'Разахивирование...',
     [LocalizationKey.NoQuestionsSelector]: 'Нет доступных вопросов',
     [LocalizationKey.Join]: 'Присоединиться',
     [LocalizationKey.JoiningRoom]: 'Готовы присоединиться?',
@@ -661,5 +670,6 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.Opinions]: 'Мнения',
     [LocalizationKey.Transcription]: 'Транскрибация',
     [LocalizationKey.CompleteAndEvaluateCandidate]: 'Завершить и оценить кандидата',
+    [LocalizationKey.QuestionsArchive]: 'Архив вопросов',
   },
 }
