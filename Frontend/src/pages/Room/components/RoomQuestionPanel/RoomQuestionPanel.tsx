@@ -12,6 +12,7 @@ import { Typography } from '../../../../components/Typography/Typography';
 import { Icon } from '../Icon/Icon';
 import { IconNames } from '../../../../constants';
 import { Button } from '../../../../components/Button/Button';
+import { RoomDateAndTime } from '../../../../components/RoomDateAndTime/RoomDateAndTime';
 
 import './RoomQuestionPanel.css';
 
@@ -181,21 +182,70 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
   };
 
   return (
-    <div className='videochat-field !w-21 flex flex-col'>
-      <div className='flex-1 py-1.5 px-1.25 bg-wrap rounded-1.125'>
-        <div className='flex flex-col h-full'>
+    <div className='videochat-field !w-21 text-left flex flex-col'>
+      <div className='flex-1 flex flex-col py-1.5 px-1.25 bg-wrap rounded-1.125'>
+        {!initialQuestion && (
+          <>
+            <Typography size='xxl' bold>
+              {localizationCaptions[LocalizationKey.WaitingInterviewStart]}
+            </Typography>
+            <Gap sizeRem={2} />
+          </>
+        )}
+        <div className='flex flex-col'>
+          {(!!room && !initialQuestion) && (
+            <>
+              <div className='flex'>
+                <Icon size='s' name={IconNames.TodayOutline} />
+                <Gap sizeRem={1} horizontal />
+                <RoomDateAndTime
+                  typographySize='m'
+                  scheduledStartTime={room.scheduledStartTime}
+                  timer={room.timer}
+                  mini
+                />
+              </div>
+              <Gap sizeRem={0.5} />
+            </>
+          )}
           <ActiveQuestionSelector
             loading={roomQuestionsLoading}
             questionsDictionary={room?.questions || []}
             questions={roomQuestions}
+            participants={room?.participants || []}
             openQuestions={openQuestionsIds}
             initialQuestion={initialQuestion}
             readOnly={readOnly}
             onSelect={handleQuestionSelect}
           />
         </div>
+        {(!initialQuestion && !readOnly) && (
+          <div className='mt-auto'>
+            <Button
+              className='w-full flex items-center'
+              variant='active'
+              onClick={handleNextQuestion}
+            >
+              {roomQuestionsLoading || loadingRoomActiveQuestion || loadingRoomStartReview ? (
+                <Loader />
+              ) : (
+                <>
+                  <span>
+                    {localizationCaptions[LocalizationKey.StartRoom]}
+                  </span>
+                  <Gap sizeRem={0.5} horizontal />
+                  <Icon name={IconNames.PlayOutline} />
+                </>
+              )}
+            </Button>
+            <Gap sizeRem={1} />
+            <Typography size='s' secondary>
+              {localizationCaptions[LocalizationKey.RoomStartDescription]}
+            </Typography>
+          </div>
+        )}
       </div>
-      {!readOnly && (
+      {(!readOnly && initialQuestion) && (
         <>
           <Gap sizeRem={0.375} />
           <div className='py-1.5 px-1.25 bg-wrap rounded-1.125'>
@@ -205,7 +255,7 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
                 onChange={handleRoomQuestionEvaluationChange}
               />
             ) : (
-              !!initialQuestion && (<Loader />)
+              <Loader />
             )}
             <Gap sizeRem={1} />
             <div className='text-left h-1.125'>
@@ -233,13 +283,11 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
               ) : (
                 <>
                   <span>
-                    {!initialQuestion ?
-                      localizationCaptions[LocalizationKey.StartRoom] :
-                      localizationCaptions[
+                    {localizationCaptions[
                       nextQuestion ?
                         LocalizationKey.NextRoomQuestion :
                         LocalizationKey.StartReviewRoom
-                      ]
+                    ]
                     }
                   </span>
                   <Gap sizeRem={0.5} horizontal />

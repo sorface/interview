@@ -222,6 +222,8 @@ export const enum LocalizationKey {
   Transcription,
   CompleteAndEvaluateCandidate,
   QuestionsArchive,
+  WaitingInterviewStart,
+  RoomStartDescription,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -447,7 +449,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.Transcription]: 'Transcription',
     [LocalizationKey.CompleteAndEvaluateCandidate]: 'Complete and evaluate candidate',
     [LocalizationKey.QuestionsArchive]: 'Questions archive',
-    
+    [LocalizationKey.WaitingInterviewStart]: 'Waiting to start the interview',
+    [LocalizationKey.RoomStartDescription]: 'Once the interview begins, the first question from the prepared list will be asked',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -671,5 +674,7 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.Transcription]: 'Транскрибация',
     [LocalizationKey.CompleteAndEvaluateCandidate]: 'Завершить и оценить кандидата',
     [LocalizationKey.QuestionsArchive]: 'Архив вопросов',
+    [LocalizationKey.WaitingInterviewStart]: 'Ожидание начала собеседования',
+    [LocalizationKey.RoomStartDescription]: 'После начала собеседования будет установлен первый вопрос из подготовленного списка',
   },
 }
