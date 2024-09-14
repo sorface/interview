@@ -158,6 +158,7 @@
 .text-ellipsis { text-overflow: ellipsis; }
 .min-w-fit { min-width: fit-content; }
 .min-h-unset { min-height: unset; }
+.min-h-4 { min-height: 4rem; }
 .w-fit { width: fit-content; }
 .w-full { width: 100%; }
 .w-1 { width: 1rem; }
