@@ -22,6 +22,7 @@ import { ReviewUserGrid } from './components/ReviewUserGrid/ReviewUserGrid';
 import { Modal } from '../../components/Modal/Modal';
 import { User } from '../../types/user';
 import { RoomAnayticsDetails } from './components/RoomAnayticsDetails/RoomAnayticsDetails';
+import { UserAvatar } from '../../components/UserAvatar/UserAvatar';
 
 const createFakeQuestion = (roomQuestion: RoomQuestion): Question => ({
   ...roomQuestion,
@@ -137,7 +138,20 @@ export const RoomAnaytics: FunctionComponent = () => {
             )}
             <RoomInfoColumn
               header={localizationCaptions[LocalizationKey.Examinee]}
-              conent={examinee ? <span className='capitalize'>{examinee.nickname}</span> : localizationCaptions[LocalizationKey.NotFound]}
+              conent={
+                examinee ? (
+                  <div className='flex items-center'>
+                    {!!examinee.avatar && (
+                      <>
+                        <UserAvatar nickname={examinee.nickname} size='xs' src={examinee.avatar} />
+                        <Gap sizeRem={0.5} horizontal />
+                      </>
+                    )}
+                    <span className='capitalize'>{examinee.nickname}</span>
+                  </div>
+                ) :
+                  localizationCaptions[LocalizationKey.NotFound]
+              }
               mini
             />
           </div>
