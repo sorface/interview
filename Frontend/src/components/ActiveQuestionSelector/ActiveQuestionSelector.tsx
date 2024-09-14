@@ -115,27 +115,26 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
               <div className='no-questions'>{localizationCaptions[LocalizationKey.NoQuestionsSelector]}</div>
             )}
             <Gap sizeRem={1} />
-            {questions.sort(sortOption).map((question, index, allQuestions) => (
-              <Fragment key={question.id}>
-                <div
-                  key={question.value}
-                  className='flex cursor-pointer'
-                  onClick={() => onItemClick(question)}
+            <div className='grid grid-cols-questions-list gap-y-0.5'>
+              {questions.sort(sortOption).map((question) => (
+                <Fragment
+                  key={question.id}
                 >
                   <Typography size='m'>{question.order + 1}.</Typography>
-                  <Gap sizeRem={1.125} horizontal />
-                  <Typography size='m'>{question.value}</Typography>
-                  {!isOpened(question) && (
-                    <div className='ml-auto text-dark-green-light'>
+                  <div
+                    className='cursor-pointer overflow-hidden whitespace-nowrap text-ellipsis'
+                    onClick={() => onItemClick(question)}
+                  >
+                    <Typography size='m'>{question.value}</Typography>
+                  </div>
+                  <div className='text-dark-green-light'>
+                    {!isOpened(question) && (
                       <Icon size='s' name={IconNames.Checkmark} />
-                    </div>
-                  )}
-                </div>
-                {(index !== allQuestions.length - 1) && (
-                  <Gap sizeRem={0.5} />
-                )}
-              </Fragment>
-            ))}
+                    )}
+                  </div>
+                </Fragment>
+              ))}
+            </div>
           </div>
         )}
       </div>
