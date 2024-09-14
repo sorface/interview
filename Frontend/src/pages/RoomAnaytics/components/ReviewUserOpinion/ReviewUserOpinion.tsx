@@ -1,13 +1,12 @@
 import { FunctionComponent } from 'react';
-import { User, UserType } from '../../../../types/user';
+import { User } from '../../../../types/user';
 import { RoomQuestionEvaluation } from '../../../../types/room';
 import { Typography } from '../../../../components/Typography/Typography';
 import { UserAvatar } from '../../../../components/UserAvatar/UserAvatar';
 import { CircularProgress } from '../../../../components/CircularProgress/CircularProgress';
 import { Gap } from '../../../../components/Gap/Gap';
-import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
-import { LocalizationKey } from '../../../../localization';
 import { AnalyticsUserReview } from '../../../../types/analytics';
+import { useParticipantTypeLocalization } from '../../../../hooks/useParticipantTypeLocalization';
 
 interface ReviewUserOpinionProps {
   user: {
@@ -21,12 +20,7 @@ export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
   user,
   allUsers,
 }) => {
-  const localizationCaptions = useLocalizationCaptions();
-  const participantTypeLocalization: { [key in UserType]: string } = {
-    Viewer: localizationCaptions[LocalizationKey.Viewer],
-    Examinee: localizationCaptions[LocalizationKey.Examinee],
-    Expert: localizationCaptions[LocalizationKey.Expert],
-  };
+  const localizeParticipantType = useParticipantTypeLocalization();
   const currentUser = allUsers.get(user.id);
 
   return (
@@ -39,7 +33,7 @@ export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
             <Typography size='m' bold>{currentUser?.nickname}</Typography>
             <span className='opacity-0.5'>
               <Typography size='m' bold>
-                {currentUser && participantTypeLocalization[currentUser.participantType]}
+                {currentUser && localizeParticipantType(currentUser.participantType)}
               </Typography>
             </span>
           </div>
