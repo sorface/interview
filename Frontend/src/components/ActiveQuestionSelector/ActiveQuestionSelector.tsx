@@ -14,9 +14,6 @@ import { Question } from '../../types/question';
 
 import './ActiveQuestionSelector.css';
 
-const sortOption = (option1: RoomQuestion, option2: RoomQuestion) =>
-  option1.order - option2.order;
-
 export interface ActiveQuestionSelectorProps {
   initialQuestion?: RoomQuestion;
   loading: boolean;
@@ -37,11 +34,10 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   onSelect,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
-  const [selectedValue, setSelectedValue] = useState<RoomQuestion | null>(null);
   const localizationCaptions = useLocalizationCaptions();
   const [questionsCount, setQuestionsCount] = useState(0);
   const [closedQuestionsCount, setClosedQuestionsCount] = useState(0);
-  const currentQuestion = initialQuestion || selectedValue;
+  const currentQuestion = initialQuestion;
   const currentQuestionInDictionary =
     currentQuestion &&
     questionsDictionary.find(q => q.id === currentQuestion.id);
@@ -68,14 +64,13 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   };
 
   const getDisplay = () => {
-    if (!selectedValue && !initialQuestion) {
+    if (!initialQuestion) {
       return '';
     }
-    return `${currentOrder + 1}. ${selectedValue?.value || initialQuestion?.value}`;
+    return `${currentOrder + 1}. ${initialQuestion?.value}`;
   };
 
   const onItemClick = (option: RoomQuestion) => {
-    setSelectedValue(option);
     setShowMenu(false);
     onSelect(option);
   };
@@ -116,7 +111,7 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
             )}
             <Gap sizeRem={1} />
             <div className='grid grid-cols-questions-list gap-y-0.5'>
-              {questions.sort(sortOption).map((question) => (
+              {questions.map((question) => (
                 <Fragment
                   key={question.id}
                 >

@@ -52,6 +52,7 @@ import { ContextMenu } from '../../components/ContextMenu/ContextMenu';
 import { Loader } from '../../components/Loader/Loader';
 import { Icon } from './components/Icon/Icon';
 import { Typography } from '../../components/Typography/Typography';
+import { sortRoomQuestion } from '../../utils/sortRoomQestions';
 
 import './Room.css';
 
@@ -657,7 +658,7 @@ export const Room: FunctionComponent = () => {
                   <RoomQuestionPanel
                     room={room}
                     roomQuestionsLoading={roomQuestionsLoading}
-                    roomQuestions={roomQuestions || []}
+                    roomQuestions={roomQuestions?.sort(sortRoomQuestion) || []}
                     initialQuestion={currentQuestion}
                     readOnly={!currentUserExpert}
                   />
