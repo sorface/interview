@@ -36,6 +36,7 @@ export const useCanvasStream = ({
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [canvasMediaStream, setMediaStream] = useState(new MediaStream());
   const [video, setVideo] = useState<HTMLVideoElement | null>(null);
+  const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
   const requestRef = useRef<number>();
 
   const onResults = useCallback((results: Results) => {
@@ -45,18 +46,32 @@ export const useCanvasStream = ({
     const canvasElement = context.canvas;
     context.save();
     context.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+    context.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+    context.globalCompositeOperation = 'destination-in';
     context.drawImage(results.segmentationMask, 0, 0, canvasElement.width, canvasElement.height);
 
-    context.globalCompositeOperation = 'source-out';
-    context.fillStyle = '#000000F5';
-    context.fillRect(0, 0, canvasElement.width, canvasElement.height);
+    if (backgroundImage) {
+      context.globalCompositeOperation = 'destination-over';
+      context.drawImage(backgroundImage, 0, 0, canvasElement.width, canvasElement.height);
+    }
 
-    context.globalCompositeOperation = 'luminosity';
-    context.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
     context.restore();
-  }, [context, cameraStream, video]);
+  }, [context, cameraStream, video, backgroundImage]);
 
   const selfieSegmentation = useSelfieSegmentation(onResults);
+
+  useEffect(() => {
+    if (backgroundImage) {
+      return;
+    }
+    const newImg = new Image();
+    newImg.onload = () => {
+      setBackgroundImage(newImg);
+    };
+    newImg.src = '/logo512.png';
+  }, [backgroundImage]);
 
   useEffect(() => {
     if (!video || !cameraStream || !context) {
