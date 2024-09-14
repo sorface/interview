@@ -6,7 +6,7 @@ interface UserAvatarProps {
   src?: string;
   nickname: string;
   altarnativeBackgound?: boolean;
-  size?: 's' | 'm' | 'l';
+  size?: 'xs' | 's' | 'm' | 'l';
 }
 
 const getSizeClassName = (size: UserAvatarProps['size']) => {
@@ -17,6 +17,8 @@ const getSizeClassName = (size: UserAvatarProps['size']) => {
       return 'w-2.5 h-2.5';
     case 's':
       return 'w-2.25 h-2.25';
+    case 'xs':
+      return 'w-1 h-1';
     default:
       return '';
   }

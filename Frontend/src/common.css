@@ -160,6 +160,7 @@
 .min-h-unset { min-height: unset; }
 .w-fit { width: fit-content; }
 .w-full { width: 100%; }
+.w-1 { width: 1rem; }
 .w-1\.125 { width: 1.125rem; }
 .w-1\.375 { width: 1.375rem; }
 .w-1\.75 { width: 1.75rem; }
@@ -186,6 +187,7 @@
 .h-full { height: 100%; }
 .h-dvh { height: 100dvh; }
 .h-0\.125 { height: 0.125rem; }
+.h-1 { height: 1rem; }
 .h-1\.125 { height: 1.125rem; }
 .h-1\.375 { height: 1.375rem; }
 .h-1\.75 { height: 1.75rem; }
