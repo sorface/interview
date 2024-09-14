@@ -12,6 +12,7 @@ import { Button } from '../../../../components/Button/Button';
 import { Gap } from '../../../../components/Gap/Gap';
 import { Modal } from '../../../../components/Modal/Modal';
 import { Typography } from '../../../../components/Typography/Typography';
+import { useParticipantTypeLocalization } from '../../../../hooks/useParticipantTypeLocalization';
 
 import './Invitations.css';
 
@@ -47,12 +48,7 @@ export const Invitations: FunctionComponent<InvitationsProps> = ({
   onGenerateAllInvites,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
-
-  const participantTypeLocalization: { [key in UserType]: string } = {
-    Viewer: localizationCaptions[LocalizationKey.Viewer],
-    Examinee: localizationCaptions[LocalizationKey.Examinee],
-    Expert: localizationCaptions[LocalizationKey.Expert],
-  };
+  const localizeParticipantType = useParticipantTypeLocalization();
 
   const handleCopyToClipboard = (link: string) => {
     window.navigator.clipboard.writeText(link);
@@ -85,7 +81,7 @@ export const Invitations: FunctionComponent<InvitationsProps> = ({
           const inviteUrlDispaly = `${window.location.origin}${invitePath}`;
           return (
             <div key={roomInvite.inviteId} className='invitations-modal-item'>
-              <Typography size='m'>{participantTypeLocalization[roomInvite.participantType]} ({roomInvite.used}/{roomInvite.max}):</Typography>
+              <Typography size='m'>{localizeParticipantType(roomInvite.participantType)} ({roomInvite.used}/{roomInvite.max}):</Typography>
               <Gap sizeRem={0.75} />
               <div className='invitations-modal-item-link-field'>
                 <Button variant='active2' onClick={() => handleCopyToClipboard(inviteUrlDispaly)}>
