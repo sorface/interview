@@ -218,6 +218,14 @@ export const questionsApiDeclaration = {
       CategoryId: params.categoryId,
     },
   }),
+  getPageArchived: (params: PaginationUrlParams): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: '/questions/archived',
+    urlParams: {
+      'PageSize': params.PageSize,
+      'PageNumber': params.PageNumber,
+    },
+  }),
   get: (id: Question['id']): ApiContractGet => ({
     method: 'GET',
     baseUrl: `/questions/${id}`,
@@ -235,6 +243,11 @@ export const questionsApiDeclaration = {
   archive: (id: Question['id']): ApiContractPatch => ({
     method: 'PATCH',
     baseUrl: `/questions/${id}/archive`,
+    body: {},
+  }),
+  unarchive: (id: Question['id']): ApiContractPatch => ({
+    method: 'PATCH',
+    baseUrl: `/questions/${id}/unarchive`,
     body: {},
   }),
 };
