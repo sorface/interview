@@ -1,6 +1,6 @@
 import React, { Fragment, FunctionComponent, MouseEventHandler, useEffect, useState } from 'react';
 import { LocalizationKey } from '../../localization';
-import { RoomQuestion } from '../../types/room';
+import { RoomParticipant, RoomQuestion } from '../../types/room';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Gap } from '../Gap/Gap';
 import { Typography } from '../Typography/Typography';
@@ -11,6 +11,7 @@ import { ModalFooter } from '../ModalFooter/ModalFooter';
 import { Button } from '../Button/Button';
 import { QuestionAnswers } from '../QuestionAnswers/QuestionAnswers';
 import { Question } from '../../types/question';
+import { useParticipantTypeLocalization } from '../../hooks/useParticipantTypeLocalization';
 
 import './ActiveQuestionSelector.css';
 
@@ -19,6 +20,7 @@ export interface ActiveQuestionSelectorProps {
   loading: boolean;
   questionsDictionary: Question[];
   questions: RoomQuestion[];
+  participants: RoomParticipant[];
   openQuestions: Array<RoomQuestion['id']>;
   readOnly: boolean;
   onSelect: (question: RoomQuestion) => void;
@@ -29,19 +31,20 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   loading,
   questionsDictionary,
   questions,
+  participants,
   openQuestions,
   readOnly,
   onSelect,
 }) => {
+  const localizeParticipantType = useParticipantTypeLocalization();
   const [showMenu, setShowMenu] = useState(false);
   const localizationCaptions = useLocalizationCaptions();
   const [questionsCount, setQuestionsCount] = useState(0);
   const [closedQuestionsCount, setClosedQuestionsCount] = useState(0);
-  const currentQuestion = initialQuestion;
   const currentQuestionInDictionary =
-    currentQuestion &&
-    questionsDictionary.find(q => q.id === currentQuestion.id);
-  const currentOrder = currentQuestion?.order || 0;
+    initialQuestion &&
+    questionsDictionary.find(q => q.id === initialQuestion.id);
+  const currentOrder = initialQuestion?.order || 0;
   const [answersModalOpen, setAnswersModalOpen] = useState(false);
 
   useEffect(() => {
@@ -57,9 +60,6 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   }
 
   const handleInputClick: MouseEventHandler<HTMLDivElement> = () => {
-    if (readOnly) {
-      return;
-    }
     setShowMenu(!showMenu);
   };
 
@@ -71,6 +71,9 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   };
 
   const onItemClick = (option: RoomQuestion) => {
+    if (readOnly) {
+      return;
+    }
     setShowMenu(false);
     onSelect(option);
   };
@@ -95,11 +98,13 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
                 {localizationCaptions[LocalizationKey.RoomQuestions]}
               </Typography>
             </div>
-            <div className='ml-auto border border-button border-solid px-0.75 py-0.125 rounded-2'>
-              <Typography size='s'>
-                {`${closedQuestionsCount} ${localizationCaptions[LocalizationKey.Of]} ${questionsCount}`}
-              </Typography>
-            </div>
+            {!!initialQuestion && (
+              <div className='ml-auto border border-button border-solid px-0.75 py-0.125 rounded-2'>
+                <Typography size='s'>
+                  {`${closedQuestionsCount} ${localizationCaptions[LocalizationKey.Of]} ${questionsCount}`}
+                </Typography>
+              </div>
+            )}
           </div>
         </div>
         <Gap sizeRem={1} />
@@ -130,6 +135,25 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
                 </Fragment>
               ))}
             </div>
+          </div>
+        )}
+        {(!initialQuestion && !showMenu) && (
+          <div>
+            <Gap sizeRem={1} />
+            <Typography size='m' bold>
+              {localizationCaptions[LocalizationKey.RoomParticipants]}:
+            </Typography>
+            <Gap sizeRem={0.5} />
+            {participants.map(participant => (
+              <Fragment key={participant.id}>
+                <div className='flex items-baseline'>
+                  <Typography size='m'>{participant.nickname}</Typography>
+                  <Gap sizeRem={0.5} horizontal />
+                  <Typography size='s' secondary>{localizeParticipantType(participant.type)}</Typography>
+                </div>
+                <Gap sizeRem={0.5} />
+              </Fragment>
+            ))}
           </div>
         )}
       </div>
