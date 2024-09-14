@@ -81,7 +81,7 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
   const totalLoadingRoomQuestionEvaluation = loadingRoomQuestionEvaluation || loadingMergeRoomQuestionEvaluation;
   const totalErrorRoomQuestionEvaluation = errorMergeRoomQuestionEvaluation || getRoomQuestionEvaluationError;
 
-  const currentQuestionOrder = initialQuestion?.order || 0;
+  const currentQuestionOrder = initialQuestion?.order || -1;
   const openQuestions = roomQuestions
     .filter(roomQuestion => roomQuestion.state === 'Open');
   const openQuestionsIds = openQuestions
