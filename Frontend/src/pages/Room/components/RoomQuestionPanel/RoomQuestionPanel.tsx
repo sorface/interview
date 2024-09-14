@@ -81,9 +81,13 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
   const totalLoadingRoomQuestionEvaluation = loadingRoomQuestionEvaluation || loadingMergeRoomQuestionEvaluation;
   const totalErrorRoomQuestionEvaluation = errorMergeRoomQuestionEvaluation || getRoomQuestionEvaluationError;
 
-  const openQuestionsIds = roomQuestions
-    .filter(roomQuestion => roomQuestion.state === 'Open')
+  const currentQuestionOrder = initialQuestion?.order || 0;
+  const openQuestions = roomQuestions
+    .filter(roomQuestion => roomQuestion.state === 'Open');
+  const openQuestionsIds = openQuestions
     .map(roomQuestion => roomQuestion.id);
+  const nextQuestion = openQuestions
+    .find(roomQuestion => roomQuestion.order > currentQuestionOrder);
 
   useEffect(() => {
     if (readOnly || !room || !initialQuestion) {
@@ -148,11 +152,15 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
 
   const handleNextQuestion = () => {
     if (!room) {
-      throw new Error('Error sending reaction. Room not found.');
+      throw new Error('handleNextQuestion Room not found.');
+    }
+    if (!nextQuestion) {
+      console.warn('handleNextQuestion empty nextQuestion');
+      return;
     }
     sendRoomActiveQuestion({
       roomId: room.id,
-      questionId: openQuestionsIds[0],
+      questionId: nextQuestion.id,
     });
   };
 
@@ -218,7 +226,7 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
             <Button
               className='w-full flex items-center'
               variant='active'
-              onClick={openQuestionsIds.length !== 0 ? handleNextQuestion : handleStartReviewRoom}
+              onClick={nextQuestion ? handleNextQuestion : handleStartReviewRoom}
             >
               {roomQuestionsLoading || loadingRoomActiveQuestion || loadingRoomStartReview ? (
                 <Loader />
@@ -228,14 +236,14 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
                     {!initialQuestion ?
                       localizationCaptions[LocalizationKey.StartRoom] :
                       localizationCaptions[
-                      openQuestionsIds.length !== 0 ?
+                      nextQuestion ?
                         LocalizationKey.NextRoomQuestion :
                         LocalizationKey.StartReviewRoom
                       ]
                     }
                   </span>
                   <Gap sizeRem={0.5} horizontal />
-                  <Icon name={openQuestionsIds.length !== 0 ? IconNames.ChevronForward : IconNames.Stop} />
+                  <Icon name={nextQuestion ? IconNames.ChevronForward : IconNames.Stop} />
                 </>
               )}
             </Button>

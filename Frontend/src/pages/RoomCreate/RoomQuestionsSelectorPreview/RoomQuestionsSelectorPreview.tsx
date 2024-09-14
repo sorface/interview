@@ -7,7 +7,7 @@ import { Icon } from '../../Room/components/Icon/Icon';
 import { IconNames } from '../../../constants';
 import { Typography } from '../../../components/Typography/Typography';
 import { Gap } from '../../../components/Gap/Gap';
-import { sortRoomQestions } from '../../../utils/sortRoomQestions';
+import { sortRoomQuestion } from '../../../utils/sortRoomQestions';
 import { useThemeClassName } from '../../../hooks/useThemeClassName';
 import { Theme } from '../../../context/ThemeContext';
 
@@ -56,7 +56,7 @@ export const RoomQuestionsSelectorPreview: FunctionComponent<RoomQuestionsSelect
         contentClassName='translate-x--4.25-y-0.25'
       >
         <div className={`w-18.125 rounded-0.75 shadow ${contentWrapperClassName}`}>
-          {qestions.sort(sortRoomQestions).map(qestion => (
+          {qestions.sort(sortRoomQuestion).map(qestion => (
             <div
               key={qestion.id}
               className={`flex items-center justify-between h-2.125 px-1 cursor-pointer ${itemClassName}`}
