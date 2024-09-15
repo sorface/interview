@@ -7,6 +7,7 @@ using Interview.Domain;
 using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.DatabaseProcessors.Records.Room;
+using Interview.Domain.Events.EventProvider;
 using Interview.Domain.Events.Storage;
 using Interview.Domain.Questions;
 using Interview.Domain.Questions.CodeEditors;
@@ -65,7 +66,7 @@ public class AnswerDetailServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var storage = new InMemoryEventStorage();
+        var storage = new InMemoryHotEventStorage();
         var (service, _, questionId) = CreateService(appDbContext, storage, testSystemClock, addQueuedRoomEvent);
         var request = new RoomQuestionAnswerDetailRequest { QuestionId = questionId, RoomId = Guid.NewGuid(), };
         await Assert.ThrowsAsync<NotFoundException>(() => service.GetAnswerDetailsAsync(request, CancellationToken.None));
@@ -78,7 +79,7 @@ public class AnswerDetailServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var storage = new InMemoryEventStorage();
+        var storage = new InMemoryHotEventStorage();
         var (service, roomId, _) = CreateService(appDbContext, storage, testSystemClock, addQueuedRoomEvent);
         var request = new RoomQuestionAnswerDetailRequest { QuestionId = Guid.NewGuid(), RoomId = roomId, };
         await Assert.ThrowsAsync<NotFoundException>(() => service.GetAnswerDetailsAsync(request, CancellationToken.None));
@@ -91,7 +92,7 @@ public class AnswerDetailServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var storage = new InMemoryEventStorage();
+        var storage = new InMemoryHotEventStorage();
         var (service, roomId, questionId) = CreateService(appDbContext, storage, testSystemClock, addQueuedRoomEvent);
         var request = new RoomQuestionAnswerDetailRequest { QuestionId = questionId, RoomId = roomId, };
         var answerDetails = await service.GetAnswerDetailsAsync(request, CancellationToken.None);
@@ -106,7 +107,7 @@ public class AnswerDetailServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var storage = new InMemoryEventStorage();
+        var storage = new InMemoryHotEventStorage();
         var (service, roomId, questionId) = CreateService(appDbContext, storage, testSystemClock, addQueuedRoomEvent);
         var q = appDbContext.Questions.First(e => e.Id == questionId);
         q.CodeEditor = new QuestionCodeEditor { Content = "test cont", Lang = "C#" };
@@ -126,7 +127,7 @@ public class AnswerDetailServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var storage = new InMemoryEventStorage();
+        var storage = new InMemoryHotEventStorage();
         var (service, roomId, questionId) = CreateService(appDbContext, storage, testSystemClock, false);
 
         var op = new JsonSerializerOptions { Encoder = JavaScriptEncoder.Create(UnicodeRanges.All) };
@@ -222,7 +223,7 @@ public class AnswerDetailServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var storage = new InMemoryEventStorage();
+        var storage = new InMemoryHotEventStorage();
         var (service, roomId, questionId) = CreateService(appDbContext, storage, testSystemClock, true);
         var users = new Faker<User>()
             .CustomInstantiator(f => new User(f.Random.Guid(), f.Person.FullName, f.Random.Hash()))
@@ -353,7 +354,7 @@ public class AnswerDetailServiceTest
         };
     }
 
-    private static (AnswerDetailService Service, Guid RoomId, Guid QuestionId) CreateService(AppDbContext db, IEventStorage storage, ISystemClock clock, bool addQueuedRoomEvent)
+    private static (AnswerDetailService Service, Guid RoomId, Guid QuestionId) CreateService(AppDbContext db, IHotEventStorage storage, ISystemClock clock, bool addQueuedRoomEvent)
     {
         var user = new User("test user", "ID");
         db.Users.Add(user);
@@ -388,12 +389,7 @@ public class AnswerDetailServiceTest
         var userAccessor = new CurrentUserAccessor();
         userAccessor.SetUser(user);
 
-        var service = new AnswerDetailService(
-            db,
-            storage,
-            clock
-        );
-
+        var service = new AnswerDetailService(clock, new RoomEventProviderFactory(storage, db), db);
         return (service, room.Id, question.Id);
     }
 

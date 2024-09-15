@@ -31,7 +31,7 @@ public class EventStorage2DatabaseServiceTest
         appDbContext.QueuedRoomEvents.AddRange(queuedRoomEvents);
         appDbContext.SaveChanges();
 
-        var eventStorage = new InMemoryEventStorage();
+        var eventStorage = new InMemoryHotEventStorage();
         var storageEvents = new StorageEvent[]
         {
             new()

@@ -8,12 +8,12 @@ using Redis.OM.Searching;
 
 namespace Interview.Infrastructure.Events;
 
-public class RedisEventStorage : IEventStorage
+public class RedisHotEventStorage : IHotEventStorage
 {
     private readonly RedisConnectionProvider _redis;
     private readonly IRedisCollection<RedisEvent> _collection;
 
-    public RedisEventStorage(RedisEventStorageConfiguration configuration)
+    public RedisHotEventStorage(RedisEventStorageConfiguration configuration)
     {
         _redis = new RedisConnectionProvider(configuration.ConnectionString);
         _collection = _redis.RedisCollection<RedisEvent>();

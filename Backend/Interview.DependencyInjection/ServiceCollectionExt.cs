@@ -100,15 +100,15 @@ public static class ServiceCollectionExt
         dependencyInjectionAppServiceOption.EventStorageConfigurator?.Invoke(builder);
         if (string.IsNullOrWhiteSpace(builder.RedisConnectionString))
         {
-            self.AddSingleton<IEventStorage, EmptyEventStorage>();
+            self.AddSingleton<IHotEventStorage, EmptyHotEventStorage>();
         }
         else
         {
-            var redisStorage = new RedisEventStorage(new RedisEventStorageConfiguration
+            var redisStorage = new RedisHotEventStorage(new RedisEventStorageConfiguration
             {
                 ConnectionString = builder.RedisConnectionString,
             });
-            self.AddSingleton<IEventStorage, RedisEventStorage>(_ => redisStorage);
+            self.AddSingleton<IHotEventStorage, RedisHotEventStorage>(_ => redisStorage);
             redisStorage.CreateIndexes();
         }
 

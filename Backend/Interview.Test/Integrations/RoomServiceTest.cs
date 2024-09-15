@@ -1047,7 +1047,7 @@ public class RoomServiceTest
         return new RoomService(
             new RoomQuestionRepository(appDbContext),
             new EmptyRoomEventDispatcher(),
-            new EmptyEventStorage(),
+            new EmptyHotEventStorage(),
             new RoomInviteService(appDbContext, roomParticipantService, NullLogger<RoomInviteService>.Instance),
             userAccessor,
             roomParticipantService,

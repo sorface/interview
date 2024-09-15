@@ -5,12 +5,12 @@ namespace Interview.Domain.Events.Sender;
 public class StoreEventSenderAdapter : IEventSenderAdapter
 {
     private readonly IEventSenderAdapter _root;
-    private readonly IEventStorage _eventStorage;
+    private readonly IHotEventStorage _hotEventStorage;
 
-    public StoreEventSenderAdapter(IEventSenderAdapter root, IEventStorage eventStorage)
+    public StoreEventSenderAdapter(IEventSenderAdapter root, IHotEventStorage hotEventStorage)
     {
         _root = root;
-        _eventStorage = eventStorage;
+        _hotEventStorage = hotEventStorage;
     }
 
     public async Task SendAsync(
@@ -32,6 +32,6 @@ public class StoreEventSenderAdapter : IEventSenderAdapter
             CreatedById = @event.CreatedById,
         };
 
-        await _eventStorage.AddAsync(storageEvent, cancellationToken);
+        await _hotEventStorage.AddAsync(storageEvent, cancellationToken);
     }
 }

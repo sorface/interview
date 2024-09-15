@@ -9,7 +9,7 @@ public class EventStorage2DatabaseService
 {
     private readonly IQueuedRoomEventRepository _queuedRoomEventRepository;
     private readonly IDbRoomEventRepository _roomEventRepository;
-    private readonly IEventStorage _eventStorage;
+    private readonly IHotEventStorage _hotEventStorage;
     private readonly ILogger<EventStorage2DatabaseService> _logger;
 
     private int ChunkSize { get; set; } = 100;
@@ -17,12 +17,12 @@ public class EventStorage2DatabaseService
     public EventStorage2DatabaseService(
         IQueuedRoomEventRepository queuedRoomEventRepository,
         IDbRoomEventRepository roomEventRepository,
-        IEventStorage eventStorage,
+        IHotEventStorage hotEventStorage,
         ILogger<EventStorage2DatabaseService> logger)
     {
         _queuedRoomEventRepository = queuedRoomEventRepository;
         _roomEventRepository = roomEventRepository;
-        _eventStorage = eventStorage;
+        _hotEventStorage = hotEventStorage;
         _logger = logger;
     }
 
@@ -74,7 +74,7 @@ public class EventStorage2DatabaseService
     {
         var specification = new Spec<IStorageEvent>(e => e.RoomId == roomId);
         var pageNumber = 0;
-        await foreach (var collection in _eventStorage.GetBySpecAsync(specification, ChunkSize, cancellationToken))
+        await foreach (var collection in _hotEventStorage.GetBySpecAsync(specification, ChunkSize, cancellationToken))
         {
             pageNumber += 1;
             var dbEvents = collection.Select(e => new DbRoomEvent
@@ -93,7 +93,7 @@ public class EventStorage2DatabaseService
             try
             {
                 _logger.LogInformation("Start delete {RoomId} events {Page}", roomId, pageNumber);
-                await _eventStorage.DeleteAsync(collection, cancellationToken);
+                await _hotEventStorage.DeleteAsync(collection, cancellationToken);
                 _logger.LogInformation("End delete {RoomId} events {Page}", roomId, pageNumber);
             }
             catch (Exception e)

@@ -32,7 +32,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 {
     private readonly IRoomQuestionRepository _roomQuestionRepository;
     private readonly IRoomEventDispatcher _roomEventDispatcher;
-    private readonly IEventStorage _eventStorage;
+    private readonly IHotEventStorage _hotEventStorage;
     private readonly IRoomInviteService _roomInviteService;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly IRoomParticipantService _roomParticipantService;
@@ -43,7 +43,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
     public RoomService(
         IRoomQuestionRepository roomQuestionRepository,
         IRoomEventDispatcher roomEventDispatcher,
-        IEventStorage eventStorage,
+        IHotEventStorage hotEventStorage,
         IRoomInviteService roomInviteService,
         ICurrentUserAccessor currentUserAccessor,
         IRoomParticipantService roomParticipantService,
@@ -52,7 +52,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         ISystemClock clock)
     {
         _roomEventDispatcher = roomEventDispatcher;
-        _eventStorage = eventStorage;
+        _hotEventStorage = hotEventStorage;
         _roomQuestionRepository = roomQuestionRepository;
         _roomInviteService = roomInviteService;
         _currentUserAccessor = currentUserAccessor;
@@ -829,7 +829,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         foreach (var (type, option) in request.TranscriptionTypeMap)
         {
             var spec = new Spec<IStorageEvent>(e => e.Type == type && e.RoomId == request.RoomId);
-            var result = await _eventStorage.GetLatestBySpecAsync(spec, option.Last, cancellationToken)
+            var result = await _hotEventStorage.GetLatestBySpecAsync(spec, option.Last, cancellationToken)
                 .FirstOrDefaultAsync(cancellationToken);
             if (response.TryGetValue(option.ResponseName, out var responses))
             {
