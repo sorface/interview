@@ -77,16 +77,20 @@ public class EventStorage2DatabaseService
         await foreach (var collection in _hotEventStorage.GetBySpecAsync(specification, ChunkSize, cancellationToken))
         {
             pageNumber += 1;
-            var dbEvents = collection.Select(e => new DbRoomEvent
+            var dbEvents = collection.Select(e =>
             {
-                Id = e.Id,
-                RoomId = e.RoomId,
-                Type = e.Type,
-                Stateful = e.Stateful,
-                Payload = e.Payload,
-                CreateDate = e.CreatedAt,
-                UpdateDate = e.CreatedAt,
-                EventSenderId = e.CreatedById,
+                var createdAt = new DateTime(e.CreatedAt.Year, e.CreatedAt.Month, e.CreatedAt.Day, e.CreatedAt.Hour, e.CreatedAt.Minute, e.CreatedAt.Second, DateTimeKind.Utc);
+                return new DbRoomEvent
+                {
+                    Id = e.Id,
+                    RoomId = e.RoomId,
+                    Type = e.Type,
+                    Stateful = e.Stateful,
+                    Payload = e.Payload,
+                    CreateDate = createdAt,
+                    UpdateDate = createdAt,
+                    EventSenderId = e.CreatedById,
+                };
             });
             await _roomEventRepository.CreateRangeAsync(dbEvents, cancellationToken);
 

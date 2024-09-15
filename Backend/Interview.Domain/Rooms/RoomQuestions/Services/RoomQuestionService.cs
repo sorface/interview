@@ -12,21 +12,21 @@ using NSpecifications;
 
 namespace Interview.Domain.Rooms.RoomQuestions.Services;
 
-public class AnswerDetailService : IRoomQuestionService
+public class RoomQuestionService : IRoomQuestionService
 {
     private readonly IRoomQuestionRepository _roomQuestionRepository;
     private readonly IQuestionRepository _questionRepository;
     private readonly IRoomRepository _roomRepository;
     private readonly IQuestionService _questionService;
     private readonly AppDbContext _db;
-    private readonly AnswerDetail.AnswerDetailService _answerDetailService;
+    private readonly AnswerDetailService _roomQuestionService;
 
-    public AnswerDetailService(
+    public RoomQuestionService(
         IRoomQuestionRepository roomQuestionRepository,
         IRoomRepository roomRepository,
         IQuestionRepository questionRepository,
         IQuestionService questionService,
-        AnswerDetail.AnswerDetailService answerDetailService,
+        AnswerDetailService roomQuestionService,
         AppDbContext db)
     {
         _roomQuestionRepository = roomQuestionRepository;
@@ -34,11 +34,11 @@ public class AnswerDetailService : IRoomQuestionService
         _questionRepository = questionRepository;
         _questionService = questionService;
         _db = db;
-        _answerDetailService = answerDetailService;
+        _roomQuestionService = roomQuestionService;
     }
 
     public Task<RoomQuestionAnswerDetailResponse> GetAnswerDetailsAsync(RoomQuestionAnswerDetailRequest request, CancellationToken cancellationToken)
-        => _answerDetailService.GetAnswerDetailsAsync(request, cancellationToken);
+        => _roomQuestionService.GetAnswerDetailsAsync(request, cancellationToken);
 
     public async Task<RoomQuestionDetail> ChangeActiveQuestionAsync(
         RoomQuestionChangeActiveRequest request, CancellationToken cancellationToken = default)

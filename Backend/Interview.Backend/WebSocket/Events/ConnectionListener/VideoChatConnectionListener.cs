@@ -62,7 +62,7 @@ public class VideoChatConnectionListener : IConnectionListener, IVideChatConnect
         if (disconnectUser && TryGetConnections(detail.Room.Id, out var connections))
         {
             var payload = new { Id = detail.User.Id, };
-            var payloadJson = System.Text.Json.JsonSerializer.Serialize(payload);
+            var payloadJson = _serializer.SerializePayloadAsString(payload);
             var sendEvent = new RoomEvent(detail.Room.Id, "user left", payloadJson, false, detail.User.Id);
             var provider = new CachedRoomEventProvider(sendEvent, _serializer);
 

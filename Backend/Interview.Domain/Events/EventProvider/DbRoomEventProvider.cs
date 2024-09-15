@@ -48,18 +48,33 @@ public sealed class DbRoomEventProvider : IRoomEventProvider
             .FirstOrDefaultAsync(cancellationToken);
     }
 
+    private static DateTime ToUtc(DateTime date)
+    {
+        if (date.Kind == DateTimeKind.Unspecified)
+        {
+            return new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second, DateTimeKind.Utc);
+        }
+
+        if (date.Kind == DateTimeKind.Local)
+        {
+            return date.ToUniversalTime();
+        }
+
+        return date;
+    }
+
     private ASpec<DbRoomEvent> BuildSpecification(EPStorageEventRequest request)
     {
         ASpec<DbRoomEvent> spec = new Spec<DbRoomEvent>(e => e.RoomId == _roomId && e.Type == request.Type);
         if (request.From is not null)
         {
-            var dateFrom = request.From.Value;
+            var dateFrom = ToUtc(request.From.Value);
             spec &= new Spec<DbRoomEvent>(e => e.CreateDate >= dateFrom);
         }
 
         if (request.To is not null)
         {
-            var dateTo = request.To.Value;
+            var dateTo = ToUtc(request.To.Value);
             spec &= new Spec<DbRoomEvent>(e => e.CreateDate <= dateTo);
         }
 

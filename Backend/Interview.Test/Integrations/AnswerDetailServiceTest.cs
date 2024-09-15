@@ -14,10 +14,10 @@ using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomQuestions;
+using Interview.Domain.Rooms.RoomQuestions.Services;
 using Interview.Domain.Rooms.RoomQuestions.Services.AnswerDetail;
 using Interview.Domain.Users;
 using Microsoft.Extensions.Internal;
-using AnswerDetailService = Interview.Domain.Rooms.RoomQuestions.Services.AnswerDetail.AnswerDetailService;
 
 namespace Interview.Test.Integrations;
 

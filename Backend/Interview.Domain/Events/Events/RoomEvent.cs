@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using Interview.Domain.Events.Events.Serializers;
 
 namespace Interview.Domain.Events.Events;
 
@@ -49,7 +50,7 @@ public class RoomEvent<T> : IRoomEvent<T>
     {
     }
 
-    public string? BuildStringPayload()
+    public string? BuildStringPayload(IRoomEventSerializer serializer)
     {
         if (Value is null)
         {
@@ -63,9 +64,9 @@ public class RoomEvent<T> : IRoomEvent<T>
 
         if (Value is IPayloadBuilder payloadBuilder)
         {
-            return payloadBuilder.BuildPayload();
+            return payloadBuilder.BuildPayload(serializer);
         }
 
-        return JsonSerializer.Serialize(Value);
+        return serializer.SerializePayloadAsString(Value);
     }
 }

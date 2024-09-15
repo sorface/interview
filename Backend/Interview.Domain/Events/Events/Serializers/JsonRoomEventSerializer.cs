@@ -9,7 +9,7 @@ namespace Interview.Domain.Events.Events.Serializers;
 
 public sealed class JsonRoomEventSerializer : IRoomEventSerializer
 {
-    private readonly JsonSerializerOptions _options = new()
+    private static readonly JsonSerializerOptions _options = new()
     {
         WriteIndented = false,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
