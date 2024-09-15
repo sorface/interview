@@ -1,6 +1,6 @@
 import React, { Fragment, FunctionComponent, MouseEventHandler, useEffect, useState } from 'react';
 import { LocalizationKey } from '../../localization';
-import { RoomParticipant, RoomQuestion } from '../../types/room';
+import { Room, RoomParticipant, RoomQuestion } from '../../types/room';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Gap } from '../Gap/Gap';
 import { Typography } from '../Typography/Typography';
@@ -12,32 +12,40 @@ import { Button } from '../Button/Button';
 import { QuestionAnswers } from '../QuestionAnswers/QuestionAnswers';
 import { Question } from '../../types/question';
 import { useParticipantTypeLocalization } from '../../hooks/useParticipantTypeLocalization';
+import { useApiMethod } from '../../hooks/useApiMethod';
+import { roomsApiDeclaration } from '../../apiDeclarations';
 
 import './ActiveQuestionSelector.css';
 
+const participantsUpdateIntervalMs = 5000;
+
 export interface ActiveQuestionSelectorProps {
+  roomId?: string;
   initialQuestion?: RoomQuestion;
   loading: boolean;
   questionsDictionary: Question[];
   questions: RoomQuestion[];
-  participants: RoomParticipant[];
   openQuestions: Array<RoomQuestion['id']>;
   readOnly: boolean;
   onSelect: (question: RoomQuestion) => void;
 }
 
 export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorProps> = ({
+  roomId,
   initialQuestion,
   loading,
   questionsDictionary,
   questions,
-  participants,
   openQuestions,
   readOnly,
   onSelect,
 }) => {
+  const { apiMethodState, fetchData: fetchRoom } = useApiMethod<Room, Room['id']>(roomsApiDeclaration.getById);
+  const { data: room, process: { error: roomError } } = apiMethodState;
+
   const localizeParticipantType = useParticipantTypeLocalization();
   const [showMenu, setShowMenu] = useState(false);
+  const [roomParticipants, setRoomParticipants] = useState<RoomParticipant[]>([]);
   const localizationCaptions = useLocalizationCaptions();
   const [questionsCount, setQuestionsCount] = useState(0);
   const [closedQuestionsCount, setClosedQuestionsCount] = useState(0);
@@ -46,6 +54,28 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
     questionsDictionary.find(q => q.id === initialQuestion.id);
   const currentOrder = initialQuestion?.order || 0;
   const [answersModalOpen, setAnswersModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!roomId || initialQuestion) {
+      return;
+    }
+    const updateRoomData = () => {
+      fetchRoom(roomId);
+    };
+    const intervalUpdate = setInterval(updateRoomData, participantsUpdateIntervalMs);
+    updateRoomData();
+
+    return () => {
+      clearInterval(intervalUpdate);
+    };
+  }, [roomId, initialQuestion, fetchRoom]);
+
+  useEffect(() => {
+    if (!room?.participants) {
+      return;
+    }
+    setRoomParticipants(room.participants);
+  }, [room?.participants])
 
   useEffect(() => {
     if (loading) {
@@ -144,7 +174,16 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
               {localizationCaptions[LocalizationKey.RoomParticipants]}:
             </Typography>
             <Gap sizeRem={0.5} />
-            {participants.map(participant => (
+            {!!roomError && (
+              <Typography size='m' error>
+                <div className='flex items-center'>
+                  <Icon name={IconNames.Information} size='s' />
+                  <Gap sizeRem={0.25} horizontal />
+                  {localizationCaptions[LocalizationKey.Error]}: {roomError}
+                </div>
+              </Typography>
+            )}
+            {roomParticipants.map(participant => (
               <Fragment key={participant.id}>
                 <div className='flex items-baseline'>
                   <Typography size='m'>{participant.nickname}</Typography>

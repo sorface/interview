@@ -209,10 +209,10 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
             </>
           )}
           <ActiveQuestionSelector
+            roomId={room?.id}
             loading={roomQuestionsLoading}
             questionsDictionary={room?.questions || []}
             questions={roomQuestions}
-            participants={room?.participants || []}
             openQuestions={openQuestionsIds}
             initialQuestion={initialQuestion}
             readOnly={readOnly}
