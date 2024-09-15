@@ -60,6 +60,10 @@ public static class ServiceCollectionExt
 
                 .AddClasses(filter => filter.AssignableTo<IServiceDecorator>())
                 .As<IServiceDecorator>()
+                .WithScopedLifetime()
+
+                .AddClasses(filter => filter.AssignableTo<ISelfScopeService>())
+                .AsSelf()
                 .WithScopedLifetime();
         });
 

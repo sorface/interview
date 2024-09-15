@@ -1,6 +1,6 @@
 using Interview.Domain.Rooms.Records.Response.Detail;
 
-namespace Interview.Domain.Rooms.RoomQuestions.AnswerDetail;
+namespace Interview.Domain.Rooms.RoomQuestions.Services.AnswerDetail;
 
 public class RoomQuestionAnswerDetailResponse
 {
