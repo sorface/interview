@@ -339,24 +339,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   }, [userAudioStream, userVideoStream, onSendWsMessage]);
 
   useEffect(() => {
-    return () => {
-      if (!userAudioStream) {
-        return;
-      }
-      userAudioStream.getTracks().forEach(track => track.stop());
-    };
-  }, [userAudioStream]);
-
-  useEffect(() => {
-    return () => {
-      if (!userVideoStream) {
-        return;
-      }
-      userVideoStream.getTracks().forEach(track => track.stop());
-    };
-  }, [userVideoStream]);
-
-  useEffect(() => {
     if (!lastWsMessage || !auth) {
       return;
     }
