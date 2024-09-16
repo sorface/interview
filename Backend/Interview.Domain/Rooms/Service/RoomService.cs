@@ -86,11 +86,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             queryable = queryable.Where(e => e.Name.ToLower().Contains(filterName));
         }
 
-        if (filter.StartValue is not null && filter.EndValue is not null)
-        {
-            queryable = queryable.Where(e => e.ScheduleStartTime >= filter.StartValue && e.ScheduleStartTime <= filter.EndValue);
-        }
-        else if (filter.StartValue is not null)
+        if (filter.StartValue is not null)
         {
             queryable = queryable.Where(e => filter.StartValue <= e.ScheduleStartTime);
         }
@@ -141,10 +137,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 Participants = e.Participants.Select(participant =>
                         new RoomUserDetail
                         {
-                            Id = participant.User.Id,
-                            Nickname = participant.User.Nickname,
-                            Avatar = participant.User.Avatar,
-                            Type = participant.Type.Name,
+                            Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, Type = participant.Type.Name,
                         })
                     .ToList(),
                 RoomStatus = e.Status.EnumValue,
@@ -181,28 +174,22 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 Name = e.Name,
                 Owner = new RoomUserDetail
                 {
-                    Id = e.CreatedBy!.Id,
-                    Nickname = e.CreatedBy!.Nickname,
-                    Avatar = e.CreatedBy!.Avatar,
-                    Type = null,
+                    Id = e.CreatedBy!.Id, Nickname = e.CreatedBy!.Nickname, Avatar = e.CreatedBy!.Avatar, Type = null,
                 },
                 Participants = e.Participants.Select(participant =>
                         new RoomUserDetail
                         {
-                            Id = participant.User.Id,
-                            Nickname = participant.User.Nickname,
-                            Avatar = participant.User.Avatar,
-                            Type = participant.Type.Name,
+                            Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, Type = participant.Type.Name,
                         })
                     .ToList(),
                 Status = e.Status.EnumValue,
                 Invites = e.Invites.Select(roomInvite => new RoomInviteResponse()
-                {
-                    InviteId = roomInvite.InviteId,
-                    ParticipantType = roomInvite.ParticipantType!.EnumValue,
-                    Max = roomInvite.Invite!.UsesMax,
-                    Used = roomInvite.Invite.UsesCurrent,
-                })
+                    {
+                        InviteId = roomInvite.InviteId,
+                        ParticipantType = roomInvite.ParticipantType!.EnumValue,
+                        Max = roomInvite.Invite!.UsesMax,
+                        Used = roomInvite.Invite.UsesCurrent,
+                    })
                     .ToList(),
                 Type = e.AccessType.EnumValue,
                 Timer = e.Timer == null ? null : new { Duration = e.Timer.Duration, ActualStartTime = e.Timer.ActualStartTime, },
@@ -213,12 +200,9 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                     Order = q.Order,
                     Value = q.Question!.Value,
                     Answers = q.Question!.Answers.Select(a => new QuestionAnswerResponse
-                    {
-                        Id = a.Id,
-                        Title = a.Title,
-                        Content = a.Content,
-                        CodeEditor = a.CodeEditor,
-                    })
+                        {
+                            Id = a.Id, Title = a.Title, Content = a.Content, CodeEditor = a.CodeEditor,
+                        })
                         .ToList(),
                     CodeEditor = q.Question.CodeEditor == null
                         ? null
@@ -329,10 +313,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                     Participants = room.Participants.Select(participant =>
                             new RoomUserDetail
                             {
-                                Id = participant.User.Id,
-                                Nickname = participant.User.Nickname,
-                                Avatar = participant.User.Avatar,
-                                Type = participant.Type.Name,
+                                Id = participant.User.Id, Nickname = participant.User.Nickname, Avatar = participant.User.Avatar, Type = participant.Type.Name,
                             })
                         .ToList(),
                     Status = room.Status.EnumValue,
@@ -439,9 +420,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         return new RoomItem
         {
-            Id = foundRoom.Id,
-            Name = foundRoom.Name,
-            Tags = tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
+            Id = foundRoom.Id, Name = foundRoom.Name, Tags = tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
         };
     }
 
@@ -591,10 +570,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         state = new RoomState
         {
-            Payload = payload,
-            RoomId = roomId,
-            Type = type,
-            Room = null,
+            Payload = payload, RoomId = roomId, Type = type, Room = null,
         };
         await _db.RoomStates.AddAsync(state, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
@@ -737,10 +713,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             .Where(e => e.RoomId == roomId && e.InviteId != null && e.ParticipantType != null)
             .Select(e => new RoomInviteResponse
             {
-                InviteId = e.InviteId,
-                ParticipantType = e.ParticipantType!.EnumValue,
-                Max = e.Invite!.UsesMax,
-                Used = e.Invite.UsesCurrent,
+                InviteId = e.InviteId, ParticipantType = e.ParticipantType!.EnumValue, Max = e.Invite!.UsesMax, Used = e.Invite.UsesCurrent,
             })
             .ToListAsync(cancellationToken);
     }
@@ -827,10 +800,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
             summary.Questions.Add(new AnalyticsSummaryQuestion
             {
-                Id = question.Id,
-                Value = question.Value,
-                Experts = experts,
-                Viewers = viewers,
+                Id = question.Id, Value = question.Value, Experts = experts, Viewers = viewers,
             });
         }
 
@@ -905,10 +875,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             _logger.LogInformation("participant is not null and just return room invite");
             return new RoomInviteResponse
             {
-                ParticipantType = participant.Type!.EnumValue,
-                InviteId = invite!.Value,
-                Max = 0,
-                Used = 0,
+                ParticipantType = participant.Type!.EnumValue, InviteId = invite!.Value, Max = 0, Used = 0,
             };
         }
 
@@ -935,10 +902,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
                 return new RoomInviteResponse
                 {
-                    ParticipantType = participant.Type.EnumValue,
-                    InviteId = invite!.Value,
-                    Max = 0,
-                    Used = 0,
+                    ParticipantType = participant.Type.EnumValue, InviteId = invite!.Value, Max = 0, Used = 0,
                 };
             },
             cancellationToken);
