@@ -82,12 +82,17 @@ export const useUserStreams = () => {
       userVideoStreamRef.current = newUserStream;
     };
     updateUserVideoStream();
+
+    return () => {
+      userVideoStreamRef.current?.getTracks().forEach(track => track.stop());
+    };
   }, [selectedCameraId]);
 
   useEffect(() => {
     if (!selectedMicId) {
       return;
     }
+    let newUserStream: MediaStream | null = null;
     const updateUserAudioStream = async () => {
       const micRequest = {
         ...audioConstraints,
@@ -96,12 +101,16 @@ export const useUserStreams = () => {
       if (!micRequest) {
         return;
       }
-      const newUserStream = await navigator.mediaDevices.getUserMedia({
+      newUserStream = await navigator.mediaDevices.getUserMedia({
         audio: micRequest,
       });
       setUserAudioStream(newUserStream);
     };
     updateUserAudioStream();
+
+    return () => {
+      newUserStream?.getTracks().forEach(track => track.stop());
+    };
   }, [selectedMicId]);
 
   useEffect(() => {

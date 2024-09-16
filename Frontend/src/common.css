@@ -1,5 +1,7 @@
 .grid { display: grid; }
 .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-cols-questions-list { grid-template-columns: 1.5rem auto 1.125rem; }
+.gap-y-0\.5 { row-gap: 0.5rem; }
 .gap-12 { gap: 3rem; }
 .flex { display: flex; }
 .flex-1 { flex: 1 1 0%; }
@@ -153,10 +155,13 @@
 .overflow-y-auto { overflow-y: auto; }
 .overflow-x-hidden { overflow-x: hidden; }
 .whitespace-nowrap { white-space: nowrap; }
+.text-ellipsis { text-overflow: ellipsis; }
 .min-w-fit { min-width: fit-content; }
 .min-h-unset { min-height: unset; }
+.min-h-4 { min-height: 4rem; }
 .w-fit { width: fit-content; }
 .w-full { width: 100%; }
+.w-1 { width: 1rem; }
 .w-1\.125 { width: 1.125rem; }
 .w-1\.375 { width: 1.375rem; }
 .w-1\.75 { width: 1.75rem; }
@@ -183,6 +188,7 @@
 .h-full { height: 100%; }
 .h-dvh { height: 100dvh; }
 .h-0\.125 { height: 0.125rem; }
+.h-1 { height: 1rem; }
 .h-1\.125 { height: 1.125rem; }
 .h-1\.375 { height: 1.375rem; }
 .h-1\.75 { height: 1.75rem; }

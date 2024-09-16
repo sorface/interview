@@ -2,7 +2,6 @@ import { Fragment, FunctionComponent } from 'react';
 import { generatePath } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { RoomInvite } from '../../types/room';
-import { UserType } from '../../types/user';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { Icon } from '../../pages/Room/components/Icon/Icon';
@@ -12,6 +11,7 @@ import { RoomCreateField } from '../../pages/RoomCreate/RoomCreateField/RoomCrea
 import { Typography } from '../Typography/Typography';
 import { Gap } from '../Gap/Gap';
 import { Button } from '../Button/Button';
+import { useParticipantTypeLocalization } from '../../hooks/useParticipantTypeLocalization';
 
 interface RoomInvitationsProps {
   roomId: string;
@@ -38,11 +38,7 @@ export const RoomInvitations: FunctionComponent<RoomInvitationsProps> = ({
 }) => {
   const localizationCaptions = useLocalizationCaptions();
 
-  const participantTypeLocalization: { [key in UserType]: string } = {
-    Viewer: localizationCaptions[LocalizationKey.Viewer],
-    Examinee: localizationCaptions[LocalizationKey.Examinee],
-    Expert: localizationCaptions[LocalizationKey.Expert],
-  };
+  const localizeParticipantType = useParticipantTypeLocalization();
 
   const handleCopyToClipboard = (link: string) => {
     window.navigator.clipboard.writeText(link);
@@ -73,7 +69,7 @@ export const RoomInvitations: FunctionComponent<RoomInvitationsProps> = ({
             return (
               <Fragment key={roomInvite.inviteId}>
                 <div>
-                  <Typography size='m' bold>{participantTypeLocalization[roomInvite.participantType]}</Typography>
+                  <Typography size='m' bold>{localizeParticipantType(roomInvite.participantType)}</Typography>
                   <Gap sizeRem={0.5} />
                   <Button
                     variant='active2'

@@ -48,6 +48,7 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
 
   const totalLoading = rootCategoriesLoading || subCategoriesLoading || questionsLoading;
   const totalError = rootCategoriesError || subCategoriesError || questionsError;
+  const triggerResetAccumData = `${rootCategory}${subCategory}`;
 
   useEffect(() => {
     fetchRootCategories({
@@ -66,6 +67,10 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
       parentId: rootCategory,
     });
   }, [rootCategory, fetchSubCategories]);
+
+  useEffect(() => {
+    setPageNumber(initialPageNumber);
+  }, [triggerResetAccumData]);
 
   useEffect(() => {
     if (!subCategory) {
@@ -199,7 +204,7 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
           currentData={questions ? questions.map((q, index) => ({ ...q, order: index })) : null}
           loading={totalLoading}
           error={null}
-          triggerResetAccumData={`${rootCategory}${subCategory}`}
+          triggerResetAccumData={triggerResetAccumData}
           loaderClassName='question-item field-wrap'
           renderItem={createQuestionItem}
           nextPageAvailable={questions?.length === pageSize}

@@ -12,6 +12,7 @@ import { Typography } from '../../../../components/Typography/Typography';
 import { Icon } from '../Icon/Icon';
 import { IconNames } from '../../../../constants';
 import { Button } from '../../../../components/Button/Button';
+import { RoomDateAndTime } from '../../../../components/RoomDateAndTime/RoomDateAndTime';
 
 import './RoomQuestionPanel.css';
 
@@ -81,9 +82,13 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
   const totalLoadingRoomQuestionEvaluation = loadingRoomQuestionEvaluation || loadingMergeRoomQuestionEvaluation;
   const totalErrorRoomQuestionEvaluation = errorMergeRoomQuestionEvaluation || getRoomQuestionEvaluationError;
 
-  const openQuestionsIds = roomQuestions
-    .filter(roomQuestion => roomQuestion.state === 'Open')
+  const currentQuestionOrder = initialQuestion?.order || -1;
+  const openQuestions = roomQuestions
+    .filter(roomQuestion => roomQuestion.state === 'Open');
+  const openQuestionsIds = openQuestions
     .map(roomQuestion => roomQuestion.id);
+  const nextQuestion = openQuestions
+    .find(roomQuestion => roomQuestion.order > currentQuestionOrder);
 
   useEffect(() => {
     if (readOnly || !room || !initialQuestion) {
@@ -148,11 +153,15 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
 
   const handleNextQuestion = () => {
     if (!room) {
-      throw new Error('Error sending reaction. Room not found.');
+      throw new Error('handleNextQuestion Room not found.');
+    }
+    if (!nextQuestion) {
+      console.warn('handleNextQuestion empty nextQuestion');
+      return;
     }
     sendRoomActiveQuestion({
       roomId: room.id,
-      questionId: openQuestionsIds[0],
+      questionId: nextQuestion.id,
     });
   };
 
@@ -173,10 +182,34 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
   };
 
   return (
-    <div className='videochat-field !w-21 flex flex-col'>
-      <div className='flex-1 py-1.5 px-1.25 bg-wrap rounded-1.125'>
-        <div className='flex flex-col h-full'>
+    <div className='videochat-field !w-21 text-left flex flex-col'>
+      <div className='flex-1 flex flex-col py-1.5 px-1.25 bg-wrap rounded-1.125'>
+        {!initialQuestion && (
+          <>
+            <Typography size='xxl' bold>
+              {localizationCaptions[LocalizationKey.WaitingInterviewStart]}
+            </Typography>
+            <Gap sizeRem={2} />
+          </>
+        )}
+        <div className='flex flex-col'>
+          {(!!room && !initialQuestion) && (
+            <>
+              <div className='flex'>
+                <Icon size='s' name={IconNames.TodayOutline} />
+                <Gap sizeRem={1} horizontal />
+                <RoomDateAndTime
+                  typographySize='m'
+                  scheduledStartTime={room.scheduledStartTime}
+                  timer={room.timer}
+                  mini
+                />
+              </div>
+              <Gap sizeRem={0.5} />
+            </>
+          )}
           <ActiveQuestionSelector
+            roomId={room?.id}
             loading={roomQuestionsLoading}
             questionsDictionary={room?.questions || []}
             questions={roomQuestions}
@@ -186,8 +219,33 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
             onSelect={handleQuestionSelect}
           />
         </div>
+        {(!initialQuestion && !readOnly) && (
+          <div className='mt-auto'>
+            <Button
+              className='w-full flex items-center'
+              variant='active'
+              onClick={handleNextQuestion}
+            >
+              {roomQuestionsLoading || loadingRoomActiveQuestion || loadingRoomStartReview ? (
+                <Loader />
+              ) : (
+                <>
+                  <span>
+                    {localizationCaptions[LocalizationKey.StartRoom]}
+                  </span>
+                  <Gap sizeRem={0.5} horizontal />
+                  <Icon name={IconNames.PlayOutline} />
+                </>
+              )}
+            </Button>
+            <Gap sizeRem={1} />
+            <Typography size='s' secondary>
+              {localizationCaptions[LocalizationKey.RoomStartDescription]}
+            </Typography>
+          </div>
+        )}
       </div>
-      {!readOnly && (
+      {(!readOnly && initialQuestion) && (
         <>
           <Gap sizeRem={0.375} />
           <div className='py-1.5 px-1.25 bg-wrap rounded-1.125'>
@@ -197,7 +255,7 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
                 onChange={handleRoomQuestionEvaluationChange}
               />
             ) : (
-              !!initialQuestion && (<Loader />)
+              <Loader />
             )}
             <Gap sizeRem={1} />
             <div className='text-left h-1.125'>
@@ -212,31 +270,28 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
                 <div>{localizationCaptions[LocalizationKey.Error]}: {totalErrorRoomQuestionEvaluation}</div>
               )}
               {errorRoomActiveQuestion && <div>{localizationCaptions[LocalizationKey.ErrorSendingActiveQuestion]}</div>}
-              {loadingRoomStartReview && <div>{localizationCaptions[LocalizationKey.CloseRoomLoading]}...</div>}
               {errorRoomStartReview && <div>{localizationCaptions[LocalizationKey.Error]}: {errorRoomStartReview}</div>}
             </div>
             <Gap sizeRem={1.8125} />
             <Button
               className='w-full flex items-center'
               variant='active'
-              onClick={openQuestionsIds.length !== 0 ? handleNextQuestion : handleStartReviewRoom}
+              onClick={nextQuestion ? handleNextQuestion : handleStartReviewRoom}
             >
               {roomQuestionsLoading || loadingRoomActiveQuestion || loadingRoomStartReview ? (
                 <Loader />
               ) : (
                 <>
                   <span>
-                    {!initialQuestion ?
-                      localizationCaptions[LocalizationKey.StartRoom] :
-                      localizationCaptions[
-                      openQuestionsIds.length !== 0 ?
+                    {localizationCaptions[
+                      nextQuestion ?
                         LocalizationKey.NextRoomQuestion :
                         LocalizationKey.StartReviewRoom
-                      ]
+                    ]
                     }
                   </span>
                   <Gap sizeRem={0.5} horizontal />
-                  <Icon name={openQuestionsIds.length !== 0 ? IconNames.ChevronForward : IconNames.Stop} />
+                  <Icon name={nextQuestion ? IconNames.ChevronForward : IconNames.Stop} />
                 </>
               )}
             </Button>

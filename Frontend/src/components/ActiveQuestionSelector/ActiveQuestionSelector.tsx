@@ -1,6 +1,6 @@
 import React, { Fragment, FunctionComponent, MouseEventHandler, useEffect, useState } from 'react';
 import { LocalizationKey } from '../../localization';
-import { RoomQuestion } from '../../types/room';
+import { Room, RoomParticipant, RoomQuestion } from '../../types/room';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Gap } from '../Gap/Gap';
 import { Typography } from '../Typography/Typography';
@@ -11,13 +11,16 @@ import { ModalFooter } from '../ModalFooter/ModalFooter';
 import { Button } from '../Button/Button';
 import { QuestionAnswers } from '../QuestionAnswers/QuestionAnswers';
 import { Question } from '../../types/question';
+import { useParticipantTypeLocalization } from '../../hooks/useParticipantTypeLocalization';
+import { useApiMethod } from '../../hooks/useApiMethod';
+import { roomsApiDeclaration } from '../../apiDeclarations';
 
 import './ActiveQuestionSelector.css';
 
-const sortOption = (option1: RoomQuestion, option2: RoomQuestion) =>
-  option1.order - option2.order;
+const participantsUpdateIntervalMs = 5000;
 
 export interface ActiveQuestionSelectorProps {
+  roomId?: string;
   initialQuestion?: RoomQuestion;
   loading: boolean;
   questionsDictionary: Question[];
@@ -28,6 +31,7 @@ export interface ActiveQuestionSelectorProps {
 }
 
 export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorProps> = ({
+  roomId,
   initialQuestion,
   loading,
   questionsDictionary,
@@ -36,17 +40,42 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   readOnly,
   onSelect,
 }) => {
+  const { apiMethodState, fetchData: fetchRoom } = useApiMethod<Room, Room['id']>(roomsApiDeclaration.getById);
+  const { data: room, process: { error: roomError } } = apiMethodState;
+
+  const localizeParticipantType = useParticipantTypeLocalization();
   const [showMenu, setShowMenu] = useState(false);
-  const [selectedValue, setSelectedValue] = useState<RoomQuestion | null>(null);
+  const [roomParticipants, setRoomParticipants] = useState<RoomParticipant[]>([]);
   const localizationCaptions = useLocalizationCaptions();
   const [questionsCount, setQuestionsCount] = useState(0);
   const [closedQuestionsCount, setClosedQuestionsCount] = useState(0);
-  const currentQuestion = initialQuestion || selectedValue;
   const currentQuestionInDictionary =
-    currentQuestion &&
-    questionsDictionary.find(q => q.id === currentQuestion.id);
-  const currentOrder = currentQuestion?.order || 0;
+    initialQuestion &&
+    questionsDictionary.find(q => q.id === initialQuestion.id);
+  const currentOrder = initialQuestion?.order || 0;
   const [answersModalOpen, setAnswersModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!roomId || initialQuestion) {
+      return;
+    }
+    const updateRoomData = () => {
+      fetchRoom(roomId);
+    };
+    const intervalUpdate = setInterval(updateRoomData, participantsUpdateIntervalMs);
+    updateRoomData();
+
+    return () => {
+      clearInterval(intervalUpdate);
+    };
+  }, [roomId, initialQuestion, fetchRoom]);
+
+  useEffect(() => {
+    if (!room?.participants) {
+      return;
+    }
+    setRoomParticipants(room.participants);
+  }, [room?.participants])
 
   useEffect(() => {
     if (loading) {
@@ -61,21 +90,20 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
   }
 
   const handleInputClick: MouseEventHandler<HTMLDivElement> = () => {
-    if (readOnly) {
-      return;
-    }
     setShowMenu(!showMenu);
   };
 
   const getDisplay = () => {
-    if (!selectedValue && !initialQuestion) {
+    if (!initialQuestion) {
       return '';
     }
-    return `${currentOrder + 1}. ${selectedValue?.value || initialQuestion?.value}`;
+    return `${currentOrder + 1}. ${initialQuestion?.value}`;
   };
 
   const onItemClick = (option: RoomQuestion) => {
-    setSelectedValue(option);
+    if (readOnly) {
+      return;
+    }
     setShowMenu(false);
     onSelect(option);
   };
@@ -100,11 +128,13 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
                 {localizationCaptions[LocalizationKey.RoomQuestions]}
               </Typography>
             </div>
-            <div className='ml-auto border border-button border-solid px-0.75 py-0.125 rounded-2'>
-              <Typography size='s'>
-                {`${closedQuestionsCount} ${localizationCaptions[LocalizationKey.Of]} ${questionsCount}`}
-              </Typography>
-            </div>
+            {!!initialQuestion && (
+              <div className='ml-auto border border-button border-solid px-0.75 py-0.125 rounded-2'>
+                <Typography size='s'>
+                  {`${closedQuestionsCount} ${localizationCaptions[LocalizationKey.Of]} ${questionsCount}`}
+                </Typography>
+              </div>
+            )}
           </div>
         </div>
         <Gap sizeRem={1} />
@@ -115,25 +145,52 @@ export const ActiveQuestionSelector: FunctionComponent<ActiveQuestionSelectorPro
               <div className='no-questions'>{localizationCaptions[LocalizationKey.NoQuestionsSelector]}</div>
             )}
             <Gap sizeRem={1} />
-            {questions.sort(sortOption).map((question, index, allQuestions) => (
-              <Fragment key={question.id}>
-                <div
-                  key={question.value}
-                  className='flex cursor-pointer'
-                  onClick={() => onItemClick(question)}
+            <div className='grid grid-cols-questions-list gap-y-0.5'>
+              {questions.map((question) => (
+                <Fragment
+                  key={question.id}
                 >
                   <Typography size='m'>{question.order + 1}.</Typography>
-                  <Gap sizeRem={1.125} horizontal />
-                  <Typography size='m'>{question.value}</Typography>
-                  {!isOpened(question) && (
-                    <div className='ml-auto text-dark-green-light'>
+                  <div
+                    className='cursor-pointer overflow-hidden whitespace-nowrap text-ellipsis'
+                    onClick={() => onItemClick(question)}
+                  >
+                    <Typography size='m'>{question.value}</Typography>
+                  </div>
+                  <div className='text-dark-green-light'>
+                    {!isOpened(question) && (
                       <Icon size='s' name={IconNames.Checkmark} />
-                    </div>
-                  )}
+                    )}
+                  </div>
+                </Fragment>
+              ))}
+            </div>
+          </div>
+        )}
+        {(!initialQuestion && !showMenu) && (
+          <div>
+            <Gap sizeRem={1} />
+            <Typography size='m' bold>
+              {localizationCaptions[LocalizationKey.RoomParticipants]}:
+            </Typography>
+            <Gap sizeRem={0.5} />
+            {!!roomError && (
+              <Typography size='m' error>
+                <div className='flex items-center'>
+                  <Icon name={IconNames.Information} size='s' />
+                  <Gap sizeRem={0.25} horizontal />
+                  {localizationCaptions[LocalizationKey.Error]}: {roomError}
                 </div>
-                {(index !== allQuestions.length - 1) && (
-                  <Gap sizeRem={0.5} />
-                )}
+              </Typography>
+            )}
+            {roomParticipants.map(participant => (
+              <Fragment key={participant.id}>
+                <div className='flex items-baseline'>
+                  <Typography size='m'>{participant.nickname}</Typography>
+                  <Gap sizeRem={0.5} horizontal />
+                  <Typography size='s' secondary>{localizeParticipantType(participant.type)}</Typography>
+                </div>
+                <Gap sizeRem={0.5} />
               </Fragment>
             ))}
           </div>

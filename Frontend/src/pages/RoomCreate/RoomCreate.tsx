@@ -22,7 +22,7 @@ import { RoomCreateField } from './RoomCreateField/RoomCreateField';
 import { ModalWithProgressWarning } from '../../components/ModalWithProgressWarning/ModalWithProgressWarning';
 import { Button } from '../../components/Button/Button';
 import { padTime } from '../../utils/padTime';
-import { sortRoomQestions } from '../../utils/sortRoomQestions';
+import { sortRoomQuestion } from '../../utils/sortRoomQestions';
 
 const nameFieldName = 'roomName';
 const dateFieldName = 'roomDate';
@@ -162,7 +162,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
       startTime: parsedScheduledStartTime ? parsedScheduledStartTime.startTime : '',
       endTime: parsedScheduledStartTime ? parsedScheduledStartTime.endTime || '' : '',
     }));
-    setSelectedQuestions(room.questions.sort(sortRoomQestions));
+    setSelectedQuestions(room.questions.sort(sortRoomQuestion));
   }, [room]);
 
   useEffect(() => {

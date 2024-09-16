@@ -10,6 +10,7 @@ export const pathnames = {
   room: `/room/:id/:${inviteParamName}?`,
   roomReview: '/rooms/:id/review',
   roomAnalytics: '/rooms/:id/analytics',
+  questionsArchive: '/questions/archive',
   questions: '/questions/:rootCategory/:subCategory',
   questionsCreate: '/questions/create/:rootCategory/:subCategory',
   questionsEdit: '/questions/edit/:id',
@@ -63,6 +64,8 @@ export const enum IconNames {
   HelpCircle = 'help-circle-outline',
   PaperPlane = 'paper-plane-outline',
   Checkmark = 'checkmark',
+  PlayOutline = 'play-outline',
+  TodayOutline = 'today-outline',
 }
 
 export const reactionIcon: Record<string, IconNames> = {
