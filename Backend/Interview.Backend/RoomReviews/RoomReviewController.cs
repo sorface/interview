@@ -125,12 +125,10 @@ public class RoomReviewController : ControllerBase
     [HttpPost("complete")]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(RoomReviewDetail), StatusCodes.Status201Created)]
-    public async Task<ActionResult> CompleteAsync([FromBody] RoomReviewCompletionRequest request, [FromServices] ICurrentUserAccessor currentUserAccessor)
+    public async Task<RoomCompleteResponse> CompleteAsync([FromBody] RoomReviewCompletionRequest request, [FromServices] ICurrentUserAccessor currentUserAccessor)
     {
         var userId = currentUserAccessor.GetUserIdOrThrow();
 
-        await _roomReviewService.CompleteAsync(request, userId, HttpContext.RequestAborted);
-
-        return ServiceResult.Ok().ToActionResult();
+        return await _roomReviewService.CompleteAsync(request, userId, HttpContext.RequestAborted);
     }
 }

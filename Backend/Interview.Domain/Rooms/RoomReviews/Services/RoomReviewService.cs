@@ -96,73 +96,81 @@ public class RoomReviewService : IRoomReviewService
 
     public async Task<UpsertReviewResponse> UpsertAsync(RoomReviewCreateRequest request, Guid userId, CancellationToken cancellationToken = default)
     {
-        await using var transaction = await _db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
-
-        var roomParticipant = await FindParticipantWithValidateAsync(request.RoomId, userId, cancellationToken);
-
-        var review = roomParticipant.Review;
-
-        var created = false;
-
-        if (review is null)
-        {
-            review = new RoomReview(roomParticipant) { Review = request.Review };
-
-            await _roomReviewRepository.CreateAsync(review, cancellationToken);
-
-            created = true;
-        }
-        else
-        {
-            if (review.State != SERoomReviewState.Open)
+        return await _db.RunTransactionAsync<UpsertReviewResponse>(async ct =>
             {
-                throw new UserException("the final review is not subject to change");
-            }
+                var roomParticipant = await FindParticipantWithValidateAsync(request.RoomId, userId, ct);
 
-            review.Review = request.Review;
+                var review = roomParticipant.Review;
 
-            await _roomReviewRepository.UpdateAsync(review, cancellationToken);
-        }
+                var created = false;
 
-        await transaction.CommitAsync(cancellationToken);
+                if (review is null)
+                {
+                    review = new RoomReview(roomParticipant) { Review = request.Review };
 
-        return RoomReviewDetailMapper.InstanceUpsert(created).Map(review);
+                    await _roomReviewRepository.CreateAsync(review, ct);
+
+                    created = true;
+                }
+                else
+                {
+                    if (review.State != SERoomReviewState.Open)
+                    {
+                        throw new UserException("the final review is not subject to change");
+                    }
+
+                    review.Review = request.Review;
+
+                    await _roomReviewRepository.UpdateAsync(review, ct);
+                }
+
+                return RoomReviewDetailMapper.InstanceUpsert(created).Map(review);
+            },
+            cancellationToken
+        );
     }
 
-    public async Task CompleteAsync(RoomReviewCompletionRequest request, Guid userId, CancellationToken cancellationToken = default)
+    public Task<RoomCompleteResponse> CompleteAsync(RoomReviewCompletionRequest request, Guid userId, CancellationToken cancellationToken = default)
     {
-        await using var transaction = await _db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
+        return _db.RunTransactionAsync<RoomCompleteResponse>(async ct =>
+            {
+                var roomCompleteResponse = new RoomCompleteResponse { RoomClosedAuto = false, };
 
-        var roomParticipant = await FindParticipantWithValidateAsync(request.RoomId, userId, cancellationToken);
+                var roomParticipant = await FindParticipantWithValidateAsync(request.RoomId, userId, ct);
 
-        var resultReview = roomParticipant.Review;
+                var resultReview = roomParticipant.Review;
 
-        if (resultReview is null)
-        {
-            throw new NotFoundException("The final review of the user in the room was not found");
-        }
+                if (resultReview is null)
+                {
+                    throw new NotFoundException("The final review of the user in the room was not found");
+                }
 
-        if (resultReview.Review.Length < 1)
-        {
-            throw new UserException("The final review of the user in the room is not filled");
-        }
+                if (resultReview.Review.Length < 1)
+                {
+                    throw new UserException("The final review of the user in the room is not filled");
+                }
 
-        resultReview.State = SERoomReviewState.Closed;
+                resultReview.State = SERoomReviewState.Closed;
 
-        await _roomQuestionEvaluationRepository.SubmitAsync(request.RoomId, userId, cancellationToken);
+                await _roomQuestionEvaluationRepository.SubmitAsync(request.RoomId, userId, ct);
 
-        var roomReadyClose = await _roomRepository.IsReadyToCloseAsync(request.RoomId, cancellationToken);
+                var roomReadyClose = await _roomRepository.IsReadyToCloseAsync(request.RoomId, ct);
 
-        if (roomReadyClose)
-        {
-            var room = roomParticipant.Room;
-            room.Status = SERoomStatus.Close;
-            await _roomRepository.UpdateAsync(room, cancellationToken);
-        }
+                if (roomReadyClose)
+                {
+                    roomCompleteResponse.RoomClosedAuto = true;
 
-        await _db.SaveChangesAsync(cancellationToken);
+                    var room = roomParticipant.Room;
+                    room.Status = SERoomStatus.Close;
+                    await _roomRepository.UpdateAsync(room, ct);
+                }
 
-        await transaction.CommitAsync(cancellationToken);
+                await _db.SaveChangesAsync(ct);
+
+                return roomCompleteResponse;
+            },
+            cancellationToken
+        );
     }
 
     public async Task<RoomReviewDetail> UpdateAsync(Guid id, RoomReviewUpdateRequest request, CancellationToken cancellationToken = default)
