@@ -90,9 +90,10 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         {
             queryable = queryable.Where(e => filter.StartValue <= e.ScheduleStartTime);
         }
-        else if (filter.EndValue is not null)
+
+        if (filter.EndValue is not null)
         {
-            queryable = queryable.Where(e => e.ScheduleStartTime <= filter.EndValue);
+            queryable = queryable.Where(e => filter.EndValue >= e.ScheduleStartTime);
         }
 
         if (filter.Statuses is not null && filter.Statuses.Count > 0)
