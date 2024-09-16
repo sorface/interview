@@ -126,8 +126,7 @@ public class RoomReviewService : IRoomReviewService
 
                 return RoomReviewDetailMapper.InstanceUpsert(created).Map(review);
             },
-            cancellationToken
-        );
+            cancellationToken);
     }
 
     public Task<RoomCompleteResponse> CompleteAsync(RoomReviewCompletionRequest request, Guid userId, CancellationToken cancellationToken = default)
@@ -169,8 +168,7 @@ public class RoomReviewService : IRoomReviewService
 
                 return roomCompleteResponse;
             },
-            cancellationToken
-        );
+            cancellationToken);
     }
 
     public async Task<RoomReviewDetail> UpdateAsync(Guid id, RoomReviewUpdateRequest request, CancellationToken cancellationToken = default)

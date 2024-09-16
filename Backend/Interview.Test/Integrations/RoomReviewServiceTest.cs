@@ -197,7 +197,7 @@ public class RoomReviewServiceTest
         var roomCompleteResponse = await service.CompleteAsync(new RoomReviewCompletionRequest { RoomId = room.Id }, user2.Id, ct);
 
         roomCompleteResponse.RoomClosedAuto.Should().BeTrue();
-        
+
         var expectedReview = await memoryDatabase.RoomReview.FirstOrDefaultAsync(roomReviewItem => roomReviewItem.Id == roomReview2.Id, ct);
 
         expectedReview?.State.Should().Be(SERoomReviewState.Closed);
