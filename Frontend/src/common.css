@@ -227,10 +227,14 @@
 .\!transition { transition: background-color 300ms, border-color 300ms, transform 300ms !important; }
 .capitalize { text-transform: capitalize; }
 .select-none { user-select: none; }
+.border { border-width: 1px; }
 .border-b-1 { border-bottom-width: 1px; }
 .border-grey-active { border-color: var(--grey-active); }
 .border-grey-3 { border-color: var(--grey3); }
 .border-red { border-color: var(--red); }
 .border-dark-red { border-color: var(--dark-red); }
+.border-button-border { border-color: var(--button-border-color); }
+.border-solid { border-style: solid; }
 .border-b-solid { border-bottom-style: solid; }
 .no-underline { text-decoration-line: none; }
+.box-border { box-sizing: border-box; }

@@ -12,8 +12,10 @@ interface CalendarProps {
   monthStartDate: Date;
   currentDate: Date;
   filledItems: Date[];
+  selectedDay: Date | null;
   onMonthBackClick: () => void;
   onMonthForwardClick: () => void;
+  onDayClick: (day: Date) => void;
 }
 
 const getMonthName = (monthStartDate: Date, locale: string) => {
@@ -51,8 +53,10 @@ export const Calendar: FunctionComponent<CalendarProps> = ({
   monthStartDate,
   currentDate,
   filledItems,
+  selectedDay,
   onMonthBackClick,
   onMonthForwardClick,
+  onDayClick,
 }) => {
   const { lang } = useContext(LocalizationContext);
   const days = getWeekDays(lang);
@@ -110,7 +114,9 @@ export const Calendar: FunctionComponent<CalendarProps> = ({
                 <CalendarDay
                   day={day}
                   currentDate={currentDate}
+                  selectedDay={selectedDay}
                   filledItemsStartDates={filledItemsStartDates}
+                  onClick={() => day && onDayClick(day)}
                 />
                 {dayIndex !== daysChunk.length - 1 && (<Gap sizeRem={0.625} horizontal />)}
               </Fragment>

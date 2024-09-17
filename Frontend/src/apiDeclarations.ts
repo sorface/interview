@@ -32,6 +32,8 @@ export interface GetRoomPageParams extends PaginationUrlParams {
   Name: string;
   Participants: string[];
   Statuses: RoomStatus[];
+  StartValue?: string;
+  EndValue?: string;
 }
 
 export interface GetRoomParticipantParams {

@@ -36,6 +36,14 @@ const addMonthsToDate = (date: Date, count: number) => {
   return newDate;
 };
 
+const getDayEndValue = (date: Date) => {
+  const result = new Date(date);
+  result.setHours(23);
+  result.setMinutes(59);
+  result.setSeconds(59);
+  return result;
+};
+
 export enum RoomsPageMode {
   Home,
   Current,
@@ -65,7 +73,8 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
   const [monthStartDate, setMonthStartDate] = useState(initialMonthStartDate);
   const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const roomDates = rooms ? rooms.map(room => new Date(room.scheduledStartTime)) : [];
-  const triggerResetAccumData = `${roomsUpdateTrigger}${searchValue}${mode}`;
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+  const triggerResetAccumData = `${roomsUpdateTrigger}${searchValue}${mode}${selectedDay}`;
 
   const getPageTitle = () => {
     switch (mode) {
@@ -82,14 +91,18 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
 
   const updateRooms = useCallback(() => {
     const statuses: RoomStatus[] = closed ? ['Close'] : ['New', 'Active', 'Review'];
+    const startValue = selectedDay ? selectedDay.toISOString() : null;
+    const endValue = selectedDay ? getDayEndValue(selectedDay).toISOString() : null;
     fetchData({
       PageSize: pageSize,
       PageNumber: pageNumber,
       Name: searchValue,
       Participants: [auth?.id || ''],
       Statuses: statuses,
+      ...(startValue && { StartValue: startValue }),
+      ...(endValue && { EndValue: endValue }),
     });
-  }, [pageNumber, searchValue, auth?.id, closed, fetchData]);
+  }, [pageNumber, searchValue, auth?.id, closed, selectedDay, fetchData]);
 
   useEffect(() => {
     updateRooms();
@@ -150,6 +163,14 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
 
   const handleMonthForwardClick = () => {
     setMonthStartDate(addMonthsToDate(monthStartDate, 1));
+  };
+
+  const handleDayClick = (day: Date) => {
+    if (selectedDay?.valueOf() === day.valueOf()) {
+      setSelectedDay(null);
+      return;
+    }
+    setSelectedDay(day);
   };
 
   const createRoomItem = (room: Room) => {
@@ -266,8 +287,10 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
                   monthStartDate={monthStartDate}
                   currentDate={currentDate}
                   filledItems={roomDates}
+                  selectedDay={selectedDay}
                   onMonthBackClick={handleMonthBackClick}
                   onMonthForwardClick={handleMonthForwardClick}
+                  onDayClick={handleDayClick}
                 />
                 <Gap sizeRem={0.5} />
                 {!!errorRoomsHistory && (
