@@ -279,3 +279,8 @@ textarea {
   border-color: var(--input-border-color);
   resize: none;
 }
+
+::placeholder {
+  color: var(--text);
+  opacity: 0.75; /* Firefox */
+}

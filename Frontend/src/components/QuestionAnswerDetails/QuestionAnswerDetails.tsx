@@ -30,6 +30,7 @@ export const QuestionAnswerDetails: FunctionComponent<QuestionAnswerDetailsProps
   const { process: { loading, error }, data } = apiMethodState;
   const [codeQuestionTab, setCodeQuestionTab] = useState<0 | 1>(0);
   const answerCodeEditorContent = data?.details[data?.details.length - 1]?.answerCodeEditorContent;
+  const hasTranscriptions = !!data?.details.length;
   const hasCodeEditorContent = !!(typeof data?.codeEditor === 'string');
   const codeEditorValue = (codeQuestionTab === 0) && hasCodeEditorContent ?
     data?.codeEditor?.content || '' :
@@ -59,12 +60,12 @@ export const QuestionAnswerDetails: FunctionComponent<QuestionAnswerDetailsProps
 
   return (
     <div className='text-left flex flex-col'>
-      <Typography size='xl' bold>
-        {questionTitle}
-      </Typography>
-      <Gap sizeRem={2.25} />
       {(data?.codeEditor || answerCodeEditorContent) && (
         <>
+          <Typography size='xl' bold>
+            {questionTitle}
+          </Typography>
+          <Gap sizeRem={2.25} />
           {hasCodeEditorContent ? (
             <>
               <SwitcherButton
@@ -99,13 +100,18 @@ export const QuestionAnswerDetails: FunctionComponent<QuestionAnswerDetailsProps
             />
           </div>
           <Gap sizeRem={2.25} />
+          <Typography size='m' bold>
+            {localizationCaptions[LocalizationKey.QurstionTranscription]}
+          </Typography>
+          <Gap sizeRem={1} />
         </>
       )}
-      <Typography size='m' bold>
-        {localizationCaptions[LocalizationKey.QurstionTranscription]}
-      </Typography>
-      <Gap sizeRem={1} />
       <div className='flex flex-col'>
+        {!hasTranscriptions && (
+          <Typography size='m' secondary>
+            {localizationCaptions[LocalizationKey.NoData]}
+          </Typography>
+        )}
         {data?.details.map(detail => detail.transcription.map(transcription => (
           <Typography key={transcription.id} size='m'>
             {transcription.user.nickname}: {transcription.payload}

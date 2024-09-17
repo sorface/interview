@@ -44,21 +44,20 @@ export const useCanvasStream = ({
       return;
     }
     const canvasElement = context.canvas;
-    context.save();
     context.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    context.save();
+    context.filter = 'blur(0)';
+
+    context.drawImage(results.segmentationMask, 0, 0, canvasElement.width, canvasElement.height);
+    context.globalCompositeOperation = 'source-in';
+    context.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+    context.globalCompositeOperation = 'destination-atop';
+    context.filter = 'blur(8px)'
 
     context.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
-    context.globalCompositeOperation = 'destination-in';
-    context.drawImage(results.segmentationMask, 0, 0, canvasElement.width, canvasElement.height);
-
-    if (backgroundImage) {
-      context.globalCompositeOperation = 'destination-over';
-      context.drawImage(backgroundImage, 0, 0, canvasElement.width, canvasElement.height);
-    }
-
     context.restore();
-  }, [context, cameraStream, video, backgroundImage]);
+  }, [context, cameraStream, video]);
 
   const selfieSegmentation = useSelfieSegmentation(onResults);
 
