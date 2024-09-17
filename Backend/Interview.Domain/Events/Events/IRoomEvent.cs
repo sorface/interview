@@ -1,3 +1,5 @@
+using Interview.Domain.Events.Events.Serializers;
+
 namespace Interview.Domain.Events.Events;
 
 public interface IRoomEvent
@@ -14,7 +16,7 @@ public interface IRoomEvent
 
     Guid CreatedById { get; }
 
-    string? BuildStringPayload();
+    string? BuildStringPayload(IRoomEventSerializer serializer);
 }
 
 public interface IRoomEvent<out T> : IRoomEvent

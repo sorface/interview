@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Interview.Domain.Events.Events.Serializers;
 
 namespace Interview.Domain.Events.Events;
 
@@ -14,8 +15,8 @@ public sealed class RoomEventUserPayload : IPayloadBuilder
         AdditionalData = additionalData;
     }
 
-    public string? BuildPayload()
+    public string? BuildPayload(IRoomEventSerializer serializer)
     {
-        return AdditionalData is null ? null : JsonSerializer.Serialize(AdditionalData);
+        return serializer.SerializePayloadAsString(AdditionalData);
     }
 }

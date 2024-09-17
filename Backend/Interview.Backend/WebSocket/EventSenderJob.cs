@@ -17,6 +17,7 @@ public class EventSenderJob : BackgroundService
     private readonly IRoomEventSerializer _roomEventSerializer;
     private readonly ILogger<WebSocketEventSender> _webSocketEventSender;
     private readonly IEventSenderAdapter _eventSenderAdapter;
+    private readonly IRoomEventSerializer _serializer;
 
     public EventSenderJob(
         IRoomEventDispatcher roomEventDispatcher,
@@ -25,7 +26,8 @@ public class EventSenderJob : BackgroundService
         IRoomEventSerializer roomEventSerializer,
         IServiceScopeFactory scopeFactory,
         ILogger<WebSocketEventSender> webSocketEventSender,
-        IEventSenderAdapter eventSenderAdapter)
+        IEventSenderAdapter eventSenderAdapter,
+        IRoomEventSerializer serializer)
     {
         _roomEventDispatcher = roomEventDispatcher;
         _webSocketConnectionSource = webSocketConnectionSource;
@@ -34,6 +36,7 @@ public class EventSenderJob : BackgroundService
         _scopeFactory = scopeFactory;
         _webSocketEventSender = webSocketEventSender;
         _eventSenderAdapter = eventSenderAdapter;
+        _serializer = serializer;
     }
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -149,7 +152,7 @@ public class EventSenderJob : BackgroundService
                 {
                     try
                     {
-                        var payload = roomEvent.BuildStringPayload();
+                        var payload = roomEvent.BuildStringPayload(_serializer);
                         await service.UpsertRoomStateAsync(
                             roomEvent.RoomId,
                             roomEvent.Type,

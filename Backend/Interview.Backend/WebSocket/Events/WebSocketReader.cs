@@ -12,17 +12,17 @@ public class WebSocketReader
 {
     private readonly RecyclableMemoryStreamManager _manager;
     private readonly IWebSocketEventHandler[] _handlers;
-    private readonly IEventStorage _eventStorage;
+    private readonly IHotEventStorage _hotEventStorage;
     private readonly ILogger<WebSocketReader> _logger;
 
     public WebSocketReader(
         RecyclableMemoryStreamManager manager,
         IEnumerable<IWebSocketEventHandler> handlers,
-        IEventStorage eventStorage,
+        IHotEventStorage hotEventStorage,
         ILogger<WebSocketReader> logger)
     {
         _manager = manager;
-        _eventStorage = eventStorage;
+        _hotEventStorage = hotEventStorage;
         _logger = logger;
         _handlers = handlers.OrderBy(e => e.Order).ToArray();
     }
@@ -143,7 +143,7 @@ public class WebSocketReader
             Type = deserializeResult.Type,
             CreatedById = user.Id,
         };
-        return _eventStorage.AddAsync(storageEvent, ct);
+        return _hotEventStorage.AddAsync(storageEvent, ct);
     }
 
     private class PoolItem : IDisposable

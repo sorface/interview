@@ -16,7 +16,7 @@ public class QueuedRoomEventRepository : EfRepository<QueuedRoomEvent>, IQueuedR
     {
         return Db.Rooms.AsNoTracking()
             .Include(e => e.QueuedRoomEvent)
-            .Where(e => e.Status == SERoomStatus.Close && e.QueuedRoomEvent == null)
+            .Where(e => (e.Status == SERoomStatus.Close || e.Status == SERoomStatus.Review) && e.QueuedRoomEvent == null)
             .Select(e => e.Id)
             .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }

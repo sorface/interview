@@ -4,7 +4,7 @@ using NSpecifications;
 
 namespace Interview.Test;
 
-public sealed class InMemoryEventStorage : IEventStorage
+public sealed class InMemoryHotEventStorage : IHotEventStorage
 {
     private readonly List<IStorageEvent> _storage = new();
 

@@ -1,4 +1,4 @@
-namespace Interview.Domain.Rooms.RoomQuestions.AnswerDetail;
+namespace Interview.Domain.Rooms.RoomQuestions.Services.AnswerDetail;
 
 public class RoomQuestionAnswerDetailRequest
 {

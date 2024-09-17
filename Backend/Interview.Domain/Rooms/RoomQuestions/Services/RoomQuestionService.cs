@@ -1,22 +1,14 @@
-using System.Runtime.CompilerServices;
-using System.Text.Json;
 using Interview.Domain.Database;
-using Interview.Domain.Events;
-using Interview.Domain.Events.DatabaseProcessors.Records.Room;
-using Interview.Domain.Events.Storage;
 using Interview.Domain.Questions;
-using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Questions.Services;
-using Interview.Domain.Rooms.RoomQuestions.AnswerDetail;
 using Interview.Domain.Rooms.RoomQuestions.Records;
 using Interview.Domain.Rooms.RoomQuestions.Records.Response;
+using Interview.Domain.Rooms.RoomQuestions.Services.AnswerDetail;
 using Interview.Domain.Rooms.RoomQuestions.Services.Update;
 using Interview.Domain.ServiceResults.Success;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Internal;
 using NSpecifications;
-using QuestionCodeEditorResponse = Interview.Domain.Rooms.Records.Response.Detail.QuestionCodeEditorResponse;
 
 namespace Interview.Domain.Rooms.RoomQuestions.Services;
 
@@ -27,124 +19,26 @@ public class RoomQuestionService : IRoomQuestionService
     private readonly IRoomRepository _roomRepository;
     private readonly IQuestionService _questionService;
     private readonly AppDbContext _db;
-    private readonly IEventStorage _eventStorage;
-    private readonly ISystemClock _clock;
+    private readonly AnswerDetailService _roomQuestionService;
 
     public RoomQuestionService(
         IRoomQuestionRepository roomQuestionRepository,
         IRoomRepository roomRepository,
         IQuestionRepository questionRepository,
         IQuestionService questionService,
-        AppDbContext db,
-        IEventStorage eventStorage,
-        ISystemClock clock)
+        AnswerDetailService roomQuestionService,
+        AppDbContext db)
     {
         _roomQuestionRepository = roomQuestionRepository;
         _roomRepository = roomRepository;
         _questionRepository = questionRepository;
         _questionService = questionService;
         _db = db;
-        _eventStorage = eventStorage;
-        _clock = clock;
+        _roomQuestionService = roomQuestionService;
     }
 
-    public async Task<RoomQuestionAnswerDetailResponse> GetAnswerDetailsAsync(RoomQuestionAnswerDetailRequest request, CancellationToken cancellationToken)
-    {
-        const int DefaultChunkSize = 500;
-        var roomQuestion = await _db.RoomQuestions
-            .Include(e => e.Question)
-                .ThenInclude(e => e!.CodeEditor)
-            .Where(e => e.RoomId == request.RoomId && e.QuestionId == request.QuestionId)
-            .Select(e => new RoomQuestionAnswerDetailResponse
-            {
-                CodeEditor = e.Question!.CodeEditor == null
-                    ? null
-                    : new QuestionCodeEditorResponse
-                    {
-                        Content = e.Question!.CodeEditor!.Content,
-                        Lang = e.Question!.CodeEditor!.Lang,
-                    },
-                Details = new List<RoomQuestionAnswerDetailResponse.Detail>(),
-            })
-            .FirstOrDefaultAsync(cancellationToken);
-        if (roomQuestion == null)
-        {
-            throw NotFoundException.Create<RoomQuestion>((request.RoomId, "RoomId"), (request.QuestionId, "QuestionId"));
-        }
-
-        await foreach (var (startActiveDate, endActiveDate) in GetActiveQuestionDateAsync(request, _eventStorage, _clock, cancellationToken))
-        {
-            var voiceRecognition = EventType.VoiceRecognition;
-            var codeEditorChangeEventType = EventType.CodeEditorChange;
-            var res = await _eventStorage
-                .GetBySpecAsync(new Spec<IStorageEvent>(e => e.RoomId == request.RoomId && e.Type == voiceRecognition && e.CreatedAt >= startActiveDate && e.CreatedAt <= endActiveDate), DefaultChunkSize, cancellationToken)
-                .ToListAsync(cancellationToken: cancellationToken);
-
-            var lastCodeEditorState = await _eventStorage
-                .GetLatestBySpecAsync(new Spec<IStorageEvent>(e => e.RoomId == request.RoomId && e.Type == codeEditorChangeEventType && e.CreatedAt >= startActiveDate && e.CreatedAt <= endActiveDate), 1, cancellationToken)
-                .FirstOrDefaultAsync(cancellationToken);
-
-            roomQuestion.Details.Add(new RoomQuestionAnswerDetailResponse.Detail
-            {
-                Transcription = res
-                    .SelectMany(e => e)
-                    .Select(e =>
-                    {
-                        using var payloadAsJson = JsonDocument.Parse(e.Payload ?? "{}");
-                        return new QuestionDetailTranscriptionResponse
-                        {
-                            Id = e.Id,
-                            Payload = payloadAsJson.RootElement.GetProperty("Message").GetString(),
-                            CreatedAt = e.CreatedAt,
-                            User = new QuestionDetailTranscriptionUserResponse
-                            {
-                                Id = e.CreatedById,
-                                Nickname = payloadAsJson.RootElement.GetProperty("Nickname").GetString() ?? "Anonymous",
-                            },
-                        };
-                    })
-                    .ToList(),
-                AnswerCodeEditorContent = lastCodeEditorState?.Count > 0 ? lastCodeEditorState.MaxBy(e => e.CreatedAt)?.Payload : null,
-                StartActiveDate = startActiveDate,
-                EndActiveDate = endActiveDate,
-            });
-        }
-
-        return roomQuestion;
-
-        static async IAsyncEnumerable<(DateTime StartActiveDate, DateTime EndActiveDate)> GetActiveQuestionDateAsync(
-            RoomQuestionAnswerDetailRequest request, IEventStorage eventStorage, ISystemClock clock, [EnumeratorCancellation] CancellationToken cancellationToken)
-        {
-            var changeRoomQuestionState = EventType.ChangeRoomQuestionState;
-            var changedRooms = await eventStorage
-                .GetBySpecAsync(new Spec<IStorageEvent>(e => e.RoomId == request.RoomId && e.Type == changeRoomQuestionState), DefaultChunkSize, cancellationToken)
-                .ToListAsync(cancellationToken: cancellationToken);
-
-            var list = changedRooms.SelectMany(e => e)
-                .Where(e => e.Payload is not null)
-                .Select(e => new
-                {
-                    Payload = JsonSerializer.Deserialize<RoomQuestionChangeEventPayload>(e.Payload!),
-                    CreateAt = e.CreatedAt,
-                })
-                .ToList();
-            foreach (var e in list)
-            {
-                if (e.Payload is null || e.Payload.QuestionId != request.QuestionId || e.Payload.NewState != RoomQuestionStateType.Active)
-                {
-                    continue;
-                }
-
-                var minDate = e.CreateAt;
-                var endActiveDate = list
-                    .Where(e => e.Payload is not null && e.Payload.QuestionId == request.QuestionId && e.Payload.OldState == RoomQuestionStateType.Active && e.CreateAt > minDate)
-                    .Select(e => (DateTime?)e.CreateAt)
-                    .FirstOrDefault();
-
-                yield return (minDate, endActiveDate ?? clock.UtcNow.UtcDateTime);
-            }
-        }
-    }
+    public Task<RoomQuestionAnswerDetailResponse> GetAnswerDetailsAsync(RoomQuestionAnswerDetailRequest request, CancellationToken cancellationToken)
+        => _roomQuestionService.GetAnswerDetailsAsync(request, cancellationToken);
 
     public async Task<RoomQuestionDetail> ChangeActiveQuestionAsync(
         RoomQuestionChangeActiveRequest request, CancellationToken cancellationToken = default)

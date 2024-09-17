@@ -6,3 +6,8 @@ public interface IRoomEventSerializer
 
     string SerializePayloadAsString<T>(T? payload);
 }
+
+public interface IRoomEventDeserializer
+{
+    T? Deserialize<T>(string? payload);
+}

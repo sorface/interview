@@ -9,7 +9,7 @@ public class EventStorage2DatabaseService
 {
     private readonly IQueuedRoomEventRepository _queuedRoomEventRepository;
     private readonly IDbRoomEventRepository _roomEventRepository;
-    private readonly IEventStorage _eventStorage;
+    private readonly IHotEventStorage _hotEventStorage;
     private readonly ILogger<EventStorage2DatabaseService> _logger;
 
     private int ChunkSize { get; set; } = 100;
@@ -17,12 +17,12 @@ public class EventStorage2DatabaseService
     public EventStorage2DatabaseService(
         IQueuedRoomEventRepository queuedRoomEventRepository,
         IDbRoomEventRepository roomEventRepository,
-        IEventStorage eventStorage,
+        IHotEventStorage hotEventStorage,
         ILogger<EventStorage2DatabaseService> logger)
     {
         _queuedRoomEventRepository = queuedRoomEventRepository;
         _roomEventRepository = roomEventRepository;
-        _eventStorage = eventStorage;
+        _hotEventStorage = hotEventStorage;
         _logger = logger;
     }
 
@@ -74,26 +74,30 @@ public class EventStorage2DatabaseService
     {
         var specification = new Spec<IStorageEvent>(e => e.RoomId == roomId);
         var pageNumber = 0;
-        await foreach (var collection in _eventStorage.GetBySpecAsync(specification, ChunkSize, cancellationToken))
+        await foreach (var collection in _hotEventStorage.GetBySpecAsync(specification, ChunkSize, cancellationToken))
         {
             pageNumber += 1;
-            var dbEvents = collection.Select(e => new DbRoomEvent
+            var dbEvents = collection.Select(e =>
             {
-                Id = e.Id,
-                RoomId = e.RoomId,
-                Type = e.Type,
-                Stateful = e.Stateful,
-                Payload = e.Payload,
-                CreateDate = e.CreatedAt,
-                UpdateDate = e.CreatedAt,
-                EventSenderId = e.CreatedById,
+                var createdAt = new DateTime(e.CreatedAt.Year, e.CreatedAt.Month, e.CreatedAt.Day, e.CreatedAt.Hour, e.CreatedAt.Minute, e.CreatedAt.Second, DateTimeKind.Utc);
+                return new DbRoomEvent
+                {
+                    Id = e.Id,
+                    RoomId = e.RoomId,
+                    Type = e.Type,
+                    Stateful = e.Stateful,
+                    Payload = e.Payload,
+                    CreateDate = createdAt,
+                    UpdateDate = createdAt,
+                    EventSenderId = e.CreatedById,
+                };
             });
             await _roomEventRepository.CreateRangeAsync(dbEvents, cancellationToken);
 
             try
             {
                 _logger.LogInformation("Start delete {RoomId} events {Page}", roomId, pageNumber);
-                await _eventStorage.DeleteAsync(collection, cancellationToken);
+                await _hotEventStorage.DeleteAsync(collection, cancellationToken);
                 _logger.LogInformation("End delete {RoomId} events {Page}", roomId, pageNumber);
             }
             catch (Exception e)

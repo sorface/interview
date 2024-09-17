@@ -1,3 +1,4 @@
+using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Events.Storage;
 
 namespace Interview.Domain.Events.Sender;
@@ -5,12 +6,14 @@ namespace Interview.Domain.Events.Sender;
 public class StoreEventSenderAdapter : IEventSenderAdapter
 {
     private readonly IEventSenderAdapter _root;
-    private readonly IEventStorage _eventStorage;
+    private readonly IHotEventStorage _hotEventStorage;
+    private readonly IRoomEventSerializer _serializer;
 
-    public StoreEventSenderAdapter(IEventSenderAdapter root, IEventStorage eventStorage)
+    public StoreEventSenderAdapter(IEventSenderAdapter root, IHotEventStorage hotEventStorage, IRoomEventSerializer serializer)
     {
         _root = root;
-        _eventStorage = eventStorage;
+        _hotEventStorage = hotEventStorage;
+        _serializer = serializer;
     }
 
     public async Task SendAsync(
@@ -26,12 +29,12 @@ public class StoreEventSenderAdapter : IEventSenderAdapter
             Id = @event.Id,
             RoomId = @event.RoomId,
             Type = @event.Type,
-            Payload = @event.BuildStringPayload(),
+            Payload = @event.BuildStringPayload(_serializer),
             Stateful = @event.Stateful,
             CreatedAt = @event.CreatedAt,
             CreatedById = @event.CreatedById,
         };
 
-        await _eventStorage.AddAsync(storageEvent, cancellationToken);
+        await _hotEventStorage.AddAsync(storageEvent, cancellationToken);
     }
 }

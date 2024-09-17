@@ -15,6 +15,7 @@ using Interview.Infrastructure.Users;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Internal;
+using NSpecifications;
 
 namespace Interview.DependencyInjection;
 
@@ -34,7 +35,9 @@ public static class ServiceCollectionExt
         self.AddSingleton<IRoomEventDispatcher, RoomEventDispatcher>();
         self.AddSingleton<ISystemClock, SystemClock>();
         self.AddSingleton(option.AdminUsers);
-        self.AddSingleton<IRoomEventSerializer, JsonRoomEventSerializer>();
+        var serializer = new JsonRoomEventSerializer();
+        self.AddSingleton<IRoomEventSerializer>(serializer);
+        self.AddSingleton<IRoomEventDeserializer>(serializer);
 
         self.AddScoped(typeof(ArchiveService<>));
 
@@ -60,6 +63,10 @@ public static class ServiceCollectionExt
 
                 .AddClasses(filter => filter.AssignableTo<IServiceDecorator>())
                 .As<IServiceDecorator>()
+                .WithScopedLifetime()
+
+                .AddClasses(filter => filter.AssignableTo<ISelfScopeService>())
+                .AsSelf()
                 .WithScopedLifetime();
         });
 
@@ -96,15 +103,15 @@ public static class ServiceCollectionExt
         dependencyInjectionAppServiceOption.EventStorageConfigurator?.Invoke(builder);
         if (string.IsNullOrWhiteSpace(builder.RedisConnectionString))
         {
-            self.AddSingleton<IEventStorage, EmptyEventStorage>();
+            self.AddSingleton<IHotEventStorage, EmptyHotEventStorage>();
         }
         else
         {
-            var redisStorage = new RedisEventStorage(new RedisEventStorageConfiguration
+            var redisStorage = new RedisHotEventStorage(new RedisEventStorageConfiguration
             {
                 ConnectionString = builder.RedisConnectionString,
             });
-            self.AddSingleton<IEventStorage, RedisEventStorage>(_ => redisStorage);
+            self.AddSingleton<IHotEventStorage, RedisHotEventStorage>(_ => redisStorage);
             redisStorage.CreateIndexes();
         }
 

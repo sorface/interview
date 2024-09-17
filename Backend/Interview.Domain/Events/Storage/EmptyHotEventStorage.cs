@@ -2,7 +2,7 @@ using NSpecifications;
 
 namespace Interview.Domain.Events.Storage;
 
-public sealed class EmptyEventStorage : IEventStorage
+public sealed class EmptyHotEventStorage : IHotEventStorage
 {
     public ValueTask AddAsync(IStorageEvent @event, CancellationToken cancellationToken)
     {

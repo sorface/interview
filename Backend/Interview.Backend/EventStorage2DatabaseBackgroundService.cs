@@ -28,7 +28,7 @@ public class EventStorage2DatabaseBackgroundService : BackgroundService
                 }
             }
 
-            await Task.Delay(TimeSpan.FromMinutes(20), stoppingToken);
+            await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
         }
     }
 }
