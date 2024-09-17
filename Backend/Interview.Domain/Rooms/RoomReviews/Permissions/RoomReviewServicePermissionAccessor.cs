@@ -50,9 +50,9 @@ public class RoomReviewServicePermissionAccessor : IRoomReviewService, IServiceD
         return await _roomReviewService.UpsertAsync(request, userId, cancellationToken);
     }
 
-    public async Task CompleteAsync(RoomReviewCompletionRequest request, Guid userId, CancellationToken cancellationToken = default)
+    public async Task<RoomCompleteResponse> CompleteAsync(RoomReviewCompletionRequest request, Guid userId, CancellationToken cancellationToken = default)
     {
         await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomReviewCompletion, cancellationToken);
-        await _roomReviewService.CompleteAsync(request, userId, cancellationToken);
+        return await _roomReviewService.CompleteAsync(request, userId, cancellationToken);
     }
 }
