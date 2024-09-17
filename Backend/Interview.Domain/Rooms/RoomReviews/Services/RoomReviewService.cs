@@ -133,7 +133,7 @@ public class RoomReviewService : IRoomReviewService
     {
         return _db.RunTransactionAsync<RoomCompleteResponse>(async ct =>
             {
-                var roomCompleteResponse = new RoomCompleteResponse { RoomClosedAuto = false, };
+                var roomCompleteResponse = new RoomCompleteResponse { AutoClosed = false, };
 
                 var roomParticipant = await FindParticipantWithValidateAsync(request.RoomId, userId, ct);
 
@@ -157,7 +157,7 @@ public class RoomReviewService : IRoomReviewService
 
                 if (roomReadyClose)
                 {
-                    roomCompleteResponse.RoomClosedAuto = true;
+                    roomCompleteResponse.AutoClosed = true;
 
                     var room = roomParticipant.Room;
                     room.Status = SERoomStatus.Close;
