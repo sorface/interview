@@ -30,7 +30,7 @@ export const QuestionAnswerDetails: FunctionComponent<QuestionAnswerDetailsProps
   const { process: { loading, error }, data } = apiMethodState;
   const [codeQuestionTab, setCodeQuestionTab] = useState<0 | 1>(0);
   const answerCodeEditorContent = data?.details[data?.details.length - 1]?.answerCodeEditorContent;
-  const hasTranscriptions = !!data?.details.length;
+  const hasTranscriptions = !!(data?.details.some(details => !!details.transcription.length));
   const hasCodeEditorContent = !!(typeof data?.codeEditor === 'string');
   const codeEditorValue = (codeQuestionTab === 0) && hasCodeEditorContent ?
     data?.codeEditor?.content || '' :
@@ -108,9 +108,12 @@ export const QuestionAnswerDetails: FunctionComponent<QuestionAnswerDetailsProps
       )}
       <div className='flex flex-col'>
         {!hasTranscriptions && (
-          <Typography size='m' secondary>
-            {localizationCaptions[LocalizationKey.NoData]}
-          </Typography>
+          <div className='text-center'>
+            <Typography size='m' secondary>
+              {localizationCaptions[LocalizationKey.NoData]}
+            </Typography>
+            <Gap sizeRem={1.5} />
+          </div>
         )}
         {data?.details.map(detail => detail.transcription.map(transcription => (
           <Typography key={transcription.id} size='m'>
