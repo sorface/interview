@@ -157,6 +157,7 @@
 .whitespace-nowrap { white-space: nowrap; }
 .text-ellipsis { text-overflow: ellipsis; }
 .min-w-fit { min-width: fit-content; }
+.min-w-unset { min-width: unset; }
 .min-h-unset { min-height: unset; }
 .min-h-4 { min-height: 4rem; }
 .w-fit { width: fit-content; }
