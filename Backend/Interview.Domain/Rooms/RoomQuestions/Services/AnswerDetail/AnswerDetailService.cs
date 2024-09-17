@@ -4,11 +4,10 @@ using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.DatabaseProcessors.Records.Room;
 using Interview.Domain.Events.EventProvider;
-using Interview.Domain.Events.Storage;
+using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Rooms.Records.Response.Detail;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Internal;
-using NSpecifications;
 
 namespace Interview.Domain.Rooms.RoomQuestions.Services.AnswerDetail;
 
@@ -17,12 +16,14 @@ public class AnswerDetailService : ISelfScopeService
     private readonly ISystemClock _clock;
     private readonly RoomEventProviderFactory _roomEventProviderFactory;
     private readonly AppDbContext _db;
+    private readonly IRoomEventDeserializer _eventDeserializer;
 
-    public AnswerDetailService(ISystemClock clock, RoomEventProviderFactory roomEventProviderFactory, AppDbContext db)
+    public AnswerDetailService(ISystemClock clock, RoomEventProviderFactory roomEventProviderFactory, AppDbContext db, IRoomEventDeserializer eventDeserializer)
     {
         _clock = clock;
         _roomEventProviderFactory = roomEventProviderFactory;
         _db = db;
+        _eventDeserializer = eventDeserializer;
     }
 
     public async Task<RoomQuestionAnswerDetailResponse> GetAnswerDetailsAsync(RoomQuestionAnswerDetailRequest request, CancellationToken cancellationToken)
@@ -90,13 +91,12 @@ public class AnswerDetailService : ISelfScopeService
     private async IAsyncEnumerable<(DateTime StartActiveDate, DateTime EndActiveDate)> GetActiveQuestionDateAsync(
         RoomQuestionAnswerDetailRequest request, IRoomEventProvider roomEventStorage, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var changeRoomQuestionState = EventType.ChangeRoomQuestionState;
         var changedRooms = await roomEventStorage
-            .GetEventsAsync(new EPStorageEventRequest { Type = changeRoomQuestionState, From = null, To = null, }, cancellationToken);
+            .GetEventsAsync(new EPStorageEventRequest { Type = EventType.ChangeRoomQuestionState, From = null, To = null, }, cancellationToken);
 
         var list = changedRooms
             .Where(e => e.Payload is not null)
-            .Select(e => new { Payload = JsonSerializer.Deserialize<RoomQuestionChangeEventPayload>(e.Payload!), CreateAt = e.CreatedAt, })
+            .Select(e => new { Payload = _eventDeserializer.Deserialize<RoomQuestionChangeEventPayload>(e.Payload!), CreateAt = e.CreatedAt, })
             .OrderBy(e => e.CreateAt)
             .ToList();
         foreach (var e in list)

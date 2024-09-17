@@ -49,7 +49,9 @@ public sealed class HotRoomEventStorageRoomEventProvider : IRoomEventProvider
 
     private ASpec<IStorageEvent> BuildSpecification(EPStorageEventRequest request)
     {
-        ASpec<IStorageEvent> spec = new Spec<IStorageEvent>(e => e.RoomId == _roomId && e.Type == request.Type);
+        var roomId = _roomId;
+        var type = request.Type;
+        ASpec<IStorageEvent> spec = new Spec<IStorageEvent>(e => e.RoomId == roomId && e.Type == type);
         if (request.From is not null)
         {
             var dateFrom = request.From.Value;

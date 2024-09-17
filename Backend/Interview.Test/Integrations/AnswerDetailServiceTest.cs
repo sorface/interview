@@ -8,6 +8,7 @@ using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.DatabaseProcessors.Records.Room;
 using Interview.Domain.Events.EventProvider;
+using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Events.Storage;
 using Interview.Domain.Questions;
 using Interview.Domain.Questions.CodeEditors;
@@ -67,7 +68,7 @@ public class AnswerDetailServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
         var storage = new InMemoryHotEventStorage();
-        var (service, _, questionId) = CreateService(appDbContext, storage, testSystemClock, addQueuedRoomEvent);
+        var (service, _, questionId, serializer) = CreateService(appDbContext, storage, testSystemClock, addQueuedRoomEvent);
         var request = new RoomQuestionAnswerDetailRequest { QuestionId = questionId, RoomId = Guid.NewGuid(), };
         await Assert.ThrowsAsync<NotFoundException>(() => service.GetAnswerDetailsAsync(request, CancellationToken.None));
     }
@@ -80,7 +81,7 @@ public class AnswerDetailServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
         var storage = new InMemoryHotEventStorage();
-        var (service, roomId, _) = CreateService(appDbContext, storage, testSystemClock, addQueuedRoomEvent);
+        var (service, roomId, _, serializer) = CreateService(appDbContext, storage, testSystemClock, addQueuedRoomEvent);
         var request = new RoomQuestionAnswerDetailRequest { QuestionId = Guid.NewGuid(), RoomId = roomId, };
         await Assert.ThrowsAsync<NotFoundException>(() => service.GetAnswerDetailsAsync(request, CancellationToken.None));
     }
@@ -93,7 +94,7 @@ public class AnswerDetailServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
         var storage = new InMemoryHotEventStorage();
-        var (service, roomId, questionId) = CreateService(appDbContext, storage, testSystemClock, addQueuedRoomEvent);
+        var (service, roomId, questionId, serializer) = CreateService(appDbContext, storage, testSystemClock, addQueuedRoomEvent);
         var request = new RoomQuestionAnswerDetailRequest { QuestionId = questionId, RoomId = roomId, };
         var answerDetails = await service.GetAnswerDetailsAsync(request, CancellationToken.None);
         answerDetails.Details.Should().BeEmpty();
@@ -108,7 +109,7 @@ public class AnswerDetailServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
         var storage = new InMemoryHotEventStorage();
-        var (service, roomId, questionId) = CreateService(appDbContext, storage, testSystemClock, addQueuedRoomEvent);
+        var (service, roomId, questionId, serializer) = CreateService(appDbContext, storage, testSystemClock, addQueuedRoomEvent);
         var q = appDbContext.Questions.First(e => e.Id == questionId);
         q.CodeEditor = new QuestionCodeEditor { Content = "test cont", Lang = "C#" };
         appDbContext.SaveChanges();
@@ -128,7 +129,7 @@ public class AnswerDetailServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
         var storage = new InMemoryHotEventStorage();
-        var (service, roomId, questionId) = CreateService(appDbContext, storage, testSystemClock, false);
+        var (service, roomId, questionId, serializer) = CreateService(appDbContext, storage, testSystemClock, false);
 
         var op = new JsonSerializerOptions { Encoder = JavaScriptEncoder.Create(UnicodeRanges.All) };
         var expectedDetails = new List<RoomQuestionAnswerDetailResponse.Detail>();
@@ -139,7 +140,7 @@ public class AnswerDetailServiceTest
                 Id = Guid.NewGuid(),
                 RoomId = roomId,
                 Type = EventType.ChangeRoomQuestionState,
-                Payload = JsonSerializer.Serialize(new RoomQuestionChangeEventPayload(questionId, RoomQuestionStateType.Open, RoomQuestionStateType.Active), op),
+                Payload = serializer.SerializePayloadAsString(new RoomQuestionChangeEventPayload(questionId, RoomQuestionStateType.Open, RoomQuestionStateType.Active)),
                 Stateful = false,
                 CreatedAt = start,
                 CreatedById = Guid.NewGuid(),
@@ -149,7 +150,7 @@ public class AnswerDetailServiceTest
                 Id = Guid.NewGuid(),
                 RoomId = roomId,
                 Type = EventType.ChangeRoomQuestionState,
-                Payload = JsonSerializer.Serialize(new RoomQuestionChangeEventPayload(questionId, RoomQuestionStateType.Active, RoomQuestionStateType.Closed), op),
+                Payload = serializer.SerializePayloadAsString(new RoomQuestionChangeEventPayload(questionId, RoomQuestionStateType.Active, RoomQuestionStateType.Closed)),
                 Stateful = false,
                 CreatedAt = end,
                 CreatedById = Guid.NewGuid(),
@@ -179,7 +180,7 @@ public class AnswerDetailServiceTest
                         Id = voiceRecognitionEvent.Id,
                         RoomId = roomId,
                         Type = EventType.VoiceRecognition,
-                        Payload = JsonSerializer.Serialize(new { Message = voiceRecognitionEvent.Message, Nickname = voiceRecognitionEvent.Nickname }, op),
+                        Payload = serializer.SerializePayloadAsString(new { Message = voiceRecognitionEvent.Message, Nickname = voiceRecognitionEvent.Nickname }),
                         Stateful = false,
                         CreatedAt = voiceRecognitionEvent.CreatedAt,
                         CreatedById = voiceRecognitionEvent.CreatedById,
@@ -224,7 +225,7 @@ public class AnswerDetailServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
         var storage = new InMemoryHotEventStorage();
-        var (service, roomId, questionId) = CreateService(appDbContext, storage, testSystemClock, true);
+        var (service, roomId, questionId, serializer) = CreateService(appDbContext, storage, testSystemClock, true);
         var users = new Faker<User>()
             .CustomInstantiator(f => new User(f.Random.Guid(), f.Person.FullName, f.Random.Hash()))
             .GenerateForever()
@@ -233,7 +234,6 @@ public class AnswerDetailServiceTest
         appDbContext.Users.AddRange(users);
         var rootFaker = new Faker();
 
-        var op = new JsonSerializerOptions { Encoder = JavaScriptEncoder.Create(UnicodeRanges.All) };
         var expectedDetails = new List<RoomQuestionAnswerDetailResponse.Detail>();
         foreach (var (startUtc, endUtc, generateTranscription, generateCodeEditor) in dates)
         {
@@ -242,7 +242,7 @@ public class AnswerDetailServiceTest
                 RoomId = roomId,
                 Type = EventType.ChangeRoomQuestionState,
                 Stateful = false,
-                Payload = JsonSerializer.Serialize(new RoomQuestionChangeEventPayload(questionId, RoomQuestionStateType.Open, RoomQuestionStateType.Active), op),
+                Payload = serializer.SerializePayloadAsString(new RoomQuestionChangeEventPayload(questionId, RoomQuestionStateType.Open, RoomQuestionStateType.Active)),
                 EventSenderId = rootFaker.PickRandom(users).Id,
                 CreateDate = startUtc,
             });
@@ -251,7 +251,7 @@ public class AnswerDetailServiceTest
                 RoomId = roomId,
                 Type = EventType.ChangeRoomQuestionState,
                 Stateful = false,
-                Payload = JsonSerializer.Serialize(new RoomQuestionChangeEventPayload(questionId, RoomQuestionStateType.Active, RoomQuestionStateType.Closed), op),
+                Payload = serializer.SerializePayloadAsString(new RoomQuestionChangeEventPayload(questionId, RoomQuestionStateType.Active, RoomQuestionStateType.Closed)),
                 EventSenderId = rootFaker.PickRandom(users).Id,
                 CreateDate = endUtc,
             });
@@ -279,7 +279,7 @@ public class AnswerDetailServiceTest
                         Id = voiceRecognitionEvent.Id,
                         RoomId = roomId,
                         Type = EventType.VoiceRecognition,
-                        Payload = JsonSerializer.Serialize(new { Message = voiceRecognitionEvent.Message, Nickname = voiceRecognitionEvent.Nickname }, op),
+                        Payload = serializer.SerializePayloadAsString(new { Message = voiceRecognitionEvent.Message, Nickname = voiceRecognitionEvent.Nickname }),
                         Stateful = false,
                         CreateDate = voiceRecognitionEvent.CreatedAt,
                         EventSenderId = voiceRecognitionEvent.CreatedById,
@@ -354,7 +354,7 @@ public class AnswerDetailServiceTest
         };
     }
 
-    private static (AnswerDetailService Service, Guid RoomId, Guid QuestionId) CreateService(AppDbContext db, IHotEventStorage storage, ISystemClock clock, bool addQueuedRoomEvent)
+    private static (AnswerDetailService Service, Guid RoomId, Guid QuestionId, IRoomEventSerializer Serializer) CreateService(AppDbContext db, IHotEventStorage storage, ISystemClock clock, bool addQueuedRoomEvent)
     {
         var user = new User("test user", "ID");
         db.Users.Add(user);
@@ -389,8 +389,9 @@ public class AnswerDetailServiceTest
         var userAccessor = new CurrentUserAccessor();
         userAccessor.SetUser(user);
 
-        var service = new AnswerDetailService(clock, new RoomEventProviderFactory(storage, db), db);
-        return (service, room.Id, question.Id);
+        var jsonRoomEventSerializer = new JsonRoomEventSerializer();
+        var service = new AnswerDetailService(clock, new RoomEventProviderFactory(storage, db), db, jsonRoomEventSerializer);
+        return (service, room.Id, question.Id, jsonRoomEventSerializer);
     }
 
     private class TranscriptionFakeData

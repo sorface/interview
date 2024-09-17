@@ -7,7 +7,7 @@ using Interview.Domain.Rooms.RoomQuestions;
 
 namespace Interview.Domain.Events.Events.Serializers;
 
-public sealed class JsonRoomEventSerializer : IRoomEventSerializer
+public sealed class JsonRoomEventSerializer : IRoomEventSerializer, IRoomEventDeserializer
 {
     private static readonly JsonSerializerOptions _options = new()
     {
@@ -26,5 +26,10 @@ public sealed class JsonRoomEventSerializer : IRoomEventSerializer
     public string SerializePayloadAsString<T>(T? payload)
     {
         return payload is null ? "{}" : JsonSerializer.Serialize(payload, payload.GetType(), _options);
+    }
+
+    public T? Deserialize<T>(string? payload)
+    {
+        return payload is null ? default : JsonSerializer.Deserialize<T>(payload, _options);
     }
 }

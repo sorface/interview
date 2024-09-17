@@ -15,6 +15,7 @@ using Interview.Infrastructure.Users;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Internal;
+using NSpecifications;
 
 namespace Interview.DependencyInjection;
 
@@ -34,7 +35,9 @@ public static class ServiceCollectionExt
         self.AddSingleton<IRoomEventDispatcher, RoomEventDispatcher>();
         self.AddSingleton<ISystemClock, SystemClock>();
         self.AddSingleton(option.AdminUsers);
-        self.AddSingleton<IRoomEventSerializer, JsonRoomEventSerializer>();
+        var serializer = new JsonRoomEventSerializer();
+        self.AddSingleton<IRoomEventSerializer>(serializer);
+        self.AddSingleton<IRoomEventDeserializer>(serializer);
 
         self.AddScoped(typeof(ArchiveService<>));
 
