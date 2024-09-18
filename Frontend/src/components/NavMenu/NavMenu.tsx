@@ -64,13 +64,12 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
   };
 
   const handleMouseLeave = () => {
+    setSelectedCategory(null);
+    setQuestionsClicked(false);
     if (bigScreen) {
       return;
     }
-
     setCollapsed(true);
-    setSelectedCategory(null);
-    setQuestionsClicked(false);
   };
 
   const handleCategoryClick = (category: Category) => {
