@@ -13,6 +13,9 @@ import { Icon } from '../Icon/Icon';
 import { IconNames } from '../../../../constants';
 import { Button } from '../../../../components/Button/Button';
 import { RoomDateAndTime } from '../../../../components/RoomDateAndTime/RoomDateAndTime';
+import { Modal } from '../../../../components/Modal/Modal';
+import { ModalWarningContent } from '../../../../components/ModalWarningContent/ModalWarningContent';
+import { ModalFooter } from '../../../../components/ModalFooter/ModalFooter';
 
 import './RoomQuestionPanel.css';
 
@@ -36,6 +39,7 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
 }) => {
   const localizationCaptions = useLocalizationCaptions();
   const [roomQuestionEvaluation, setRoomQuestionEvaluation] = useState<RoomQuestionEvaluationValue | null>(null);
+  const [reviewWarning, setReviewWarning] = useState(false);
 
   const {
     apiMethodState: apiSendActiveQuestionState,
@@ -165,10 +169,19 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
     });
   };
 
+  const handleReviewWarningOpen = () => {
+    setReviewWarning(true);
+  };
+
+  const handleReviewWarningClose = () => {
+    setReviewWarning(false);
+  };
+
   const handleStartReviewRoom = useCallback(() => {
     if (!room?.id) {
       throw new Error('Room id not found');
     }
+    setReviewWarning(false);
     fetchRoomStartReview(room.id);
   }, [room?.id, fetchRoomStartReview]);
 
@@ -276,7 +289,7 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
             <Button
               className='w-full flex items-center'
               variant='active'
-              onClick={nextQuestion ? handleNextQuestion : handleStartReviewRoom}
+              onClick={nextQuestion ? handleNextQuestion : handleReviewWarningOpen}
             >
               {roomQuestionsLoading || loadingRoomActiveQuestion || loadingRoomStartReview ? (
                 <Loader />
@@ -296,6 +309,21 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
               )}
             </Button>
           </div>
+          <Modal
+            open={reviewWarning}
+            contentLabel=''
+            onClose={handleReviewWarningClose}
+          >
+            <ModalWarningContent
+              captionLine1={localizationCaptions[LocalizationKey.StartReviewRoom]}
+              captionLine2={localizationCaptions[LocalizationKey.StartReviewRoomModalTitle]}
+              iconName={IconNames.HelpCircle}
+            />
+            <ModalFooter>
+              <Button onClick={handleReviewWarningClose}>{localizationCaptions[LocalizationKey.Cancel]}</Button>
+              <Button onClick={handleStartReviewRoom} variant='active'>{localizationCaptions[LocalizationKey.Save]}</Button>
+            </ModalFooter>
+          </Modal>
         </>
       )}
     </div>
