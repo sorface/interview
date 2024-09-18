@@ -170,6 +170,8 @@ public class ServiceConfigurator
 
         serviceCollection.AddAppServices(serviceOption);
 
+        serviceCollection.AddSingleton<IDistributedLockStorage, DistributedLockStorage>();
+
         serviceCollection
             .AddSingleton<ITicketStore, DistributedCacheTicketStore>()
             .AddSession()
