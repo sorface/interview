@@ -9,14 +9,17 @@ public class SorfacePrincipalValidator
     private readonly ILogger<SorfacePrincipalValidator> _logger;
     private readonly SorfaceTokenService _sorfaceTokenService;
     private readonly SemaphoreLockProvider<string> _semaphoreLockProvider;
+    private readonly IDistributedLockStorage _distributedLockStorage;
 
     public SorfacePrincipalValidator(ILogger<SorfacePrincipalValidator> logger,
                                      SorfaceTokenService sorfaceTokenService,
-                                     SemaphoreLockProvider<string> semaphoreLockProvider)
+                                     SemaphoreLockProvider<string> semaphoreLockProvider,
+                                     IDistributedLockStorage distributedLockStorage)
     {
         _logger = logger;
         _sorfaceTokenService = sorfaceTokenService;
         _semaphoreLockProvider = semaphoreLockProvider;
+        _distributedLockStorage = distributedLockStorage;
     }
 
     public async Task ValidateAsync(CookieValidatePrincipalContext context)
@@ -69,6 +72,14 @@ public class SorfacePrincipalValidator
 
                 try
                 {
+                    if (await _distributedLockStorage.IsLockAsync(refreshToken))
+                    {
+                        _logger.LogDebug("double refresh {} access token locked", refreshToken);
+                        return;
+                    }
+
+                    await _distributedLockStorage.LockAsync(refreshToken, TimeSpan.FromSeconds(30));
+
                     _logger.LogDebug($"Start refresh ACCESS_TOKEN with lock");
 
                     await RefreshAccessTokenAsync(context, refreshToken, context.HttpContext.RequestAborted);
@@ -127,6 +138,7 @@ public class SorfacePrincipalValidator
         catch (Exception ex)
         {
             _logger.LogDebug("token refresh error {}", ex.Message);
+            context.RejectPrincipal();
             return;
         }
 
