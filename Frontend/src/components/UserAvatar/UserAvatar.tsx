@@ -18,7 +18,7 @@ const getSizeClassName = (size: UserAvatarProps['size']) => {
     case 's':
       return 'w-2.25 h-2.25';
     case 'xs':
-      return 'w-1 h-1';
+      return 'w-1 h-1 items-end';
     default:
       return '';
   }

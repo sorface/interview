@@ -17,7 +17,7 @@ import { parseWsMessage } from './utils/parseWsMessage';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
 import { RoomIdParam, roomsApiDeclaration } from '../../../../apiDeclarations';
 import { EventsSearch } from '../../../../types/event';
-import { UserType } from '../../../../types/user';
+import { User, UserType } from '../../../../types/user';
 import { useReactionsStatus } from '../../hooks/useReactionsStatus';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
@@ -64,11 +64,6 @@ interface PeerMeta {
   screenShare: boolean;
 }
 
-const createMessage = (body: { userNickname: string; value: string; createdAt: string; }): Transcript => ({
-  frontendId: randomId(),
-  ...body,
-});
-
 const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string, toChat: boolean) => {
   const roomEvents = roomEventsSearch[type];
   if (!roomEvents) {
@@ -77,17 +72,21 @@ const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string, toCh
   return roomEvents.map(chatMessageEvent => {
     try {
       const chatMessageEventParsed = JSON.parse(chatMessageEvent?.payload);
-      return createMessage({
+      return {
+        id: chatMessageEvent.id,
+        userId: chatMessageEvent.createdById,
         userNickname: chatMessageEventParsed.Nickname || 'Nickname not found',
         value: chatMessageEventParsed.Message,
         createdAt: (new Date()).toISOString(),
-      });
+      };
     } catch {
-      return createMessage({
+      return {
+        id: randomId(),
+        userId: randomId(),
         userNickname: 'Message not found',
         value: '',
         createdAt: (new Date()).toISOString(),
-      });
+      };
     };
   }).reverse();
 };
@@ -103,6 +102,23 @@ const findUserByOrder = (videoOrder: Record<string, number>) => {
     return lounderUser[0];
   }
   return null;
+};
+
+const getAllUsers = (data: PeerMeta[], auth: User | null) => {
+  const users: Map<User['id'], Pick<User, 'nickname' | 'avatar'>> = new Map();
+  data.forEach(peer => {
+    users.set(peer.peerID, {
+      nickname: peer.nickname,
+      avatar: peer.avatar,
+    });
+  });
+  if (auth) {
+    users.set(auth.id, {
+      nickname: auth.nickname,
+      avatar: auth.avatar,
+    });
+  }
+  return users;
 };
 
 export const VideoChat: FunctionComponent<VideoChatProps> = ({
@@ -149,6 +165,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   const { activeReactions } = useReactionsStatus({
     lastMessage: lastWsMessage,
   });
+  const allUsers = getAllUsers(peers, auth);
 
   const createPeer = useCallback((to: string, forViewer?: boolean, screenShare?: boolean) => {
     if (viewerMode) {
@@ -248,11 +265,13 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     // const newTranscripts = getChatMessageEvents(roomEventsSearch, 'VoiceRecognition', false);
     const newTextMessages = [
       ...getChatMessageEvents(roomEventsSearch, 'ChatMessage', true),
-      createMessage({
+      {
+        id: randomId(),
+        userId: randomId(),
         userNickname: localizationCaptions[LocalizationKey.ChatWelcomeMessageNickname],
         value: `${localizationCaptions[LocalizationKey.ChatWelcomeMessage]}, ${auth?.nickname}.`,
         createdAt: (new Date()).toISOString(),
-      }),
+      },
     ];
     setTextMessages(newTextMessages);
     // AiAssistant
@@ -543,11 +562,13 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           setTextMessages(transcripts => limitLength(
             [
               ...transcripts,
-              createMessage({
+              {
+                id: parsedData.Id,
+                userId: parsedData.CreatedById,
                 userNickname: parsedData.Value.Nickname,
                 value: parsedData.Value.Message,
                 createdAt: parsedData.CreatedAt,
-              }),
+              },
             ],
             transcriptsMaxLength
           ));
@@ -709,6 +730,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         <div className={`absolute top-0 h-full bg-wrap w-full ${messagesChatEnabled ? 'visible' : 'invisible'} z-1`}>
           <MessagesChat
             textMessages={textMessages}
+            allUsers={allUsers}
             onMessageSubmit={handleTextMessageSubmit}
           />
         </div>
