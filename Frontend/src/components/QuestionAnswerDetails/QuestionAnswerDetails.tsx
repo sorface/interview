@@ -12,17 +12,21 @@ import { CodeEditor } from '../CodeEditor/CodeEditor';
 import { CodeEditorLang } from '../../types/question';
 import { Theme, ThemeContext } from '../../context/ThemeContext';
 import { Button } from '../Button/Button';
+import { ChatMessage } from '../../pages/Room/components/VideoChat/ChatMessage';
+import { User } from '../../types/user';
 
 interface QuestionAnswerDetailsProps {
   roomId: string;
   questionId: string;
   questionTitle: string;
+  allUsers: Map<User['id'], Pick<User, 'nickname' | 'avatar'>>;
 }
 
 export const QuestionAnswerDetails: FunctionComponent<QuestionAnswerDetailsProps> = ({
   roomId,
   questionId,
   questionTitle,
+  allUsers,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
   const { themeInUi } = useContext(ThemeContext);
@@ -116,9 +120,13 @@ export const QuestionAnswerDetails: FunctionComponent<QuestionAnswerDetailsProps
           </div>
         )}
         {data?.details.map(detail => detail.transcription.map(transcription => (
-          <Typography key={transcription.id} size='m'>
-            {transcription.user.nickname}: {transcription.payload}
-          </Typography>
+          <ChatMessage
+            key={transcription.id}
+            createdAt={transcription.createdAt}
+            message={transcription.payload}
+            nickname={transcription.user.nickname}
+            avatar={allUsers.get(transcription.user.id)?.avatar}
+          />
         )))}
       </div>
     </div>

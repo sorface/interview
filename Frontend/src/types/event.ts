@@ -8,6 +8,8 @@ export interface Event {
 }
 
 export type EventsSearch = Record<string, Array<{
+  id: string;
+  createdById: string;
   trype: string;
   payload: string;
 }>>;

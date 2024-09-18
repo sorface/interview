@@ -64,6 +64,7 @@ export const RoomAnayticsDetails: FunctionComponent<RoomAnayticsDetailsProps> = 
           questionId={openedQuestion.id}
           questionTitle={openedQuestion.value}
           roomId={roomId || ''}
+          allUsers={allUsers}
         />
       )}
     </div>

@@ -14,6 +14,7 @@
 .items-center { align-items: center; }
 .items-stretch { align-items: stretch; }
 .items-baseline { align-items: baseline; }
+.items-end { align-items: flex-end; }
 .text-blue-main { color: var(--blue-main); }
 .text-blue-light { color: var(--blue-light); }
 .text-blue-dark { color: var(--blue-dark); }

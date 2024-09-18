@@ -1,4 +1,4 @@
-import { FunctionComponent, useRef, KeyboardEvent, useEffect, Fragment } from 'react';
+import { FunctionComponent, useRef, KeyboardEvent, useEffect } from 'react';
 import { Transcript } from '../../../../types/transcript';
 import { Theme } from '../../../../context/ThemeContext';
 import { LocalizationKey } from '../../../../localization';
@@ -6,33 +6,25 @@ import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptio
 import { Button } from '../../../../components/Button/Button';
 import { Gap } from '../../../../components/Gap/Gap';
 import { useThemeClassName } from '../../../../hooks/useThemeClassName';
-import { Typography } from '../../../../components/Typography/Typography';
-import { padTime } from '../../../../utils/padTime';
 import { IconNames } from '../../../../constants';
 import { Icon } from '../Icon/Icon';
+import { ChatMessage } from './ChatMessage';
+import { User } from '../../../../types/user';
 
 import './MessagesChat.css';
 
 interface MessagesChatProps {
   textMessages: Transcript[];
+  allUsers: Map<User['id'], Pick<User, 'nickname' | 'avatar'>>;
   onMessageSubmit: (message: string) => void;
 }
 
-const formatTime = (value: Date) => {
-  const hours = padTime(value.getHours());
-  const minutes = padTime(value.getMinutes());
-  return `${hours}:${minutes}`;
-};
-
 export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
   textMessages,
+  allUsers,
   onMessageSubmit,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
-  const messageClassName = useThemeClassName({
-    [Theme.Dark]: 'bg-dark-history-hover',
-    [Theme.Light]: 'bg-grey1',
-  });
   const chatButtonVariant = useThemeClassName({
     [Theme.Dark]: 'inverted' as const,
     [Theme.Light]: 'invertedActive' as const,
@@ -75,19 +67,13 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
       <Gap sizeRem={0.75} />
       <div className='videochat-transcripts px-0.75' ref={videochatTranscriptsRef}>
         {textMessages.map(transcript => (
-          <Fragment key={transcript.frontendId}>
-            <div
-              className={`${messageClassName} flex flex-col py-0.25 px-0.5 rounded-0.5`}
-            >
-              <Typography size='s' bold>{transcript.userNickname}</Typography>
-              <Gap sizeRem={0.25} />
-              <Typography size='s'>{transcript.value}</Typography>
-              <div className='text-right'>
-                <Typography size='xs' secondary>{formatTime(new Date(transcript.createdAt))}</Typography>
-              </div>
-            </div>
-            <Gap sizeRem={0.25} />
-          </Fragment>
+          <ChatMessage
+            key={transcript.id}
+            createdAt={transcript.createdAt}
+            message={transcript.value}
+            nickname={transcript.userNickname}
+            avatar={allUsers.get(transcript.userId)?.avatar}
+          />
         ))}
       </div>
       <Gap sizeRem={0.5} />

@@ -1,5 +1,6 @@
 export interface Transcript {
-  frontendId: string;
+  id: string;
+  userId: string;
   userNickname: string;
   value: string;
   createdAt: string;

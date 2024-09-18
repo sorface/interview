@@ -31,10 +31,22 @@ import { ModalFooter } from '../../components/ModalFooter/ModalFooter';
 import { ModalWarningContent } from '../../components/ModalWarningContent/ModalWarningContent';
 import { QuestionAnswerDetails } from '../../components/QuestionAnswerDetails/QuestionAnswerDetails';
 import { Icon } from '../Room/components/Icon/Icon';
+import { User } from '../../types/user';
 
 const upsertRoomReviewDebounceMs = 1000;
 export const sortMyRoomReviews = (r1: MyRoomQuestionEvaluation, r2: MyRoomQuestionEvaluation) =>
   r1.order - r2.order;
+
+const getAllUsers = (data: Room) => {
+  const users: Map<User['id'], Pick<User, 'nickname' | 'avatar'>> = new Map();
+  data.participants.forEach(participant => {
+    users.set(participant.id, {
+      nickname: participant.nickname,
+      avatar: participant.avatar,
+    });
+  });
+  return users;
+};
 
 export const RoomReview: FunctionComponent = () => {
   const auth = useContext(AuthContext);
@@ -96,6 +108,7 @@ export const RoomReview: FunctionComponent = () => {
     participant => participant.type === 'Examinee'
   );
   const reviewCompleted = myRoomReview?.state === 'Closed';
+  const allUsers = room ? getAllUsers(room) : new Map<User['id'], Pick<User, 'nickname' | 'avatar'>>();
 
   useEffect(() => {
     if (!id) {
@@ -300,6 +313,7 @@ export const RoomReview: FunctionComponent = () => {
             roomId={room.id}
             questionId={openedAnswerDetailsId || ''}
             questionTitle={myQuestionEvaluations?.find(e => e.id === openedAnswerDetailsId)?.value || ''}
+            allUsers={allUsers}
           />
           <ModalFooter>
             <Button onClick={handleDetailsClose}>
