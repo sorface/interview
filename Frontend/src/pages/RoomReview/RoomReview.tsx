@@ -21,7 +21,7 @@ import { Typography } from '../../components/Typography/Typography';
 import { RoomReview as RoomReviewType } from '../../types/room';
 import { RoomParticipants } from '../../components/RoomParticipants/RoomParticipants';
 import { Button } from '../../components/Button/Button';
-import { IconNames, roomReviewMaxLength, toastSuccessOptions } from '../../constants';
+import { IconNames, roomReviewMaxLength } from '../../constants';
 import { InfoBlock } from '../../components/InfoBlock/InfoBlock';
 import { AuthContext } from '../../context/AuthContext';
 import { Textarea } from '../../components/Textarea/Textarea';
@@ -111,7 +111,7 @@ export const RoomReview: FunctionComponent = () => {
       return;
     }
     handleCloseCloseModal();
-    toast.success(localizationCaptions[LocalizationKey.Saved], toastSuccessOptions);
+    toast.success(localizationCaptions[LocalizationKey.Saved]);
   }, [roomCloseCode, localizationCaptions]);
 
   useEffect(() => {
@@ -119,7 +119,7 @@ export const RoomReview: FunctionComponent = () => {
       return;
     }
     handleCloseSaveModal();
-    toast.success(localizationCaptions[LocalizationKey.Saved], toastSuccessOptions);
+    toast.success(localizationCaptions[LocalizationKey.Saved]);
     fetchMyRoomReview(id || '');
   }, [id, completedRoomReview, localizationCaptions, fetchMyRoomReview]);
 

@@ -7,7 +7,7 @@ import { HeaderWithLink } from '../../components/HeaderWithLink/HeaderWithLink';
 import { Loader } from '../../components/Loader/Loader';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { SubmitField } from '../../components/SubmitField/SubmitField';
-import { pathnames, toastSuccessOptions } from '../../constants';
+import { pathnames } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
@@ -70,7 +70,7 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }
     if (!createdCategoryId) {
       return;
     }
-    toast.success(localizationCaptions[LocalizationKey.CategoryCreatedSuccessfully], toastSuccessOptions);
+    toast.success(localizationCaptions[LocalizationKey.CategoryCreatedSuccessfully]);
     navigate(pathnames.categories);
   }, [createdCategoryId, localizationCaptions, navigate]);
 
@@ -78,7 +78,7 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean; }> = ({ edit }
     if (!updatedCategoryId) {
       return;
     }
-    toast.success(localizationCaptions[LocalizationKey.CategoryUpdatedSuccessfully], toastSuccessOptions);
+    toast.success(localizationCaptions[LocalizationKey.CategoryUpdatedSuccessfully]);
     navigate(pathnames.categories);
   }, [updatedCategoryId, localizationCaptions, navigate]);
 
