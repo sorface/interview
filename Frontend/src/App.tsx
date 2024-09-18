@@ -8,8 +8,9 @@ import { Loader } from './components/Loader/Loader';
 import { ThemeProvider } from './context/ThemeContext';
 import { LocalizationProvider } from './context/LocalizationContext';
 import { useLogout } from './hooks/useLogout';
-import { unauthorizedHttpCode } from './constants';
+import { IconNames, unauthorizedHttpCode } from './constants';
 import { LoadingAccountError } from './components/LoadingAccountError/LoadingAccountError';
+import { Icon } from './pages/Room/components/Icon/Icon';
 
 import './App.css';
 
@@ -52,18 +53,20 @@ export const App: FunctionComponent = () => {
         toastOptions={{
           duration: 3000,
           style: {
-            background: 'var(--bg)',
+            background: 'var(--toast-success)',
             color: 'var(--text)',
           },
           success: {
+            icon: (<Icon name={IconNames.Checkmark} />),
             style: {
-              background: 'var(--bg-success)',
+              background: 'var(--toast-success)',
               color: 'var(--text)',
             },
           },
           error: {
+            icon: (<Icon name={IconNames.Information} />),
             style: {
-              background: 'var(--red)',
+              background: 'var(--toast-error)',
               color: 'var(--text)',
             },
           },

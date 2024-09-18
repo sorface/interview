@@ -1,6 +1,7 @@
 import { FunctionComponent, ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { SendMessage } from 'react-use-websocket';
 import Peer from 'simple-peer';
+import toast from 'react-hot-toast';
 import { AuthContext } from '../../../../context/AuthContext';
 import { Transcript } from '../../../../types/transcript';
 import { VideoChatVideo } from './VideoChatVideo';
@@ -508,6 +509,28 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       console.error('parse ws message error: ', err);
     }
   }, [auth, lastWsMessage, viewerMode, addPeer, createPeer, addPeerStream, removePeerStream]);
+
+  useEffect(() => {
+    if (!lastWsMessage) {
+      return;
+    }
+    try {
+      const parsedMessage = parseWsMessage(lastWsMessage?.data);
+      const parsedPayload = parsedMessage?.Value;
+      switch (parsedMessage?.Type) {
+        case 'user joined':
+          const fromUser = parsedPayload.From;
+          toast.success(
+            `${fromUser.Nickname} ${localizationCaptions[LocalizationKey.UserConnectedToRoom]}`
+          );
+          break;
+        default:
+          break;
+      }
+    } catch (err) {
+      console.error('parse ws message error: ', err);
+    }
+  }, [lastWsMessage, localizationCaptions]);
 
   useEffect(() => {
     if (!lastWsMessage) {

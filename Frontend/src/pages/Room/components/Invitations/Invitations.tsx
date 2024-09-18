@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../../localization';
 import { RoomInvite } from '../../../../types/room';
-import { IconNames, inviteParamName, pathnames, toastSuccessOptions } from '../../../../constants';
+import { IconNames, inviteParamName, pathnames } from '../../../../constants';
 import { UserType } from '../../../../types/user';
 import { Icon } from '../Icon/Icon';
 import { Loader } from '../../../../components/Loader/Loader';
@@ -52,7 +52,7 @@ export const Invitations: FunctionComponent<InvitationsProps> = ({
 
   const handleCopyToClipboard = (link: string) => {
     window.navigator.clipboard.writeText(link);
-    toast.success(localizationCaptions[LocalizationKey.CopiedToClipboard], toastSuccessOptions);
+    toast.success(localizationCaptions[LocalizationKey.CopiedToClipboard]);
   };
 
   return (

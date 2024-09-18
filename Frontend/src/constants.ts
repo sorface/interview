@@ -75,10 +75,6 @@ export const reactionIcon: Record<string, IconNames> = {
   CodeEditor: IconNames.CodeEditor,
 }
 
-export const toastSuccessOptions = {
-  icon: '👌',
-};
-
 export const enum EventName {
   CodeEditor = 'CodeEditor',
   CodeEditorLanguage = 'CodeEditorLanguage',

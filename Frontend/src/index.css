@@ -89,6 +89,8 @@
   --room-tools-panel-bg: #0B152940;
   --code-editor-tools-panel-bg: #233149;
   --code-editor-select-border: var(--dark-input);
+  --toast-success: var(--dark-green);
+  --toast-error: var(--dark-red);
 }
 
 :root[data-theme="Light"] {
@@ -128,6 +130,8 @@
   --input-border-color: var(--grey2);
   --code-editor-tools-panel-bg: var(--white);
   --code-editor-select-border: var(--input-border-color);
+  --toast-success: var(--green-light);
+  --toast-error: var(--red-light);
 }
 
 :root[data-color-transition="enabled"] * {

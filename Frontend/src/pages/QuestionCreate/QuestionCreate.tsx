@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
 import { CreateQuestionBody, GetCategoriesParams, UpdateQuestionBody, categoriesApiDeclaration, questionsApiDeclaration } from '../../apiDeclarations';
 import { Loader } from '../../components/Loader/Loader';
-import { IconNames, toastSuccessOptions } from '../../constants';
+import { IconNames } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { CodeEditorLang, Question, QuestionAnswer, QuestionType } from '../../types/question';
 import { LocalizationKey } from '../../localization';
@@ -118,7 +118,7 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
     if (!createdQuestionId) {
       return;
     }
-    toast.success(localizationCaptions[LocalizationKey.QuestionCreatedSuccessfully], toastSuccessOptions);
+    toast.success(localizationCaptions[LocalizationKey.QuestionCreatedSuccessfully]);
     onClose();
   }, [createdQuestionId, localizationCaptions, onClose]);
 
@@ -126,7 +126,7 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
     if (!updatedQuestionId) {
       return;
     }
-    toast.success(localizationCaptions[LocalizationKey.QuestionUpdatedSuccessfully], toastSuccessOptions);
+    toast.success(localizationCaptions[LocalizationKey.QuestionUpdatedSuccessfully]);
     onClose();
   }, [updatedQuestionId, localizationCaptions, onClose]);
 

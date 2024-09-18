@@ -5,7 +5,7 @@ import { RoomInvite } from '../../types/room';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { Icon } from '../../pages/Room/components/Icon/Icon';
-import { IconNames, inviteParamName, pathnames, toastSuccessOptions } from '../../constants';
+import { IconNames, inviteParamName, pathnames } from '../../constants';
 import { Loader } from '../Loader/Loader';
 import { RoomCreateField } from '../../pages/RoomCreate/RoomCreateField/RoomCreateField';
 import { Typography } from '../Typography/Typography';
@@ -42,7 +42,7 @@ export const RoomInvitations: FunctionComponent<RoomInvitationsProps> = ({
 
   const handleCopyToClipboard = (link: string) => {
     window.navigator.clipboard.writeText(link);
-    toast.success(localizationCaptions[LocalizationKey.CopiedToClipboard], toastSuccessOptions);
+    toast.success(localizationCaptions[LocalizationKey.CopiedToClipboard]);
   };
 
   return (
