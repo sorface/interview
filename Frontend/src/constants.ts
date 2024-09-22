@@ -81,4 +81,7 @@ export const enum EventName {
   CodeEditorCursor = 'CodeEditorCursor',
 }
 
-export const unauthorizedHttpCode = 401;
+export enum HttpResponseCode {
+  Unauthorized = 401,
+  Forbidden = 403,
+};

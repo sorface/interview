@@ -8,7 +8,7 @@ import { Loader } from './components/Loader/Loader';
 import { ThemeProvider } from './context/ThemeContext';
 import { LocalizationProvider } from './context/LocalizationContext';
 import { useLogout } from './hooks/useLogout';
-import { IconNames, unauthorizedHttpCode } from './constants';
+import { IconNames, HttpResponseCode } from './constants';
 import { LoadingAccountError } from './components/LoadingAccountError/LoadingAccountError';
 import { Icon } from './pages/Room/components/Icon/Icon';
 
@@ -36,7 +36,7 @@ export const App: FunctionComponent = () => {
         </div>
       )
     }
-    if (error && code !== unauthorizedHttpCode) {
+    if (error && code !== HttpResponseCode.Unauthorized) {
       return (
         <LoadingAccountError onAccountReset={handlePageReset} />
       );
