@@ -45,6 +45,7 @@ export const QuestionsArchive: FunctionComponent = () => {
     <li key={question.id} className='pb-0.25'>
       <QuestionItem
         question={question}
+        categoryName={question.category.name}
         primary
         contextMenu={{
           position: 'bottom-right',

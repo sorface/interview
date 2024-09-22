@@ -21,6 +21,7 @@ interface QuestionItemProps {
   checked?: boolean;
   checkboxLabel?: ReactNode;
   mark?: number;
+  categoryName?: string;
   primary?: boolean;
   contextMenu?: Omit<ContextMenuProps, 'toggleContent'>;
   bgSelected?: boolean;
@@ -36,6 +37,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
   checked,
   checkboxLabel,
   mark,
+  categoryName,
   primary,
   contextMenu,
   bgSelected,
@@ -91,10 +93,18 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
           <Gap sizeRem={1.5} horizontal />
         </>
       )}
-      <div className={`${!accordionDisabled ? 'px-0.75' : ''}`}>
+      <div className={`flex items-baseline ${!accordionDisabled ? 'px-0.75' : ''}`}>
         <Typography size='m' bold>
           {question.value}
         </Typography>
+        {categoryName && (
+          <>
+            <Gap sizeRem={1.15} horizontal />
+            <Typography size='m' secondary>
+              {question.category.name}
+            </Typography>
+          </>
+        )}
       </div>
       <div className='ml-auto'>
         {contextMenu && (

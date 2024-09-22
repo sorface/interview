@@ -30,6 +30,11 @@ const createFakeQuestion = (roomQuestion: RoomQuestion): Question => ({
   tags: [],
   answers: [],
   codeEditor: null,
+  category: {
+    id: '',
+    name: '',
+    parentId: '',
+  },
 });
 
 const generateUserOpinion = (userReview: AnalyticsUserReview) => ({

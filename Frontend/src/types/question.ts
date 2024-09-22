@@ -45,4 +45,9 @@ export interface Question {
     lang: CodeEditorLang;
   } | null;
   answers: QuestionAnswer[];
+  category: {
+    id: string;
+    name: string;
+    parentId: string;
+  };
 }
