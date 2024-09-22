@@ -226,6 +226,7 @@ export const enum LocalizationKey {
   RoomStartDescription,
   NoData,
   UserConnectedToRoom,
+  NotEnoughRights,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -455,6 +456,7 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.RoomStartDescription]: 'Once the interview begins, the first question from the prepared list will be asked',
     [LocalizationKey.NoData]: 'No data',
     [LocalizationKey.UserConnectedToRoom]: 'connected',
+    [LocalizationKey.NotEnoughRights]: 'Insufficient rights to view content',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.SpeechRecognitionLang]: 'ru',
@@ -682,5 +684,6 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.RoomStartDescription]: 'После начала собеседования будет установлен первый вопрос из подготовленного списка',
     [LocalizationKey.NoData]: 'Нет данных',
     [LocalizationKey.UserConnectedToRoom]: 'подключился(ась)',
+    [LocalizationKey.NotEnoughRights]: 'Недостаточно прав для просмотра содержимого',
   },
 }

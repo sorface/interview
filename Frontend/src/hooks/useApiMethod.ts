@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useReducer } from 'react';
 import { REACT_APP_BACKEND_URL } from '../config';
-import { pathnames, unauthorizedHttpCode } from '../constants';
+import { pathnames, HttpResponseCode } from '../constants';
 import { ApiContract } from '../types/apiContracts';
 import { useLogout } from './useLogout';
 import { useNavigate } from 'react-router-dom';
@@ -165,7 +165,7 @@ export const useApiMethod = <ResponseData, RequestData = AnyObject>(apiContractC
           name: 'setCode',
           payload: response.status,
         });
-        if (response.status === unauthorizedHttpCode) {
+        if (response.status === HttpResponseCode.Unauthorized) {
           logout();
           return;
         }
