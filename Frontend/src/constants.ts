@@ -82,6 +82,7 @@ export const enum EventName {
 }
 
 export enum HttpResponseCode {
+  Ok = 200,
   Unauthorized = 401,
   Forbidden = 403,
 };

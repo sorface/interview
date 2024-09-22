@@ -1,6 +1,6 @@
 import { ChangeEvent, Fragment, FunctionComponent, useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useParams } from 'react-router-dom';
+import { generatePath, Navigate, useParams } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
@@ -21,7 +21,7 @@ import { Typography } from '../../components/Typography/Typography';
 import { RoomReview as RoomReviewType } from '../../types/room';
 import { RoomParticipants } from '../../components/RoomParticipants/RoomParticipants';
 import { Button } from '../../components/Button/Button';
-import { IconNames, roomReviewMaxLength } from '../../constants';
+import { HttpResponseCode, IconNames, pathnames, roomReviewMaxLength } from '../../constants';
 import { InfoBlock } from '../../components/InfoBlock/InfoBlock';
 import { AuthContext } from '../../context/AuthContext';
 import { Textarea } from '../../components/Textarea/Textarea';
@@ -102,12 +102,17 @@ export const RoomReview: FunctionComponent = () => {
   const participant = room?.participants.find(
     participant => participant.id === auth?.id
   );
-  const canWriteReview = participant?.type === 'Expert';
+
+  const canWriteReview = participant ? participant.type === 'Expert' : true;
+  const reviewCompleted = myRoomReview ? myRoomReview.state === 'Closed' : false;
+  const shouldRedirectToAnalytics = (
+    (!canWriteReview || reviewCompleted) ||
+    (completedRoomReview || roomCloseCode === HttpResponseCode.Ok)
+  );
   const totalError = error || myQuestionEvaluationsError || myRoomReviewError;
   const examinee = room?.participants.find(
     participant => participant.type === 'Examinee'
   );
-  const reviewCompleted = myRoomReview?.state === 'Closed';
   const allUsers = room ? getAllUsers(room) : new Map<User['id'], Pick<User, 'nickname' | 'avatar'>>();
 
   useEffect(() => {
@@ -120,7 +125,7 @@ export const RoomReview: FunctionComponent = () => {
   }, [id, fetchData, fetchMyRoomReview, fetchMyRoomQuestionEvaluations]);
 
   useEffect(() => {
-    if (roomCloseCode !== 200) {
+    if (roomCloseCode !== HttpResponseCode.Ok) {
       return;
     }
     handleCloseCloseModal();
@@ -133,7 +138,6 @@ export const RoomReview: FunctionComponent = () => {
     }
     handleCloseSaveModal();
     toast.success(localizationCaptions[LocalizationKey.Saved]);
-    fetchMyRoomReview(id || '');
   }, [id, completedRoomReview, localizationCaptions, fetchMyRoomReview]);
 
   useEffect(() => {
@@ -213,6 +217,10 @@ export const RoomReview: FunctionComponent = () => {
     setOpenedAnswerDetailsId(null);
   };
 
+  if (shouldRedirectToAnalytics) {
+    return <Navigate to={generatePath(pathnames.roomAnalytics, { id })} replace />
+  }
+
   if (loading || !room || myQuestionEvaluationsLoading || myRoomReviewLoading) {
     return (
       <Loader />
@@ -252,57 +260,42 @@ export const RoomReview: FunctionComponent = () => {
           )}
         </InfoBlock>
         <Gap sizeRem={0.5} />
-        {reviewCompleted && (
-          <InfoBlock className='text-left flex flex-col'>
-            <Typography size='m' bold>{localizationCaptions[LocalizationKey.RoomReviewAlreadyGiven]}</Typography>
-          </InfoBlock>
-        )}
-        {!canWriteReview && (
-          <InfoBlock className='text-left flex flex-col'>
-            <Typography size='m' bold>{localizationCaptions[LocalizationKey.RoomReviewWaiting]}</Typography>
-          </InfoBlock>
-        )}
-        {(!reviewCompleted && canWriteReview) && (
-          <>
-            <InfoBlock className='text-left flex flex-col'>
-              <Typography size='s' bold>{localizationCaptions[LocalizationKey.CandidateOpinion]}</Typography>
-              <Gap sizeRem={1} />
-              <Textarea
-                className='h-3.625'
-                maxLength={roomReviewMaxLength}
-                showMaxLength={true}
-                value={roomReviewValue ?? myRoomReview?.review ?? ''}
-                onInput={handleReviewChange}
+        <InfoBlock className='text-left flex flex-col'>
+          <Typography size='s' bold>{localizationCaptions[LocalizationKey.CandidateOpinion]}</Typography>
+          <Gap sizeRem={1} />
+          <Textarea
+            className='h-3.625'
+            maxLength={roomReviewMaxLength}
+            showMaxLength={true}
+            value={roomReviewValue ?? myRoomReview?.review ?? ''}
+            onInput={handleReviewChange}
+          />
+          {upsertedRoomReview && (
+            <Typography size='s'>
+              <Icon name={IconNames.CheckmarkDone} />
+              {localizationCaptions[LocalizationKey.Saved]}
+            </Typography>
+          )}
+          {upsertRoomReviewLoading && (<Loader />)}
+          {upsertRoomReviewError && (
+            <Typography size='s' error>{localizationCaptions[LocalizationKey.Error]}: {upsertRoomReviewError}</Typography>
+          )}
+        </InfoBlock>
+        <Gap sizeRem={0.5} />
+        <InfoBlock className='text-left'>
+          <Typography size='xl' bold>{localizationCaptions[LocalizationKey.CandidateMarks]}</Typography>
+          <Gap sizeRem={2} />
+          {myQuestionEvaluations && myQuestionEvaluations.sort(sortMyRoomReviews).map((questionEvaluations, index, allMyQuestionEvaluations) => (
+            <Fragment key={questionEvaluations.id}>
+              <RoomReviewQuestionEvaluation
+                roomId={room.id}
+                questionEvaluations={questionEvaluations}
+                onDetailsOpen={() => handleDetailsOpen(questionEvaluations.id)}
               />
-              {upsertedRoomReview && (
-                <Typography size='s'>
-                  <Icon name={IconNames.CheckmarkDone} />
-                  {localizationCaptions[LocalizationKey.Saved]}
-                </Typography>
-              )}
-              {upsertRoomReviewLoading && (<Loader />)}
-              {upsertRoomReviewError && (
-                <Typography size='s' error>{localizationCaptions[LocalizationKey.Error]}: {upsertRoomReviewError}</Typography>
-              )}
-            </InfoBlock>
-            <Gap sizeRem={0.5} />
-            <InfoBlock className='text-left'>
-              <Typography size='xl' bold>{localizationCaptions[LocalizationKey.CandidateMarks]}</Typography>
-              <Gap sizeRem={2} />
-              {myQuestionEvaluations && myQuestionEvaluations.sort(sortMyRoomReviews).map((questionEvaluations, index, allMyQuestionEvaluations) => (
-                <Fragment key={questionEvaluations.id}>
-                  <RoomReviewQuestionEvaluation
-                    roomId={room.id}
-                    questionEvaluations={questionEvaluations}
-                    readOnly={reviewCompleted}
-                    onDetailsOpen={() => handleDetailsOpen(questionEvaluations.id)}
-                  />
-                  {index !== allMyQuestionEvaluations.length - 1 && (<Gap sizeRem={0.25} />)}
-                </Fragment>
-              ))}
-            </InfoBlock>
-          </>
-        )}
+              {index !== allMyQuestionEvaluations.length - 1 && (<Gap sizeRem={0.25} />)}
+            </Fragment>
+          ))}
+        </InfoBlock>
         <Gap sizeRem={1.75} />
         <Modal
           open={!!openedAnswerDetailsId}
@@ -374,18 +367,16 @@ export const RoomReview: FunctionComponent = () => {
               <Gap sizeRem={1} horizontal />
             </>
           )}
-          {(!reviewCompleted && canWriteReview) && (
-            <Button
-              variant='active'
-              onClick={handleOpenSaveModal}
-            >
-              {completeRoomReviewLoading ? (
-                <Loader />
-              ) : (
-                localizationCaptions[LocalizationKey.RoomReviewSave]
-              )}
-            </Button>
-          )}
+          <Button
+            variant='active'
+            onClick={handleOpenSaveModal}
+          >
+            {completeRoomReviewLoading ? (
+              <Loader />
+            ) : (
+              localizationCaptions[LocalizationKey.RoomReviewSave]
+            )}
+          </Button>
         </div>
         <Gap sizeRem={0.75} />
       </div>
