@@ -1,5 +1,5 @@
 import { FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
-import { useParams, Navigate, useNavigate } from 'react-router-dom';
+import { useParams, Navigate, useNavigate, generatePath } from 'react-router-dom';
 import useWebSocket from 'react-use-websocket';
 import toast from 'react-hot-toast';
 import {
@@ -57,6 +57,13 @@ import { sortRoomQuestion } from '../../utils/sortRoomQestions';
 import './Room.css';
 
 const connectingReadyState = 0;
+
+const getCloseRedirectLink = (roomId: string, currentUserExpert: boolean) => {
+  if (currentUserExpert) {
+    return generatePath(pathnames.roomReview, { id: roomId });
+  }
+  return generatePath(pathnames.home, { redirect: '' });
+};
 
 export const Room: FunctionComponent = () => {
   const navigate = useNavigate();
@@ -567,7 +574,7 @@ export const Room: FunctionComponent = () => {
   };
 
   if (roomInReview && id) {
-    return <Navigate to={pathnames.roomReview.replace(':id', id)} replace />;
+    return <Navigate to={getCloseRedirectLink(id, currentUserExpert)} replace />;
   }
 
   if (wsClosed) {
