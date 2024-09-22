@@ -31,6 +31,11 @@ const createFakeQuestion = (roomQuestion: MyRoomQuestionEvaluation): Question =>
   tags: [],
   answers: [],
   codeEditor: null,
+  category: {
+    id: '',
+    name: '',
+    parentId: '',
+  },
 });
 
 export const RoomReviewQuestionEvaluation: FunctionComponent<RoomReviewQuestionEvaluationProps> = ({
