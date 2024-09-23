@@ -11,12 +11,15 @@ public class AuthController : ControllerBase
 {
     private readonly OAuthServiceDispatcher _oAuthDispatcher;
     private readonly ILogger<AuthController> _logger;
+    private readonly SorfaceTokenService _sorfaceTokenService;
 
     public AuthController(OAuthServiceDispatcher oAuthDispatcher,
-                          ILogger<AuthController> logger)
+                          ILogger<AuthController> logger,
+                          SorfaceTokenService sorfaceTokenService)
     {
         _oAuthDispatcher = oAuthDispatcher;
         _logger = logger;
+        _sorfaceTokenService = sorfaceTokenService;
     }
 
     [HttpGet("login/{scheme}")]
@@ -64,9 +67,15 @@ public class AuthController : ControllerBase
     [HttpPost("logout")]
     [ProducesResponseType(200)]
     [ProducesResponseType(typeof(string), 400)]
-    public Task SignOutImpl()
+    public async Task SignOutImpl([FromServices] ICurrentUserAccessor currentUserAccessor)
     {
-        return HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme, new AuthenticationProperties());
+        currentUserAccessor.GetUserIdOrThrow();
+
+        var accessToken = await HttpContext.GetTokenAsync(SorfaceTokenDefaults.AccessTokenName);
+
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme, new AuthenticationProperties());
+
+        await _sorfaceTokenService.RevokeTokenAsync(HttpContext, accessToken);
     }
 
     [HttpPost("refresh")]

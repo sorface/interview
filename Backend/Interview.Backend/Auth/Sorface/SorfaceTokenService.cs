@@ -1,7 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Interview.Backend.Auth.Sorface;
 
@@ -55,6 +55,34 @@ public class SorfaceTokenService
         return jsonDocument.Deserialize<RefreshTokenObject>();
     }
 
+    public async Task RevokeTokenAsync(HttpContext httpContent, string? accessToken)
+    {
+        if (accessToken is null)
+        {
+            return;
+        }
+
+        var form = new List<KeyValuePair<string, string>> { new("token", $"{accessToken}"), };
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, _options.RevokeTokenEndpoint) { Content = new FormUrlEncodedContent(form), };
+
+        var chars = $"{_options.ClientId}:{_options.ClientSecret}";
+
+        var bytes = Encoding.UTF8.GetBytes(chars);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(bytes));
+
+        try
+        {
+            var httpClient = _httpClientFactory.CreateClient();
+
+            await httpClient.SendAsync(request, httpContent.RequestAborted);
+        }
+        catch (Exception e)
+        {
+            // ignored
+        }
+    }
+
     public async Task<JsonDocument> GetTokenPrincipalAsync(
         string? accessToken,
         CancellationToken cancellationToken = default)
@@ -85,22 +113,4 @@ public class SorfaceTokenService
 
         return JsonDocument.Parse(content);
     }
-}
-
-public class RefreshTokenObject
-{
-    [JsonPropertyName("access_token")]
-    public string? AccessToken { get; set; }
-
-    [JsonPropertyName("refresh_token")]
-    public string? RefreshToken { get; set; }
-
-    [JsonPropertyName("scope")]
-    public string? Scope { get; set; }
-
-    [JsonPropertyName("token_type")]
-    public string? TokenType { get; set; }
-
-    [JsonPropertyName("expires_in")]
-    public double? ExpiresIn { get; set; }
 }

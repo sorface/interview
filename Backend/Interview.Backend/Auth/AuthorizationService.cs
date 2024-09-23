@@ -16,6 +16,8 @@ public class AuthorizationService
 
     public string ClientSecret { get; set; } = string.Empty;
 
+    public string RevokeTokenEndpoint { get; set; } = string.Empty;
+
     public string ClaimsIssuer { get; set; } = string.Empty;
 
     public string CookieDomain { get; set; } = string.Empty;
