@@ -1,7 +1,6 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication;
 
 namespace Interview.Backend.Auth.Sorface;
@@ -114,17 +113,4 @@ public class SorfaceTokenService
 
         return JsonDocument.Parse(content);
     }
-}
-
-public class RefreshTokenObject
-{
-    [JsonPropertyName("access_token")] public string? AccessToken { get; set; }
-
-    [JsonPropertyName("refresh_token")] public string? RefreshToken { get; set; }
-
-    [JsonPropertyName("scope")] public string? Scope { get; set; }
-
-    [JsonPropertyName("token_type")] public string? TokenType { get; set; }
-
-    [JsonPropertyName("expires_in")] public double? ExpiresIn { get; set; }
 }
