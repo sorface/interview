@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Net.WebSockets;
 using System.Text.Json;
 using Interview.Backend.WebSocket.Events.Handlers;
+using Interview.Domain.Database;
 using Interview.Domain.Events.Storage;
 using Interview.Domain.Rooms.RoomParticipants;
 using Microsoft.IO;
@@ -69,6 +70,9 @@ public class WebSocketReader
         {
             return;
         }
+
+        var appDbContext = scopedServiceProvider.GetRequiredService<AppDbContext>();
+        appDbContext.ChangeTracker.Clear();
 
         await SaveEventAsync(room, user, deserializeResult, ct);
         var socketEventDetail = new SocketEventDetail(
