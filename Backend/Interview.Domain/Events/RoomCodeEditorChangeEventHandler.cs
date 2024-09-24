@@ -22,12 +22,12 @@ public class RoomCodeEditorChangeEventHandler
     public async Task HandleAsync(Guid roomId, bool enabled, CancellationToken cancellationToken)
     {
         var roomConfiguration = await _db.RoomConfiguration.Include(e => e.Room)
-            .FirstOrDefaultAsync(e => e.Room!.Id == roomId, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == roomId, cancellationToken);
         if (roomConfiguration is null)
         {
             roomConfiguration = new RoomConfiguration
             {
-                Room = await _db.Rooms.FirstAsync(e => e.Id == roomId, cancellationToken),
+                Id = roomId,
                 CodeEditorEnabled = enabled,
             };
             await _db.RoomConfiguration.AddAsync(roomConfiguration, cancellationToken);
