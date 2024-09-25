@@ -12,6 +12,7 @@ using Interview.Domain.Rooms.Records.Response.RoomStates;
 using Interview.Domain.Rooms.RoomInvites;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomParticipants.Service;
+using Interview.Domain.Rooms.RoomQuestionEvaluations;
 using Interview.Domain.Rooms.RoomQuestionReactions.Mappers;
 using Interview.Domain.Rooms.RoomQuestionReactions.Specifications;
 using Interview.Domain.Rooms.RoomQuestions;
@@ -633,11 +634,22 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         foreach (var analyticsQuestion in analytics.Questions!)
         {
             analyticsQuestion.Users = await GetUsersByQuestionIdAsync(analyticsQuestion.Id, cancellationToken);
-            analyticsQuestion.AverageMark = analyticsQuestion.Users
-                .Where(e => e.Evaluation?.Mark is not null && e.Evaluation.Mark.Value > 0)
-                .Select(e => e.Evaluation!.Mark!.Value)
-                .DefaultIfEmpty(0)
-                .Average();
+
+            if (analytics.Completed)
+            {
+                analyticsQuestion.AverageMark = analyticsQuestion.Users
+                    .Where(e => e.Evaluation?.Mark is not null && e.Evaluation.Mark.Value > 0)
+                    .Select(e => e.Evaluation!.Mark!.Value)
+                    .DefaultIfEmpty(0)
+                    .Average();
+            }
+            else
+            {
+                foreach (var analyticsQuestionUser in analyticsQuestion.Users)
+                {
+                    analyticsQuestionUser.Evaluation = null;
+                }
+            }
         }
 
         return analytics;
@@ -657,11 +669,12 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                             Status = q.State!.Name,
                             Value = q.Question.Value,
                             Users = null,
-                            AverageMark = 0,
+                            AverageMark = null,
                         })
                         .ToList(),
-                    AverageMark = 0,
+                    AverageMark = null,
                     UserReview = new List<Analytics.AnalyticsUserAverageMark>(),
+                    Completed = false,
                 })
                 .FirstOrDefaultAsync(ct);
             if (res is null)
@@ -686,24 +699,36 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                     Nickname = e.User.Nickname,
                     Avatar = e.User.Avatar,
                     ParticipantType = e.Type,
+                    Incomplete = e.User.RoomQuestionEvaluations
+                        .Any(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.State == SERoomQuestionEvaluationState.Draft),
                 })
                 .ToListAsync(cancellationToken);
             res.UserReview = userReview
                 .Select(e => new Analytics.AnalyticsUserAverageMark
                 {
                     UserId = e.UserId,
-                    AverageMark = e.AverageMarks.DefaultIfEmpty(0)
-                        .Average(),
+                    AverageMark = e.Incomplete ? null : e.AverageMarks.DefaultIfEmpty(0).Average(),
                     Comment = e.Comment ?? string.Empty,
                     Nickname = e.Nickname,
                     Avatar = e.Avatar,
                     ParticipantType = e.ParticipantType.EnumValue,
                 })
                 .ToList();
-            res.AverageMark = res.UserReview.Select(e => e.AverageMark)
-                .Where(e => e > 0)
-                .DefaultIfEmpty(0)
-                .Average();
+            res.Completed = userReview.All(e => !e.Incomplete);
+            if (res.Completed)
+            {
+                res.AverageMark = res.UserReview.Select(e => e.AverageMark)
+                    .Where(e => e > 0)
+                    .DefaultIfEmpty(0)
+                    .Average();
+            }
+            else
+            {
+                foreach (var analyticsUserAverageMark in res.UserReview)
+                {
+                    analyticsUserAverageMark.AverageMark = null;
+                }
+            }
 
             return res;
         }
@@ -719,7 +744,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 {
                     Id = e.User.Id,
                     Evaluation = e.User.RoomQuestionEvaluations
-                        .Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.RoomQuestion!.QuestionId == questionId)
+                        .Where(rqe => rqe.RoomQuestion!.RoomId == request.RoomId && rqe.RoomQuestion!.QuestionId == questionId && rqe.State == SERoomQuestionEvaluationState.Submitted)
                         .Select(rqe => new Analytics.AnalyticsUserQuestionEvaluation { Review = rqe.Review, Mark = rqe.Mark, })
                         .FirstOrDefault(),
                 })
