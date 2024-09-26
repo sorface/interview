@@ -151,7 +151,7 @@ export const RoomAnaytics: FunctionComponent = () => {
                   <div className='flex items-center'>
                     {!!examinee.avatar && (
                       <>
-                        <UserAvatar nickname={examinee.nickname} size='xs' src={examinee.avatar} />
+                        <UserAvatar nickname={examinee.nickname} size='xxs' src={examinee.avatar} />
                         <Gap sizeRem={0.5} horizontal />
                       </>
                     )}
