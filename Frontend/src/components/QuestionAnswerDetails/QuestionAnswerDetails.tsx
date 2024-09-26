@@ -73,9 +73,15 @@ export const QuestionAnswerDetails: FunctionComponent<QuestionAnswerDetailsProps
           {hasCodeEditorContent ? (
             <>
               <SwitcherButton
-                captions={[
-                  localizationCaptions[LocalizationKey.QuestionCode],
-                  localizationCaptions[LocalizationKey.AnswerCode],
+                items={[
+                  {
+                    id: 1,
+                    content: localizationCaptions[LocalizationKey.QuestionCode],
+                  },
+                  {
+                    id: 2,
+                    content: localizationCaptions[LocalizationKey.AnswerCode],
+                  },
                 ]}
                 activeIndex={codeQuestionTab}
                 {...(themeInUi === Theme.Dark && {

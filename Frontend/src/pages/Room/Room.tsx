@@ -53,6 +53,7 @@ import { Loader } from '../../components/Loader/Loader';
 import { Icon } from './components/Icon/Icon';
 import { Typography } from '../../components/Typography/Typography';
 import { sortRoomQuestion } from '../../utils/sortRoomQestions';
+import { UnreadChatMessagesCounter } from './components/UnreadChatMessagesCounter/UnreadChatMessagesCounter';
 
 import './Room.css';
 
@@ -648,9 +649,37 @@ export const Room: FunctionComponent = () => {
                   </>
                 )}
                 <SwitcherButton
-                  captions={[
-                    `${localizationCaptions[LocalizationKey.Chat]} ${unreadChatMessages || ''}`,
-                    `${localizationCaptions[LocalizationKey.RoomParticipants]} ${peersLength + 1}`,
+                  items={[
+                    {
+                      id: 0,
+                      content: (
+                        <div className='flex items-center'>
+                          <div>
+                            {localizationCaptions[LocalizationKey.Chat]}
+                          </div>
+                          {!!unreadChatMessages && (
+                            <>
+                              <Gap sizeRem={0.5} horizontal />
+                              <UnreadChatMessagesCounter value={unreadChatMessages} />
+                            </>
+                          )}
+                        </div>
+                      ),
+                    },
+                    {
+                      id: 1,
+                      content: (
+                        <div className='flex items-center'>
+                          <div>
+                            {localizationCaptions[LocalizationKey.RoomParticipants]}
+                          </div>
+                          <Gap sizeRem={0.5} horizontal />
+                          <div>
+                            {peersLength + 1}
+                          </div>
+                        </div>
+                      ),
+                    },
                   ]}
                   activeIndex={messagesChatEnabled ? 0 : 1}
                   variant='alternative'

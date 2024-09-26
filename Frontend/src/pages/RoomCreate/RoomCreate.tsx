@@ -426,9 +426,15 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         {!questionsView && (
           <>
             <SwitcherButton
-              captions={[
-                localizationCaptions[LocalizationKey.CreateRoomStep1],
-                localizationCaptions[LocalizationKey.CreateRoomStep2],
+              items={[
+                {
+                  id: 1,
+                  content: localizationCaptions[LocalizationKey.CreateRoomStep1],
+                },
+                {
+                  id: 2,
+                  content: localizationCaptions[LocalizationKey.CreateRoomStep2],
+                },
               ]}
               activeIndex={creationStep}
             />
