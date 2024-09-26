@@ -1,12 +1,17 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, ReactNode } from 'react';
 import { Button } from '../Button/Button';
 
 import './SwitcherButton.css';
 
 type ActiveIndex = 0 | 1;
 
+interface SwitcherButtonContent {
+  id: string | number;
+  content: ReactNode;
+}
+
 interface SwitcherButtonProps {
-  captions: [string, string];
+  items: [SwitcherButtonContent, SwitcherButtonContent];
   activeIndex: ActiveIndex;
   variant?: 'alternative';
   disabled?: boolean;
@@ -14,7 +19,7 @@ interface SwitcherButtonProps {
 }
 
 export const SwitcherButton: FunctionComponent<SwitcherButtonProps> = ({
-  captions,
+  items,
   activeIndex,
   variant,
   disabled,
@@ -24,13 +29,13 @@ export const SwitcherButton: FunctionComponent<SwitcherButtonProps> = ({
   const disabledClassName = disabled ? 'cursor-not-allowed' : '';
   return (
     <div className={`switcher-button flex ${disabledClassName}`}>
-      {captions.map((caption, index) => (
+      {items.map((item, index) => (
         <Button
-          key={caption}
+          key={item.id}
           variant={index === activeIndex ? 'invertedActive' : nonActiveVariant}
           onClick={() => { onClick?.(index as ActiveIndex); }}
         >
-          {caption}
+          {item.content}
         </Button>
       ))}
     </div>

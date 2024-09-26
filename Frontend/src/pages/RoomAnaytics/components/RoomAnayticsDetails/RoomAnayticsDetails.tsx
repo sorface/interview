@@ -30,9 +30,15 @@ export const RoomAnayticsDetails: FunctionComponent<RoomAnayticsDetailsProps> = 
   return (
     <div>
       <SwitcherButton
-        captions={[
-          localizationCaptions[LocalizationKey.Opinions],
-          localizationCaptions[LocalizationKey.Transcription],
+        items={[
+          {
+            id: 1,
+            content: localizationCaptions[LocalizationKey.Opinions],
+          },
+          {
+            id: 2,
+            content: localizationCaptions[LocalizationKey.Transcription],
+          },
         ]}
         activeIndex={activeTab}
         {...(themeInUi === Theme.Dark && {
