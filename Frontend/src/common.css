@@ -72,6 +72,7 @@
 .bg-dark-input { background-color: var(--dark-input); }
 .bg-room-tools-panel-bg { background-color: var(--room-tools-panel-bg); }
 .bg-dark-history-hover { background-color: var(--dark-history-hover); }
+.bg-dark-active { background-color: var(--dark-active); }
 .hover\:bg-blue-main:hover { background-color: var(--blue-main); }
 .hover\:bg-blue-light:hover { background-color: var(--blue-light); }
 .hover\:bg-blue-dark:hover { background-color: var(--blue-dark); }
@@ -98,6 +99,7 @@
 .rounded-2 { border-radius: 2rem; }
 .rounded-t-0\.75 { border-top-left-radius: 0.75rem !important; border-top-right-radius: 0.75rem !important; }
 .rounded-b-0\.75 { border-bottom-left-radius: 0.75rem !important; border-bottom-right-radius: 0.75rem !important; }
+.rounded-br-0 { border-bottom-right-radius: 0; }
 .first-button\:rounded-t-0\.75 button:first-of-type { border-top-left-radius: 0.75rem !important; border-top-right-radius: 0.75rem !important; }
 .last-button\:rounded-b-0\.75 button:last-of-type { border-bottom-left-radius: 0.75rem !important; border-bottom-right-radius: 0.75rem !important; }
 .rounded-l-2 { border-top-left-radius: 2rem; border-bottom-left-radius: 2rem; }
@@ -176,6 +178,7 @@
 .w-7\.5 { width: 7.5rem; }
 .w-9 { width: 9rem; }
 .w-13\.75 { width: 13.75rem; }
+.max-w-12 { max-width: 12rem; }
 .max-w-15\.75 { max-width: 15.75rem; }
 .w-17\.25 { width: 17.25rem; }
 .w-17\.375 { width: 17.375rem; }

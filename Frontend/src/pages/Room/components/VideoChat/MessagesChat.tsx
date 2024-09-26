@@ -1,4 +1,4 @@
-import { FunctionComponent, useRef, KeyboardEvent, useEffect } from 'react';
+import { FunctionComponent, useRef, KeyboardEvent, useEffect, useContext } from 'react';
 import { Transcript } from '../../../../types/transcript';
 import { Theme } from '../../../../context/ThemeContext';
 import { LocalizationKey } from '../../../../localization';
@@ -10,6 +10,7 @@ import { IconNames } from '../../../../constants';
 import { Icon } from '../Icon/Icon';
 import { ChatMessage } from './ChatMessage';
 import { User } from '../../../../types/user';
+import { AuthContext } from '../../../../context/AuthContext';
 
 import './MessagesChat.css';
 
@@ -24,6 +25,7 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
   allUsers,
   onMessageSubmit,
 }) => {
+  const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
   const chatButtonVariant = useThemeClassName({
     [Theme.Dark]: 'inverted' as const,
@@ -64,15 +66,18 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
 
   return (
     <div className='messages-chat'>
-      <Gap sizeRem={0.75} />
       <div className='videochat-transcripts px-0.75' ref={videochatTranscriptsRef}>
-        {textMessages.map(transcript => (
+        <Gap sizeRem={1.5} />
+        {textMessages.map((transcript, index, allTranscripts) => (
           <ChatMessage
             key={transcript.id}
             createdAt={transcript.createdAt}
             message={transcript.value}
             nickname={transcript.userNickname}
             avatar={allUsers.get(transcript.userId)?.avatar}
+            removePaggingTop={index === 0}
+            stackWithPrevious={allTranscripts[index - 1]?.userId === transcript.userId}
+            fromCurrentUser={!!auth && auth.id === transcript.userId}
           />
         ))}
       </div>

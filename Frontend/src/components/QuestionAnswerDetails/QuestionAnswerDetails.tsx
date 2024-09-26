@@ -119,13 +119,15 @@ export const QuestionAnswerDetails: FunctionComponent<QuestionAnswerDetailsProps
             <Gap sizeRem={1.5} />
           </div>
         )}
-        {data?.details.map(detail => detail.transcription.map(transcription => (
+        {data?.details.map(detail => detail.transcription.map((transcription, index, allTranscriptions) => (
           <ChatMessage
             key={transcription.id}
             createdAt={transcription.createdAt}
             message={transcription.payload}
             nickname={transcription.user.nickname}
             avatar={allUsers.get(transcription.user.id)?.avatar}
+            removePaggingTop={index === 0}
+            stackWithPrevious={allTranscriptions[index - 1]?.user.id === transcription.user.id}
           />
         )))}
       </div>

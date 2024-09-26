@@ -11,6 +11,9 @@ interface ChatMessageProps {
   message: string;
   createdAt: string;
   avatar?: string;
+  removePaggingTop?: boolean;
+  stackWithPrevious?: boolean;
+  fromCurrentUser?: boolean;
 }
 
 export const ChatMessage: FunctionComponent<ChatMessageProps> = ({
@@ -18,31 +21,48 @@ export const ChatMessage: FunctionComponent<ChatMessageProps> = ({
   message,
   createdAt,
   avatar,
+  removePaggingTop,
+  stackWithPrevious,
+  fromCurrentUser,
 }) => {
   const messageClassName = useThemeClassName({
     [Theme.Dark]: 'bg-dark-history-hover',
     [Theme.Light]: 'bg-grey1',
   });
+  const currentUserMessageClassName = useThemeClassName({
+    [Theme.Dark]: 'bg-dark-active rounded-br-0',
+    [Theme.Light]: 'bg-blue-light rounded-br-0',
+  });
 
   return (
     <Fragment>
-      <div
-        className={`${messageClassName} flex flex-col py-0.25 px-0.5 rounded-0.5`}
-      >
-        <div className='flex items-center'>
-          <Typography size='xs'>
-            <UserAvatar nickname={nickname} src={avatar} size='xs' />
-          </Typography>
-          <Gap sizeRem={0.25} horizontal />
-          <Typography size='s' bold>{nickname}</Typography>
-        </div>
-        <Gap sizeRem={0.25} />
-        <Typography size='s'>{message}</Typography>
-        <div className='text-right'>
-          <Typography size='xs' secondary>{formatTime(new Date(createdAt))}</Typography>
+      {!removePaggingTop && (
+        <Gap sizeRem={stackWithPrevious ? 0.25 : 1} />
+      )}
+      <div className='flex justify-end'>
+        {(!fromCurrentUser) && (
+          <div className={`flex ${stackWithPrevious ? 'invisible' : ''}`}>
+            <Typography size='xs'>
+              <UserAvatar nickname={nickname} src={avatar} size='xs' />
+            </Typography>
+            <Gap sizeRem={0.25} horizontal />
+          </div>
+        )}
+        <div
+          className={`${fromCurrentUser ? currentUserMessageClassName : messageClassName} ${fromCurrentUser ? 'max-w-12' : ''} flex flex-1 flex-col py-0.25 px-0.5 rounded-0.5`}
+        >
+          {(!fromCurrentUser && !stackWithPrevious) && (
+            <div className='flex items-center'>
+              <Typography size='s' bold>{nickname}</Typography>
+            </div>
+          )}
+          <Gap sizeRem={0.25} />
+          <Typography size='s'>{message}</Typography>
+          <div className='text-right'>
+            <Typography size='xs' secondary>{formatTime(new Date(createdAt))}</Typography>
+          </div>
         </div>
       </div>
-      <Gap sizeRem={0.25} />
     </Fragment>
   );
 };
