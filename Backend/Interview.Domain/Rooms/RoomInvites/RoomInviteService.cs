@@ -2,6 +2,7 @@ using Interview.Domain.Database;
 using Interview.Domain.Invites;
 using Interview.Domain.Rooms.Records.Response;
 using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Rooms.RoomParticipants.Permissions;
 using Interview.Domain.Rooms.RoomParticipants.Records.Request;
 using Interview.Domain.Rooms.RoomParticipants.Service;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +13,12 @@ namespace Interview.Domain.Rooms.RoomInvites;
 public class RoomInviteService : IRoomInviteService
 {
     private readonly AppDbContext _db;
-    private readonly IRoomParticipantService _roomParticipantService;
+    private readonly IRoomParticipantServiceWithoutPermissionCheck _roomParticipantService;
     private readonly ILogger<RoomInviteService> _logger;
 
-    public RoomInviteService(AppDbContext db, IRoomParticipantService roomParticipantService, ILogger<RoomInviteService> logger)
+    public RoomInviteService(AppDbContext db,
+                             IRoomParticipantServiceWithoutPermissionCheck roomParticipantService,
+                             ILogger<RoomInviteService> logger)
     {
         _db = db;
         _roomParticipantService = roomParticipantService;
@@ -43,6 +46,7 @@ public class RoomInviteService : IRoomInviteService
         }
 
         var roomInvite = await _db.RoomInvites
+            .Include(inviteItem => inviteItem.Room)
             .Where(roomInviteItem => roomInviteItem.InviteId == inviteId)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -60,6 +64,12 @@ public class RoomInviteService : IRoomInviteService
             throw new NotFoundException("The invitation no longer belongs to the room");
         }
 
+        if (roomInvite.Room.CreatedById == userId)
+        {
+            _logger.LogError("You cannot apply an invite {inviteId} to a room in which you are the creator", inviteId);
+            throw new UserException("You cannot apply an invite to a room in which you are the creator");
+        }
+
         _logger.LogInformation("found room [id -> {roomId}] which joined for invite [id -> {inviteId}]", roomInvite.RoomId, inviteId);
 
         var user = await _db.Users.Where(user => user.Id == userId)
@@ -73,62 +83,54 @@ public class RoomInviteService : IRoomInviteService
         _logger.LogInformation("User with id [{userId}] for invite found {inviteId}", user.Id, inviteId);
 
         return await _db.RunTransactionAsync(async _ =>
-        {
-            var participant = await _db.RoomParticipants
-                .Include(e => e.Room)
-                .Where(participant => participant.User.Id == userId && participant.Room.Id == roomInvite.RoomId)
-                .FirstOrDefaultAsync(cancellationToken);
-
-            if (participant is null)
             {
-                _logger.LogInformation("Room participant not found in room [id -> {roomId}] by user [id -> {userId}]", user.Id, inviteId);
+                var participant = await _db.RoomParticipants
+                    .Include(e => e.Room)
+                    .Where(participant => participant.User.Id == userId && participant.Room.Id == roomInvite.RoomId)
+                    .FirstOrDefaultAsync(cancellationToken);
 
-                var participants = await _roomParticipantService.CreateAsync(
-                    roomInvite.Room.Id,
-                    new[] { (user, roomInvite.Room, roomInvite.ParticipantType ?? SERoomParticipantType.Viewer) },
-                    cancellationToken);
-                var roomParticipant = participants.First();
+                if (participant is null)
+                {
+                    _logger.LogInformation("Room participant not found in room [id -> {roomId}] by user [id -> {userId}]", user.Id, inviteId);
 
-                _logger.LogInformation(
-                    "Created participant room [id -> {participantId}, type -> {participantType}] for room [id -> {roomId}] and user [id -> {userId}]",
-                    roomParticipant.Id,
-                    roomParticipant.Type,
-                    roomInvite.RoomId,
-                    userId);
+                    var participants = await _roomParticipantService.CreateAsync(
+                        roomInvite.Room.Id,
+                        new[] { (user, roomInvite.Room, roomInvite.ParticipantType ?? SERoomParticipantType.Viewer) },
+                        cancellationToken);
+                    var roomParticipant = participants.First();
 
-                await UpdateInviteLimit(roomInvite, cancellationToken);
-                await _db.SaveChangesAsync(cancellationToken);
+                    _logger.LogInformation(
+                        "Created participant room [id -> {participantId}, type -> {participantType}] for room [id -> {roomId}] and user [id -> {userId}]",
+                        roomParticipant.Id,
+                        roomParticipant.Type,
+                        roomInvite.RoomId,
+                        userId);
 
+                    await UpdateInviteLimit(roomInvite, cancellationToken);
+                    await _db.SaveChangesAsync(cancellationToken);
+
+                    return new RoomInviteResponse
+                    {
+                        InviteId = invite.Id, ParticipantType = roomInvite.ParticipantType!.EnumValue, Used = invite.UsesCurrent, Max = invite.UsesMax,
+                    };
+                }
+
+                if (participant.Type != roomInvite.ParticipantType && roomInvite.ParticipantType is not null)
+                {
+                    var roomParticipantChangeStatusRequest = new RoomParticipantChangeStatusRequest
+                    {
+                        RoomId = roomInvite.RoomId, UserId = participant.UserId, UserType = roomInvite.ParticipantType.EnumValue,
+                    };
+                    await _roomParticipantService.ChangeStatusAsync(roomParticipantChangeStatusRequest, cancellationToken);
+                }
+
+                // await UpdateInviteLimit(roomInvite, cancellationToken);
                 return new RoomInviteResponse
                 {
-                    InviteId = invite.Id,
-                    ParticipantType = roomInvite.ParticipantType!.EnumValue,
-                    Used = invite.UsesCurrent,
-                    Max = invite.UsesMax,
+                    InviteId = invite.Id, ParticipantType = roomInvite.ParticipantType!.EnumValue, Used = invite.UsesCurrent, Max = invite.UsesMax,
                 };
-            }
-
-            if (participant.Type != roomInvite.ParticipantType && roomInvite.ParticipantType is not null)
-            {
-                var roomParticipantChangeStatusRequest = new RoomParticipantChangeStatusRequest
-                {
-                    RoomId = roomInvite.RoomId,
-                    UserId = participant.UserId,
-                    UserType = roomInvite.ParticipantType.EnumValue,
-                };
-                await _roomParticipantService.ChangeStatusAsync(roomParticipantChangeStatusRequest, cancellationToken);
-            }
-
-            // await UpdateInviteLimit(roomInvite, cancellationToken);
-            return new RoomInviteResponse
-            {
-                InviteId = invite.Id,
-                ParticipantType = roomInvite.ParticipantType!.EnumValue,
-                Used = invite.UsesCurrent,
-                Max = invite.UsesMax,
-            };
-        },
-        cancellationToken);
+            },
+            cancellationToken);
     }
 
     public async Task<RoomInviteResponse> GenerateAsync(
@@ -153,10 +155,7 @@ public class RoomInviteService : IRoomInviteService
 
         return new RoomInviteResponse
         {
-            InviteId = invite.Id,
-            ParticipantType = newRoomInvite.ParticipantType!.EnumValue,
-            Used = invite.UsesCurrent,
-            Max = invite.UsesMax,
+            InviteId = invite.Id, ParticipantType = newRoomInvite.ParticipantType!.EnumValue, Used = invite.UsesCurrent, Max = invite.UsesMax,
         };
     }
 

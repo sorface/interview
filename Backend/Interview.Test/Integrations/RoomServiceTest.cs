@@ -740,17 +740,17 @@ public class RoomServiceTest
             TimeZoneOffset = -180
         });
 
-        var roomCalendarItems = roomCalendarResponse.MeetingSchedules;
+        var roomCalendarItems = roomCalendarResponse;
 
         roomCalendarItems.Should().NotBeNullOrEmpty();
         roomCalendarItems.Count.Should().Be(2);
 
-        var roomCalendarRoom1 = roomCalendarItems.FirstOrDefault(meeting => meeting.UtcTime.Equals(firstScheduled));
+        var roomCalendarRoom1 = roomCalendarItems.FirstOrDefault(meeting => meeting.MinScheduledStartTime.Equals(firstScheduled));
         roomCalendarRoom1.Should().NotBeNull();
 
         roomCalendarRoom1?.Statuses.Count.Should().Be(1);
 
-        var roomCalendarRoom2 = roomCalendarItems.FirstOrDefault(meeting => meeting.UtcTime.Equals(secondScheduled));
+        var roomCalendarRoom2 = roomCalendarItems.FirstOrDefault(meeting => meeting.MinScheduledStartTime.Equals(secondScheduled));
         roomCalendarRoom2.Should().NotBeNull();
 
         roomCalendarRoom1?.Statuses.Count.Should().Be(1);

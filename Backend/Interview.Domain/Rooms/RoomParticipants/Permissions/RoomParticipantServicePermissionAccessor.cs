@@ -51,3 +51,7 @@ public class RoomParticipantServicePermissionAccessor : IRoomParticipantService,
         return _roomParticipantService.CreateAsync(roomId, participants, cancellationToken);
     }
 }
+
+public interface IRoomParticipantServiceWithoutPermissionCheck : IRoomParticipantService
+{
+}

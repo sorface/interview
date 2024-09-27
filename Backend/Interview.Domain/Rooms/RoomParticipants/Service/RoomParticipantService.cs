@@ -1,5 +1,6 @@
 using Interview.Domain.Permissions;
 using Interview.Domain.Repository;
+using Interview.Domain.Rooms.RoomParticipants.Permissions;
 using Interview.Domain.Rooms.RoomParticipants.Records.Request;
 using Interview.Domain.Rooms.RoomParticipants.Records.Response;
 using Interview.Domain.Users;
@@ -8,7 +9,7 @@ using NSpecifications;
 
 namespace Interview.Domain.Rooms.RoomParticipants.Service;
 
-public class RoomParticipantService : IRoomParticipantService
+public class RoomParticipantService : IRoomParticipantServiceWithoutPermissionCheck
 {
     private readonly IRoomParticipantRepository _roomParticipantRepository;
     private readonly IRoomRepository _roomRepository;
@@ -45,10 +46,7 @@ public class RoomParticipantService : IRoomParticipantService
 
         return new RoomParticipantDetail
         {
-            Id = participant.Id,
-            RoomId = participant.Room.Id,
-            UserId = participant.User.Id,
-            UserType = participant.Type.Name,
+            Id = participant.Id, RoomId = participant.Room.Id, UserId = participant.User.Id, UserType = participant.Type.Name,
         };
     }
 
@@ -76,10 +74,7 @@ public class RoomParticipantService : IRoomParticipantService
 
         return new RoomParticipantDetail
         {
-            Id = participant.Id,
-            RoomId = participant.Room.Id,
-            UserId = participant.User.Id,
-            UserType = participant.Type.Name,
+            Id = participant.Id, RoomId = participant.Room.Id, UserId = participant.User.Id, UserType = participant.Type.Name,
         };
     }
 
@@ -127,10 +122,7 @@ public class RoomParticipantService : IRoomParticipantService
 
         return new RoomParticipantDetail
         {
-            Id = roomParticipant.Id,
-            RoomId = roomParticipant.Room.Id,
-            UserId = roomParticipant.User.Id,
-            UserType = roomParticipant.Type.Name,
+            Id = roomParticipant.Id, RoomId = roomParticipant.Room.Id, UserId = roomParticipant.User.Id, UserType = roomParticipant.Type.Name,
         };
     }
 

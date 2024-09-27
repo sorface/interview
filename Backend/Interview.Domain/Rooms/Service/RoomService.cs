@@ -165,7 +165,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
         });
     }
 
-    public async Task<RoomCalendarResponse> GetCalendarAsync(RoomCalendarRequest filter, CancellationToken cancellationToken = default)
+    public async Task<List<RoomCalendarItem>> GetCalendarAsync(RoomCalendarRequest filter, CancellationToken cancellationToken = default)
     {
         var currentUserId = _currentUserAccessor.UserId;
 
@@ -197,9 +197,9 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             .Select(room => new { Time = room.ScheduleStartTime, room.Status })
             .ToListAsync(cancellationToken);
 
-        var offset = TimeSpan.FromMinutes(filter.TimeZoneOffset * (-1));
+        var offset = TimeSpan.FromMinutes(filter.TimeZoneOffset);
 
-        var roomCalendarItems = rooms.Select(roomInfo => new { TimeOffset = roomInfo.Time.Add(offset), UtcTime = roomInfo.Time, Status = roomInfo.Status })
+        return rooms.Select(roomInfo => new { TimeOffset = roomInfo.Time.Add(offset), UtcTime = roomInfo.Time, Status = roomInfo.Status })
             .GroupBy(info => $@"{info.TimeOffset.Day}-{info.TimeOffset.Month}-{info.TimeOffset.Year}")
             .ToDictionary(grouping => grouping.Key, grouping => grouping.ToList())
             .Values
@@ -214,10 +214,8 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 };
             })
             .Where(meeting => meeting.First is not null)
-            .Select(meeting => new RoomCalendarItem { TimeOffset = meeting.First!.TimeOffset, UtcTime = meeting.First!.UtcTime, Statuses = meeting.Statuses, })
+            .Select(meeting => new RoomCalendarItem { MinScheduledStartTime = meeting.First!.UtcTime, Statuses = meeting.Statuses, })
             .ToList();
-
-        return new RoomCalendarResponse { MeetingSchedules = roomCalendarItems };
     }
 
     public async Task<RoomDetail> FindByIdAsync(Guid id, CancellationToken cancellationToken)

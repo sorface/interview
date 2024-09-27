@@ -63,8 +63,8 @@ public class RoomController : ControllerBase
     [Authorize]
     [HttpGet("calendar")]
     [Produces(MediaTypeNames.Application.Json)]
-    [ProducesResponseType(typeof(RoomCalendarResponse), StatusCodes.Status200OK)]
-    public Task<RoomCalendarResponse> GetCalendar([FromQuery] RoomCalendarRequest request)
+    [ProducesResponseType(typeof(List<RoomCalendarItem>), StatusCodes.Status200OK)]
+    public Task<List<RoomCalendarItem>> GetCalendar([FromQuery] RoomCalendarRequest request)
     {
         return _roomService.GetCalendarAsync(request, HttpContext.RequestAborted);
     }

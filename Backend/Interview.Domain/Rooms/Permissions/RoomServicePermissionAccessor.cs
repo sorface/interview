@@ -29,7 +29,7 @@ public class RoomServicePermissionAccessor : IRoomService, IServiceDecorator
         return await _roomService.FindPageAsync(filter, pageNumber, pageSize, cancellationToken);
     }
 
-    public async Task<RoomCalendarResponse> GetCalendarAsync(RoomCalendarRequest filter, CancellationToken cancellationToken = default)
+    public async Task<List<RoomCalendarItem>> GetCalendarAsync(RoomCalendarRequest filter, CancellationToken cancellationToken = default)
     {
         await _securityService.EnsurePermissionAsync(SEPermission.GetRoomCalendar, cancellationToken);
         return await _roomService.GetCalendarAsync(filter, cancellationToken);
