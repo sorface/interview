@@ -73,6 +73,7 @@
 .bg-room-tools-panel-bg { background-color: var(--room-tools-panel-bg); }
 .bg-dark-history-hover { background-color: var(--dark-history-hover); }
 .bg-dark-active { background-color: var(--dark-active); }
+.bg-dark-red { background-color: var(--dark-red); }
 .hover\:bg-blue-main:hover { background-color: var(--blue-main); }
 .hover\:bg-blue-light:hover { background-color: var(--blue-light); }
 .hover\:bg-blue-dark:hover { background-color: var(--blue-dark); }
@@ -165,6 +166,7 @@
 .min-h-4 { min-height: 4rem; }
 .w-fit { width: fit-content; }
 .w-full { width: 100%; }
+.w-0\.75 { width: 0.75rem; }
 .w-1 { width: 1rem; }
 .w-1\.125 { width: 1.125rem; }
 .w-1\.375 { width: 1.375rem; }
@@ -193,6 +195,7 @@
 .h-full { height: 100%; }
 .h-dvh { height: 100dvh; }
 .h-0\.125 { height: 0.125rem; }
+.h-0\.75 { height: 0.75rem; }
 .h-1 { height: 1rem; }
 .h-1\.125 { height: 1.125rem; }
 .h-1\.375 { height: 1.375rem; }

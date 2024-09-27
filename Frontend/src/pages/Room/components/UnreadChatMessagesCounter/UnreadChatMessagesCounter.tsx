@@ -1,21 +1,24 @@
 import { FunctionComponent } from 'react';
 import { useThemeClassName } from '../../../../hooks/useThemeClassName';
 import { Theme } from '../../../../context/ThemeContext';
+import { Typography } from '../../../../components/Typography/Typography';
 
 interface UnreadChatMessagesCounterProps {
-  value: number;
+  value: number | string;
 }
 
 export const UnreadChatMessagesCounter: FunctionComponent<UnreadChatMessagesCounterProps> = ({
   value,
 }) => {
   const themedClassName = useThemeClassName({
-    [Theme.Dark]: 'bg-dark-active',
-    [Theme.Light]: 'bg-grey2',
+    [Theme.Dark]: 'bg-dark-red',
+    [Theme.Light]: 'bg-red text-white',
   });
   return (
-    <div className={`${themedClassName} w-1 h-1 p-0.25 rounded-0.75`}>
-      {value}
+    <div className={`${themedClassName} flex items-center justify-center w-0.75 h-0.75 p-0.25 rounded-0.75`}>
+      <Typography size='s'>
+        {value}
+      </Typography>
     </div>
   );
 };

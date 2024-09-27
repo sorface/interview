@@ -134,6 +134,7 @@ export const Room: FunctionComponent = () => {
   const { unreadChatMessages } = useUnreadChatMessages({
     lastMessage,
     messagesChatEnabled,
+    maxCount: 9,
   });
 
   const { apiMethodState, fetchData } = useApiMethod<RoomType, RoomType['id']>(roomsApiDeclaration.getById);

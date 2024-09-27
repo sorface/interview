@@ -3,11 +3,13 @@ import { useEffect, useRef, useState } from 'react';
 interface UseUnreadChatMessagesParams {
   lastMessage: MessageEvent<any> | null;
   messagesChatEnabled: boolean;
+  maxCount: number;
 }
 
 export const useUnreadChatMessages = ({
   lastMessage,
   messagesChatEnabled,
+  maxCount,
 }: UseUnreadChatMessagesParams) => {
   const unreadChatMessagesRef = useRef(0);
   const [unreadChatMessages, setUnreadChatMessages] = useState(0);
@@ -41,6 +43,6 @@ export const useUnreadChatMessages = ({
   }, [messagesChatEnabled]);
 
   return {
-    unreadChatMessages,
+    unreadChatMessages: unreadChatMessages > maxCount ? `${maxCount}+` : unreadChatMessages,
   };
 };
