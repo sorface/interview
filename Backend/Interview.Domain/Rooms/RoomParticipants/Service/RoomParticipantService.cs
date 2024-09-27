@@ -46,7 +46,10 @@ public class RoomParticipantService : IRoomParticipantServiceWithoutPermissionCh
 
         return new RoomParticipantDetail
         {
-            Id = participant.Id, RoomId = participant.Room.Id, UserId = participant.User.Id, UserType = participant.Type.Name,
+            Id = participant.Id,
+            RoomId = participant.Room.Id,
+            UserId = participant.User.Id,
+            UserType = participant.Type.Name,
         };
     }
 
@@ -74,7 +77,10 @@ public class RoomParticipantService : IRoomParticipantServiceWithoutPermissionCh
 
         return new RoomParticipantDetail
         {
-            Id = participant.Id, RoomId = participant.Room.Id, UserId = participant.User.Id, UserType = participant.Type.Name,
+            Id = participant.Id,
+            RoomId = participant.Room.Id,
+            UserId = participant.User.Id,
+            UserType = participant.Type.Name,
         };
     }
 
@@ -122,7 +128,10 @@ public class RoomParticipantService : IRoomParticipantServiceWithoutPermissionCh
 
         return new RoomParticipantDetail
         {
-            Id = roomParticipant.Id, RoomId = roomParticipant.Room.Id, UserId = roomParticipant.User.Id, UserType = roomParticipant.Type.Name,
+            Id = roomParticipant.Id,
+            RoomId = roomParticipant.Room.Id,
+            UserId = roomParticipant.User.Id,
+            UserType = roomParticipant.Type.Name,
         };
     }
 

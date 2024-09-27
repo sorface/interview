@@ -111,7 +111,10 @@ public class RoomInviteService : IRoomInviteService
 
                     return new RoomInviteResponse
                     {
-                        InviteId = invite.Id, ParticipantType = roomInvite.ParticipantType!.EnumValue, Used = invite.UsesCurrent, Max = invite.UsesMax,
+                        InviteId = invite.Id,
+                        ParticipantType = roomInvite.ParticipantType!.EnumValue,
+                        Used = invite.UsesCurrent,
+                        Max = invite.UsesMax,
                     };
                 }
 
@@ -119,7 +122,9 @@ public class RoomInviteService : IRoomInviteService
                 {
                     var roomParticipantChangeStatusRequest = new RoomParticipantChangeStatusRequest
                     {
-                        RoomId = roomInvite.RoomId, UserId = participant.UserId, UserType = roomInvite.ParticipantType.EnumValue,
+                        RoomId = roomInvite.RoomId,
+                        UserId = participant.UserId,
+                        UserType = roomInvite.ParticipantType.EnumValue,
                     };
                     await _roomParticipantService.ChangeStatusAsync(roomParticipantChangeStatusRequest, cancellationToken);
                 }
@@ -127,7 +132,10 @@ public class RoomInviteService : IRoomInviteService
                 // await UpdateInviteLimit(roomInvite, cancellationToken);
                 return new RoomInviteResponse
                 {
-                    InviteId = invite.Id, ParticipantType = roomInvite.ParticipantType!.EnumValue, Used = invite.UsesCurrent, Max = invite.UsesMax,
+                    InviteId = invite.Id,
+                    ParticipantType = roomInvite.ParticipantType!.EnumValue,
+                    Used = invite.UsesCurrent,
+                    Max = invite.UsesMax,
                 };
             },
             cancellationToken);
@@ -155,7 +163,10 @@ public class RoomInviteService : IRoomInviteService
 
         return new RoomInviteResponse
         {
-            InviteId = invite.Id, ParticipantType = newRoomInvite.ParticipantType!.EnumValue, Used = invite.UsesCurrent, Max = invite.UsesMax,
+            InviteId = invite.Id,
+            ParticipantType = newRoomInvite.ParticipantType!.EnumValue,
+            Used = invite.UsesCurrent,
+            Max = invite.UsesMax,
         };
     }
 
