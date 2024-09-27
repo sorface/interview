@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Storage;
@@ -162,6 +163,61 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             Timer = e.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)e.Timer.Duration.TotalSeconds, StartTime = e.Timer.ActualStartTime, },
             ScheduledStartTime = e.ScheduledStartTime,
         });
+    }
+
+    public async Task<RoomCalendarResponse> GetCalendarAsync(RoomCalendarRequest filter, CancellationToken cancellationToken = default)
+    {
+        var currentUserId = _currentUserAccessor.UserId;
+
+        var queryable = _db.Rooms
+            .Include(room => room.Participants)
+            .Where(room => room.Participants.Any(participant => participant.UserId == currentUserId));
+
+        if (filter.StartDateTime is not null)
+        {
+            queryable = queryable.Where(e => filter.StartDateTime <= e.ScheduleStartTime);
+        }
+
+        if (filter.EndDateTime is not null)
+        {
+            queryable = queryable.Where(e => filter.EndDateTime >= e.ScheduleStartTime);
+        }
+
+        if (filter.RoomStatus is not null && filter.RoomStatus.Count > 0)
+        {
+            var mapStatuses = filter.RoomStatus
+                .Join(SERoomStatus.List, status => status, status => status.EnumValue, (_, roomStatus) => roomStatus).ToList();
+
+            queryable = queryable.Where(e => mapStatuses.Contains(e.Status));
+        }
+
+        var rooms = await queryable
+            .OrderBy(room => room.ScheduleStartTime)
+            .ThenBy(room => room.ScheduleStartTime)
+            .Select(room => new { Time = room.ScheduleStartTime, room.Status })
+            .ToListAsync(cancellationToken);
+
+        var offset = TimeSpan.FromMinutes(filter.TimeZoneOffset * (-1));
+
+        var roomCalendarItems = rooms.Select(roomInfo => new { TimeOffset = roomInfo.Time.Add(offset), UtcTime = roomInfo.Time, Status = roomInfo.Status })
+            .GroupBy(info => $@"{info.TimeOffset.Day}-{info.TimeOffset.Month}-{info.TimeOffset.Year}")
+            .ToDictionary(grouping => grouping.Key, grouping => grouping.ToList())
+            .Values
+            .Select(values =>
+            {
+                var meeting = values.MinBy(it => it.UtcTime);
+
+                return new
+                {
+                    First = meeting,
+                    Statuses = values.Select(it => it.Status.EnumValue).ToList(),
+                };
+            })
+            .Where(meeting => meeting.First is not null)
+            .Select(meeting => new RoomCalendarItem { TimeOffset = meeting.First!.TimeOffset, UtcTime = meeting.First!.UtcTime, Statuses = meeting.Statuses, })
+            .ToList();
+
+        return new RoomCalendarResponse { MeetingSchedules = roomCalendarItems };
     }
 
     public async Task<RoomDetail> FindByIdAsync(Guid id, CancellationToken cancellationToken)

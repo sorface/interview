@@ -234,7 +234,7 @@ public sealed class UserService : IUserService
 
     private Task<List<Permission>> GetDefaultUserPermission(User user, CancellationToken cancellationToken = default)
     {
-        var existsPermissions = user.Permissions?.Select(e => e.Id).ToList() ?? (IReadOnlyCollection<Guid>)Array.Empty<Guid>();
+        var existsPermissions = user.Permissions.Select(e => e.Id).ToList() ?? (IReadOnlyCollection<Guid>)Array.Empty<Guid>();
         var permissionTypes = user.Roles
             .SelectMany(it => it.Name.DefaultPermissions)
             .ToHashSet();

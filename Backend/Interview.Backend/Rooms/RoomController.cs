@@ -56,6 +56,20 @@ public class RoomController : ControllerBase
     }
 
     /// <summary>
+    /// Getting a calendar rooms
+    /// </summary>
+    /// <param name="request">FromQuery filter</param>
+    /// <returns>Page.</returns>
+    [Authorize]
+    [HttpGet("calendar")]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(RoomCalendarResponse), StatusCodes.Status200OK)]
+    public Task<RoomCalendarResponse> GetCalendar([FromQuery] RoomCalendarRequest request)
+    {
+        return _roomService.GetCalendarAsync(request, HttpContext.RequestAborted);
+    }
+
+    /// <summary>
     /// Getting a Room by ID.
     /// </summary>
     /// <param name="id">Id.</param>
@@ -262,12 +276,7 @@ public class RoomController : ControllerBase
         [FromBody] Dictionary<string, TranscriptionRequestOption> options,
         [FromServices] ICurrentUserAccessor currentUserAccessor)
     {
-        var request = new TranscriptionRequest
-        {
-            RoomId = roomId,
-            UserId = currentUserAccessor.GetUserIdOrThrow(),
-            TranscriptionTypeMap = options,
-        };
+        var request = new TranscriptionRequest { RoomId = roomId, UserId = currentUserAccessor.GetUserIdOrThrow(), TranscriptionTypeMap = options, };
         return _roomService.GetTranscriptionAsync(request, HttpContext.RequestAborted);
     }
 }
