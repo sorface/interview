@@ -643,13 +643,6 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                     .DefaultIfEmpty(0)
                     .Average();
             }
-            else
-            {
-                foreach (var analyticsQuestionUser in analyticsQuestion.Users)
-                {
-                    analyticsQuestionUser.Evaluation = null;
-                }
-            }
         }
 
         return analytics;

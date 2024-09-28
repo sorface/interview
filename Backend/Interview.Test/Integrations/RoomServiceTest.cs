@@ -789,7 +789,11 @@ public class RoomServiceTest
                         new()
                         {
                             Id = users[3].Id,
-                            Evaluation = null,
+                            Evaluation = new()
+                            {
+                                Mark = 10,
+                                Review = "test test",
+                            },
                         },
                     },
                     AverageMark = null
@@ -809,7 +813,11 @@ public class RoomServiceTest
                         new()
                         {
                             Id = users[1].Id,
-                            Evaluation = null,
+                            Evaluation = new()
+                            {
+                                Mark = 5,
+                                Review = "test",
+                            },
                         },
                         new()
                         {
@@ -864,7 +872,11 @@ public class RoomServiceTest
                         new()
                         {
                             Id = users[0].Id,
-                            Evaluation = null,
+                            Evaluation = new()
+                            {
+                                Review = "test 4444",
+                                Mark = 10
+                            },
                         },
                         new()
                         {
