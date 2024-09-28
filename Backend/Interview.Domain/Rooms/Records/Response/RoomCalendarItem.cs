@@ -4,5 +4,5 @@ public class RoomCalendarItem
 {
     public DateTime MinScheduledStartTime { get; set; }
 
-    public List<EVRoomStatus> Statuses { get; set; } = new();
+    public HashSet<EVRoomStatus> Statuses { get; set; } = new();
 }

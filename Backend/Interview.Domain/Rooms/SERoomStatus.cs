@@ -19,4 +19,17 @@ public class SERoomStatus : SmartEnum<SERoomStatus, char>
     }
 
     public EVRoomStatus EnumValue { get; }
+
+    public static SERoomStatus FromEnum(EVRoomStatus enumValue)
+    {
+        foreach (var roomStatus in List)
+        {
+            if (roomStatus.EnumValue == enumValue)
+            {
+                return roomStatus;
+            }
+        }
+
+        throw new ArgumentException($"No room status found for value {enumValue}");
+    }
 }

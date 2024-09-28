@@ -167,55 +167,54 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
     public async Task<List<RoomCalendarItem>> GetCalendarAsync(RoomCalendarRequest filter, CancellationToken cancellationToken = default)
     {
-        var currentUserId = _currentUserAccessor.UserId;
-
-        var queryable = _db.Rooms
-            .Include(room => room.Participants)
-            .Where(room => room.Participants.Any(participant => participant.UserId == currentUserId));
-
-        if (filter.StartDateTime is not null)
-        {
-            queryable = queryable.Where(e => filter.StartDateTime <= e.ScheduleStartTime);
-        }
-
-        if (filter.EndDateTime is not null)
-        {
-            queryable = queryable.Where(e => filter.EndDateTime >= e.ScheduleStartTime);
-        }
-
-        if (filter.RoomStatus is not null && filter.RoomStatus.Count > 0)
-        {
-            var mapStatuses = filter.RoomStatus
-                .Join(SERoomStatus.List, status => status, status => status.EnumValue, (_, roomStatus) => roomStatus).ToList();
-
-            queryable = queryable.Where(e => mapStatuses.Contains(e.Status));
-        }
-
-        var rooms = await queryable
+        var currentUserId = _currentUserAccessor.GetUserIdOrThrow();
+        var spec = BuildSpecification(filter);
+        var rooms = await _db.RoomParticipants
+            .AsNoTracking()
+            .Where(e => e.UserId == currentUserId)
+            .Select(e => e.Room)
+            .Where(spec)
             .OrderBy(room => room.ScheduleStartTime)
-            .ThenBy(room => room.ScheduleStartTime)
             .Select(room => new { Time = room.ScheduleStartTime, room.Status })
             .ToListAsync(cancellationToken);
 
         var offset = TimeSpan.FromMinutes(filter.TimeZoneOffset);
-
-        return rooms.Select(roomInfo => new { TimeOffset = roomInfo.Time.Add(offset), UtcTime = roomInfo.Time, Status = roomInfo.Status })
-            .GroupBy(info => $@"{info.TimeOffset.Day}-{info.TimeOffset.Month}-{info.TimeOffset.Year}")
-            .ToDictionary(grouping => grouping.Key, grouping => grouping.ToList())
-            .Values
-            .Select(values =>
+        return rooms
+            .Select(roomInfo => new
             {
-                var meeting = values.MinBy(it => it.UtcTime);
-
-                return new
-                {
-                    First = meeting,
-                    Statuses = values.Select(it => it.Status.EnumValue).ToList(),
-                };
+                TimeOffset = roomInfo.Time.Add(offset),
+                UtcTime = roomInfo.Time,
+                Status = roomInfo.Status,
             })
-            .Where(meeting => meeting.First is not null)
-            .Select(meeting => new RoomCalendarItem { MinScheduledStartTime = meeting.First!.UtcTime, Statuses = meeting.Statuses, })
+            .GroupBy(info => info.TimeOffset.Date)
+            .Select(values => new RoomCalendarItem
+            {
+                MinScheduledStartTime = values.MinBy(it => it.UtcTime)!.UtcTime,
+                Statuses = values.Select(it => it.Status.EnumValue).ToHashSet(),
+            })
             .ToList();
+
+        static ASpec<Room> BuildSpecification(RoomCalendarRequest filter)
+        {
+            ASpec<Room> res = Spec<Room>.Any;
+            if (filter.StartDateTime is not null)
+            {
+                res &= new Spec<Room>(e => filter.StartDateTime <= e.ScheduleStartTime);
+            }
+
+            if (filter.EndDateTime is not null)
+            {
+                res &= new Spec<Room>(e => filter.EndDateTime >= e.ScheduleStartTime);
+            }
+
+            if (filter.RoomStatus is not null && filter.RoomStatus.Count > 0)
+            {
+                var mapStatuses = filter.RoomStatus.Select(SERoomStatus.FromEnum).ToList();
+                res &= new Spec<Room>(e => mapStatuses.Contains(e.Status));
+            }
+
+            return res;
+        }
     }
 
     public async Task<RoomDetail> FindByIdAsync(Guid id, CancellationToken cancellationToken)
