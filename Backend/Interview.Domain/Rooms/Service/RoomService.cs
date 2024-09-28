@@ -190,7 +190,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             .Select(values => new RoomCalendarItem
             {
                 MinScheduledStartTime = values.MinBy(it => it.UtcTime)!.UtcTime,
-                Statuses = values.Select(it => it.Status.EnumValue).ToHashSet(),
+                Statuses = values.Select(it => it.Status.EnumValue).ToList(),
             })
             .ToList();
 
