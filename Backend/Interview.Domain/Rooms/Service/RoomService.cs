@@ -184,7 +184,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             {
                 TimeOffset = roomInfo.Time.Add(offset),
                 UtcTime = roomInfo.Time,
-                Status = roomInfo.Status,
+                roomInfo.Status,
             })
             .GroupBy(info => info.TimeOffset.Date)
             .Select(values => new RoomCalendarItem
@@ -196,7 +196,7 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
 
         static ASpec<Room> BuildSpecification(RoomCalendarRequest filter)
         {
-            ASpec<Room> res = Spec<Room>.Any;
+            var res = Spec<Room>.Any;
             if (filter.StartDateTime is not null)
             {
                 res &= new Spec<Room>(e => filter.StartDateTime <= e.ScheduleStartTime);
