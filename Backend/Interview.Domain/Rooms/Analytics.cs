@@ -6,7 +6,9 @@ public class Analytics
 {
     public required List<AnalyticsQuestion>? Questions { get; set; }
 
-    public required double AverageMark { get; set; }
+    public required bool Completed { get; set; }
+
+    public required double? AverageMark { get; set; }
 
     public required List<AnalyticsUserAverageMark> UserReview { get; set; }
 
@@ -20,7 +22,7 @@ public class Analytics
 
         public required List<AnalyticsUser>? Users { get; set; }
 
-        public required double AverageMark { get; set; }
+        public required double? AverageMark { get; set; }
     }
 
     public sealed class AnalyticsUserQuestionEvaluation
@@ -50,7 +52,7 @@ public class Analytics
     {
         public required Guid UserId { get; set; }
 
-        public required double AverageMark { get; set; }
+        public required double? AverageMark { get; set; }
 
         public required EVRoomParticipantType ParticipantType { get; set; }
 
