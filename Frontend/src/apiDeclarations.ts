@@ -36,6 +36,13 @@ export interface GetRoomPageParams extends PaginationUrlParams {
   EndValue?: string;
 }
 
+export interface GetRoomCalendarParams {
+  StartDateTime: string;
+  EndDateTime: string;
+  RoomStatus: RoomStatus[];
+  TimeZoneOffset: number;
+}
+
 export interface GetRoomParticipantParams {
   RoomId: Room['id'];
   UserId: User['id'];
@@ -59,6 +66,11 @@ export const roomsApiDeclaration = {
   getPage: (params: GetRoomPageParams): ApiContractGet => ({
     method: 'GET',
     baseUrl: '/rooms',
+    urlParams: params,
+  }),
+  calendar: (params: GetRoomCalendarParams): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: '/rooms/calendar',
     urlParams: params,
   }),
   getById: (id: Room['id']): ApiContractGet => ({

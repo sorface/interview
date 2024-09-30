@@ -9,6 +9,7 @@ import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme } from '../../context/ThemeContext';
 
 interface CalendarProps {
+  loading: boolean;
   monthStartDate: Date;
   currentDate: Date;
   filledItems: Date[];
@@ -50,6 +51,7 @@ const unshiftNull = <T extends any>(array: T[], count: number) => {
 };
 
 export const Calendar: FunctionComponent<CalendarProps> = ({
+  loading,
   monthStartDate,
   currentDate,
   filledItems,
@@ -108,7 +110,7 @@ export const Calendar: FunctionComponent<CalendarProps> = ({
       <Gap sizeRem={0.25} />
       {daysChunks.map((daysChunk, index) => (
         <Fragment key={`daysChunk${index}`}>
-          <div className='flex'>
+          <div className={`flex ${loading ? 'opacity-0.5' : ''}`}>
             {daysChunk.map((day, dayIndex) => (
               <Fragment key={day ? day.valueOf() : `null-day${dayIndex}`}>
                 <CalendarDay
