@@ -28,6 +28,11 @@ export interface Room {
   };
 }
 
+export interface RoomCalendarItem {
+  minScheduledStartTime: string;
+  statuses: RoomStatus[];
+}
+
 export type RoomQuestionListItem = Question & DragNDropListItem;
 
 export interface RoomParticipant extends User {

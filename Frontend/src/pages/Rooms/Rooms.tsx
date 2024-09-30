@@ -1,10 +1,10 @@
 import React, { FunctionComponent, useCallback, useContext, useEffect, useState, MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { GetRoomPageParams, roomsApiDeclaration } from '../../apiDeclarations';
+import { GetRoomCalendarParams, GetRoomPageParams, roomsApiDeclaration } from '../../apiDeclarations';
 import { IconNames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
-import { Room, RoomStatus } from '../../types/room';
+import { Room, RoomCalendarItem, RoomStatus } from '../../types/room';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
@@ -44,6 +44,11 @@ const getDayEndValue = (date: Date) => {
   return result;
 };
 
+const getMonthEndDate = (startMonthDate: Date) => {
+  const endDate = new Date(startMonthDate.getFullYear(), startMonthDate.getMonth() + 1, 0, 23, 59, 59);
+  return endDate;
+};
+
 export enum RoomsPageMode {
   Home,
   Current,
@@ -64,6 +69,8 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
   const { process: { loading, error }, data: rooms } = apiMethodState;
   const { apiMethodState: roomsHistoryApiMethodState, fetchData: fetchRoomsHistory } = useApiMethod<Room[], GetRoomPageParams>(roomsApiDeclaration.getPage);
   const { process: { loading: loadingRoomsHistory, error: errorRoomsHistory }, data: roomsHistory } = roomsHistoryApiMethodState;
+  const { apiMethodState: roomsCalendarApiMethodState, fetchData: fetchRoomsCalendar } = useApiMethod<RoomCalendarItem[], GetRoomCalendarParams>(roomsApiDeclaration.calendar);
+  const { process: { loading: loadingRoomsCalendar, error: errorRoomsCalendar }, data: roomsCalendar } = roomsCalendarApiMethodState;
   const [searchValueInput, setSearchValueInput] = useState('');
   const [searchValue, setSearchValue] = useState('');
   const closed = mode === RoomsPageMode.Closed;
@@ -72,7 +79,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
   const [roomsUpdateTrigger, setRoomsUpdateTrigger] = useState(0);
   const [monthStartDate, setMonthStartDate] = useState(initialMonthStartDate);
   const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const roomDates = rooms ? rooms.map(room => new Date(room.scheduledStartTime)) : [];
+  const roomDates = roomsCalendar ? roomsCalendar.map(roomCalendar => new Date(roomCalendar.minScheduledStartTime)) : [];
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const triggerResetAccumData = `${roomsUpdateTrigger}${searchValue}${mode}${selectedDay}`;
 
@@ -107,6 +114,19 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
   useEffect(() => {
     updateRooms();
   }, [updateRooms, roomsUpdateTrigger, mode]);
+
+  useEffect(() => {
+    if (!monthStartDate || mode !== RoomsPageMode.Home) {
+      return;
+    }
+    const monthEndDate = getMonthEndDate(monthStartDate);
+    fetchRoomsCalendar({
+      RoomStatus: ['New', 'Active', 'Review'],
+      TimeZoneOffset: (new Date()).getTimezoneOffset() * -1,
+      StartDateTime: monthStartDate.toISOString(),
+      EndDateTime: monthEndDate.toISOString(),
+    });
+  }, [roomsUpdateTrigger, mode, monthStartDate, fetchRoomsCalendar]);
 
   useEffect(() => {
     setPageNumber(initialPageNumber);
@@ -283,7 +303,19 @@ export const Rooms: FunctionComponent<RoomsProps> = ({
             <div className='flex overflow-auto'>
               <Gap sizeRem={1} horizontal />
               <div className='flex flex-col overflow-auto w-17.375'>
+                {!!errorRoomsCalendar && (
+                  <Typography size='m' error>
+                    <div className='text-left flex items-center'>
+                      <Icon name={IconNames.Information} />
+                      <Gap sizeRem={0.25} horizontal />
+                      <div>
+                        {localizationCaptions[LocalizationKey.Error]}: {errorRoomsCalendar}
+                      </div>
+                    </div>
+                  </Typography>
+                )}
                 <Calendar
+                  loading={loadingRoomsCalendar}
                   monthStartDate={monthStartDate}
                   currentDate={currentDate}
                   filledItems={roomDates}
