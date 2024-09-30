@@ -29,7 +29,7 @@ const remoteCursorColor = 'var(--active)';
 const remoteSelectionColor = 'var(--active)';
 
 interface RoomCodeEditorProps {
-  initialValue: string;
+  initialValue: string | null;
   language?: CodeEditorLang;
   roomState: RoomState | null;
   readOnly: boolean;
@@ -47,7 +47,7 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
 }) => {
   const auth = useContext(AuthContext);
   const ignoreChangeRef = useRef(false);
-  const [value, setValue] = useState<string>(initialValue);
+  const [value, setValue] = useState<string | null>(initialValue);
   const [remoteCursor, setRemoteCursor] = useState<RemoteCursor | null>(null);
   const [remoteSelection, setRemoteSelection] = useState<RemoteSelection | null>(null);
   const [cursorPosition, setCursorPosition] = useState<CursorPosition | null>(null);
@@ -56,6 +56,13 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   const {
     fetchData: sendRoomEvent,
   } = useApiMethod<unknown, SendEventBody>(roomsApiDeclaration.sendEvent);
+
+  useEffect(() => {
+    if (typeof initialValue !== 'string') {
+      return;
+    }
+    setValue(initialValue);
+  }, [initialValue]);
 
   useEffect(() => {
     if (!lastWsMessage?.data) {
@@ -218,7 +225,7 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
       language={language || defaultLanguage}
       languages={Object.values(CodeEditorLang)}
       readOnly={readOnly}
-      value={value}
+      value={value || ''}
       onMount={handleEditorMount}
       onChange={handleChange}
       onLanguageChange={handleLanguageChange}
