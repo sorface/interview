@@ -223,7 +223,10 @@ export const RoomReview: FunctionComponent = () => {
 
   if (loading || !room || myQuestionEvaluationsLoading || myRoomReviewLoading) {
     return (
+      <>
+      <PageHeader title={localizationCaptions[LocalizationKey.RoomReviewPageName]} />
       <Loader />
+      </>
     );
   }
 
