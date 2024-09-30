@@ -45,12 +45,13 @@ export interface AnalyticsUserReview {
   nickname: User['nickname'];
   avatar?: User['avatar'];
   participantType: UserType;
-  averageMark: number;
+  averageMark?: number;
   comment: string;
 }
 
 export interface Analytics {
-  averageMark: number;
+  completed: boolean;
+  averageMark?: number;
   questions: AnalyticsQuestions[];
   userReview: AnalyticsUserReview[];
 }

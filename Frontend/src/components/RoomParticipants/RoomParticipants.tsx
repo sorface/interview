@@ -1,12 +1,12 @@
 import { FunctionComponent } from 'react';
 import { Room } from '../../types/room';
 import { UserAvatar } from '../UserAvatar/UserAvatar';
-import { Tooltip } from 'react-tooltip';
 import { useParticipantTypeLocalization } from '../../hooks/useParticipantTypeLocalization';
-
-import './RoomParticipants.css';
 import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme } from '../../context/ThemeContext';
+import { Tooltip } from '../Tooltip/Tooltip';
+
+import './RoomParticipants.css';
 
 interface RoomParticipantsProps {
   participants: Room['participants'];

@@ -8,7 +8,8 @@ import './Icon.css';
 
 export interface IconProps {
   name: IconNames;
-  size?: 'xxl' | 'm' | 's';
+  size?: 'xxl' | 'm' | 'l' | 's';
+  inheritFontSize?: boolean;
   secondary?: boolean;
   danger?: boolean;
 }
@@ -18,6 +19,8 @@ const getSizeClassName = (size: IconProps['size']) => {
     case 's':
       return 'w-1.125 h-1.125';
     case 'm':
+      return 'w-1.25 h-1.25';
+    case 'l':
       return 'w-1.375 h-1.375';
     case 'xxl':
       return 'w-4 h-4';
@@ -29,10 +32,11 @@ const getSizeClassName = (size: IconProps['size']) => {
 export const Icon: FunctionComponent<IconProps> = ({
   name,
   size,
+  inheritFontSize,
   secondary,
   danger,
 }) => {
-  const sizeClassName = getSizeClassName(size);
+  const sizeClassName = inheritFontSize ? '' : getSizeClassName(size || 'm');
   const themeSecondaryClassName = useThemeClassName({
     [Theme.Dark]: 'text-dark-grey4',
     [Theme.Light]: 'text-grey3',

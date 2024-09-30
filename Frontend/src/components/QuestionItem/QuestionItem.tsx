@@ -83,12 +83,12 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
 
   const title = (
     <>
-      {typeof mark === 'number' && (
+      {(typeof mark === 'number' || mark === null) && (
         <>
           <CircularProgress
             size='s'
-            value={mark * 10}
-            caption={mark.toFixed(1)}
+            value={typeof mark === 'number' ? mark * 10 : null}
+            caption={typeof mark === 'number' ? mark.toFixed(1) : null}
           />
           <Gap sizeRem={1.5} horizontal />
         </>

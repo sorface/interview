@@ -10,7 +10,7 @@ import { MessagesChat } from './MessagesChat';
 import { getAverageVolume } from './utils/getAverageVolume';
 import { createAudioAnalyser, frequencyBinCount } from './utils/createAudioAnalyser';
 import { limitLength } from './utils/limitLength';
-import { randomId } from './utils/randomId';
+import { randomId } from '../../../../utils/randomId';
 import { RoomCodeEditor } from '../RoomCodeEditor/RoomCodeEditor';
 import { RoomState } from '../../../../types/room';
 import { parseWsMessage } from './utils/parseWsMessage';

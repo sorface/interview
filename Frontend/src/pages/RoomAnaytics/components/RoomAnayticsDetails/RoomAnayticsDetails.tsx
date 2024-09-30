@@ -52,9 +52,6 @@ export const RoomAnayticsDetails: FunctionComponent<RoomAnayticsDetailsProps> = 
           {openedQuestion?.users
             .filter(questionUser => allUsers.get(questionUser.id)?.participantType === 'Expert')
             .map(questionUser => {
-              if (!questionUser.evaluation) {
-                return undefined;
-              }
               return (
                 <ReviewUserOpinion
                   key={questionUser.id}

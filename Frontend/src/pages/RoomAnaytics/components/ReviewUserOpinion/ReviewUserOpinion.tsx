@@ -39,13 +39,11 @@ export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
           </div>
         </div>
         <div>
-          {!!user.evaluation && (
-            <CircularProgress
-            value={user.evaluation.mark ? user.evaluation.mark * 10 : 0}
-            caption={user.evaluation.mark ? user.evaluation.mark.toFixed(1) : 0}
+          <CircularProgress
+            value={typeof user.evaluation?.mark === 'number' ? user.evaluation.mark * 10 : null}
+            caption={typeof user.evaluation?.mark === 'number' ? user.evaluation.mark.toFixed(1) : null}
             size='s'
           />
-          )}
         </div>
       </div>
       <Gap sizeRem={1} />
