@@ -1287,8 +1287,34 @@ public class RoomServiceTest
         var room = new Room("test", SERoomAccessType.Private);
 
         memoryDatabase.Users.AddRange(user1, user2);
+        memoryDatabase.SaveChanges();
         memoryDatabase.Rooms.Add(room);
         memoryDatabase.Questions.AddRange(question, question1);
+
+        var roomQuestions = new[]
+        {
+            (Question: question, User: user1, State: RoomQuestionState.Active),
+            (Question: question1, User: user2, State: RoomQuestionState.Active),
+        }
+        .Select(e => new RoomQuestion
+        {
+            RoomId = default,
+            QuestionId = default,
+            Room = room,
+            Question = e.Question,
+            State = e.State,
+            Order = 0,
+            CreatedById = e.User.Id
+        })
+        .ToList();
+        memoryDatabase.RoomQuestions.AddRange(roomQuestions);
+
+        memoryDatabase.RoomQuestionEvaluation.AddRange(roomQuestions.Select(e => new RoomQuestionEvaluation
+        {
+            RoomQuestionId = e.Id,
+            CreatedById = e.CreatedById,
+            State = SERoomQuestionEvaluationState.Draft
+        }));
 
         var roomParticipant1 = new RoomParticipant(user1, room, SERoomParticipantType.Expert);
         var roomParticipant2 = new RoomParticipant(user2, room, SERoomParticipantType.Expert);
@@ -1301,12 +1327,77 @@ public class RoomServiceTest
         memoryDatabase.RoomReview.AddRange(roomReview1, roomReview2);
 
         await memoryDatabase.SaveChangesAsync(cancellationToken);
+        memoryDatabase.SaveChanges();
 
         var roomRepository = new RoomRepository(memoryDatabase);
 
         var isReadyToCloseAsync = await roomRepository.IsReadyToCloseAsync(room.Id, cancellationToken);
 
         isReadyToCloseAsync.Should().BeFalse();
+    }
+
+    [Fact(DisplayName = "One of the users was not in the room at the time of the interview")]
+    public async Task TestRoomIsReadyToCloseSuccess()
+    {
+        var cancellationToken = new CancellationToken();
+
+        await using var memoryDatabase = new TestAppDbContextFactory().Create(new TestSystemClock());
+
+        var user1 = new User(Guid.NewGuid(), "user1", Guid.NewGuid().ToString());
+        var user2 = new User(Guid.NewGuid(), "user2", Guid.NewGuid().ToString());
+
+        var question = new Question("question_test");
+        var question1 = new Question("question_test_1");
+
+        var room = new Room("test", SERoomAccessType.Private);
+
+        memoryDatabase.Users.AddRange(user1, user2);
+        memoryDatabase.SaveChanges();
+        memoryDatabase.Rooms.Add(room);
+        memoryDatabase.Questions.AddRange(question, question1);
+
+        var roomQuestions = new[]
+        {
+            (Question: question, User: user1, State: RoomQuestionState.Active),
+            (Question: question1, User: user1, State: RoomQuestionState.Active),
+        }
+        .Select(e => new RoomQuestion
+        {
+            RoomId = default,
+            QuestionId = default,
+            Room = room,
+            Question = e.Question,
+            State = e.State,
+            Order = 0,
+            CreatedById = e.User.Id
+        })
+        .ToList();
+        memoryDatabase.RoomQuestions.AddRange(roomQuestions);
+
+        memoryDatabase.RoomQuestionEvaluation.AddRange(roomQuestions.Select(e => new RoomQuestionEvaluation
+        {
+            RoomQuestionId = e.Id,
+            CreatedById = e.CreatedById,
+            State = SERoomQuestionEvaluationState.Draft
+        }));
+
+        var roomParticipant1 = new RoomParticipant(user1, room, SERoomParticipantType.Expert);
+        var roomParticipant2 = new RoomParticipant(user2, room, SERoomParticipantType.Expert);
+
+        memoryDatabase.RoomParticipants.AddRange(roomParticipant1, roomParticipant2);
+
+        var roomReview1 = new RoomReview(roomParticipant1, SERoomReviewState.Closed);
+
+        memoryDatabase.RoomReview.AddRange(roomReview1);
+
+        await memoryDatabase.SaveChangesAsync(cancellationToken);
+        memoryDatabase.SaveChanges();
+
+        var roomRepository = new RoomRepository(memoryDatabase);
+
+        var isReadyToCloseAsync = await roomRepository.IsReadyToCloseAsync(room.Id, cancellationToken);
+
+        isReadyToCloseAsync.Should().BeTrue();
     }
 
     [Fact]
