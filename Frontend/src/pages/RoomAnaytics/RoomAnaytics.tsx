@@ -1,4 +1,5 @@
-import { Fragment, FunctionComponent, useEffect, useState } from 'react';
+import { Fragment, FunctionComponent, useContext, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { useParams } from 'react-router-dom';
 import { useApiMethod } from '../../hooks/useApiMethod';
@@ -23,7 +24,11 @@ import { Modal } from '../../components/Modal/Modal';
 import { User } from '../../types/user';
 import { RoomAnayticsDetails } from './components/RoomAnayticsDetails/RoomAnayticsDetails';
 import { UserAvatar } from '../../components/UserAvatar/UserAvatar';
-import { HttpResponseCode } from '../../constants';
+import { HttpResponseCode, IconNames } from '../../constants';
+import { AuthContext } from '../../context/AuthContext';
+import { Button } from '../../components/Button/Button';
+import { ModalWarningContent } from '../../components/ModalWarningContent/ModalWarningContent';
+import { ModalFooter } from '../../components/ModalFooter/ModalFooter';
 
 const createFakeQuestion = (roomQuestion: RoomQuestion): Question => ({
   ...roomQuestion,
@@ -56,9 +61,11 @@ const getAllUsers = (data: Analytics) => {
 };
 
 export const RoomAnaytics: FunctionComponent = () => {
+  const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
   const { id } = useParams();
   const [openedQuestionDetails, setOpenedQuestionDetails] = useState('');
+  const [closeModalOpen, setCloseModalOpen] = useState(false);
 
   const { apiMethodState, fetchData } = useApiMethod<Analytics, Room['id']>(roomsApiDeclaration.analytics);
   const { data, process: { loading, error, code } } = apiMethodState;
@@ -71,6 +78,20 @@ export const RoomAnaytics: FunctionComponent = () => {
     process: { loading: roomLoading, error: roomError },
     data: room,
   } = roomApiMethodState;
+
+  const {
+    apiMethodState: apiRoomCloseMethodState,
+    fetchData: fetchRoomClose,
+  } = useApiMethod<unknown, Room['id']>(roomsApiDeclaration.close);
+  const {
+    process: {
+      loading: roomCloseLoading,
+      error: roomCloseError,
+      code: roomCloseCode,
+    },
+  } = apiRoomCloseMethodState;
+
+  const averageMarkOrNull = data?.averageMark ?? null;
 
   const viewNotAllowed = code === HttpResponseCode.Forbidden;
 
@@ -90,12 +111,42 @@ export const RoomAnaytics: FunctionComponent = () => {
     fetchRoom(id);
   }, [id, fetchData, fetchRoom]);
 
+  useEffect(() => {
+    if (roomCloseCode !== HttpResponseCode.Ok) {
+      return;
+    }
+    handleCloseCloseModal();
+    toast.success(localizationCaptions[LocalizationKey.Saved]);
+  }, [roomCloseCode, localizationCaptions]);
+
+  useEffect(() => {
+    if (!roomCloseError) {
+      return;
+    }
+    toast.error(roomCloseError);
+  }, [roomCloseError]);
+
   const handleQuestionClick = (question: Question) => {
     setOpenedQuestionDetails(question.id);
   };
 
   const handleQuestionDetailsClose = () => {
     setOpenedQuestionDetails('');
+  };
+
+  const handleOpenCloseModal = () => {
+    setCloseModalOpen(true);
+  };
+
+  const handleCloseCloseModal = () => {
+    setCloseModalOpen(false);
+  };
+
+  const handleCloseRoom = () => {
+    if (!id) {
+      throw new Error('Room id not found');
+    }
+    fetchRoomClose(id);
   };
 
   if (loading || roomLoading) {
@@ -178,13 +229,11 @@ export const RoomAnaytics: FunctionComponent = () => {
                 {localizationCaptions[LocalizationKey.AverageCandidateMark]}
               </Typography>
               <Gap sizeRem={1} />
-              {!!data && (
                 <CircularProgress
-                  value={data.averageMark * 10}
-                  caption={data.averageMark.toFixed(1)}
+                  value={averageMarkOrNull ? averageMarkOrNull * 10 : null}
+                  caption={averageMarkOrNull ? averageMarkOrNull.toFixed(1) : null}
                   size='m'
                 />
-              )}
             </InfoBlock>
           </>
         )}
@@ -225,7 +274,7 @@ export const RoomAnaytics: FunctionComponent = () => {
                 <Fragment key={question.id}>
                   <QuestionItem
                     question={createFakeQuestion(question)}
-                    mark={question.averageMark}
+                    mark={question.averageMark ?? null}
                     onClick={handleQuestionClick}
                   />
                   {index !== questions.length - 1 && (<Gap sizeRem={0.25} />)}
@@ -233,6 +282,40 @@ export const RoomAnaytics: FunctionComponent = () => {
               );
             })}
           </InfoBlock>
+        </>
+      )}
+      {(data?.completed === false && room && room?.owner.id === auth?.id) && (
+        <>
+          <Gap sizeRem={1.75} />
+          <div className='flex justify-end'>
+            <Button
+              onClick={handleOpenCloseModal}
+            >
+              {localizationCaptions[LocalizationKey.CloseRoomWithoutReview]}
+            </Button>
+            <Gap sizeRem={1} horizontal />
+          </div>
+          <Modal
+            contentLabel=''
+            open={closeModalOpen}
+            onClose={handleCloseCloseModal}
+          >
+            <ModalWarningContent
+              iconName={IconNames.HelpCircle}
+              captionLine1={localizationCaptions[LocalizationKey.CloseRoomWithoutQuestionEvaluationWarningLine1]}
+              captionLine2={localizationCaptions[LocalizationKey.CloseRoomWithoutQuestionEvaluationWarningLine2]}
+            />
+            <ModalFooter>
+              <Button onClick={handleCloseCloseModal}>{localizationCaptions[LocalizationKey.Cancel]}</Button>
+              <Button onClick={handleCloseRoom} variant='active'>
+                {roomCloseLoading ? (
+                  <Loader />
+                ) : (
+                  localizationCaptions[LocalizationKey.Save]
+                )}
+              </Button>
+            </ModalFooter>
+          </Modal>
         </>
       )}
     </>

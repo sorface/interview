@@ -1,11 +1,17 @@
 import { FunctionComponent } from 'react';
+import { Typography } from '../Typography/Typography';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
+import { IconNames } from '../../constants';
+import { useRandomId } from '../../hooks/useRandomId';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { LocalizationKey } from '../../localization';
+import { Tooltip } from '../Tooltip/Tooltip';
 
 import './CircularProgress.css';
-import { Typography } from '../Typography/Typography';
 
 interface CircularProgressProps {
-  value: number;
-  caption: string | number;
+  value: number | null;
+  caption: string | number | null;
   size: 'm' | 's';
 }
 
@@ -14,8 +20,34 @@ export const CircularProgress: FunctionComponent<CircularProgressProps> = ({
   caption,
   size,
 }) => {
+  const randomId = useRandomId();
+  const localizationCaptions = useLocalizationCaptions();
   const sizePx = size === 'm' ? 108 : 40;
   const strokeWidth = size === 'm' ? '12px' : '4px';
+
+  if (value === null) {
+    return (
+      <>
+        <Tooltip
+          id={`CircularProgress-tooltip-${randomId}`}
+          place='top'
+          content={localizationCaptions[LocalizationKey.RoomReviewWaiting]}
+        />
+        <div
+          data-tooltip-id={`CircularProgress-tooltip-${randomId}`}
+          className='flex items-center justify-center'
+          style={{
+            width: `${sizePx}px`,
+            height: `${sizePx}px`,
+            fontSize: `${sizePx}px`,
+          }}
+        >
+          <Icon inheritFontSize name={IconNames.Time} />
+        </div>
+      </>
+    );
+  }
+
   return (
     <div
       className='relative circular-progress-wrapper'
