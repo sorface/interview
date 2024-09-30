@@ -160,7 +160,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   const [videoOrder, setVideoOrder] = useState<Record<string, number>>({
     [auth?.id || '']: 1,
   });
-  const [codeEditorInitialValue, setCodeEditorInitialValue] = useState('');
+  const [codeEditorInitialValue, setCodeEditorInitialValue] = useState<string | null>(null);
   const updateLouderUserTimeout = useRef(0);
   const { activeReactions } = useReactionsStatus({
     lastMessage: lastWsMessage,
@@ -251,7 +251,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     if (!roomState) {
       return;
     }
-    setCodeEditorInitialValue(roomState.codeEditor.content || '');
+    setCodeEditorInitialValue(roomState.codeEditor.content);
     fetchRoomEventsSearch({
       roomId: roomState.id,
     });
@@ -635,7 +635,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     if (codeEditorEnabled) {
       return (
         <RoomCodeEditor
-          initialValue={codeEditorInitialValue || ''}
+          initialValue={codeEditorInitialValue}
           language={codeEditorLanguage}
           roomState={roomState}
           readOnly={viewerMode}
