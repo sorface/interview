@@ -30,6 +30,8 @@ import { Button } from '../../components/Button/Button';
 import { ModalWarningContent } from '../../components/ModalWarningContent/ModalWarningContent';
 import { ModalFooter } from '../../components/ModalFooter/ModalFooter';
 
+const updateDataTimeoutMs = 10000;
+
 const createFakeQuestion = (roomQuestion: RoomQuestion): Question => ({
   ...roomQuestion,
   tags: [],
@@ -66,6 +68,7 @@ export const RoomAnaytics: FunctionComponent = () => {
   const { id } = useParams();
   const [openedQuestionDetails, setOpenedQuestionDetails] = useState('');
   const [closeModalOpen, setCloseModalOpen] = useState(false);
+  const [loadedData, setLoadedData] = useState<Analytics | null>(null);
 
   const { apiMethodState, fetchData } = useApiMethod<Analytics, Room['id']>(roomsApiDeclaration.analytics);
   const { data, process: { loading, error, code } } = apiMethodState;
@@ -91,13 +94,13 @@ export const RoomAnaytics: FunctionComponent = () => {
     },
   } = apiRoomCloseMethodState;
 
-  const averageMarkOrNull = data?.averageMark ?? null;
+  const averageMarkOrNull = loadedData?.averageMark ?? null;
 
   const viewNotAllowed = code === HttpResponseCode.Forbidden;
 
   const totalError = (!viewNotAllowed && error) || roomError;
 
-  const allUsers = data ? getAllUsers(data) : new Map<User['id'], AnalyticsUserReview>();
+  const allUsers = loadedData ? getAllUsers(loadedData) : new Map<User['id'], AnalyticsUserReview>();
 
   const examinee = room?.participants.find(
     participant => participant.type === 'Examinee'
@@ -126,6 +129,29 @@ export const RoomAnaytics: FunctionComponent = () => {
     toast.error(roomCloseError);
   }, [roomCloseError]);
 
+  useEffect(() => {
+    if (!id) {
+      throw new Error('Room id not found');
+    }
+    if (!loadedData || loadedData.completed) {
+      return;
+    }
+    const timeout = setTimeout(() => {
+      fetchData(id);
+    }, updateDataTimeoutMs);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [id, loadedData, fetchData]);
+
+  useEffect(() => {
+    if (!data) {
+      return;
+    }
+    setLoadedData(data);
+  }, [data]);
+
   const handleQuestionClick = (question: Question) => {
     setOpenedQuestionDetails(question.id);
   };
@@ -149,7 +175,7 @@ export const RoomAnaytics: FunctionComponent = () => {
     fetchRoomClose(id);
   };
 
-  if (loading || roomLoading) {
+  if ((loading && !loadedData) || roomLoading) {
     return (
       <Loader />
     );
@@ -164,7 +190,7 @@ export const RoomAnaytics: FunctionComponent = () => {
       >
         <RoomAnayticsDetails
           allUsers={allUsers}
-          data={data}
+          data={loadedData}
           openedQuestionDetails={openedQuestionDetails}
           roomId={room?.id}
         />
@@ -229,11 +255,11 @@ export const RoomAnaytics: FunctionComponent = () => {
                 {localizationCaptions[LocalizationKey.AverageCandidateMark]}
               </Typography>
               <Gap sizeRem={1} />
-                <CircularProgress
-                  value={averageMarkOrNull ? averageMarkOrNull * 10 : null}
-                  caption={averageMarkOrNull ? averageMarkOrNull.toFixed(1) : null}
-                  size='m'
-                />
+              <CircularProgress
+                value={averageMarkOrNull ? averageMarkOrNull * 10 : null}
+                caption={averageMarkOrNull ? averageMarkOrNull.toFixed(1) : null}
+                size='m'
+              />
             </InfoBlock>
           </>
         )}
@@ -251,7 +277,7 @@ export const RoomAnaytics: FunctionComponent = () => {
               {localizationCaptions[LocalizationKey.OpinionsAndMarks]}
               <Gap sizeRem={2} />
               <ReviewUserGrid>
-                {data?.userReview
+                {loadedData?.userReview
                   .filter(userReview => allUsers.get(userReview.userId)?.participantType === 'Expert')
                   .map((userReview) => (
                     <ReviewUserOpinion
@@ -269,7 +295,7 @@ export const RoomAnaytics: FunctionComponent = () => {
               {localizationCaptions[LocalizationKey.MarksForQuestions]}
             </Typography>
             <Gap sizeRem={2} />
-            {data?.questions.map((question, index, questions) => {
+            {loadedData?.questions.map((question, index, questions) => {
               return (
                 <Fragment key={question.id}>
                   <QuestionItem
@@ -284,7 +310,7 @@ export const RoomAnaytics: FunctionComponent = () => {
           </InfoBlock>
         </>
       )}
-      {(data?.completed === false && room && room?.owner.id === auth?.id) && (
+      {(loadedData?.completed === false && room && room?.owner.id === auth?.id) && (
         <>
           <Gap sizeRem={1.75} />
           <div className='flex justify-end'>
