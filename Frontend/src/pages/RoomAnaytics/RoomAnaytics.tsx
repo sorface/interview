@@ -175,12 +175,6 @@ export const RoomAnaytics: FunctionComponent = () => {
     fetchRoomClose(id);
   };
 
-  if ((loading && !loadedData) || roomLoading) {
-    return (
-      <Loader />
-    );
-  }
-
   return (
     <>
       <Modal
@@ -204,66 +198,72 @@ export const RoomAnaytics: FunctionComponent = () => {
           <Typography size='m' error>{localizationCaptions[LocalizationKey.Error]}: {totalError}</Typography>
         </div>
       )}
-      <div className='flex text-left'>
-        <InfoBlock className='flex-1'>
-          <div className='flex'>
-            {room?.scheduledStartTime && (
+      {roomLoading ? (
+        <InfoBlock className='h-9.375 flex items-center justify-center'>
+          <Loader />
+        </InfoBlock>
+      ) : (
+        <div className='flex text-left'>
+          <InfoBlock className='flex-1'>
+            <div className='flex'>
+              {room?.scheduledStartTime && (
+                <RoomInfoColumn
+                  header={localizationCaptions[LocalizationKey.RoomDateAndTime]}
+                  conent={
+                    <RoomDateAndTime
+                      typographySize='s'
+                      scheduledStartTime={room.scheduledStartTime}
+                      timer={room.timer}
+                      mini
+                    />
+                  }
+                  mini
+                />
+              )}
               <RoomInfoColumn
-                header={localizationCaptions[LocalizationKey.RoomDateAndTime]}
+                header={localizationCaptions[LocalizationKey.Examinee]}
                 conent={
-                  <RoomDateAndTime
-                    typographySize='s'
-                    scheduledStartTime={room.scheduledStartTime}
-                    timer={room.timer}
-                    mini
-                  />
+                  examinee ? (
+                    <div className='flex items-center'>
+                      {!!examinee.avatar && (
+                        <>
+                          <UserAvatar nickname={examinee.nickname} size='xxs' src={examinee.avatar} />
+                          <Gap sizeRem={0.5} horizontal />
+                        </>
+                      )}
+                      <span className='capitalize'>{examinee.nickname}</span>
+                    </div>
+                  ) :
+                    localizationCaptions[LocalizationKey.NotFound]
                 }
                 mini
               />
-            )}
+            </div>
+            <Gap sizeRem={2} />
             <RoomInfoColumn
-              header={localizationCaptions[LocalizationKey.Examinee]}
-              conent={
-                examinee ? (
-                  <div className='flex items-center'>
-                    {!!examinee.avatar && (
-                      <>
-                        <UserAvatar nickname={examinee.nickname} size='xxs' src={examinee.avatar} />
-                        <Gap sizeRem={0.5} horizontal />
-                      </>
-                    )}
-                    <span className='capitalize'>{examinee.nickname}</span>
-                  </div>
-                ) :
-                  localizationCaptions[LocalizationKey.NotFound]
-              }
+              header={localizationCaptions[LocalizationKey.RoomParticipants]}
+              conent={<RoomParticipants participants={room?.participants || []} />}
               mini
             />
-          </div>
-          <Gap sizeRem={2} />
-          <RoomInfoColumn
-            header={localizationCaptions[LocalizationKey.RoomParticipants]}
-            conent={<RoomParticipants participants={room?.participants || []} />}
-            mini
-          />
-        </InfoBlock>
-        {!viewNotAllowed && (
-          <>
-            <Gap sizeRem={0.5} horizontal />
-            <InfoBlock className='px-5 flex flex-col items-center'>
-              <Typography size='m' bold>
-                {localizationCaptions[LocalizationKey.AverageCandidateMark]}
-              </Typography>
-              <Gap sizeRem={1} />
-              <CircularProgress
-                value={averageMarkOrNull ? averageMarkOrNull * 10 : null}
-                caption={averageMarkOrNull ? averageMarkOrNull.toFixed(1) : null}
-                size='m'
-              />
-            </InfoBlock>
-          </>
-        )}
-      </div>
+          </InfoBlock>
+          {!viewNotAllowed && (
+            <>
+              <Gap sizeRem={0.5} horizontal />
+              <InfoBlock className='px-5 flex flex-col items-center'>
+                <Typography size='m' bold>
+                  {localizationCaptions[LocalizationKey.AverageCandidateMark]}
+                </Typography>
+                <Gap sizeRem={1} />
+                <CircularProgress
+                  value={averageMarkOrNull ? averageMarkOrNull * 10 : null}
+                  caption={averageMarkOrNull ? averageMarkOrNull.toFixed(1) : null}
+                  size='m'
+                />
+              </InfoBlock>
+            </>
+          )}
+        </div>
+      )}
       <Gap sizeRem={0.5} />
       {viewNotAllowed && (
         <InfoBlock className='text-left'>
@@ -273,40 +273,56 @@ export const RoomAnaytics: FunctionComponent = () => {
       {!viewNotAllowed && (
         <>
           <InfoBlock className='text-left'>
-            <Typography size='xl' bold>
-              {localizationCaptions[LocalizationKey.OpinionsAndMarks]}
-              <Gap sizeRem={2} />
-              <ReviewUserGrid>
-                {loadedData?.userReview
-                  .filter(userReview => allUsers.get(userReview.userId)?.participantType === 'Expert')
-                  .map((userReview) => (
-                    <ReviewUserOpinion
-                      key={userReview.userId}
-                      user={generateUserOpinion(userReview)}
-                      allUsers={allUsers}
-                    />
-                  ))}
-              </ReviewUserGrid>
-            </Typography>
+            {(!loadedData && loading) ? (
+              <div className='h-9.375 flex items-center justify-center'>
+                <Loader />
+              </div>
+            ) : (
+              <>
+                <Typography size='xl' bold>
+                  {localizationCaptions[LocalizationKey.OpinionsAndMarks]}
+                  <Gap sizeRem={2} />
+                  <ReviewUserGrid>
+                    {loadedData?.userReview
+                      .filter(userReview => allUsers.get(userReview.userId)?.participantType === 'Expert')
+                      .map((userReview) => (
+                        <ReviewUserOpinion
+                          key={userReview.userId}
+                          user={generateUserOpinion(userReview)}
+                          allUsers={allUsers}
+                        />
+                      ))}
+                  </ReviewUserGrid>
+                </Typography>
+              </>
+            )}
           </InfoBlock>
           <Gap sizeRem={0.5} />
           <InfoBlock className='text-left'>
-            <Typography size='xl' bold>
-              {localizationCaptions[LocalizationKey.MarksForQuestions]}
-            </Typography>
-            <Gap sizeRem={2} />
-            {loadedData?.questions.map((question, index, questions) => {
-              return (
-                <Fragment key={question.id}>
-                  <QuestionItem
-                    question={createFakeQuestion(question)}
-                    mark={question.averageMark ?? null}
-                    onClick={handleQuestionClick}
-                  />
-                  {index !== questions.length - 1 && (<Gap sizeRem={0.25} />)}
-                </Fragment>
-              );
-            })}
+            {(!loadedData && loading) ? (
+              <div className='h-4 flex items-center justify-center'>
+                <Loader />
+              </div>
+            ) : (
+              <>
+                <Typography size='xl' bold>
+                  {localizationCaptions[LocalizationKey.MarksForQuestions]}
+                </Typography>
+                <Gap sizeRem={2} />
+                {loadedData?.questions.map((question, index, questions) => {
+                  return (
+                    <Fragment key={question.id}>
+                      <QuestionItem
+                        question={createFakeQuestion(question)}
+                        mark={question.averageMark ?? null}
+                        onClick={handleQuestionClick}
+                      />
+                      {index !== questions.length - 1 && (<Gap sizeRem={0.25} />)}
+                    </Fragment>
+                  );
+                })}
+              </>
+            )}
           </InfoBlock>
         </>
       )}
