@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Storage;
@@ -163,6 +164,58 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
             Timer = e.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)e.Timer.Duration.TotalSeconds, StartTime = e.Timer.ActualStartTime, },
             ScheduledStartTime = e.ScheduledStartTime,
         });
+    }
+
+    public async Task<List<RoomCalendarItem>> GetCalendarAsync(RoomCalendarRequest filter, CancellationToken cancellationToken = default)
+    {
+        var currentUserId = _currentUserAccessor.GetUserIdOrThrow();
+        var spec = BuildSpecification(filter);
+        var rooms = await _db.RoomParticipants
+            .AsNoTracking()
+            .Where(e => e.UserId == currentUserId)
+            .Select(e => e.Room)
+            .Where(spec)
+            .OrderBy(room => room.ScheduleStartTime)
+            .Select(room => new { Time = room.ScheduleStartTime, room.Status })
+            .ToListAsync(cancellationToken);
+
+        var offset = TimeSpan.FromMinutes(filter.TimeZoneOffset);
+        return rooms
+            .Select(roomInfo => new
+            {
+                TimeOffset = roomInfo.Time.Add(offset),
+                UtcTime = roomInfo.Time,
+                roomInfo.Status,
+            })
+            .GroupBy(info => info.TimeOffset.Date)
+            .Select(values => new RoomCalendarItem
+            {
+                MinScheduledStartTime = values.MinBy(it => it.UtcTime)!.UtcTime,
+                Statuses = values.Select(it => it.Status.EnumValue).ToList(),
+            })
+            .ToList();
+
+        static ASpec<Room> BuildSpecification(RoomCalendarRequest filter)
+        {
+            var res = Spec<Room>.Any;
+            if (filter.StartDateTime is not null)
+            {
+                res &= new Spec<Room>(e => filter.StartDateTime <= e.ScheduleStartTime);
+            }
+
+            if (filter.EndDateTime is not null)
+            {
+                res &= new Spec<Room>(e => filter.EndDateTime >= e.ScheduleStartTime);
+            }
+
+            if (filter.RoomStatus is not null && filter.RoomStatus.Count > 0)
+            {
+                var mapStatuses = filter.RoomStatus.Select(SERoomStatus.FromEnum).ToList();
+                res &= new Spec<Room>(e => mapStatuses.Contains(e.Status));
+            }
+
+            return res;
+        }
     }
 
     public async Task<RoomDetail> FindByIdAsync(Guid id, CancellationToken cancellationToken)

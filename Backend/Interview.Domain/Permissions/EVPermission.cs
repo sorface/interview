@@ -196,5 +196,8 @@ public enum EVPermission
 
     [Description("Gets details on the question in the room questions")]
     GetRoomQuestionAnswerDetails,
+
+    [Description("Getting a schedule of meetings")]
+    GetRoomCalendar,
 #pragma warning restore SA1602
 }

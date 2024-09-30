@@ -15,6 +15,8 @@ public interface IRoomService : IService
     Task<IPagedList<RoomPageDetail>> FindPageAsync(
         RoomPageDetailRequestFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 
+    Task<List<RoomCalendarItem>> GetCalendarAsync(RoomCalendarRequest filter, CancellationToken cancellationToken = default);
+
     Task<RoomDetail> FindByIdAsync(Guid id, CancellationToken cancellationToken);
 
     Task<RoomPageDetail> CreateAsync(RoomCreateRequest request, CancellationToken cancellationToken = default);

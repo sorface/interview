@@ -1169,6 +1169,70 @@ public class RoomServiceTest
         actualInvites.Should().HaveCount(expectInvites.Count).And.BeEquivalentTo(expectInvites);
     }
 
+    [Fact]
+    public async Task GetCalendar()
+    {
+        await using var memoryDatabase = new TestAppDbContextFactory().Create(new TestSystemClock());
+
+        var user = new User("pavel", "externals");
+
+        var firstScheduled = new DateTime(2024, 9, 27, 0, 0, 0, 0, DateTimeKind.Utc);
+        var secondScheduled = new DateTime(2024, 9, 27, 23, 49, 0, 0, DateTimeKind.Utc);
+
+        var room1 = new Room(DefaultRoomName + Random.Shared.Next(10), SERoomAccessType.Public)
+        {
+            ScheduleStartTime = firstScheduled,
+            Status = SERoomStatus.Active
+        };
+        var room2 = new Room(DefaultRoomName + Random.Shared.Next(10), SERoomAccessType.Public)
+        {
+            ScheduleStartTime = secondScheduled,
+            Status = SERoomStatus.Review
+        };
+        var room3 = new Room(DefaultRoomName + Random.Shared.Next(10), SERoomAccessType.Public)
+        {
+            ScheduleStartTime = DateTime.UtcNow,
+            Status = SERoomStatus.Close
+        };
+
+        memoryDatabase.Rooms.AddRange(room1, room2, room3);
+
+        var roomParticipant = new RoomParticipant(user, room1, SERoomParticipantType.Expert);
+        var roomParticipant2 = new RoomParticipant(user, room2, SERoomParticipantType.Expert);
+        var roomParticipant3 = new RoomParticipant(user, room3, SERoomParticipantType.Expert);
+
+        memoryDatabase.RoomParticipants.AddRange(roomParticipant, roomParticipant2, roomParticipant3);
+
+        var roomService = CreateRoomService(memoryDatabase, user);
+
+        await memoryDatabase.SaveChangesAsync();
+
+        var roomCalendarResponse = await roomService.GetCalendarAsync(new RoomCalendarRequest
+        {
+            RoomStatus = new HashSet<EVRoomStatus>
+            {
+                EVRoomStatus.Active,
+                EVRoomStatus.Review
+            },
+            TimeZoneOffset = -180
+        });
+
+        var roomCalendarItems = roomCalendarResponse;
+
+        roomCalendarItems.Should().NotBeNullOrEmpty();
+        roomCalendarItems.Count.Should().Be(2);
+
+        var roomCalendarRoom1 = roomCalendarItems.FirstOrDefault(meeting => meeting.MinScheduledStartTime.Equals(firstScheduled));
+        roomCalendarRoom1.Should().NotBeNull();
+
+        roomCalendarRoom1?.Statuses.Count.Should().Be(1);
+
+        var roomCalendarRoom2 = roomCalendarItems.FirstOrDefault(meeting => meeting.MinScheduledStartTime.Equals(secondScheduled));
+        roomCalendarRoom2.Should().NotBeNull();
+
+        roomCalendarRoom1?.Statuses.Count.Should().Be(1);
+    }
+
     [Fact(DisplayName = "All participants of the room have left the resulting feedback and the room is ready to close")]
     public async Task TestIsReadyToCloseSuccess()
     {

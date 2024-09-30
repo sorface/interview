@@ -401,16 +401,22 @@ public class SEPermission : SmartEnum<SEPermission>
         EVPermission.RoomQuestionEvaluationFind);
 
     public static readonly SEPermission RoomQuestionUpdate = new(
-            Guid.Parse("4F39059A-E69F-4494-9B48-54E3A6AEA2F3"),
-            "RoomQuestionUpdate",
-            "Update room questions",
-            EVPermission.RoomQuestionUpdate);
+        Guid.Parse("4F39059A-E69F-4494-9B48-54E3A6AEA2F3"),
+        "RoomQuestionUpdate",
+        "Update room questions",
+        EVPermission.RoomQuestionUpdate);
 
     public static readonly SEPermission GetRoomQuestionAnswerDetails = new(
         Guid.Parse("EDAB0E5D-7AC2-4761-B47F-A5F41A9AE48C"),
         "GetRoomQuestionAnswerDetails",
         "Gets details on the question in the room questions",
         EVPermission.GetRoomQuestionAnswerDetails);
+
+    public static readonly SEPermission GetRoomCalendar = new(
+        Guid.Parse("06D64B89-090F-4FD0-B81D-20268EE91CEA"),
+        "GetRoomCalendar",
+        "Getting a schedule of meetings",
+        EVPermission.GetRoomCalendar);
 
     public Guid Id { get; }
 
