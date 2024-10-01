@@ -1,8 +1,9 @@
-import { FunctionComponent, useContext } from 'react';
+import { ChangeEventHandler, FunctionComponent, useContext } from 'react';
 import { LocalizationKey } from '../../localization';
 import { LocalizationContext, LocalizationLang } from '../../context/LocalizationContext';
 import { LocalizationCaption } from '../LocalizationCaption/LocalizationCaption';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { Typography } from '../Typography/Typography';
 
 export const LangSwitch: FunctionComponent = () => {
   const { lang, setLang } = useContext(LocalizationContext);
@@ -13,20 +14,20 @@ export const LangSwitch: FunctionComponent = () => {
     [LocalizationLang.ru]: localizationCaptions[LocalizationKey.LocalizationLangRu],
   };
 
+  const handleLangChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+    setLang(e.target.value as LocalizationLang);
+  };
+
   return (
-    <div className='setting-switch'>
-      <div><LocalizationCaption captionKey={LocalizationKey.Language} />:</div>
-      {Object.entries(LocalizationLang).map(([_, langValue]) => (
-        <div key={langValue}>
-          <input
-            type="checkbox"
-            id={langValue}
-            checked={lang === langValue}
-            onChange={() => setLang(langValue)}
-          />
-          <label htmlFor={langValue}>{langLocalization[langValue] || langValue}</label>
-        </div>
-      ))}
-    </div>
+    <>
+      <div className='text-left flex items-center'>
+        <Typography size='m'><LocalizationCaption captionKey={LocalizationKey.Language} />:</Typography>
+      </div>
+      <select id="rootCategory" className='w-full' value={lang} onChange={handleLangChange}>
+        {Object.entries(LocalizationLang)?.map(([_, langValue]) => (
+          <option key={langValue} value={langValue}>{langLocalization[langValue]}</option>
+        ))}
+      </select>
+    </>
   )
 };

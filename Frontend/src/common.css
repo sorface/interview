@@ -1,7 +1,9 @@
 .grid { display: grid; }
 .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .grid-cols-questions-list { grid-template-columns: 1.5rem auto 1.125rem; }
+.grid-cols-settings-list { grid-template-columns: 9.25rem auto; }
 .gap-y-0\.5 { row-gap: 0.5rem; }
+.gap-y-1 { row-gap: 1rem; }
 .gap-12 { gap: 3rem; }
 .flex { display: flex; }
 .flex-1 { flex: 1 1 0%; }
@@ -178,11 +180,13 @@
 .w-2\.375 { width: 2.375rem; }
 .w-2\.5 { width: 2.5rem; }
 .w-4 { width: 4rem; }
+.w-6\.875 { width: 6.875rem; }
 .w-7\.5 { width: 7.5rem; }
 .w-9 { width: 9rem; }
 .w-13\.75 { width: 13.75rem; }
 .max-w-12 { max-width: 12rem; }
 .max-w-15\.75 { max-width: 15.75rem; }
+.max-w-29\.25 { max-width: 29.25rem; }
 .w-17\.25 { width: 17.25rem; }
 .w-17\.375 { width: 17.375rem; }
 .w-18\.125 { width: 18.125rem; }
@@ -210,6 +214,7 @@
 .h-3\.625 { height: 3.625rem; }
 .h-4 { height: 4rem; }
 .h-6\.25 { height: 6.25rem; }
+.h-6\.875 { height: 6.875rem; }
 .h-9\.375 { height: 9.375rem; }
 .h-25 { height: 25rem; }
 .h-32\.25 { height: 32.25rem; }
