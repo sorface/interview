@@ -17,6 +17,7 @@ using Interview.Domain.Rooms.RoomQuestionEvaluations;
 using Interview.Domain.Rooms.RoomQuestionReactions.Mappers;
 using Interview.Domain.Rooms.RoomQuestionReactions.Specifications;
 using Interview.Domain.Rooms.RoomQuestions;
+using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Rooms.RoomTimers;
 using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
@@ -1040,7 +1041,23 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 currentRoom.Status = status;
 
                 await _roomQuestionRepository.CloseActiveQuestionAsync(roomId, cancellationToken);
-                _db.Rooms.Update(currentRoom);
+                if (status == SERoomStatus.Close)
+                {
+                    await _db.RoomQuestionEvaluation
+                        .Include(e => e.RoomQuestion)
+                        .Where(e => e.RoomQuestion!.RoomId == roomId && e.State != SERoomQuestionEvaluationState.Submitted)
+                        .ExecuteUpdateAsync(
+                            calls => calls.SetProperty(e => e.State, SERoomQuestionEvaluationState.Submitted),
+                            cancellationToken);
+
+                    await _db.RoomReview
+                        .Include(e => e.Participant)
+                        .Where(e => e.Participant!.RoomId == roomId && e.State != SERoomReviewState.Closed)
+                        .ExecuteUpdateAsync(
+                            calls => calls.SetProperty(e => e.State, SERoomReviewState.Closed),
+                            cancellationToken);
+                }
+
                 await _db.SaveChangesAsync(cancellationToken);
                 return DBNull.Value;
             },
