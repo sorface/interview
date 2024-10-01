@@ -1045,9 +1045,16 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                 {
                     await _db.RoomQuestionEvaluation
                         .Include(e => e.RoomQuestion)
-                        .Where(e => e.RoomQuestion!.RoomId == roomId && e.State != SERoomQuestionEvaluationState.Submitted)
+                        .Where(e => e.RoomQuestion!.RoomId == roomId && e.State == SERoomQuestionEvaluationState.Draft)
                         .ExecuteUpdateAsync(
-                            calls => calls.SetProperty(e => e.State, SERoomQuestionEvaluationState.Submitted),
+                            calls => calls.SetProperty(e => e.State, SERoomQuestionEvaluationState.Rejected),
+                            cancellationToken);
+
+                    await _db.RoomReview
+                        .Include(e => e.Participant)
+                        .Where(e => e.Participant!.RoomId == roomId && e.State == SERoomReviewState.Open)
+                        .ExecuteUpdateAsync(
+                            calls => calls.SetProperty(e => e.State, SERoomReviewState.Rejected),
                             cancellationToken);
                 }
 

@@ -6,6 +6,7 @@ public class SERoomQuestionEvaluationState : SmartEnum<SERoomQuestionEvaluationS
 {
     public static readonly SERoomQuestionEvaluationState Draft = new("Draft", EVRoomQuestionEvaluationState.Draft);
     public static readonly SERoomQuestionEvaluationState Submitted = new("Submitted", EVRoomQuestionEvaluationState.Submitted);
+    public static readonly SERoomQuestionEvaluationState Rejected = new("Rejected", EVRoomQuestionEvaluationState.Rejected);
 
     public EVRoomQuestionEvaluationState EnumValue { get; }
 
