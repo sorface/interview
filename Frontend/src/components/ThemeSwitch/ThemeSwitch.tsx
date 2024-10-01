@@ -1,7 +1,8 @@
-import { FunctionComponent, useContext } from 'react';
+import { ChangeEventHandler, FunctionComponent, useContext } from 'react';
 import { Theme, ThemeContext } from '../../context/ThemeContext';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { Typography } from '../Typography/Typography';
 
 export const ThemeSwitch: FunctionComponent = () => {
   const { themeInSetting, setTheme } = useContext(ThemeContext);
@@ -12,20 +13,20 @@ export const ThemeSwitch: FunctionComponent = () => {
     [Theme.Dark]: localizationCaptions[LocalizationKey.ThemeDark],
   };
 
+  const handleThemeChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+    setTheme(e.target.value as Theme);
+  };
+
   return (
-    <div className='setting-switch'>
-      <div>{localizationCaptions[LocalizationKey.Theme]}:</div>
-      {Object.entries(Theme).map(([_, themeValue]) => (
-        <div key={themeValue}>
-          <input
-            type="checkbox"
-            id={themeValue}
-            checked={themeInSetting === themeValue}
-            onChange={() => setTheme(themeValue)}
-          />
-          <label htmlFor={themeValue}>{themeLocalization[themeValue]}</label>
-        </div>
-      ))}
-    </div>
+    <>
+      <div className='text-left flex items-center'>
+        <Typography size='m'>{localizationCaptions[LocalizationKey.Theme]}:</Typography>
+      </div>
+      <select id="rootCategory" className='w-full' value={themeInSetting} onChange={handleThemeChange}>
+        {Object.entries(Theme)?.map(([_, themeValue]) => (
+          <option key={themeValue} value={themeValue}>{themeLocalization[themeValue]}</option>
+        ))}
+      </select>
+    </>
   )
 };
