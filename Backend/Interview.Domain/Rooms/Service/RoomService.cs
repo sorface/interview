@@ -1049,13 +1049,6 @@ public sealed class RoomService : IRoomServiceWithoutPermissionCheck
                         .ExecuteUpdateAsync(
                             calls => calls.SetProperty(e => e.State, SERoomQuestionEvaluationState.Submitted),
                             cancellationToken);
-
-                    await _db.RoomReview
-                        .Include(e => e.Participant)
-                        .Where(e => e.Participant!.RoomId == roomId && e.State != SERoomReviewState.Closed)
-                        .ExecuteUpdateAsync(
-                            calls => calls.SetProperty(e => e.State, SERoomReviewState.Closed),
-                            cancellationToken);
                 }
 
                 await _db.SaveChangesAsync(cancellationToken);
