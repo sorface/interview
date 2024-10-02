@@ -196,46 +196,9 @@ public class RoomAnalyticServiceTest
         appDbContext.RoomQuestionEvaluation.AddRange(roomQuestionEvaluation);
         await appDbContext.SaveChangesAsync();
 
-        var like = appDbContext.Reactions.Find(ReactionType.Like.Id) ?? throw new Exception("Unexpected state");
-        var dislike = appDbContext.Reactions.Find(ReactionType.Dislike.Id) ?? throw new Exception("Unexpected state");
-
-        var questionReactions = new RoomQuestionReaction[]
-        {
-            new()
-            {
-                Id = Guid.Parse("D15AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), RoomQuestion = roomQuestion[0], Reaction = like, Sender = users[1],
-            },
-            new()
-            {
-                Id = Guid.Parse("D25AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), RoomQuestion = roomQuestion[0], Reaction = like, Sender = users[1],
-            },
-            new()
-            {
-                Id = Guid.Parse("D35AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), RoomQuestion = roomQuestion[0], Reaction = like, Sender = users[2],
-            },
-            new()
-            {
-                Id = Guid.Parse("D45AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), RoomQuestion = roomQuestion[0], Reaction = dislike, Sender = users[3],
-            },
-            new()
-            {
-                Id = Guid.Parse("D55AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), RoomQuestion = roomQuestion[1], Reaction = dislike, Sender = users[1],
-            },
-            new()
-            {
-                Id = Guid.Parse("D65AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), RoomQuestion = roomQuestion[1], Reaction = like, Sender = users[2],
-            },
-            new()
-            {
-                Id = Guid.Parse("D75AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), RoomQuestion = roomQuestion[1], Reaction = dislike, Sender = users[3],
-            },
-        };
-        appDbContext.RoomQuestionReactions.AddRange(questionReactions);
-        await appDbContext.SaveChangesAsync();
-
         appDbContext.RoomReview.AddRange(
             new RoomReview(roomParticipants[0], SERoomReviewState.Closed) { Review = "test review", },
-            new RoomReview(roomParticipants[3], SERoomReviewState.Open) { Review = "test review 22", });
+            new RoomReview(roomParticipants[3], SERoomReviewState.Closed) { Review = "test review 22", });
         await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
 
@@ -398,7 +361,7 @@ public class RoomAnalyticServiceTest
                 {
                     UserId = users[1].Id,
                     AverageMark = 5,
-                    Comment = string.Empty,
+                    Comment = null,
                     Nickname = users[1].Nickname,
                     Avatar = users[1].Avatar,
                     ParticipantType = roomParticipants[1].Type.EnumValue
@@ -407,7 +370,7 @@ public class RoomAnalyticServiceTest
                 {
                     UserId = users[2].Id,
                     AverageMark = 0,
-                    Comment = string.Empty,
+                    Comment = null,
                     Nickname = users[2].Nickname,
                     Avatar = users[2].Avatar,
                     ParticipantType = roomParticipants[2].Type.EnumValue
@@ -596,43 +559,6 @@ public class RoomAnalyticServiceTest
         appDbContext.RoomQuestionEvaluation.AddRange(roomQuestionEvaluation);
         await appDbContext.SaveChangesAsync();
 
-        var like = appDbContext.Reactions.Find(ReactionType.Like.Id) ?? throw new Exception("Unexpected state");
-        var dislike = appDbContext.Reactions.Find(ReactionType.Dislike.Id) ?? throw new Exception("Unexpected state");
-
-        var questionReactions = new RoomQuestionReaction[]
-        {
-            new()
-            {
-                Id = Guid.Parse("D15AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), RoomQuestion = roomQuestion[0], Reaction = like, Sender = users[1],
-            },
-            new()
-            {
-                Id = Guid.Parse("D25AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), RoomQuestion = roomQuestion[0], Reaction = like, Sender = users[1],
-            },
-            new()
-            {
-                Id = Guid.Parse("D35AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), RoomQuestion = roomQuestion[0], Reaction = like, Sender = users[2],
-            },
-            new()
-            {
-                Id = Guid.Parse("D45AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), RoomQuestion = roomQuestion[0], Reaction = dislike, Sender = users[3],
-            },
-            new()
-            {
-                Id = Guid.Parse("D55AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), RoomQuestion = roomQuestion[1], Reaction = dislike, Sender = users[1],
-            },
-            new()
-            {
-                Id = Guid.Parse("D65AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), RoomQuestion = roomQuestion[1], Reaction = like, Sender = users[2],
-            },
-            new()
-            {
-                Id = Guid.Parse("D75AA6D4-FA7B-49CB-AFA2-EA4F900F2258"), RoomQuestion = roomQuestion[1], Reaction = dislike, Sender = users[3],
-            },
-        };
-        appDbContext.RoomQuestionReactions.AddRange(questionReactions);
-        await appDbContext.SaveChangesAsync();
-
         appDbContext.RoomReview.AddRange(
             new RoomReview(roomParticipants[0], SERoomReviewState.Closed) { Review = "test review", },
             new RoomReview(roomParticipants[3], SERoomReviewState.Open) { Review = "test review 22", });
@@ -794,7 +720,7 @@ public class RoomAnalyticServiceTest
                 {
                     UserId = users[1].Id,
                     AverageMark = null,
-                    Comment = string.Empty,
+                    Comment = null,
                     Nickname = users[1].Nickname,
                     Avatar = users[1].Avatar,
                     ParticipantType = roomParticipants[1].Type.EnumValue
@@ -803,7 +729,7 @@ public class RoomAnalyticServiceTest
                 {
                     UserId = users[2].Id,
                     AverageMark = null,
-                    Comment = string.Empty,
+                    Comment = null,
                     Nickname = users[2].Nickname,
                     Avatar = users[2].Avatar,
                     ParticipantType = roomParticipants[2].Type.EnumValue
@@ -812,7 +738,7 @@ public class RoomAnalyticServiceTest
                 {
                     UserId = users[3].Id,
                     AverageMark = null,
-                    Comment = "test review 22",
+                    Comment = null,
                     Nickname = users[3].Nickname,
                     Avatar = users[3].Avatar,
                     ParticipantType = roomParticipants[3].Type.EnumValue

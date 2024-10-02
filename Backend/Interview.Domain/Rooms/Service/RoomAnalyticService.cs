@@ -107,10 +107,12 @@ public sealed class RoomAnalyticService : ISelfScopeService
         res.Completed = userReview.All(e => !e.Incomplete);
         if (res.Completed)
         {
-            res.AverageMark = res.UserReview.Select(e => e.AverageMark)
-                .Where(e => e > 0)
-                .DefaultIfEmpty(0)
-                .Average();
+            res.AverageMark = res.UserReview.All(e => e.AverageMark is null)
+                ? null
+                : res.UserReview.Select(e => e.AverageMark)
+                    .Where(e => e > 0)
+                    .DefaultIfEmpty(0)
+                    .Average();
         }
         else
         {
