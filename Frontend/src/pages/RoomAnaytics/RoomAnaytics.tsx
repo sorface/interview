@@ -102,7 +102,7 @@ export const RoomAnaytics: FunctionComponent = () => {
 
   const allUsers = loadedData ? getAllUsers(loadedData) : new Map<User['id'], AnalyticsUserReview>();
 
-  const examinee = room?.participants.find(
+  const examinees = room?.participants.filter(
     participant => participant.type === 'Examinee'
   );
 
@@ -223,15 +223,20 @@ export const RoomAnaytics: FunctionComponent = () => {
               <RoomInfoColumn
                 header={localizationCaptions[LocalizationKey.Examinee]}
                 conent={
-                  examinee ? (
+                  examinees?.length ? (
                     <div className='flex items-center'>
-                      {!!examinee.avatar && (
-                        <>
-                          <UserAvatar nickname={examinee.nickname} size='xxs' src={examinee.avatar} />
-                          <Gap sizeRem={0.5} horizontal />
-                        </>
-                      )}
-                      <span className='capitalize'>{examinee.nickname}</span>
+                      {examinees.map(examinee => (
+                        <Fragment>
+                          <Typography size='xs'>
+                            <div className='flex'>
+                              <UserAvatar nickname={examinee.nickname} size='xxs' src={examinee.avatar} />
+                            </div>
+                          </Typography>
+                          <Gap sizeRem={0.25} horizontal />
+                          <span className='capitalize'>{examinee.nickname}</span>
+                          <Gap sizeRem={1} horizontal />
+                        </Fragment>
+                      ))}
                     </div>
                   ) :
                     localizationCaptions[LocalizationKey.NotFound]
