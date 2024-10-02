@@ -345,7 +345,7 @@ public class RoomAnalyticServiceTest
                     AverageMark = 10,
                 }
             },
-            AverageMark = 7,
+            AverageMark = 8,
             UserReview = new List<Analytics.AnalyticsUserAverageMark>
             {
                 new()
@@ -360,7 +360,7 @@ public class RoomAnalyticServiceTest
                 new()
                 {
                     UserId = users[1].Id,
-                    AverageMark = 5,
+                    AverageMark = null,
                     Comment = null,
                     Nickname = users[1].Nickname,
                     Avatar = users[1].Avatar,
@@ -369,7 +369,7 @@ public class RoomAnalyticServiceTest
                 new()
                 {
                     UserId = users[2].Id,
-                    AverageMark = 0,
+                    AverageMark = null,
                     Comment = null,
                     Nickname = users[2].Nickname,
                     Avatar = users[2].Avatar,
@@ -395,9 +395,13 @@ public class RoomAnalyticServiceTest
         serviceResult.Should().BeEquivalentTo(expectAnalytics);
     }
 
-    [Fact(DisplayName = "GetAnalytics should return valid analytics by roomId with incomplete")]
-    public async Task GetAnalytics_Should_Return_Valid_Analytics_By_RoomId_With_Incomplete()
+    [Theory(DisplayName = "GetAnalytics should return valid analytics by roomId with incomplete")]
+    [InlineData(EVRoomQuestionEvaluationState.Draft, EVRoomReviewState.Open)]
+    [InlineData(EVRoomQuestionEvaluationState.Draft, EVRoomReviewState.Rejected)]
+    public async Task GetAnalytics_Should_Return_Valid_Analytics_By_RoomId_With_Incomplete(EVRoomQuestionEvaluationState roomQuestionEvaluationState, EVRoomReviewState roomReviewState)
     {
+        var closeRoomQuestionEvaluation = SERoomQuestionEvaluationState.FromValue((int)roomQuestionEvaluationState);
+        var closeReviewState = SERoomReviewState.FromValue((int)roomReviewState);
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
@@ -529,7 +533,7 @@ public class RoomAnalyticServiceTest
                 CreatedById = users[0].Id,
                 Mark = 2,
                 Review = "test 2",
-                State = SERoomQuestionEvaluationState.Draft,
+                State = closeRoomQuestionEvaluation,
             },
             new()
             {
@@ -561,7 +565,7 @@ public class RoomAnalyticServiceTest
 
         appDbContext.RoomReview.AddRange(
             new RoomReview(roomParticipants[0], SERoomReviewState.Closed) { Review = "test review", },
-            new RoomReview(roomParticipants[3], SERoomReviewState.Open) { Review = "test review 22", });
+            new RoomReview(roomParticipants[3], closeReviewState) { Review = "test review 22", });
         await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
 
