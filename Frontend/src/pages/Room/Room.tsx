@@ -54,6 +54,7 @@ import { Icon } from './components/Icon/Icon';
 import { Typography } from '../../components/Typography/Typography';
 import { sortRoomQuestion } from '../../utils/sortRoomQestions';
 import { UnreadChatMessagesCounter } from './components/UnreadChatMessagesCounter/UnreadChatMessagesCounter';
+import { RoomSettings } from './components/RoomSettings/RoomSettings';
 
 import './Room.css';
 
@@ -91,6 +92,7 @@ export const Room: FunctionComponent = () => {
   const [recognitionEnabled, setRecognitionEnabled] = useState(false);
   const [peersLength, setPeersLength] = useState(0);
   const [invitationsOpen, setInvitationsOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const socketUrl = `${REACT_APP_WS_URL}/ws?roomId=${id}`;
   const checkWebSocketReadyToConnect = () => {
     if (!inviteParam) {
@@ -436,8 +438,16 @@ export const Room: FunctionComponent = () => {
     setInvitationsOpen(true);
   };
 
+  const handleSettingsOpen = () => {
+    setSettingsOpen(true);
+  };
+
   const handleInvitationsClose = () => {
     setInvitationsOpen(false);
+  };
+
+  const handleSettingsClose = () => {
+    setSettingsOpen(false);
   };
 
   const handleInviteGenerate = (participantType: UserType) => {
@@ -521,7 +531,7 @@ export const Room: FunctionComponent = () => {
             )}
           </RoomToolsPanel.ButtonsGroupWrapper>
         )}
-        {currentUserExpert && (
+        {!viewerMode && (
           <RoomToolsPanel.ButtonsGroupWrapper>
             {/* ScreenShare */}
             {/* <RoomToolsPanel.SwitchButton
@@ -530,12 +540,23 @@ export const Room: FunctionComponent = () => {
               iconDisabledName={IconNames.TV}
               onClick={handleScreenShare}
             /> */}
+            {currentUserExpert && (
+              <>
+                <Gap sizeRem={0.125} />
+                <RoomToolsPanel.SwitchButton
+                  enabled={true}
+                  iconEnabledName={IconNames.PersonAdd}
+                  iconDisabledName={IconNames.PersonAdd}
+                  onClick={handleInvitationsOpen}
+                />
+              </>
+            )}
             <Gap sizeRem={0.125} />
             <RoomToolsPanel.SwitchButton
               enabled={true}
-              iconEnabledName={IconNames.PersonAdd}
-              iconDisabledName={IconNames.PersonAdd}
-              onClick={handleInvitationsOpen}
+              iconEnabledName={IconNames.Settings}
+              iconDisabledName={IconNames.Settings}
+              onClick={handleSettingsOpen}
             />
           </RoomToolsPanel.ButtonsGroupWrapper>
         )}
@@ -619,6 +640,10 @@ export const Room: FunctionComponent = () => {
         onRequestClose={handleInvitationsClose}
         onGenerateInvite={handleInviteGenerate}
         onGenerateAllInvites={handleInvitesAllGenerate}
+      />
+      <RoomSettings
+        open={settingsOpen}
+        onRequestClose={handleSettingsClose}
       />
       <ProcessWrapper
         loading={loading}

@@ -10,6 +10,7 @@ import { Gap } from '../../components/Gap/Gap';
 import { UserAvatar } from '../../components/UserAvatar/UserAvatar';
 import { AuthContext } from '../../context/AuthContext';
 import { Typography } from '../../components/Typography/Typography';
+import { RecognitionLangSwitch } from '../../components/RecognitionLangSwitch/RecognitionLangSwitch';
 
 export const Session: FunctionComponent = () => {
   const auth = useContext(AuthContext);
@@ -38,6 +39,7 @@ export const Session: FunctionComponent = () => {
           <div className='w-full max-w-29.25 grid grid-cols-settings-list gap-y-1'>
             <ThemeSwitch />
             <LangSwitch />
+            <RecognitionLangSwitch />
           </div>
           <Gap sizeRem={2} />
           <Button variant='danger' className='max-w-12' onClick={handleLogOut}>{localizationCaptions[LocalizationKey.LogOut]}</Button>

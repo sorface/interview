@@ -5,8 +5,8 @@ import { LocalizationCaption } from '../LocalizationCaption/LocalizationCaption'
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Typography } from '../Typography/Typography';
 
-export const LangSwitch: FunctionComponent = () => {
-  const { lang, setLang } = useContext(LocalizationContext);
+export const RecognitionLangSwitch: FunctionComponent = () => {
+  const { recognitionLang, setRecognitionLang } = useContext(LocalizationContext);
   const localizationCaptions = useLocalizationCaptions();
 
   const langLocalization = {
@@ -14,16 +14,16 @@ export const LangSwitch: FunctionComponent = () => {
     [LocalizationLang.ru]: localizationCaptions[LocalizationKey.LocalizationLangRu],
   };
 
-  const handleLangChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
-    setLang(e.target.value as LocalizationLang);
+  const handleRecognitionLangChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+    setRecognitionLang(e.target.value as LocalizationLang);
   };
 
   return (
     <>
       <div className='text-left flex items-center'>
-        <Typography size='m'><LocalizationCaption captionKey={LocalizationKey.Language} />:</Typography>
+        <Typography size='m'><LocalizationCaption captionKey={LocalizationKey.RecognitionLanguage} />:</Typography>
       </div>
-      <select className='w-full' value={lang} onChange={handleLangChange}>
+      <select className='w-full' value={recognitionLang} onChange={handleRecognitionLangChange}>
         {Object.entries(LocalizationLang)?.map(([_, langValue]) => (
           <option key={langValue} value={langValue}>{langLocalization[langValue]}</option>
         ))}

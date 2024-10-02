@@ -9,16 +9,19 @@ const defaultLang = LocalizationLang.en;
 
 interface LocalizationContextType {
   lang: LocalizationLang;
+  recognitionLang: LocalizationLang;
   setLang: Dispatch<SetStateAction<LocalizationLang>>;
+  setRecognitionLang: Dispatch<SetStateAction<LocalizationLang>>;
 }
 
-const localStorageKey = 'localization';
+const localizationLocalStorageKey = 'localization';
+const recognitionLocalStorageKey = 'recognition';
 
-const readFromStorage = () =>
-  localStorage.getItem(localStorageKey);
+const readFromStorage = (key: string) =>
+  localStorage.getItem(key);
 
-const saveToStorage = (lang: LocalizationLang) =>
-  localStorage.setItem(localStorageKey, String(lang));
+const saveToStorage = (key: string, lang: LocalizationLang) =>
+  localStorage.setItem(key, String(lang));
 
 const validateLang = (lang: string | null) => {
   if (lang && Object.values(LocalizationLang).includes(lang as LocalizationLang)) {
@@ -27,8 +30,8 @@ const validateLang = (lang: string | null) => {
   return null;
 }
 
-const getLangInSetting = (): LocalizationLang | null => {
-  const langeFromStorage = readFromStorage();
+const getLangInSetting = (key: string): LocalizationLang | null => {
+  const langeFromStorage = readFromStorage(key);
   const validLang = validateLang(langeFromStorage);
   if (validLang) {
     return validLang;
@@ -48,8 +51,10 @@ export const getLangInBrowser = () => {
 };
 
 export const LocalizationContext = createContext<LocalizationContextType>({
-  lang: getLangInSetting() || getLangInBrowser(),
+  lang: getLangInSetting(localizationLocalStorageKey) || getLangInBrowser(),
+  recognitionLang: getLangInSetting(recognitionLocalStorageKey) || getLangInBrowser(),
   setLang: () => { },
+  setRecognitionLang: () => { },
 });
 
 interface LocalizationProviderProps {
@@ -59,14 +64,19 @@ interface LocalizationProviderProps {
 export const LocalizationProvider: FunctionComponent<LocalizationProviderProps> = ({
   children,
 }) => {
-  const [lang, setLang] = useState<LocalizationLang>(getLangInSetting() || getLangInBrowser());
+  const [lang, setLang] = useState<LocalizationLang>(getLangInSetting(localizationLocalStorageKey) || getLangInBrowser());
+  const [recognitionLang, setRecognitionLang] = useState<LocalizationLang>(getLangInSetting(recognitionLocalStorageKey) || getLangInBrowser());
 
   useEffect(() => {
-    saveToStorage(lang);
-  }, [lang])
+    saveToStorage(localizationLocalStorageKey, lang);
+  }, [lang]);
+
+  useEffect(() => {
+    saveToStorage(recognitionLocalStorageKey, recognitionLang);
+  }, [recognitionLang]);
 
   return (
-    <LocalizationContext.Provider value={{ lang, setLang }}>
+    <LocalizationContext.Provider value={{ lang, recognitionLang, setLang, setRecognitionLang }}>
       {children}
     </LocalizationContext.Provider>
   )

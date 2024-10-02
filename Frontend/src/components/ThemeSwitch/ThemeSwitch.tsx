@@ -22,7 +22,7 @@ export const ThemeSwitch: FunctionComponent = () => {
       <div className='text-left flex items-center'>
         <Typography size='m'>{localizationCaptions[LocalizationKey.Theme]}:</Typography>
       </div>
-      <select id="rootCategory" className='w-full' value={themeInSetting} onChange={handleThemeChange}>
+      <select className='w-full' value={themeInSetting} onChange={handleThemeChange}>
         {Object.entries(Theme)?.map(([_, themeValue]) => (
           <option key={themeValue} value={themeValue}>{themeLocalization[themeValue]}</option>
         ))}
