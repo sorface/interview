@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { LocalizationKey } from '../../../localization';
-import { useLocalizationCaptions } from '../../../hooks/useLocalizationCaptions';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { LocalizationContext } from '../../../context/LocalizationContext';
 
 interface UseSpeechRecognitionParams {
   recognitionEnabled: boolean;
@@ -13,7 +12,7 @@ export const useSpeechRecognition = ({
   recognitionEnabled,
   onVoiceRecognition,
 }: UseSpeechRecognitionParams) => {
-  const localizationCaptions = useLocalizationCaptions();
+  const { recognitionLang } = useContext(LocalizationContext);
   const recognition = useRef(SpeechRecognition ? new SpeechRecognition() : null);
   const [recognitionNotSupported, setRecognitionNotSupported] = useState(false);
 
@@ -35,7 +34,7 @@ export const useSpeechRecognition = ({
     if (!recog) {
       return;
     }
-    recog.lang = localizationCaptions[LocalizationKey.SpeechRecognitionLang];
+    recog.lang = recognitionLang;
     recog.continuous = true;
     recog.onend = () => {
       if (recognitionEnabled) {
@@ -46,7 +45,33 @@ export const useSpeechRecognition = ({
     return () => {
       recog.onend = null;
     }
-  }, [recognitionEnabled, localizationCaptions]);
+  }, [recognitionEnabled, recognitionLang]);
+
+  useEffect(() => {
+    const recog = recognition.current;
+    if (!recog) {
+      return;
+    }
+    try {
+      if (recognitionEnabled) {
+        recog.stop();
+      }
+      recog.lang = recognitionLang;
+      recog.start();
+    } catch (error) {
+      console.warn(error);
+    }
+
+    return () => {
+      try {
+        if (recognitionEnabled) {
+          recog.stop();
+        }
+      } catch (error) {
+        console.warn(error);
+      }
+    }
+  }, [recognitionEnabled, recognitionLang]);
 
   useEffect(() => {
     const recog = recognition.current;

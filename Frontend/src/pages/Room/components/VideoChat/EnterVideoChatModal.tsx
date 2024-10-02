@@ -14,6 +14,7 @@ import { Button } from '../../../../components/Button/Button';
 import { Typography } from '../../../../components/Typography/Typography';
 import { Gap } from '../../../../components/Gap/Gap';
 import { RoomToolsPanel } from '../RoomToolsPanel/RoomToolsPanel';
+import { RecognitionLangSwitch } from '../../../../components/RecognitionLangSwitch/RecognitionLangSwitch';
 
 interface EnterVideoChatModalProps {
   open: boolean;
@@ -245,6 +246,16 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
                 onSelect={handleSelectCamera}
                 icon={IconNames.VideocamOn}
               />
+            </div>
+            <Gap sizeRem={1.25} />
+            <div className='w-full max-w-29.25 grid grid-cols-settings-list gap-y-1'>
+              <RecognitionLangSwitch />
+            </div>
+            <Gap sizeRem={0.25} />
+            <div className='text-left'>
+              <Typography size='s' secondary>
+                {localizationCaptions[LocalizationKey.PleaseSelectRecognitionLanguage]}
+              </Typography>
             </div>
             <Gap sizeRem={2} />
             <Button variant='active' className='w-full' onClick={onClose}>{localizationCaptions[LocalizationKey.Join]}</Button>

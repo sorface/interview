@@ -1,7 +1,6 @@
 import { LocalizationLang } from './context/LocalizationContext';
 
 export const enum LocalizationKey {
-  SpeechRecognitionLang,
   AppName,
   LoginRequired,
   WelcomeMessage,
@@ -169,6 +168,8 @@ export const enum LocalizationKey {
   ThemeLight,
   ThemeDark,
   Language,
+  PleaseSelectRecognitionLanguage,
+  RecognitionLanguage,
   FontSize,
   You,
   NoRecords,
@@ -231,7 +232,6 @@ export const enum LocalizationKey {
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
   [LocalizationLang.en]: {
-    [LocalizationKey.SpeechRecognitionLang]: 'en',
     [LocalizationKey.AppName]: 'Interview Platform',
     [LocalizationKey.LoginRequired]: 'To view this page you need to log in to your account',
     [LocalizationKey.WelcomeMessage]: 'Welcome',
@@ -399,6 +399,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.ThemeLight]: 'Light theme',
     [LocalizationKey.ThemeDark]: 'Dark theme',
     [LocalizationKey.Language]: 'Language',
+    [LocalizationKey.PleaseSelectRecognitionLanguage]: 'Please indicate the language you will speak',
+    [LocalizationKey.RecognitionLanguage]: 'Transcription language',
     [LocalizationKey.FontSize]: 'FontSize',
     [LocalizationKey.You]: 'You',
     [LocalizationKey.NoRecords]: 'List is empty',
@@ -459,7 +461,6 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.NotEnoughRights]: 'Insufficient rights to view content',
   },
   [LocalizationLang.ru]: {
-    [LocalizationKey.SpeechRecognitionLang]: 'ru',
     [LocalizationKey.AppName]: 'Interview Platform',
     [LocalizationKey.LoginRequired]: 'Для просмотра данной страницы необходимо войти в аккаунт',
     [LocalizationKey.WelcomeMessage]: 'Добро пожаловать',
@@ -627,6 +628,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.ThemeLight]: 'Светлая тема',
     [LocalizationKey.ThemeDark]: 'Тёмная тема',
     [LocalizationKey.Language]: 'Язык',
+    [LocalizationKey.PleaseSelectRecognitionLanguage]: 'Пожалуйста, укажите язык на котором будете говорить',
+    [LocalizationKey.RecognitionLanguage]: 'Язык транскрибации',
     [LocalizationKey.FontSize]: 'Размер шрифта',
     [LocalizationKey.You]: 'Вы',
     [LocalizationKey.NoRecords]: 'Список пуст',
