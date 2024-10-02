@@ -77,11 +77,15 @@ public sealed class RoomAnalyticService : ISelfScopeService
             .Select(e => new
             {
                 UserId = e.User.Id,
-                AverageMarks = e.User.RoomQuestionEvaluations
+                AverageMarks = e.Review == null || e.Review.State != SERoomReviewState.Closed
+                    ? null
+                    : e.User.RoomQuestionEvaluations
                     .Where(rqe => rqe.RoomQuestion!.RoomId == roomId && rqe.Mark != null && rqe.Mark > 0)
                     .Select(rqe => rqe.Mark ?? 0)
                     .ToList(),
-                Comment = e.Review == null || e.Review.State != SERoomReviewState.Closed ? null : e.Review!.Review,
+                Comment = e.Review == null || e.Review.State != SERoomReviewState.Closed
+                    ? null
+                    : e.Review!.Review,
                 Nickname = e.User.Nickname,
                 Avatar = e.User.Avatar,
                 ParticipantType = e.Type,
@@ -93,8 +97,8 @@ public sealed class RoomAnalyticService : ISelfScopeService
             .Select(e => new Analytics.AnalyticsUserAverageMark
             {
                 UserId = e.UserId,
-                AverageMark = e.Incomplete ? null : e.AverageMarks.DefaultIfEmpty(0).Average(),
-                Comment = e.Comment ?? string.Empty,
+                AverageMark = e.Incomplete ? null : e.AverageMarks?.DefaultIfEmpty(0).Average(),
+                Comment = string.IsNullOrWhiteSpace(e.Comment) ? null : e.Comment,
                 Nickname = e.Nickname,
                 Avatar = e.Avatar,
                 ParticipantType = e.ParticipantType.EnumValue,
