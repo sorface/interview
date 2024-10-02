@@ -14,4 +14,9 @@ public enum EVRoomReviewState
     /// Closed state.
     /// </summary>
     Closed,
+
+    /// <summary>
+    /// Rejected state.
+    /// </summary>
+    Rejected,
 }

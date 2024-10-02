@@ -10,6 +10,7 @@ using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Tags.Records.Response;
 using Interview.Domain.Users;
 using Microsoft.EntityFrameworkCore;
+using NSpecifications;
 using X.PagedList;
 
 namespace Interview.Infrastructure.Rooms;
@@ -40,13 +41,17 @@ public class RoomRepository : EfRepository<Room>, IRoomRepository
             cancellationToken);
     }
 
-    public async Task<bool> IsReadyToCloseAsync(Guid roomId, CancellationToken cancellationToken)
+    public Task<bool> IsReadyToCloseAsync(Guid roomId, CancellationToken cancellationToken)
     {
-        return await Db.RoomParticipants
+        var userAttendedAtLeast1QuestionSpec = new Spec<RoomParticipant>(e => e.User.RoomQuestionEvaluations.Any(rq => rq.RoomQuestion!.RoomId == roomId));
+        var roomExpertsSpec = new Spec<RoomParticipant>(participant => participant.RoomId == roomId && participant.Type == SERoomParticipantType.Expert);
+        return Db.RoomParticipants
             .Include(participant => participant.Review)
-            .Where(participant => participant.RoomId == roomId && participant.Type == SERoomParticipantType.Expert)
-            .Select(participant => participant.Review)
-            .AllAsync(review => review != null && review.State == SERoomReviewState.Closed, cancellationToken);
+            .Include(participant => participant.User)
+            .ThenInclude(e => e.RoomQuestionEvaluations)
+            .ThenInclude(e => e.RoomQuestion)
+            .Where(roomExpertsSpec & userAttendedAtLeast1QuestionSpec)
+            .AllAsync(participant => participant.Review != null && participant.Review.State == SERoomReviewState.Closed, cancellationToken);
     }
 
     protected override IQueryable<Room> ApplyIncludes(DbSet<Room> set)

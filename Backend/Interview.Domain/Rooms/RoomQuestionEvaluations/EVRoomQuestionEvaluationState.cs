@@ -14,4 +14,9 @@ public enum EVRoomQuestionEvaluationState
     /// Submitted state.
     /// </summary>
     Submitted,
+
+    /// <summary>
+    /// Rejected state.
+    /// </summary>
+    Rejected,
 }

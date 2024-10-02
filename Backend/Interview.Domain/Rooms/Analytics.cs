@@ -56,7 +56,7 @@ public class Analytics
 
         public required EVRoomParticipantType ParticipantType { get; set; }
 
-        public required string Comment { get; set; } = string.Empty;
+        public required string? Comment { get; set; }
 
         public required string Nickname { get; set; } = string.Empty;
 
