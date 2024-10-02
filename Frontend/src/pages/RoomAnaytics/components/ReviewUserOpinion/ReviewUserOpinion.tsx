@@ -7,6 +7,8 @@ import { CircularProgress } from '../../../../components/CircularProgress/Circul
 import { Gap } from '../../../../components/Gap/Gap';
 import { AnalyticsUserReview } from '../../../../types/analytics';
 import { useParticipantTypeLocalization } from '../../../../hooks/useParticipantTypeLocalization';
+import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
+import { LocalizationKey } from '../../../../localization';
 
 interface ReviewUserOpinionProps {
   user: {
@@ -20,6 +22,7 @@ export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
   user,
   allUsers,
 }) => {
+  const localizationCaptions = useLocalizationCaptions();
   const localizeParticipantType = useParticipantTypeLocalization();
   const currentUser = allUsers.get(user.id);
 
@@ -47,8 +50,8 @@ export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
         </div>
       </div>
       <Gap sizeRem={1} />
-      <Typography size='m'>
-        {user.evaluation?.review}
+      <Typography size='m' secondary={!user.evaluation?.review}>
+        {user.evaluation?.review ?? localizationCaptions[LocalizationKey.RoomReviewWaiting]}
       </Typography>
     </div>
   );

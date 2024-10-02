@@ -51,6 +51,7 @@ export const RoomAnayticsDetails: FunctionComponent<RoomAnayticsDetailsProps> = 
         <ReviewUserGrid>
           {openedQuestion?.users
             .filter(questionUser => allUsers.get(questionUser.id)?.participantType === 'Expert')
+            .filter(questionUser => data?.completed ? !!questionUser.evaluation : true)
             .map(questionUser => {
               return (
                 <ReviewUserOpinion

@@ -285,6 +285,7 @@ export const RoomAnaytics: FunctionComponent = () => {
                   <ReviewUserGrid>
                     {loadedData?.userReview
                       .filter(userReview => allUsers.get(userReview.userId)?.participantType === 'Expert')
+                      .filter(userReview => data?.completed ? typeof userReview.averageMark === 'number' : true)
                       .map((userReview) => (
                         <ReviewUserOpinion
                           key={userReview.userId}

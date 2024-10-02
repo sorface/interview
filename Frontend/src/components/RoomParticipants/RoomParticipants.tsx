@@ -2,8 +2,6 @@ import { FunctionComponent } from 'react';
 import { Room } from '../../types/room';
 import { UserAvatar } from '../UserAvatar/UserAvatar';
 import { useParticipantTypeLocalization } from '../../hooks/useParticipantTypeLocalization';
-import { useThemeClassName } from '../../hooks/useThemeClassName';
-import { Theme } from '../../context/ThemeContext';
 import { Tooltip } from '../Tooltip/Tooltip';
 
 import './RoomParticipants.css';
@@ -16,10 +14,6 @@ export const RoomParticipants: FunctionComponent<RoomParticipantsProps> = ({
   participants,
 }) => {
   const localizeParticipantType = useParticipantTypeLocalization();
-  const tooltipThemedBackground = useThemeClassName({
-    [Theme.Dark]: 'var(--dark-dark1)',
-    [Theme.Light]: 'var(--dark)',
-  });
 
   return (
     <div className='room-participants'>
@@ -28,7 +22,6 @@ export const RoomParticipants: FunctionComponent<RoomParticipantsProps> = ({
           <Tooltip
             id={`user-tooltip-${roomParticipant.id}`}
             place='top'
-            style={{ backgroundColor: tooltipThemedBackground, zIndex: 999 }}
             content={`${roomParticipant.nickname} (${localizeParticipantType(roomParticipant.type)})`}
           />
           <UserAvatar
