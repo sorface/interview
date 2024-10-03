@@ -39,11 +39,6 @@ namespace Interview.Backend.Auth
 
             semaphore.Release();
 
-            if (LOCKSTORE.TryRemove(id, out _))
-            {
-                _logger.LogDebug($@"drop semaphore from semaphore store {LOCKSTORE.Count}");
-            }
-
             _logger.LogDebug($@"current capacity semaphore store {LOCKSTORE.Count}");
         }
     }
