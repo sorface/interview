@@ -63,7 +63,7 @@ public class SorfacePrincipalValidator
                 var refreshToken = context.Properties.GetTokenValue(SorfaceTokenDefaults.RefreshTokenName);
                 if (refreshToken is null)
                 {
-                    _logger.Log(LogLevel.Warning, "refreshToken is null");
+                    _logger.Log(LogLevel.Warning, "reject principal");
                     context.RejectPrincipal();
                     return;
                 }
@@ -72,13 +72,13 @@ public class SorfacePrincipalValidator
 
                 try
                 {
+                    await _distributedLockStorage.LockAsync(refreshToken, TimeSpan.FromSeconds(30));
+
                     if (await _distributedLockStorage.IsLockAsync(refreshToken))
                     {
                         _logger.LogDebug("double refresh {} access token locked", refreshToken);
                         return;
                     }
-
-                    await _distributedLockStorage.LockAsync(refreshToken, TimeSpan.FromSeconds(30));
 
                     _logger.LogDebug($"Start refresh ACCESS_TOKEN with lock");
 
