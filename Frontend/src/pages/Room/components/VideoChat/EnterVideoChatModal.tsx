@@ -103,6 +103,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
     }
     if (userVideo.current) {
       userVideo.current.srcObject = userVideoStream;
+      userVideo.current.play();
     }
   }, [userVideoStream]);
 

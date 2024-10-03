@@ -59,7 +59,7 @@ export const useCanvasStream = ({
     context.restore();
   }, [context, cameraStream, video]);
 
-  const selfieSegmentation = useSelfieSegmentation(onResults);
+  const selfieSegmentation = useSelfieSegmentation(Boolean(cameraStream && video), onResults);
 
   useEffect(() => {
     if (backgroundImage) {
@@ -79,7 +79,11 @@ export const useCanvasStream = ({
     const newCamera = new Camera(video, {
       onFrame: async () => {
         if (video && cameraStream && selfieSegmentation) {
-          await selfieSegmentation.send({ image: video });
+          try {
+            await selfieSegmentation.send({ image: video });
+          } catch (err) {
+            console.warn(err);
+          }
         }
       },
       width: video.width,
