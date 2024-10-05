@@ -1,4 +1,6 @@
-namespace Interview.Backend.WebSocket.Events.Handlers;
+using Microsoft.Extensions.Logging;
+
+namespace Interview.Infrastructure.WebSocket.Events.Handlers;
 
 #pragma warning disable SA1402
 public abstract class WebSocketByNameEventHandlerBase<TPayload> : WebSocketEventHandlerBase<TPayload>

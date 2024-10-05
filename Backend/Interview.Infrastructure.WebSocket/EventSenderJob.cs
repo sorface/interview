@@ -1,12 +1,15 @@
-using Interview.Backend.WebSocket.Events;
-using Interview.Backend.WebSocket.Events.ConnectionListener;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Events;
 using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Events.Sender;
 using Interview.Domain.Rooms.Service;
+using Interview.Infrastructure.WebSocket.Events;
+using Interview.Infrastructure.WebSocket.Events.ConnectionListener;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
-namespace Interview.Backend.WebSocket;
+namespace Interview.Infrastructure.WebSocket;
 
 public class EventSenderJob : BackgroundService
 {

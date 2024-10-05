@@ -1,4 +1,4 @@
-namespace Interview.Backend.WebSocket.Events;
+namespace Interview.Infrastructure.WebSocket.Events;
 
 public class WebSocketEvent
 {

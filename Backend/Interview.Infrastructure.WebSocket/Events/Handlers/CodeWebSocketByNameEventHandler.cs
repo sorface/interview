@@ -1,7 +1,9 @@
 using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Domain.Rooms.RoomParticipants;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
-namespace Interview.Backend.WebSocket.Events.Handlers;
+namespace Interview.Infrastructure.WebSocket.Events.Handlers;
 
 public class CodeWebSocketByNameEventHandler : WebSocketByNameEventHandlerBase
 {

@@ -1,11 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net.WebSockets;
 using Interview.Backend.Auth;
-using Interview.Backend.WebSocket.Events;
-using Interview.Backend.WebSocket.Events.ConnectionListener;
 using Interview.Domain;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.Service;
+using Interview.Infrastructure.WebSocket.Events;
+using Interview.Infrastructure.WebSocket.Events.ConnectionListener;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

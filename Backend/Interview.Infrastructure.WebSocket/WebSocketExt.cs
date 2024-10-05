@@ -1,6 +1,6 @@
 using System.Net.WebSockets;
 
-namespace Interview.Backend.WebSocket;
+namespace Interview.Infrastructure.WebSocket;
 
 public static class WebSocketExt
 {

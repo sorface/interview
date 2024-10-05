@@ -1,8 +1,9 @@
 using System.Net.WebSockets;
 using System.Text;
 using Interview.Domain.Events.Sender;
+using Microsoft.Extensions.Logging;
 
-namespace Interview.Backend.WebSocket.Events;
+namespace Interview.Infrastructure.WebSocket.Events;
 
 public class WebSocketEventSender : IEventSender
 {

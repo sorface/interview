@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Interview.Backend.WebSocket.Events.ConnectionListener;
+namespace Interview.Infrastructure.WebSocket.Events.ConnectionListener;
 
 public class UserConnectionListener : IConnectionListener, IUserWebSocketConnectionProvider
 {

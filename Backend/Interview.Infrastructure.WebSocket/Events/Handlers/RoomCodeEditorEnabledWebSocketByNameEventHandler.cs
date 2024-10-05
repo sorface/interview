@@ -1,12 +1,10 @@
-using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.DatabaseProcessors.Records.Question;
-using Interview.Domain.Events.Events;
-using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Domain.Rooms.RoomParticipants;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
-namespace Interview.Backend.WebSocket.Events.Handlers;
+namespace Interview.Infrastructure.WebSocket.Events.Handlers;
 
 public class RoomCodeEditorEnabledWebSocketByNameEventHandler : WebSocketByNameEventHandlerBase<RoomCodeEditorEnabledEvent.Payload>
 {

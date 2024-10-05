@@ -1,13 +1,16 @@
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using Interview.Backend.WebSocket.Events.Handlers;
 using Interview.Domain.Events.Events;
 using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Events.Sender;
 using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Users;
+using Interview.Infrastructure.WebSocket.Events.Handlers;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
-namespace Interview.Backend.WebSocket.Events.ConnectionListener;
+namespace Interview.Infrastructure.WebSocket.Events.ConnectionListener;
 
 public class VideoChatConnectionListener : IConnectionListener, IVideChatConnectionProvider
 {

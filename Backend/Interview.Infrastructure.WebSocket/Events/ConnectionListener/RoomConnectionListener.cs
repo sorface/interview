@@ -1,12 +1,9 @@
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using Interview.Backend.Auth;
 using Interview.Domain.Connections;
-using Interview.Domain.Events;
-using Microsoft.Extensions.Options;
 
-namespace Interview.Backend.WebSocket.Events.ConnectionListener;
+namespace Interview.Infrastructure.WebSocket.Events.ConnectionListener;
 
 public class RoomConnectionListener : IActiveRoomSource, IConnectionListener, IWebSocketConnectionSource
 {
@@ -19,16 +16,8 @@ public class RoomConnectionListener : IActiveRoomSource, IConnectionListener, IW
         await Task.Yield();
         _ = _activeRooms.AddOrUpdate(
             detail.Room.Id,
-            roomId =>
-            {
-                return ImmutableList.Create(detail);
-            },
-            (roomId, list) =>
-            {
-                var newList = list.Add(detail);
-
-                return newList;
-            });
+            _ => ImmutableList.Create(detail),
+            (_, list) => list.Add(detail));
     }
 
     public async Task OnDisconnectAsync(WebSocketConnectDetail detail, CancellationToken cancellationToken)
@@ -36,12 +25,8 @@ public class RoomConnectionListener : IActiveRoomSource, IConnectionListener, IW
         await Task.Yield();
         _activeRooms.AddOrUpdate(
             detail.Room.Id,
-            s => ImmutableList<WebSocketConnectDetail>.Empty,
-            (roomId, list) =>
-            {
-                var newList = list.Remove(detail);
-                return newList;
-            });
+            _ => ImmutableList<WebSocketConnectDetail>.Empty,
+            (_, list) => list.Remove(detail));
     }
 
     public bool TryGetConnections(Guid roomId, [NotNullWhen(true)] out IReadOnlyCollection<System.Net.WebSockets.WebSocket>? connections)

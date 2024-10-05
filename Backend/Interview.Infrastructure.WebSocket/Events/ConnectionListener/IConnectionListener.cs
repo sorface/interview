@@ -1,6 +1,8 @@
+using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Users;
 
-namespace Interview.Backend.WebSocket.Events.ConnectionListener;
+namespace Interview.Infrastructure.WebSocket.Events.ConnectionListener;
 
 public interface IConnectionListener
 {

@@ -1,13 +1,17 @@
 using System.Buffers;
 using System.Net.WebSockets;
 using System.Text.Json;
-using Interview.Backend.WebSocket.Events.Handlers;
 using Interview.Domain.Database;
 using Interview.Domain.Events.Storage;
+using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Users;
+using Interview.Infrastructure.WebSocket.Events.Handlers;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IO;
 
-namespace Interview.Backend.WebSocket.Events;
+namespace Interview.Infrastructure.WebSocket.Events;
 
 public class WebSocketReader
 {

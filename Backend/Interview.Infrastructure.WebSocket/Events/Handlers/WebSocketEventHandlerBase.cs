@@ -1,6 +1,7 @@
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 
-namespace Interview.Backend.WebSocket.Events.Handlers
+namespace Interview.Infrastructure.WebSocket.Events.Handlers
 {
 #pragma warning disable SA1402
     public abstract class WebSocketEventHandlerBase<TPayload> : IWebSocketEventHandler

@@ -2,8 +2,10 @@ using Interview.Domain.Database;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Service;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
-namespace Interview.Backend.WebSocket.Events.Handlers;
+namespace Interview.Infrastructure.WebSocket.Events.Handlers;
 
 public sealed class AppEventWebSocketEventHandler : WebSocketEventHandlerBase<Dictionary<string, object>>
 {
