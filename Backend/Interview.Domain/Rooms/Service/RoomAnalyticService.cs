@@ -97,7 +97,7 @@ public sealed class RoomAnalyticService : ISelfScopeService
             .Select(e => new Analytics.AnalyticsUserAverageMark
             {
                 UserId = e.UserId,
-                AverageMark = e.Incomplete ? null : e.AverageMarks?.DefaultIfEmpty(0).Average(),
+                AverageMark = e.AverageMarks?.DefaultIfEmpty(0).Average(),
                 Comment = string.IsNullOrWhiteSpace(e.Comment) ? null : e.Comment,
                 Nickname = e.Nickname,
                 Avatar = e.Avatar,
@@ -113,13 +113,6 @@ public sealed class RoomAnalyticService : ISelfScopeService
                     .Where(e => e > 0)
                     .DefaultIfEmpty(0)
                     .Average();
-        }
-        else
-        {
-            foreach (var analyticsUserAverageMark in res.UserReview)
-            {
-                analyticsUserAverageMark.AverageMark = null;
-            }
         }
 
         return res;
