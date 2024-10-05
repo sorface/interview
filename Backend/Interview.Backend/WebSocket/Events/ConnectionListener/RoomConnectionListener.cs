@@ -12,21 +12,12 @@ public class RoomConnectionListener : IActiveRoomSource, IConnectionListener, IW
 {
     private readonly ConcurrentDictionary<Guid, ImmutableList<WebSocketConnectDetail>> _activeRooms = new();
 
-    private readonly ChatBotAccount _chatBotAccount;
-    private readonly ILogger<RoomConnectionListener> _logger;
-
-    public RoomConnectionListener(IOptions<ChatBotAccount> chatBotAccount, IRoomEventDispatcher roomEventDispatcher, ILogger<RoomConnectionListener> logger)
-    {
-        _chatBotAccount = chatBotAccount.Value;
-        _logger = logger;
-    }
-
     public IReadOnlyCollection<Guid> ActiveRooms => _activeRooms.Where(e => e.Value.Count > 0).Select(e => e.Key).ToList();
 
     public async Task OnConnectAsync(WebSocketConnectDetail detail, CancellationToken cancellationToken)
     {
         await Task.Yield();
-        var list = _activeRooms.AddOrUpdate(
+        _ = _activeRooms.AddOrUpdate(
             detail.Room.Id,
             roomId =>
             {
