@@ -228,6 +228,7 @@ export const enum LocalizationKey {
   NoData,
   UserConnectedToRoom,
   NotEnoughRights,
+  WebcamBackgroundBlur,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -459,6 +460,7 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.NoData]: 'No data',
     [LocalizationKey.UserConnectedToRoom]: 'connected',
     [LocalizationKey.NotEnoughRights]: 'Insufficient rights to view content',
+    [LocalizationKey.WebcamBackgroundBlur]: 'Background blur',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.AppName]: 'Interview Platform',
@@ -688,5 +690,6 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.NoData]: 'Нет данных',
     [LocalizationKey.UserConnectedToRoom]: 'подключился(ась)',
     [LocalizationKey.NotEnoughRights]: 'Недостаточно прав для просмотра содержимого',
+    [LocalizationKey.WebcamBackgroundBlur]: 'Размытие фона',
   },
 }

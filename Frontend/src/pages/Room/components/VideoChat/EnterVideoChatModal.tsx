@@ -15,6 +15,7 @@ import { Typography } from '../../../../components/Typography/Typography';
 import { Gap } from '../../../../components/Gap/Gap';
 import { RoomToolsPanel } from '../RoomToolsPanel/RoomToolsPanel';
 import { RecognitionLangSwitch } from '../../../../components/RecognitionLangSwitch/RecognitionLangSwitch';
+import { Checkbox } from '../../../../components/Checkbox/Checkbox';
 
 interface EnterVideoChatModalProps {
   open: boolean;
@@ -27,6 +28,7 @@ interface EnterVideoChatModalProps {
   userAudioStream: MediaStream | null;
   micEnabled: boolean;
   cameraEnabled: boolean;
+  backgroundRemoveEnabled: boolean;
   setSelectedCameraId: React.Dispatch<React.SetStateAction<string | undefined>>;
   setSelectedMicId: React.Dispatch<React.SetStateAction<string | undefined>>;
   onRequestDevices: () => void;
@@ -34,6 +36,7 @@ interface EnterVideoChatModalProps {
   onClose: () => void;
   onMicSwitch: () => void;
   onCameraSwitch: () => void;
+  onBackgroundRemoveSwitch: () => void;
 }
 
 const updateAnalyserDelay = 1000 / 30;
@@ -55,6 +58,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
   userAudioStream,
   micEnabled,
   cameraEnabled,
+  backgroundRemoveEnabled,
   setSelectedCameraId,
   setSelectedMicId,
   onRequestDevices,
@@ -62,6 +66,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
   onClose,
   onMicSwitch,
   onCameraSwitch,
+  onBackgroundRemoveSwitch,
 }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
@@ -229,6 +234,15 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
               </RoomToolsPanel.ButtonsGroupWrapper>
             </RoomToolsPanel.Wrapper>
           </div>
+          <Gap sizeRem={0.75} />
+          <Typography size='m'>
+            <Checkbox
+              id='webcam-background-remove'
+              label={localizationCaptions[LocalizationKey.WebcamBackgroundBlur]}
+              checked={backgroundRemoveEnabled}
+              onChange={onBackgroundRemoveSwitch}
+            />
+          </Typography>
         </div>
         <div className='w-20 flex flex-col items-center text-center'>
           {joiningRoomHeader}
