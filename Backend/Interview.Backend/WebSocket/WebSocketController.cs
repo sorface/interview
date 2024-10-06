@@ -2,11 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.WebSockets;
 using Interview.Backend.Auth;
 using Interview.Domain;
-using Interview.Domain.Rooms.RoomParticipants;
-using Interview.Domain.Rooms.Service;
-using Interview.Infrastructure.WebSocket.Events;
-using Interview.Infrastructure.WebSocket.Events.ConnectionListener;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Interview.Infrastructure.WebSocket;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,20 +12,12 @@ namespace Interview.Backend.WebSocket;
 [Route("[controller]")]
 public class WebSocketController : ControllerBase
 {
+    private readonly WebSocketConnectionHandler _connectionHandler;
     private readonly ILogger<WebSocketController> _logger;
-    private readonly IRoomService _roomService;
-    private readonly IConnectionListener[] _connectListeners;
-    private readonly WebSocketReader _webSocketReader;
 
-    public WebSocketController(
-        IRoomService roomService,
-        WebSocketReader webSocketReader,
-        IEnumerable<IConnectionListener> connectionListeners,
-        ILogger<WebSocketController> logger)
+    public WebSocketController(WebSocketConnectionHandler connectionHandler, ILogger<WebSocketController> logger)
     {
-        _roomService = roomService;
-        _connectListeners = connectionListeners.ToArray();
-        _webSocketReader = webSocketReader;
+        _connectionHandler = connectionHandler;
         _logger = logger;
     }
 
@@ -46,39 +34,27 @@ public class WebSocketController : ControllerBase
 
         _logger.LogInformation("WebSocket connection established");
 
-        await ExecuteWebSocket(webSocket, CancellationToken.None);
-    }
-
-    [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task ExecuteWebSocket(System.Net.WebSockets.WebSocket webSocket, CancellationToken ct)
-    {
         if (!TryGetUser(out var user))
         {
             return;
         }
 
-        WebSocketConnectDetail? detail = null;
         try
         {
-            var roomIdentity = await ParseRoomIdAsync(webSocket, ct);
-
-            if (roomIdentity is null)
+            var roomId = await ParseRoomIdAsync(webSocket, CancellationToken.None);
+            if (roomId is null)
             {
                 return;
             }
 
-            var (dbRoom, participant) = await _roomService.AddParticipantAsync(roomIdentity.Value, user.Id, ct);
-
-            var participantType = participant.Type.EnumValue;
-            detail = new WebSocketConnectDetail(webSocket, dbRoom, user, participantType);
-            await HandleListenersSafely(
-                nameof(IConnectionListener.OnConnectAsync),
-                e => e.OnConnectAsync(detail, ct));
-
-            var waitTask = CreateWaitTask(ct);
-            var readerTask = RunEventReaderJob(user, dbRoom, participantType, HttpContext.RequestServices, webSocket, ct);
-            await Task.WhenAny(waitTask, readerTask);
-            await CloseSafely(webSocket, WebSocketCloseStatus.NormalClosure, string.Empty, ct);
+            var webSocketConnectHandlerRequest = new WebSocketConnectHandlerRequest
+            {
+                WebSocket = webSocket,
+                User = user,
+                RoomId = roomId.Value,
+                ServiceProvider = HttpContext.RequestServices,
+            };
+            await _connectionHandler.HandleAsync(webSocketConnectHandlerRequest, CancellationToken.None);
         }
         catch (OperationCanceledException)
         {
@@ -86,89 +62,28 @@ public class WebSocketController : ControllerBase
         }
         catch (Exception e)
         {
-            await CloseSafely(webSocket, WebSocketCloseStatus.InvalidPayloadData, e.Message, ct);
-        }
-        finally
-        {
-            if (detail is not null)
-            {
-                await HandleListenersSafely(
-                    nameof(IConnectionListener.OnDisconnectAsync),
-                    e => e.OnDisconnectAsync(detail, CancellationToken.None));
-            }
-        }
-
-        return;
-
-        static async Task CreateWaitTask(CancellationToken cancellationToken)
-        {
-            var cst = new TaskCompletionSource<object>();
-            await using (cancellationToken.Register(() => cst.TrySetCanceled()))
-            {
-                await cst.Task;
-            }
-        }
-
-        static async Task CloseSafely(
-            System.Net.WebSockets.WebSocket ws,
-            WebSocketCloseStatus status,
-            string message,
-            CancellationToken cancellationToken)
-        {
             try
             {
-                await ws.CloseAsync(status, message, cancellationToken);
+                await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, e.Message, CancellationToken.None);
             }
             catch
             {
-                // ignore
+                // ignored
             }
         }
-    }
-
-    private async Task HandleListenersSafely(string actionName, Func<IConnectionListener, Task> map)
-    {
-        var tasks = _connectListeners.Select(map);
-        try
-        {
-            await Task.WhenAll(tasks);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "During {Action}", actionName);
-        }
-    }
-
-    private Task RunEventReaderJob(
-        User user,
-        Room room,
-        EVRoomParticipantType participantType,
-        IServiceProvider scopedServiceProvider,
-        System.Net.WebSockets.WebSocket webSocket,
-        CancellationToken ct)
-    {
-        return Task.Run(
-            () => _webSocketReader.ReadAsync(
-                user,
-                room,
-                participantType,
-                scopedServiceProvider,
-                webSocket,
-                ct),
-            ct);
     }
 
     private async Task<Guid?> ParseRoomIdAsync(System.Net.WebSockets.WebSocket webSocket, CancellationToken ct)
     {
         if (!HttpContext.Request.Query.TryGetValue("roomId", out var roomIdentityString))
         {
-            await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Invalid room details", ct);
+            await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Not found roomId", ct);
             return null;
         }
 
         if (!Guid.TryParse(roomIdentityString, out var roomIdentity))
         {
-            await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Invalid room details", ct);
+            await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Invalid room id format", ct);
             return null;
         }
 
@@ -177,13 +92,6 @@ public class WebSocketController : ControllerBase
 
     private bool TryGetUser([NotNullWhen(true)] out User? user)
     {
-        if (!HttpContext.WebSockets.IsWebSocketRequest)
-        {
-            HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-            user = null;
-            return false;
-        }
-
         user = HttpContext.User.ToUser();
         if (user == null)
         {

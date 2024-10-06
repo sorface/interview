@@ -88,7 +88,7 @@ public class ServiceConfigurator
         AddAppServices(serviceCollection);
 
         serviceCollection.AddHostedService<EventSenderJob>();
-
+        serviceCollection.AddSingleton<WebSocketConnectionHandler>();
         serviceCollection.AddSingleton(new OAuthServiceDispatcher(_configuration));
 
         AddWebSocketServices(serviceCollection);
