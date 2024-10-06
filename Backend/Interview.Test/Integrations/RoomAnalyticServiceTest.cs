@@ -714,7 +714,7 @@ public class RoomAnalyticServiceTest
                 new()
                 {
                     UserId = users[0].Id,
-                    AverageMark = null,
+                    AverageMark = 6.0,
                     Comment = "test review",
                     Nickname = users[0].Nickname,
                     Avatar = users[0].Avatar,
