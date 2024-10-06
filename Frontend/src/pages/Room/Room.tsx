@@ -110,10 +110,12 @@ export const Room: FunctionComponent = () => {
     userAudioStream,
     userVideoStream,
     cameraEnabled,
+    backgroundRemoveEnabled,
     micEnabled,
     setSelectedCameraId,
     setSelectedMicId,
     setCameraEnabled,
+    setBackgroundRemoveEnabled,
     setMicEnabled,
     requestDevices,
     updateDevices,
@@ -405,6 +407,10 @@ export const Room: FunctionComponent = () => {
     setCameraEnabled(!cameraEnabled);
   }, [cameraEnabled, setCameraEnabled]);
 
+  const handleBackgroundRemoveSwitch = useCallback(() => {
+    setBackgroundRemoveEnabled(!backgroundRemoveEnabled);
+  }, [backgroundRemoveEnabled, setBackgroundRemoveEnabled]);
+
   const enableDisableMic = useCallback((enabled: boolean) => {
     setMicEnabled(enabled);
   }, [setMicEnabled]);
@@ -623,6 +629,7 @@ export const Room: FunctionComponent = () => {
         userAudioStream={userAudioStream}
         micEnabled={micEnabled}
         cameraEnabled={cameraEnabled}
+        backgroundRemoveEnabled={backgroundRemoveEnabled}
         setSelectedCameraId={setSelectedCameraId}
         setSelectedMicId={setSelectedMicId}
         onRequestDevices={requestDevices}
@@ -630,6 +637,7 @@ export const Room: FunctionComponent = () => {
         onClose={handleWelcomeScreenClose}
         onMicSwitch={handleMicSwitch}
         onCameraSwitch={handleCameraSwitch}
+        onBackgroundRemoveSwitch={handleBackgroundRemoveSwitch}
       />
       <Invitations
         open={invitationsOpen}
@@ -643,7 +651,9 @@ export const Room: FunctionComponent = () => {
       />
       <RoomSettings
         open={settingsOpen}
+        backgroundRemoveEnabled={backgroundRemoveEnabled}
         onRequestClose={handleSettingsClose}
+        onBackgroundRemoveSwitch={handleBackgroundRemoveSwitch}
       />
       <ProcessWrapper
         loading={loading}
