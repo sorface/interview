@@ -97,21 +97,21 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
     {
       path: pathnames.highlightRooms,
       caption: <LocalizationCaption captionKey={LocalizationKey.HighlightsRoomsPageName} />,
-      icon: IconNames.Home,
-      onClick: handleItemClick,
-    },
-    {
-      path: pathnames.currentRooms,
-      caption: <LocalizationCaption captionKey={LocalizationKey.CurrentRoomsPageName} />,
       icon: IconNames.Cube,
       onClick: handleItemClick,
     },
-    {
-      path: pathnames.closedRooms,
-      caption: <LocalizationCaption captionKey={LocalizationKey.ClosedRoomsPageName} />,
-      icon: IconNames.Golf,
-      onClick: handleItemClick,
-    },
+    // {
+    //   path: pathnames.currentRooms,
+    //   caption: <LocalizationCaption captionKey={LocalizationKey.CurrentRoomsPageName} />,
+    //   icon: IconNames.Cube,
+    //   onClick: handleItemClick,
+    // },
+    // {
+    //   path: pathnames.closedRooms,
+    //   caption: <LocalizationCaption captionKey={LocalizationKey.ClosedRoomsPageName} />,
+    //   icon: IconNames.Golf,
+    //   onClick: handleItemClick,
+    // },
     {
       path: pathnames.questions,
       caption: <LocalizationCaption captionKey={LocalizationKey.QuestionsPageName} />,
