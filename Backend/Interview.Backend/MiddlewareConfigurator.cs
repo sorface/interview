@@ -30,15 +30,6 @@ public class MiddlewareConfigurator
 
         _app.UseWebSockets();
 
-        if (_app.Environment.IsDevelopment())
-        {
-            _app.UseWebSocketsAuthorization(new WebSocketAuthorizationOptions
-            {
-                CookieName = WebSocketAuthorizationOptions.DefaultCookieName,
-                WebSocketQueryName = "Authorization",
-            });
-        }
-
         _app.UseCors("All");
 
         _app.UseRateLimiter();
@@ -51,6 +42,9 @@ public class MiddlewareConfigurator
 
             return func();
         });
+
+        _app.UseSwagger();
+        _app.UseSwaggerUI();
 
         _app.UseAuthentication();
         _app.UseAuthorization();
@@ -91,10 +85,7 @@ public class MiddlewareConfigurator
 
             return func();
         });
-
-        _app.UseSwagger();
-        _app.UseSwaggerUI();
-
+        
         _app.MapControllers();
 
         _app.MapHealthChecks("/actuator/health/liveness", new HealthCheckOptions { Predicate = r => r.Name.Contains("liveness"), });

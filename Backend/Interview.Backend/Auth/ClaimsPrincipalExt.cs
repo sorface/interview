@@ -18,8 +18,10 @@ public static class ClaimsPrincipalExt
 
     public static User? ToUser(this ClaimsPrincipal self)
     {
-        var profileId = self.Claims.FirstOrDefault(e => e.Type == SorfaceClaimTypes.Claims.Profile.Id);
-        var nickname = self.Claims.FirstOrDefault(e => e.Type == SorfaceClaimTypes.Claims.Profile.Username);
+        var claims = self.Claims;
+
+        var profileId = self.Claims.FirstOrDefault(e => e.Type == "user_id");
+        var nickname = self.Claims.FirstOrDefault(e => e.Type == "sub");
 
         if (profileId == null || nickname == null)
         {
@@ -28,8 +30,6 @@ public static class ClaimsPrincipalExt
 
         var id = self.Claims.FirstOrDefault(e => e.Type == UserClaimConstants.UserId);
 
-        var profileImage = self.Claims.FirstOrDefault(e => e.Type == SorfaceClaimTypes.Claims.Profile.Avatar);
-
         var user = new User(nickname.Value, profileId.Value);
 
         if (id != null && Guid.TryParse(id.Value, out var typedId))
@@ -37,20 +37,9 @@ public static class ClaimsPrincipalExt
             user.Id = typedId;
         }
 
-        user.Avatar = profileImage?.Value;
+        var authoritiesClaim = self.Claims.Where(e => e.Type == "roles").Select(it => it.Value);
 
-        var authoritiesClaim = self.Claims.FirstOrDefault(e => e.Type == SorfaceClaimTypes.Claims.Profile.Authorities);
-
-        if (authoritiesClaim is null)
-        {
-            return user;
-        }
-
-        var values = authoritiesClaim.Value;
-
-        var strings = values.Split(',');
-
-        foreach (var authority in strings)
+        foreach (var authority in authoritiesClaim)
         {
             var roleName = RoleName.FromName(authority, true);
             user.Roles.Add(new Role(roleName));
