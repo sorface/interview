@@ -5,7 +5,6 @@ using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Ardalis.SmartEnum.SystemTextJson;
 using Interview.Backend.Auth;
-using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Swagger;
 using Interview.Backend.WebSocket;
 using Interview.Backend.WebSocket.Events;
@@ -13,7 +12,6 @@ using Interview.Backend.WebSocket.Events.ConnectionListener;
 using Interview.Backend.WebSocket.Events.Handlers;
 using Interview.DependencyInjection;
 using Interview.Domain.Rooms.RoomQuestions;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IO;
@@ -89,16 +87,12 @@ public class ServiceConfigurator
 
         serviceCollection.AddHostedService<EventSenderJob>();
 
-        serviceCollection.AddSingleton(new OAuthServiceDispatcher(_configuration));
-
         AddWebSocketServices(serviceCollection);
 
-        serviceCollection.Configure<ChatBotAccount>(_configuration.GetSection(nameof(ChatBotAccount)));
         serviceCollection.Configure<ForwardedHeadersOptions>(options =>
         {
             options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
         });
-        AddRateLimiter(serviceCollection);
 
         AddSwagger(serviceCollection);
         serviceCollection.AddHostedService<EventStorage2DatabaseBackgroundService>();
@@ -106,12 +100,7 @@ public class ServiceConfigurator
 
     private void AddAppServices(IServiceCollection serviceCollection)
     {
-        var sorfaceAuth = new OAuthServiceDispatcher(_configuration).GetAuthService("sorface") ?? throw new Exception("Not found \"sorface\" section");
-
-        serviceCollection.AddSingleton(sorfaceAuth);
         serviceCollection.AddHttpClient();
-        serviceCollection.AddSingleton<SorfacePrincipalValidator>();
-        serviceCollection.AddSingleton<SorfaceTokenService>();
 
         var adminUsers = _configuration.GetSection(nameof(AdminUsers))
             .Get<AdminUsers>() ?? throw new ArgumentException($"Not found \"{nameof(AdminUsers)}\" section");
@@ -153,68 +142,17 @@ public class ServiceConfigurator
                     (host, port, username, password) =>
                     {
                         builder.UseRedis($@"redis://{username}:{password}@{host}:{port}");
-
-                        serviceCollection.AddStackExchangeRedisCache(options =>
-                        {
-                            options.Configuration = $@"{host}:{port},password={password}";
-                            options.InstanceName = "sorface.interview.session.";
-                        });
                     },
                     () =>
                     {
-                        serviceCollection.AddDistributedMemoryCache();
                         builder.UseEmpty();
                     });
             },
         };
-
         serviceCollection.AddAppServices(serviceOption);
 
-        serviceCollection.AddSingleton<IDistributedLockStorage, DistributedLockStorage>();
-
-        serviceCollection
-            .AddSingleton<ITicketStore, DistributedCacheTicketStore>()
-            .AddSession()
-            .AddAppAuth(sorfaceAuth);
-    }
-
-    private void AddRateLimiter(IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddRateLimiter(_ =>
-        {
-            _.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, IPAddress>(context =>
-            {
-                /*
-                var address = context.Connection.RemoteIpAddress;
-                if (address is not null && !IPAddress.IsLoopback(address))
-                {
-                    return RateLimitPartition.GetFixedWindowLimiter(address, key => new()
-                    {
-                        PermitLimit = 36,
-                        Window = TimeSpan.FromSeconds(30),
-                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                        AutoReplenishment = true,
-                    });
-                }
-                */
-                return RateLimitPartition.GetNoLimiter(IPAddress.Loopback);
-            });
-            _.OnRejected = (context, token) =>
-            {
-                if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
-                {
-                    context.HttpContext.Response.Headers.RetryAfter =
-                        ((int)retryAfter.TotalSeconds).ToString(NumberFormatInfo.InvariantInfo);
-                }
-
-                context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-                context.HttpContext.Response.WriteAsync(
-                    "Too many requests. Please try again later.",
-                    cancellationToken: token);
-
-                return ValueTask.CompletedTask;
-            };
-        });
+        var openIdConnectOptions = _configuration.GetSection(nameof(OpenIdConnectOptions)).Get<OpenIdConnectOptions>()!;
+        serviceCollection.AddAppAuth(openIdConnectOptions);
     }
 
     private void AddSwagger(IServiceCollection serviceCollection)

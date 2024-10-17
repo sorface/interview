@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useReducer } from 'react';
-import { REACT_APP_BACKEND_URL } from '../config';
 
 interface LogoutState {
   process: {
@@ -73,9 +72,10 @@ export const useLogout = () => {
   const logout = useCallback(async () => {
     dispatch({ name: 'startLoad' });
     try {
-      const response = await fetch(`${REACT_APP_BACKEND_URL}/logout`, {
+      const response = await fetch(`http://localhost:9000/logout`, {
         method: 'POST',
-        credentials: 'include'
+        credentials: 'include',
+        mode: "no-cors"
       });
       if (!response.ok) {
         throw new Error('logout error');

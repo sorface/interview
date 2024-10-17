@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Interview.Backend.Auth.Sorface;
 
 namespace Interview.Backend.Auth;
 
@@ -18,9 +17,7 @@ public static class ClaimsPrincipalExt
 
     public static User? ToUser(this ClaimsPrincipal self)
     {
-        var claims = self.Claims;
-
-        var profileId = self.Claims.FirstOrDefault(e => e.Type == "user_id");
+        var profileId = self.Claims.FirstOrDefault(e => e.Type == "principal-id");
         var nickname = self.Claims.FirstOrDefault(e => e.Type == "sub");
 
         if (profileId == null || nickname == null)
