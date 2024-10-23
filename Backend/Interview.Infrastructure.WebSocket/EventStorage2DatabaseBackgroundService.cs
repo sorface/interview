@@ -1,6 +1,8 @@
 using Interview.Domain.Events;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-namespace Interview.Backend;
+namespace Interview.Infrastructure.WebSocket;
 
 public class EventStorage2DatabaseBackgroundService : BackgroundService
 {

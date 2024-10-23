@@ -32,22 +32,6 @@ public class ServiceConfigurator
         _configuration = configuration;
     }
 
-    public static void AddWebSocketServices(IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddSingleton<RecyclableMemoryStreamManager>();
-        serviceCollection.AddScoped<WebSocketReader>();
-        serviceCollection.Scan(selector =>
-        {
-            selector.FromAssemblies(typeof(IWebSocketEventHandler).Assembly)
-                .AddClasses(f => f.AssignableTo<IWebSocketEventHandler>())
-                .As<IWebSocketEventHandler>()
-                .WithScopedLifetime()
-                .AddClasses(f => f.AssignableTo<IConnectionListener>())
-                .AsSelfWithInterfaces()
-                .WithSingletonLifetime();
-        });
-    }
-
     public void AddServices(IServiceCollection serviceCollection)
     {
         var corsOptions = _configuration.GetSection(nameof(CorsOptions)).Get<CorsOptions>();
@@ -87,11 +71,9 @@ public class ServiceConfigurator
 
         AddAppServices(serviceCollection);
 
-        serviceCollection.AddHostedService<EventSenderJob>();
-        serviceCollection.AddSingleton<WebSocketConnectionHandler>();
         serviceCollection.AddSingleton(new OAuthServiceDispatcher(_configuration));
 
-        AddWebSocketServices(serviceCollection);
+        serviceCollection.AddWebSocketServices();
 
         serviceCollection.Configure<ForwardedHeadersOptions>(options =>
         {
@@ -100,7 +82,6 @@ public class ServiceConfigurator
         AddRateLimiter(serviceCollection);
 
         AddSwagger(serviceCollection);
-        serviceCollection.AddHostedService<EventStorage2DatabaseBackgroundService>();
     }
 
     private void AddAppServices(IServiceCollection serviceCollection)

@@ -145,33 +145,35 @@ public class EventSenderJob : BackgroundService
 
     private async Task UpdateRoomStateAsync(List<IRoomEvent> statefulEvents, CancellationToken cancellationToken)
     {
-        if (statefulEvents.Count > 0)
+        if (statefulEvents.Count <= 0)
         {
-            try
+            return;
+        }
+
+        try
+        {
+            await using var dbScope = _scopeFactory.CreateAsyncScope();
+            var service = dbScope.ServiceProvider.GetRequiredService<IRoomServiceWithoutPermissionCheck>();
+            foreach (var roomEvent in statefulEvents)
             {
-                await using var dbScope = _scopeFactory.CreateAsyncScope();
-                var service = dbScope.ServiceProvider.GetRequiredService<IRoomServiceWithoutPermissionCheck>();
-                foreach (var roomEvent in statefulEvents)
+                try
                 {
-                    try
-                    {
-                        var payload = roomEvent.BuildStringPayload(_serializer);
-                        await service.UpsertRoomStateAsync(
-                            roomEvent.RoomId,
-                            roomEvent.Type,
-                            payload ?? string.Empty,
-                            cancellationToken);
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogError(e, "During update {Type} room state", roomEvent.Type);
-                    }
+                    var payload = roomEvent.BuildStringPayload(_serializer);
+                    await service.UpsertRoomStateAsync(
+                        roomEvent.RoomId,
+                        roomEvent.Type,
+                        payload ?? string.Empty,
+                        cancellationToken);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "During update {Type} room state", roomEvent.Type);
                 }
             }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Fails to update room states");
-            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Fails to update room states");
         }
     }
 }
