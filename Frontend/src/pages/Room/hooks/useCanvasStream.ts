@@ -10,6 +10,7 @@ interface UseCanvasStreamParams {
   height: number;
   frameRate: number;
   cameraStream: MediaStream | null;
+  backgroundRemoveEnabled: boolean;
 }
 
 const fillNoCamera = (context: CanvasRenderingContext2D, nickname: string | null) => {
@@ -31,6 +32,7 @@ export const useCanvasStream = ({
   height,
   frameRate,
   cameraStream,
+  backgroundRemoveEnabled,
 }: UseCanvasStreamParams) => {
   const auth = useContext(AuthContext);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
@@ -38,6 +40,8 @@ export const useCanvasStream = ({
   const [video, setVideo] = useState<HTMLVideoElement | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
   const requestRef = useRef<number>();
+  const backgroundRemoveEnabledRef = useRef(false);
+  backgroundRemoveEnabledRef.current = backgroundRemoveEnabled;
 
   const onResults = useCallback((results: Results) => {
     if (!context || !cameraStream || !video) {
@@ -59,7 +63,11 @@ export const useCanvasStream = ({
     context.restore();
   }, [context, cameraStream, video]);
 
-  const selfieSegmentation = useSelfieSegmentation(onResults);
+  const selfieSegmentationEnabled = Boolean(backgroundRemoveEnabled && cameraStream && video);
+  const selfieSegmentation = useSelfieSegmentation(
+    selfieSegmentationEnabled,
+    onResults,
+  );
 
   useEffect(() => {
     if (backgroundImage) {
@@ -78,8 +86,12 @@ export const useCanvasStream = ({
     }
     const newCamera = new Camera(video, {
       onFrame: async () => {
-        if (video && cameraStream && selfieSegmentation) {
-          await selfieSegmentation.send({ image: video });
+        if (video && cameraStream && selfieSegmentation && backgroundRemoveEnabledRef.current) {
+          try {
+            await selfieSegmentation.send({ image: video });
+          } catch (err) {
+            console.warn(err);
+          }
         }
       },
       width: video.width,
@@ -90,11 +102,9 @@ export const useCanvasStream = ({
     return () => {
       newCamera.stop().then(() => {
         cameraStream.getTracks().forEach(track => track.stop());
-        fillNoCamera(context, auth?.nickname || null);
       });
     };
   }, [video, context, width, height, cameraStream, selfieSegmentation, auth?.nickname]);
-
 
   useEffect(() => {
     if (!enabled) {
@@ -126,6 +136,10 @@ export const useCanvasStream = ({
     }
     const triggerCanvasUpdate = () => {
       if (cameraStream && video) {
+        if (!backgroundRemoveEnabled) {
+          context.drawImage(video, 0, 0, context.canvas.width, context.canvas.height);
+        }
+        requestRef.current = requestAnimationFrame(triggerCanvasUpdate);
         return;
       }
       fillNoCamera(context, auth?.nickname || null);
@@ -137,7 +151,7 @@ export const useCanvasStream = ({
         cancelAnimationFrame(requestRef.current);
       }
     };
-  }, [context, video, cameraStream, auth?.nickname]);
+  }, [context, video, cameraStream, auth?.nickname, backgroundRemoveEnabled]);
 
   useEffect(() => {
     if (cameraStream && video && context) {

@@ -228,6 +228,7 @@ export const enum LocalizationKey {
   NoData,
   UserConnectedToRoom,
   NotEnoughRights,
+  WebcamBackgroundBlur,
 };
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
@@ -235,7 +236,7 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.AppName]: 'Interview Platform',
     [LocalizationKey.LoginRequired]: 'To view this page you need to log in to your account',
     [LocalizationKey.WelcomeMessage]: 'Welcome',
-    [LocalizationKey.HighlightsRoomsPageName]: 'Home',
+    [LocalizationKey.HighlightsRoomsPageName]: 'Rooms',
     [LocalizationKey.CurrentRoomsPageName]: 'Current rooms',
     [LocalizationKey.ClosedRoomsPageName]: 'Closed rooms',
     [LocalizationKey.RoomsPageName]: 'Meetings',
@@ -459,12 +460,13 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.NoData]: 'No data',
     [LocalizationKey.UserConnectedToRoom]: 'connected',
     [LocalizationKey.NotEnoughRights]: 'Insufficient rights to view content',
+    [LocalizationKey.WebcamBackgroundBlur]: 'Background blur',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.AppName]: 'Interview Platform',
     [LocalizationKey.LoginRequired]: 'Для просмотра данной страницы необходимо войти в аккаунт',
     [LocalizationKey.WelcomeMessage]: 'Добро пожаловать',
-    [LocalizationKey.HighlightsRoomsPageName]: 'Главная',
+    [LocalizationKey.HighlightsRoomsPageName]: 'Комнаты',
     [LocalizationKey.CurrentRoomsPageName]: 'Актуальные комнаты',
     [LocalizationKey.ClosedRoomsPageName]: 'Завершенные комнаты',
     [LocalizationKey.RoomsPageName]: 'Встречи',
@@ -688,5 +690,6 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.NoData]: 'Нет данных',
     [LocalizationKey.UserConnectedToRoom]: 'подключился(ась)',
     [LocalizationKey.NotEnoughRights]: 'Недостаточно прав для просмотра содержимого',
+    [LocalizationKey.WebcamBackgroundBlur]: 'Размытие фона',
   },
 }
