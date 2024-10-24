@@ -45,14 +45,17 @@ public static class ServiceCollectionExt
 public sealed class PubSubFactoryConfiguration
 {
     private Type? _implementation;
+    private RedisPubSubFactoryConfiguration? _configuration;
 
     public void UseInMemory()
     {
+        _configuration = null;
         _implementation = typeof(MemoryPubSubFactory);
     }
     
-    public void UseRedis()
+    public void UseRedis(RedisPubSubFactoryConfiguration configuration)
     {
+        _configuration = configuration;
         _implementation = typeof(RedisPubSubFactory);
     }
 
@@ -64,5 +67,9 @@ public sealed class PubSubFactoryConfiguration
         }
         
         serviceCollection.AddSingleton(typeof(IPubSubFactory), _implementation);
+        if (_configuration is not null)
+        {
+            serviceCollection.AddSingleton(_configuration);
+        }
     }
 }
