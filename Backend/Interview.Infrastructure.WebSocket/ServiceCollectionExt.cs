@@ -1,6 +1,8 @@
 using Interview.Infrastructure.WebSocket.Events;
 using Interview.Infrastructure.WebSocket.Events.ConnectionListener;
 using Interview.Infrastructure.WebSocket.Events.Handlers;
+using Interview.Infrastructure.WebSocket.PubSub;
+using Interview.Infrastructure.WebSocket.PubSub.Factory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IO;
@@ -12,7 +14,9 @@ namespace Interview.Infrastructure.WebSocket;
 /// </summary>
 public static class ServiceCollectionExt
 {
-    public static IServiceCollection AddWebSocketServices(this IServiceCollection self)
+    public static IServiceCollection AddWebSocketServices(
+        this IServiceCollection self,
+        Action<PubSubFactoryConfiguration> pubSubFactoryConfiguration)
     {
         self.AddScoped<WebSocketConnectionHandler>();
         self.TryAddSingleton(typeof(RecyclableMemoryStreamManager));
@@ -30,6 +34,35 @@ public static class ServiceCollectionExt
 
         self.AddHostedService<EventSenderJob>();
         self.AddHostedService<EventStorage2DatabaseBackgroundService>();
+        
+        var subFactoryConfiguration = new PubSubFactoryConfiguration();
+        pubSubFactoryConfiguration.Invoke(subFactoryConfiguration);
+        subFactoryConfiguration.AddServices(self);
         return self;
+    }
+}
+
+public sealed class PubSubFactoryConfiguration
+{
+    private Type? _implementation;
+
+    public void UseInMemory()
+    {
+        _implementation = typeof(MemoryPubSubFactory);
+    }
+    
+    public void UseRedis()
+    {
+        _implementation = typeof(RedisPubSubFactory);
+    }
+
+    internal void AddServices(IServiceCollection serviceCollection)
+    {
+        if (_implementation is null)
+        {
+            throw new Exception("You should specify implementation of PubSubFactory");
+        }
+        
+        serviceCollection.AddSingleton(typeof(IPubSubFactory), _implementation);
     }
 }

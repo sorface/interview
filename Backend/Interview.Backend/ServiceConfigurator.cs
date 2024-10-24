@@ -73,7 +73,7 @@ public class ServiceConfigurator
 
         serviceCollection.AddSingleton(new OAuthServiceDispatcher(_configuration));
 
-        serviceCollection.AddWebSocketServices();
+        serviceCollection.AddWebSocketServices(configuration => configuration.UseInMemory());
 
         serviceCollection.Configure<ForwardedHeadersOptions>(options =>
         {

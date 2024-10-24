@@ -27,7 +27,7 @@ namespace Interview.Test.Units
                 EventStorageConfigurator = builder => builder.UseEmpty(),
             };
             webAppBuilder.Services.AddAppServices(option);
-            webAppBuilder.Services.AddWebSocketServices();
+            webAppBuilder.Services.AddWebSocketServices(configuration => configuration.UseInMemory());
 
             var webApp = webAppBuilder.Build();
             webApp.Should().NotBeNull();
