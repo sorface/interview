@@ -47,27 +47,29 @@ public sealed class RedisEventBusFactory : IEventBusPublisherFactory, IEventBusS
             _subscriber = subscriber;
         }
 
-        public async Task<IAsyncDisposable> SubscribeAsync(IEventBusKey key, Action<EventBusEvent?> callback, CancellationToken cancellationToken)
+        public async Task<IAsyncDisposable> SubscribeAsync<TKey>(TKey key, Action<TKey, EventBusEvent?> callback, CancellationToken cancellationToken)
+            where TKey : IEventBusKey
         {
             var redisKey = CreateKey(key);
             await _subscriber.SubscribeAsync(redisKey, (_, value) =>
             {
                 if (!value.HasValue)
                 {
-                    callback(null);
+                    callback(key, null);
                 }
                 else
                 {
                     var content = (byte[])value.Box()!;
                     var ev = JsonSerializer.Deserialize<EventBusEvent>(content);
-                    callback(ev);
+                    callback(key, ev);
                 }
             });
             
             return new Unsubscriber(_subscriber, redisKey);
         }
 
-        public Task PublishAsync(IEventBusKey key, EventBusEvent roomEventBusEvent, CancellationToken cancellationToken)
+        public Task PublishAsync<TKey>(TKey key, EventBusEvent roomEventBusEvent, CancellationToken cancellationToken)
+            where TKey : IEventBusKey
         {
             var tKey = CreateKey(key);
             var serializeToUtf8Bytes = JsonSerializer.SerializeToUtf8Bytes(roomEventBusEvent);

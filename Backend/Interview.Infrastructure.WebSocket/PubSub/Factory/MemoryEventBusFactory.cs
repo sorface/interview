@@ -17,24 +17,26 @@ public sealed class MemoryEventBusFactory : IEventBusPublisherFactory, IEventBus
     
     private sealed class MemoryEventBus : IEventBus
     {
-        private readonly ConcurrentDictionary<string, List<Action<EventBusEvent?>>> _mapping = new();
+        private readonly ConcurrentDictionary<string, ConcurrentDictionary<object, Action<IEventBusKey, EventBusEvent?>>> _mapping = new();
         
-        public Task<IAsyncDisposable> SubscribeAsync(IEventBusKey key, Action<EventBusEvent?> callback, CancellationToken cancellationToken)
+        public Task<IAsyncDisposable> SubscribeAsync<TKey>(TKey key, Action<TKey, EventBusEvent?> callback, CancellationToken cancellationToken)
+            where TKey : IEventBusKey
         {
             var strKey = key.BuildStringKey();
-            var list = _mapping.GetOrAdd(strKey, static _ => new List<Action<EventBusEvent?>>());
-            list.Add(callback);
+            var list = _mapping.GetOrAdd(strKey, static _ => new ConcurrentDictionary<object, Action<IEventBusKey, EventBusEvent?>>());
+            list.TryAdd(callback, (k, ev) => callback((TKey)k, ev));
             return Task.FromResult<IAsyncDisposable>(new Unsubscriber(strKey, this, callback));
         }
 
-        public Task PublishAsync(IEventBusKey key, EventBusEvent roomEventBusEvent, CancellationToken cancellationToken)
+        public Task PublishAsync<TKey>(TKey key, EventBusEvent roomEventBusEvent, CancellationToken cancellationToken)
+            where TKey : IEventBusKey
         {
             var strKey = key.BuildStringKey();
             if (_mapping.TryGetValue(strKey, out var actions))
             {
-                foreach (var action in actions)
+                foreach (var action in actions.Values)
                 {
-                    action(roomEventBusEvent);
+                    action(key, roomEventBusEvent);
                 }
             }
             
@@ -45,9 +47,9 @@ public sealed class MemoryEventBusFactory : IEventBusPublisherFactory, IEventBus
         {
             private readonly string _key;
             private readonly MemoryEventBus _root;
-            private readonly Action<EventBusEvent?> _callback;
+            private readonly object _callback;
 
-            public Unsubscriber(string key, MemoryEventBus root, Action<EventBusEvent?> callback)
+            public Unsubscriber(string key, MemoryEventBus root, object callback)
             {
                 _key = key;
                 _root = root;
@@ -61,7 +63,7 @@ public sealed class MemoryEventBusFactory : IEventBusPublisherFactory, IEventBus
                     return ValueTask.CompletedTask;
                 }
 
-                items.Remove(_callback);
+                items.TryRemove(_callback, out _);
                 return ValueTask.CompletedTask;
             }
         }

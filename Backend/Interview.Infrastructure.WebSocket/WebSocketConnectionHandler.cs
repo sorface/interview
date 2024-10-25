@@ -6,6 +6,9 @@ using Interview.Domain.Rooms.Service;
 using Interview.Domain.Users;
 using Interview.Infrastructure.WebSocket.Events;
 using Interview.Infrastructure.WebSocket.Events.ConnectionListener;
+using Interview.Infrastructure.WebSocket.PubSub;
+using Interview.Infrastructure.WebSocket.PubSub.Events;
+using Interview.Infrastructure.WebSocket.PubSub.Factory;
 using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket;
@@ -27,17 +30,23 @@ public class WebSocketConnectionHandler
     private readonly IRoomService _roomService;
     private readonly IConnectionListener[] _connectListeners;
     private readonly WebSocketReader _webSocketReader;
+    private readonly IEventBusPublisherFactory _publisherFactory;
+    private readonly IEventBusSubscriberFactory _subscriberFactory;
 
     public WebSocketConnectionHandler(
         IRoomService roomService,
         WebSocketReader webSocketReader,
         IEnumerable<IConnectionListener> connectionListeners,
-        ILogger<WebSocketConnectionHandler> logger)
+        ILogger<WebSocketConnectionHandler> logger,
+        IEventBusPublisherFactory publisherFactory,
+        IEventBusSubscriberFactory subscriberFactory)
     {
         _roomService = roomService;
         _connectListeners = connectionListeners.ToArray();
         _webSocketReader = webSocketReader;
         _logger = logger;
+        _publisherFactory = publisherFactory;
+        _subscriberFactory = subscriberFactory;
     }
 
     public async Task HandleAsync(WebSocketConnectHandlerRequest request, CancellationToken ct)
@@ -73,6 +82,9 @@ public class WebSocketConnectionHandler
         var participantType = participant.Type.EnumValue;
         var detail = new WebSocketConnectDetail(request.WebSocket, dbRoom, request.User, participantType);
 
+        var subscriber = await _subscriberFactory.CreateAsync(ct);
+        
+        // subscriber.SubscribeAsync(new EventBusRoomEventKey(request.RoomId))
         await HandleListenersSafely(
             nameof(IConnectionListener.OnConnectAsync),
             e => e.OnConnectAsync(detail, ct));

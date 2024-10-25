@@ -8,10 +8,12 @@ public interface IEventBus : IEventBusSubscriber, IEventBusPublisher
 
 public interface IEventBusPublisher
 {
-    Task PublishAsync(IEventBusKey key, EventBusEvent roomEventBusEvent, CancellationToken cancellationToken);
+    Task PublishAsync<TKey>(TKey key, EventBusEvent roomEventBusEvent, CancellationToken cancellationToken)
+        where TKey : IEventBusKey;
 }
 
 public interface IEventBusSubscriber
 {
-    Task<IAsyncDisposable> SubscribeAsync(IEventBusKey key, Action<EventBusEvent?> callback, CancellationToken cancellationToken);
+    Task<IAsyncDisposable> SubscribeAsync<TKey>(TKey key, Action<TKey, EventBusEvent?> callback, CancellationToken cancellationToken)
+        where TKey : IEventBusKey;
 }
