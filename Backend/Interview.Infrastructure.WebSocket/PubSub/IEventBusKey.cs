@@ -1,11 +1,11 @@
 namespace Interview.Infrastructure.WebSocket.PubSub;
 
-public interface IPubSubKey
+public interface IEventBusKey
 {
     string BuildStringKey();
 }
 
-public record PubSubKey : IPubSubKey
+public record EventBusKey : IEventBusKey
 {
     public string BuildStringKey() => ToString();
 }

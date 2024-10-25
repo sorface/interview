@@ -3,33 +3,38 @@ using Interview.Infrastructure.WebSocket.PubSub.Events;
 
 namespace Interview.Infrastructure.WebSocket.PubSub.Factory;
 
-public sealed class MemoryPubSubFactory : IPubSubFactory
+public sealed class MemoryEventBusFactory : IEventBusPublisherFactory, IEventBusSubscriberFactory
 {
-    public Task<IPubSub> CreateAsync(CancellationToken cancellationToken)
+    Task<IEventBusPublisher> IEventBusPublisherFactory.CreateAsync(CancellationToken cancellationToken)
     {
-        return Task.FromResult<IPubSub>(new MemoryPubSub());
+        return Task.FromResult<IEventBusPublisher>(new MemoryEventBus());
+    }
+
+    Task<IEventBusSubscriber> IEventBusSubscriberFactory.CreateAsync(CancellationToken cancellationToken)
+    {
+        return Task.FromResult<IEventBusSubscriber>(new MemoryEventBus());
     }
     
-    private sealed class MemoryPubSub : IPubSub
+    private sealed class MemoryEventBus : IEventBus
     {
-        private readonly ConcurrentDictionary<string, List<Action<RedisRoomEvent?>>> _mapping = new();
+        private readonly ConcurrentDictionary<string, List<Action<EventBusEvent?>>> _mapping = new();
         
-        public Task<IAsyncDisposable> SubscribeAsync(IPubSubKey key, Action<RedisRoomEvent?> callback, CancellationToken cancellationToken)
+        public Task<IAsyncDisposable> SubscribeAsync(IEventBusKey key, Action<EventBusEvent?> callback, CancellationToken cancellationToken)
         {
             var strKey = key.BuildStringKey();
-            var list = _mapping.GetOrAdd(strKey, static _ => new List<Action<RedisRoomEvent?>>());
+            var list = _mapping.GetOrAdd(strKey, static _ => new List<Action<EventBusEvent?>>());
             list.Add(callback);
             return Task.FromResult<IAsyncDisposable>(new Unsubscriber(strKey, this, callback));
         }
 
-        public Task PublishAsync(IPubSubKey key, RedisRoomEvent roomEvent, CancellationToken cancellationToken)
+        public Task PublishAsync(IEventBusKey key, EventBusEvent roomEventBusEvent, CancellationToken cancellationToken)
         {
             var strKey = key.BuildStringKey();
             if (_mapping.TryGetValue(strKey, out var actions))
             {
                 foreach (var action in actions)
                 {
-                    action(roomEvent);
+                    action(roomEventBusEvent);
                 }
             }
             
@@ -39,10 +44,10 @@ public sealed class MemoryPubSubFactory : IPubSubFactory
         private sealed class Unsubscriber : IAsyncDisposable
         {
             private readonly string _key;
-            private readonly MemoryPubSub _root;
-            private readonly Action<RedisRoomEvent?> _callback;
+            private readonly MemoryEventBus _root;
+            private readonly Action<EventBusEvent?> _callback;
 
-            public Unsubscriber(string key, MemoryPubSub root, Action<RedisRoomEvent?> callback)
+            public Unsubscriber(string key, MemoryEventBus root, Action<EventBusEvent?> callback)
             {
                 _key = key;
                 _root = root;

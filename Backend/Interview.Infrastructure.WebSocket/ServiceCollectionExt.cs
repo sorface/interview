@@ -50,13 +50,13 @@ public sealed class PubSubFactoryConfiguration
     public void UseInMemory()
     {
         _configuration = null;
-        _implementation = typeof(MemoryPubSubFactory);
+        _implementation = typeof(MemoryEventBusFactory);
     }
     
     public void UseRedis(RedisPubSubFactoryConfiguration configuration)
     {
         _configuration = configuration;
-        _implementation = typeof(RedisPubSubFactory);
+        _implementation = typeof(RedisEventBusFactory);
     }
 
     internal void AddServices(IServiceCollection serviceCollection)
@@ -65,8 +65,10 @@ public sealed class PubSubFactoryConfiguration
         {
             throw new Exception("You should specify implementation of PubSubFactory");
         }
-        
-        serviceCollection.AddSingleton(typeof(IPubSubFactory), _implementation);
+
+        serviceCollection.AddSingleton(_implementation);
+        serviceCollection.AddSingleton<IEventBusPublisherFactory>(provider => (IEventBusPublisherFactory)provider.GetRequiredService(_implementation));
+        serviceCollection.AddSingleton<IEventBusSubscriberFactory>(provider => (IEventBusSubscriberFactory)provider.GetRequiredService(_implementation));
         if (_configuration is not null)
         {
             serviceCollection.AddSingleton(_configuration);

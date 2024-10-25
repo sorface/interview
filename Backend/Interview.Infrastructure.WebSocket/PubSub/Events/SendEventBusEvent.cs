@@ -1,3 +1,3 @@
 namespace Interview.Infrastructure.WebSocket.PubSub.Events;
 
-public abstract record SendRedisRoomEvent : RedisRoomEvent;
+public abstract record SendEventBusEvent : EventBusEvent;
