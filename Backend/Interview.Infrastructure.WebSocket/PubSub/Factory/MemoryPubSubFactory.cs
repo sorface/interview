@@ -12,14 +12,14 @@ public sealed class MemoryPubSubFactory : IPubSubFactory
     
     private sealed class MemoryPubSub : IPubSub
     {
-        private readonly ConcurrentDictionary<string, ConcurrentStack<Action<RedisRoomEvent?>>> _mapping = new();
+        private readonly ConcurrentDictionary<string, List<Action<RedisRoomEvent?>>> _mapping = new();
         
-        public Task SubscribeAsync(IPubSubKey key, Action<RedisRoomEvent?> callback, CancellationToken cancellationToken)
+        public Task<IAsyncDisposable> SubscribeAsync(IPubSubKey key, Action<RedisRoomEvent?> callback, CancellationToken cancellationToken)
         {
             var strKey = key.BuildStringKey();
-            var list = _mapping.GetOrAdd(strKey, static _ => new ConcurrentStack<Action<RedisRoomEvent?>>());
-            list.Push(callback);
-            return Task.CompletedTask;
+            var list = _mapping.GetOrAdd(strKey, static _ => new List<Action<RedisRoomEvent?>>());
+            list.Add(callback);
+            return Task.FromResult<IAsyncDisposable>(new Unsubscriber(strKey, this, callback));
         }
 
         public Task PublishAsync(IPubSubKey key, RedisRoomEvent roomEvent, CancellationToken cancellationToken)
@@ -34,6 +34,31 @@ public sealed class MemoryPubSubFactory : IPubSubFactory
             }
             
             return Task.CompletedTask;
+        }
+        
+        private sealed class Unsubscriber : IAsyncDisposable
+        {
+            private readonly string _key;
+            private readonly MemoryPubSub _root;
+            private readonly Action<RedisRoomEvent?> _callback;
+
+            public Unsubscriber(string key, MemoryPubSub root, Action<RedisRoomEvent?> callback)
+            {
+                _key = key;
+                _root = root;
+                _callback = callback;
+            }
+
+            public ValueTask DisposeAsync()
+            {
+                if (!_root._mapping.TryGetValue(_key, out var items))
+                {
+                    return ValueTask.CompletedTask;
+                }
+
+                items.Remove(_callback);
+                return ValueTask.CompletedTask;
+            }
         }
     }
 }

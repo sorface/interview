@@ -40,9 +40,10 @@ public sealed class RedisPubSubFactory : IPubSubFactory, IAsyncDisposable
             _subscriber = subscriber;
         }
 
-        public Task SubscribeAsync(IPubSubKey key, Action<RedisRoomEvent?> callback, CancellationToken cancellationToken)
+        public async Task<IAsyncDisposable> SubscribeAsync(IPubSubKey key, Action<RedisRoomEvent?> callback, CancellationToken cancellationToken)
         {
-            return _subscriber.SubscribeAsync(CreateKey(key), (_, value) =>
+            var redisKey = CreateKey(key);
+            await _subscriber.SubscribeAsync(redisKey, (_, value) =>
             {
                 if (!value.HasValue)
                 {
@@ -55,6 +56,8 @@ public sealed class RedisPubSubFactory : IPubSubFactory, IAsyncDisposable
                     callback(ev);
                 }
             });
+            
+            return new Unsubscriber(_subscriber, redisKey);
         }
 
         public Task PublishAsync(IPubSubKey key, RedisRoomEvent roomEvent, CancellationToken cancellationToken)
@@ -68,6 +71,20 @@ public sealed class RedisPubSubFactory : IPubSubFactory, IAsyncDisposable
         {
             var buildStringKey = key.BuildStringKey();
             return new RedisChannel(buildStringKey, RedisChannel.PatternMode.Auto);
+        }
+        
+        private sealed class Unsubscriber : IAsyncDisposable
+        {
+            private readonly ISubscriber _subscriber;
+            private readonly RedisChannel _key;
+
+            public Unsubscriber(ISubscriber subscriber, RedisChannel key)
+            {
+                _subscriber = subscriber;
+                _key = key;
+            }
+
+            public ValueTask DisposeAsync() => new(_subscriber.UnsubscribeAsync(_key));
         }
     }
 }
