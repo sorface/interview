@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { FunctionComponent, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { SendMessage } from 'react-use-websocket';
 import Peer from 'simple-peer';
 import toast from 'react-hot-toast';
@@ -12,7 +12,7 @@ import { createAudioAnalyser, frequencyBinCount } from './utils/createAudioAnaly
 import { limitLength } from './utils/limitLength';
 import { randomId } from '../../../../utils/randomId';
 import { RoomCodeEditor } from '../RoomCodeEditor/RoomCodeEditor';
-import { RoomState } from '../../../../types/room';
+import { Room, RoomState } from '../../../../types/room';
 import { parseWsMessage } from './utils/parseWsMessage';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
 import { RoomIdParam, roomsApiDeclaration } from '../../../../apiDeclarations';
@@ -27,6 +27,15 @@ import { checkIsAudioStream } from './utils/checkIsAudioStream';
 // import { AiAssistantExperience } from '../AiAssistant/AiAssistantExperience';
 import { CodeEditorLang } from '../../../../types/question';
 import { usePeerStream } from '../../hooks/usePeerStream';
+import { RoomToolsPanel } from '../RoomToolsPanel/RoomToolsPanel';
+import { UserStreamsContext } from '../../context/UserStreamsContext';
+import { IconNames } from '../../../../constants';
+import { Gap } from '../../../../components/Gap/Gap';
+import { ContextMenu } from '../../../../components/ContextMenu/ContextMenu';
+import { Loader } from '../../../../components/Loader/Loader';
+import { Typography } from '../../../../components/Typography/Typography';
+import { Icon } from '../Icon/Icon';
+import { Reactions } from '../Reactions/Reactions';
 
 import './VideoChat.css';
 
@@ -39,19 +48,29 @@ const updateLoudedUserTimeout = 5000;
 const viewerOrder = 666;
 
 interface VideoChatProps {
+  room: Room | null;
   roomState: RoomState | null;
   viewerMode: boolean;
   lastWsMessage: MessageEvent<any> | null;
   messagesChatEnabled: boolean;
   codeEditorEnabled: boolean;
   codeEditorLanguage: CodeEditorLang;
-  userVideoStream: MediaStream | null;
-  userAudioStream: MediaStream | null;
+  recognitionNotSupported: boolean;
+  recognitionEnabled: boolean;
+  reactionsVisible: boolean;
+  currentUserExpert: boolean;
+  loadingRoomStartReview: boolean;
+  errorRoomStartReview: string | null;
   // ScreenShare
   // screenStream: MediaStream | null;
   onSendWsMessage: SendMessage;
   onUpdatePeersLength: (length: number) => void;
-  renderToolsPanel: () => ReactElement;
+  setRecognitionEnabled: (enabled: boolean) => void;
+  handleCodeEditor: () => void;
+  handleInvitationsOpen: () => void;
+  handleStartReviewRoom: () => void;
+  handleSettingsOpen: () => void;
+  handleLeaveRoom: () => void;
 };
 
 interface PeerMeta {
@@ -122,22 +141,40 @@ const getAllUsers = (data: PeerMeta[], auth: User | null) => {
 };
 
 export const VideoChat: FunctionComponent<VideoChatProps> = ({
+  room,
   roomState,
   viewerMode,
   lastWsMessage,
   messagesChatEnabled,
   codeEditorEnabled,
   codeEditorLanguage,
-  userVideoStream,
-  userAudioStream,
+  recognitionNotSupported,
+  recognitionEnabled,
+  currentUserExpert,
+  errorRoomStartReview,
+  reactionsVisible,
+  loadingRoomStartReview,
   // ScreenShare
   // screenStream,
   onSendWsMessage,
   onUpdatePeersLength,
-  renderToolsPanel,
+  setRecognitionEnabled,
+  handleCodeEditor,
+  handleInvitationsOpen,
+  handleLeaveRoom,
+  handleSettingsOpen,
+  handleStartReviewRoom,
 }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
+  const {
+    userAudioStream,
+    userVideoStream,
+    micEnabled,
+    cameraEnabled,
+    setMicEnabled,
+    setCameraEnabled,
+  } = useContext(UserStreamsContext);
   const {
     apiMethodState: apiRoomEventsSearchState,
     fetchData: fetchRoomEventsSearch,
@@ -622,13 +659,32 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     if (videoOrder[auth?.id || ''] === 1 && userVideoMainContent.current) {
       userVideoMainContent.current.srcObject = userVideoStream;
     }
-  }, [auth?.id, videoOrder, userVideoStream])
+  }, [auth?.id, videoOrder, userVideoStream]);
+
+  useEffect(() => {
+    if (viewerMode) {
+      return;
+    }
+    setRecognitionEnabled(micEnabled);
+  }, [viewerMode, micEnabled, setRecognitionEnabled]);
 
   const handleTextMessageSubmit = (message: string) => {
     onSendWsMessage(JSON.stringify({
       Type: 'chat-message',
       Value: message,
     }));
+  };
+
+  const handleMicSwitch = () => {
+    setMicEnabled(!micEnabled);
+  };
+
+  const handleCameraSwitch = () => {
+    setCameraEnabled(!cameraEnabled);
+  };
+
+  const handleVoiceRecognitionSwitch = () => {
+    setRecognitionEnabled(!recognitionEnabled);
   };
 
   const renderMain = () => {
@@ -671,7 +727,116 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
 
   return (
     <>
-      {renderToolsPanel()}
+      <RoomToolsPanel.Wrapper rightPos='21.5rem' bottomPos='1.5rem'>
+        {!viewerMode && (
+          <RoomToolsPanel.ButtonsGroupWrapper>
+            <RoomToolsPanel.SwitchButton
+              enabled={micEnabled}
+              iconEnabledName={IconNames.MicOn}
+              iconDisabledName={IconNames.MicOff}
+              onClick={handleMicSwitch}
+            />
+            <Gap sizeRem={0.125} />
+            <RoomToolsPanel.SwitchButton
+              enabled={cameraEnabled}
+              iconEnabledName={IconNames.VideocamOn}
+              iconDisabledName={IconNames.VideocamOff}
+              onClick={handleCameraSwitch}
+            />
+            {!recognitionNotSupported && (
+              <>
+                <Gap sizeRem={0.125} />
+                <RoomToolsPanel.SwitchButton
+                  enabled={recognitionEnabled}
+                  htmlDisabled={!micEnabled}
+                  iconEnabledName={IconNames.RecognitionOn}
+                  iconDisabledName={IconNames.RecognitionOff}
+                  onClick={handleVoiceRecognitionSwitch}
+                />
+              </>
+            )}
+          </RoomToolsPanel.ButtonsGroupWrapper>
+        )}
+        {reactionsVisible && (
+          <RoomToolsPanel.ButtonsGroupWrapper>
+            <Reactions
+              room={room}
+            />
+            {!viewerMode && (
+              <>
+                <Gap sizeRem={0.125} />
+                <RoomToolsPanel.SwitchButton
+                  enabled={true}
+                  iconEnabledName={IconNames.CodeEditor}
+                  iconDisabledName={IconNames.CodeEditor}
+                  onClick={handleCodeEditor}
+                />
+              </>
+            )}
+          </RoomToolsPanel.ButtonsGroupWrapper>
+        )}
+        {!viewerMode && (
+          <RoomToolsPanel.ButtonsGroupWrapper>
+            {/* ScreenShare */}
+            {/* <RoomToolsPanel.SwitchButton
+              enabled={true}
+              iconEnabledName={IconNames.TV}
+              iconDisabledName={IconNames.TV}
+              onClick={handleScreenShare}
+            /> */}
+            {currentUserExpert && (
+              <>
+                <Gap sizeRem={0.125} />
+                <RoomToolsPanel.SwitchButton
+                  enabled={true}
+                  iconEnabledName={IconNames.PersonAdd}
+                  iconDisabledName={IconNames.PersonAdd}
+                  onClick={handleInvitationsOpen}
+                />
+              </>
+            )}
+            <Gap sizeRem={0.125} />
+            <RoomToolsPanel.SwitchButton
+              enabled={true}
+              iconEnabledName={IconNames.Settings}
+              iconDisabledName={IconNames.Settings}
+              onClick={handleSettingsOpen}
+            />
+          </RoomToolsPanel.ButtonsGroupWrapper>
+        )}
+        <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
+          <ContextMenu
+            toggleContent={
+              <RoomToolsPanel.SwitchButton
+                enabled={true}
+                iconEnabledName={IconNames.Call}
+                iconDisabledName={IconNames.Call}
+                onClick={currentUserExpert ? () => { } : handleLeaveRoom}
+                danger
+              />
+            }
+            position='left'
+          >
+            {loadingRoomStartReview && (
+              <Loader />
+            )}
+            {errorRoomStartReview && (
+              <div className='flex items-center justify-center'>
+                <Typography size='m' error>
+                  <Icon name={IconNames.Information} />
+                </Typography>
+                <Typography size='m' error>
+                  {errorRoomStartReview}
+                </Typography>
+              </div>
+            )}
+            {currentUserExpert && (
+              <ContextMenu.Item title={localizationCaptions[LocalizationKey.CompleteAndEvaluateCandidate]} onClick={handleStartReviewRoom} />
+            )}
+            <ContextMenu.Item title={localizationCaptions[LocalizationKey.Exit]} onClick={handleLeaveRoom} />
+          </ContextMenu>
+        </RoomToolsPanel.ButtonsGroupWrapper>
+      </RoomToolsPanel.Wrapper>
       <div className='videochat-field videochat-field-main bg-wrap rounded-1.125'>
         {renderMain()}
       </div>
