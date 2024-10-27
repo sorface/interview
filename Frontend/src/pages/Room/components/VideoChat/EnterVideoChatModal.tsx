@@ -6,7 +6,6 @@ import { createAudioAnalyser, frequencyBinCount } from './utils/createAudioAnaly
 import { getAverageVolume } from './utils/getAverageVolume';
 import { AuthContext } from '../../../../context/AuthContext';
 import { UserAvatar } from '../../../../components/UserAvatar/UserAvatar';
-import { Devices } from '../../hooks/useUserStreams';
 import { Loader } from '../../../../components/Loader/Loader';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
@@ -16,27 +15,15 @@ import { Gap } from '../../../../components/Gap/Gap';
 import { RoomToolsPanel } from '../RoomToolsPanel/RoomToolsPanel';
 import { RecognitionLangSwitch } from '../../../../components/RecognitionLangSwitch/RecognitionLangSwitch';
 import { Checkbox } from '../../../../components/Checkbox/Checkbox';
+import { UserStreamsContext } from '../../context/UserStreamsContext';
 
 interface EnterVideoChatModalProps {
   open: boolean;
   viewerMode: boolean;
   loading: boolean;
   roomName?: string;
-  devices: Devices;
   error: string | null;
-  userVideoStream: MediaStream | null;
-  userAudioStream: MediaStream | null;
-  micEnabled: boolean;
-  cameraEnabled: boolean;
-  backgroundRemoveEnabled: boolean;
-  setSelectedCameraId: React.Dispatch<React.SetStateAction<string | undefined>>;
-  setSelectedMicId: React.Dispatch<React.SetStateAction<string | undefined>>;
-  onRequestDevices: () => void;
-  updateDevices: () => Promise<void>;
   onClose: () => void;
-  onMicSwitch: () => void;
-  onCameraSwitch: () => void;
-  onBackgroundRemoveSwitch: () => void;
 }
 
 const updateAnalyserDelay = 1000 / 30;
@@ -52,24 +39,26 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
   loading,
   viewerMode,
   roomName,
-  devices,
   error,
-  userVideoStream,
-  userAudioStream,
-  micEnabled,
-  cameraEnabled,
-  backgroundRemoveEnabled,
-  setSelectedCameraId,
-  setSelectedMicId,
-  onRequestDevices,
-  updateDevices,
   onClose,
-  onMicSwitch,
-  onCameraSwitch,
-  onBackgroundRemoveSwitch,
 }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
+  const {
+    userAudioStream,
+    userVideoStream,
+    micEnabled,
+    cameraEnabled,
+    backgroundRemoveEnabled,
+    devices,
+    setMicEnabled,
+    setCameraEnabled,
+    setSelectedCameraId,
+    setSelectedMicId,
+    requestDevices,
+    updateDevices,
+    setBackgroundRemoveEnabled,
+  } = useContext(UserStreamsContext);
   const [screen, setScreen] = useState<Screen>(Screen.Joining);
   const [micVolume, setMicVolume] = useState(0);
   const userVideo = useRef<HTMLVideoElement>(null);
@@ -81,8 +70,8 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
     if (viewerMode) {
       return;
     }
-    onRequestDevices();
-  }, [viewerMode, onRequestDevices]);
+    requestDevices();
+  }, [viewerMode, requestDevices]);
 
   useEffect(() => {
     if (!error) {
@@ -163,6 +152,18 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
     setSelectedCameraId(deviceId);
   }, [setSelectedCameraId]);
 
+  const handleMicSwitch = () => {
+    setMicEnabled(!micEnabled);
+  };
+
+  const handleCameraSwitch = () => {
+    setCameraEnabled(!cameraEnabled);
+  };
+
+  const handleBackgroundRemoveSwitch = () => {
+    setBackgroundRemoveEnabled(!backgroundRemoveEnabled);
+  };
+
   const joiningRoomHeader = (
     <div>
       <Typography size='xl' bold>
@@ -221,7 +222,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
                   enabled={micEnabled}
                   iconEnabledName={IconNames.MicOn}
                   iconDisabledName={IconNames.MicOff}
-                  onClick={onMicSwitch}
+                  onClick={handleMicSwitch}
                   progress={micVolume / 50}
                 />
                 <Gap sizeRem={0.125} />
@@ -229,7 +230,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
                   enabled={cameraEnabled}
                   iconEnabledName={IconNames.VideocamOn}
                   iconDisabledName={IconNames.VideocamOff}
-                  onClick={onCameraSwitch}
+                  onClick={handleCameraSwitch}
                 />
               </RoomToolsPanel.ButtonsGroupWrapper>
             </RoomToolsPanel.Wrapper>
@@ -240,7 +241,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
               id='webcam-background-remove'
               label={localizationCaptions[LocalizationKey.WebcamBackgroundBlur]}
               checked={backgroundRemoveEnabled}
-              onChange={onBackgroundRemoveSwitch}
+              onChange={handleBackgroundRemoveSwitch}
             />
           </Typography>
         </div>
