@@ -16,12 +16,11 @@ import { RoomToolsPanel } from '../RoomToolsPanel/RoomToolsPanel';
 import { RecognitionLangSwitch } from '../../../../components/RecognitionLangSwitch/RecognitionLangSwitch';
 import { Checkbox } from '../../../../components/Checkbox/Checkbox';
 import { UserStreamsContext } from '../../context/UserStreamsContext';
+import { RoomContext } from '../../context/RoomContext';
 
 interface EnterVideoChatModalProps {
   open: boolean;
-  viewerMode: boolean;
   loading: boolean;
-  roomName?: string;
   error: string | null;
   onClose: () => void;
 }
@@ -37,13 +36,12 @@ const enum Screen {
 export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = ({
   open,
   loading,
-  viewerMode,
-  roomName,
   error,
   onClose,
 }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
+  const { viewerMode, room } = useContext(RoomContext);
   const {
     userAudioStream,
     userVideoStream,
@@ -305,7 +303,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
         <div className='w-2.375 h-2.375 pr-1'>
           <img className='w-2.375 h-2.375 rounded-0.375' src='/logo192.png' alt='site logo' />
         </div>
-        <h3>{roomName}</h3>
+        <h3>{room?.name}</h3>
       </div>
       <div className='flex items-center justify-center mt-auto mb-auto'>
         {screens[screen]}

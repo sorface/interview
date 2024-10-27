@@ -1,5 +1,4 @@
 import { FunctionComponent, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { SendMessage } from 'react-use-websocket';
 import Peer from 'simple-peer';
 import toast from 'react-hot-toast';
 import { AuthContext } from '../../../../context/AuthContext';
@@ -12,7 +11,6 @@ import { createAudioAnalyser, frequencyBinCount } from './utils/createAudioAnaly
 import { limitLength } from './utils/limitLength';
 import { randomId } from '../../../../utils/randomId';
 import { RoomCodeEditor } from '../RoomCodeEditor/RoomCodeEditor';
-import { Room, RoomState } from '../../../../types/room';
 import { parseWsMessage } from './utils/parseWsMessage';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
 import { RoomIdParam, roomsApiDeclaration } from '../../../../apiDeclarations';
@@ -25,7 +23,6 @@ import { checkIsAudioStream } from './utils/checkIsAudioStream';
 // AiAssistant
 // import { Canvas } from '@react-three/fiber';
 // import { AiAssistantExperience } from '../AiAssistant/AiAssistantExperience';
-import { CodeEditorLang } from '../../../../types/question';
 import { usePeerStream } from '../../hooks/usePeerStream';
 import { RoomToolsPanel } from '../RoomToolsPanel/RoomToolsPanel';
 import { UserStreamsContext } from '../../context/UserStreamsContext';
@@ -36,6 +33,7 @@ import { Loader } from '../../../../components/Loader/Loader';
 import { Typography } from '../../../../components/Typography/Typography';
 import { Icon } from '../Icon/Icon';
 import { Reactions } from '../Reactions/Reactions';
+import { RoomContext } from '../../context/RoomContext';
 
 import './VideoChat.css';
 
@@ -48,13 +46,7 @@ const updateLoudedUserTimeout = 5000;
 const viewerOrder = 666;
 
 interface VideoChatProps {
-  room: Room | null;
-  roomState: RoomState | null;
-  viewerMode: boolean;
-  lastWsMessage: MessageEvent<any> | null;
   messagesChatEnabled: boolean;
-  codeEditorEnabled: boolean;
-  codeEditorLanguage: CodeEditorLang;
   recognitionNotSupported: boolean;
   recognitionEnabled: boolean;
   reactionsVisible: boolean;
@@ -63,10 +55,8 @@ interface VideoChatProps {
   errorRoomStartReview: string | null;
   // ScreenShare
   // screenStream: MediaStream | null;
-  onSendWsMessage: SendMessage;
   onUpdatePeersLength: (length: number) => void;
   setRecognitionEnabled: (enabled: boolean) => void;
-  handleCodeEditor: () => void;
   handleInvitationsOpen: () => void;
   handleStartReviewRoom: () => void;
   handleSettingsOpen: () => void;
@@ -141,13 +131,7 @@ const getAllUsers = (data: PeerMeta[], auth: User | null) => {
 };
 
 export const VideoChat: FunctionComponent<VideoChatProps> = ({
-  room,
-  roomState,
-  viewerMode,
-  lastWsMessage,
   messagesChatEnabled,
-  codeEditorEnabled,
-  codeEditorLanguage,
   recognitionNotSupported,
   recognitionEnabled,
   currentUserExpert,
@@ -156,10 +140,8 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   loadingRoomStartReview,
   // ScreenShare
   // screenStream,
-  onSendWsMessage,
   onUpdatePeersLength,
   setRecognitionEnabled,
-  handleCodeEditor,
   handleInvitationsOpen,
   handleLeaveRoom,
   handleSettingsOpen,
@@ -167,6 +149,14 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
 }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
+  const {
+    viewerMode,
+    room,
+    roomState,
+    lastWsMessage,
+    codeEditorEnabled,
+    sendWsMessage,
+  } = useContext(RoomContext);
   const {
     userAudioStream,
     userVideoStream,
@@ -206,7 +196,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
 
   const createPeer = useCallback((to: string, forViewer?: boolean, screenShare?: boolean) => {
     if (viewerMode) {
-      onSendWsMessage(JSON.stringify({
+      sendWsMessage(JSON.stringify({
         Type: 'sending signal',
         Value: JSON.stringify({
           To: to,
@@ -239,7 +229,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     });
 
     peer.on('signal', signal => {
-      onSendWsMessage(JSON.stringify({
+      sendWsMessage(JSON.stringify({
         Type: 'sending signal',
         Value: JSON.stringify({
           To: to,
@@ -250,7 +240,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     });
 
     return peer;
-  }, [userAudioStream, userVideoStream, viewerMode, onSendWsMessage]);
+  }, [userAudioStream, userVideoStream, viewerMode, sendWsMessage]);
 
   // ScreenShare  
   // useEffect(() => {
@@ -380,7 +370,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     });
 
     peer.on('signal', signal => {
-      onSendWsMessage(JSON.stringify({
+      sendWsMessage(JSON.stringify({
         Type: 'returning signal',
         Value: JSON.stringify({
           To: callerID,
@@ -393,7 +383,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     peer.signal(incomingSignal);
 
     return peer;
-  }, [userAudioStream, userVideoStream, onSendWsMessage]);
+  }, [userAudioStream, userVideoStream, sendWsMessage]);
 
   useEffect(() => {
     if (!lastWsMessage || !auth) {
@@ -669,7 +659,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   }, [viewerMode, micEnabled, setRecognitionEnabled]);
 
   const handleTextMessageSubmit = (message: string) => {
-    onSendWsMessage(JSON.stringify({
+    sendWsMessage(JSON.stringify({
       Type: 'chat-message',
       Value: message,
     }));
@@ -687,16 +677,18 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     setRecognitionEnabled(!recognitionEnabled);
   };
 
+  const handleCodeEditorSwitch = () => {
+    sendWsMessage(JSON.stringify({
+      Type: 'room-code-editor-enabled',
+      Value: JSON.stringify({ Enabled: !codeEditorEnabled }),
+    }));
+  };
+
   const renderMain = () => {
     if (codeEditorEnabled) {
       return (
         <RoomCodeEditor
           initialValue={codeEditorInitialValue}
-          language={codeEditorLanguage}
-          roomState={roomState}
-          readOnly={viewerMode}
-          lastWsMessage={lastWsMessage}
-          onSendWsMessage={onSendWsMessage}
         />
       );
     }
@@ -769,7 +761,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
                   enabled={true}
                   iconEnabledName={IconNames.CodeEditor}
                   iconDisabledName={IconNames.CodeEditor}
-                  onClick={handleCodeEditor}
+                  onClick={handleCodeEditorSwitch}
                 />
               </>
             )}

@@ -1,8 +1,6 @@
 import { FunctionComponent, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { OnChange, OnMount } from '@monaco-editor/react';
 import { RemoteCursorManager, RemoteSelectionManager } from '@convergencelabs/monaco-collab-ext';
-import { SendMessage } from 'react-use-websocket';
-import { RoomState } from '../../../../types/room';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
 import { SendEventBody, roomsApiDeclaration } from '../../../../apiDeclarations';
 import { EventName } from '../../../../constants';
@@ -11,6 +9,7 @@ import { RemoteCursor } from '@convergencelabs/monaco-collab-ext/typings/RemoteC
 import { RemoteSelection } from '@convergencelabs/monaco-collab-ext/typings/RemoteSelection';
 import { CodeEditorLang } from '../../../../types/question';
 import { CodeEditor, defaultCodeEditorFontSize } from '../../../../components/CodeEditor/CodeEditor';
+import { RoomContext } from '../../context/RoomContext';
 
 import './RoomCodeEditor.css';
 
@@ -30,22 +29,19 @@ const remoteSelectionColor = 'var(--active)';
 
 interface RoomCodeEditorProps {
   initialValue: string | null;
-  language?: CodeEditorLang;
-  roomState: RoomState | null;
-  readOnly: boolean;
-  lastWsMessage: MessageEvent<any> | null;
-  onSendWsMessage: SendMessage;
 }
 
 export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   initialValue,
-  language,
-  roomState,
-  readOnly,
-  lastWsMessage,
-  onSendWsMessage,
 }) => {
   const auth = useContext(AuthContext);
+  const {
+    viewerMode,
+    roomState,
+    lastWsMessage,
+    codeEditorLanguage,
+    sendWsMessage,
+  } = useContext(RoomContext);
   const ignoreChangeRef = useRef(false);
   const [value, setValue] = useState<string | null>(initialValue);
   const [remoteCursor, setRemoteCursor] = useState<RemoteCursor | null>(null);
@@ -146,12 +142,12 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   }, [lastWsMessage, remoteSelection, remoteCursor, auth, dirtyChangeRemoteCursorTooltip]);
 
   useEffect(() => {
-    if (!roomState || readOnly || !cursorPosition || !selectionPosition) {
+    if (!roomState || viewerMode || !cursorPosition || !selectionPosition) {
       console.warn('Cannot send room event');
       return;
     }
     const sendEventTimeoutId = setTimeout(() => {
-      onSendWsMessage(JSON.stringify({
+      sendWsMessage(JSON.stringify({
         Type: EventName.CodeEditorCursor,
         Value: JSON.stringify({
           cursor: cursorPosition,
@@ -164,7 +160,7 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
     return () => {
       clearTimeout(sendEventTimeoutId);
     };
-  }, [cursorPosition, selectionPosition, roomState, readOnly, auth, onSendWsMessage]);
+  }, [cursorPosition, selectionPosition, roomState, viewerMode, auth, sendWsMessage]);
 
   const handleEditorMount: OnMount = (mountedEditor) => {
     const newRemoteCursorManager = new RemoteCursorManager({
@@ -198,10 +194,10 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   };
 
   const handleChange: OnChange = (value) => {
-    if (readOnly) {
+    if (viewerMode) {
       return;
     }
-    onSendWsMessage(JSON.stringify({
+    sendWsMessage(JSON.stringify({
       Type: 'code',
       Value: value,
     }));
@@ -222,9 +218,9 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
 
   return (
     <CodeEditor
-      language={language || defaultLanguage}
+      language={codeEditorLanguage || defaultLanguage}
       languages={Object.values(CodeEditorLang)}
-      readOnly={readOnly}
+      readOnly={viewerMode}
       value={value || ''}
       onMount={handleEditorMount}
       onChange={handleChange}
