@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
+import { FunctionComponent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useParams, Navigate, useNavigate, generatePath } from 'react-router-dom';
 import useWebSocket from 'react-use-websocket';
 import toast from 'react-hot-toast';
@@ -44,7 +44,7 @@ import { CodeEditorLang } from '../../types/question';
 import { Button } from '../../components/Button/Button';
 import { SwitcherButton } from '../../components/SwitcherButton/SwitcherButton';
 import { Gap } from '../../components/Gap/Gap';
-import { parseWsMessage } from './components/VideoChat/utils/parseWsMessage';
+import { parseWsMessage } from './utils/parseWsMessage';
 import { sortRoomQuestion } from '../../utils/sortRoomQestions';
 import { UnreadChatMessagesCounter } from './components/UnreadChatMessagesCounter/UnreadChatMessagesCounter';
 import { RoomSettings } from './components/RoomSettings/RoomSettings';
@@ -100,6 +100,7 @@ export const Room: FunctionComponent = () => {
   };
   const { lastMessage, readyState, sendMessage } = useWebSocket(checkWebSocketReadyToConnect() ? socketUrl : null);
   const wsClosed = readyState === 3 || readyState === 2;
+  const lastWsMessageParsed = useMemo(() => parseWsMessage(lastMessage), [lastMessage]);
   // ScreenShare
   // const { screenStream, requestScreenStream } = useScreenStream();
   const localizationCaptions = useLocalizationCaptions();
@@ -116,7 +117,7 @@ export const Room: FunctionComponent = () => {
     onVoiceRecognition: handleVoiceRecognition,
   });
   const { unreadChatMessages } = useUnreadChatMessages({
-    lastMessage,
+    lastWsMessageParsed,
     messagesChatEnabled,
     maxCount: 9,
   });
@@ -269,21 +270,19 @@ export const Room: FunctionComponent = () => {
   }, [roomState]);
 
   useEffect(() => {
-    if (!lastMessage) {
+    if (!lastWsMessageParsed) {
       return;
     }
     try {
-      const parsedMessage = parseWsMessage(lastMessage?.data);
-      const parsedPayload = parsedMessage?.Value;
-      switch (parsedMessage?.Type) {
+      switch (lastWsMessageParsed.Type) {
         case 'room-code-editor-enabled':
-          setCodeEditorEnabled(parsedPayload.Enabled);
+          setCodeEditorEnabled(lastWsMessageParsed.Value.Enabled);
           break;
         default:
           break;
       }
     } catch { }
-  }, [lastMessage]);
+  }, [lastWsMessageParsed]);
 
   useEffect(() => {
     if (!room || !roomQuestions) {
@@ -449,7 +448,7 @@ export const Room: FunctionComponent = () => {
       roomParticipant,
       roomState,
       viewerMode,
-      lastWsMessage: lastMessage,
+      lastWsMessageParsed,
       codeEditorEnabled,
       codeEditorLanguage,
       sendWsMessage: sendMessage,

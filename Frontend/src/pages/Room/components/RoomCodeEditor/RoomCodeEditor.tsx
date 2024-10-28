@@ -38,7 +38,7 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   const {
     viewerMode,
     roomState,
-    lastWsMessage,
+    lastWsMessageParsed,
     codeEditorLanguage,
     sendWsMessage,
   } = useContext(RoomContext);
@@ -61,16 +61,15 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   }, [initialValue]);
 
   useEffect(() => {
-    if (!lastWsMessage?.data) {
+    if (!lastWsMessageParsed) {
       return;
     }
     try {
-      const parsedData = JSON.parse(lastWsMessage?.data);
-      const value = parsedData.Value;
+      const value = lastWsMessageParsed.Value;
       if (typeof value !== 'string') {
         return;
       }
-      switch (parsedData?.Type) {
+      switch (lastWsMessageParsed?.Type) {
         case 'ChangeCodeEditor':
           if (ignoreChangeRef.current) {
             ignoreChangeRef.current = false;
@@ -84,7 +83,7 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
     } catch (err) {
       console.error('parse editor message error: ', err);
     }
-  }, [lastWsMessage]);
+  }, [lastWsMessageParsed]);
 
   const dirtyChangeRemoteCursorHeight = (height: number) => {
     const el = document.querySelector(`.${remoteCursorClassName}`) as HTMLElement;
@@ -109,28 +108,26 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   }, []);
 
   useEffect(() => {
-    if (!lastWsMessage?.data || !auth || !remoteCursor || !remoteSelection) {
+    if (!lastWsMessageParsed || !auth || !remoteCursor || !remoteSelection) {
       return;
     }
     try {
-      const parsedData = JSON.parse(lastWsMessage?.data);
-      const value = parsedData.Value;
-      switch (parsedData?.Type) {
+      switch (lastWsMessageParsed.Type) {
         case EventName.CodeEditorCursor:
-          if (auth.id === value.UserId) {
+          if (auth.id === lastWsMessageParsed.Value.UserId) {
             remoteSelection.hide();
             remoteCursor.hide();
             return;
           }
-          if (value.AdditionalData.cursor.column === -1) {
+          if (lastWsMessageParsed.Value.AdditionalData.cursor.column === -1) {
             remoteCursor.hide();
             remoteSelection.hide();
             return;
           }
-          dirtyChangeRemoteCursorTooltip(value.AdditionalData.nickname);
-          remoteCursor.setPosition(value.AdditionalData.cursor);
+          dirtyChangeRemoteCursorTooltip(lastWsMessageParsed.Value.AdditionalData.nickname);
+          remoteCursor.setPosition(lastWsMessageParsed.Value.AdditionalData.cursor);
           remoteCursor.show();
-          remoteSelection.setPositions(value.AdditionalData.selection.start, value.AdditionalData.selection.end);
+          remoteSelection.setPositions(lastWsMessageParsed.Value.AdditionalData.selection.start, lastWsMessageParsed.Value.AdditionalData.selection.end);
           remoteSelection.show();
           break;
         default:
@@ -139,7 +136,7 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
     } catch (err) {
       console.error('parse editor message error: ', err);
     }
-  }, [lastWsMessage, remoteSelection, remoteCursor, auth, dirtyChangeRemoteCursorTooltip]);
+  }, [lastWsMessageParsed, remoteSelection, remoteCursor, auth, dirtyChangeRemoteCursorTooltip]);
 
   useEffect(() => {
     if (!roomState || viewerMode || !cursorPosition || !selectionPosition) {

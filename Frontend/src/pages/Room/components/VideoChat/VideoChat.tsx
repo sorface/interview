@@ -11,7 +11,6 @@ import { createAudioAnalyser, frequencyBinCount } from './utils/createAudioAnaly
 import { limitLength } from './utils/limitLength';
 import { randomId } from '../../../../utils/randomId';
 import { RoomCodeEditor } from '../RoomCodeEditor/RoomCodeEditor';
-import { parseWsMessage } from './utils/parseWsMessage';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
 import { RoomIdParam, roomsApiDeclaration } from '../../../../apiDeclarations';
 import { EventsSearch } from '../../../../types/event';
@@ -153,7 +152,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     viewerMode,
     room,
     roomState,
-    lastWsMessage,
+    lastWsMessageParsed,
     codeEditorEnabled,
     sendWsMessage,
   } = useContext(RoomContext);
@@ -190,7 +189,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   const [codeEditorInitialValue, setCodeEditorInitialValue] = useState<string | null>(null);
   const updateLouderUserTimeout = useRef(0);
   const { activeReactions } = useReactionsStatus({
-    lastMessage: lastWsMessage,
+    lastWsMessageParsed,
   });
   const allUsers = getAllUsers(peers, auth);
 
@@ -386,25 +385,19 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   }, [userAudioStream, userVideoStream, sendWsMessage]);
 
   useEffect(() => {
-    if (!lastWsMessage || !auth) {
+    if (!lastWsMessageParsed || !auth) {
       return;
     }
     try {
-      const parsedMessage = parseWsMessage(lastWsMessage?.data);
-      const parsedPayload = parsedMessage?.Value;
-      const screenShare = !!(parsedPayload?.ScreenShare);
-      switch (parsedMessage?.Type) {
+      // ScreenShare
+      // const screenShare = !!(parsedPayload?.ScreenShare);
+      const screenShare = false;
+      switch (lastWsMessageParsed?.Type) {
         case 'ChangeCodeEditor':
-          if (typeof parsedPayload !== 'string') {
-            return;
-          }
-          setCodeEditorInitialValue(parsedPayload);
+          setCodeEditorInitialValue(lastWsMessageParsed.Value);
           break;
         case 'all users':
-          if (!Array.isArray(parsedPayload)) {
-            break;
-          }
-          parsedPayload.forEach(userInChat => {
+          lastWsMessageParsed.Value.forEach(userInChat => {
             if (userInChat.Id === auth.id) {
               return;
             }
@@ -433,7 +426,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           setPeers([...peersRef.current]);
           break;
         case 'user joined':
-          const fromUser = parsedPayload.From;
+          const fromUser = lastWsMessageParsed.Value.From;
           if (!viewerMode && fromUser.ParticipantType === 'Viewer') {
             const peer = createPeer(fromUser.Id, true);
             const newPeerMeta: PeerMeta = {
@@ -478,7 +471,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             break;
           }
           if (viewerMode || screenShare) {
-            const peer = addPeer(JSON.parse(parsedPayload.Signal), fromUser.Id, screenShare);
+            const peer = addPeer(JSON.parse(lastWsMessageParsed.Value.Signal), fromUser.Id, screenShare);
             addPeerStream(fromUser.Id, peer, true);
             const newPeerMeta: PeerMeta = {
               peerID: fromUser.Id,
@@ -502,7 +495,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             setPeers([...peersRef.current]);
             break;
           }
-          const peer = addPeer(JSON.parse(parsedPayload.Signal), fromUser.Id);
+          const peer = addPeer(JSON.parse(lastWsMessageParsed.Value.Signal), fromUser.Id);
           addPeerStream(fromUser.Id, peer, true);
           const newPeerMeta: PeerMeta = {
             peerID: fromUser.Id,
@@ -526,7 +519,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           setPeers([...peersRef.current]);
           break;
         case 'user left':
-          const leftUserId = parsedPayload.Id;
+          const leftUserId = lastWsMessageParsed.Value.Id;
           const leftUserPeer = peersRef.current.find(p => p.targetUserId === leftUserId);
           if (leftUserPeer) {
             removePeerStream(leftUserPeer.peerID);
@@ -542,10 +535,10 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           break;
         case 'receiving returned signal':
           const item = peersRef.current.find(p =>
-            p.peerID === parsedPayload.From && (screenShare ? p.screenShare : true)
+            p.peerID === lastWsMessageParsed.Value.From && (screenShare ? p.screenShare : true)
           );
           if (item) {
-            item.peer.signal(parsedPayload.Signal);
+            item.peer.signal(lastWsMessageParsed.Value.Signal);
           }
           break;
         default:
@@ -554,18 +547,16 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     } catch (err) {
       console.error('parse ws message error: ', err);
     }
-  }, [auth, lastWsMessage, viewerMode, addPeer, createPeer, addPeerStream, removePeerStream]);
+  }, [auth, lastWsMessageParsed, viewerMode, addPeer, createPeer, addPeerStream, removePeerStream]);
 
   useEffect(() => {
-    if (!lastWsMessage) {
+    if (!lastWsMessageParsed) {
       return;
     }
     try {
-      const parsedMessage = parseWsMessage(lastWsMessage?.data);
-      const parsedPayload = parsedMessage?.Value;
-      switch (parsedMessage?.Type) {
+      switch (lastWsMessageParsed?.Type) {
         case 'user joined':
-          const fromUser = parsedPayload.From;
+          const fromUser = lastWsMessageParsed.Value.From;
           toast.success(
             `${fromUser.Nickname} ${localizationCaptions[LocalizationKey.UserConnectedToRoom]}`
           );
@@ -576,25 +567,24 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     } catch (err) {
       console.error('parse ws message error: ', err);
     }
-  }, [lastWsMessage, localizationCaptions]);
+  }, [lastWsMessageParsed, localizationCaptions]);
 
   useEffect(() => {
-    if (!lastWsMessage) {
+    if (!lastWsMessageParsed) {
       return;
     }
     try {
-      const parsedData = parseWsMessage(lastWsMessage?.data);
-      switch (parsedData?.Type) {
+      switch (lastWsMessageParsed.Type) {
         case 'ChatMessage':
           setTextMessages(transcripts => limitLength(
             [
               ...transcripts,
               {
-                id: parsedData.Id,
-                userId: parsedData.CreatedById,
-                userNickname: parsedData.Value.Nickname,
-                value: parsedData.Value.Message,
-                createdAt: parsedData.CreatedAt,
+                id: lastWsMessageParsed.Id,
+                userId: lastWsMessageParsed.CreatedById,
+                userNickname: lastWsMessageParsed.Value.Nickname,
+                value: lastWsMessageParsed.Value.Message,
+                createdAt: lastWsMessageParsed.CreatedAt,
               },
             ],
             transcriptsMaxLength
@@ -620,7 +610,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     } catch (err) {
       console.error('parse chat message error: ', err);
     }
-  }, [lastWsMessage]);
+  }, [lastWsMessageParsed]);
 
   useEffect(() => {
     if (!userAudioStream || !auth?.id) {
