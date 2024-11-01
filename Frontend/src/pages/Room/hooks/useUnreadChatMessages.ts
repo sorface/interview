@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
+import { ParsedWsMessage } from '../utils/parseWsMessage';
 
 interface UseUnreadChatMessagesParams {
-  lastMessage: MessageEvent<any> | null;
+  lastWsMessageParsed: ParsedWsMessage | null;
   messagesChatEnabled: boolean;
   maxCount: number;
 }
 
 export const useUnreadChatMessages = ({
-  lastMessage,
+  lastWsMessageParsed,
   messagesChatEnabled,
   maxCount,
 }: UseUnreadChatMessagesParams) => {
@@ -17,22 +18,24 @@ export const useUnreadChatMessages = ({
 
   useEffect(() => {
     try {
-      const parsedData = JSON.parse(lastMessage?.data);
-      if (parsedData?.Type !== 'ChatMessage') {
+      if (!lastWsMessageParsed) {
+        return;
+      }
+      if (lastWsMessageParsed.Type !== 'ChatMessage') {
         return;
       }
       if (messagesChatEnabled) {
-        setLastReadMessageId(parsedData?.Id);
+        setLastReadMessageId(lastWsMessageParsed.Id);
         return;
       }
-      if (parsedData?.Id === lastReadMessageId) {
+      if (lastWsMessageParsed.Id === lastReadMessageId) {
         return;
       }
-      setLastReadMessageId(parsedData?.Id);
+      setLastReadMessageId(lastWsMessageParsed.Id);
       unreadChatMessagesRef.current++;
       setUnreadChatMessages(unreadChatMessagesRef.current);
     } catch { }
-  }, [lastMessage, messagesChatEnabled, unreadChatMessages, lastReadMessageId]);
+  }, [lastWsMessageParsed, messagesChatEnabled, unreadChatMessages, lastReadMessageId]);
 
   useEffect(() => {
     if (!messagesChatEnabled) {
