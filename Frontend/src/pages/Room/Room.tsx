@@ -511,12 +511,14 @@ export const Room: FunctionComponent = () => {
                         <span
                           className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
                         >
-                          <div className='room-page-header-wrapper flex items-center'>
-                            <div className='w-2.375 pr-1'>
-                              <img className='w-2.375 h-2.375 rounded-0.375' src='/logo192.png' alt='site logo' />
+                          <Link to={pathnames.highlightRooms} className='no-underline'>
+                            <div className='room-page-header-wrapper flex items-center'>
+                              <div className='w-2.375 pr-1'>
+                                <img className='w-2.375 h-2.375 rounded-0.375' src='/logo192.png' alt='site logo' />
+                              </div>
+                              <h3>{room?.name}</h3>
                             </div>
-                            <h3>{room?.name}</h3>
-                          </div>
+                          </Link>
                         </span>
                       </div>
                       <div className='flex'>

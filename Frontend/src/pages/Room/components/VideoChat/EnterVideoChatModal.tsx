@@ -1,6 +1,6 @@
 import { FunctionComponent, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import Modal from 'react-modal';
-import { IconNames } from '../../../../constants';
+import { IconNames, pathnames } from '../../../../constants';
 import { DeviceSelect } from './DeviceSelect';
 import { createAudioAnalyser, frequencyBinCount } from './utils/createAudioAnalyser';
 import { getAverageVolume } from './utils/getAverageVolume';
@@ -18,6 +18,7 @@ import { UserStreamsContext } from '../../context/UserStreamsContext';
 import { RoomContext } from '../../context/RoomContext';
 import { useThemeClassName } from '../../../../hooks/useThemeClassName';
 import { Theme } from '../../../../context/ThemeContext';
+import { Link } from 'react-router-dom';
 
 interface EnterVideoChatModalProps {
   open: boolean;
@@ -334,12 +335,14 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
         },
       }}
     >
-      <div className="action-modal-header absolute flex items-center px-0.5 py-0.5 h-4">
-        <div className='w-2.375 h-2.375 pr-1'>
-          <img className='w-2.375 h-2.375 rounded-0.375' src='/logo192.png' alt='site logo' />
+      <Link to={pathnames.highlightRooms} className='no-underline'>
+        <div className="action-modal-header absolute flex items-center px-0.5 py-0.5 h-4">
+          <div className='w-2.375 h-2.375 pr-1'>
+            <img className='w-2.375 h-2.375 rounded-0.375' src='/logo192.png' alt='site logo' />
+          </div>
+          <h3>{room?.name}</h3>
         </div>
-        <h3>{room?.name}</h3>
-      </div>
+      </Link>
       <div className='flex items-center justify-center mt-auto mb-auto'>
         {screens[screen]}
       </div>
