@@ -1,11 +1,14 @@
+.videochat {
+  --videochat-video-width: 300px;
+  --videochat-video-height: 230px;
+}
+
 .room-columns .videochat-field {
   margin-right: 0.75rem !important;
   margin-top: 0rem !important;
   margin-left: 0rem !important;
   margin-bottom: 0.5rem !important;
-  --videochat-video-size: 250px;
-  --videochat-video-size-big: 300px;
-  width: var(--videochat-video-size-big);
+  width: var(--videochat-video-width);
   overflow-y: visible;
   overflow-x: hidden;
 }
@@ -33,8 +36,8 @@
 }
 
 .videochat-ai-assistant {
-  width: var(--videochat-video-size);
-  height: var(--videochat-video-size);
+  width: var(--videochat-video-width);
+  height: var(--videochat-video-height);
 }
 
 .videochat-participants {
@@ -44,7 +47,7 @@
 }
 
 .videochat-participant-viewer-wrapper {
-  width: var(--videochat-video-size-big);
+  width: var(--videochat-video-width);
   padding: 0.25rem 0rem;
 }
 
@@ -68,8 +71,8 @@
 
 .videochat-participant {
   position: relative;
-  width: var(--videochat-video-size);
-  height: var(--videochat-video-size);
+  width: var(--videochat-video-width);
+  height: var(--videochat-video-height);
   margin-bottom: 0.5rem;
   animation: var(--fadeIn-animation);
 }
@@ -84,8 +87,8 @@
 }
 
 .videochat-participant-big {
-  width: var(--videochat-video-size-big);
-  height: var(--videochat-video-size-big);
+  width: var(--videochat-video-width);
+  height: var(--videochat-video-height);
 }
 
 .videochat-caption {

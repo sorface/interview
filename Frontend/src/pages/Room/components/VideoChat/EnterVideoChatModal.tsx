@@ -5,7 +5,6 @@ import { DeviceSelect } from './DeviceSelect';
 import { createAudioAnalyser, frequencyBinCount } from './utils/createAudioAnalyser';
 import { getAverageVolume } from './utils/getAverageVolume';
 import { AuthContext } from '../../../../context/AuthContext';
-import { UserAvatar } from '../../../../components/UserAvatar/UserAvatar';
 import { Loader } from '../../../../components/Loader/Loader';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
@@ -17,6 +16,8 @@ import { RecognitionLangSwitch } from '../../../../components/RecognitionLangSwi
 import { Checkbox } from '../../../../components/Checkbox/Checkbox';
 import { UserStreamsContext } from '../../context/UserStreamsContext';
 import { RoomContext } from '../../context/RoomContext';
+import { useThemeClassName } from '../../../../hooks/useThemeClassName';
+import { Theme } from '../../../../context/ThemeContext';
 
 interface EnterVideoChatModalProps {
   open: boolean;
@@ -63,6 +64,10 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
   const requestRef = useRef<number>();
   const updateAnalyserTimeout = useRef(0);
   const audioAnalyser = useRef<AnalyserNode | null>(null);
+  const joinPreviewThemedClassName = useThemeClassName({
+    [Theme.Dark]: 'bg-dark-dark2',
+    [Theme.Light]: 'bg-grey2',
+  });
 
   useEffect(() => {
     if (viewerMode) {
@@ -174,14 +179,48 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
   const screens: { [key in Screen]: JSX.Element } = {
     [Screen.Joining]: (
       <>
-        <div className='pr-4 w-25 h-25 flex items-center justify-center'>
-          {!!(auth?.nickname && auth?.avatar) && (
-            <UserAvatar
-              nickname={auth.nickname}
-              src={auth.avatar}
-              size='l'
-            />
-          )}
+        <div className='pr-4'>
+          <div className='relative w-37 h-28'>
+            <div className={`flex items-center justify-center w-37 h-28 rounded-1.25 ${joinPreviewThemedClassName}`}>
+              <Typography size='xxl'>
+                {auth?.nickname}
+              </Typography>
+            </div>
+            <RoomToolsPanel.Wrapper>
+              <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
+                <RoomToolsPanel.SwitchButton
+                  enabled={false}
+                  htmlDisabled
+                  danger
+                  iconEnabledName={IconNames.MicOn}
+                  iconDisabledName={IconNames.MicOff}
+                  onClick={() => { }}
+                  progress={micVolume / 50}
+                />
+                <Gap sizeRem={0.125} />
+                <RoomToolsPanel.SwitchButton
+                  enabled={false}
+                  htmlDisabled
+                  danger
+                  iconEnabledName={IconNames.VideocamOn}
+                  iconDisabledName={IconNames.VideocamOff}
+                  onClick={() => { }}
+                />
+              </RoomToolsPanel.ButtonsGroupWrapper>
+            </RoomToolsPanel.Wrapper>
+          </div>
+          <Gap sizeRem={0.75} />
+          <div className='invisible'>
+            <Typography size='m'>
+              <Checkbox
+                id='webcam-background-remove'
+                label={localizationCaptions[LocalizationKey.WebcamBackgroundBlur]}
+                disabled
+                checked={false}
+                onChange={() => { }}
+              />
+            </Typography>
+          </div>
         </div>
         <div className='w-20 flex flex-col items-center text-center'>
           {joiningRoomHeader}
@@ -191,26 +230,22 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
             viewerMode ? (
               <Button variant='active' onClick={onClose}>{localizationCaptions[LocalizationKey.Join]}</Button>
             ) : (
-              <Button className='w-full' onClick={handleSetupDevices}>{localizationCaptions[LocalizationKey.SetupDevices]}</Button>
+              <Button variant='active' className='w-full' onClick={handleSetupDevices}>{localizationCaptions[LocalizationKey.SetupDevices]}</Button>
             )
           )}
-          <Gap sizeRem={1} />
-          <Typography size='s'>
-            {localizationCaptions[LocalizationKey.CallRecording]}
-          </Typography>
         </div>
       </>
     ),
     [Screen.SetupDevices]: (
       <>
         <div className='pr-4'>
-          <div className='relative w-25 h-25'>
+          <div className='relative w-37 h-28'>
             <video
               ref={userVideo}
               muted
               autoPlay
               playsInline
-              className='w-25 h-25 rounded-1.25'
+              className='w-37 h-28 rounded-1.25 object-cover'
             >
               Video not supported
             </video>
@@ -274,7 +309,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
             <Gap sizeRem={2} />
             <Button variant='active' className='w-full' onClick={onClose}>{localizationCaptions[LocalizationKey.Join]}</Button>
             <Gap sizeRem={1} />
-            <Typography size='s'>
+            <Typography size='s' secondary>
               {localizationCaptions[LocalizationKey.CallRecording]}
             </Typography>
           </div>

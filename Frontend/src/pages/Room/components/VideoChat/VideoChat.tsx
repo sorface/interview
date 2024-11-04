@@ -335,6 +335,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     }
     return (
       <VideoChatVideo
+        blurBg
         videoStream={peerToStream.get(userOrder1Peer.peerID)?.video}
       />
     );
@@ -479,7 +480,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           >
             <video
               ref={userVideo}
-              className='videochat-video'
+              className='videochat-video object-cover'
               muted
               autoPlay
               playsInline
@@ -499,6 +500,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
                 reaction={activeReactions[peer.peerID]}
               >
                 <VideoChatVideo
+                  cover
                   loaded={peerToStream.get(peer.peerID)?.loaded}
                   audioStream={peerToStream.get(peer.peerID)?.audio}
                   videoStream={peerToStream.get(peer.peerID)?.video}

@@ -7,8 +7,8 @@ export interface Devices {
 }
 
 const videoConstraints = {
+  width: 370,
   height: 300,
-  width: 300,
   frameRate: 15,
 };
 
