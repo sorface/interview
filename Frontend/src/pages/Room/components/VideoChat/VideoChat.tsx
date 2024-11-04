@@ -133,6 +133,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   const [textMessages, setTextMessages] = useState<Transcript[]>([]);
   const userVideo = useRef<HTMLVideoElement>(null);
   const userVideoMainContent = useRef<HTMLVideoElement>(null);
+  const userVideoMainContentBackground = useRef<HTMLVideoElement>(null);
   const screenSharePeer = peers.find(peer => peer.screenShare);
   const [codeEditorInitialValue, setCodeEditorInitialValue] = useState<string | null>(null);
   const { activeReactions } = useReactionsStatus({
@@ -244,11 +245,20 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     if (userVideoMainContent.current) {
       userVideoMainContent.current.srcObject = userVideoStream;
     }
+    if (userVideoMainContentBackground.current) {
+      userVideoMainContentBackground.current.srcObject = userVideoStream;
+    }
   }, [userVideoStream, needToRenderMainField]);
 
   useEffect(() => {
-    if (videoOrder[auth?.id || ''] === 1 && userVideoMainContent.current) {
+    if (videoOrder[auth?.id || ''] !== 1) {
+      return;
+    }
+    if (userVideoMainContent.current) {
       userVideoMainContent.current.srcObject = userVideoStream;
+    }
+    if (userVideoMainContentBackground.current) {
+      userVideoMainContentBackground.current.srcObject = userVideoStream;
     }
   }, [auth?.id, videoOrder, userVideoStream]);
 
@@ -296,15 +306,27 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     const userOrder1 = findUserByOrder(videoOrder);
     if (!userOrder1 || userOrder1 === auth?.id) {
       return (
-        <video
-          ref={userVideoMainContent}
-          className='videochat-video'
-          muted
-          autoPlay
-          playsInline
-        >
-          Video not supported
-        </video>
+        <>
+          <video
+            ref={userVideoMainContentBackground}
+            className='absolute w-full h-full object-cover blur-lg'
+            muted
+            autoPlay
+            playsInline
+          >
+            Video not supported
+          </video>
+          <video
+            ref={userVideoMainContent}
+            className='videochat-video relative'
+            muted
+            autoPlay
+            playsInline
+          >
+            Video not supported
+          </video>
+
+        </>
       );
     }
     const userOrder1Peer = peers.find(peer => peer.targetUserId === userOrder1);
@@ -430,7 +452,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           </ContextMenu>
         </RoomToolsPanel.ButtonsGroupWrapper>
       </RoomToolsPanel.Wrapper>
-      <div className='videochat-field videochat-field-main bg-wrap rounded-1.125'>
+      <div className='videochat-field relative videochat-field-main bg-wrap rounded-1.125'>
         {renderMain()}
       </div>
 

@@ -238,6 +238,7 @@
 .opacity-0\.5 { opacity: 0.5; }
 .opacity-0\.65 { opacity: 0.65; }
 .backdrop-blur { backdrop-filter: blur(6px); }
+.blur-lg { filter: blur(16px); }
 .origin-bottom { transform-origin: bottom; }
 .transition-none { transition-property: none; }
 .\!transition { transition: background-color 300ms, border-color 300ms, transform 300ms !important; }
@@ -254,3 +255,4 @@
 .border-b-solid { border-bottom-style: solid; }
 .no-underline { text-decoration-line: none; }
 .box-border { box-sizing: border-box; }
+.object-cover { object-fit: cover; }
