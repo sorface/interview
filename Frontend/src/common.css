@@ -258,3 +258,4 @@
 .no-underline { text-decoration-line: none; }
 .box-border { box-sizing: border-box; }
 .object-cover { object-fit: cover; }
+.break-all { word-break: break-all; }
