@@ -3,17 +3,22 @@ import { Loader } from '../../../../components/Loader/Loader';
 
 interface VideoChatVideoProps {
   loaded?: boolean;
+  cover?: boolean;
+  blurBg?: boolean;
   audioStream?: MediaStream;
   videoStream?: MediaStream;
 }
 
 export const VideoChatVideo: FunctionComponent<VideoChatVideoProps> = ({
   loaded,
+  cover,
+  blurBg,
   audioStream,
   videoStream,
 }) => {
   const loading = typeof loaded === 'boolean' ? !loaded : false;
   const refVideo = useRef<HTMLVideoElement>(null);
+  const refVideoBgBlur = useRef<HTMLVideoElement>(null);
   const refAudio = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -23,8 +28,14 @@ export const VideoChatVideo: FunctionComponent<VideoChatVideoProps> = ({
   }, [audioStream]);
 
   useEffect(() => {
-    if (videoStream && refVideo.current) {
+    if (!videoStream) {
+      return;
+    }
+    if (refVideo.current) {
       refVideo.current.srcObject = videoStream;
+    }
+    if (refVideoBgBlur.current) {
+      refVideoBgBlur.current.srcObject = videoStream;
     }
   }, [videoStream]);
 
@@ -36,7 +47,18 @@ export const VideoChatVideo: FunctionComponent<VideoChatVideoProps> = ({
         </div>
       )}
       <>
-        <video playsInline autoPlay ref={refVideo} className='videochat-video object-cover' />
+        {blurBg && (
+          <video
+            ref={refVideoBgBlur}
+            className='absolute w-full h-full object-cover blur-lg'
+            muted
+            autoPlay
+            playsInline
+          >
+            Video not supported
+          </video>
+        )}
+        <video playsInline autoPlay ref={refVideo} className={`videochat-video relative ${cover ? 'object-cover' : ''}`} />
         <audio playsInline autoPlay ref={refAudio} />
       </>
     </>
