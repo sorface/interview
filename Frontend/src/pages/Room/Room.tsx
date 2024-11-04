@@ -48,8 +48,10 @@ import { parseWsMessage } from './utils/parseWsMessage';
 import { sortRoomQuestion } from '../../utils/sortRoomQestions';
 import { UnreadChatMessagesCounter } from './components/UnreadChatMessagesCounter/UnreadChatMessagesCounter';
 import { RoomSettings } from './components/RoomSettings/RoomSettings';
-import { UserStreamsProvider } from './context/UserStreamsContext';
+import { UserStreamsContext } from './context/UserStreamsContext';
 import { RoomContext } from './context/RoomContext';
+import { useVideoChat } from './components/VideoChat/hoks/useVideoChat';
+import { useUserStreams } from './hooks/useUserStreams';
 
 import './Room.css';
 
@@ -85,7 +87,6 @@ export const Room: FunctionComponent = () => {
   const [messagesChatEnabled, setMessagesChatEnabled] = useState(false);
   const [welcomeScreen, setWelcomeScreen] = useState(true);
   const [recognitionEnabled, setRecognitionEnabled] = useState(false);
-  const [peersLength, setPeersLength] = useState(0);
   const [invitationsOpen, setInvitationsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const socketUrl = `${REACT_APP_WS_URL}/ws?roomId=${id}`;
@@ -198,6 +199,20 @@ export const Room: FunctionComponent = () => {
   const currentUserExpert = roomParticipant?.userType === 'Expert';
   const currentUserExaminee = roomParticipant?.userType === 'Examinee';
   const viewerMode = !(currentUserExpert || currentUserExaminee);
+
+  const userStreams = useUserStreams();
+  const {
+    peers,
+    videoOrder,
+    peerToStream,
+    allUsers,
+  } = useVideoChat({
+    viewerMode,
+    lastWsMessageParsed,
+    userAudioStream: userStreams.userAudioStream,
+    userVideoStream: userStreams.userVideoStream,
+    sendWsMessage: sendMessage,
+  });
 
   const updateQuestions = useCallback(() => {
     if (!id) {
@@ -451,10 +466,14 @@ export const Room: FunctionComponent = () => {
       lastWsMessageParsed,
       codeEditorEnabled,
       codeEditorLanguage,
+      peers,
+      videoOrder,
+      peerToStream,
+      allUsers,
       sendWsMessage: sendMessage,
       setCodeEditorEnabled,
     }}>
-      <UserStreamsProvider>
+      <UserStreamsContext.Provider value={userStreams}>
         <MainContentWrapper withMargin className="room-wrapper">
           <EnterVideoChatModal
             open={welcomeScreen}
@@ -534,7 +553,7 @@ export const Room: FunctionComponent = () => {
                                   </div>
                                   <Gap sizeRem={0.5} horizontal />
                                   <div>
-                                    {peersLength + 1}
+                                    {peers.length + 1}
                                   </div>
                                 </div>
                               ),
@@ -566,7 +585,6 @@ export const Room: FunctionComponent = () => {
                           errorRoomStartReview={errorRoomStartReview}
                           // ScreenShare
                           // screenStream={screenStream}
-                          onUpdatePeersLength={setPeersLength}
                           setRecognitionEnabled={setRecognitionEnabled}
                           handleInvitationsOpen={handleInvitationsOpen}
                           handleStartReviewRoom={handleStartReviewRoom}
@@ -581,7 +599,7 @@ export const Room: FunctionComponent = () => {
             </>
           )}
         </MainContentWrapper>
-      </UserStreamsProvider>
+      </UserStreamsContext.Provider>
     </RoomContext.Provider>
   );
 };
