@@ -49,7 +49,7 @@ export const ChatMessage: FunctionComponent<ChatMessageProps> = ({
           </div>
         )}
         <div
-          className={`${fromCurrentUser ? currentUserMessageClassName : messageClassName} ${fromCurrentUser ? 'max-w-12' : ''} flex flex-1 flex-col py-0.25 px-0.5 rounded-0.5`}
+          className={`${fromCurrentUser ? currentUserMessageClassName : messageClassName} ${fromCurrentUser ? 'max-w-12' : ''} overflow-auto flex flex-1 flex-col py-0.25 px-0.5 rounded-0.5`}
         >
           {(!fromCurrentUser && !stackWithPrevious) && (
             <div className='flex items-center'>
