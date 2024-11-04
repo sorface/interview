@@ -36,7 +36,7 @@ export const VideoChatVideo: FunctionComponent<VideoChatVideoProps> = ({
         </div>
       )}
       <>
-        <video playsInline autoPlay ref={refVideo} className='videochat-video' />
+        <video playsInline autoPlay ref={refVideo} className='videochat-video object-cover' />
         <audio playsInline autoPlay ref={refAudio} />
       </>
     </>

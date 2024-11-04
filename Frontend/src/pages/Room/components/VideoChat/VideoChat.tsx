@@ -479,7 +479,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           >
             <video
               ref={userVideo}
-              className='videochat-video'
+              className='videochat-video object-cover'
               muted
               autoPlay
               playsInline
