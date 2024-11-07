@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
 import { OnChange, OnMount } from '@monaco-editor/react';
 import { RemoteCursorManager, RemoteSelectionManager } from '@convergencelabs/monaco-collab-ext';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
@@ -42,7 +42,6 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
     codeEditorLanguage,
     sendWsMessage,
   } = useContext(RoomContext);
-  const ignoreChangeRef = useRef(false);
   const [value, setValue] = useState<string | null>(initialValue);
   const [remoteCursor, setRemoteCursor] = useState<RemoteCursor | null>(null);
   const [remoteSelection, setRemoteSelection] = useState<RemoteSelection | null>(null);
@@ -71,8 +70,7 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
       }
       switch (lastWsMessageParsed?.Type) {
         case 'ChangeCodeEditor':
-          if (ignoreChangeRef.current) {
-            ignoreChangeRef.current = false;
+          if (lastWsMessageParsed.CreatedById === auth?.id) {
             break;
           }
           setValue(value);
@@ -83,7 +81,7 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
     } catch (err) {
       console.error('parse editor message error: ', err);
     }
-  }, [lastWsMessageParsed]);
+  }, [lastWsMessageParsed, auth]);
 
   const dirtyChangeRemoteCursorHeight = (height: number) => {
     const el = document.querySelector(`.${remoteCursorClassName}`) as HTMLElement;
@@ -198,7 +196,6 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
       Type: 'code',
       Value: value,
     }));
-    ignoreChangeRef.current = true;
   };
 
   const handleLanguageChange = (lang: CodeEditorLang) => {

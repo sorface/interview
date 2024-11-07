@@ -17,6 +17,7 @@ export type ParsedWsMessage =
     };
   } | {
     Type: 'ChangeCodeEditor';
+    CreatedById: string;
     Value: string;
   } | {
     Type: 'all users';

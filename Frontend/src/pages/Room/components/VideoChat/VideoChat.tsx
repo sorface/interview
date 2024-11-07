@@ -172,6 +172,9 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   }, [roomEventsSearch, auth?.nickname, localizationCaptions]);
 
   useEffect(() => {
+    if (codeEditorEnabled) {
+      return;
+    }
     if (!lastWsMessageParsed || !auth) {
       return;
     }
@@ -188,7 +191,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     } catch (err) {
       console.error('parse ws message error: ', err);
     }
-  }, [auth, lastWsMessageParsed, viewerMode]);
+  }, [auth, lastWsMessageParsed, viewerMode, codeEditorEnabled]);
 
   useEffect(() => {
     if (!lastWsMessageParsed) {
