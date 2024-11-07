@@ -52,6 +52,7 @@ import { UserStreamsContext } from './context/UserStreamsContext';
 import { RoomContext } from './context/RoomContext';
 import { useVideoChat } from './components/VideoChat/hoks/useVideoChat';
 import { useUserStreams } from './hooks/useUserStreams';
+import { useRoomSounds } from './hooks/useRoomSounds';
 
 import './Room.css';
 
@@ -201,6 +202,7 @@ export const Room: FunctionComponent = () => {
   const viewerMode = !(currentUserExpert || currentUserExaminee);
 
   const userStreams = useUserStreams();
+  const { playJoinRoomSound, playChatMessageSound } = useRoomSounds();
   const {
     peers,
     videoOrder,
@@ -212,6 +214,7 @@ export const Room: FunctionComponent = () => {
     userAudioStream: userStreams.userAudioStream,
     userVideoStream: userStreams.userVideoStream,
     sendWsMessage: sendMessage,
+    playJoinRoomSound,
   });
 
   const updateQuestions = useCallback(() => {
@@ -329,6 +332,7 @@ export const Room: FunctionComponent = () => {
           if (message.includes(auth.nickname)) {
             toast(`${nickname}: ${message}`, { icon: '💬' });
           }
+          playChatMessageSound();
           break;
         case 'ChangeRoomStatus':
           const newStatus: RoomType['status'] = 'New';
@@ -359,7 +363,7 @@ export const Room: FunctionComponent = () => {
           break;
       }
     } catch { }
-  }, [id, auth, lastMessage, updateQuestions]);
+  }, [id, auth, lastMessage, playChatMessageSound, updateQuestions]);
 
   useEffect(() => {
     if (!currentQuestionId) {

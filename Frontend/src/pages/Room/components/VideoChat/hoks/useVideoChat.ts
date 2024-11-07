@@ -17,6 +17,7 @@ interface UseVideoChatProps {
   userAudioStream: MediaStream | null;
   userVideoStream: MediaStream | null;
   sendWsMessage: (message: string) => void;
+  playJoinRoomSound: () => void;
 }
 
 export interface PeerMeta {
@@ -60,6 +61,7 @@ export const useVideoChat = ({
   userAudioStream,
   userVideoStream,
   sendWsMessage,
+  playJoinRoomSound,
 }: UseVideoChatProps) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
@@ -407,6 +409,7 @@ export const useVideoChat = ({
           toast.success(
             `${fromUser.Nickname} ${localizationCaptions[LocalizationKey.UserConnectedToRoom]}`
           );
+          playJoinRoomSound();
           break;
         default:
           break;
@@ -414,7 +417,7 @@ export const useVideoChat = ({
     } catch (err) {
       console.error('parse ws message error: ', err);
     }
-  }, [lastWsMessageParsed, localizationCaptions]);
+  }, [lastWsMessageParsed, localizationCaptions, playJoinRoomSound]);
 
   useEffect(() => {
     if (!userAudioStream || !auth?.id) {
