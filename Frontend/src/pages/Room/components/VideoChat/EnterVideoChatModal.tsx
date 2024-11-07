@@ -285,6 +285,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
             <div className='flex items-center'>
               <DeviceSelect
                 devices={devices.mic}
+                localStorageKey='defalutMic'
                 onSelect={handleSelectMic}
                 icon={IconNames.MicOn}
               />
@@ -293,6 +294,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
             <div className='flex items-center'>
               <DeviceSelect
                 devices={devices.camera}
+                localStorageKey='defalutCamera'
                 onSelect={handleSelectCamera}
                 icon={IconNames.VideocamOn}
               />

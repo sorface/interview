@@ -5,21 +5,27 @@ import { Icon } from '../Icon/Icon';
 interface DeviceSelectProps {
   devices: MediaDeviceInfo[];
   icon?: IconNames;
+  localStorageKey: string;
   onSelect: (deviceId: MediaDeviceInfo['deviceId']) => void;
 }
 
 export const DeviceSelect: FunctionComponent<DeviceSelectProps> = ({
   devices,
   icon,
+  localStorageKey,
   onSelect,
 }) => {
   const [value, setValue] = useState<string>();
 
   useEffect(() => {
-    const newValue = devices[0]?.deviceId;
+    const deviceIdFromStorage = localStorage.getItem(localStorageKey);
+    const deviceFromStorageAvailable =
+      deviceIdFromStorage &&
+      devices.find(device => device.deviceId === deviceIdFromStorage);
+    const newValue = deviceFromStorageAvailable ? deviceIdFromStorage : devices[0]?.deviceId;
     setValue(newValue);
     onSelect(newValue);
-  }, [devices, onSelect]);
+  }, [devices, localStorageKey, onSelect]);
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const selectedDeviceId = event.target.value;
@@ -30,6 +36,7 @@ export const DeviceSelect: FunctionComponent<DeviceSelectProps> = ({
     }
     setValue(selectedDeviceId);
     onSelect(selectedDeviceId);
+    localStorage.setItem(localStorageKey, selectedDeviceId);
   };
 
   return (
