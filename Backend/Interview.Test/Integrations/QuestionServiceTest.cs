@@ -10,6 +10,7 @@ using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Questions.Services;
 using Interview.Domain.Reactions;
 using Interview.Domain.Rooms;
+using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomQuestionReactions;
 using Interview.Domain.Rooms.RoomQuestions;
@@ -387,6 +388,7 @@ public class QuestionServiceTest
             {
                 Content = "test",
                 Lang = "js",
+                Source = EVRoomCodeEditorChangeSource.User,
             }
         };
         var category = new Category { Name = "Test", };
@@ -434,6 +436,7 @@ public class QuestionServiceTest
             {
                 Content = "test",
                 Lang = "js",
+                Source = EVRoomCodeEditorChangeSource.User,
             }
         };
         var category = new Category { Name = "Test", };

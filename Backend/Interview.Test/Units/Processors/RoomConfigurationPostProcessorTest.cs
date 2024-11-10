@@ -27,7 +27,12 @@ public class RoomConfigurationPostProcessorTest
         _dispatcher.Setup(dispatcher =>
             dispatcher.WriteAsync(It.IsAny<RoomCodeEditorChangeEvent>(), new CancellationToken()));
 
-        var roomConfiguration = new RoomConfiguration { Id = Guid.NewGuid(), CodeEditorContent = "test" };
+        var roomConfiguration = new RoomConfiguration
+        {
+            Id = Guid.NewGuid(),
+            CodeEditorContent = "test",
+            CodeEditorChangeSource = EVRoomCodeEditorChangeSource.User
+        };
         await _roomConfigurationPostProcessor.ProcessAddedAsync(roomConfiguration, new CancellationToken());
 
         var argumentCaptor = new ArgumentCaptor<RoomCodeEditorChangeEvent>();
@@ -47,8 +52,18 @@ public class RoomConfigurationPostProcessorTest
         _dispatcher.Setup(dispatcher =>
             dispatcher.WriteAsync(It.IsAny<RoomCodeEditorChangeEvent>(), new CancellationToken()));
 
-        var roomConfigurationOrigin = new RoomConfiguration { Id = Guid.NewGuid(), CodeEditorContent = "test" };
-        var roomConfigurationCurrent = new RoomConfiguration { Id = Guid.NewGuid(), CodeEditorContent = "tests" };
+        var roomConfigurationOrigin = new RoomConfiguration
+        {
+            Id = Guid.NewGuid(),
+            CodeEditorContent = "test",
+            CodeEditorChangeSource = EVRoomCodeEditorChangeSource.User,
+        };
+        var roomConfigurationCurrent = new RoomConfiguration
+        {
+            Id = Guid.NewGuid(),
+            CodeEditorContent = "tests",
+            CodeEditorChangeSource = EVRoomCodeEditorChangeSource.User
+        };
         await _roomConfigurationPostProcessor.ProcessModifiedAsync(
             roomConfigurationOrigin,
             roomConfigurationCurrent,
