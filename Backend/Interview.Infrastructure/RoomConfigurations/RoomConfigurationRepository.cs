@@ -20,17 +20,12 @@ public class RoomConfigurationRepository : EfRepository<RoomConfiguration>, IRoo
             throw new ApplicationException($"Unknown room '{request.RoomId}'");
         }
 
-        if (room.Configuration is null)
+        room.Configuration ??= new RoomConfiguration
         {
-            room.Configuration = new RoomConfiguration
-            {
-                CodeEditorContent = request.CodeEditorContent,
-            };
-        }
-        else
-        {
-            room.Configuration.CodeEditorContent = request.CodeEditorContent;
-        }
+            CodeEditorContent = request.CodeEditorContent,
+            CodeEditorChangeSource = request.ChangeCodeEditorContentSource,
+        };
+        room.Configuration.ChangeCodeEditor(request.CodeEditorContent, request.ChangeCodeEditorContentSource);
 
         if (request.SaveChanges)
         {

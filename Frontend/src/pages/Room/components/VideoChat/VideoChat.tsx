@@ -183,7 +183,10 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       // const screenShare = !!(parsedPayload?.ScreenShare);
       switch (lastWsMessageParsed?.Type) {
         case 'ChangeCodeEditor':
-          setCodeEditorInitialValue(lastWsMessageParsed.Value);
+          if (lastWsMessageParsed.Value.Source === 'User') {
+            break;
+          }
+          setCodeEditorInitialValue(lastWsMessageParsed.Value.Content);
           break;
         default:
           break;

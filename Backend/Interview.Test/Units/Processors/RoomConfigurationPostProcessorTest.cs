@@ -27,7 +27,12 @@ public class RoomConfigurationPostProcessorTest
         _dispatcher.Setup(dispatcher =>
             dispatcher.WriteAsync(It.IsAny<RoomCodeEditorChangeEvent>(), new CancellationToken()));
 
-        var roomConfiguration = new RoomConfiguration { Id = Guid.NewGuid(), CodeEditorContent = "test" };
+        var roomConfiguration = new RoomConfiguration
+        {
+            Id = Guid.NewGuid(),
+            CodeEditorContent = "test",
+            CodeEditorChangeSource = EVRoomCodeEditorChangeSource.User
+        };
         await _roomConfigurationPostProcessor.ProcessAddedAsync(roomConfiguration, new CancellationToken());
 
         var argumentCaptor = new ArgumentCaptor<RoomCodeEditorChangeEvent>();
@@ -38,7 +43,7 @@ public class RoomConfigurationPostProcessorTest
         var @event = argumentCaptor.Value;
 
         @event.RoomId.Should().Be(roomConfiguration.Id);
-        @event.Value.Should().Be(roomConfiguration.CodeEditorContent);
+        @event.Value.Content.Should().Be(roomConfiguration.CodeEditorContent);
     }
 
     [Fact(DisplayName = "Sending an event about changing the configuration of the room.")]
@@ -47,8 +52,18 @@ public class RoomConfigurationPostProcessorTest
         _dispatcher.Setup(dispatcher =>
             dispatcher.WriteAsync(It.IsAny<RoomCodeEditorChangeEvent>(), new CancellationToken()));
 
-        var roomConfigurationOrigin = new RoomConfiguration { Id = Guid.NewGuid(), CodeEditorContent = "test" };
-        var roomConfigurationCurrent = new RoomConfiguration { Id = Guid.NewGuid(), CodeEditorContent = "tests" };
+        var roomConfigurationOrigin = new RoomConfiguration
+        {
+            Id = Guid.NewGuid(),
+            CodeEditorContent = "test",
+            CodeEditorChangeSource = EVRoomCodeEditorChangeSource.User,
+        };
+        var roomConfigurationCurrent = new RoomConfiguration
+        {
+            Id = Guid.NewGuid(),
+            CodeEditorContent = "tests",
+            CodeEditorChangeSource = EVRoomCodeEditorChangeSource.User
+        };
         await _roomConfigurationPostProcessor.ProcessModifiedAsync(
             roomConfigurationOrigin,
             roomConfigurationCurrent,
@@ -62,6 +77,6 @@ public class RoomConfigurationPostProcessorTest
         var @event = argumentCaptor.Value;
 
         @event.RoomId.Should().Be(roomConfigurationCurrent.Id);
-        @event.Value.Should().Be(roomConfigurationCurrent.CodeEditorContent);
+        @event.Value.Content.Should().Be(roomConfigurationCurrent.CodeEditorContent);
     }
 }

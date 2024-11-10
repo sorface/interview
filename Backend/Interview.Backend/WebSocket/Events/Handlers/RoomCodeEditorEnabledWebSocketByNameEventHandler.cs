@@ -25,6 +25,6 @@ public class RoomCodeEditorEnabledWebSocketByNameEventHandler : WebSocketByNameE
         }
 
         var handler = detail.ScopedServiceProvider.GetRequiredService<RoomCodeEditorChangeEventHandler>();
-        return handler.HandleAsync(detail.RoomId, message?.Enabled ?? false, cancellationToken);
+        return handler.HandleAsync(detail.RoomId, message?.Enabled ?? false, EVRoomCodeEditorChangeSource.User, cancellationToken);
     }
 }

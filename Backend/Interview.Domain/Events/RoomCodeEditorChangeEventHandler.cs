@@ -19,7 +19,7 @@ public class RoomCodeEditorChangeEventHandler
         _currentUserAccessor = currentUserAccessor;
     }
 
-    public async Task HandleAsync(Guid roomId, bool enabled, CancellationToken cancellationToken)
+    public async Task HandleAsync(Guid roomId, bool enabled, EVRoomCodeEditorChangeSource source, CancellationToken cancellationToken)
     {
         var roomConfiguration = await _db.RoomConfiguration.Include(e => e.Room)
             .FirstOrDefaultAsync(e => e.Id == roomId, cancellationToken);
@@ -29,6 +29,8 @@ public class RoomCodeEditorChangeEventHandler
             {
                 Id = roomId,
                 CodeEditorEnabled = enabled,
+                CodeEditorContent = null,
+                CodeEditorChangeSource = source,
             };
             await _db.RoomConfiguration.AddAsync(roomConfiguration, cancellationToken);
             await _db.SaveChangesAsync(cancellationToken);

@@ -4,6 +4,7 @@ using Interview.Domain.Database;
 using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Questions.Records.FindPage;
+using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
@@ -100,6 +101,7 @@ public class QuestionService : IQuestionService
                 {
                     Content = request.CodeEditor.Content,
                     Lang = request.CodeEditor.Lang,
+                    Source = EVRoomCodeEditorChangeSource.User,
                 },
         };
 
@@ -210,7 +212,7 @@ public class QuestionService : IQuestionService
 
         if (request.CodeEditor is not null && entity.CodeEditor is not null)
         {
-            entity.CodeEditor.Content = request.CodeEditor.Content;
+            entity.CodeEditor.UpdateContent(request.CodeEditor.Content, EVRoomCodeEditorChangeSource.User);
             entity.CodeEditor.Lang = request.CodeEditor.Lang;
         }
         else
@@ -229,6 +231,7 @@ public class QuestionService : IQuestionService
                 {
                     Content = request.CodeEditor.Content,
                     Lang = request.CodeEditor.Lang,
+                    Source = EVRoomCodeEditorChangeSource.User,
                 };
             }
         }

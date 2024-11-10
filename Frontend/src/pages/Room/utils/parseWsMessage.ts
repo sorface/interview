@@ -18,7 +18,10 @@ export type ParsedWsMessage =
   } | {
     Type: 'ChangeCodeEditor';
     CreatedById: string;
-    Value: string;
+    Value: {
+      Content: string;
+      Source: 'User' | 'System';
+    };
   } | {
     Type: 'all users';
     Value: Array<{
