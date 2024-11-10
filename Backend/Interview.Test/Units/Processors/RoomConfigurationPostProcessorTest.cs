@@ -43,7 +43,7 @@ public class RoomConfigurationPostProcessorTest
         var @event = argumentCaptor.Value;
 
         @event.RoomId.Should().Be(roomConfiguration.Id);
-        @event.Value.Should().Be(roomConfiguration.CodeEditorContent);
+        @event.Value.Content.Should().Be(roomConfiguration.CodeEditorContent);
     }
 
     [Fact(DisplayName = "Sending an event about changing the configuration of the room.")]
@@ -77,6 +77,6 @@ public class RoomConfigurationPostProcessorTest
         var @event = argumentCaptor.Value;
 
         @event.RoomId.Should().Be(roomConfigurationCurrent.Id);
-        @event.Value.Should().Be(roomConfigurationCurrent.CodeEditorContent);
+        @event.Value.Content.Should().Be(roomConfigurationCurrent.CodeEditorContent);
     }
 }
