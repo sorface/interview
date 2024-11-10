@@ -106,6 +106,8 @@ export const RoomAnaytics: FunctionComponent = () => {
     participant => participant.type === 'Examinee'
   );
 
+  const openedQuestionDetailsTitle = data?.questions.find(question => question.id === openedQuestionDetails)?.value;
+
   useEffect(() => {
     if (!id) {
       throw new Error('Room id not found');
@@ -179,7 +181,7 @@ export const RoomAnaytics: FunctionComponent = () => {
     <>
       <Modal
         open={!!openedQuestionDetails}
-        contentLabel={localizationCaptions[LocalizationKey.QuestionAnswerDetails]}
+        contentLabel={`${localizationCaptions[LocalizationKey.QuestionAnswerDetails]} "${openedQuestionDetailsTitle}"`}
         onClose={handleQuestionDetailsClose}
       >
         <RoomAnayticsDetails
