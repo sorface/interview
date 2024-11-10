@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useContext } from 'react';
 import { Modal } from '../../../../components/Modal/Modal';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../../localization';
@@ -8,21 +8,26 @@ import { LangSwitch } from '../../../../components/LangSwitch/LangSwitch';
 import { ThemeSwitch } from '../../../../components/ThemeSwitch/ThemeSwitch';
 import { Checkbox } from '../../../../components/Checkbox/Checkbox';
 import { Typography } from '../../../../components/Typography/Typography';
+import { UserStreamsContext } from '../../context/UserStreamsContext';
 
 interface RoomSettingsProps {
   open: boolean;
-  backgroundRemoveEnabled: boolean;
   onRequestClose: () => void;
-  onBackgroundRemoveSwitch: () => void;
 }
 
 export const RoomSettings: FunctionComponent<RoomSettingsProps> = ({
   open,
-  backgroundRemoveEnabled,
   onRequestClose,
-  onBackgroundRemoveSwitch,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
+  const {
+    backgroundRemoveEnabled,
+    setBackgroundRemoveEnabled,
+  } = useContext(UserStreamsContext);
+
+  const handleBackgroundRemoveSwitch = () => {
+    setBackgroundRemoveEnabled(!backgroundRemoveEnabled);
+  };
 
   return (
     <Modal
@@ -45,7 +50,7 @@ export const RoomSettings: FunctionComponent<RoomSettingsProps> = ({
               id='webcam-background-remove'
               label=''
               checked={backgroundRemoveEnabled}
-              onChange={onBackgroundRemoveSwitch}
+              onChange={handleBackgroundRemoveSwitch}
             />
           </div>
         </div>

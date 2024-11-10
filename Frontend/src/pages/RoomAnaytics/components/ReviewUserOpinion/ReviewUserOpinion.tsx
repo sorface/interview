@@ -32,7 +32,7 @@ export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
         <div className='flex'>
           <UserAvatar size='m' nickname={currentUser?.nickname || ''} src={currentUser?.avatar} />
           <Gap sizeRem={1} horizontal />
-          <div className='flex flex-col'>
+          <div className='flex flex-col break-all'>
             <Typography size='m' bold>{currentUser?.nickname}</Typography>
             <span className='opacity-0.5'>
               <Typography size='m' bold>

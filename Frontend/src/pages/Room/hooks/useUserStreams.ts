@@ -7,8 +7,8 @@ export interface Devices {
 }
 
 const videoConstraints = {
+  width: 370,
   height: 300,
-  width: 300,
   frameRate: 15,
 };
 
@@ -36,7 +36,7 @@ export const useUserStreams = () => {
   const [selectedCameraId, setSelectedCameraId] = useState<MediaDeviceInfo['deviceId']>();
   const [selectedMicId, setSelectedMicId] = useState<MediaDeviceInfo['deviceId']>();
   const [micEnabled, setMicEnabled] = useState(true);
-  const [cameraEnabled, setCameraEnabled] = useState(true);
+  const [cameraEnabled, setCameraEnabled] = useState(false);
   const [backgroundRemoveEnabled, setBackgroundRemoveEnabled] = useState(true);
   const [userAudioStream, setUserAudioStream] = useState<MediaStream | null>(null);
   const [userAudioProcessedStream, setUserAudioProcessedStream] = useState<MediaStream | null>(null);

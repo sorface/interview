@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useEffect, useState } from 'react';
+import { FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
 import { ActiveQuestionSelector } from '../../../../components/ActiveQuestionSelector/ActiveQuestionSelector';
 import { Room, RoomQuestion, RoomQuestionEvaluation as RoomQuestionEvaluationType } from '../../../../types/room';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
@@ -16,6 +16,7 @@ import { RoomDateAndTime } from '../../../../components/RoomDateAndTime/RoomDate
 import { Modal } from '../../../../components/Modal/Modal';
 import { ModalWarningContent } from '../../../../components/ModalWarningContent/ModalWarningContent';
 import { ModalFooter } from '../../../../components/ModalFooter/ModalFooter';
+import { RoomContext } from '../../context/RoomContext';
 
 import './RoomQuestionPanel.css';
 
@@ -23,21 +24,19 @@ const mergeRoomQuestionEvaluationDebounceMs = 1000;
 const notFoundCode = 404;
 
 export interface RoomQuestionPanelProps {
-  room: Room | null;
   roomQuestionsLoading: boolean;
   roomQuestions: RoomQuestion[];
   initialQuestion?: RoomQuestion;
-  readOnly: boolean;
 }
 
 export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
-  room,
   roomQuestionsLoading,
   roomQuestions,
   initialQuestion,
-  readOnly,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
+  const { room, roomParticipant } = useContext(RoomContext);
+  const readOnly = roomParticipant?.userType !== 'Expert';
   const [roomQuestionEvaluation, setRoomQuestionEvaluation] = useState<RoomQuestionEvaluationValue | null>(null);
   const [reviewWarning, setReviewWarning] = useState(false);
 

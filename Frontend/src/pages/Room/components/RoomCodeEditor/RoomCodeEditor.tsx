@@ -1,8 +1,6 @@
-import { FunctionComponent, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
 import { OnChange, OnMount } from '@monaco-editor/react';
 import { RemoteCursorManager, RemoteSelectionManager } from '@convergencelabs/monaco-collab-ext';
-import { SendMessage } from 'react-use-websocket';
-import { RoomState } from '../../../../types/room';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
 import { SendEventBody, roomsApiDeclaration } from '../../../../apiDeclarations';
 import { EventName } from '../../../../constants';
@@ -11,6 +9,7 @@ import { RemoteCursor } from '@convergencelabs/monaco-collab-ext/typings/RemoteC
 import { RemoteSelection } from '@convergencelabs/monaco-collab-ext/typings/RemoteSelection';
 import { CodeEditorLang } from '../../../../types/question';
 import { CodeEditor, defaultCodeEditorFontSize } from '../../../../components/CodeEditor/CodeEditor';
+import { RoomContext } from '../../context/RoomContext';
 
 import './RoomCodeEditor.css';
 
@@ -30,23 +29,19 @@ const remoteSelectionColor = 'var(--active)';
 
 interface RoomCodeEditorProps {
   initialValue: string | null;
-  language?: CodeEditorLang;
-  roomState: RoomState | null;
-  readOnly: boolean;
-  lastWsMessage: MessageEvent<any> | null;
-  onSendWsMessage: SendMessage;
 }
 
 export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   initialValue,
-  language,
-  roomState,
-  readOnly,
-  lastWsMessage,
-  onSendWsMessage,
 }) => {
   const auth = useContext(AuthContext);
-  const ignoreChangeRef = useRef(false);
+  const {
+    viewerMode,
+    roomState,
+    lastWsMessageParsed,
+    codeEditorLanguage,
+    sendWsMessage,
+  } = useContext(RoomContext);
   const [value, setValue] = useState<string | null>(initialValue);
   const [remoteCursor, setRemoteCursor] = useState<RemoteCursor | null>(null);
   const [remoteSelection, setRemoteSelection] = useState<RemoteSelection | null>(null);
@@ -65,19 +60,17 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   }, [initialValue]);
 
   useEffect(() => {
-    if (!lastWsMessage?.data) {
+    if (!lastWsMessageParsed) {
       return;
     }
     try {
-      const parsedData = JSON.parse(lastWsMessage?.data);
-      const value = parsedData.Value;
+      const value = lastWsMessageParsed.Value;
       if (typeof value !== 'string') {
         return;
       }
-      switch (parsedData?.Type) {
+      switch (lastWsMessageParsed?.Type) {
         case 'ChangeCodeEditor':
-          if (ignoreChangeRef.current) {
-            ignoreChangeRef.current = false;
+          if (lastWsMessageParsed.CreatedById === auth?.id) {
             break;
           }
           setValue(value);
@@ -88,7 +81,7 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
     } catch (err) {
       console.error('parse editor message error: ', err);
     }
-  }, [lastWsMessage]);
+  }, [lastWsMessageParsed, auth]);
 
   const dirtyChangeRemoteCursorHeight = (height: number) => {
     const el = document.querySelector(`.${remoteCursorClassName}`) as HTMLElement;
@@ -113,28 +106,26 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   }, []);
 
   useEffect(() => {
-    if (!lastWsMessage?.data || !auth || !remoteCursor || !remoteSelection) {
+    if (!lastWsMessageParsed || !auth || !remoteCursor || !remoteSelection) {
       return;
     }
     try {
-      const parsedData = JSON.parse(lastWsMessage?.data);
-      const value = parsedData.Value;
-      switch (parsedData?.Type) {
+      switch (lastWsMessageParsed.Type) {
         case EventName.CodeEditorCursor:
-          if (auth.id === value.UserId) {
+          if (auth.id === lastWsMessageParsed.Value.UserId) {
             remoteSelection.hide();
             remoteCursor.hide();
             return;
           }
-          if (value.AdditionalData.cursor.column === -1) {
+          if (lastWsMessageParsed.Value.AdditionalData.cursor.column === -1) {
             remoteCursor.hide();
             remoteSelection.hide();
             return;
           }
-          dirtyChangeRemoteCursorTooltip(value.AdditionalData.nickname);
-          remoteCursor.setPosition(value.AdditionalData.cursor);
+          dirtyChangeRemoteCursorTooltip(lastWsMessageParsed.Value.AdditionalData.nickname);
+          remoteCursor.setPosition(lastWsMessageParsed.Value.AdditionalData.cursor);
           remoteCursor.show();
-          remoteSelection.setPositions(value.AdditionalData.selection.start, value.AdditionalData.selection.end);
+          remoteSelection.setPositions(lastWsMessageParsed.Value.AdditionalData.selection.start, lastWsMessageParsed.Value.AdditionalData.selection.end);
           remoteSelection.show();
           break;
         default:
@@ -143,15 +134,15 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
     } catch (err) {
       console.error('parse editor message error: ', err);
     }
-  }, [lastWsMessage, remoteSelection, remoteCursor, auth, dirtyChangeRemoteCursorTooltip]);
+  }, [lastWsMessageParsed, remoteSelection, remoteCursor, auth, dirtyChangeRemoteCursorTooltip]);
 
   useEffect(() => {
-    if (!roomState || readOnly || !cursorPosition || !selectionPosition) {
+    if (!roomState || viewerMode || !cursorPosition || !selectionPosition) {
       console.warn('Cannot send room event');
       return;
     }
     const sendEventTimeoutId = setTimeout(() => {
-      onSendWsMessage(JSON.stringify({
+      sendWsMessage(JSON.stringify({
         Type: EventName.CodeEditorCursor,
         Value: JSON.stringify({
           cursor: cursorPosition,
@@ -164,7 +155,7 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
     return () => {
       clearTimeout(sendEventTimeoutId);
     };
-  }, [cursorPosition, selectionPosition, roomState, readOnly, auth, onSendWsMessage]);
+  }, [cursorPosition, selectionPosition, roomState, viewerMode, auth, sendWsMessage]);
 
   const handleEditorMount: OnMount = (mountedEditor) => {
     const newRemoteCursorManager = new RemoteCursorManager({
@@ -198,14 +189,13 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   };
 
   const handleChange: OnChange = (value) => {
-    if (readOnly) {
+    if (viewerMode) {
       return;
     }
-    onSendWsMessage(JSON.stringify({
+    sendWsMessage(JSON.stringify({
       Type: 'code',
       Value: value,
     }));
-    ignoreChangeRef.current = true;
   };
 
   const handleLanguageChange = (lang: CodeEditorLang) => {
@@ -222,9 +212,9 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
 
   return (
     <CodeEditor
-      language={language || defaultLanguage}
+      language={codeEditorLanguage || defaultLanguage}
       languages={Object.values(CodeEditorLang)}
-      readOnly={readOnly}
+      readOnly={viewerMode}
       value={value || ''}
       onMount={handleEditorMount}
       onChange={handleChange}

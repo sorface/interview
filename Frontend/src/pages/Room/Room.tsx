@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
+import { FunctionComponent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useParams, Navigate, useNavigate, generatePath } from 'react-router-dom';
 import useWebSocket from 'react-use-websocket';
 import toast from 'react-hot-toast';
@@ -14,7 +14,7 @@ import {
 } from '../../apiDeclarations';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { REACT_APP_WS_URL } from '../../config';
-import { EventName, IconNames, inviteParamName, pathnames } from '../../constants';
+import { EventName, inviteParamName, pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import {
@@ -24,13 +24,11 @@ import {
   RoomState,
   Room as RoomType,
 } from '../../types/room';
-import { Reactions } from './components/Reactions/Reactions';
 import { RoomQuestionPanel } from './components/RoomQuestionPanel/RoomQuestionPanel';
 import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
 import { VideoChat } from './components/VideoChat/VideoChat';
 import { Link } from 'react-router-dom';
 import { EnterVideoChatModal } from './components/VideoChat/EnterVideoChatModal';
-import { useUserStreams } from './hooks/useUserStreams';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useUnreadChatMessages } from './hooks/useUnreadChatMessages';
 // ScreenShare
@@ -44,17 +42,17 @@ import { useEventsState } from './hooks/useEventsState';
 import { RoomTimer } from './components/RoomTimer/RoomTimer';
 import { CodeEditorLang } from '../../types/question';
 import { Button } from '../../components/Button/Button';
-import { RoomToolsPanel } from './components/RoomToolsPanel/RoomToolsPanel';
 import { SwitcherButton } from '../../components/SwitcherButton/SwitcherButton';
 import { Gap } from '../../components/Gap/Gap';
-import { parseWsMessage } from './components/VideoChat/utils/parseWsMessage';
-import { ContextMenu } from '../../components/ContextMenu/ContextMenu';
-import { Loader } from '../../components/Loader/Loader';
-import { Icon } from './components/Icon/Icon';
-import { Typography } from '../../components/Typography/Typography';
+import { parseWsMessage } from './utils/parseWsMessage';
 import { sortRoomQuestion } from '../../utils/sortRoomQestions';
 import { UnreadChatMessagesCounter } from './components/UnreadChatMessagesCounter/UnreadChatMessagesCounter';
 import { RoomSettings } from './components/RoomSettings/RoomSettings';
+import { UserStreamsContext } from './context/UserStreamsContext';
+import { RoomContext } from './context/RoomContext';
+import { useVideoChat } from './components/VideoChat/hoks/useVideoChat';
+import { useUserStreams } from './hooks/useUserStreams';
+import { useRoomSounds } from './hooks/useRoomSounds';
 
 import './Room.css';
 
@@ -90,7 +88,6 @@ export const Room: FunctionComponent = () => {
   const [messagesChatEnabled, setMessagesChatEnabled] = useState(false);
   const [welcomeScreen, setWelcomeScreen] = useState(true);
   const [recognitionEnabled, setRecognitionEnabled] = useState(false);
-  const [peersLength, setPeersLength] = useState(0);
   const [invitationsOpen, setInvitationsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const socketUrl = `${REACT_APP_WS_URL}/ws?roomId=${id}`;
@@ -105,21 +102,7 @@ export const Room: FunctionComponent = () => {
   };
   const { lastMessage, readyState, sendMessage } = useWebSocket(checkWebSocketReadyToConnect() ? socketUrl : null);
   const wsClosed = readyState === 3 || readyState === 2;
-  const {
-    devices,
-    userAudioStream,
-    userVideoStream,
-    cameraEnabled,
-    backgroundRemoveEnabled,
-    micEnabled,
-    setSelectedCameraId,
-    setSelectedMicId,
-    setCameraEnabled,
-    setBackgroundRemoveEnabled,
-    setMicEnabled,
-    requestDevices,
-    updateDevices,
-  } = useUserStreams();
+  const lastWsMessageParsed = useMemo(() => parseWsMessage(lastMessage), [lastMessage]);
   // ScreenShare
   // const { screenStream, requestScreenStream } = useScreenStream();
   const localizationCaptions = useLocalizationCaptions();
@@ -136,7 +119,7 @@ export const Room: FunctionComponent = () => {
     onVoiceRecognition: handleVoiceRecognition,
   });
   const { unreadChatMessages } = useUnreadChatMessages({
-    lastMessage,
+    lastWsMessageParsed,
     messagesChatEnabled,
     maxCount: 9,
   });
@@ -218,6 +201,22 @@ export const Room: FunctionComponent = () => {
   const currentUserExaminee = roomParticipant?.userType === 'Examinee';
   const viewerMode = !(currentUserExpert || currentUserExaminee);
 
+  const userStreams = useUserStreams();
+  const { playJoinRoomSound, playChatMessageSound } = useRoomSounds();
+  const {
+    peers,
+    videoOrder,
+    peerToStream,
+    allUsers,
+  } = useVideoChat({
+    viewerMode,
+    lastWsMessageParsed,
+    userAudioStream: userStreams.userAudioStream,
+    userVideoStream: userStreams.userVideoStream,
+    sendWsMessage: sendMessage,
+    playJoinRoomSound,
+  });
+
   const updateQuestions = useCallback(() => {
     if (!id) {
       throw new Error('Room id not found');
@@ -289,21 +288,19 @@ export const Room: FunctionComponent = () => {
   }, [roomState]);
 
   useEffect(() => {
-    if (!lastMessage) {
+    if (!lastWsMessageParsed) {
       return;
     }
     try {
-      const parsedMessage = parseWsMessage(lastMessage?.data);
-      const parsedPayload = parsedMessage?.Value;
-      switch (parsedMessage?.Type) {
+      switch (lastWsMessageParsed.Type) {
         case 'room-code-editor-enabled':
-          setCodeEditorEnabled(parsedPayload.Enabled);
+          setCodeEditorEnabled(lastWsMessageParsed.Value.Enabled);
           break;
         default:
           break;
       }
     } catch { }
-  }, [lastMessage]);
+  }, [lastWsMessageParsed]);
 
   useEffect(() => {
     if (!room || !roomQuestions) {
@@ -335,6 +332,7 @@ export const Room: FunctionComponent = () => {
           if (message.includes(auth.nickname)) {
             toast(`${nickname}: ${message}`, { icon: '💬' });
           }
+          playChatMessageSound();
           break;
         case 'ChangeRoomStatus':
           const newStatus: RoomType['status'] = 'New';
@@ -365,7 +363,7 @@ export const Room: FunctionComponent = () => {
           break;
       }
     } catch { }
-  }, [id, auth, lastMessage, updateQuestions]);
+  }, [id, auth, lastMessage, playChatMessageSound, updateQuestions]);
 
   useEffect(() => {
     if (!currentQuestionId) {
@@ -379,13 +377,6 @@ export const Room: FunctionComponent = () => {
   //   requestScreenStream();
   // };
 
-  const handleCodeEditor = () => {
-    sendMessage(JSON.stringify({
-      Type: 'room-code-editor-enabled',
-      Value: JSON.stringify({ Enabled: !codeEditorEnabled }),
-    }));
-  };
-
   const loaders = [
     {},
     {},
@@ -397,38 +388,7 @@ export const Room: FunctionComponent = () => {
     sendMessage(JSON.stringify({
       Type: "join video chat",
     }));
-    if (viewerMode) {
-      return;
-    }
-    setRecognitionEnabled(true);
   };
-
-  const handleCameraSwitch = useCallback(() => {
-    setCameraEnabled(!cameraEnabled);
-  }, [cameraEnabled, setCameraEnabled]);
-
-  const handleBackgroundRemoveSwitch = useCallback(() => {
-    setBackgroundRemoveEnabled(!backgroundRemoveEnabled);
-  }, [backgroundRemoveEnabled, setBackgroundRemoveEnabled]);
-
-  const enableDisableMic = useCallback((enabled: boolean) => {
-    setMicEnabled(enabled);
-  }, [setMicEnabled]);
-
-  const handleMicSwitch = useCallback(() => {
-    enableDisableMic(!micEnabled);
-  }, [micEnabled, enableDisableMic]);
-
-  useEffect(() => {
-    if (welcomeScreen || viewerMode) {
-      return;
-    }
-    setRecognitionEnabled(micEnabled);
-  }, [welcomeScreen, viewerMode, micEnabled]);
-
-  const handleVoiceRecognitionSwitch = useCallback(() => {
-    setRecognitionEnabled(!recognitionEnabled);
-  }, [recognitionEnabled]);
 
   const handleSwitchMessagesChat = (index: number) => {
     setMessagesChatEnabled(index === 0);
@@ -487,121 +447,6 @@ export const Room: FunctionComponent = () => {
     fetchRoomStartReview(room.id);
   };
 
-  const renderToolsPanel = () => {
-    return (
-      <RoomToolsPanel.Wrapper rightPos='21.5rem' bottomPos='1.5rem'>
-        {!viewerMode && (
-          <RoomToolsPanel.ButtonsGroupWrapper>
-            <RoomToolsPanel.SwitchButton
-              enabled={micEnabled}
-              iconEnabledName={IconNames.MicOn}
-              iconDisabledName={IconNames.MicOff}
-              onClick={handleMicSwitch}
-            />
-            <Gap sizeRem={0.125} />
-            <RoomToolsPanel.SwitchButton
-              enabled={cameraEnabled}
-              iconEnabledName={IconNames.VideocamOn}
-              iconDisabledName={IconNames.VideocamOff}
-              onClick={handleCameraSwitch}
-            />
-            {!recognitionNotSupported && (
-              <>
-                <Gap sizeRem={0.125} />
-                <RoomToolsPanel.SwitchButton
-                  enabled={recognitionEnabled}
-                  htmlDisabled={!micEnabled}
-                  iconEnabledName={IconNames.RecognitionOn}
-                  iconDisabledName={IconNames.RecognitionOff}
-                  onClick={handleVoiceRecognitionSwitch}
-                />
-              </>
-            )}
-          </RoomToolsPanel.ButtonsGroupWrapper>
-        )}
-        {reactionsVisible && (
-          <RoomToolsPanel.ButtonsGroupWrapper>
-            <Reactions
-              room={room}
-            />
-            {!viewerMode && (
-              <>
-                <Gap sizeRem={0.125} />
-                <RoomToolsPanel.SwitchButton
-                  enabled={true}
-                  iconEnabledName={IconNames.CodeEditor}
-                  iconDisabledName={IconNames.CodeEditor}
-                  onClick={handleCodeEditor}
-                />
-              </>
-            )}
-          </RoomToolsPanel.ButtonsGroupWrapper>
-        )}
-        {!viewerMode && (
-          <RoomToolsPanel.ButtonsGroupWrapper>
-            {/* ScreenShare */}
-            {/* <RoomToolsPanel.SwitchButton
-              enabled={true}
-              iconEnabledName={IconNames.TV}
-              iconDisabledName={IconNames.TV}
-              onClick={handleScreenShare}
-            /> */}
-            {currentUserExpert && (
-              <>
-                <Gap sizeRem={0.125} />
-                <RoomToolsPanel.SwitchButton
-                  enabled={true}
-                  iconEnabledName={IconNames.PersonAdd}
-                  iconDisabledName={IconNames.PersonAdd}
-                  onClick={handleInvitationsOpen}
-                />
-              </>
-            )}
-            <Gap sizeRem={0.125} />
-            <RoomToolsPanel.SwitchButton
-              enabled={true}
-              iconEnabledName={IconNames.Settings}
-              iconDisabledName={IconNames.Settings}
-              onClick={handleSettingsOpen}
-            />
-          </RoomToolsPanel.ButtonsGroupWrapper>
-        )}
-        <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
-          <ContextMenu
-            toggleContent={
-              <RoomToolsPanel.SwitchButton
-                enabled={true}
-                iconEnabledName={IconNames.Call}
-                iconDisabledName={IconNames.Call}
-                onClick={currentUserExpert ? () => { } : handleLeaveRoom}
-                danger
-              />
-            }
-            position='left'
-          >
-            {loadingRoomStartReview && (
-              <Loader />
-            )}
-            {errorRoomStartReview && (
-              <div className='flex items-center justify-center'>
-                <Typography size='m' error>
-                  <Icon name={IconNames.Information} />
-                </Typography>
-                <Typography size='m' error>
-                  {errorRoomStartReview}
-                </Typography>
-              </div>
-            )}
-            {currentUserExpert && (
-              <ContextMenu.Item title={localizationCaptions[LocalizationKey.CompleteAndEvaluateCandidate]} onClick={handleStartReviewRoom} />
-            )}
-            <ContextMenu.Item title={localizationCaptions[LocalizationKey.Exit]} onClick={handleLeaveRoom} />
-          </ContextMenu>
-        </RoomToolsPanel.ButtonsGroupWrapper>
-      </RoomToolsPanel.Wrapper>
-    );
-  };
-
   if (roomInReview && id) {
     return <Navigate to={getCloseRedirectLink(id, currentUserExpert)} replace />;
   }
@@ -617,144 +462,150 @@ export const Room: FunctionComponent = () => {
   }
 
   return (
-    <MainContentWrapper withMargin className="room-wrapper">
-      <EnterVideoChatModal
-        open={welcomeScreen}
-        loading={loading || loadingRoomState || roomParticipantLoading || roomParticipantWillLoaded || applyRoomInviteLoading || readyState === connectingReadyState}
-        viewerMode={roomParticipant ? viewerMode : true}
-        roomName={room?.name}
-        devices={devices}
-        error={applyRoomInviteError && localizationCaptions[LocalizationKey.ErrorApplyRoomInvite]}
-        userVideoStream={userVideoStream}
-        userAudioStream={userAudioStream}
-        micEnabled={micEnabled}
-        cameraEnabled={cameraEnabled}
-        backgroundRemoveEnabled={backgroundRemoveEnabled}
-        setSelectedCameraId={setSelectedCameraId}
-        setSelectedMicId={setSelectedMicId}
-        onRequestDevices={requestDevices}
-        updateDevices={updateDevices}
-        onClose={handleWelcomeScreenClose}
-        onMicSwitch={handleMicSwitch}
-        onCameraSwitch={handleCameraSwitch}
-        onBackgroundRemoveSwitch={handleBackgroundRemoveSwitch}
-      />
-      <Invitations
-        open={invitationsOpen}
-        roomId={id || ''}
-        roomInvitesData={roomInvitesData}
-        roomInvitesError={roomInvitesError || generateRoomInviteError || generateRoomAllInvitesError}
-        roomInvitesLoading={roomInvitesLoading || generateRoomInviteLoading || generateRoomAllInvitesLoading}
-        onRequestClose={handleInvitationsClose}
-        onGenerateInvite={handleInviteGenerate}
-        onGenerateAllInvites={handleInvitesAllGenerate}
-      />
-      <RoomSettings
-        open={settingsOpen}
-        backgroundRemoveEnabled={backgroundRemoveEnabled}
-        onRequestClose={handleSettingsClose}
-        onBackgroundRemoveSwitch={handleBackgroundRemoveSwitch}
-      />
-      <ProcessWrapper
-        loading={loading}
-        loadingPrefix={localizationCaptions[LocalizationKey.LoadingRoom]}
-        loaders={loaders}
-        error={error}
-        errorPrefix={localizationCaptions[LocalizationKey.ErrorLoadingRoom]}
-      >
-        <div className="room-page">
-          <div className="room-page-main">
-            <div className="room-page-header justify-between">
-              <div>
-                <span
-                  className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
-                >
-                  <div className='room-page-header-wrapper flex items-center'>
-                    <div className='w-2.375 pr-1'>
-                      <img className='w-2.375 h-2.375 rounded-0.375' src='/logo192.png' alt='site logo' />
+    <RoomContext.Provider value={{
+      room,
+      roomParticipant,
+      roomState,
+      viewerMode,
+      lastWsMessageParsed,
+      codeEditorEnabled,
+      codeEditorLanguage,
+      peers,
+      videoOrder,
+      peerToStream,
+      allUsers,
+      sendWsMessage: sendMessage,
+      setCodeEditorEnabled,
+    }}>
+      <UserStreamsContext.Provider value={userStreams}>
+        <MainContentWrapper withMargin className="room-wrapper">
+          <EnterVideoChatModal
+            open={welcomeScreen}
+            loading={loading || loadingRoomState || roomParticipantLoading || roomParticipantWillLoaded || applyRoomInviteLoading || readyState === connectingReadyState}
+            error={applyRoomInviteError && localizationCaptions[LocalizationKey.ErrorApplyRoomInvite]}
+            onClose={handleWelcomeScreenClose}
+          />
+          {!welcomeScreen && (
+            <>
+              <Invitations
+                open={invitationsOpen}
+                roomId={id || ''}
+                roomInvitesData={roomInvitesData}
+                roomInvitesError={roomInvitesError || generateRoomInviteError || generateRoomAllInvitesError}
+                roomInvitesLoading={roomInvitesLoading || generateRoomInviteLoading || generateRoomAllInvitesLoading}
+                onRequestClose={handleInvitationsClose}
+                onGenerateInvite={handleInviteGenerate}
+                onGenerateAllInvites={handleInvitesAllGenerate}
+              />
+              <RoomSettings
+                open={settingsOpen}
+                onRequestClose={handleSettingsClose}
+              />
+              <ProcessWrapper
+                loading={loading}
+                loadingPrefix={localizationCaptions[LocalizationKey.LoadingRoom]}
+                loaders={loaders}
+                error={error}
+                errorPrefix={localizationCaptions[LocalizationKey.ErrorLoadingRoom]}
+              >
+                <div className="room-page">
+                  <div className="room-page-main">
+                    <div className="room-page-header justify-between">
+                      <div>
+                        <span
+                          className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
+                        >
+                          <Link to={pathnames.highlightRooms} className='no-underline'>
+                            <div className='room-page-header-wrapper flex items-center'>
+                              <div className='w-2.375 pr-1'>
+                                <img className='w-2.375 h-2.375 rounded-0.375' src='/logo192.png' alt='site logo' />
+                              </div>
+                              <h3>{room?.name}</h3>
+                            </div>
+                          </Link>
+                        </span>
+                      </div>
+                      <div className='flex'>
+                        {!!roomTimer?.startTime && (
+                          <>
+                            <RoomTimer durationSec={roomTimer.durationSec} startTime={roomTimer.startTime} />
+                            <Gap sizeRem={0.5} horizontal />
+                          </>
+                        )}
+                        <SwitcherButton
+                          items={[
+                            {
+                              id: 0,
+                              content: (
+                                <div className='flex items-center'>
+                                  <div>
+                                    {localizationCaptions[LocalizationKey.Chat]}
+                                  </div>
+                                  {!!unreadChatMessages && (
+                                    <>
+                                      <Gap sizeRem={0.5} horizontal />
+                                      <UnreadChatMessagesCounter value={unreadChatMessages} />
+                                    </>
+                                  )}
+                                </div>
+                              ),
+                            },
+                            {
+                              id: 1,
+                              content: (
+                                <div className='flex items-center'>
+                                  <div>
+                                    {localizationCaptions[LocalizationKey.RoomParticipants]}
+                                  </div>
+                                  <Gap sizeRem={0.5} horizontal />
+                                  <div>
+                                    {peers.length + 1}
+                                  </div>
+                                </div>
+                              ),
+                            },
+                          ]}
+                          activeIndex={messagesChatEnabled ? 0 : 1}
+                          variant='alternative'
+                          onClick={handleSwitchMessagesChat}
+                        />
+                      </div>
                     </div>
-                    <h3>{room?.name}</h3>
+                    <div className="room-page-main-content">
+                      <div className='room-columns'>
+                        {errorRoomState && <div>{localizationCaptions[LocalizationKey.ErrorLoadingRoomState]}...</div>}
+                        {(currentUserExpert || viewerMode) && (
+                          <RoomQuestionPanel
+                            roomQuestionsLoading={roomQuestionsLoading}
+                            roomQuestions={roomQuestions?.sort(sortRoomQuestion) || []}
+                            initialQuestion={currentQuestion}
+                          />
+                        )}
+                        <VideoChat
+                          messagesChatEnabled={messagesChatEnabled}
+                          recognitionNotSupported={recognitionNotSupported}
+                          recognitionEnabled={recognitionEnabled}
+                          reactionsVisible={reactionsVisible}
+                          currentUserExpert={currentUserExpert}
+                          loadingRoomStartReview={loadingRoomStartReview}
+                          errorRoomStartReview={errorRoomStartReview}
+                          // ScreenShare
+                          // screenStream={screenStream}
+                          setRecognitionEnabled={setRecognitionEnabled}
+                          handleInvitationsOpen={handleInvitationsOpen}
+                          handleStartReviewRoom={handleStartReviewRoom}
+                          handleSettingsOpen={handleSettingsOpen}
+                          handleLeaveRoom={handleLeaveRoom}
+                        />
+                      </div>
+                    </div>
                   </div>
-                </span>
-              </div>
-              <div className='flex'>
-                {!!roomTimer?.startTime && (
-                  <>
-                    <RoomTimer durationSec={roomTimer.durationSec} startTime={roomTimer.startTime} />
-                    <Gap sizeRem={0.5} horizontal />
-                  </>
-                )}
-                <SwitcherButton
-                  items={[
-                    {
-                      id: 0,
-                      content: (
-                        <div className='flex items-center'>
-                          <div>
-                            {localizationCaptions[LocalizationKey.Chat]}
-                          </div>
-                          {!!unreadChatMessages && (
-                            <>
-                              <Gap sizeRem={0.5} horizontal />
-                              <UnreadChatMessagesCounter value={unreadChatMessages} />
-                            </>
-                          )}
-                        </div>
-                      ),
-                    },
-                    {
-                      id: 1,
-                      content: (
-                        <div className='flex items-center'>
-                          <div>
-                            {localizationCaptions[LocalizationKey.RoomParticipants]}
-                          </div>
-                          <Gap sizeRem={0.5} horizontal />
-                          <div>
-                            {peersLength + 1}
-                          </div>
-                        </div>
-                      ),
-                    },
-                  ]}
-                  activeIndex={messagesChatEnabled ? 0 : 1}
-                  variant='alternative'
-                  onClick={handleSwitchMessagesChat}
-                />
-              </div>
-            </div>
-            <div className="room-page-main-content">
-              <div className='room-columns'>
-                {errorRoomState && <div>{localizationCaptions[LocalizationKey.ErrorLoadingRoomState]}...</div>}
-                {(currentUserExpert || viewerMode) && (
-                  <RoomQuestionPanel
-                    room={room}
-                    roomQuestionsLoading={roomQuestionsLoading}
-                    roomQuestions={roomQuestions?.sort(sortRoomQuestion) || []}
-                    initialQuestion={currentQuestion}
-                    readOnly={!currentUserExpert}
-                  />
-                )}
-                <VideoChat
-                  roomState={roomState}
-                  viewerMode={viewerMode}
-                  lastWsMessage={lastMessage}
-                  messagesChatEnabled={messagesChatEnabled}
-                  codeEditorEnabled={codeEditorEnabled}
-                  codeEditorLanguage={codeEditorLanguage}
-                  userVideoStream={userVideoStream}
-                  userAudioStream={userAudioStream}
-                  // ScreenShare
-                  // screenStream={screenStream}
-                  onSendWsMessage={sendMessage}
-                  onUpdatePeersLength={setPeersLength}
-                  renderToolsPanel={renderToolsPanel}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </ProcessWrapper>
-    </MainContentWrapper>
+                </div>
+              </ProcessWrapper>
+            </>
+          )}
+        </MainContentWrapper>
+      </UserStreamsContext.Provider>
+    </RoomContext.Provider>
   );
 };

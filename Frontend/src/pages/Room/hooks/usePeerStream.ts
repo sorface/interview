@@ -1,7 +1,7 @@
 import { useCallback, useReducer } from 'react';
 import Peer from 'simple-peer';
 
-type UsePeerStreamState = Map<string, { audio?: MediaStream; video?: MediaStream; loaded?: boolean }>;
+export type UsePeerStreamState = Map<string, { audio?: MediaStream; video?: MediaStream; loaded?: boolean }>;
 
 const initialState: UsePeerStreamState = new Map();
 

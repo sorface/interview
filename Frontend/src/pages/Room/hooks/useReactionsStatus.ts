@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { User } from '../../../types/user';
+import { ParsedWsMessage } from '../utils/parseWsMessage';
 
 interface UseReactionsStatusParams {
-  lastMessage: MessageEvent<any> | null
+  lastWsMessageParsed: ParsedWsMessage | null;
 }
 
 interface ReactionTimeout {
@@ -13,8 +14,6 @@ interface ReactionTimeout {
 type UserReactionsTimeout = Map<User['id'], ReactionTimeout | null>;
 
 type ActiveReactions = Record<User['id'], string | null>;
-
-export const handledEventTypes = ['Like', 'Dislike'];
 
 const updateIntervalMs = 500;
 const addReactionTimeoutMs = 3000.0;
@@ -64,7 +63,7 @@ const timeoutToActiveReactions = (
 };
 
 export const useReactionsStatus = ({
-  lastMessage,
+  lastWsMessageParsed,
 }: UseReactionsStatusParams) => {
   const userReactionsTimeoutRef = useRef<UserReactionsTimeout>(new Map());
   const [activeReactions, setActiveReactions] = useState<ActiveReactions>({});
@@ -88,25 +87,24 @@ export const useReactionsStatus = ({
   }, []);
 
   useEffect(() => {
-    if (!lastMessage) {
+    if (!lastWsMessageParsed) {
       return;
     }
-    const parsedData = JSON.parse(lastMessage?.data);
-    if (!handledEventTypes.includes(parsedData?.Type)) {
-      return;
+    switch (lastWsMessageParsed.Type) {
+      case 'Like':
+      case 'Dislike':
+        const userId = lastWsMessageParsed.Value.UserId;
+        addReactionTimeout(
+          userReactionsTimeoutRef.current,
+          userId,
+          lastWsMessageParsed.Type || '',
+        );
+        setActiveReactions(timeoutToActiveReactions(userReactionsTimeoutRef.current));
+        break;
+      default:
+        break;
     }
-    const userId = parsedData?.Value.UserId;
-    if (!userId) {
-      return;
-    }
-    addReactionTimeout(
-      userReactionsTimeoutRef.current,
-      userId,
-      parsedData?.Type,
-    );
-    setActiveReactions(timeoutToActiveReactions(userReactionsTimeoutRef.current));
-
-  }, [lastMessage]);
+  }, [lastWsMessageParsed]);
 
   return {
     activeReactions,
