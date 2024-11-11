@@ -1,7 +1,6 @@
 import { LocalizationLang } from './context/LocalizationContext';
 
 export const enum LocalizationKey {
-  AppName,
   LoginRequired,
   WelcomeMessage,
   HighlightsRoomsPageName,
@@ -233,7 +232,6 @@ export const enum LocalizationKey {
 
 export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
   [LocalizationLang.en]: {
-    [LocalizationKey.AppName]: 'Interview Platform',
     [LocalizationKey.LoginRequired]: 'To view this page you need to log in to your account',
     [LocalizationKey.WelcomeMessage]: 'Welcome',
     [LocalizationKey.HighlightsRoomsPageName]: 'Rooms',
@@ -463,7 +461,6 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.WebcamBackgroundBlur]: 'Background blur',
   },
   [LocalizationLang.ru]: {
-    [LocalizationKey.AppName]: 'Interview Platform',
     [LocalizationKey.LoginRequired]: 'Для просмотра данной страницы необходимо войти в аккаунт',
     [LocalizationKey.WelcomeMessage]: 'Добро пожаловать',
     [LocalizationKey.HighlightsRoomsPageName]: 'Комнаты',

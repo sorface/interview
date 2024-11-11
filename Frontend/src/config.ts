@@ -6,6 +6,16 @@ const getFromEnv = (varName: string) => {
   return value;
 };
 
+const getFromEnvOrDefault = (varName: string, defaultValue: string) => {
+  try {
+    return getFromEnv(varName);
+  } catch {
+    return defaultValue;
+  }
+};
+
+
 export const REACT_APP_BACKEND_URL = getFromEnv('REACT_APP_BACKEND_URL');
 export const REACT_APP_WS_URL = getFromEnv('REACT_APP_WS_URL');
 export const REACT_APP_BUILD_HASH = getFromEnv('REACT_APP_BUILD_HASH');
+export const REACT_APP_APP_NAME = getFromEnvOrDefault('REACT_APP_APP_NAME', 'Interview Platform');
