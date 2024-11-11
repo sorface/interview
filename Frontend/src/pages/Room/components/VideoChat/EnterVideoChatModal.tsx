@@ -103,7 +103,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
       userVideo.current.srcObject = userVideoStream;
       userVideo.current.play();
     }
-  }, [userVideoStream]);
+  }, [userVideoStream, screen]);
 
   useEffect(() => {
     const frequencyData = new Uint8Array(frequencyBinCount);
