@@ -2,6 +2,7 @@ using Interview.Domain.Database;
 using Interview.Domain.Database.Processors;
 using Interview.Domain.Events.DatabaseProcessors.Records.Question;
 using Interview.Domain.Events.DatabaseProcessors.Records.Room;
+using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.Users;
 using Microsoft.EntityFrameworkCore;
@@ -54,7 +55,7 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
         if (current.State == RoomQuestionState.Active)
         {
             var codeEditorPayload = await GetCodeEditorEventPayload(current, cancellationToken);
-            await _roomCodeEditorChangeEventHandler.HandleAsync(current.RoomId, codeEditorPayload.Enabled, cancellationToken);
+            await _roomCodeEditorChangeEventHandler.HandleAsync(current.RoomId, codeEditorPayload.Enabled, EVRoomCodeEditorChangeSource.System, cancellationToken);
         }
     }
 

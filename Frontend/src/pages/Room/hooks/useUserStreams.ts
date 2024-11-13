@@ -36,14 +36,13 @@ export const useUserStreams = () => {
   const [selectedCameraId, setSelectedCameraId] = useState<MediaDeviceInfo['deviceId']>();
   const [selectedMicId, setSelectedMicId] = useState<MediaDeviceInfo['deviceId']>();
   const [micEnabled, setMicEnabled] = useState(true);
-  const [cameraEnabled, setCameraEnabled] = useState(false);
+  const [cameraEnabled, setCameraEnabled] = useState(true);
   const [backgroundRemoveEnabled, setBackgroundRemoveEnabled] = useState(true);
   const [userAudioStream, setUserAudioStream] = useState<MediaStream | null>(null);
   const [userAudioProcessedStream, setUserAudioProcessedStream] = useState<MediaStream | null>(null);
   const [userVideoStream, setUserVideoStream] = useState<MediaStream | null>(null);
   const userVideoStreamRef = useRef<MediaStream | null>(null);
   const canvasMediaStream = useCanvasStream({
-    enabled: !!selectedCameraId,
     width: videoConstraints.width,
     height: videoConstraints.height,
     frameRate: videoConstraints.frameRate,

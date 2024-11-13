@@ -5,7 +5,6 @@ import { useSelfieSegmentation } from './useSelfieSegmentation';
 import { AuthContext } from '../../../context/AuthContext';
 
 interface UseCanvasStreamParams {
-  enabled: boolean;
   width: number;
   height: number;
   frameRate: number;
@@ -27,7 +26,6 @@ const fillNoCamera = (context: CanvasRenderingContext2D, nickname: string | null
 };
 
 export const useCanvasStream = ({
-  enabled,
   width,
   height,
   frameRate,
@@ -38,7 +36,6 @@ export const useCanvasStream = ({
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [canvasMediaStream, setMediaStream] = useState(new MediaStream());
   const [video, setVideo] = useState<HTMLVideoElement | null>(null);
-  const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
   const requestRef = useRef<number>();
   const backgroundRemoveEnabledRef = useRef(false);
   backgroundRemoveEnabledRef.current = backgroundRemoveEnabled;
@@ -70,17 +67,6 @@ export const useCanvasStream = ({
   );
 
   useEffect(() => {
-    if (backgroundImage) {
-      return;
-    }
-    const newImg = new Image();
-    newImg.onload = () => {
-      setBackgroundImage(newImg);
-    };
-    newImg.src = '/logo512.png';
-  }, [backgroundImage]);
-
-  useEffect(() => {
     if (!video || !cameraStream || !context) {
       return;
     }
@@ -107,9 +93,6 @@ export const useCanvasStream = ({
   }, [video, context, width, height, cameraStream, selfieSegmentation, auth?.nickname]);
 
   useEffect(() => {
-    if (!enabled) {
-      return;
-    }
     const canvas = document.createElement('canvas');
     const newVideo = document.createElement('video');
     newVideo.width = canvas.width = width;
@@ -128,7 +111,7 @@ export const useCanvasStream = ({
     setVideo(newVideo);
     setContext(canvasContext);
     setMediaStream(new MediaStream([videoTrack]));
-  }, [frameRate, height, width, enabled, auth?.nickname]);
+  }, [frameRate, height, width, auth?.nickname]);
 
   useEffect(() => {
     if (!context) {
@@ -152,18 +135,6 @@ export const useCanvasStream = ({
       }
     };
   }, [context, video, cameraStream, auth?.nickname, backgroundRemoveEnabled]);
-
-  useEffect(() => {
-    if (cameraStream && video && context) {
-      video.srcObject = cameraStream;
-      video.play();
-      return;
-    }
-    if (!context) {
-      return;
-    }
-    fillNoCamera(context, auth?.nickname || null);
-  }, [cameraStream, context, video, auth?.nickname]);
 
   return canvasMediaStream;
 };

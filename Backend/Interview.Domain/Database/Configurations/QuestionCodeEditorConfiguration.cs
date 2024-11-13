@@ -1,4 +1,5 @@
 using Interview.Domain.Questions.CodeEditors;
+using Interview.Domain.Rooms.RoomConfigurations;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Interview.Domain.Database.Configurations;
@@ -14,5 +15,7 @@ public class QuestionCodeEditorConfiguration : EntityTypeConfigurationBase<Quest
         builder.Property(e => e.Lang)
             .HasMaxLength(32)
             .IsRequired();
+
+        builder.Property(e => e.Source).ConfigureRequiredEnum(EVRoomCodeEditorChangeSource.User, 12);
     }
 }

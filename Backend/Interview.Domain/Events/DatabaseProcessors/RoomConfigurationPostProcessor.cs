@@ -40,7 +40,8 @@ public class RoomConfigurationPostProcessor : EntityPostProcessor<RoomConfigurat
     {
         if (original is null || original.CodeEditorContent != current.CodeEditorContent)
         {
-            return new RoomCodeEditorChangeEvent(current.Id, current.CodeEditorContent, _currentUserAccessor.GetUserIdOrThrow());
+            var payload = new RoomCodeEditorChangeEvent.Payload { Content = current.CodeEditorContent, Source = current.CodeEditorChangeSource, };
+            return new RoomCodeEditorChangeEvent(current.Id, payload, _currentUserAccessor.GetUserIdOrThrow());
         }
 
         return null;

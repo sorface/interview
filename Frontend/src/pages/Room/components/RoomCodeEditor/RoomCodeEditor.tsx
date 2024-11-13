@@ -64,16 +64,15 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
       return;
     }
     try {
-      const value = lastWsMessageParsed.Value;
-      if (typeof value !== 'string') {
-        return;
-      }
       switch (lastWsMessageParsed?.Type) {
         case 'ChangeCodeEditor':
-          if (lastWsMessageParsed.CreatedById === auth?.id) {
+          if (
+            lastWsMessageParsed.Value.Source === 'User' &&
+            lastWsMessageParsed.CreatedById === auth?.id
+          ) {
             break;
           }
-          setValue(value);
+          setValue(lastWsMessageParsed.Value.Content);
           break;
         default:
           break;
