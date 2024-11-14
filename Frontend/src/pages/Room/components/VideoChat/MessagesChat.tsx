@@ -88,6 +88,7 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
           placeholder={localizationCaptions[LocalizationKey.ChatMessagePlaceholder]}
           ref={messageInputRef}
           className='flex-1'
+          maxLength={1000}
           onKeyDown={handleInputKeyDown}
         />
         <Gap sizeRem={0.25} horizontal />

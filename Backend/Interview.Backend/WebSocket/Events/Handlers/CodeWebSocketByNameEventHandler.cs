@@ -30,7 +30,12 @@ public class CodeWebSocketByNameEventHandler : WebSocketByNameEventHandlerBase
         }
 
         var repository = detail.ScopedServiceProvider.GetRequiredService<IRoomConfigurationRepository>();
-        var request = new UpsertCodeStateRequest { CodeEditorContent = payload ?? string.Empty, RoomId = detail.RoomId, };
+        var request = new UpsertCodeStateRequest
+        {
+            CodeEditorContent = payload ?? string.Empty,
+            RoomId = detail.RoomId,
+            ChangeCodeEditorContentSource = EVRoomCodeEditorChangeSource.User,
+        };
         await repository.UpsertCodeStateAsync(request, cancellationToken);
     }
 }

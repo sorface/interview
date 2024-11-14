@@ -67,6 +67,7 @@ export const enum IconNames {
   PlayOutline = 'play-outline',
   TodayOutline = 'today-outline',
   Search = 'search',
+  Hourglass = 'hourglass',
 }
 
 export const reactionIcon: Record<string, IconNames> = {

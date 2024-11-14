@@ -1,5 +1,5 @@
-import { createContext, FunctionComponent, ReactNode } from 'react';
-import { Devices, useUserStreams } from '../hooks/useUserStreams';
+import { createContext } from 'react';
+import { Devices } from '../hooks/useUserStreams';
 
 export interface UserStreamsContextType {
   userAudioStream: MediaStream | null;
@@ -40,20 +40,3 @@ const defaultValue: UserStreamsContextType = {
 };
 
 export const UserStreamsContext = createContext<UserStreamsContextType>(defaultValue);
-
-interface UserStreamsProps {
-  children: ReactNode;
-}
-
-export const UserStreamsProvider: FunctionComponent<UserStreamsProps> = ({
-  children,
-}) => {
-  const userStreams = useUserStreams();
-
-  return (
-    <UserStreamsContext.Provider value={userStreams}>
-      {children}
-    </UserStreamsContext.Provider>
-  )
-};
-

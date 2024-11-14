@@ -42,7 +42,7 @@ export const CircularProgress: FunctionComponent<CircularProgressProps> = ({
             fontSize: `${sizePx}px`,
           }}
         >
-          <Icon inheritFontSize name={IconNames.Time} />
+          <Icon inheritFontSize name={IconNames.Hourglass} />
         </div>
       </>
     );

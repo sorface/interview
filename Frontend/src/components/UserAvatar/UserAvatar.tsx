@@ -38,7 +38,7 @@ export const UserAvatar: FunctionComponent<UserAvatarProps> = ({
   if (!src) {
     return (
       <div
-        className={`${altarnativeBackgound ? 'bg-wrap' : 'bg-form'} flex items-center justify-center user-avatar ${getSizeClassName(size)}`}
+        className={`${altarnativeBackgound ? 'bg-wrap' : 'bg-form'} flex items-center justify-center user-avatar shrink-0 ${getSizeClassName(size)}`}
         {...restProps}
       >
         {nickname[0].toLocaleUpperCase()}
@@ -49,7 +49,7 @@ export const UserAvatar: FunctionComponent<UserAvatarProps> = ({
   return (
     <img
       src={src}
-      className={`user-avatar ${getSizeClassName(size)}`}
+      className={`user-avatar shrink-0 ${getSizeClassName(size)}`}
       alt={`${nickname} avatar`}
       {...restProps}
     />

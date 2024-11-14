@@ -38,6 +38,7 @@ public class RoomQuestionPreProcessor : EntityPreProcessor<RoomQuestion>
         {
             RoomId = current.RoomId,
             CodeEditorContent = codeEditorContent ?? string.Empty,
+            ChangeCodeEditorContentSource = EVRoomCodeEditorChangeSource.System,
             SaveChanges = false,
         };
         await _roomConfigurationRepository.UpsertCodeStateAsync(upsertCodeStateRequest, cancellationToken);

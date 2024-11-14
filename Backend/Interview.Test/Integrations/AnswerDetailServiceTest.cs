@@ -13,6 +13,7 @@ using Interview.Domain.Events.Storage;
 using Interview.Domain.Questions;
 using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Rooms;
+using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.Rooms.RoomQuestions.Services;
@@ -111,7 +112,12 @@ public class AnswerDetailServiceTest
         var storage = new InMemoryHotEventStorage();
         var (service, roomId, questionId, serializer) = CreateService(appDbContext, storage, testSystemClock, addQueuedRoomEvent);
         var q = appDbContext.Questions.First(e => e.Id == questionId);
-        q.CodeEditor = new QuestionCodeEditor { Content = "test cont", Lang = "C#" };
+        q.CodeEditor = new QuestionCodeEditor
+        {
+            Content = "test cont",
+            Lang = "C#",
+            Source = EVRoomCodeEditorChangeSource.User
+        };
         appDbContext.SaveChanges();
         appDbContext.ChangeTracker.Clear();
 

@@ -7,8 +7,8 @@ export interface Devices {
 }
 
 const videoConstraints = {
+  width: 370,
   height: 300,
-  width: 300,
   frameRate: 15,
 };
 
@@ -43,7 +43,6 @@ export const useUserStreams = () => {
   const [userVideoStream, setUserVideoStream] = useState<MediaStream | null>(null);
   const userVideoStreamRef = useRef<MediaStream | null>(null);
   const canvasMediaStream = useCanvasStream({
-    enabled: !!selectedCameraId,
     width: videoConstraints.width,
     height: videoConstraints.height,
     frameRate: videoConstraints.frameRate,
