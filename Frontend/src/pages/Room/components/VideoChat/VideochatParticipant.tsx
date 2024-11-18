@@ -11,16 +11,11 @@ interface VideochatParticipantProps {
   reaction?: string | null;
 }
 
-export const VideochatParticipant: FunctionComponent<VideochatParticipantProps> = ({
-  viewer,
-  ...restProps
-}) => {
+export const VideochatParticipant: FunctionComponent<
+  VideochatParticipantProps
+> = ({ viewer, ...restProps }) => {
   if (viewer) {
-    return (
-      <VideochatParticipantWithoutVideo {...restProps} />
-    );
+    return <VideochatParticipantWithoutVideo {...restProps} />;
   }
-  return (
-    <VideochatParticipantWithVideo {...restProps} />
-  );
+  return <VideochatParticipantWithVideo {...restProps} />;
 };

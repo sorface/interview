@@ -14,7 +14,7 @@
 
 .question-create .question-answer-controls {
   display: flex;
-  justify-content: space-between; 
+  justify-content: space-between;
 }
 
 .question-create .question-answer-name {

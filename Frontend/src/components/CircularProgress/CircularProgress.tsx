@@ -30,12 +30,12 @@ export const CircularProgress: FunctionComponent<CircularProgressProps> = ({
       <>
         <Tooltip
           id={`CircularProgress-tooltip-${randomId}`}
-          place='top'
+          place="top"
           content={localizationCaptions[LocalizationKey.RoomReviewWaiting]}
         />
         <div
           data-tooltip-id={`CircularProgress-tooltip-${randomId}`}
-          className='flex items-center justify-center'
+          className="flex items-center justify-center"
           style={{
             width: `${sizePx}px`,
             height: `${sizePx}px`,
@@ -50,23 +50,25 @@ export const CircularProgress: FunctionComponent<CircularProgressProps> = ({
 
   return (
     <div
-      className='relative circular-progress-wrapper'
+      className="relative circular-progress-wrapper"
       style={{ '--size': `${sizePx}px` } as React.CSSProperties}
     >
       <svg
         width={`${sizePx + 1}`}
         height={`${sizePx + 1}`}
         viewBox={`0 0 ${sizePx + 1} ${sizePx + 1}`}
-        className='circular-progress'
-        style={{
-          '--end-progress': value,
-          '--stroke-width': strokeWidth,
-        } as React.CSSProperties}
+        className="circular-progress"
+        style={
+          {
+            '--end-progress': value,
+            '--stroke-width': strokeWidth,
+          } as React.CSSProperties
+        }
       >
-        <circle stroke='var(--blue-light)'></circle>
-        <circle stroke='var(--blue-main)' className='fg'></circle>
+        <circle stroke="var(--blue-light)"></circle>
+        <circle stroke="var(--blue-main)" className="fg"></circle>
       </svg>
-      <div className='circular-progress-caption'>
+      <div className="circular-progress-caption">
         <Typography size={size === 'm' ? 'xxxl' : 'm'}>{caption}</Typography>
       </div>
     </div>

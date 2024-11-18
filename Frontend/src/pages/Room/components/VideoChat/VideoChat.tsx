@@ -1,4 +1,10 @@
-import { FunctionComponent, useContext, useEffect, useRef, useState } from 'react';
+import {
+  FunctionComponent,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { AuthContext } from '../../../../context/AuthContext';
 import { Transcript } from '../../../../types/transcript';
 import { VideoChatVideo } from './VideoChatVideo';
@@ -47,37 +53,45 @@ interface VideoChatProps {
   handleStartReviewRoom: () => void;
   handleSettingsOpen: () => void;
   handleLeaveRoom: () => void;
-};
+}
 
-const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string, toChat: boolean) => {
+const getChatMessageEvents = (
+  roomEventsSearch: EventsSearch,
+  type: string,
+  toChat: boolean,
+) => {
   const roomEvents = roomEventsSearch[type];
   if (!roomEvents) {
     return [];
   }
-  return roomEvents.map(chatMessageEvent => {
-    try {
-      const chatMessageEventParsed = JSON.parse(chatMessageEvent?.payload);
-      return {
-        id: chatMessageEvent.id,
-        userId: chatMessageEvent.createdById,
-        userNickname: chatMessageEventParsed.Nickname || 'Nickname not found',
-        value: chatMessageEventParsed.Message,
-        createdAt: (new Date()).toISOString(),
-      };
-    } catch {
-      return {
-        id: randomId(),
-        userId: randomId(),
-        userNickname: 'Message not found',
-        value: '',
-        createdAt: (new Date()).toISOString(),
-      };
-    };
-  }).reverse();
+  return roomEvents
+    .map((chatMessageEvent) => {
+      try {
+        const chatMessageEventParsed = JSON.parse(chatMessageEvent?.payload);
+        return {
+          id: chatMessageEvent.id,
+          userId: chatMessageEvent.createdById,
+          userNickname: chatMessageEventParsed.Nickname || 'Nickname not found',
+          value: chatMessageEventParsed.Message,
+          createdAt: new Date().toISOString(),
+        };
+      } catch {
+        return {
+          id: randomId(),
+          userId: randomId(),
+          userNickname: 'Message not found',
+          value: '',
+          createdAt: new Date().toISOString(),
+        };
+      }
+    })
+    .reverse();
 };
 
 const findUserByOrder = (videoOrder: Record<string, number>) => {
-  const lounderUser = Object.entries(videoOrder).find(([userId, order]) => order === 1);
+  const lounderUser = Object.entries(videoOrder).find(
+    ([userId, order]) => order === 1,
+  );
   if (lounderUser) {
     return lounderUser[0];
   }
@@ -125,17 +139,17 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     apiMethodState: apiRoomEventsSearchState,
     fetchData: fetchRoomEventsSearch,
   } = useApiMethod<EventsSearch, RoomIdParam>(roomsApiDeclaration.eventsSearch);
-  const {
-    data: roomEventsSearch,
-  } = apiRoomEventsSearchState;
+  const { data: roomEventsSearch } = apiRoomEventsSearchState;
   // AiAssistant
   // const [transcripts, setTranscripts] = useState<Transcript[]>([]);
   const [textMessages, setTextMessages] = useState<Transcript[]>([]);
   const userVideo = useRef<HTMLVideoElement>(null);
   const userVideoMainContent = useRef<HTMLVideoElement>(null);
   const userVideoMainContentBackground = useRef<HTMLVideoElement>(null);
-  const screenSharePeer = peers.find(peer => peer.screenShare);
-  const [codeEditorInitialValue, setCodeEditorInitialValue] = useState<string | null>(null);
+  const screenSharePeer = peers.find((peer) => peer.screenShare);
+  const [codeEditorInitialValue, setCodeEditorInitialValue] = useState<
+    string | null
+  >(null);
   const { activeReactions } = useReactionsStatus({
     lastWsMessageParsed,
   });
@@ -161,9 +175,10 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       {
         id: randomId(),
         userId: randomId(),
-        userNickname: localizationCaptions[LocalizationKey.ChatWelcomeMessageNickname],
+        userNickname:
+          localizationCaptions[LocalizationKey.ChatWelcomeMessageNickname],
         value: `${localizationCaptions[LocalizationKey.ChatWelcomeMessage]}, ${auth?.nickname}.`,
-        createdAt: (new Date()).toISOString(),
+        createdAt: new Date().toISOString(),
       },
     ];
     setTextMessages(newTextMessages);
@@ -203,19 +218,21 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     try {
       switch (lastWsMessageParsed.Type) {
         case 'ChatMessage':
-          setTextMessages(transcripts => limitLength(
-            [
-              ...transcripts,
-              {
-                id: lastWsMessageParsed.Id,
-                userId: lastWsMessageParsed.CreatedById,
-                userNickname: lastWsMessageParsed.Value.Nickname,
-                value: lastWsMessageParsed.Value.Message,
-                createdAt: lastWsMessageParsed.CreatedAt,
-              },
-            ],
-            transcriptsMaxLength
-          ));
+          setTextMessages((transcripts) =>
+            limitLength(
+              [
+                ...transcripts,
+                {
+                  id: lastWsMessageParsed.Id,
+                  userId: lastWsMessageParsed.CreatedById,
+                  userNickname: lastWsMessageParsed.Value.Nickname,
+                  value: lastWsMessageParsed.Value.Message,
+                  createdAt: lastWsMessageParsed.CreatedAt,
+                },
+              ],
+              transcriptsMaxLength,
+            ),
+          );
           break;
         // AiAssistant
         // case 'VoiceRecognition':
@@ -276,10 +293,12 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   }, [viewerMode, micEnabled, setRecognitionEnabled]);
 
   const handleTextMessageSubmit = (message: string) => {
-    sendWsMessage(JSON.stringify({
-      Type: 'chat-message',
-      Value: message,
-    }));
+    sendWsMessage(
+      JSON.stringify({
+        Type: 'chat-message',
+        Value: message,
+      }),
+    );
   };
 
   const handleMicSwitch = () => {
@@ -295,19 +314,17 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   };
 
   const handleCodeEditorSwitch = () => {
-    sendWsMessage(JSON.stringify({
-      Type: 'room-code-editor-enabled',
-      Value: JSON.stringify({ Enabled: !codeEditorEnabled }),
-    }));
+    sendWsMessage(
+      JSON.stringify({
+        Type: 'room-code-editor-enabled',
+        Value: JSON.stringify({ Enabled: !codeEditorEnabled }),
+      }),
+    );
   };
 
   const renderMain = () => {
     if (codeEditorEnabled) {
-      return (
-        <RoomCodeEditor
-          initialValue={codeEditorInitialValue}
-        />
-      );
+      return <RoomCodeEditor initialValue={codeEditorInitialValue} />;
     }
     const userOrder1 = findUserByOrder(videoOrder);
     if (!userOrder1 || userOrder1 === auth?.id) {
@@ -315,7 +332,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         <>
           <video
             ref={userVideoMainContentBackground}
-            className='absolute w-full h-full object-cover blur-lg'
+            className="absolute w-full h-full object-cover blur-lg"
             muted
             autoPlay
             playsInline
@@ -324,18 +341,19 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           </video>
           <video
             ref={userVideoMainContent}
-            className='videochat-video relative'
+            className="videochat-video relative"
             muted
             autoPlay
             playsInline
           >
             Video not supported
           </video>
-
         </>
       );
     }
-    const userOrder1Peer = peers.find(peer => peer.targetUserId === userOrder1);
+    const userOrder1Peer = peers.find(
+      (peer) => peer.targetUserId === userOrder1,
+    );
     if (!userOrder1Peer) {
       return <></>;
     }
@@ -349,7 +367,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
 
   return (
     <>
-      <RoomToolsPanel.Wrapper rightPos='21.5rem' bottomPos='1.5rem'>
+      <RoomToolsPanel.Wrapper rightPos="21.5rem" bottomPos="1.5rem">
         {!viewerMode && (
           <RoomToolsPanel.ButtonsGroupWrapper>
             <RoomToolsPanel.SwitchButton
@@ -381,9 +399,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         )}
         {reactionsVisible && (
           <RoomToolsPanel.ButtonsGroupWrapper>
-            <Reactions
-              room={room}
-            />
+            <Reactions room={room} />
             {!viewerMode && (
               <>
                 <Gap sizeRem={0.125} />
@@ -433,38 +449,48 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
                 enabled={true}
                 iconEnabledName={IconNames.Call}
                 iconDisabledName={IconNames.Call}
-                onClick={currentUserExpert ? () => { } : handleLeaveRoom}
+                onClick={currentUserExpert ? () => {} : handleLeaveRoom}
                 danger
               />
             }
-            position='left'
+            position="left"
           >
-            {loadingRoomStartReview && (
-              <Loader />
-            )}
+            {loadingRoomStartReview && <Loader />}
             {errorRoomStartReview && (
-              <div className='flex items-center justify-center'>
-                <Typography size='m' error>
+              <div className="flex items-center justify-center">
+                <Typography size="m" error>
                   <Icon name={IconNames.Information} />
                 </Typography>
-                <Typography size='m' error>
+                <Typography size="m" error>
                   {errorRoomStartReview}
                 </Typography>
               </div>
             )}
             {currentUserExpert && (
-              <ContextMenu.Item title={localizationCaptions[LocalizationKey.CompleteAndEvaluateCandidate]} onClick={handleStartReviewRoom} />
+              <ContextMenu.Item
+                title={
+                  localizationCaptions[
+                    LocalizationKey.CompleteAndEvaluateCandidate
+                  ]
+                }
+                onClick={handleStartReviewRoom}
+              />
             )}
-            <ContextMenu.Item title={localizationCaptions[LocalizationKey.Exit]} onClick={handleLeaveRoom} />
+            <ContextMenu.Item
+              title={localizationCaptions[LocalizationKey.Exit]}
+              onClick={handleLeaveRoom}
+            />
           </ContextMenu>
         </RoomToolsPanel.ButtonsGroupWrapper>
       </RoomToolsPanel.Wrapper>
-      <div className='videochat-field relative videochat-field-main bg-wrap rounded-1.125'>
+      <div className="videochat-field relative videochat-field-main bg-wrap rounded-1.125">
         {renderMain()}
       </div>
 
-      <div className='relative videochat-field bg-wrap rounded-1.125'>
-        <div className={`videochat ${messagesChatEnabled ? 'invisible h-full' : 'visible'}`}>
+      <div className="relative videochat-field bg-wrap rounded-1.125">
+        <div
+          className={`videochat ${messagesChatEnabled ? 'invisible h-full' : 'visible'}`}
+        >
           {/* AiAssistant */}
           {/* <VideochatParticipant
             order={3}
@@ -486,7 +512,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           >
             <video
               ref={userVideo}
-              className='videochat-video object-cover'
+              className="videochat-video object-cover"
               muted
               autoPlay
               playsInline
@@ -495,12 +521,16 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             </video>
           </VideochatParticipant>
           {peers
-            .filter(peer => !peer.screenShare)
-            .map(peer => (
+            .filter((peer) => !peer.screenShare)
+            .map((peer) => (
               <VideochatParticipant
                 key={peer.peerID}
                 viewer={peer.participantType === 'Viewer'}
-                order={peer.participantType === 'Viewer' ? viewerOrder : videoOrder[peer.targetUserId]}
+                order={
+                  peer.participantType === 'Viewer'
+                    ? viewerOrder
+                    : videoOrder[peer.targetUserId]
+                }
                 avatar={peer?.avatar}
                 nickname={peer?.nickname}
                 reaction={activeReactions[peer.peerID]}
@@ -515,7 +545,9 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             ))}
         </div>
 
-        <div className={`absolute top-0 h-full bg-wrap w-full ${messagesChatEnabled ? 'visible' : 'invisible'} z-1`}>
+        <div
+          className={`absolute top-0 h-full bg-wrap w-full ${messagesChatEnabled ? 'visible' : 'invisible'} z-1`}
+        >
           <MessagesChat
             textMessages={textMessages}
             allUsers={allUsers}

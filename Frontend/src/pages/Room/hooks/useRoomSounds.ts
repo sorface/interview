@@ -12,10 +12,13 @@ const prepareAudio = (soundName: Sound, volume: number) => {
 };
 
 export const useRoomSounds = () => {
-  const audios = useMemo(() => ({
-    [Sound.JoinRoom]: prepareAudio(Sound.JoinRoom, 0.3),
-    [Sound.ChatMessage]: prepareAudio(Sound.JoinRoom, 0.3),
-  }), []);
+  const audios = useMemo(
+    () => ({
+      [Sound.JoinRoom]: prepareAudio(Sound.JoinRoom, 0.3),
+      [Sound.ChatMessage]: prepareAudio(Sound.JoinRoom, 0.3),
+    }),
+    [],
+  );
 
   const playJoinRoomSound = useCallback(() => {
     audios[Sound.JoinRoom].play();

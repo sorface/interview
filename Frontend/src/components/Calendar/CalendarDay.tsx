@@ -32,10 +32,15 @@ export const CalendarDay: FunctionComponent<CalendarDayProps> = ({
     [Theme.Dark]: 'bg-dark-red',
     [Theme.Light]: 'bg-red text-white',
   });
-  const selected = selectedDay && (day?.valueOf() === selectedDay?.valueOf());
-  const filledClassName = filledItemsStartDates.includes(day?.valueOf()) ? filledThemedClassName : '';
-  const currentDayClassName = day?.valueOf() === currentDate.valueOf() ? currentDayThemedClassName : '';
-  const selectedDayClassName = selected ? 'border border-solid border-button-border' : '';
+  const selected = selectedDay && day?.valueOf() === selectedDay?.valueOf();
+  const filledClassName = filledItemsStartDates.includes(day?.valueOf())
+    ? filledThemedClassName
+    : '';
+  const currentDayClassName =
+    day?.valueOf() === currentDate.valueOf() ? currentDayThemedClassName : '';
+  const selectedDayClassName = selected
+    ? 'border border-solid border-button-border'
+    : '';
 
   return (
     <>
@@ -43,12 +48,12 @@ export const CalendarDay: FunctionComponent<CalendarDayProps> = ({
         className={`flex items-center justify-center w-1.875 h-1.875 rounded-full cursor-pointer box-border ${currentDayClassName || filledClassName} ${selectedDayClassName}`}
         onClick={onClick}
       >
-        <Typography size='m'>
-          {day?.getDate() || ''}
-        </Typography>
+        <Typography size="m">{day?.getDate() || ''}</Typography>
         {selected && (
-          <div className={`${closeThemedClassName} absolute translate-x-0.75-y--0.75 w-1 h-1 flex items-center justify-center rounded-full`}>
-              <Icon name={IconNames.Close} inheritFontSize size='s' />
+          <div
+            className={`${closeThemedClassName} absolute translate-x-0.75-y--0.75 w-1 h-1 flex items-center justify-center rounded-full`}
+          >
+            <Icon name={IconNames.Close} inheritFontSize size="s" />
           </div>
         )}
       </div>

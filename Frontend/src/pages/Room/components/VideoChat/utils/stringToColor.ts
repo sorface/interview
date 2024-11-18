@@ -17,8 +17,8 @@ const colorsDark = [
 export const stringToColor = (str: string, themeInUi: Theme) => {
   const colors = themeInUi === Theme.Light ? colorsLight : colorsDark;
   let hash = 0;
-  str.split('').forEach(char => {
-    hash = char.charCodeAt(0) + ((hash << 5) - hash)
+  str.split('').forEach((char) => {
+    hash = char.charCodeAt(0) + ((hash << 5) - hash);
   });
   return colors[Math.abs(hash) % colors.length];
 };

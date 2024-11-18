@@ -22,25 +22,31 @@ const audioConstraints = {
   autoGainControl: true,
 };
 
-const getDevices = async () =>
-  await navigator.mediaDevices.enumerateDevices();
+const getDevices = async () => await navigator.mediaDevices.enumerateDevices();
 
 const micDeviceKind = 'audioinput';
 const cameraDeviceKind = 'videoinput';
 
 const enableDisableUserTrack = (stream: MediaStream, enabled: boolean) =>
-  stream.getTracks().forEach(track => track.enabled = enabled);
+  stream.getTracks().forEach((track) => (track.enabled = enabled));
 
 export const useUserStreams = () => {
   const [devices, setDevices] = useState<Devices>({ camera: [], mic: [] });
-  const [selectedCameraId, setSelectedCameraId] = useState<MediaDeviceInfo['deviceId']>();
-  const [selectedMicId, setSelectedMicId] = useState<MediaDeviceInfo['deviceId']>();
+  const [selectedCameraId, setSelectedCameraId] =
+    useState<MediaDeviceInfo['deviceId']>();
+  const [selectedMicId, setSelectedMicId] =
+    useState<MediaDeviceInfo['deviceId']>();
   const [micEnabled, setMicEnabled] = useState(true);
   const [cameraEnabled, setCameraEnabled] = useState(true);
   const [backgroundRemoveEnabled, setBackgroundRemoveEnabled] = useState(true);
-  const [userAudioStream, setUserAudioStream] = useState<MediaStream | null>(null);
-  const [userAudioProcessedStream, setUserAudioProcessedStream] = useState<MediaStream | null>(null);
-  const [userVideoStream, setUserVideoStream] = useState<MediaStream | null>(null);
+  const [userAudioStream, setUserAudioStream] = useState<MediaStream | null>(
+    null,
+  );
+  const [userAudioProcessedStream, setUserAudioProcessedStream] =
+    useState<MediaStream | null>(null);
+  const [userVideoStream, setUserVideoStream] = useState<MediaStream | null>(
+    null,
+  );
   const userVideoStreamRef = useRef<MediaStream | null>(null);
   const canvasMediaStream = useCanvasStream({
     width: videoConstraints.width,
@@ -56,8 +62,12 @@ export const useUserStreams = () => {
 
   const updateDevices = useCallback(async () => {
     const allDevices = await getDevices();
-    const micDevices = allDevices.filter(device => device.kind === micDeviceKind);
-    const cameraDevices = allDevices.filter(device => device.kind === cameraDeviceKind);
+    const micDevices = allDevices.filter(
+      (device) => device.kind === micDeviceKind,
+    );
+    const cameraDevices = allDevices.filter(
+      (device) => device.kind === cameraDeviceKind,
+    );
     setDevices({
       camera: cameraDevices,
       mic: micDevices,
@@ -85,7 +95,7 @@ export const useUserStreams = () => {
     updateUserVideoStream();
 
     return () => {
-      userVideoStreamRef.current?.getTracks().forEach(track => track.stop());
+      userVideoStreamRef.current?.getTracks().forEach((track) => track.stop());
     };
   }, [selectedCameraId]);
 
@@ -110,7 +120,7 @@ export const useUserStreams = () => {
     updateUserAudioStream();
 
     return () => {
-      newUserStream?.getTracks().forEach(track => track.stop());
+      newUserStream?.getTracks().forEach((track) => track.stop());
     };
   }, [selectedMicId]);
 
@@ -157,7 +167,7 @@ export const useUserStreams = () => {
       return;
     }
 
-    userVideoStreamRefCurrent.getTracks().forEach(track => track.stop());
+    userVideoStreamRefCurrent.getTracks().forEach((track) => track.stop());
   }, []);
 
   const enableVideo = useCallback(async () => {

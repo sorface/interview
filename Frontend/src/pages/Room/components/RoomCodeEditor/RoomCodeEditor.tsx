@@ -1,14 +1,29 @@
-import { FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
+import {
+  FunctionComponent,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { OnChange, OnMount } from '@monaco-editor/react';
-import { RemoteCursorManager, RemoteSelectionManager } from '@convergencelabs/monaco-collab-ext';
+import {
+  RemoteCursorManager,
+  RemoteSelectionManager,
+} from '@convergencelabs/monaco-collab-ext';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
-import { SendEventBody, roomsApiDeclaration } from '../../../../apiDeclarations';
+import {
+  SendEventBody,
+  roomsApiDeclaration,
+} from '../../../../apiDeclarations';
 import { EventName } from '../../../../constants';
 import { AuthContext } from '../../../../context/AuthContext';
 import { RemoteCursor } from '@convergencelabs/monaco-collab-ext/typings/RemoteCursor';
 import { RemoteSelection } from '@convergencelabs/monaco-collab-ext/typings/RemoteSelection';
 import { CodeEditorLang } from '../../../../types/question';
-import { CodeEditor, defaultCodeEditorFontSize } from '../../../../components/CodeEditor/CodeEditor';
+import {
+  CodeEditor,
+  defaultCodeEditorFontSize,
+} from '../../../../components/CodeEditor/CodeEditor';
 import { RoomContext } from '../../context/RoomContext';
 
 import './RoomCodeEditor.css';
@@ -44,13 +59,19 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   } = useContext(RoomContext);
   const [value, setValue] = useState<string | null>(initialValue);
   const [remoteCursor, setRemoteCursor] = useState<RemoteCursor | null>(null);
-  const [remoteSelection, setRemoteSelection] = useState<RemoteSelection | null>(null);
-  const [cursorPosition, setCursorPosition] = useState<CursorPosition | null>(null);
-  const [selectionPosition, setSelectionPosition] = useState<{ start: CursorPosition; end: CursorPosition; } | null>(null);
+  const [remoteSelection, setRemoteSelection] =
+    useState<RemoteSelection | null>(null);
+  const [cursorPosition, setCursorPosition] = useState<CursorPosition | null>(
+    null,
+  );
+  const [selectionPosition, setSelectionPosition] = useState<{
+    start: CursorPosition;
+    end: CursorPosition;
+  } | null>(null);
 
-  const {
-    fetchData: sendRoomEvent,
-  } = useApiMethod<unknown, SendEventBody>(roomsApiDeclaration.sendEvent);
+  const { fetchData: sendRoomEvent } = useApiMethod<unknown, SendEventBody>(
+    roomsApiDeclaration.sendEvent,
+  );
 
   useEffect(() => {
     if (typeof initialValue !== 'string') {
@@ -83,7 +104,9 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   }, [lastWsMessageParsed, auth]);
 
   const dirtyChangeRemoteCursorHeight = (height: number) => {
-    const el = document.querySelector(`.${remoteCursorClassName}`) as HTMLElement;
+    const el = document.querySelector(
+      `.${remoteCursorClassName}`,
+    ) as HTMLElement;
     if (!el) {
       console.warn('Remote cursor element not found');
       return;
@@ -92,11 +115,13 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   };
 
   const handleFontSizeChange = (size: number) => {
-    dirtyChangeRemoteCursorHeight(~~(size + (size / 4)));
+    dirtyChangeRemoteCursorHeight(~~(size + size / 4));
   };
 
   const dirtyChangeRemoteCursorTooltip = useCallback((content: string) => {
-    const el = document.querySelector(`.${remoteTooltipClassName}`) as HTMLElement;
+    const el = document.querySelector(
+      `.${remoteTooltipClassName}`,
+    ) as HTMLElement;
     if (!el) {
       console.warn('Remote tooltip element not found');
       return;
@@ -121,10 +146,17 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
             remoteSelection.hide();
             return;
           }
-          dirtyChangeRemoteCursorTooltip(lastWsMessageParsed.Value.AdditionalData.nickname);
-          remoteCursor.setPosition(lastWsMessageParsed.Value.AdditionalData.cursor);
+          dirtyChangeRemoteCursorTooltip(
+            lastWsMessageParsed.Value.AdditionalData.nickname,
+          );
+          remoteCursor.setPosition(
+            lastWsMessageParsed.Value.AdditionalData.cursor,
+          );
           remoteCursor.show();
-          remoteSelection.setPositions(lastWsMessageParsed.Value.AdditionalData.selection.start, lastWsMessageParsed.Value.AdditionalData.selection.end);
+          remoteSelection.setPositions(
+            lastWsMessageParsed.Value.AdditionalData.selection.start,
+            lastWsMessageParsed.Value.AdditionalData.selection.end,
+          );
           remoteSelection.show();
           break;
         default:
@@ -133,7 +165,13 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
     } catch (err) {
       console.error('parse editor message error: ', err);
     }
-  }, [lastWsMessageParsed, remoteSelection, remoteCursor, auth, dirtyChangeRemoteCursorTooltip]);
+  }, [
+    lastWsMessageParsed,
+    remoteSelection,
+    remoteCursor,
+    auth,
+    dirtyChangeRemoteCursorTooltip,
+  ]);
 
   useEffect(() => {
     if (!roomState || viewerMode || !cursorPosition || !selectionPosition) {
@@ -141,20 +179,29 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
       return;
     }
     const sendEventTimeoutId = setTimeout(() => {
-      sendWsMessage(JSON.stringify({
-        Type: EventName.CodeEditorCursor,
-        Value: JSON.stringify({
-          cursor: cursorPosition,
-          selection: selectionPosition,
-          id: auth?.id,
-          nickname: auth?.nickname,
+      sendWsMessage(
+        JSON.stringify({
+          Type: EventName.CodeEditorCursor,
+          Value: JSON.stringify({
+            cursor: cursorPosition,
+            selection: selectionPosition,
+            id: auth?.id,
+            nickname: auth?.nickname,
+          }),
         }),
-      }));
+      );
     }, sendCursorEventTimeout);
     return () => {
       clearTimeout(sendEventTimeoutId);
     };
-  }, [cursorPosition, selectionPosition, roomState, viewerMode, auth, sendWsMessage]);
+  }, [
+    cursorPosition,
+    selectionPosition,
+    roomState,
+    viewerMode,
+    auth,
+    sendWsMessage,
+  ]);
 
   const handleEditorMount: OnMount = (mountedEditor) => {
     const newRemoteCursorManager = new RemoteCursorManager({
@@ -165,22 +212,37 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
       tooltipDuration: 2,
       tooltipClassName: remoteTooltipClassName,
     });
-    const cursor = newRemoteCursorManager.addCursor('cursor1', remoteCursorColor, '');
+    const cursor = newRemoteCursorManager.addCursor(
+      'cursor1',
+      remoteCursorColor,
+      '',
+    );
     cursor.hide();
     setRemoteCursor(cursor);
     dirtyChangeRemoteCursorHeight(defaultCodeEditorFontSize);
-    const remoteSelectionManager = new RemoteSelectionManager({ editor: mountedEditor });
-    const selection = remoteSelectionManager.addSelection('selection1', remoteSelectionColor);
+    const remoteSelectionManager = new RemoteSelectionManager({
+      editor: mountedEditor,
+    });
+    const selection = remoteSelectionManager.addSelection(
+      'selection1',
+      remoteSelectionColor,
+    );
     setRemoteSelection(selection);
 
-    mountedEditor.onDidChangeCursorPosition(e => {
+    mountedEditor.onDidChangeCursorPosition((e) => {
       setCursorPosition(e.position);
     });
-    mountedEditor.onDidChangeCursorSelection(e => {
+    mountedEditor.onDidChangeCursorSelection((e) => {
       setSelectionPosition({
-        start: { column: e.selection.startColumn, lineNumber: e.selection.startLineNumber },
-        end: { column: e.selection.endColumn, lineNumber: e.selection.endLineNumber },
-      })
+        start: {
+          column: e.selection.startColumn,
+          lineNumber: e.selection.startLineNumber,
+        },
+        end: {
+          column: e.selection.endColumn,
+          lineNumber: e.selection.endLineNumber,
+        },
+      });
     });
     mountedEditor.onDidBlurEditorWidget(() => {
       setCursorPosition({ column: -1, lineNumber: -1 });
@@ -191,10 +253,12 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
     if (viewerMode) {
       return;
     }
-    sendWsMessage(JSON.stringify({
-      Type: 'code',
-      Value: value,
-    }));
+    sendWsMessage(
+      JSON.stringify({
+        Type: 'code',
+        Value: value,
+      }),
+    );
   };
 
   const handleLanguageChange = (lang: CodeEditorLang) => {

@@ -20,18 +20,22 @@ const initialState: GetMeState = {
   user: null,
 };
 
-type GetMeAction = {
-  name: 'startLoad';
-} | {
-  name: 'setUser';
-  payload: User;
-} | {
-  name: 'setError';
-  payload: string;
-} | {
-  name: 'setCode';
-  payload: number;
-};
+type GetMeAction =
+  | {
+      name: 'startLoad';
+    }
+  | {
+      name: 'setUser';
+      payload: User;
+    }
+  | {
+      name: 'setError';
+      payload: string;
+    }
+  | {
+      name: 'setCode';
+      payload: number;
+    };
 
 const getMeReducer = (state: GetMeState, action: GetMeAction): GetMeState => {
   switch (action.name) {
@@ -50,8 +54,8 @@ const getMeReducer = (state: GetMeState, action: GetMeAction): GetMeState => {
         process: {
           ...state.process,
           loading: false,
-          error: action.payload
-        }
+          error: action.payload,
+        },
       };
     case 'setUser':
       return {
@@ -60,7 +64,7 @@ const getMeReducer = (state: GetMeState, action: GetMeAction): GetMeState => {
           loading: false,
           error: null,
         },
-        user: action.payload
+        user: action.payload,
       };
     case 'setCode':
       return {
@@ -82,7 +86,7 @@ export const useGetMeApi = () => {
     dispatch({ name: 'startLoad' });
     try {
       const response = await fetch(`${REACT_APP_BACKEND_URL}/users/self`, {
-        credentials: 'include'
+        credentials: 'include',
       });
       dispatch({
         name: 'setCode',

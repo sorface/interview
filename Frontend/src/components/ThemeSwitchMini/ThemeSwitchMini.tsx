@@ -19,17 +19,11 @@ export const ThemeSwitchMini: FunctionComponent<ThemeSwitchMiniProps> = ({
 
   const handleSwitch = () => {
     setTheme(getNextTheme(themeInUi));
-  }
+  };
 
   return (
-    <div
-      className={`theme-switch-mini ${className}`}
-      onClick={handleSwitch}
-    >
-      <ToggleSwitch
-        toggled={toggled}
-        onToggle={handleSwitch}
-      />
+    <div className={`theme-switch-mini ${className}`} onClick={handleSwitch}>
+      <ToggleSwitch toggled={toggled} onToggle={handleSwitch} />
     </div>
   );
 };

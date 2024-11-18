@@ -17,44 +17,45 @@ export const PageHeaderUserAvatar: FunctionComponent = () => {
   return (
     <>
       <ContextMenu
-        position='bottom-right'
+        position="bottom-right"
         toggleContent={
-          <div className='cursor-pointer'>
+          <div className="cursor-pointer">
             <UserAvatar
               nickname={auth?.nickname || ''}
               src={auth?.avatar || ''}
-              size='m'
+              size="m"
               altarnativeBackgound
             />
           </div>
         }
       >
-        <div className='flex flex-col items-center py-1.5'>
+        <div className="flex flex-col items-center py-1.5">
           <UserAvatar
             nickname={auth?.nickname || ''}
             src={auth?.avatar || ''}
-            size='l'
+            size="l"
           />
           <Gap sizeRem={0.5} />
-          <Typography size='m' bold>{auth?.nickname}</Typography>
+          <Typography size="m" bold>
+            {auth?.nickname}
+          </Typography>
           <Gap sizeRem={1.5} />
-          <div className='flex'>
-            <div className='pr-1.5'>
+          <div className="flex">
+            <div className="pr-1.5">
               <Link to={pathnames.session}>
-                <Button variant='text'>
+                <Button variant="text">
                   <Icon name={IconNames.Settings} />
                 </Button>
               </Link>
             </div>
             <div>
-              <Button variant='text' onClick={logout}>
+              <Button variant="text" onClick={logout}>
                 <Icon name={IconNames.Exit} />
               </Button>
             </div>
           </div>
         </div>
       </ContextMenu>
-
     </>
   );
 };

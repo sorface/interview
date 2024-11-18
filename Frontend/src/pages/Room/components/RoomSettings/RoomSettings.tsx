@@ -20,10 +20,8 @@ export const RoomSettings: FunctionComponent<RoomSettingsProps> = ({
   onRequestClose,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
-  const {
-    backgroundRemoveEnabled,
-    setBackgroundRemoveEnabled,
-  } = useContext(UserStreamsContext);
+  const { backgroundRemoveEnabled, setBackgroundRemoveEnabled } =
+    useContext(UserStreamsContext);
 
   const handleBackgroundRemoveSwitch = () => {
     setBackgroundRemoveEnabled(!backgroundRemoveEnabled);
@@ -35,20 +33,20 @@ export const RoomSettings: FunctionComponent<RoomSettingsProps> = ({
       contentLabel={localizationCaptions[LocalizationKey.Settings]}
       onClose={onRequestClose}
     >
-      <div className='flex-1 flex flex-col items-center'>
-        <div className='w-full max-w-29.25 grid grid-cols-settings-list gap-y-1'>
+      <div className="flex-1 flex flex-col items-center">
+        <div className="w-full max-w-29.25 grid grid-cols-settings-list gap-y-1">
           <ThemeSwitch />
           <LangSwitch />
           <RecognitionLangSwitch />
-          <div className='text-left flex items-center'>
-            <Typography size='m'>
+          <div className="text-left flex items-center">
+            <Typography size="m">
               {localizationCaptions[LocalizationKey.WebcamBackgroundBlur]}:
             </Typography>
           </div>
-          <div className='text-left'>
+          <div className="text-left">
             <Checkbox
-              id='webcam-background-remove'
-              label=''
+              id="webcam-background-remove"
+              label=""
               checked={backgroundRemoveEnabled}
               onChange={handleBackgroundRemoveSwitch}
             />

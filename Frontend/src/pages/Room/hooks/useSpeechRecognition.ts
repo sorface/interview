@@ -6,14 +6,17 @@ interface UseSpeechRecognitionParams {
   onVoiceRecognition: (transcript: string) => void;
 }
 
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
 
 export const useSpeechRecognition = ({
   recognitionEnabled,
   onVoiceRecognition,
 }: UseSpeechRecognitionParams) => {
   const { recognitionLang } = useContext(LocalizationContext);
-  const recognition = useRef(SpeechRecognition ? new SpeechRecognition() : null);
+  const recognition = useRef(
+    SpeechRecognition ? new SpeechRecognition() : null,
+  );
   const [recognitionNotSupported, setRecognitionNotSupported] = useState(false);
 
   useEffect(() => {
@@ -40,11 +43,11 @@ export const useSpeechRecognition = ({
       if (recognitionEnabled) {
         recog.start();
       }
-    }
+    };
 
     return () => {
       recog.onend = null;
-    }
+    };
   }, [recognitionEnabled, recognitionLang]);
 
   useEffect(() => {
@@ -70,7 +73,7 @@ export const useSpeechRecognition = ({
       } catch (error) {
         console.warn(error);
       }
-    }
+    };
   }, [recognitionEnabled, recognitionLang]);
 
   useEffect(() => {
@@ -108,5 +111,5 @@ export const useSpeechRecognition = ({
 
   return {
     recognitionNotSupported,
-  }
+  };
 };

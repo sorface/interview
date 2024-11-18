@@ -1,8 +1,18 @@
-import { FunctionComponent, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import {
+  FunctionComponent,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import Modal from 'react-modal';
 import { IconNames, pathnames } from '../../../../constants';
 import { DeviceSelect } from './DeviceSelect';
-import { createAudioAnalyser, frequencyBinCount } from './utils/createAudioAnalyser';
+import {
+  createAudioAnalyser,
+  frequencyBinCount,
+} from './utils/createAudioAnalyser';
 import { getAverageVolume } from './utils/getAverageVolume';
 import { AuthContext } from '../../../../context/AuthContext';
 import { Loader } from '../../../../components/Loader/Loader';
@@ -35,12 +45,9 @@ const enum Screen {
   Error,
 }
 
-export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = ({
-  open,
-  loading,
-  error,
-  onClose,
-}) => {
+export const EnterVideoChatModal: FunctionComponent<
+  EnterVideoChatModalProps
+> = ({ open, loading, error, onClose }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
   const { viewerMode, room } = useContext(RoomContext);
@@ -148,13 +155,19 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
     }
   };
 
-  const handleSelectMic = useCallback((deviceId: MediaDeviceInfo['deviceId']) => {
-    setSelectedMicId(deviceId);
-  }, [setSelectedMicId]);
+  const handleSelectMic = useCallback(
+    (deviceId: MediaDeviceInfo['deviceId']) => {
+      setSelectedMicId(deviceId);
+    },
+    [setSelectedMicId],
+  );
 
-  const handleSelectCamera = useCallback((deviceId: MediaDeviceInfo['deviceId']) => {
-    setSelectedCameraId(deviceId);
-  }, [setSelectedCameraId]);
+  const handleSelectCamera = useCallback(
+    (deviceId: MediaDeviceInfo['deviceId']) => {
+      setSelectedCameraId(deviceId);
+    },
+    [setSelectedCameraId],
+  );
 
   const handleMicSwitch = () => {
     setMicEnabled(!micEnabled);
@@ -170,7 +183,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
 
   const joiningRoomHeader = (
     <div>
-      <Typography size='xl' bold>
+      <Typography size="xl" bold>
         {localizationCaptions[LocalizationKey.JoiningRoom]}
       </Typography>
       <Gap sizeRem={2} />
@@ -180,12 +193,12 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
   const screens: { [key in Screen]: JSX.Element } = {
     [Screen.Joining]: (
       <>
-        <div className='pr-4'>
-          <div className='relative w-37 h-28'>
-            <div className={`flex items-center justify-center w-37 h-28 rounded-1.25 ${joinPreviewThemedClassName}`}>
-              <Typography size='xxl'>
-                {auth?.nickname}
-              </Typography>
+        <div className="pr-4">
+          <div className="relative w-37 h-28">
+            <div
+              className={`flex items-center justify-center w-37 h-28 rounded-1.25 ${joinPreviewThemedClassName}`}
+            >
+              <Typography size="xxl">{auth?.nickname}</Typography>
             </div>
             <RoomToolsPanel.Wrapper>
               <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
@@ -195,7 +208,7 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
                   danger
                   iconEnabledName={IconNames.MicOn}
                   iconDisabledName={IconNames.MicOff}
-                  onClick={() => { }}
+                  onClick={() => {}}
                   progress={micVolume / 50}
                 />
                 <Gap sizeRem={0.125} />
@@ -205,48 +218,56 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
                   danger
                   iconEnabledName={IconNames.VideocamOn}
                   iconDisabledName={IconNames.VideocamOff}
-                  onClick={() => { }}
+                  onClick={() => {}}
                 />
               </RoomToolsPanel.ButtonsGroupWrapper>
             </RoomToolsPanel.Wrapper>
           </div>
           <Gap sizeRem={0.75} />
-          <div className='invisible'>
-            <Typography size='m'>
+          <div className="invisible">
+            <Typography size="m">
               <Checkbox
-                id='webcam-background-remove'
-                label={localizationCaptions[LocalizationKey.WebcamBackgroundBlur]}
+                id="webcam-background-remove"
+                label={
+                  localizationCaptions[LocalizationKey.WebcamBackgroundBlur]
+                }
                 disabled
                 checked={false}
-                onChange={() => { }}
+                onChange={() => {}}
               />
             </Typography>
           </div>
         </div>
-        <div className='w-20 flex flex-col items-center text-center'>
+        <div className="w-20 flex flex-col items-center text-center">
           {joiningRoomHeader}
           {loading ? (
             <Loader />
+          ) : viewerMode ? (
+            <Button variant="active" onClick={onClose}>
+              {localizationCaptions[LocalizationKey.Join]}
+            </Button>
           ) : (
-            viewerMode ? (
-              <Button variant='active' onClick={onClose}>{localizationCaptions[LocalizationKey.Join]}</Button>
-            ) : (
-              <Button variant='active' className='w-full' onClick={handleSetupDevices}>{localizationCaptions[LocalizationKey.SetupDevices]}</Button>
-            )
+            <Button
+              variant="active"
+              className="w-full"
+              onClick={handleSetupDevices}
+            >
+              {localizationCaptions[LocalizationKey.SetupDevices]}
+            </Button>
           )}
         </div>
       </>
     ),
     [Screen.SetupDevices]: (
       <>
-        <div className='pr-4'>
-          <div className='relative w-37 h-28'>
+        <div className="pr-4">
+          <div className="relative w-37 h-28">
             <video
               ref={userVideo}
               muted
               autoPlay
               playsInline
-              className='w-37 h-28 rounded-1.25 object-cover'
+              className="w-37 h-28 rounded-1.25 object-cover"
             >
               Video not supported
             </video>
@@ -270,58 +291,62 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
             </RoomToolsPanel.Wrapper>
           </div>
           <Gap sizeRem={0.75} />
-          <Typography size='m'>
+          <Typography size="m">
             <Checkbox
-              id='webcam-background-remove'
+              id="webcam-background-remove"
               label={localizationCaptions[LocalizationKey.WebcamBackgroundBlur]}
               checked={backgroundRemoveEnabled}
               onChange={handleBackgroundRemoveSwitch}
             />
           </Typography>
         </div>
-        <div className='w-20 flex flex-col items-center text-center'>
+        <div className="w-20 flex flex-col items-center text-center">
           {joiningRoomHeader}
-          <div >
-            <div className='flex items-center'>
+          <div>
+            <div className="flex items-center">
               <DeviceSelect
                 devices={devices.mic}
-                localStorageKey='defalutMic'
+                localStorageKey="defalutMic"
                 onSelect={handleSelectMic}
                 icon={IconNames.MicOn}
               />
             </div>
             <Gap sizeRem={0.5} />
-            <div className='flex items-center'>
+            <div className="flex items-center">
               <DeviceSelect
                 devices={devices.camera}
-                localStorageKey='defalutCamera'
+                localStorageKey="defalutCamera"
                 onSelect={handleSelectCamera}
                 icon={IconNames.VideocamOn}
               />
             </div>
             <Gap sizeRem={1.25} />
-            <div className='w-full max-w-29.25 grid grid-cols-settings-list gap-y-1'>
+            <div className="w-full max-w-29.25 grid grid-cols-settings-list gap-y-1">
               <RecognitionLangSwitch />
             </div>
             <Gap sizeRem={0.25} />
-            <div className='text-left'>
-              <Typography size='s' secondary>
-                {localizationCaptions[LocalizationKey.PleaseSelectRecognitionLanguage]}
+            <div className="text-left">
+              <Typography size="s" secondary>
+                {
+                  localizationCaptions[
+                    LocalizationKey.PleaseSelectRecognitionLanguage
+                  ]
+                }
               </Typography>
             </div>
             <Gap sizeRem={2} />
-            <Button variant='active' className='w-full' onClick={onClose}>{localizationCaptions[LocalizationKey.Join]}</Button>
+            <Button variant="active" className="w-full" onClick={onClose}>
+              {localizationCaptions[LocalizationKey.Join]}
+            </Button>
             <Gap sizeRem={1} />
-            <Typography size='s' secondary>
+            <Typography size="s" secondary>
               {localizationCaptions[LocalizationKey.CallRecording]}
             </Typography>
           </div>
         </div>
       </>
     ),
-    [Screen.Error]: (
-      <div>{error}</div>
-    ),
+    [Screen.Error]: <div>{error}</div>,
   };
 
   return (
@@ -337,17 +362,21 @@ export const EnterVideoChatModal: FunctionComponent<EnterVideoChatModalProps> = 
         },
       }}
     >
-      <Link to={pathnames.highlightRooms} className='no-underline'>
+      <Link to={pathnames.highlightRooms} className="no-underline">
         <div className="action-modal-header absolute flex items-center px-0.5 py-0.5 h-4">
-          <div className='w-2.375 h-2.375 pr-1'>
-            <img className='w-2.375 h-2.375 rounded-0.375' src='/logo192.png' alt='site logo' />
+          <div className="w-2.375 h-2.375 pr-1">
+            <img
+              className="w-2.375 h-2.375 rounded-0.375"
+              src="/logo192.png"
+              alt="site logo"
+            />
           </div>
           <h3>{room?.name}</h3>
         </div>
       </Link>
-      <div className='flex items-center justify-center mt-auto mb-auto'>
+      <div className="flex items-center justify-center mt-auto mb-auto">
         {screens[screen]}
       </div>
-    </Modal >
+    </Modal>
   );
 };

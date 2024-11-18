@@ -1,16 +1,14 @@
 import { useCallback, useState } from 'react';
 
-
 const handleRequestScreenStream = async () => {
   let captureStream = null;
 
   try {
-    captureStream =
-      await navigator.mediaDevices.getDisplayMedia({
-        audio: false,
-        // @ts-ignore
-        selfBrowserSurface: 'exclude',
-      });
+    captureStream = await navigator.mediaDevices.getDisplayMedia({
+      audio: false,
+      // @ts-ignore
+      selfBrowserSurface: 'exclude',
+    });
   } catch (err) {
     console.error(`requestScreenStream error: ${err}`);
   }

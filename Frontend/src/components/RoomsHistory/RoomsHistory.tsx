@@ -28,25 +28,22 @@ export const RoomsHistory: FunctionComponent<RoomsHistoryProps> = ({
   const localizationCaptions = useLocalizationCaptions();
 
   return (
-    <div className='text-left overflow-auto flex flex-col h-full px-1.125 bg-wrap rounded-1.125'>
+    <div className="text-left overflow-auto flex flex-col h-full px-1.125 bg-wrap rounded-1.125">
       <Gap sizeRem={1.5} />
-      <div className='sticky top-0 bg-wrap w-full z-1'>
-        <Typography size='m' bold>
+      <div className="sticky top-0 bg-wrap w-full z-1">
+        <Typography size="m" bold>
           {localizationCaptions[LocalizationKey.InterviewHistoryTitle]}
         </Typography>
         <Gap sizeRem={0.5} />
       </div>
       <div>
-        {rooms.sort(sortRoomsByTime).map(room => (
-          <RoomsHistoryItem
-            key={room.id}
-            room={room}
-          />
+        {rooms.sort(sortRoomsByTime).map((room) => (
+          <RoomsHistoryItem key={room.id} room={room} />
         ))}
       </div>
       {rooms.length === 0 && (
-        <div className='h-full flex flex-col items-center justify-center'>
-          <Typography size='m' secondary>
+        <div className="h-full flex flex-col items-center justify-center">
+          <Typography size="m" secondary>
             {localizationCaptions[LocalizationKey.NoRecords]}
           </Typography>
         </div>

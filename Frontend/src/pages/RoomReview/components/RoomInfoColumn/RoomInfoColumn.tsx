@@ -15,13 +15,11 @@ export const RoomInfoColumn: FunctionComponent<RoomInfoColumnProps> = ({
 }) => {
   return (
     <div className={`flex flex-col ${mini ? 'w-22' : 'w-23.125'}`}>
-      <Typography size='s' bold>
+      <Typography size="s" bold>
         {header}
       </Typography>
       <Gap sizeRem={0.5} />
-      <Typography size='m'>
-        {conent}
-      </Typography>
+      <Typography size="m">{conent}</Typography>
     </div>
   );
 };

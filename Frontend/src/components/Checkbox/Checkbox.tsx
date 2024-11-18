@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactNode } from "react";
+import { FunctionComponent, ReactNode } from 'react';
 
 import './Checkbox.css';
 
@@ -14,8 +14,10 @@ export const Checkbox: FunctionComponent<CheckboxProps> = ({
 }) => {
   return (
     <>
-      <input type='checkbox' className='checkbox' id={id} {...rest} />
-      <label htmlFor={id} className='cursor-pointer'>{label}</label>
+      <input type="checkbox" className="checkbox" id={id} {...rest} />
+      <label htmlFor={id} className="cursor-pointer">
+        {label}
+      </label>
     </>
   );
 };

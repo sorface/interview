@@ -1,5 +1,5 @@
 import React, { FunctionComponent, ReactElement } from 'react';
-import { RouteProps, Navigate, useLocation, } from 'react-router-dom';
+import { RouteProps, Navigate, useLocation } from 'react-router-dom';
 import { pathnames } from '../constants';
 
 type PrivateRouteProps = RouteProps & {
@@ -13,7 +13,15 @@ export const ProtectedRoute: FunctionComponent<PrivateRouteProps> = ({
 }) => {
   const location = useLocation();
   if (!allowed) {
-    return <Navigate to={pathnames.home.replace(':redirect?', encodeURIComponent(location.pathname))} replace />;
+    return (
+      <Navigate
+        to={pathnames.home.replace(
+          ':redirect?',
+          encodeURIComponent(location.pathname),
+        )}
+        replace
+      />
+    );
   }
 
   return children;

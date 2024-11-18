@@ -1,4 +1,10 @@
-import { FunctionComponent, useRef, KeyboardEvent, useEffect, useContext } from 'react';
+import {
+  FunctionComponent,
+  useRef,
+  KeyboardEvent,
+  useEffect,
+  useContext,
+} from 'react';
 import { Transcript } from '../../../../types/transcript';
 import { Theme } from '../../../../context/ThemeContext';
 import { LocalizationKey } from '../../../../localization';
@@ -65,8 +71,11 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
   };
 
   return (
-    <div className='messages-chat'>
-      <div className='videochat-transcripts px-0.75' ref={videochatTranscriptsRef}>
+    <div className="messages-chat">
+      <div
+        className="videochat-transcripts px-0.75"
+        ref={videochatTranscriptsRef}
+      >
         <Gap sizeRem={1.5} />
         {textMessages.map((transcript, index, allTranscripts) => (
           <ChatMessage
@@ -76,28 +85,32 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
             nickname={transcript.userNickname}
             avatar={allUsers.get(transcript.userId)?.avatar}
             removePaggingTop={index === 0}
-            stackWithPrevious={allTranscripts[index - 1]?.userId === transcript.userId}
+            stackWithPrevious={
+              allTranscripts[index - 1]?.userId === transcript.userId
+            }
             fromCurrentUser={!!auth && auth.id === transcript.userId}
           />
         ))}
       </div>
       <Gap sizeRem={0.5} />
-      <div className='flex justify-between px-0.75'>
+      <div className="flex justify-between px-0.75">
         <input
-          type='text'
-          placeholder={localizationCaptions[LocalizationKey.ChatMessagePlaceholder]}
+          type="text"
+          placeholder={
+            localizationCaptions[LocalizationKey.ChatMessagePlaceholder]
+          }
           ref={messageInputRef}
-          className='flex-1'
+          className="flex-1"
           maxLength={1000}
           onKeyDown={handleInputKeyDown}
         />
         <Gap sizeRem={0.25} horizontal />
         <Button
           variant={chatButtonVariant}
-          className='min-w-fit !transition rounded-full p-0 w-2.125 h-2.125 min-h-unset'
+          className="min-w-fit !transition rounded-full p-0 w-2.125 h-2.125 min-h-unset"
           onClick={handleChatMessageSubmit}
         >
-          <Icon size='s' name={IconNames.PaperPlane} />
+          <Icon size="s" name={IconNames.PaperPlane} />
         </Button>
       </div>
       <Gap sizeRem={0.75} />

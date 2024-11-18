@@ -1,8 +1,17 @@
-import React, { ChangeEvent, FunctionComponent, useCallback, useEffect, useState } from 'react';
+import React, {
+  ChangeEvent,
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import { Loader } from '../Loader/Loader';
 import { Paginator } from '../Paginator/Paginator';
 import { useApiMethod } from '../../hooks/useApiMethod';
-import { PaginationUrlParams, usersApiDeclaration } from '../../apiDeclarations';
+import {
+  PaginationUrlParams,
+  usersApiDeclaration,
+} from '../../apiDeclarations';
 import { User } from '../../types/user';
 
 import './UsersSelector.css';
@@ -24,11 +33,14 @@ export const UsersSelector: FunctionComponent<UsersSelectorProps> = ({
   onUnselect,
 }) => {
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
+  const { apiMethodState: usersState, fetchData: fetchUsers } = useApiMethod<
+    User[],
+    PaginationUrlParams
+  >(usersApiDeclaration.getPage);
   const {
-    apiMethodState: usersState,
-    fetchData: fetchUsers,
-  } = useApiMethod<User[], PaginationUrlParams>(usersApiDeclaration.getPage);
-  const { process: { loading, error }, data: users } = usersState;
+    process: { loading, error },
+    data: users,
+  } = usersState;
 
   useEffect(() => {
     fetchUsers({
@@ -37,37 +49,41 @@ export const UsersSelector: FunctionComponent<UsersSelectorProps> = ({
     });
   }, [fetchUsers, pageNumber]);
 
-  const handleCheckboxChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = event.target;
-    if (!users) {
-      console.warn('No users found');
-      return;
-    }
-    const userItem = users.find(
-      user => user.id === value
-    );
-    if (!userItem) {
-      throw new Error('User item not found in state');
-    }
-    if (checked) {
-      onSelect(userItem);
-    } else {
-      onUnselect(userItem);
-    }
-  }, [users, onSelect, onUnselect]);
+  const handleCheckboxChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const { value, checked } = event.target;
+      if (!users) {
+        console.warn('No users found');
+        return;
+      }
+      const userItem = users.find((user) => user.id === value);
+      if (!userItem) {
+        throw new Error('User item not found in state');
+      }
+      if (checked) {
+        onSelect(userItem);
+      } else {
+        onUnselect(userItem);
+      }
+    },
+    [users, onSelect, onUnselect],
+  );
 
-  const createUserItem = useCallback((user: User) => (
-    <li key={user.id}>
-      <input
-        id={`input-${uniqueKey}-${user.id}`}
-        type="checkbox"
-        value={user.id}
-        checked={selected.some(que => que.id === user.id)}
-        onChange={handleCheckboxChange}
-      />
-      <label htmlFor={`input-${uniqueKey}-${user.id}`}>{user.nickname}</label>
-    </li>
-  ), [selected, uniqueKey, handleCheckboxChange]);
+  const createUserItem = useCallback(
+    (user: User) => (
+      <li key={user.id}>
+        <input
+          id={`input-${uniqueKey}-${user.id}`}
+          type="checkbox"
+          value={user.id}
+          checked={selected.some((que) => que.id === user.id)}
+          onChange={handleCheckboxChange}
+        />
+        <label htmlFor={`input-${uniqueKey}-${user.id}`}>{user.nickname}</label>
+      </li>
+    ),
+    [selected, uniqueKey, handleCheckboxChange],
+  );
 
   const handleNextPage = useCallback(() => {
     setPageNumber(pageNumber + 1);
@@ -78,9 +94,7 @@ export const UsersSelector: FunctionComponent<UsersSelectorProps> = ({
   }, [pageNumber]);
 
   if (error) {
-    return (
-      <div>Error: {error}</div>
-    );
+    return <div>Error: {error}</div>;
   }
   if (loading || !users) {
     return (
@@ -95,9 +109,7 @@ export const UsersSelector: FunctionComponent<UsersSelectorProps> = ({
   }
   return (
     <>
-      <ul className="users-selector">
-        {users.map(createUserItem)}
-      </ul>
+      <ul className="users-selector">{users.map(createUserItem)}</ul>
       <Paginator
         pageNumber={pageNumber}
         prevDisabled={pageNumber === initialPageNumber}

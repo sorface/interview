@@ -17,7 +17,10 @@ import './App.css';
 export const App: FunctionComponent = () => {
   const { getMeState, loadMe } = useGetMeApi();
   const { logout } = useLogout();
-  const { process: { loading, error, code }, user } = getMeState;
+  const {
+    process: { loading, error, code },
+    user,
+  } = getMeState;
   const userWillLoad = !user && !error;
 
   useEffect(() => {
@@ -31,19 +34,15 @@ export const App: FunctionComponent = () => {
   const renderMainContent = () => {
     if (loading || userWillLoad) {
       return (
-        <div className='h-dvh flex items-center justify-center'>
+        <div className="h-dvh flex items-center justify-center">
           <Loader />
         </div>
-      )
-    }
-    if (error && code !== HttpResponseCode.Unauthorized) {
-      return (
-        <LoadingAccountError onAccountReset={handlePageReset} />
       );
     }
-    return (
-      <AppRoutes user={user} />
-    );
+    if (error && code !== HttpResponseCode.Unauthorized) {
+      return <LoadingAccountError onAccountReset={handlePageReset} />;
+    }
+    return <AppRoutes user={user} />;
   };
 
   return (
@@ -57,14 +56,14 @@ export const App: FunctionComponent = () => {
             color: 'var(--text)',
           },
           success: {
-            icon: (<Icon name={IconNames.Checkmark} />),
+            icon: <Icon name={IconNames.Checkmark} />,
             style: {
               background: 'var(--toast-success)',
               color: 'var(--text)',
             },
           },
           error: {
-            icon: (<Icon name={IconNames.Information} />),
+            icon: <Icon name={IconNames.Information} />,
             style: {
               background: 'var(--toast-error)',
               color: 'var(--text)',
@@ -75,9 +74,7 @@ export const App: FunctionComponent = () => {
       <ThemeProvider>
         <LocalizationProvider>
           <AuthContext.Provider value={user}>
-            <div className="App-container">
-              {renderMainContent()}
-            </div>
+            <div className="App-container">{renderMainContent()}</div>
           </AuthContext.Provider>
         </LocalizationProvider>
       </ThemeProvider>

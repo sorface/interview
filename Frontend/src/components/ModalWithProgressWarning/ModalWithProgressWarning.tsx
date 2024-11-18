@@ -11,10 +11,9 @@ interface ModalWithProgressWarningProps extends ModalProps {
   warningCaption: string;
 }
 
-export const ModalWithProgressWarning: FunctionComponent<ModalWithProgressWarningProps> = ({
-  warningCaption,
-  ...modalProps
-}) => {
+export const ModalWithProgressWarning: FunctionComponent<
+  ModalWithProgressWarningProps
+> = ({ warningCaption, ...modalProps }) => {
   const localizationCaptions = useLocalizationCaptions();
   const [warningOpen, setWarningOpen] = useState(false);
 
@@ -35,7 +34,7 @@ export const ModalWithProgressWarning: FunctionComponent<ModalWithProgressWarnin
     <>
       <Modal
         open={warningOpen}
-        contentLabel=''
+        contentLabel=""
         onClose={handleRequestCloselWithoutSave}
       >
         <ModalWarningContent
@@ -45,15 +44,10 @@ export const ModalWithProgressWarning: FunctionComponent<ModalWithProgressWarnin
           dangerIcon
         />
         <ModalFooter>
-          <Button
-            onClick={handleRequestWarningClose}
-          >
+          <Button onClick={handleRequestWarningClose}>
             {localizationCaptions[LocalizationKey.Stay]}
           </Button>
-          <Button
-            variant='active'
-            onClick={handleRequestCloselWithoutSave}
-          >
+          <Button variant="active" onClick={handleRequestCloselWithoutSave}>
             {localizationCaptions[LocalizationKey.CloselWithoutSave]}
           </Button>
         </ModalFooter>

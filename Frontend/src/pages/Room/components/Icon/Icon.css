@@ -7,7 +7,8 @@
   box-sizing: content-box !important;
 }
 
-.icon .icon-inner, .icon .icon-inner svg {
+.icon .icon-inner,
+.icon .icon-inner svg {
   display: block;
   height: 100%;
   width: 100%;

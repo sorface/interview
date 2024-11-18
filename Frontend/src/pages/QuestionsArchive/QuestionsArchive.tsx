@@ -1,5 +1,8 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-import { PaginationUrlParams, questionsApiDeclaration } from '../../apiDeclarations';
+import {
+  PaginationUrlParams,
+  questionsApiDeclaration,
+} from '../../apiDeclarations';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Question } from '../../types/question';
 import { LocalizationKey } from '../../localization';
@@ -17,13 +20,25 @@ const initialPageNumber = 1;
 export const QuestionsArchive: FunctionComponent = () => {
   const localizationCaptions = useLocalizationCaptions();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
-  
-  const { apiMethodState: questionsState, fetchData: fetchQuestios } = useApiMethod<Question[], PaginationUrlParams>(questionsApiDeclaration.getPageArchived);
-  const { process: { loading, error }, data: questions } = questionsState;
-  
-  const { apiMethodState: unarchiveQuestionsState, fetchData: unarchiveQuestion } = useApiMethod<Question, Question['id']>(questionsApiDeclaration.unarchive);
-  const { process: { loading: unarchiveLoading, error: unarchiveError }, data: unarchivedQuestion } = unarchiveQuestionsState;
-  
+
+  const { apiMethodState: questionsState, fetchData: fetchQuestios } =
+    useApiMethod<Question[], PaginationUrlParams>(
+      questionsApiDeclaration.getPageArchived,
+    );
+  const {
+    process: { loading, error },
+    data: questions,
+  } = questionsState;
+
+  const {
+    apiMethodState: unarchiveQuestionsState,
+    fetchData: unarchiveQuestion,
+  } = useApiMethod<Question, Question['id']>(questionsApiDeclaration.unarchive);
+  const {
+    process: { loading: unarchiveLoading, error: unarchiveError },
+    data: unarchivedQuestion,
+  } = unarchiveQuestionsState;
+
   const triggerResetAccumData = `${unarchivedQuestion}`;
 
   useEffect(() => {
@@ -42,7 +57,7 @@ export const QuestionsArchive: FunctionComponent = () => {
   };
 
   const createQuestionItem = (question: Question) => (
-    <li key={question.id} className='pb-0.25'>
+    <li key={question.id} className="pb-0.25">
       <QuestionItem
         question={question}
         categoryName={question.category.name}
@@ -52,8 +67,12 @@ export const QuestionsArchive: FunctionComponent = () => {
           useButton: true,
           children: [
             <ContextMenu.Item
-              key='ContextMenuItemArchive'
-              title={unarchiveLoading ? localizationCaptions[LocalizationKey.UnarchiveLoading] : localizationCaptions[LocalizationKey.Unarchive]}
+              key="ContextMenuItemArchive"
+              title={
+                unarchiveLoading
+                  ? localizationCaptions[LocalizationKey.UnarchiveLoading]
+                  : localizationCaptions[LocalizationKey.Unarchive]
+              }
               onClick={handleUnarchiveQuestion(question)}
             />,
           ],
@@ -67,10 +86,10 @@ export const QuestionsArchive: FunctionComponent = () => {
       <PageHeader
         title={localizationCaptions[LocalizationKey.QuestionsPageName]}
       />
-      <div className='flex-1 overflow-auto'>
-        <div className='sticky top-0 bg-form z-1'>
-          <div className='flex items-center'>
-            <Typography size='m' bold>
+      <div className="flex-1 overflow-auto">
+        <div className="sticky top-0 bg-form z-1">
+          <div className="flex items-center">
+            <Typography size="m" bold>
               {localizationCaptions[LocalizationKey.QuestionsArchive]}
             </Typography>
           </div>
@@ -81,7 +100,7 @@ export const QuestionsArchive: FunctionComponent = () => {
           loading={loading}
           error={error || unarchiveError}
           triggerResetAccumData={triggerResetAccumData}
-          loaderClassName='field-wrap'
+          loaderClassName="field-wrap"
           renderItem={createQuestionItem}
           nextPageAvailable={questions?.length === pageSize}
           handleNextPage={handleNextPage}

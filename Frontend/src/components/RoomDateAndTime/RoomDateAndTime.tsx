@@ -27,7 +27,8 @@ const formatScheduledStartDay = (scheduledStartTime: string, lang: string) => {
   return `${day}`;
 };
 
-const formatTime = (value: Date) => `${padTime(value.getHours())}:${padTime(value.getMinutes())}`;
+const formatTime = (value: Date) =>
+  `${padTime(value.getHours())}:${padTime(value.getMinutes())}`;
 
 const formatDuration = (scheduledStartTime: string, durationSec: number) => {
   const dateStart = new Date(scheduledStartTime);
@@ -51,13 +52,17 @@ export const RoomDateAndTime: FunctionComponent<RoomDateAndTimeProps> = ({
   const secondaryClassName = secondary ? themeSecondaryClassName : '';
 
   return (
-    <div className={`flex  ${!mini ? 'justify-between' : ''} ${secondaryClassName} items-baseline`}>
-      <div className='flex items-baseline'>
+    <div
+      className={`flex  ${!mini ? 'justify-between' : ''} ${secondaryClassName} items-baseline`}
+    >
+      <div className="flex items-baseline">
         <Typography size={typographySize}>
           {formatScheduledStartTime(scheduledStartTime, lang)}
         </Typography>
         <Gap sizeRem={0.5} horizontal />
-        <div className={`capitalize ${!secondary ? themeSecondaryClassName : ''}`}>
+        <div
+          className={`capitalize ${!secondary ? themeSecondaryClassName : ''}`}
+        >
           <Typography size={typographySize}>
             {formatScheduledStartDay(scheduledStartTime, lang)}
           </Typography>
@@ -65,7 +70,7 @@ export const RoomDateAndTime: FunctionComponent<RoomDateAndTimeProps> = ({
       </div>
       {timer && (
         <>
-          {mini && (<Gap sizeRem={1} horizontal />)}
+          {mini && <Gap sizeRem={1} horizontal />}
           <Typography size={typographySize}>
             {formatDuration(scheduledStartTime, timer.durationSec)}
           </Typography>
