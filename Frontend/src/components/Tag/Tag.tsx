@@ -27,21 +27,16 @@ const themeClassNames: Record<ThemeInUi, Record<TagState, string>> = {
     [TagState.Pending]: 'bg-green-light',
     [TagState.Closed]: 'bg-grey-active',
     [TagState.WaitingForAction]: 'bg-red-light',
-  }
+  },
 };
 
-export const Tag: FunctionComponent<TagProps> = ({
-  state,
-  children,
-}) => {
+export const Tag: FunctionComponent<TagProps> = ({ state, children }) => {
   const themeClassName = useThemeClassName(themeClassNames)[state];
   return (
     <div
       className={`flex items-center py-0.125 px-0.375 rounded-0.375 ${themeClassName}`}
     >
-      <Typography size='s'>
-        {children}
-      </Typography>
+      <Typography size="s">{children}</Typography>
     </div>
-  )
+  );
 };

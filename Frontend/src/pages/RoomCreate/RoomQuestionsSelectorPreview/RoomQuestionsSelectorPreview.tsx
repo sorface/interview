@@ -16,10 +16,9 @@ interface RoomQuestionsSelectorPreviewProps {
   onRemove: (question: RoomQuestionListItem) => void;
 }
 
-export const RoomQuestionsSelectorPreview: FunctionComponent<RoomQuestionsSelectorPreviewProps> = ({
-  qestions,
-  onRemove,
-}) => {
+export const RoomQuestionsSelectorPreview: FunctionComponent<
+  RoomQuestionsSelectorPreviewProps
+> = ({ qestions, onRemove }) => {
   const localizationCaptions = useLocalizationCaptions();
   const contentWrapperClassName = useThemeClassName({
     [Theme.Dark]: 'bg-modal-bg',
@@ -30,40 +29,41 @@ export const RoomQuestionsSelectorPreview: FunctionComponent<RoomQuestionsSelect
     [Theme.Light]: 'hover:bg-grey-active',
   });
 
-  const handleRemoveClick = (qestion: RoomQuestionListItem) => (e: MouseEvent<HTMLSpanElement>) => {
-    e.stopPropagation();
-    onRemove(qestion);
-  };
+  const handleRemoveClick =
+    (qestion: RoomQuestionListItem) => (e: MouseEvent<HTMLSpanElement>) => {
+      e.stopPropagation();
+      onRemove(qestion);
+    };
 
   return (
     <div>
       <Dropdown
         useButton
-        buttonVariant='invertedActive'
+        buttonVariant="invertedActive"
         toggleContent={
-          <div className='flex'>
-            <Typography size='m'>
+          <div className="flex">
+            <Typography size="m">
               {localizationCaptions[LocalizationKey.RoomSelectedQuestions]}:
             </Typography>
             <Gap sizeRem={0.25} horizontal />
-            <Typography size='m'>
-              {qestions.length}
-            </Typography>
+            <Typography size="m">{qestions.length}</Typography>
           </div>
         }
-        toggleClassName='w-13.75 flex justify-between'
+        toggleClassName="w-13.75 flex justify-between"
         toggleIcon
-        contentClassName='translate-x--4.25-y-0.25'
+        contentClassName="translate-x--4.25-y-0.25"
       >
-        <div className={`w-18.125 rounded-0.75 shadow ${contentWrapperClassName}`}>
-          {qestions.sort(sortRoomQuestion).map(qestion => (
+        <div
+          className={`w-18.125 rounded-0.75 shadow ${contentWrapperClassName}`}
+        >
+          {qestions.sort(sortRoomQuestion).map((qestion) => (
             <div
               key={qestion.id}
               className={`flex items-center justify-between h-2.125 px-1 cursor-pointer ${itemClassName}`}
             >
-              <Typography size='s'>{qestion.value}</Typography>
-              <span onClick={handleRemoveClick(qestion)} className='text-grey2'>
-                <Icon size='s' name={IconNames.Trash} />
+              <Typography size="s">{qestion.value}</Typography>
+              <span onClick={handleRemoveClick(qestion)} className="text-grey2">
+                <Icon size="s" name={IconNames.Trash} />
               </span>
             </div>
           ))}

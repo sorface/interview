@@ -23,19 +23,13 @@ export const Paginator: FunctionComponent<PaginatorProps> = ({
 }) => {
   return (
     <Field className="paginator">
-      <Button
-        type="button"
-        disabled={prevDisabled}
-        onClick={onPrevClick}
-      >
+      <Button type="button" disabled={prevDisabled} onClick={onPrevClick}>
         &#60;
       </Button>
-      <span>{useLocalizationCaptions()[LocalizationKey.Page]}: {pageNumber}</span>
-      <Button
-        type="button"
-        disabled={nextDisabled}
-        onClick={onNextClick}
-      >
+      <span>
+        {useLocalizationCaptions()[LocalizationKey.Page]}: {pageNumber}
+      </span>
+      <Button type="button" disabled={nextDisabled} onClick={onNextClick}>
         &#62;
       </Button>
     </Field>

@@ -16,16 +16,15 @@ interface RoomAnayticsDetailsProps {
   roomId: string | undefined;
 }
 
-export const RoomAnayticsDetails: FunctionComponent<RoomAnayticsDetailsProps> = ({
-  data,
-  allUsers,
-  openedQuestionDetails,
-  roomId,
-}) => {
+export const RoomAnayticsDetails: FunctionComponent<
+  RoomAnayticsDetailsProps
+> = ({ data, allUsers, openedQuestionDetails, roomId }) => {
   const localizationCaptions = useLocalizationCaptions();
   const { themeInUi } = useContext(ThemeContext);
   const [activeTab, setActiveTab] = useState<0 | 1>(0);
-  const openedQuestion = data?.questions.find(question => question.id === openedQuestionDetails);
+  const openedQuestion = data?.questions.find(
+    (question) => question.id === openedQuestionDetails,
+  );
 
   return (
     <div>
@@ -50,9 +49,14 @@ export const RoomAnayticsDetails: FunctionComponent<RoomAnayticsDetailsProps> = 
       {activeTab === 0 && (
         <ReviewUserGrid>
           {openedQuestion?.users
-            .filter(questionUser => allUsers.get(questionUser.id)?.participantType === 'Expert')
-            .filter(questionUser => data?.completed ? !!questionUser.evaluation : true)
-            .map(questionUser => {
+            .filter(
+              (questionUser) =>
+                allUsers.get(questionUser.id)?.participantType === 'Expert',
+            )
+            .filter((questionUser) =>
+              data?.completed ? !!questionUser.evaluation : true,
+            )
+            .map((questionUser) => {
               return (
                 <ReviewUserOpinion
                   key={questionUser.id}
@@ -63,7 +67,7 @@ export const RoomAnayticsDetails: FunctionComponent<RoomAnayticsDetailsProps> = 
             })}
         </ReviewUserGrid>
       )}
-      {(activeTab === 1 && openedQuestion) && (
+      {activeTab === 1 && openedQuestion && (
         <QuestionAnswerDetails
           questionId={openedQuestion.id}
           questionTitle={openedQuestion.value}

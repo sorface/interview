@@ -37,14 +37,12 @@ export const ChatMessage: FunctionComponent<ChatMessageProps> = ({
 
   return (
     <Fragment>
-      {!removePaggingTop && (
-        <Gap sizeRem={stackWithPrevious ? 0.25 : 1} />
-      )}
-      <div className='flex justify-end'>
-        {(!fromCurrentUser) && (
+      {!removePaggingTop && <Gap sizeRem={stackWithPrevious ? 0.25 : 1} />}
+      <div className="flex justify-end">
+        {!fromCurrentUser && (
           <div className={`flex ${stackWithPrevious ? 'invisible' : ''}`}>
-            <Typography size='xs'>
-              <UserAvatar nickname={nickname} src={avatar} size='xs' />
+            <Typography size="xs">
+              <UserAvatar nickname={nickname} src={avatar} size="xs" />
             </Typography>
             <Gap sizeRem={0.25} horizontal />
           </div>
@@ -52,17 +50,23 @@ export const ChatMessage: FunctionComponent<ChatMessageProps> = ({
         <div
           className={`${fromCurrentUser ? currentUserMessageClassName : messageClassName} ${fromCurrentUser ? 'max-w-12' : ''} overflow-auto flex flex-1 flex-col py-0.25 px-0.5 rounded-0.5`}
         >
-          {(!fromCurrentUser && !stackWithPrevious) && (
-            <div className='flex items-center'>
-              <Typography size='s' bold>{nickname}</Typography>
+          {!fromCurrentUser && !stackWithPrevious && (
+            <div className="flex items-center">
+              <Typography size="s" bold>
+                {nickname}
+              </Typography>
             </div>
           )}
           <Gap sizeRem={0.25} />
-            <Typography size='s'>
-              <Linkify options={{ target: '_blank', rel: 'noopener noreferrer' }}>{message}</Linkify>
+          <Typography size="s">
+            <Linkify options={{ target: '_blank', rel: 'noopener noreferrer' }}>
+              {message}
+            </Linkify>
+          </Typography>
+          <div className="text-right">
+            <Typography size="xs" secondary>
+              {formatTime(new Date(createdAt))}
             </Typography>
-          <div className='text-right'>
-            <Typography size='xs' secondary>{formatTime(new Date(createdAt))}</Typography>
           </div>
         </div>
       </div>

@@ -19,14 +19,22 @@ export const ThemeSwitch: FunctionComponent = () => {
 
   return (
     <>
-      <div className='text-left flex items-center'>
-        <Typography size='m'>{localizationCaptions[LocalizationKey.Theme]}:</Typography>
+      <div className="text-left flex items-center">
+        <Typography size="m">
+          {localizationCaptions[LocalizationKey.Theme]}:
+        </Typography>
       </div>
-      <select className='w-full' value={themeInSetting} onChange={handleThemeChange}>
+      <select
+        className="w-full"
+        value={themeInSetting}
+        onChange={handleThemeChange}
+      >
         {Object.entries(Theme)?.map(([_, themeValue]) => (
-          <option key={themeValue} value={themeValue}>{themeLocalization[themeValue]}</option>
+          <option key={themeValue} value={themeValue}>
+            {themeLocalization[themeValue]}
+          </option>
         ))}
       </select>
     </>
-  )
+  );
 };

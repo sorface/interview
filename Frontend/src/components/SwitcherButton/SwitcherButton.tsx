@@ -25,7 +25,8 @@ export const SwitcherButton: FunctionComponent<SwitcherButtonProps> = ({
   disabled,
   onClick,
 }) => {
-  const nonActiveVariant = variant === 'alternative' ? 'invertedAlternative' : 'inverted';
+  const nonActiveVariant =
+    variant === 'alternative' ? 'invertedAlternative' : 'inverted';
   const disabledClassName = disabled ? 'cursor-not-allowed' : '';
   return (
     <div className={`switcher-button flex ${disabledClassName}`}>
@@ -33,7 +34,9 @@ export const SwitcherButton: FunctionComponent<SwitcherButtonProps> = ({
         <Button
           key={item.id}
           variant={index === activeIndex ? 'invertedActive' : nonActiveVariant}
-          onClick={() => { onClick?.(index as ActiveIndex); }}
+          onClick={() => {
+            onClick?.(index as ActiveIndex);
+          }}
         >
           {item.content}
         </Button>

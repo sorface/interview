@@ -17,17 +17,23 @@ const initialState: LogoutState = {
   },
 };
 
-type LogoutAction = {
-  name: 'startLoad';
-} | {
-  name: 'setError';
-  payload: string;
-} | {
-  name: 'setCode';
-  payload: number;
-};
+type LogoutAction =
+  | {
+      name: 'startLoad';
+    }
+  | {
+      name: 'setError';
+      payload: string;
+    }
+  | {
+      name: 'setCode';
+      payload: number;
+    };
 
-const logoutReducer = (state: LogoutState, action: LogoutAction): LogoutState => {
+const logoutReducer = (
+  state: LogoutState,
+  action: LogoutAction,
+): LogoutState => {
   switch (action.name) {
     case 'startLoad':
       return {
@@ -43,8 +49,8 @@ const logoutReducer = (state: LogoutState, action: LogoutAction): LogoutState =>
         process: {
           logoutLoading: false,
           logoutCode: null,
-          logoutError: action.payload
-        }
+          logoutError: action.payload,
+        },
       };
     case 'setCode':
       return {
@@ -61,7 +67,9 @@ const logoutReducer = (state: LogoutState, action: LogoutAction): LogoutState =>
 
 export const useLogout = () => {
   const [logoutState, dispatch] = useReducer(logoutReducer, initialState);
-  const { process: { logoutCode } } = logoutState;
+  const {
+    process: { logoutCode },
+  } = logoutState;
 
   useEffect(() => {
     if (!logoutCode || logoutCode !== 200) {
@@ -75,7 +83,7 @@ export const useLogout = () => {
     try {
       const response = await fetch(`${REACT_APP_BACKEND_URL}/logout`, {
         method: 'POST',
-        credentials: 'include'
+        credentials: 'include',
       });
       if (!response.ok) {
         throw new Error('logout error');

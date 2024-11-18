@@ -21,23 +21,19 @@ export interface ReactionsProps {
   room: Room | null;
 }
 
-export const Reactions: FunctionComponent<ReactionsProps> = ({
-  room,
-}) => {
+export const Reactions: FunctionComponent<ReactionsProps> = ({ room }) => {
   const localizationCaptions = useLocalizationCaptions();
-  const {
-    apiMethodState: apiReactionsState,
-    fetchData: fetchReactions,
-  } = useApiMethod<Reaction[], PaginationUrlParams>(reactionsApiDeclaration.getPage);
+  const { apiMethodState: apiReactionsState, fetchData: fetchReactions } =
+    useApiMethod<Reaction[], PaginationUrlParams>(
+      reactionsApiDeclaration.getPage,
+    );
   const {
     process: { loading: loadingReactions, error: errorReactions },
     data: reactions,
   } = apiReactionsState;
 
-  const {
-    apiMethodState: apiRoomReactionState,
-    fetchData: sendRoomReaction,
-  } = useApiMethod<unknown, SendReactionBody>(roomReactionApiDeclaration.send);
+  const { apiMethodState: apiRoomReactionState, fetchData: sendRoomReaction } =
+    useApiMethod<unknown, SendReactionBody>(roomReactionApiDeclaration.send);
   const {
     process: { loading: loadingRoomReaction, error: errorRoomReaction },
   } = apiRoomReactionState;
@@ -60,27 +56,31 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
     toast.error(localizationCaptions[LocalizationKey.ErrorSendingReaction]);
   }, [errorRoomReaction, localizationCaptions]);
 
-  const handleReactionClick = useCallback((reaction: Reaction) => {
-    if (!room) {
-      throw new Error('Error sending reaction. Room not found.');
-    }
-    sendRoomReaction({
-      reactionId: reaction.id,
-      roomId: room.id,
-      payload: reaction.type.name,
-    });
-    setLastSendedReactionType(reaction.type.name);
-  }, [room, sendRoomReaction]);
+  const handleReactionClick = useCallback(
+    (reaction: Reaction) => {
+      if (!room) {
+        throw new Error('Error sending reaction. Room not found.');
+      }
+      sendRoomReaction({
+        reactionId: reaction.id,
+        roomId: room.id,
+        payload: reaction.type.name,
+      });
+      setLastSendedReactionType(reaction.type.name);
+    },
+    [room, sendRoomReaction],
+  );
 
   if (errorReactions) {
     return (
-      <div>{localizationCaptions[LocalizationKey.ReactionsLoadingError]}: {errorReactions}</div>
+      <div>
+        {localizationCaptions[LocalizationKey.ReactionsLoadingError]}:{' '}
+        {errorReactions}
+      </div>
     );
   }
   if (loadingReactions) {
-    return (
-      <Loader />
-    );
+    return <Loader />;
   }
 
   return (
@@ -88,7 +88,9 @@ export const Reactions: FunctionComponent<ReactionsProps> = ({
       <ReactionsList
         sortOrder={-1}
         reactions={reactionsSafe}
-        loadingReactionName={loadingRoomReaction ? lastSendedReactionType : null}
+        loadingReactionName={
+          loadingRoomReaction ? lastSendedReactionType : null
+        }
         onClick={handleReactionClick}
       />
     </>

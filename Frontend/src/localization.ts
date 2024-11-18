@@ -229,12 +229,16 @@ export const enum LocalizationKey {
   UserConnectedToRoom,
   NotEnoughRights,
   WebcamBackgroundBlur,
-};
+}
 
-export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationKey, string>> = {
+export const LocalizationCaptions: Record<
+  LocalizationLang,
+  Record<LocalizationKey, string>
+> = {
   [LocalizationLang.en]: {
     [LocalizationKey.AppName]: 'Interview Platform',
-    [LocalizationKey.LoginRequired]: 'To view this page you need to log in to your account',
+    [LocalizationKey.LoginRequired]:
+      'To view this page you need to log in to your account',
     [LocalizationKey.WelcomeMessage]: 'Welcome',
     [LocalizationKey.HighlightsRoomsPageName]: 'Rooms',
     [LocalizationKey.CurrentRoomsPageName]: 'Current rooms',
@@ -244,7 +248,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.CategoriesPageName]: 'Categories',
     [LocalizationKey.RoomReviewPageName]: 'Interview results',
     [LocalizationKey.CandidateOpinion]: 'Your opinion about candidate',
-    [LocalizationKey.CandidateMarks]: 'Your assessments of the candidate and comments on questions',
+    [LocalizationKey.CandidateMarks]:
+      'Your assessments of the candidate and comments on questions',
     [LocalizationKey.DoNotRate]: 'Do not rate',
     [LocalizationKey.UnauthorizedMessage]: 'Unauthorized',
     [LocalizationKey.Page]: 'Page',
@@ -281,25 +286,31 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.Stay]: 'Stay',
     [LocalizationKey.Error]: 'Error',
     [LocalizationKey.NotSelected]: 'Not selected',
-    [LocalizationKey.QuestionCreatedSuccessfully]: 'Question created successfully',
-    [LocalizationKey.QuestionUpdatedSuccessfully]: 'Question updated successfully',
+    [LocalizationKey.QuestionCreatedSuccessfully]:
+      'Question created successfully',
+    [LocalizationKey.QuestionUpdatedSuccessfully]:
+      'Question updated successfully',
     [LocalizationKey.SelectActiveQuestion]: 'Select current question',
     [LocalizationKey.CreatingRoomQuestion]: 'Creating current question',
-    [LocalizationKey.CategoryCreatedSuccessfully]: 'Category created successfully',
-    [LocalizationKey.CategoryUpdatedSuccessfully]: 'Category updated successfully',
+    [LocalizationKey.CategoryCreatedSuccessfully]:
+      'Category created successfully',
+    [LocalizationKey.CategoryUpdatedSuccessfully]:
+      'Category updated successfully',
     [LocalizationKey.LoadingRoom]: 'Loading meeting',
     [LocalizationKey.ErrorLoadingRoom]: 'Error loading meeting',
     [LocalizationKey.LoadingRoomState]: 'Loading meeting state',
     [LocalizationKey.ErrorLoadingRoomState]: 'Error loading meeting state',
     [LocalizationKey.RoomCreated]: 'Meeting created',
-    [LocalizationKey.ErrorSendingActiveQuestion]: 'Error sending current question',
+    [LocalizationKey.ErrorSendingActiveQuestion]:
+      'Error sending current question',
     [LocalizationKey.ErrorCreatingRoomQuestion]: 'Error creating question',
     [LocalizationKey.ReactionsLoadingError]: 'Reactions loading error',
     [LocalizationKey.ErrorSendingReaction]: 'Error sending reaction',
     [LocalizationKey.GetRoomEvent]: 'Receiving meeting event',
     [LocalizationKey.ErrorGetRoomEvent]: 'Error receiving meeting event',
     [LocalizationKey.ErrorSendingRoomEvent]: 'Error sending meeting event',
-    [LocalizationKey.TermsOfUsageAcceptance]: 'By login, you acknowledge that you have read, understood, and agree to ',
+    [LocalizationKey.TermsOfUsageAcceptance]:
+      'By login, you acknowledge that you have read, understood, and agree to ',
     [LocalizationKey.TermsOfUsage]: 'Terms of usage',
     [LocalizationKey.Login]: 'Login',
     [LocalizationKey.LikeTable]: '👍',
@@ -322,11 +333,14 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.MarkPostfixBad]: 'Bad.',
     [LocalizationKey.MarkSmmary]: 'Mark smmary',
     [LocalizationKey.CloseRoom]: 'Close meeting',
-    [LocalizationKey.CloseRoomWithoutReview]: 'Close meeting without waiting for evaluations',
+    [LocalizationKey.CloseRoomWithoutReview]:
+      'Close meeting without waiting for evaluations',
     [LocalizationKey.StartRoom]: 'Start interview',
     [LocalizationKey.StartReviewRoom]: 'Start meeting review.',
-    [LocalizationKey.CloseRoomModalTitle]: 'Do you really want to close meeting?',
-    [LocalizationKey.StartReviewRoomModalTitle]: 'Start filling out meeting report?',
+    [LocalizationKey.CloseRoomModalTitle]:
+      'Do you really want to close meeting?',
+    [LocalizationKey.StartReviewRoomModalTitle]:
+      'Start filling out meeting report?',
     [LocalizationKey.CloseRoomLoading]: 'Closing meeting',
     [LocalizationKey.Yes]: 'Yes ✔️',
     [LocalizationKey.No]: 'No ❌',
@@ -352,7 +366,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.CreateRoomStep1]: 'Step 1 - Filling the Room',
     [LocalizationKey.CreateRoomStep2]: 'Step 2 - Inviting Participants',
     [LocalizationKey.RoomName]: 'Meeting name',
-    [LocalizationKey.RoomNamePrompt]: 'In the title, indicate the name of the candidate and the position for which the interview will be held',
+    [LocalizationKey.RoomNamePrompt]:
+      'In the title, indicate the name of the candidate and the position for which the interview will be held',
     [LocalizationKey.RoomDateAndTime]: 'Date and time',
     [LocalizationKey.RoomQuestions]: 'Questions list',
     [LocalizationKey.RoomSelectedQuestions]: 'Selected questions',
@@ -369,16 +384,18 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.ChatMessagePlaceholder]: 'Write to chat',
     [LocalizationKey.SendToChat]: 'Send',
     [LocalizationKey.SearchByName]: 'Search by name',
-    [LocalizationKey.ParticipatingRooms]: 'I\'m participating',
+    [LocalizationKey.ParticipatingRooms]: "I'm participating",
     [LocalizationKey.RootCategories]: 'Root categories',
     [LocalizationKey.Category]: 'Category',
     [LocalizationKey.Subcategory]: 'Subcategory',
-    [LocalizationKey.SelectCategorySubcategory]: 'To search and add a question, specify a category and subcategory, and then select questions from the list',
+    [LocalizationKey.SelectCategorySubcategory]:
+      'To search and add a question, specify a category and subcategory, and then select questions from the list',
     [LocalizationKey.ClosedRooms]: 'Closed',
     [LocalizationKey.ToRooms]: 'Go to meetings',
     [LocalizationKey.Warning]: 'WARNING!',
     [LocalizationKey.CallRecording]: 'The meeting is being recorded',
-    [LocalizationKey.VoiceRecognitionNotSupported]: 'Voice recognition is not supported by your browser',
+    [LocalizationKey.VoiceRecognitionNotSupported]:
+      'Voice recognition is not supported by your browser',
     [LocalizationKey.Archive]: 'Archive',
     [LocalizationKey.ArchiveLoading]: 'Archiving...',
     [LocalizationKey.Unarchive]: 'Unarchive',
@@ -400,13 +417,15 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.ThemeLight]: 'Light theme',
     [LocalizationKey.ThemeDark]: 'Dark theme',
     [LocalizationKey.Language]: 'Language',
-    [LocalizationKey.PleaseSelectRecognitionLanguage]: 'Please indicate the language you will speak',
+    [LocalizationKey.PleaseSelectRecognitionLanguage]:
+      'Please indicate the language you will speak',
     [LocalizationKey.RecognitionLanguage]: 'Transcription language',
     [LocalizationKey.FontSize]: 'FontSize',
     [LocalizationKey.You]: 'You',
     [LocalizationKey.NoRecords]: 'List is empty',
     [LocalizationKey.ConnectionError]: 'Connection error',
-    [LocalizationKey.RoomConnectionError]: 'Connection to the room has been lost',
+    [LocalizationKey.RoomConnectionError]:
+      'Connection to the room has been lost',
     [LocalizationKey.LocalizationLangEn]: 'English',
     [LocalizationKey.LocalizationLangRu]: 'Русский',
     [LocalizationKey.AiAssistantName]: 'Michael (Alpha)',
@@ -420,10 +439,14 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.CopiedToClipboard]: 'Copied to clipboard',
     [LocalizationKey.Of]: 'of',
     [LocalizationKey.RoomQuestionEvaluationTitle]: 'Rate the answer',
-    [LocalizationKey.SaveRoomQuestionEvaluationWarningLine1]: 'Are you sure you want to save review?',
-    [LocalizationKey.SaveRoomQuestionEvaluationWarningLine2]: 'After saving, editing will not be possible.',
-    [LocalizationKey.CloseRoomWithoutQuestionEvaluationWarningLine1]: 'Are you sure you want to close review without waiting for other participants\' reviews?',
-    [LocalizationKey.CloseRoomWithoutQuestionEvaluationWarningLine2]: 'If other participants leave review, review will end automatically.',
+    [LocalizationKey.SaveRoomQuestionEvaluationWarningLine1]:
+      'Are you sure you want to save review?',
+    [LocalizationKey.SaveRoomQuestionEvaluationWarningLine2]:
+      'After saving, editing will not be possible.',
+    [LocalizationKey.CloseRoomWithoutQuestionEvaluationWarningLine1]:
+      "Are you sure you want to close review without waiting for other participants' reviews?",
+    [LocalizationKey.CloseRoomWithoutQuestionEvaluationWarningLine2]:
+      'If other participants leave review, review will end automatically.',
     [LocalizationKey.MarksGroupBad]: 'Bad',
     [LocalizationKey.MarksGroupMedium]: 'Med.',
     [LocalizationKey.MarksGroupGood]: 'Good',
@@ -435,28 +458,37 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.AnswerDetails]: 'Answer details',
     [LocalizationKey.QuestionAnswerDetails]: 'Question answer details',
     [LocalizationKey.EmptyRoomNameError]: 'Please provide the meeting name',
-    [LocalizationKey.RoomEmptyStartTimeError]: 'Please enter meeting start time',
-    [LocalizationKey.RoomStartTimeMustBeGreaterError]: 'Meeting start time must be greater than the current time',
-    [LocalizationKey.RoomEmptyQuestionsListError]: 'Please add questions to the list of questions',
+    [LocalizationKey.RoomEmptyStartTimeError]:
+      'Please enter meeting start time',
+    [LocalizationKey.RoomStartTimeMustBeGreaterError]:
+      'Meeting start time must be greater than the current time',
+    [LocalizationKey.RoomEmptyQuestionsListError]:
+      'Please add questions to the list of questions',
     [LocalizationKey.InterviewHistoryTitle]: 'Interview history',
-    [LocalizationKey.RoomReviewAlreadyGiven]: 'You have already given feedback on the interview. Waiting for evaluation from other participants.',
+    [LocalizationKey.RoomReviewAlreadyGiven]:
+      'You have already given feedback on the interview. Waiting for evaluation from other participants.',
     [LocalizationKey.RoomReviewSave]: 'Finish review',
     [LocalizationKey.RoomReviewWaiting]: 'Waiting for evaluation',
-    [LocalizationKey.EmptyCommentQuestionEvaluation]: 'Write a comment to answer the question',
+    [LocalizationKey.EmptyCommentQuestionEvaluation]:
+      'Write a comment to answer the question',
     [LocalizationKey.QurstionTranscription]: 'Transcription of the answer',
     [LocalizationKey.QuestionCode]: 'Question code',
     [LocalizationKey.AnswerCode]: 'Answer code',
-    [LocalizationKey.WeAwareOfProblem]: 'We are already aware of the problem and are working on a solution',
-    [LocalizationKey.CurrentQuestionNotBeSaved]: 'Current question will not be saved',
+    [LocalizationKey.WeAwareOfProblem]:
+      'We are already aware of the problem and are working on a solution',
+    [LocalizationKey.CurrentQuestionNotBeSaved]:
+      'Current question will not be saved',
     [LocalizationKey.CurrentRoomNotBeSaved]: 'Current room will not be saved',
     [LocalizationKey.LoadingAccountError]: 'Failed to load user profile',
     [LocalizationKey.LoadingAccountErrorTitle]: 'Account loading error',
     [LocalizationKey.Opinions]: 'Opinions',
     [LocalizationKey.Transcription]: 'Transcription',
-    [LocalizationKey.CompleteAndEvaluateCandidate]: 'Complete and evaluate candidate',
+    [LocalizationKey.CompleteAndEvaluateCandidate]:
+      'Complete and evaluate candidate',
     [LocalizationKey.QuestionsArchive]: 'Questions archive',
     [LocalizationKey.WaitingInterviewStart]: 'Waiting to start the interview',
-    [LocalizationKey.RoomStartDescription]: 'Once the interview begins, the first question from the prepared list will be asked',
+    [LocalizationKey.RoomStartDescription]:
+      'Once the interview begins, the first question from the prepared list will be asked',
     [LocalizationKey.NoData]: 'No data',
     [LocalizationKey.UserConnectedToRoom]: 'connected',
     [LocalizationKey.NotEnoughRights]: 'Insufficient rights to view content',
@@ -464,7 +496,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.AppName]: 'Interview Platform',
-    [LocalizationKey.LoginRequired]: 'Для просмотра данной страницы необходимо войти в аккаунт',
+    [LocalizationKey.LoginRequired]:
+      'Для просмотра данной страницы необходимо войти в аккаунт',
     [LocalizationKey.WelcomeMessage]: 'Добро пожаловать',
     [LocalizationKey.HighlightsRoomsPageName]: 'Комнаты',
     [LocalizationKey.CurrentRoomsPageName]: 'Актуальные комнаты',
@@ -474,7 +507,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.CategoriesPageName]: 'Категории',
     [LocalizationKey.RoomReviewPageName]: 'Результаты собеседования',
     [LocalizationKey.CandidateOpinion]: 'Ваше мнение о кандидате',
-    [LocalizationKey.CandidateMarks]: 'Ваши оценки кандидата и комментарии к вопросам',
+    [LocalizationKey.CandidateMarks]:
+      'Ваши оценки кандидата и комментарии к вопросам',
     [LocalizationKey.DoNotRate]: 'Не оценивать',
     [LocalizationKey.UnauthorizedMessage]: 'Неавторизован',
     [LocalizationKey.Page]: 'Страница',
@@ -516,20 +550,24 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.SelectActiveQuestion]: 'Установить текущий вопрос',
     [LocalizationKey.CreatingRoomQuestion]: 'Создание текущего вопроса',
     [LocalizationKey.CategoryCreatedSuccessfully]: 'Категория успешно создана',
-    [LocalizationKey.CategoryUpdatedSuccessfully]: 'Категория успешно обновлёна',
+    [LocalizationKey.CategoryUpdatedSuccessfully]:
+      'Категория успешно обновлёна',
     [LocalizationKey.LoadingRoom]: 'Загрузка встречи',
     [LocalizationKey.ErrorLoadingRoom]: 'Ошибка загрузки встречи',
     [LocalizationKey.LoadingRoomState]: 'Загрузка состояния встречи',
-    [LocalizationKey.ErrorLoadingRoomState]: 'Ошибка загрузки состояния встречи',
+    [LocalizationKey.ErrorLoadingRoomState]:
+      'Ошибка загрузки состояния встречи',
     [LocalizationKey.RoomCreated]: 'Встреча успешно создана',
     [LocalizationKey.ErrorSendingActiveQuestion]: 'Ошибка в установке вопроса',
-    [LocalizationKey.ErrorCreatingRoomQuestion]: 'Ошибка создания текущего вопроса',
+    [LocalizationKey.ErrorCreatingRoomQuestion]:
+      'Ошибка создания текущего вопроса',
     [LocalizationKey.ReactionsLoadingError]: 'Ошибка загрузки реакций',
     [LocalizationKey.ErrorSendingReaction]: 'Ошибка в отправке реакции',
     [LocalizationKey.GetRoomEvent]: 'Получение событий',
     [LocalizationKey.ErrorGetRoomEvent]: 'Ошибка в получении событий',
     [LocalizationKey.ErrorSendingRoomEvent]: 'Ошибка в отправке собтия',
-    [LocalizationKey.TermsOfUsageAcceptance]: 'Входя, вы подтверждаете, что прочитали, поняли и соглашаетесь с ',
+    [LocalizationKey.TermsOfUsageAcceptance]:
+      'Входя, вы подтверждаете, что прочитали, поняли и соглашаетесь с ',
     [LocalizationKey.TermsOfUsage]: 'Условиями использования',
     [LocalizationKey.Login]: 'Войти',
     [LocalizationKey.LikeTable]: '👍',
@@ -552,11 +590,14 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.MarkPostfixBad]: 'Плохо.',
     [LocalizationKey.MarkSmmary]: 'Итог',
     [LocalizationKey.CloseRoom]: 'Закрыть встречу',
-    [LocalizationKey.CloseRoomWithoutReview]: 'Закрыть встречу не дожидаясь оценок',
+    [LocalizationKey.CloseRoomWithoutReview]:
+      'Закрыть встречу не дожидаясь оценок',
     [LocalizationKey.StartRoom]: 'Начать собеседование',
     [LocalizationKey.StartReviewRoom]: 'Начать разбор встречи',
-    [LocalizationKey.CloseRoomModalTitle]: 'Действительно хотите закрыть встречу?',
-    [LocalizationKey.StartReviewRoomModalTitle]: 'Начать заполнение отчёта по встрече?',
+    [LocalizationKey.CloseRoomModalTitle]:
+      'Действительно хотите закрыть встречу?',
+    [LocalizationKey.StartReviewRoomModalTitle]:
+      'Начать заполнение отчёта по встрече?',
     [LocalizationKey.CloseRoomLoading]: 'Закрытие встречи',
     [LocalizationKey.Yes]: 'Да ✔️',
     [LocalizationKey.No]: 'Нет ❌',
@@ -577,12 +618,14 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.CreateRoom]: 'Создать встречу',
     [LocalizationKey.NewRoom]: 'Новая комната',
     [LocalizationKey.EditRoom]: 'Редактирование комнаты',
-    [LocalizationKey.AddingRoomQuestions]: 'Добавление вопросов для собеседования',
+    [LocalizationKey.AddingRoomQuestions]:
+      'Добавление вопросов для собеседования',
     [LocalizationKey.CreatingRoom]: 'Создание встречи',
     [LocalizationKey.CreateRoomStep1]: 'Шаг 1 - Наполнение комнаты',
     [LocalizationKey.CreateRoomStep2]: 'Шаг 2 - Приглашение участников',
     [LocalizationKey.RoomName]: 'Имя встречи',
-    [LocalizationKey.RoomNamePrompt]: 'В названии укажите имя кандидата и должность, на которую пройдет собеседование',
+    [LocalizationKey.RoomNamePrompt]:
+      'В названии укажите имя кандидата и должность, на которую пройдет собеседование',
     [LocalizationKey.RoomDateAndTime]: 'Дата и время',
     [LocalizationKey.RoomQuestions]: 'Список вопросов',
     [LocalizationKey.RoomSelectedQuestions]: 'Выбрано вопросов',
@@ -593,7 +636,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.RoomExaminees]: 'Собеседуемые',
     [LocalizationKey.SearchByValue]: 'Поиск по содержимому',
     [LocalizationKey.Recognized]: '🗣️',
-    [LocalizationKey.UserStreamError]: 'Не удалось получить доступ к камере и микрофону',
+    [LocalizationKey.UserStreamError]:
+      'Не удалось получить доступ к камере и микрофону',
     [LocalizationKey.ChatWelcomeMessage]: 'Добро пожаловать',
     [LocalizationKey.ChatWelcomeMessageNickname]: 'Система',
     [LocalizationKey.ChatMessagePlaceholder]: 'Написать в чат',
@@ -603,12 +647,14 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.RootCategories]: 'Корневые категории',
     [LocalizationKey.Category]: 'Категория',
     [LocalizationKey.Subcategory]: 'Подкатегория',
-    [LocalizationKey.SelectCategorySubcategory]: 'Для поиска и добавления вопроса укажите категорию и подкатегорию, а затем выберите вопросы из списка',
+    [LocalizationKey.SelectCategorySubcategory]:
+      'Для поиска и добавления вопроса укажите категорию и подкатегорию, а затем выберите вопросы из списка',
     [LocalizationKey.ClosedRooms]: 'Закрытые',
     [LocalizationKey.ToRooms]: 'Перейти ко встречам',
     [LocalizationKey.Warning]: 'ВНИМАНИЕ!',
     [LocalizationKey.CallRecording]: 'Встреча записывается',
-    [LocalizationKey.VoiceRecognitionNotSupported]: 'Распознавание голоса не поддерживается вашим браузером',
+    [LocalizationKey.VoiceRecognitionNotSupported]:
+      'Распознавание голоса не поддерживается вашим браузером',
     [LocalizationKey.Archive]: 'В архив',
     [LocalizationKey.ArchiveLoading]: 'Ахивирование...',
     [LocalizationKey.Unarchive]: 'Разархивировать',
@@ -630,7 +676,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.ThemeLight]: 'Светлая тема',
     [LocalizationKey.ThemeDark]: 'Тёмная тема',
     [LocalizationKey.Language]: 'Язык',
-    [LocalizationKey.PleaseSelectRecognitionLanguage]: 'Пожалуйста, укажите язык на котором будете говорить',
+    [LocalizationKey.PleaseSelectRecognitionLanguage]:
+      'Пожалуйста, укажите язык на котором будете говорить',
     [LocalizationKey.RecognitionLanguage]: 'Язык транскрибации',
     [LocalizationKey.FontSize]: 'Размер шрифта',
     [LocalizationKey.You]: 'Вы',
@@ -641,7 +688,8 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.LocalizationLangRu]: 'Русский',
     [LocalizationKey.AiAssistantName]: 'Михаил (Альфа)',
     [LocalizationKey.AiAssistantWelcomePrompt]: 'Привет Михаил',
-    [LocalizationKey.ErrorApplyRoomInvite]: 'Приглашение на встречу недействительно',
+    [LocalizationKey.ErrorApplyRoomInvite]:
+      'Приглашение на встречу недействительно',
     [LocalizationKey.RoomInvitesLoading]: 'Загрузка приглашений в комнату',
     [LocalizationKey.Invitations]: 'Приглашения',
     [LocalizationKey.InviteViaLink]: 'Пригласить по ссылке',
@@ -650,10 +698,14 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.CopiedToClipboard]: 'Скопировано в буфер обмена',
     [LocalizationKey.Of]: 'из',
     [LocalizationKey.RoomQuestionEvaluationTitle]: 'Оцените ответ',
-    [LocalizationKey.SaveRoomQuestionEvaluationWarningLine1]: 'Вы действительно хотите сохранить отзыв?',
-    [LocalizationKey.SaveRoomQuestionEvaluationWarningLine2]: 'После сохранения редактирование будет невозможным.',
-    [LocalizationKey.CloseRoomWithoutQuestionEvaluationWarningLine1]: 'Вы действительно хотите закрыть оценивание не дожидаясь оценок других участников?',
-    [LocalizationKey.CloseRoomWithoutQuestionEvaluationWarningLine2]: 'Если остальные участники оставят отзывы, оценивание завершится автоматически.',
+    [LocalizationKey.SaveRoomQuestionEvaluationWarningLine1]:
+      'Вы действительно хотите сохранить отзыв?',
+    [LocalizationKey.SaveRoomQuestionEvaluationWarningLine2]:
+      'После сохранения редактирование будет невозможным.',
+    [LocalizationKey.CloseRoomWithoutQuestionEvaluationWarningLine1]:
+      'Вы действительно хотите закрыть оценивание не дожидаясь оценок других участников?',
+    [LocalizationKey.CloseRoomWithoutQuestionEvaluationWarningLine2]:
+      'Если остальные участники оставят отзывы, оценивание завершится автоматически.',
     [LocalizationKey.MarksGroupBad]: 'Плохо',
     [LocalizationKey.MarksGroupMedium]: 'Удовлетв.',
     [LocalizationKey.MarksGroupGood]: 'Хорошо',
@@ -665,31 +717,43 @@ export const LocalizationCaptions: Record<LocalizationLang, Record<LocalizationK
     [LocalizationKey.AnswerDetails]: 'Детали ответа',
     [LocalizationKey.QuestionAnswerDetails]: 'Детали ответа на вопрос',
     [LocalizationKey.EmptyRoomNameError]: 'Пожалуйста, укажите имя встречи',
-    [LocalizationKey.RoomEmptyStartTimeError]: 'Пожалуйста, укажите время начала встречи',
-    [LocalizationKey.RoomStartTimeMustBeGreaterError]: 'Время начала встречи должно быть больше текущего времени',
-    [LocalizationKey.RoomEmptyQuestionsListError]: 'Пожалуйста, добавьте вопросы в список вопросов',
+    [LocalizationKey.RoomEmptyStartTimeError]:
+      'Пожалуйста, укажите время начала встречи',
+    [LocalizationKey.RoomStartTimeMustBeGreaterError]:
+      'Время начала встречи должно быть больше текущего времени',
+    [LocalizationKey.RoomEmptyQuestionsListError]:
+      'Пожалуйста, добавьте вопросы в список вопросов',
     [LocalizationKey.InterviewHistoryTitle]: 'История собеседований',
-    [LocalizationKey.RoomReviewAlreadyGiven]: 'Вы уже дали отзыв о собеседовании. Ожидание оценки от остальных участников.',
+    [LocalizationKey.RoomReviewAlreadyGiven]:
+      'Вы уже дали отзыв о собеседовании. Ожидание оценки от остальных участников.',
     [LocalizationKey.RoomReviewSave]: 'Завершить заполнение',
     [LocalizationKey.RoomReviewWaiting]: 'Ожидание оценки',
-    [LocalizationKey.EmptyCommentQuestionEvaluation]: 'Напишите комментарий  к ответу на вопрос',
+    [LocalizationKey.EmptyCommentQuestionEvaluation]:
+      'Напишите комментарий  к ответу на вопрос',
     [LocalizationKey.QurstionTranscription]: 'Транскрибация ответа',
     [LocalizationKey.QuestionCode]: 'Код вопроса',
     [LocalizationKey.AnswerCode]: 'Код ответа',
-    [LocalizationKey.WeAwareOfProblem]: 'Мы уже знаем о проблеме и работаем над ее решением',
-    [LocalizationKey.CurrentQuestionNotBeSaved]: 'Текущий вопрос не будет сохранен',
-    [LocalizationKey.CurrentRoomNotBeSaved]: 'Текущая комната не будет сохранена',
-    [LocalizationKey.LoadingAccountError]: 'Не удалось загрузить профиль пользователя',
+    [LocalizationKey.WeAwareOfProblem]:
+      'Мы уже знаем о проблеме и работаем над ее решением',
+    [LocalizationKey.CurrentQuestionNotBeSaved]:
+      'Текущий вопрос не будет сохранен',
+    [LocalizationKey.CurrentRoomNotBeSaved]:
+      'Текущая комната не будет сохранена',
+    [LocalizationKey.LoadingAccountError]:
+      'Не удалось загрузить профиль пользователя',
     [LocalizationKey.LoadingAccountErrorTitle]: 'Ошибка загрузки профиля',
     [LocalizationKey.Opinions]: 'Мнения',
     [LocalizationKey.Transcription]: 'Транскрибация',
-    [LocalizationKey.CompleteAndEvaluateCandidate]: 'Завершить и оценить кандидата',
+    [LocalizationKey.CompleteAndEvaluateCandidate]:
+      'Завершить и оценить кандидата',
     [LocalizationKey.QuestionsArchive]: 'Архив вопросов',
     [LocalizationKey.WaitingInterviewStart]: 'Ожидание начала собеседования',
-    [LocalizationKey.RoomStartDescription]: 'После начала собеседования будет установлен первый вопрос из подготовленного списка',
+    [LocalizationKey.RoomStartDescription]:
+      'После начала собеседования будет установлен первый вопрос из подготовленного списка',
     [LocalizationKey.NoData]: 'Нет данных',
     [LocalizationKey.UserConnectedToRoom]: 'подключился(ась)',
-    [LocalizationKey.NotEnoughRights]: 'Недостаточно прав для просмотра содержимого',
+    [LocalizationKey.NotEnoughRights]:
+      'Недостаточно прав для просмотра содержимого',
     [LocalizationKey.WebcamBackgroundBlur]: 'Размытие фона',
   },
-}
+};

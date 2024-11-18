@@ -42,7 +42,7 @@ export const VideoChatVideo: FunctionComponent<VideoChatVideoProps> = ({
   return (
     <>
       {(!videoStream || loading) && (
-        <div className='flex items-center h-full justify-center'>
+        <div className="flex items-center h-full justify-center">
           <Loader />
         </div>
       )}
@@ -50,7 +50,7 @@ export const VideoChatVideo: FunctionComponent<VideoChatVideoProps> = ({
         {blurBg && (
           <video
             ref={refVideoBgBlur}
-            className='absolute w-full h-full object-cover blur-lg'
+            className="absolute w-full h-full object-cover blur-lg"
             muted
             autoPlay
             playsInline
@@ -58,7 +58,12 @@ export const VideoChatVideo: FunctionComponent<VideoChatVideoProps> = ({
             Video not supported
           </video>
         )}
-        <video playsInline autoPlay ref={refVideo} className={`videochat-video relative ${cover ? 'object-cover' : ''}`} />
+        <video
+          playsInline
+          autoPlay
+          ref={refVideo}
+          className={`videochat-video relative ${cover ? 'object-cover' : ''}`}
+        />
         <audio playsInline autoPlay ref={refAudio} />
       </>
     </>

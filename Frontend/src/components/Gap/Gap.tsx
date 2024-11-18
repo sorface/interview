@@ -5,13 +5,10 @@ interface GapProps {
   horizontal?: boolean;
 }
 
-export const Gap: FunctionComponent<GapProps> = ({
-  sizeRem,
-  horizontal,
-}) => {
+export const Gap: FunctionComponent<GapProps> = ({ sizeRem, horizontal }) => {
   return (
     <div
-      className='shrink-0'
+      className="shrink-0"
       style={{ [horizontal ? 'width' : 'height']: `${sizeRem}rem` }}
     />
   );

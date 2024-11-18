@@ -49,9 +49,14 @@ export const Icon: FunctionComponent<IconProps> = ({
   const dangerClassName = danger ? themeDangerClassName : '';
 
   return (
-    <div className={`icon ${sizeClassName} ${secondaryClassName} ${dangerClassName}`} role='img'>
-      <div className='icon-inner'>
-        <svg><use href={`${iconsSpritesheet}#${name}`} /></svg>
+    <div
+      className={`icon ${sizeClassName} ${secondaryClassName} ${dangerClassName}`}
+      role="img"
+    >
+      <div className="icon-inner">
+        <svg>
+          <use href={`${iconsSpritesheet}#${name}`} />
+        </svg>
       </div>
     </div>
   );

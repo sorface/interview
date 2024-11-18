@@ -1,6 +1,9 @@
 import { FunctionComponent, useContext, useEffect, useState } from 'react';
 import { useApiMethod } from '../../hooks/useApiMethod';
-import { GetAnswerParams, roomQuestionApiDeclaration } from '../../apiDeclarations';
+import {
+  GetAnswerParams,
+  roomQuestionApiDeclaration,
+} from '../../apiDeclarations';
 import { Loader } from '../Loader/Loader';
 import { Typography } from '../Typography/Typography';
 import { RoomQuestionAnswer } from '../../types/room';
@@ -22,23 +25,30 @@ interface QuestionAnswerDetailsProps {
   allUsers: Map<User['id'], Pick<User, 'nickname' | 'avatar'>>;
 }
 
-export const QuestionAnswerDetails: FunctionComponent<QuestionAnswerDetailsProps> = ({
-  roomId,
-  questionId,
-  questionTitle,
-  allUsers,
-}) => {
+export const QuestionAnswerDetails: FunctionComponent<
+  QuestionAnswerDetailsProps
+> = ({ roomId, questionId, questionTitle, allUsers }) => {
   const localizationCaptions = useLocalizationCaptions();
   const { themeInUi } = useContext(ThemeContext);
-  const { apiMethodState, fetchData } = useApiMethod<RoomQuestionAnswer, GetAnswerParams>(roomQuestionApiDeclaration.getAnswer);
-  const { process: { loading, error }, data } = apiMethodState;
+  const { apiMethodState, fetchData } = useApiMethod<
+    RoomQuestionAnswer,
+    GetAnswerParams
+  >(roomQuestionApiDeclaration.getAnswer);
+  const {
+    process: { loading, error },
+    data,
+  } = apiMethodState;
   const [codeQuestionTab, setCodeQuestionTab] = useState<0 | 1>(0);
-  const answerCodeEditorContent = data?.details[data?.details.length - 1]?.answerCodeEditorContent;
-  const hasTranscriptions = !!(data?.details.some(details => !!details.transcription.length));
+  const answerCodeEditorContent =
+    data?.details[data?.details.length - 1]?.answerCodeEditorContent;
+  const hasTranscriptions = !!data?.details.some(
+    (details) => !!details.transcription.length,
+  );
   const hasCodeEditorContent = !!(typeof data?.codeEditor === 'string');
-  const codeEditorValue = (codeQuestionTab === 0) && hasCodeEditorContent ?
-    data?.codeEditor?.content || '' :
-    answerCodeEditorContent;
+  const codeEditorValue =
+    codeQuestionTab === 0 && hasCodeEditorContent
+      ? data?.codeEditor?.content || ''
+      : answerCodeEditorContent;
 
   useEffect(() => {
     if (!roomId || !questionId) {
@@ -51,22 +61,22 @@ export const QuestionAnswerDetails: FunctionComponent<QuestionAnswerDetailsProps
   }, [roomId, questionId, fetchData]);
 
   if (loading) {
-    return (
-      <Loader />
-    );
+    return <Loader />;
   }
 
   if (error) {
     return (
-      <Typography error size='m'>{error}</Typography>
+      <Typography error size="m">
+        {error}
+      </Typography>
     );
   }
 
   return (
-    <div className='text-left flex flex-col'>
+    <div className="text-left flex flex-col">
       {(data?.codeEditor || answerCodeEditorContent) && (
         <>
-          <Typography size='xl' bold>
+          <Typography size="xl" bold>
             {questionTitle}
           </Typography>
           <Gap sizeRem={2.25} />
@@ -91,15 +101,12 @@ export const QuestionAnswerDetails: FunctionComponent<QuestionAnswerDetailsProps
               />
             </>
           ) : (
-            <Button
-              variant='invertedActive'
-              className='w-fit'
-            >
+            <Button variant="invertedActive" className="w-fit">
               {localizationCaptions[LocalizationKey.AnswerCode]}
             </Button>
           )}
           <Gap sizeRem={1} />
-          <div className='h-32.25'>
+          <div className="h-32.25">
             <CodeEditor
               language={data.codeEditor?.lang || CodeEditorLang.Plaintext}
               languages={[data.codeEditor?.lang || CodeEditorLang.Plaintext]}
@@ -110,32 +117,39 @@ export const QuestionAnswerDetails: FunctionComponent<QuestionAnswerDetailsProps
             />
           </div>
           <Gap sizeRem={2.25} />
-          <Typography size='m' bold>
+          <Typography size="m" bold>
             {localizationCaptions[LocalizationKey.QurstionTranscription]}
           </Typography>
           <Gap sizeRem={1} />
         </>
       )}
-      <div className='flex flex-col'>
+      <div className="flex flex-col">
         {!hasTranscriptions && (
-          <div className='text-center'>
-            <Typography size='m' secondary>
+          <div className="text-center">
+            <Typography size="m" secondary>
               {localizationCaptions[LocalizationKey.NoData]}
             </Typography>
             <Gap sizeRem={1.5} />
           </div>
         )}
-        {data?.details.map(detail => detail.transcription.map((transcription, index, allTranscriptions) => (
-          <ChatMessage
-            key={transcription.id}
-            createdAt={transcription.createdAt}
-            message={transcription.payload}
-            nickname={transcription.user.nickname}
-            avatar={allUsers.get(transcription.user.id)?.avatar}
-            removePaggingTop={index === 0}
-            stackWithPrevious={allTranscriptions[index - 1]?.user.id === transcription.user.id}
-          />
-        )))}
+        {data?.details.map((detail) =>
+          detail.transcription.map(
+            (transcription, index, allTranscriptions) => (
+              <ChatMessage
+                key={transcription.id}
+                createdAt={transcription.createdAt}
+                message={transcription.payload}
+                nickname={transcription.user.nickname}
+                avatar={allUsers.get(transcription.user.id)?.avatar}
+                removePaggingTop={index === 0}
+                stackWithPrevious={
+                  allTranscriptions[index - 1]?.user.id ===
+                  transcription.user.id
+                }
+              />
+            ),
+          ),
+        )}
       </div>
     </div>
   );

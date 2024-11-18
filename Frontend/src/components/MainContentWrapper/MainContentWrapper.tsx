@@ -9,14 +9,14 @@ interface MainContentWrapperProps {
   children: ReactNode;
 }
 
-export const MainContentWrapper: FunctionComponent<MainContentWrapperProps> =
-  ({ className, withMargin, children }) => {
-    return (
-      <FieldsBlock
-        withMargin={withMargin}
-        className={`${className} h-full`}
-      >
-        {children}
-      </FieldsBlock>
-    );
-  };
+export const MainContentWrapper: FunctionComponent<MainContentWrapperProps> = ({
+  className,
+  withMargin,
+  children,
+}) => {
+  return (
+    <FieldsBlock withMargin={withMargin} className={`${className} h-full`}>
+      {children}
+    </FieldsBlock>
+  );
+};

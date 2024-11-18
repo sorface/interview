@@ -1,5 +1,15 @@
-import { ChangeEventHandler, FunctionComponent, useContext, useState } from 'react';
-import Editor, { OnChange, OnMount, BeforeMount, Monaco } from '@monaco-editor/react';
+import {
+  ChangeEventHandler,
+  FunctionComponent,
+  useContext,
+  useState,
+} from 'react';
+import Editor, {
+  OnChange,
+  OnMount,
+  BeforeMount,
+  Monaco,
+} from '@monaco-editor/react';
 import { CodeEditorLang } from '../../types/question';
 import { Theme, ThemeContext } from '../../context/ThemeContext';
 
@@ -10,7 +20,7 @@ export const defaultCodeEditorFontSize = 13;
 const fontSizeOptions = [10, 12, 13, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48];
 
 const renderOptions = (options: Array<number | string>) =>
-  options.map(option => (
+  options.map((option) => (
     <option key={option} value={option}>
       {option}
     </option>
@@ -46,13 +56,17 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   const { themeInUi } = useContext(ThemeContext);
   const [fontSize, setFontSize] = useState(defaultCodeEditorFontSize);
 
-  const handleFontSizeChange: ChangeEventHandler<HTMLSelectElement> = (event) => {
+  const handleFontSizeChange: ChangeEventHandler<HTMLSelectElement> = (
+    event,
+  ) => {
     const newFontSize = Number(event.target.value);
     setFontSize(newFontSize);
     onFontSizeChange?.(newFontSize);
   };
 
-  const handleLanguageChange: ChangeEventHandler<HTMLSelectElement> = (event) => {
+  const handleLanguageChange: ChangeEventHandler<HTMLSelectElement> = (
+    event,
+  ) => {
     onLanguageChange?.(event.target.value as CodeEditorLang);
   };
 
@@ -65,21 +79,33 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
         'editor.background': '#233149',
         'editor.lineHighlightBackground': '#FFFFFF0F',
       },
-    }
+    };
     monaco.editor.defineTheme('my-dark', theme);
   };
 
   return (
-    <div className={`code-editor flex flex-col rounded-1.125 overflow-hidden ${className}`}>
-      <div className='code-editor-tools'>
-        <select className='code-editor-tools-select' value={language} disabled={!onLanguageChange} onChange={handleLanguageChange}>
+    <div
+      className={`code-editor flex flex-col rounded-1.125 overflow-hidden ${className}`}
+    >
+      <div className="code-editor-tools">
+        <select
+          className="code-editor-tools-select"
+          value={language}
+          disabled={!onLanguageChange}
+          onChange={handleLanguageChange}
+        >
           {renderOptions(languages)}
         </select>
-        <select className='code-editor-tools-select' value={fontSize} disabled={!onFontSizeChange} onChange={handleFontSizeChange}>
+        <select
+          className="code-editor-tools-select"
+          value={fontSize}
+          disabled={!onFontSizeChange}
+          onChange={handleFontSizeChange}
+        >
           {renderOptions(fontSizeOptions)}
         </select>
       </div>
-      <div className='flex-1'>
+      <div className="flex-1">
         <Editor
           keepCurrentModel={true}
           options={{

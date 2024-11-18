@@ -21,15 +21,19 @@ export const DeviceSelect: FunctionComponent<DeviceSelectProps> = ({
     const deviceIdFromStorage = localStorage.getItem(localStorageKey);
     const deviceFromStorageAvailable =
       deviceIdFromStorage &&
-      devices.find(device => device.deviceId === deviceIdFromStorage);
-    const newValue = deviceFromStorageAvailable ? deviceIdFromStorage : devices[0]?.deviceId;
+      devices.find((device) => device.deviceId === deviceIdFromStorage);
+    const newValue = deviceFromStorageAvailable
+      ? deviceIdFromStorage
+      : devices[0]?.deviceId;
     setValue(newValue);
     onSelect(newValue);
   }, [devices, localStorageKey, onSelect]);
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const selectedDeviceId = event.target.value;
-    const selectedDevice = devices.find(device => device.deviceId === selectedDeviceId);
+    const selectedDevice = devices.find(
+      (device) => device.deviceId === selectedDeviceId,
+    );
     if (!selectedDevice) {
       console.warn(`empty selectedDevice: ${selectedDeviceId}`);
       return;
@@ -42,20 +46,13 @@ export const DeviceSelect: FunctionComponent<DeviceSelectProps> = ({
   return (
     <>
       {icon && (
-        <div className='pr-0.25'>
+        <div className="pr-0.25">
           <Icon name={icon} />
         </div>
       )}
-      <select
-        value={value}
-        className='w-full'
-        onChange={handleChange}
-      >
-        {devices.map(device => (
-          <option
-            key={device.deviceId}
-            value={device.deviceId}
-          >
+      <select value={value} className="w-full" onChange={handleChange}>
+        {devices.map((device) => (
+          <option key={device.deviceId} value={device.deviceId}>
             {device.label}
           </option>
         ))}

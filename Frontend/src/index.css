@@ -1,39 +1,39 @@
 :root {
   --pi: 3.14159265358979;
 
-  --blue-main: #0666E2;
-  --blue-light: #EBF2FF;
-  --blue-dark: #0058CA;
-  --dark: #24243A;
+  --blue-main: #0666e2;
+  --blue-light: #ebf2ff;
+  --blue-dark: #0058ca;
+  --dark: #24243a;
   --dark-dark1: #172849;
-  --dark-dark2: #101E36;
-  --dark-dark-button: #404B65;
-  --grey3: #838AA4;
-  --grey2: #C3CBDF;
-  --grey1: #F5F6F8;
-  --white: #FFFFFF;
-  --red: #D91404;
-  --red-light: #F8E5E4;
-  --green-light: #E9F8E7;
-  --grey-active: #F1F3F8;
-  --dark-grey4: #5A709C;
-  --dark-white: #FAFAFA;
-  --dark-orange: #E94D2B;
-  --dark-orange-light: #E09E6D;
-  --dark-blue: #0666E2;
-  --dark-blue-light: #579EF9;
-  --dark-green: #3FA96A;
-  --dark-green-light: #3FA96A;
+  --dark-dark2: #101e36;
+  --dark-dark-button: #404b65;
+  --grey3: #838aa4;
+  --grey2: #c3cbdf;
+  --grey1: #f5f6f8;
+  --white: #ffffff;
+  --red: #d91404;
+  --red-light: #f8e5e4;
+  --green-light: #e9f8e7;
+  --grey-active: #f1f3f8;
+  --dark-grey4: #5a709c;
+  --dark-white: #fafafa;
+  --dark-orange: #e94d2b;
+  --dark-orange-light: #e09e6d;
+  --dark-blue: #0666e2;
+  --dark-blue-light: #579ef9;
+  --dark-green: #3fa96a;
+  --dark-green-light: #3fa96a;
   --dark-closed: #273654;
-  --dark-closed-light: #8B9FC7;
+  --dark-closed-light: #8b9fc7;
   --dark-history-hover: #152643;
-  --dark-active: #3A5281;
+  --dark-active: #3a5281;
   --dark-disable: #182947;
-  --dark-input: #4C556B;
-  --dark-red: #E0473A;
+  --dark-input: #4c556b;
+  --dark-red: #e0473a;
 
   --text: var(--dark-white);
-  --page-bg: #0B1529;
+  --page-bg: #0b1529;
   --form-bg: var(--page-bg);
   --wrap-bg: var(--dark-dark2);
   --active: #b9221c;
@@ -58,7 +58,7 @@
   --button-active-color: var(--dark-white);
   --button-active-bg: var(--blue-main);
   --button-active2-bg: var(--dark-active);
-  --button-active-bg-hover: #4096FF;
+  --button-active-bg-hover: #4096ff;
   --button-bg-active: var(--active);
   --button-hover-border-color: var(--text);
   --button-danger-border-color: var(--active);
@@ -73,7 +73,7 @@
   --modal-close-button-text-hover: var(--text);
   --list-border-color: #444;
   --tab-border-color: var(--list-border-color);
-  --active-tab-color: #5993FF;
+  --active-tab-color: #5993ff;
   --border-radius: 0.5rem;
   --fields-block-margin: 0rem 1rem;
   --fields-wrap-margin: 0rem 0rem;
@@ -86,29 +86,29 @@
   --slider-checked: var(--blue-main);
   --modal-bg: #293550;
   --input-border-color: #424242;
-  --room-tools-panel-bg: #0B152940;
+  --room-tools-panel-bg: #0b152940;
   --code-editor-tools-panel-bg: #233149;
   --code-editor-select-border: var(--dark-input);
   --toast-success: var(--dark-green);
   --toast-error: var(--dark-red);
 }
 
-:root[data-theme="Light"] {
-  --text: #1F1F1F;
+:root[data-theme='Light'] {
+  --text: #1f1f1f;
   --page-bg: var(--grey1);
-  --wrap-bg: #FFF;
-  --active-nav-tab: #D9D9D9;
+  --wrap-bg: #fff;
+  --active-nav-tab: #d9d9d9;
   --nav-header-color: var(--dark);
   --nav-item-color: var(--grey3);
   --nav-item-color-hover-background: var(--grey-active);
   --nav-item-active-background: var(--dark);
   --nav-item-active-color: var(--white);
   --nav-category-item-active-color: var(--nav-item-color);
-  --bg-success: #00B96B;
+  --bg-success: #00b96b;
   --shadow: rgba(200, 200, 200, 0.5);
 
   --button-border-color: var(--grey2);
-  --button-bg: #FFF;
+  --button-bg: #fff;
   --button-active-color: var(--button-bg);
   --button-active2-bg: var(--blue-light);
   --button-active-bg: var(--blue-main);
@@ -134,12 +134,19 @@
   --toast-error: var(--red-light);
 }
 
-:root[data-color-transition="enabled"] * {
-  transition: background-color 300ms, border-color 300ms, transform 300ms;
+:root[data-color-transition='enabled'] * {
+  transition:
+    background-color 300ms,
+    border-color 300ms,
+    transform 300ms;
 }
 
-:root[data-color-transition="enabled"] .move-transition {
-  transition: background-color 300ms, border-color 300ms, padding-left 200ms, width 200ms;
+:root[data-color-transition='enabled'] .move-transition {
+  transition:
+    background-color 300ms,
+    border-color 300ms,
+    padding-left 200ms,
+    width 200ms;
 }
 
 @media screen and (max-width: 1100px) {
@@ -212,10 +219,10 @@ table td {
 }
 
 textarea,
-input[type="text"],
-input[type="color"],
-input[type="date"],
-input[type="time"] {
+input[type='text'],
+input[type='color'],
+input[type='date'],
+input[type='time'] {
   font-size: 0.875rem;
   color: var(--text);
   background-color: var(--wrap-bg);
@@ -224,7 +231,7 @@ input[type="time"] {
   padding: 0.5rem 1rem;
 }
 
-input[type="color"] {
+input[type='color'] {
   background-color: var(--form-bg);
 }
 
@@ -263,11 +270,19 @@ progress {
   display: block;
 }
 
-progress::-moz-progress-bar { background: var(--button-active-bg); }
+progress::-moz-progress-bar {
+  background: var(--button-active-bg);
+}
 
-progress::-webkit-progress-bar {background-color: var(--wrap-bg);}
-progress::-webkit-progress-value {background-color: var(--button-active-bg) !important;}
-progress[value] {-webkit-appearance: none;}
+progress::-webkit-progress-bar {
+  background-color: var(--wrap-bg);
+}
+progress::-webkit-progress-value {
+  background-color: var(--button-active-bg) !important;
+}
+progress[value] {
+  -webkit-appearance: none;
+}
 
 textarea {
   font-family: 'Manrope';

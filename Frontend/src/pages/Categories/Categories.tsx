@@ -1,6 +1,15 @@
-import React, { ChangeEventHandler, FunctionComponent, useCallback, useEffect, useState } from 'react';
+import React, {
+  ChangeEventHandler,
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import { Link } from 'react-router-dom';
-import { GetCategoriesParams, categoriesApiDeclaration } from '../../apiDeclarations';
+import {
+  GetCategoriesParams,
+  categoriesApiDeclaration,
+} from '../../apiDeclarations';
 import { Field } from '../../components/FieldsBlock/Field';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { IconNames, pathnames } from '../../constants';
@@ -27,14 +36,32 @@ export const Categories: FunctionComponent = () => {
   const [showOnlyWithoutParent, setShowOnlyWithoutParent] = useState(false);
   const [categoryParent, setCategoryParent] = useState('');
 
-  const { apiMethodState: categoriesState, fetchData: fetchCategories } = useApiMethod<Category[], GetCategoriesParams>(categoriesApiDeclaration.getPage);
-  const { process: { loading, error }, data: categories } = categoriesState;
+  const { apiMethodState: categoriesState, fetchData: fetchCategories } =
+    useApiMethod<Category[], GetCategoriesParams>(
+      categoriesApiDeclaration.getPage,
+    );
+  const {
+    process: { loading, error },
+    data: categories,
+  } = categoriesState;
 
-  const { apiMethodState: rootCategoriesState, fetchData: fetchRootCategories } = useApiMethod<Category[], GetCategoriesParams>(categoriesApiDeclaration.getPage);
-  const { process: { loading: rootCategoriesLoading, error: rootCategoriesError }, data: rootCategories } = rootCategoriesState;
+  const {
+    apiMethodState: rootCategoriesState,
+    fetchData: fetchRootCategories,
+  } = useApiMethod<Category[], GetCategoriesParams>(
+    categoriesApiDeclaration.getPage,
+  );
+  const {
+    process: { loading: rootCategoriesLoading, error: rootCategoriesError },
+    data: rootCategories,
+  } = rootCategoriesState;
 
-  const { apiMethodState: archiveCategoryState, fetchData: archiveCategory } = useApiMethod<Category, Category['id']>(categoriesApiDeclaration.archive);
-  const { process: { loading: archiveLoading, error: archiveError }, data: archivedCategory } = archiveCategoryState;
+  const { apiMethodState: archiveCategoryState, fetchData: archiveCategory } =
+    useApiMethod<Category, Category['id']>(categoriesApiDeclaration.archive);
+  const {
+    process: { loading: archiveLoading, error: archiveError },
+    data: archivedCategory,
+  } = archiveCategoryState;
 
   const triggerResetAccumData = `${searchValueInput}${showOnlyWithoutParent}${archivedCategory}${categoryParent}`;
 
@@ -46,7 +73,14 @@ export const Categories: FunctionComponent = () => {
       showOnlyWithoutParent,
       ...(categoryParent && { parentId: categoryParent }),
     });
-  }, [pageNumber, searchValueInput, archivedCategory, showOnlyWithoutParent, categoryParent, fetchCategories]);
+  }, [
+    pageNumber,
+    searchValueInput,
+    archivedCategory,
+    showOnlyWithoutParent,
+    categoryParent,
+    fetchCategories,
+  ]);
 
   useEffect(() => {
     fetchRootCategories({
@@ -65,37 +99,46 @@ export const Categories: FunctionComponent = () => {
     setPageNumber(pageNumber + 1);
   }, [pageNumber]);
 
-  const handleOnlyWithoutParentChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+  const handleOnlyWithoutParentChange: ChangeEventHandler<HTMLInputElement> = (
+    e,
+  ) => {
     setShowOnlyWithoutParent(e.target.checked);
   };
 
-  const handleCategoryParentChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+  const handleCategoryParentChange: ChangeEventHandler<HTMLSelectElement> = (
+    e,
+  ) => {
     setCategoryParent(e.target.value);
   };
 
-  const createCategoryItem = useCallback((category: Category) => (
-    <li key={category.id}>
-      <Field className="category-item">
-        <span>{category.name}</span>
-        {!category.parentId && <Icon name={IconNames.Clipboard} />}
-        <div className="category-controls">
-          <Link to={pathnames.categoriesEdit.replace(':id', category.id)}>
-            <Button>
-              🖊️
-            </Button>
-          </Link>
-          <ActionModal
-            openButtonCaption='📁'
-            error={archiveError}
-            loading={archiveLoading}
-            title={localizationCaptions[LocalizationKey.Archive]}
-            loadingCaption={localizationCaptions[LocalizationKey.ArchiveLoading]}
-            onAction={() => { archiveCategory(category.id) }}
-          />
-        </div>
-      </Field>
-    </li>
-  ), [archiveLoading, archiveError, localizationCaptions, archiveCategory]);
+  const createCategoryItem = useCallback(
+    (category: Category) => (
+      <li key={category.id}>
+        <Field className="category-item">
+          <span>{category.name}</span>
+          {!category.parentId && <Icon name={IconNames.Clipboard} />}
+          <div className="category-controls">
+            <Link to={pathnames.categoriesEdit.replace(':id', category.id)}>
+              <Button>🖊️</Button>
+            </Link>
+            <ActionModal
+              openButtonCaption="📁"
+              error={archiveError}
+              loading={archiveLoading}
+              title={localizationCaptions[LocalizationKey.Archive]}
+              loadingCaption={
+                localizationCaptions[LocalizationKey.ArchiveLoading]
+              }
+              onAction={() => {
+                archiveCategory(category.id);
+              }}
+            />
+          </div>
+        </Field>
+      </li>
+    ),
+    [archiveLoading, archiveError, localizationCaptions, archiveCategory],
+  );
 
   return (
     <MainContentWrapper className="categories-page">
@@ -105,13 +148,13 @@ export const Categories: FunctionComponent = () => {
         onSearchChange={setSearchValueInput}
       >
         <Link to={pathnames.categoriesCreate}>
-          <Button variant='active' className='h-2.5'>
+          <Button variant="active" className="h-2.5">
             <Icon name={IconNames.Add} />
             {localizationCaptions[LocalizationKey.CreateCategory]}
           </Button>
         </Link>
       </PageHeader>
-      <Field className='!mt-0'>
+      <Field className="!mt-0">
         <div className="flex">
           <input
             id="showOnlyWithoutParent"
@@ -119,12 +162,24 @@ export const Categories: FunctionComponent = () => {
             checked={showOnlyWithoutParent}
             onChange={handleOnlyWithoutParentChange}
           />
-          <label htmlFor="showOnlyWithoutParent" className='mr-1'>{localizationCaptions[LocalizationKey.RootCategories]}</label>
-          <label htmlFor="parentID">{localizationCaptions[LocalizationKey.Category]}:</label>
-          <select id="parentID" value={categoryParent} onChange={handleCategoryParentChange}>
-            <option value=''>{localizationCaptions[LocalizationKey.NotSelected]}</option>
-            {rootCategories?.map(rootCategory => (
-              <option key={rootCategory.id} value={rootCategory.id}>{rootCategory.name}</option>
+          <label htmlFor="showOnlyWithoutParent" className="mr-1">
+            {localizationCaptions[LocalizationKey.RootCategories]}
+          </label>
+          <label htmlFor="parentID">
+            {localizationCaptions[LocalizationKey.Category]}:
+          </label>
+          <select
+            id="parentID"
+            value={categoryParent}
+            onChange={handleCategoryParentChange}
+          >
+            <option value="">
+              {localizationCaptions[LocalizationKey.NotSelected]}
+            </option>
+            {rootCategories?.map((rootCategory) => (
+              <option key={rootCategory.id} value={rootCategory.id}>
+                {rootCategory.name}
+              </option>
             ))}
           </select>
         </div>
@@ -138,7 +193,7 @@ export const Categories: FunctionComponent = () => {
           loading={loading || rootCategoriesLoading}
           error={error || archiveError || rootCategoriesError}
           triggerResetAccumData={triggerResetAccumData}
-          loaderClassName='category-item field-wrap'
+          loaderClassName="category-item field-wrap"
           renderItem={createCategoryItem}
           nextPageAvailable={categories?.length === pageSize}
           handleNextPage={handleNextPage}

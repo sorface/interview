@@ -63,43 +63,58 @@ export const Invitations: FunctionComponent<InvitationsProps> = ({
     >
       <div>
         {roomInvitesLoading && (
-          <div className='invitations-modal-item'>
-            <Typography size='m'>
+          <div className="invitations-modal-item">
+            <Typography size="m">
               {localizationCaptions[LocalizationKey.RoomInvitesLoading]}...
             </Typography>
             <Loader />
           </div>
         )}
         {roomInvitesError && (
-          <div className='invitations-modal-item'>{localizationCaptions[LocalizationKey.Error]}: {roomInvitesError}</div>
+          <div className="invitations-modal-item">
+            {localizationCaptions[LocalizationKey.Error]}: {roomInvitesError}
+          </div>
         )}
-        {!roomInvitesLoading && roomInvitesData?.sort(sortInvites).map(roomInvite => {
-          const invitePath = generatePath(pathnames.room, {
-            id: roomId,
-            [inviteParamName]: roomInvite.inviteId,
-          });
-          const inviteUrlDispaly = `${window.location.origin}${invitePath}`;
-          return (
-            <div key={roomInvite.inviteId} className='invitations-modal-item'>
-              <Typography size='m'>{localizeParticipantType(roomInvite.participantType)} ({roomInvite.used}/{roomInvite.max}):</Typography>
-              <Gap sizeRem={0.75} />
-              <div className='invitations-modal-item-link-field'>
-                <Button variant='active2' onClick={() => handleCopyToClipboard(inviteUrlDispaly)}>
-                  <Icon name={IconNames.Link} />
-                  <Gap sizeRem={0.5} horizontal />
-                  {localizationCaptions[LocalizationKey.InviteViaLink]}
-                </Button>
-                <Button variant='text' onClick={() => onGenerateInvite(roomInvite.participantType)}><Icon name={IconNames.Refresh} /></Button>
+        {!roomInvitesLoading &&
+          roomInvitesData?.sort(sortInvites).map((roomInvite) => {
+            const invitePath = generatePath(pathnames.room, {
+              id: roomId,
+              [inviteParamName]: roomInvite.inviteId,
+            });
+            const inviteUrlDispaly = `${window.location.origin}${invitePath}`;
+            return (
+              <div key={roomInvite.inviteId} className="invitations-modal-item">
+                <Typography size="m">
+                  {localizeParticipantType(roomInvite.participantType)} (
+                  {roomInvite.used}/{roomInvite.max}):
+                </Typography>
+                <Gap sizeRem={0.75} />
+                <div className="invitations-modal-item-link-field">
+                  <Button
+                    variant="active2"
+                    onClick={() => handleCopyToClipboard(inviteUrlDispaly)}
+                  >
+                    <Icon name={IconNames.Link} />
+                    <Gap sizeRem={0.5} horizontal />
+                    {localizationCaptions[LocalizationKey.InviteViaLink]}
+                  </Button>
+                  <Button
+                    variant="text"
+                    onClick={() => onGenerateInvite(roomInvite.participantType)}
+                  >
+                    <Icon name={IconNames.Refresh} />
+                  </Button>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
         <Button
-          className='invitations-modal-refresh-all'
-          variant='active2'
+          className="invitations-modal-refresh-all"
+          variant="active2"
           onClick={onGenerateAllInvites}
         >
-          {localizationCaptions[LocalizationKey.RefreshAll]}<Icon name={IconNames.Refresh} />
+          {localizationCaptions[LocalizationKey.RefreshAll]}
+          <Icon name={IconNames.Refresh} />
         </Button>
       </div>
     </Modal>

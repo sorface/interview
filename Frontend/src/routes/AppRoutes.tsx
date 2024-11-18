@@ -25,113 +25,122 @@ interface AppRoutesProps {
   user: User | null;
 }
 
-export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
-  user,
-}) => {
+export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
   const admin = checkAdmin(user);
   const location = useLocation();
   const fullScreenPage = matchPath(
-    { path: pathnames.room.replace(`/:${inviteParamName}?`, ''), end: false, },
+    { path: pathnames.room.replace(`/:${inviteParamName}?`, ''), end: false },
     location.pathname,
   );
   const authenticated = !!user;
 
   return (
     <>
-      {!fullScreenPage && (
-        <NavMenu admin={admin} />
-      )}
+      {!fullScreenPage && <NavMenu admin={admin} />}
       <div className={`App ${fullScreenPage ? 'full-screen-page' : ''}`}>
         <div className="App-content">
           <Routes>
             <Route path={pathnames.home} element={<Home />} />
             <Route path={pathnames.terms} element={<Terms />} />
             <Route path={pathnames.logoutError} element={<LogoutError />} />
-            <Route path={pathnames.roomsParticipants}
+            <Route
+              path={pathnames.roomsParticipants}
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <RoomParticipants />
                 </ProtectedRoute>
               }
             />
-            <Route path={pathnames.roomReview}
+            <Route
+              path={pathnames.roomReview}
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <RoomReview />
                 </ProtectedRoute>
               }
             />
-            <Route path={pathnames.roomAnalytics}
+            <Route
+              path={pathnames.roomAnalytics}
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <RoomAnaytics />
                 </ProtectedRoute>
               }
             />
-            <Route path={pathnames.room}
+            <Route
+              path={pathnames.room}
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <Room />
                 </ProtectedRoute>
               }
             />
-            <Route path={pathnames.highlightRooms}
+            <Route
+              path={pathnames.highlightRooms}
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <Rooms mode={RoomsPageMode.Home} />
                 </ProtectedRoute>
               }
             />
-            <Route path={pathnames.currentRooms}
+            <Route
+              path={pathnames.currentRooms}
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <Rooms mode={RoomsPageMode.Current} />
                 </ProtectedRoute>
               }
             />
-            <Route path={pathnames.closedRooms}
+            <Route
+              path={pathnames.closedRooms}
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <Rooms mode={RoomsPageMode.Closed} />
                 </ProtectedRoute>
               }
             />
-            <Route path={pathnames.questionsArchive}
+            <Route
+              path={pathnames.questionsArchive}
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <QuestionsArchive />
                 </ProtectedRoute>
               }
             />
-            <Route path={pathnames.questions}
+            <Route
+              path={pathnames.questions}
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <Questions />
                 </ProtectedRoute>
               }
             />
-            <Route path={pathnames.session}
+            <Route
+              path={pathnames.session}
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <Session />
                 </ProtectedRoute>
               }
             />
-            <Route path={pathnames.categoriesCreate}
+            <Route
+              path={pathnames.categoriesCreate}
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <CategoriesCreate edit={false} />
                 </ProtectedRoute>
               }
             />
-            <Route path={pathnames.categoriesEdit}
+            <Route
+              path={pathnames.categoriesEdit}
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <CategoriesCreate edit={true} />
                 </ProtectedRoute>
               }
             />
-            <Route path={pathnames.categories}
+            <Route
+              path={pathnames.categories}
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <Categories />
@@ -140,9 +149,7 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({
             />
             <Route path="*" element={<NotFound />} />
           </Routes>
-          {!fullScreenPage && (
-            <Gap sizeRem={0.5} />
-          )}
+          {!fullScreenPage && <Gap sizeRem={0.5} />}
         </div>
       </div>
     </>

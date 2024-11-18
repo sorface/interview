@@ -22,11 +22,11 @@ const ContextMenuComponent: FunctionComponent<ContextMenuProps> = ({
 }) => {
   const defaultToggleContent = <Icon name={IconNames.EllipsisVertical} />;
   const positionClassName =
-    position === 'bottom-right' ?
-      'translate-x--11.375-y-0.25' :
-      position === 'left' ?
-        'translate-x--14.25-y--6.75' :
-        '';
+    position === 'bottom-right'
+      ? 'translate-x--11.375-y-0.25'
+      : position === 'left'
+        ? 'translate-x--14.25-y--6.75'
+        : '';
 
   return (
     <Dropdown
@@ -35,9 +35,7 @@ const ContextMenuComponent: FunctionComponent<ContextMenuProps> = ({
       buttonVariant={buttonVariant}
       contentClassName={`w-13.75 rounded-0.75 ${positionClassName}`}
     >
-      <div className='bg-wrap py-0.5'>
-        {children}
-      </div>
+      <div className="bg-wrap py-0.5">{children}</div>
     </Dropdown>
   );
 };
@@ -52,13 +50,8 @@ const ContextMenuItem: FunctionComponent<ContextMenuItemProps> = ({
   onClick,
 }) => {
   return (
-    <div
-      className='cursor-pointer hover:bg-form px-1 py-0.5'
-      onClick={onClick}
-    >
-      <Typography size='m'>
-        {title}
-      </Typography>
+    <div className="cursor-pointer hover:bg-form px-1 py-0.5" onClick={onClick}>
+      <Typography size="m">{title}</Typography>
     </div>
   );
 };

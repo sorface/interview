@@ -39,15 +39,15 @@ export const Accordion: FunctionComponent<AccordionProps> = ({
         onClick={disabled && !onClick ? undefined : handleOnClick}
       >
         {!disabled && (
-          <span className={`cursor-pointer h-1.125 ${expanded ? 'rotate-90' : ''}`}>
+          <span
+            className={`cursor-pointer h-1.125 ${expanded ? 'rotate-90' : ''}`}
+          >
             <Icon name={IconNames.ChevronForward} />
           </span>
         )}
         {title}
       </div>
-      <div>
-        {expanded && children}
-      </div>
+      <div>{expanded && children}</div>
     </div>
   );
 };

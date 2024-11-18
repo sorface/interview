@@ -30,23 +30,21 @@ export const RoomsHistoryItem: FunctionComponent<RoomsHistoryItemProps> = ({
 
   return (
     <div className={`p-0.5 cursor-pointer rounded-0.375 ${themeClassName}`}>
-      <Link to={roomLink} className='no-underline'>
-        <div className='flex items-center justify-between'>
+      <Link to={roomLink} className="no-underline">
+        <div className="flex items-center justify-between">
           <RoomDateAndTime
             scheduledStartTime={room.scheduledStartTime}
-            typographySize='s'
+            typographySize="s"
             timer={room.timer}
             mini
             secondary
           />
           <div className={`flex items-center ${iconClassName}`}>
-            <Icon name={IconNames.ChevronForward} size='s' />
+            <Icon name={IconNames.ChevronForward} size="s" />
           </div>
         </div>
         <Gap sizeRem={0.25} />
-        <Typography size='s'>
-          {room.name}
-        </Typography>
+        <Typography size="s">{room.name}</Typography>
       </Link>
     </div>
   );

@@ -19,11 +19,11 @@ export const Tabs: FunctionComponent<TabsProps> = ({
   onTabClick,
 }) => {
   return (
-    <div className='tabs'>
-      {tabs.map(tab => (
+    <div className="tabs">
+      {tabs.map((tab) => (
         <div
           key={tab.id}
-          role='tab'
+          role="tab"
           className={`tabs-tab ${tab.id === activeTabId ? 'tabs-tab-active' : ''}`}
           onClick={() => onTabClick(tab.id)}
         >
@@ -31,5 +31,5 @@ export const Tabs: FunctionComponent<TabsProps> = ({
         </div>
       ))}
     </div>
-  )
-}
+  );
+};

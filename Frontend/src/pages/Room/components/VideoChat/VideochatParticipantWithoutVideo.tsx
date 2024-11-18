@@ -9,27 +9,17 @@ interface VideochatParticipantWithoutVideoProps {
   reaction?: string | null;
 }
 
-export const VideochatParticipantWithoutVideo: FunctionComponent<VideochatParticipantWithoutVideoProps> = ({
-  order,
-  avatar,
-  nickname,
-  reaction,
-}) => {
+export const VideochatParticipantWithoutVideo: FunctionComponent<
+  VideochatParticipantWithoutVideoProps
+> = ({ order, avatar, nickname, reaction }) => {
   const orderSafe = order || 2;
   return (
     <div
-      className='videochat-participant-viewer-wrapper'
+      className="videochat-participant-viewer-wrapper"
       style={{ order: orderSafe }}
     >
-      <div
-        className='videochat-participant-viewer'
-      >
-        {avatar && (
-          <UserAvatar
-            src={avatar}
-            nickname={nickname || ''}
-          />
-        )}
+      <div className="videochat-participant-viewer">
+        {avatar && <UserAvatar src={avatar} nickname={nickname || ''} />}
         <div>{nickname}</div>
         <ParticipantReactions reaction={reaction} />
       </div>

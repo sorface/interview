@@ -1,4 +1,10 @@
-import { Fragment, FunctionComponent, useContext, useEffect, useState } from 'react';
+import {
+  Fragment,
+  FunctionComponent,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import toast from 'react-hot-toast';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { useParams } from 'react-router-dom';
@@ -51,12 +57,12 @@ const generateUserOpinion = (userReview: AnalyticsUserReview) => ({
   evaluation: {
     mark: userReview.averageMark,
     review: userReview.comment,
-  }
+  },
 });
 
 const getAllUsers = (data: Analytics) => {
   const users: Map<User['id'], AnalyticsUserReview> = new Map();
-  data.userReview.forEach(userReview => {
+  data.userReview.forEach((userReview) => {
     users.set(userReview.userId, userReview);
   });
   return users;
@@ -70,22 +76,23 @@ export const RoomAnaytics: FunctionComponent = () => {
   const [closeModalOpen, setCloseModalOpen] = useState(false);
   const [loadedData, setLoadedData] = useState<Analytics | null>(null);
 
-  const { apiMethodState, fetchData } = useApiMethod<Analytics, Room['id']>(roomsApiDeclaration.analytics);
-  const { data, process: { loading, error, code } } = apiMethodState;
-
+  const { apiMethodState, fetchData } = useApiMethod<Analytics, Room['id']>(
+    roomsApiDeclaration.analytics,
+  );
   const {
-    apiMethodState: roomApiMethodState,
-    fetchData: fetchRoom,
-  } = useApiMethod<Room, Room['id']>(roomsApiDeclaration.getById);
+    data,
+    process: { loading, error, code },
+  } = apiMethodState;
+
+  const { apiMethodState: roomApiMethodState, fetchData: fetchRoom } =
+    useApiMethod<Room, Room['id']>(roomsApiDeclaration.getById);
   const {
     process: { loading: roomLoading, error: roomError },
     data: room,
   } = roomApiMethodState;
 
-  const {
-    apiMethodState: apiRoomCloseMethodState,
-    fetchData: fetchRoomClose,
-  } = useApiMethod<unknown, Room['id']>(roomsApiDeclaration.close);
+  const { apiMethodState: apiRoomCloseMethodState, fetchData: fetchRoomClose } =
+    useApiMethod<unknown, Room['id']>(roomsApiDeclaration.close);
   const {
     process: {
       loading: roomCloseLoading,
@@ -100,13 +107,17 @@ export const RoomAnaytics: FunctionComponent = () => {
 
   const totalError = (!viewNotAllowed && error) || roomError;
 
-  const allUsers = loadedData ? getAllUsers(loadedData) : new Map<User['id'], AnalyticsUserReview>();
+  const allUsers = loadedData
+    ? getAllUsers(loadedData)
+    : new Map<User['id'], AnalyticsUserReview>();
 
   const examinees = room?.participants.filter(
-    participant => participant.type === 'Examinee'
+    (participant) => participant.type === 'Examinee',
   );
 
-  const openedQuestionDetailsTitle = data?.questions.find(question => question.id === openedQuestionDetails)?.value;
+  const openedQuestionDetailsTitle = data?.questions.find(
+    (question) => question.id === openedQuestionDetails,
+  )?.value;
 
   useEffect(() => {
     if (!id) {
@@ -193,27 +204,31 @@ export const RoomAnaytics: FunctionComponent = () => {
         <Gap sizeRem={1} />
       </Modal>
 
-      <PageHeader title={`${localizationCaptions[LocalizationKey.RoomReviewPageName]} ${room?.name}`} />
+      <PageHeader
+        title={`${localizationCaptions[LocalizationKey.RoomReviewPageName]} ${room?.name}`}
+      />
       <Gap sizeRem={1} />
       {totalError && (
-        <div className='text-left'>
-          <Typography size='m' error>{localizationCaptions[LocalizationKey.Error]}: {totalError}</Typography>
+        <div className="text-left">
+          <Typography size="m" error>
+            {localizationCaptions[LocalizationKey.Error]}: {totalError}
+          </Typography>
         </div>
       )}
       {roomLoading ? (
-        <InfoBlock className='h-9.375 flex items-center justify-center'>
+        <InfoBlock className="h-9.375 flex items-center justify-center">
           <Loader />
         </InfoBlock>
       ) : (
-        <div className='flex text-left'>
-          <InfoBlock className='flex-1'>
-            <div className='flex'>
+        <div className="flex text-left">
+          <InfoBlock className="flex-1">
+            <div className="flex">
               {room?.scheduledStartTime && (
                 <RoomInfoColumn
                   header={localizationCaptions[LocalizationKey.RoomDateAndTime]}
                   conent={
                     <RoomDateAndTime
-                      typographySize='s'
+                      typographySize="s"
                       scheduledStartTime={room.scheduledStartTime}
                       timer={room.timer}
                       mini
@@ -226,22 +241,29 @@ export const RoomAnaytics: FunctionComponent = () => {
                 header={localizationCaptions[LocalizationKey.Examinee]}
                 conent={
                   examinees?.length ? (
-                    <div className='flex items-center'>
-                      {examinees.map(examinee => (
+                    <div className="flex items-center">
+                      {examinees.map((examinee) => (
                         <Fragment>
-                          <Typography size='xs'>
-                            <div className='flex'>
-                              <UserAvatar nickname={examinee.nickname} size='xxs' src={examinee.avatar} />
+                          <Typography size="xs">
+                            <div className="flex">
+                              <UserAvatar
+                                nickname={examinee.nickname}
+                                size="xxs"
+                                src={examinee.avatar}
+                              />
                             </div>
                           </Typography>
                           <Gap sizeRem={0.25} horizontal />
-                          <span className='capitalize'>{examinee.nickname}</span>
+                          <span className="capitalize">
+                            {examinee.nickname}
+                          </span>
                           <Gap sizeRem={1} horizontal />
                         </Fragment>
                       ))}
                     </div>
-                  ) :
+                  ) : (
                     localizationCaptions[LocalizationKey.NotFound]
+                  )
                 }
                 mini
               />
@@ -249,22 +271,26 @@ export const RoomAnaytics: FunctionComponent = () => {
             <Gap sizeRem={2} />
             <RoomInfoColumn
               header={localizationCaptions[LocalizationKey.RoomParticipants]}
-              conent={<RoomParticipants participants={room?.participants || []} />}
+              conent={
+                <RoomParticipants participants={room?.participants || []} />
+              }
               mini
             />
           </InfoBlock>
           {!viewNotAllowed && (
             <>
               <Gap sizeRem={0.5} horizontal />
-              <InfoBlock className='px-5 flex flex-col items-center'>
-                <Typography size='m' bold>
+              <InfoBlock className="px-5 flex flex-col items-center">
+                <Typography size="m" bold>
                   {localizationCaptions[LocalizationKey.AverageCandidateMark]}
                 </Typography>
                 <Gap sizeRem={1} />
                 <CircularProgress
                   value={averageMarkOrNull ? averageMarkOrNull * 10 : null}
-                  caption={averageMarkOrNull ? averageMarkOrNull.toFixed(1) : null}
-                  size='m'
+                  caption={
+                    averageMarkOrNull ? averageMarkOrNull.toFixed(1) : null
+                  }
+                  size="m"
                 />
               </InfoBlock>
             </>
@@ -273,26 +299,36 @@ export const RoomAnaytics: FunctionComponent = () => {
       )}
       <Gap sizeRem={0.5} />
       {viewNotAllowed && (
-        <InfoBlock className='text-left'>
-          <Typography size='m' bold>{localizationCaptions[LocalizationKey.NotEnoughRights]}</Typography>
+        <InfoBlock className="text-left">
+          <Typography size="m" bold>
+            {localizationCaptions[LocalizationKey.NotEnoughRights]}
+          </Typography>
         </InfoBlock>
       )}
       {!viewNotAllowed && (
         <>
-          <InfoBlock className='text-left'>
-            {(!loadedData && loading) ? (
-              <div className='h-9.375 flex items-center justify-center'>
+          <InfoBlock className="text-left">
+            {!loadedData && loading ? (
+              <div className="h-9.375 flex items-center justify-center">
                 <Loader />
               </div>
             ) : (
               <>
-                <Typography size='xl' bold>
+                <Typography size="xl" bold>
                   {localizationCaptions[LocalizationKey.OpinionsAndMarks]}
                   <Gap sizeRem={2} />
                   <ReviewUserGrid>
                     {loadedData?.userReview
-                      .filter(userReview => allUsers.get(userReview.userId)?.participantType === 'Expert')
-                      .filter(userReview => data?.completed ? typeof userReview.averageMark === 'number' : true)
+                      .filter(
+                        (userReview) =>
+                          allUsers.get(userReview.userId)?.participantType ===
+                          'Expert',
+                      )
+                      .filter((userReview) =>
+                        data?.completed
+                          ? typeof userReview.averageMark === 'number'
+                          : true,
+                      )
                       .map((userReview) => (
                         <ReviewUserOpinion
                           key={userReview.userId}
@@ -306,14 +342,14 @@ export const RoomAnaytics: FunctionComponent = () => {
             )}
           </InfoBlock>
           <Gap sizeRem={0.5} />
-          <InfoBlock className='text-left'>
-            {(!loadedData && loading) ? (
-              <div className='h-4 flex items-center justify-center'>
+          <InfoBlock className="text-left">
+            {!loadedData && loading ? (
+              <div className="h-4 flex items-center justify-center">
                 <Loader />
               </div>
             ) : (
               <>
-                <Typography size='xl' bold>
+                <Typography size="xl" bold>
                   {localizationCaptions[LocalizationKey.MarksForQuestions]}
                 </Typography>
                 <Gap sizeRem={2} />
@@ -325,7 +361,7 @@ export const RoomAnaytics: FunctionComponent = () => {
                         mark={question.averageMark ?? null}
                         onClick={handleQuestionClick}
                       />
-                      {index !== questions.length - 1 && (<Gap sizeRem={0.25} />)}
+                      {index !== questions.length - 1 && <Gap sizeRem={0.25} />}
                     </Fragment>
                   );
                 })}
@@ -334,40 +370,52 @@ export const RoomAnaytics: FunctionComponent = () => {
           </InfoBlock>
         </>
       )}
-      {(loadedData?.completed === false && room && room?.owner.id === auth?.id) && (
-        <>
-          <Gap sizeRem={1.75} />
-          <div className='flex justify-end'>
-            <Button
-              onClick={handleOpenCloseModal}
-            >
-              {localizationCaptions[LocalizationKey.CloseRoomWithoutReview]}
-            </Button>
-            <Gap sizeRem={1} horizontal />
-          </div>
-          <Modal
-            contentLabel=''
-            open={closeModalOpen}
-            onClose={handleCloseCloseModal}
-          >
-            <ModalWarningContent
-              iconName={IconNames.HelpCircle}
-              captionLine1={localizationCaptions[LocalizationKey.CloseRoomWithoutQuestionEvaluationWarningLine1]}
-              captionLine2={localizationCaptions[LocalizationKey.CloseRoomWithoutQuestionEvaluationWarningLine2]}
-            />
-            <ModalFooter>
-              <Button onClick={handleCloseCloseModal}>{localizationCaptions[LocalizationKey.Cancel]}</Button>
-              <Button onClick={handleCloseRoom} variant='active'>
-                {roomCloseLoading ? (
-                  <Loader />
-                ) : (
-                  localizationCaptions[LocalizationKey.Save]
-                )}
+      {loadedData?.completed === false &&
+        room &&
+        room?.owner.id === auth?.id && (
+          <>
+            <Gap sizeRem={1.75} />
+            <div className="flex justify-end">
+              <Button onClick={handleOpenCloseModal}>
+                {localizationCaptions[LocalizationKey.CloseRoomWithoutReview]}
               </Button>
-            </ModalFooter>
-          </Modal>
-        </>
-      )}
+              <Gap sizeRem={1} horizontal />
+            </div>
+            <Modal
+              contentLabel=""
+              open={closeModalOpen}
+              onClose={handleCloseCloseModal}
+            >
+              <ModalWarningContent
+                iconName={IconNames.HelpCircle}
+                captionLine1={
+                  localizationCaptions[
+                    LocalizationKey
+                      .CloseRoomWithoutQuestionEvaluationWarningLine1
+                  ]
+                }
+                captionLine2={
+                  localizationCaptions[
+                    LocalizationKey
+                      .CloseRoomWithoutQuestionEvaluationWarningLine2
+                  ]
+                }
+              />
+              <ModalFooter>
+                <Button onClick={handleCloseCloseModal}>
+                  {localizationCaptions[LocalizationKey.Cancel]}
+                </Button>
+                <Button onClick={handleCloseRoom} variant="active">
+                  {roomCloseLoading ? (
+                    <Loader />
+                  ) : (
+                    localizationCaptions[LocalizationKey.Save]
+                  )}
+                </Button>
+              </ModalFooter>
+            </Modal>
+          </>
+        )}
     </>
   );
 };

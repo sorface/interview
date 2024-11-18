@@ -1,10 +1,18 @@
-import { Dispatch, FunctionComponent, ReactNode, SetStateAction, createContext, useEffect, useState } from 'react'
+import {
+  Dispatch,
+  FunctionComponent,
+  ReactNode,
+  SetStateAction,
+  createContext,
+  useEffect,
+  useState,
+} from 'react';
 
 export enum Theme {
   System = 'System',
   Light = 'Light',
   Dark = 'Dark',
-};
+}
 
 export type ThemeInUi = Theme.Dark | Theme.Light;
 
@@ -18,8 +26,7 @@ interface ThemeContextType {
 
 const localStorageKey = 'theme';
 
-const readFromStorage = () =>
-  localStorage.getItem(localStorageKey);
+const readFromStorage = () => localStorage.getItem(localStorageKey);
 
 const saveToStorage = (theme: Theme) =>
   localStorage.setItem(localStorageKey, String(theme));
@@ -29,7 +36,7 @@ const validateTheme = (theme: string | null) => {
     return theme as Theme;
   }
   return null;
-}
+};
 
 const getThemeInSetting = (): Theme => {
   const themeFromStorage = readFromStorage();
@@ -52,11 +59,12 @@ export const getThemeInUi = () => {
 };
 
 const setDomUiTheme = (theme: Theme) =>
-  document.documentElement.dataset.theme = theme;
+  (document.documentElement.dataset.theme = theme);
 
 export const initThemeInUi = (fastApply: boolean) => {
   const themeInSetting = getThemeInSetting();
-  const themeInUi = themeInSetting === Theme.System ? getThemeInUi() : themeInSetting;
+  const themeInUi =
+    themeInSetting === Theme.System ? getThemeInUi() : themeInSetting;
   if (fastApply) {
     setDomUiTheme(themeInUi);
   }
@@ -66,7 +74,7 @@ export const initThemeInUi = (fastApply: boolean) => {
 export const ThemeContext = createContext<ThemeContextType>({
   themeInSetting: getThemeInSetting(),
   themeInUi: initThemeInUi(false),
-  setTheme: () => { },
+  setTheme: () => {},
 });
 
 interface ThemeProviderProps {
@@ -76,7 +84,8 @@ interface ThemeProviderProps {
 export const ThemeProvider: FunctionComponent<ThemeProviderProps> = ({
   children,
 }) => {
-  const [themeInSetting, setThemeInSetting] = useState<Theme>(getThemeInSetting);
+  const [themeInSetting, setThemeInSetting] =
+    useState<Theme>(getThemeInSetting);
   const [themeInUi, setThemeInUi] = useState<ThemeInUi>(initThemeInUi(true));
 
   useEffect(() => {
@@ -86,7 +95,7 @@ export const ThemeProvider: FunctionComponent<ThemeProviderProps> = ({
 
     return () => {
       clearTimeout(timeoutId);
-    }
+    };
   }, []);
 
   useEffect(() => {
@@ -128,8 +137,10 @@ export const ThemeProvider: FunctionComponent<ThemeProviderProps> = ({
   }, [themeInSetting]);
 
   return (
-    <ThemeContext.Provider value={{ themeInSetting, themeInUi, setTheme: setThemeInSetting }}>
+    <ThemeContext.Provider
+      value={{ themeInSetting, themeInUi, setTheme: setThemeInSetting }}
+    >
       {children}
     </ThemeContext.Provider>
-  )
+  );
 };

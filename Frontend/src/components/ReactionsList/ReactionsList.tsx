@@ -26,14 +26,17 @@ export const ReactionsList: FunctionComponent<ReactionsListProps> = ({
   sortOrder,
   onClick,
 }) => {
-  const handleReactionClick = useCallback((reaction: Reaction) => () => {
-    onClick(reaction);
-  }, [onClick]);
+  const handleReactionClick = useCallback(
+    (reaction: Reaction) => () => {
+      onClick(reaction);
+    },
+    [onClick],
+  );
 
   return (
     <>
       {reactions
-        .filter(reaction => !ignoredReactions.includes(reaction.type.name))
+        .filter((reaction) => !ignoredReactions.includes(reaction.type.name))
         .sort((reaction1, reaction2) => {
           if (reaction1.type.name > reaction2.type.name) {
             return 1 * sortOrder;
@@ -49,11 +52,15 @@ export const ReactionsList: FunctionComponent<ReactionsListProps> = ({
               key={`${reaction.id}${reaction.type.name}`}
               enabled={true}
               loading={reaction.type.name === loadingReactionName}
-              iconEnabledName={reactionIcon[reaction.type.name] || defaultIconName}
-              iconDisabledName={reactionIcon[reaction.type.name] || defaultIconName}
+              iconEnabledName={
+                reactionIcon[reaction.type.name] || defaultIconName
+              }
+              iconDisabledName={
+                reactionIcon[reaction.type.name] || defaultIconName
+              }
               onClick={handleReactionClick(reaction)}
             />
-            {index !== reacts.length - 1 && (<Gap sizeRem={0.125} />)}
+            {index !== reacts.length - 1 && <Gap sizeRem={0.125} />}
           </Fragment>
         ))}
     </>

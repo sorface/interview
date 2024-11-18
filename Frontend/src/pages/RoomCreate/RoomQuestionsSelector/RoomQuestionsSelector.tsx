@@ -1,7 +1,18 @@
-import { ChangeEventHandler, Fragment, FunctionComponent, useEffect, useState } from 'react';
+import {
+  ChangeEventHandler,
+  Fragment,
+  FunctionComponent,
+  useEffect,
+  useState,
+} from 'react';
 import { useApiMethod } from '../../../hooks/useApiMethod';
 import { Category } from '../../../types/category';
-import { GetCategoriesParams, GetQuestionsParams, categoriesApiDeclaration, questionsApiDeclaration } from '../../../apiDeclarations';
+import {
+  GetCategoriesParams,
+  GetQuestionsParams,
+  categoriesApiDeclaration,
+  questionsApiDeclaration,
+} from '../../../apiDeclarations';
 import { useLocalizationCaptions } from '../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../localization';
 import { ModalFooter } from '../../../components/ModalFooter/ModalFooter';
@@ -25,29 +36,50 @@ interface RoomQuestionsSelectorProps {
 const pageSize = 10;
 const initialPageNumber = 1;
 
-export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps> = ({
-  preSelected,
-  onCancel,
-  onSave,
-}) => {
+export const RoomQuestionsSelector: FunctionComponent<
+  RoomQuestionsSelectorProps
+> = ({ preSelected, onCancel, onSave }) => {
   const localizationCaptions = useLocalizationCaptions();
 
-  const { apiMethodState: rootCategoriesState, fetchData: fetchRootCategories } = useApiMethod<Category[], GetCategoriesParams>(categoriesApiDeclaration.getPage);
-  const { process: { loading: rootCategoriesLoading, error: rootCategoriesError }, data: rootCategories } = rootCategoriesState;
+  const {
+    apiMethodState: rootCategoriesState,
+    fetchData: fetchRootCategories,
+  } = useApiMethod<Category[], GetCategoriesParams>(
+    categoriesApiDeclaration.getPage,
+  );
+  const {
+    process: { loading: rootCategoriesLoading, error: rootCategoriesError },
+    data: rootCategories,
+  } = rootCategoriesState;
 
-  const { apiMethodState: subCategoriesState, fetchData: fetchSubCategories } = useApiMethod<Category[], GetCategoriesParams>(categoriesApiDeclaration.getPage);
-  const { process: { loading: subCategoriesLoading, error: subCategoriesError }, data: subCategories } = subCategoriesState;
+  const { apiMethodState: subCategoriesState, fetchData: fetchSubCategories } =
+    useApiMethod<Category[], GetCategoriesParams>(
+      categoriesApiDeclaration.getPage,
+    );
+  const {
+    process: { loading: subCategoriesLoading, error: subCategoriesError },
+    data: subCategories,
+  } = subCategoriesState;
 
-  const { apiMethodState: questionsState, fetchData: fetchQuestios } = useApiMethod<Question[], GetQuestionsParams>(questionsApiDeclaration.getPage);
-  const { process: { loading: questionsLoading, error: questionsError }, data: questions } = questionsState;
+  const { apiMethodState: questionsState, fetchData: fetchQuestios } =
+    useApiMethod<Question[], GetQuestionsParams>(
+      questionsApiDeclaration.getPage,
+    );
+  const {
+    process: { loading: questionsLoading, error: questionsError },
+    data: questions,
+  } = questionsState;
 
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const [rootCategory, setRootCategory] = useState('');
   const [subCategory, setSubCategory] = useState('');
-  const [selectedQuestions, setSelectedQuestions] = useState<RoomQuestionListItem[]>(preSelected);
+  const [selectedQuestions, setSelectedQuestions] =
+    useState<RoomQuestionListItem[]>(preSelected);
 
-  const totalLoading = rootCategoriesLoading || subCategoriesLoading || questionsLoading;
-  const totalError = rootCategoriesError || subCategoriesError || questionsError;
+  const totalLoading =
+    rootCategoriesLoading || subCategoriesLoading || questionsLoading;
+  const totalError =
+    rootCategoriesError || subCategoriesError || questionsError;
   const triggerResetAccumData = `${rootCategory}${subCategory}`;
 
   useEffect(() => {
@@ -85,12 +117,16 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
     });
   }, [pageNumber, subCategory, fetchQuestios]);
 
-  const handleRootCategoryChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+  const handleRootCategoryChange: ChangeEventHandler<HTMLSelectElement> = (
+    e,
+  ) => {
     setRootCategory(e.target.value);
     setSubCategory('');
   };
 
-  const handleSubCategoryChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+  const handleSubCategoryChange: ChangeEventHandler<HTMLSelectElement> = (
+    e,
+  ) => {
     setPageNumber(1);
     setSubCategory(e.target.value);
   };
@@ -104,7 +140,9 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
   };
 
   const handleQuestionCheck = (question: RoomQuestionListItem) => {
-    const checked = !!selectedQuestions.find(selectedQuestion => selectedQuestion.id === question.id);
+    const checked = !!selectedQuestions.find(
+      (selectedQuestion) => selectedQuestion.id === question.id,
+    );
     if (!checked) {
       const newSelectedQuestions = [
         ...selectedQuestions,
@@ -115,33 +153,41 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
       ].map((selectedQuestion, index) => ({
         ...selectedQuestion,
         order: index,
-      }))
+      }));
       setSelectedQuestions(newSelectedQuestions);
       return;
     }
     const newSelectedQuestions = selectedQuestions.filter(
-      selectedQuestion => selectedQuestion.id !== question.id
+      (selectedQuestion) => selectedQuestion.id !== question.id,
     );
     setSelectedQuestions(newSelectedQuestions);
   };
 
   const createQuestionItem = (question: RoomQuestionListItem) => (
     <Fragment key={question.id}>
-      <div className='flex'>
+      <div className="flex">
         <div>
           <Gap sizeRem={1.25} />
           <Checkbox
             id={question.id}
-            checked={!!selectedQuestions.find(selectedQuestion => selectedQuestion.id === question.id)}
+            checked={
+              !!selectedQuestions.find(
+                (selectedQuestion) => selectedQuestion.id === question.id,
+              )
+            }
             onChange={() => handleQuestionCheck(question)}
-            label=''
+            label=""
           />
         </div>
         <Gap sizeRem={0.5} horizontal />
-        <div className='flex-1'>
+        <div className="flex-1">
           <QuestionItem
             question={question}
-            bgSelected={!!selectedQuestions.find(selectedQuestion => selectedQuestion.id === question.id)}
+            bgSelected={
+              !!selectedQuestions.find(
+                (selectedQuestion) => selectedQuestion.id === question.id,
+              )
+            }
           />
         </div>
       </div>
@@ -151,36 +197,63 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
 
   return (
     <div>
-      <div className='flex justify-between'>
-        <div className='flex w-full'>
-          <RoomCreateField.Wrapper className='w-full max-w-15.75'>
+      <div className="flex justify-between">
+        <div className="flex w-full">
+          <RoomCreateField.Wrapper className="w-full max-w-15.75">
             <RoomCreateField.Label>
-              <label htmlFor="rootCategory"><Typography size='m' bold>{localizationCaptions[LocalizationKey.Category]}</Typography></label>
+              <label htmlFor="rootCategory">
+                <Typography size="m" bold>
+                  {localizationCaptions[LocalizationKey.Category]}
+                </Typography>
+              </label>
             </RoomCreateField.Label>
             <RoomCreateField.Content>
-              <select id="rootCategory" className='w-full' value={rootCategory} onChange={handleRootCategoryChange}>
-                <option value=''>{localizationCaptions[LocalizationKey.NotSelected]}</option>
-                {rootCategories?.map(rootCategory => (
-                  <option key={rootCategory.id} value={rootCategory.id}>{rootCategory.name}</option>
+              <select
+                id="rootCategory"
+                className="w-full"
+                value={rootCategory}
+                onChange={handleRootCategoryChange}
+              >
+                <option value="">
+                  {localizationCaptions[LocalizationKey.NotSelected]}
+                </option>
+                {rootCategories?.map((rootCategory) => (
+                  <option key={rootCategory.id} value={rootCategory.id}>
+                    {rootCategory.name}
+                  </option>
                 ))}
               </select>
             </RoomCreateField.Content>
           </RoomCreateField.Wrapper>
           <Gap sizeRem={1} horizontal />
-          <RoomCreateField.Wrapper className='w-full max-w-15.75'>
+          <RoomCreateField.Wrapper className="w-full max-w-15.75">
             <RoomCreateField.Label>
-              <label htmlFor="subCategory"><Typography size='m' bold>{localizationCaptions[LocalizationKey.Subcategory]}</Typography></label>
+              <label htmlFor="subCategory">
+                <Typography size="m" bold>
+                  {localizationCaptions[LocalizationKey.Subcategory]}
+                </Typography>
+              </label>
             </RoomCreateField.Label>
             <RoomCreateField.Content>
-              <select id="subCategory" className='w-full' value={subCategory} disabled={!rootCategory} onChange={handleSubCategoryChange}>
-                <option value=''>{localizationCaptions[LocalizationKey.NotSelected]}</option>
-                {subCategories?.map(subCategory => (
-                  <option key={subCategory.id} value={subCategory.id}>{subCategory.name}</option>
+              <select
+                id="subCategory"
+                className="w-full"
+                value={subCategory}
+                disabled={!rootCategory}
+                onChange={handleSubCategoryChange}
+              >
+                <option value="">
+                  {localizationCaptions[LocalizationKey.NotSelected]}
+                </option>
+                {subCategories?.map((subCategory) => (
+                  <option key={subCategory.id} value={subCategory.id}>
+                    {subCategory.name}
+                  </option>
                 ))}
               </select>
             </RoomCreateField.Content>
           </RoomCreateField.Wrapper>
-          <RoomCreateField.Wrapper className='ml-auto'>
+          <RoomCreateField.Wrapper className="ml-auto">
             <RoomCreateField.Label>
               <Gap sizeRem={1.25} />
             </RoomCreateField.Label>
@@ -201,20 +274,24 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
       )}
       {!!subCategory ? (
         <ItemsGrid
-          currentData={questions ? questions.map((q, index) => ({ ...q, order: index })) : null}
+          currentData={
+            questions
+              ? questions.map((q, index) => ({ ...q, order: index }))
+              : null
+          }
           loading={totalLoading}
           error={null}
           triggerResetAccumData={triggerResetAccumData}
-          loaderClassName='question-item field-wrap'
+          loaderClassName="question-item field-wrap"
           renderItem={createQuestionItem}
           nextPageAvailable={questions?.length === pageSize}
           handleNextPage={handleNextPage}
         />
       ) : (
-        <div className='flex flex-col items-center'>
+        <div className="flex flex-col items-center">
           <Gap sizeRem={5.375} />
-          <div className='w-38.375 text-center'>
-            <Typography size='xl' secondary>
+          <div className="w-38.375 text-center">
+            <Typography size="xl" secondary>
               {localizationCaptions[LocalizationKey.SelectCategorySubcategory]}
             </Typography>
           </div>
@@ -222,9 +299,13 @@ export const RoomQuestionsSelector: FunctionComponent<RoomQuestionsSelectorProps
         </div>
       )}
       <ModalFooter>
-        <Button onClick={onCancel}>{localizationCaptions[LocalizationKey.Cancel]}</Button>
-        <Button variant='active' onClick={handleSave}>{localizationCaptions[LocalizationKey.AddRoomQuestions]}</Button>
+        <Button onClick={onCancel}>
+          {localizationCaptions[LocalizationKey.Cancel]}
+        </Button>
+        <Button variant="active" onClick={handleSave}>
+          {localizationCaptions[LocalizationKey.AddRoomQuestions]}
+        </Button>
       </ModalFooter>
     </div>
-  )
+  );
 };

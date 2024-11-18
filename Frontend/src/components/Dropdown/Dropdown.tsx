@@ -1,4 +1,10 @@
-import { FunctionComponent, ReactNode, useEffect, useRef, useState } from 'react';
+import {
+  FunctionComponent,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Button, ButtonProps } from '../Button/Button';
 import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';
@@ -27,14 +33,16 @@ export const Dropdown: FunctionComponent<DropdownProps> = ({
 
   const handleToggle = () => {
     setOpen(!open);
-  }
+  };
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (!e.target || !open) {
         return;
       }
-      const containerRefTarget = containerRef.current?.contains(e.target as any);
+      const containerRefTarget = containerRef.current?.contains(
+        e.target as any,
+      );
       if (!containerRefTarget) {
         setOpen(false);
       }
@@ -47,22 +55,39 @@ export const Dropdown: FunctionComponent<DropdownProps> = ({
   });
 
   return (
-    <div ref={containerRef} className='relative'>
+    <div ref={containerRef} className="relative">
       {useButton ? (
-        <Button aria-expanded={open} variant={buttonVariant} className={toggleClassName} onClick={handleToggle}>
+        <Button
+          aria-expanded={open}
+          variant={buttonVariant}
+          className={toggleClassName}
+          onClick={handleToggle}
+        >
           {toggleContent}
           {toggleIcon && (
-            <span className={`cursor-pointer h-1.125 ${open ? 'rotate-90' : ''}`}>
-              <Icon size='s' name={IconNames.ChevronForward} />
+            <span
+              className={`cursor-pointer h-1.125 ${open ? 'rotate-90' : ''}`}
+            >
+              <Icon size="s" name={IconNames.ChevronForward} />
             </span>
           )}
         </Button>
       ) : (
-        <div aria-expanded={open} className={toggleClassName} onClick={handleToggle}>
+        <div
+          aria-expanded={open}
+          className={toggleClassName}
+          onClick={handleToggle}
+        >
           {toggleContent}
         </div>
       )}
-      {open && <div className={`${contentClassName} absolute overflow-auto max-h-20 z-50 translate-y-0.25 shadow`}>{children}</div>}
+      {open && (
+        <div
+          className={`${contentClassName} absolute overflow-auto max-h-20 z-50 translate-y-0.25 shadow`}
+        >
+          {children}
+        </div>
+      )}
     </div>
   );
 };

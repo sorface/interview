@@ -10,11 +10,7 @@ export const Wrapper: FunctionComponent<RoomCreateFieldProps> = ({
   className,
   children,
 }) => {
-  return (
-    <div className={`flex flex-col ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={`flex flex-col ${className}`}>{children}</div>;
 };
 
 export const Label: FunctionComponent<RoomCreateFieldProps> = ({
@@ -23,9 +19,7 @@ export const Label: FunctionComponent<RoomCreateFieldProps> = ({
 }) => {
   return (
     <>
-      <div className={`w-7.5 pr-0.5 ${className}`}>
-        {children}
-      </div>
+      <div className={`w-7.5 pr-0.5 ${className}`}>{children}</div>
       <Gap sizeRem={0.5} />
     </>
   );
@@ -35,11 +29,7 @@ export const Content: FunctionComponent<RoomCreateFieldProps> = ({
   className,
   children,
 }) => {
-  return (
-    <div className={`flex-1 ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={`flex-1 ${className}`}>{children}</div>;
 };
 
 const RoomCreateField = {

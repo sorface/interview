@@ -40,20 +40,20 @@ export const ActionModal: FunctionComponent<ActionModalProps> = ({
   }, [handleCloseModal, onAction]);
 
   if (loading) {
-    return (<div>{loadingCaption}...</div>);
+    return <div>{loadingCaption}...</div>;
   }
 
   if (error) {
-    return (<div>{localizationCaptions[LocalizationKey.Error]}: {error}</div>);
+    return (
+      <div>
+        {localizationCaptions[LocalizationKey.Error]}: {error}
+      </div>
+    );
   }
 
   return (
     <>
-      <Button
-        onClick={handleOpenModal}
-      >
-        {openButtonCaption}
-      </Button>
+      <Button onClick={handleOpenModal}>{openButtonCaption}</Button>
       <Modal
         isOpen={modalOpen}
         contentLabel={localizationCaptions[LocalizationKey.CloseRoom]}
@@ -71,8 +71,12 @@ export const ActionModal: FunctionComponent<ActionModalProps> = ({
           <Button onClick={handleCloseModal}>X</Button>
         </div>
         <div className="action-modal-content">
-          <Button onClick={onCallAction}>{localizationCaptions[LocalizationKey.Yes]}</Button>
-          <Button onClick={handleCloseModal}>{localizationCaptions[LocalizationKey.No]}</Button>
+          <Button onClick={onCallAction}>
+            {localizationCaptions[LocalizationKey.Yes]}
+          </Button>
+          <Button onClick={handleCloseModal}>
+            {localizationCaptions[LocalizationKey.No]}
+          </Button>
         </div>
       </Modal>
     </>
