@@ -1,4 +1,5 @@
 import { Fragment, FunctionComponent } from 'react';
+import Linkify from 'linkify-react';
 import { Typography } from '../../../../components/Typography/Typography';
 import { useThemeClassName } from '../../../../hooks/useThemeClassName';
 import { Theme } from '../../../../context/ThemeContext';
@@ -57,7 +58,9 @@ export const ChatMessage: FunctionComponent<ChatMessageProps> = ({
             </div>
           )}
           <Gap sizeRem={0.25} />
-          <Typography size='s'>{message}</Typography>
+            <Typography size='s'>
+              <Linkify options={{ target: '_blank', rel: 'noopener noreferrer' }}>{message}</Linkify>
+            </Typography>
           <div className='text-right'>
             <Typography size='xs' secondary>{formatTime(new Date(createdAt))}</Typography>
           </div>
