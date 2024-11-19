@@ -31,7 +31,5 @@ export const InfinitePaginator: FunctionComponent<InfinitePaginatorProps> = ({
     };
   }, [triggerElRef, onNextPage]);
 
-  return (
-    <div ref={triggerElRef} className="infinite-paginator"></div>
-  );
+  return <div ref={triggerElRef} className="infinite-paginator"></div>;
 };

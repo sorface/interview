@@ -7,7 +7,9 @@ import { useLocalizationCaptions } from './hooks/useLocalizationCaptions';
 describe('App', () => {
   test('renders app name', () => {
     render(<App />);
-    const apNameElement = screen.getByRole('link', { name: useLocalizationCaptions()[LocalizationKey.AppName] });
+    const apNameElement = screen.getByRole('link', {
+      name: useLocalizationCaptions()[LocalizationKey.AppName],
+    });
     expect(apNameElement).toBeInTheDocument();
   });
 });

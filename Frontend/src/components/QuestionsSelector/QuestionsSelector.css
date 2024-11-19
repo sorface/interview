@@ -13,15 +13,21 @@
   margin-right: 0.5rem;
 }
 
-.questions-selector .questions-selector-item .questions-selector-item-tag::after {
-  content: ",";
+.questions-selector
+  .questions-selector-item
+  .questions-selector-item-tag::after {
+  content: ',';
 }
 
-.questions-selector .questions-selector-item .questions-selector-item-tag:last-child::after {
-  content: "";
+.questions-selector
+  .questions-selector-item
+  .questions-selector-item-tag:last-child::after {
+  content: '';
   margin-right: 0px;
 }
 
-.questions-selector .questions-selector-item .questions-selector-item-tag:last-child {
+.questions-selector
+  .questions-selector-item
+  .questions-selector-item-tag:last-child {
   margin-right: 0px;
 }

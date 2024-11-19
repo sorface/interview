@@ -49,11 +49,9 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
   const localizationCaptions = useLocalizationCaptions();
   const hasCheckbox = typeof checked === 'boolean';
   const accordionDisabled =
-    question.answers.length === 0 &&
-    !question.codeEditor &&
-    !children;
+    question.answers.length === 0 && !question.codeEditor && !children;
   const [selectedAnswer, setSelectedAnswer] = useState<QuestionAnswer | null>(
-    question.answers ? question.answers[0] : null
+    question.answers ? question.answers[0] : null,
   );
   const contextMenuIconClassName = useThemeClassName({
     [Theme.Dark]: 'text-dark-grey4',
@@ -86,37 +84,39 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
       {(typeof mark === 'number' || mark === null) && (
         <>
           <CircularProgress
-            size='s'
+            size="s"
             value={typeof mark === 'number' ? mark * 10 : null}
             caption={typeof mark === 'number' ? mark.toFixed(1) : null}
           />
           <Gap sizeRem={1.5} horizontal />
         </>
       )}
-      <div className={`flex items-baseline ${!accordionDisabled ? 'px-0.75' : ''}`}>
-        <Typography size='m' bold>
+      <div
+        className={`flex items-baseline ${!accordionDisabled ? 'px-0.75' : ''}`}
+      >
+        <Typography size="m" bold>
           {question.value}
         </Typography>
         {categoryName && (
           <>
             <Gap sizeRem={1.15} horizontal />
-            <Typography size='m' secondary>
+            <Typography size="m" secondary>
               {question.category.name}
             </Typography>
           </>
         )}
       </div>
-      <div className='ml-auto'>
+      <div className="ml-auto">
         {contextMenu && (
           <div onClick={handleCheckboxAreaClick}>
             <ContextMenu
               {...contextMenu}
-              toggleContent={(
+              toggleContent={
                 <div className={contextMenuIconClassName}>
-                  <Icon size='s' name={IconNames.EllipsisVertical} />
+                  <Icon size="s" name={IconNames.EllipsisVertical} />
                 </div>
-              )}
-              buttonVariant='text'
+              }
+              buttonVariant="text"
             />
           </div>
         )}
@@ -125,18 +125,18 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
             <Checkbox
               id={`questionCheckbox${question.id}`}
               checked={checked}
-              label={checkboxLabel && (checkboxLabel)}
+              label={checkboxLabel && checkboxLabel}
               onChange={handleCheckboxChange}
             />
           </div>
         )}
         {onRemove && (
-          <span onClick={handleRemove} className='cursor-pointer text-grey3'>
-            <Icon size='s' name={IconNames.Trash} />
+          <span onClick={handleRemove} className="cursor-pointer text-grey3">
+            <Icon size="s" name={IconNames.Trash} />
           </span>
         )}
         {onClick && (
-          <span className='opacity-0.5'>
+          <span className="opacity-0.5">
             <Icon name={IconNames.ChevronForward} />
           </span>
         )}
@@ -150,7 +150,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
       disabled={accordionDisabled}
       openedByDefault={openedByDefault}
       className={`${accordionClassName} rounded-0.75 py-1.25 px-1.5`}
-      classNameTitle='flex items-center'
+      classNameTitle="flex items-center"
       onClick={onClick ? handleOnClick : undefined}
     >
       {question.codeEditor && (
@@ -163,43 +163,49 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
             readOnly
             scrollBeyondLastLine={false}
             alwaysConsumeMouseWheel={false}
-            className='h-32.25'
+            className="h-32.25"
           />
         </>
       )}
       <Gap sizeRem={1.5} />
       {!!question.answers.length && (
         <>
-          <Typography size='m' bold>
+          <Typography size="m" bold>
             {localizationCaptions[LocalizationKey.QuestionAnswerOptions]}
           </Typography>
           <Gap sizeRem={1} />
         </>
       )}
       {children}
-      {question.answers.map(answer => (
+      {question.answers.map((answer) => (
         <Button
           key={answer.id}
           variant={answer === selectedAnswer ? 'active' : undefined}
-          className='mr-0.25'
+          className="mr-0.25"
           onClick={() => setSelectedAnswer(answer)}
         >
-          <Typography size='m'>
-            {answer.title}
-          </Typography>
+          <Typography size="m">{answer.title}</Typography>
         </Button>
       ))}
       {!!selectedAnswer && (
         <>
           <Gap sizeRem={1} />
           <CodeEditor
-            language={(selectedAnswer.codeEditor && question.codeEditor) ? question.codeEditor.lang : CodeEditorLang.Plaintext}
-            languages={[(selectedAnswer.codeEditor && question.codeEditor) ? question.codeEditor.lang : CodeEditorLang.Plaintext]}
+            language={
+              selectedAnswer.codeEditor && question.codeEditor
+                ? question.codeEditor.lang
+                : CodeEditorLang.Plaintext
+            }
+            languages={[
+              selectedAnswer.codeEditor && question.codeEditor
+                ? question.codeEditor.lang
+                : CodeEditorLang.Plaintext,
+            ]}
             value={selectedAnswer.content}
             readOnly
             scrollBeyondLastLine={false}
             alwaysConsumeMouseWheel={false}
-            className='h-32.25'
+            className="h-32.25"
           />
         </>
       )}

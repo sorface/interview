@@ -34,16 +34,12 @@ export const SwitchButton: FunctionComponent<SwitchButtonProps> = ({
   return (
     <div className="switch-button-container">
       <Button
-        variant='text'
+        variant="text"
         disabled={htmlDisabled}
-        className={`switch-button ${(!enabled && disabledColor) ? 'switch-button-disabled' : ''}`}
+        className={`switch-button ${!enabled && disabledColor ? 'switch-button-disabled' : ''}`}
         onClick={onClick}
       >
-        {loading ? (
-          <Loader />
-        ) : (
-          <Icon name={iconName} />
-        )}
+        {loading ? <Loader /> : <Icon name={iconName} />}
         {!!counter && (
           <div className="switch-button-counter-wrapper">
             <div className="switch-button-counter">

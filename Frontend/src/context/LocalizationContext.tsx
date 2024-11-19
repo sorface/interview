@@ -1,9 +1,17 @@
-import { Dispatch, FunctionComponent, ReactNode, SetStateAction, createContext, useEffect, useState } from 'react'
+import {
+  Dispatch,
+  FunctionComponent,
+  ReactNode,
+  SetStateAction,
+  createContext,
+  useEffect,
+  useState,
+} from 'react';
 
 export enum LocalizationLang {
   ru = 'ru',
   en = 'en',
-};
+}
 
 const defaultLang = LocalizationLang.en;
 
@@ -17,18 +25,20 @@ interface LocalizationContextType {
 const localizationLocalStorageKey = 'localization';
 const recognitionLocalStorageKey = 'recognition';
 
-const readFromStorage = (key: string) =>
-  localStorage.getItem(key);
+const readFromStorage = (key: string) => localStorage.getItem(key);
 
 const saveToStorage = (key: string, lang: LocalizationLang) =>
   localStorage.setItem(key, String(lang));
 
 const validateLang = (lang: string | null) => {
-  if (lang && Object.values(LocalizationLang).includes(lang as LocalizationLang)) {
+  if (
+    lang &&
+    Object.values(LocalizationLang).includes(lang as LocalizationLang)
+  ) {
     return lang as LocalizationLang;
   }
   return null;
-}
+};
 
 const getLangInSetting = (key: string): LocalizationLang | null => {
   const langeFromStorage = readFromStorage(key);
@@ -52,20 +62,25 @@ export const getLangInBrowser = () => {
 
 export const LocalizationContext = createContext<LocalizationContextType>({
   lang: getLangInSetting(localizationLocalStorageKey) || getLangInBrowser(),
-  recognitionLang: getLangInSetting(recognitionLocalStorageKey) || getLangInBrowser(),
-  setLang: () => { },
-  setRecognitionLang: () => { },
+  recognitionLang:
+    getLangInSetting(recognitionLocalStorageKey) || getLangInBrowser(),
+  setLang: () => {},
+  setRecognitionLang: () => {},
 });
 
 interface LocalizationProviderProps {
   children: ReactNode;
 }
 
-export const LocalizationProvider: FunctionComponent<LocalizationProviderProps> = ({
-  children,
-}) => {
-  const [lang, setLang] = useState<LocalizationLang>(getLangInSetting(localizationLocalStorageKey) || getLangInBrowser());
-  const [recognitionLang, setRecognitionLang] = useState<LocalizationLang>(getLangInSetting(recognitionLocalStorageKey) || getLangInBrowser());
+export const LocalizationProvider: FunctionComponent<
+  LocalizationProviderProps
+> = ({ children }) => {
+  const [lang, setLang] = useState<LocalizationLang>(
+    getLangInSetting(localizationLocalStorageKey) || getLangInBrowser(),
+  );
+  const [recognitionLang, setRecognitionLang] = useState<LocalizationLang>(
+    getLangInSetting(recognitionLocalStorageKey) || getLangInBrowser(),
+  );
 
   useEffect(() => {
     saveToStorage(localizationLocalStorageKey, lang);
@@ -76,8 +91,10 @@ export const LocalizationProvider: FunctionComponent<LocalizationProviderProps> 
   }, [recognitionLang]);
 
   return (
-    <LocalizationContext.Provider value={{ lang, recognitionLang, setLang, setRecognitionLang }}>
+    <LocalizationContext.Provider
+      value={{ lang, recognitionLang, setLang, setRecognitionLang }}
+    >
       {children}
     </LocalizationContext.Provider>
-  )
+  );
 };

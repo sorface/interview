@@ -12,7 +12,10 @@ interface UseCanvasStreamParams {
   backgroundRemoveEnabled: boolean;
 }
 
-const fillNoCamera = (context: CanvasRenderingContext2D, nickname: string | null) => {
+const fillNoCamera = (
+  context: CanvasRenderingContext2D,
+  nickname: string | null,
+) => {
   context.fillStyle = 'black';
   context.fillRect(0, 0, context.canvas.width, context.canvas.height);
 
@@ -40,27 +43,50 @@ export const useCanvasStream = ({
   const backgroundRemoveEnabledRef = useRef(false);
   backgroundRemoveEnabledRef.current = backgroundRemoveEnabled;
 
-  const onResults = useCallback((results: Results) => {
-    if (!context || !cameraStream || !video) {
-      return;
-    }
-    const canvasElement = context.canvas;
-    context.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    context.save();
-    context.filter = 'blur(0)';
+  const onResults = useCallback(
+    (results: Results) => {
+      if (!context || !cameraStream || !video) {
+        return;
+      }
+      const canvasElement = context.canvas;
+      context.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      context.save();
+      context.filter = 'blur(0)';
 
-    context.drawImage(results.segmentationMask, 0, 0, canvasElement.width, canvasElement.height);
-    context.globalCompositeOperation = 'source-in';
-    context.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-    context.globalCompositeOperation = 'destination-atop';
-    context.filter = 'blur(8px)'
+      context.drawImage(
+        results.segmentationMask,
+        0,
+        0,
+        canvasElement.width,
+        canvasElement.height,
+      );
+      context.globalCompositeOperation = 'source-in';
+      context.drawImage(
+        results.image,
+        0,
+        0,
+        canvasElement.width,
+        canvasElement.height,
+      );
+      context.globalCompositeOperation = 'destination-atop';
+      context.filter = 'blur(8px)';
 
-    context.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+      context.drawImage(
+        results.image,
+        0,
+        0,
+        canvasElement.width,
+        canvasElement.height,
+      );
 
-    context.restore();
-  }, [context, cameraStream, video]);
+      context.restore();
+    },
+    [context, cameraStream, video],
+  );
 
-  const selfieSegmentationEnabled = Boolean(backgroundRemoveEnabled && cameraStream && video);
+  const selfieSegmentationEnabled = Boolean(
+    backgroundRemoveEnabled && cameraStream && video,
+  );
   const selfieSegmentation = useSelfieSegmentation(
     selfieSegmentationEnabled,
     onResults,
@@ -72,7 +98,12 @@ export const useCanvasStream = ({
     }
     const newCamera = new Camera(video, {
       onFrame: async () => {
-        if (video && cameraStream && selfieSegmentation && backgroundRemoveEnabledRef.current) {
+        if (
+          video &&
+          cameraStream &&
+          selfieSegmentation &&
+          backgroundRemoveEnabledRef.current
+        ) {
           try {
             await selfieSegmentation.send({ image: video });
           } catch (err) {
@@ -87,10 +118,18 @@ export const useCanvasStream = ({
 
     return () => {
       newCamera.stop().then(() => {
-        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream.getTracks().forEach((track) => track.stop());
       });
     };
-  }, [video, context, width, height, cameraStream, selfieSegmentation, auth?.nickname]);
+  }, [
+    video,
+    context,
+    width,
+    height,
+    cameraStream,
+    selfieSegmentation,
+    auth?.nickname,
+  ]);
 
   useEffect(() => {
     const canvas = document.createElement('canvas');
@@ -120,7 +159,13 @@ export const useCanvasStream = ({
     const triggerCanvasUpdate = () => {
       if (cameraStream && video) {
         if (!backgroundRemoveEnabled) {
-          context.drawImage(video, 0, 0, context.canvas.width, context.canvas.height);
+          context.drawImage(
+            video,
+            0,
+            0,
+            context.canvas.width,
+            context.canvas.height,
+          );
         }
         requestRef.current = requestAnimationFrame(triggerCanvasUpdate);
         return;

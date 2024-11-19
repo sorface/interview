@@ -7,9 +7,12 @@ export interface Event {
   roles: Role[];
 }
 
-export type EventsSearch = Record<string, Array<{
-  id: string;
-  createdById: string;
-  trype: string;
-  payload: string;
-}>>;
+export type EventsSearch = Record<
+  string,
+  Array<{
+    id: string;
+    createdById: string;
+    trype: string;
+    payload: string;
+  }>
+>;

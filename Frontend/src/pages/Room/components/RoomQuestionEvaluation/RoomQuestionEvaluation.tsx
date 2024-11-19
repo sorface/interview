@@ -21,7 +21,10 @@ interface RoomQuestionEvaluationPorps {
   onChange: (newValue: RoomQuestionEvaluationValue) => void;
 }
 
-const themeClassNames: Record<ThemeInUi, Record<'active' | 'nonActive', string>> = {
+const themeClassNames: Record<
+  ThemeInUi,
+  Record<'active' | 'nonActive', string>
+> = {
   [Theme.Dark]: {
     active: '!bg-dark-blue',
     nonActive: 'bg-dark-input',
@@ -45,12 +48,9 @@ const checkIsCommentValid = (evaluation: RoomQuestionEvaluationValue) => {
   return true;
 };
 
-export const RoomQuestionEvaluation: FunctionComponent<RoomQuestionEvaluationPorps> = ({
-  readOnly,
-  value,
-  validateComment,
-  onChange,
-}) => {
+export const RoomQuestionEvaluation: FunctionComponent<
+  RoomQuestionEvaluationPorps
+> = ({ readOnly, value, validateComment, onChange }) => {
   const commonButtonClassName = 'w-1.75 h-1.75 min-h-unset p-0.375';
   const themeClassName = useThemeClassName(themeClassNames);
   const localizationCaptions = useLocalizationCaptions();
@@ -104,21 +104,23 @@ export const RoomQuestionEvaluation: FunctionComponent<RoomQuestionEvaluationPor
 
   return (
     <div>
-      <div className='text-left'>
-        <Typography size='l' bold>
+      <div className="text-left">
+        <Typography size="l" bold>
           {localizationCaptions[LocalizationKey.RoomQuestionEvaluationTitle]}
         </Typography>
       </div>
       <Gap sizeRem={1} />
-      <div className='flex'>
+      <div className="flex">
         {markGroups.map((markGroup, markGroupIndex) => (
           <Fragment key={`markGroup${markGroupIndex}`}>
             <div>
-              <div className={`rounded-l-2 rounded-r-2 overflow-hidden whitespace-nowrap ${themeClassName['nonActive']}`}>
+              <div
+                className={`rounded-l-2 rounded-r-2 overflow-hidden whitespace-nowrap ${themeClassName['nonActive']}`}
+              >
                 {markGroup.marks.map((markVal) => (
                   <Button
                     key={markVal}
-                    variant='text'
+                    variant="text"
                     className={`${commonButtonClassName} ${themeClassName[markVal === value.mark ? 'active' : 'nonActive']}`}
                     onClick={handleMarkChange(markVal)}
                   >
@@ -126,14 +128,18 @@ export const RoomQuestionEvaluation: FunctionComponent<RoomQuestionEvaluationPor
                   </Button>
                 ))}
               </div>
-              <Typography size='s' secondary>{markGroup.caption}</Typography>
+              <Typography size="s" secondary>
+                {markGroup.caption}
+              </Typography>
             </div>
-            {markGroupIndex !== markGroups.length - 1 && (<Gap sizeRem={0.375} horizontal />)}
-          </ Fragment>
+            {markGroupIndex !== markGroups.length - 1 && (
+              <Gap sizeRem={0.375} horizontal />
+            )}
+          </Fragment>
         ))}
       </div>
       <Gap sizeRem={1} />
-      <div className='flex'>
+      <div className="flex">
         <Textarea
           className={`flex-1 h-6.25 ${noValidComment ? textareaNoValidClassName : ''}`}
           maxLength={roomReviewMaxLength}
@@ -144,11 +150,15 @@ export const RoomQuestionEvaluation: FunctionComponent<RoomQuestionEvaluationPor
       </div>
       {noValidComment && (
         <div className={`text-right ${noValidMessageClassName}`}>
-          <Typography size='s'>
-            {localizationCaptions[LocalizationKey.EmptyCommentQuestionEvaluation]}
+          <Typography size="s">
+            {
+              localizationCaptions[
+                LocalizationKey.EmptyCommentQuestionEvaluation
+              ]
+            }
           </Typography>
         </div>
       )}
     </div>
-  )
+  );
 };

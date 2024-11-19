@@ -1,8 +1,13 @@
-import { ChangeEventHandler, FunctionComponent, useEffect, useState } from 'react';
+import {
+  ChangeEventHandler,
+  FunctionComponent,
+  useEffect,
+  useState,
+} from 'react';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 
-import './QustionsSearch.css'
+import './QustionsSearch.css';
 
 interface QustionsSearchProps {
   onSearchChange: (value: string) => void;
@@ -14,10 +19,7 @@ export const QustionsSearch: FunctionComponent<QustionsSearchProps> = ({
   const [searchValue, setSearchValue] = useState('');
   const localizationCaptions = useLocalizationCaptions();
 
-  useEffect(
-    () => onSearchChange(searchValue),
-    [searchValue, onSearchChange]
-  );
+  useEffect(() => onSearchChange(searchValue), [searchValue, onSearchChange]);
 
   const handleSearchChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     setSearchValue(e.target.value);

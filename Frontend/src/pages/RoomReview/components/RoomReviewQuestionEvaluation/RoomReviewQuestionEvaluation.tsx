@@ -1,8 +1,17 @@
 import { FunctionComponent, useEffect, useState } from 'react';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
-import { RoomQuestionEvaluation, RoomQuestionEvaluationValue } from '../../../Room/components/RoomQuestionEvaluation/RoomQuestionEvaluation';
-import { MyRoomQuestionEvaluation, MyRoomQuestionEvaluation as RoomQuestionEvaluationType } from '../../../../types/room'
-import { MergeRoomQuestionEvaluationBody, roomQuestionEvaluationApiDeclaration } from '../../../../apiDeclarations';
+import {
+  RoomQuestionEvaluation,
+  RoomQuestionEvaluationValue,
+} from '../../../Room/components/RoomQuestionEvaluation/RoomQuestionEvaluation';
+import {
+  MyRoomQuestionEvaluation,
+  MyRoomQuestionEvaluation as RoomQuestionEvaluationType,
+} from '../../../../types/room';
+import {
+  MergeRoomQuestionEvaluationBody,
+  roomQuestionEvaluationApiDeclaration,
+} from '../../../../apiDeclarations';
 import { Typography } from '../../../../components/Typography/Typography';
 import { Icon } from '../../../Room/components/Icon/Icon';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
@@ -26,7 +35,9 @@ const defaultRoomQuestionEvaluation: RoomQuestionEvaluationValue = {
   review: '',
 };
 
-const createFakeQuestion = (roomQuestion: MyRoomQuestionEvaluation): Question => ({
+const createFakeQuestion = (
+  roomQuestion: MyRoomQuestionEvaluation,
+): Question => ({
   ...roomQuestion,
   tags: [],
   answers: [],
@@ -38,21 +49,24 @@ const createFakeQuestion = (roomQuestion: MyRoomQuestionEvaluation): Question =>
   },
 });
 
-export const RoomReviewQuestionEvaluation: FunctionComponent<RoomReviewQuestionEvaluationProps> = ({
-  roomId,
-  questionEvaluations,
-  readOnly,
-  onDetailsOpen,
-}) => {
+export const RoomReviewQuestionEvaluation: FunctionComponent<
+  RoomReviewQuestionEvaluationProps
+> = ({ roomId, questionEvaluations, readOnly, onDetailsOpen }) => {
   const localizationCaptions = useLocalizationCaptions();
-  const [roomQuestionEvaluation, setRoomQuestionEvaluation] = useState<RoomQuestionEvaluationValue | null>(null);
-  const actualRoomQuestionEvaluation = roomQuestionEvaluation || questionEvaluations.evaluation || defaultRoomQuestionEvaluation;
+  const [roomQuestionEvaluation, setRoomQuestionEvaluation] =
+    useState<RoomQuestionEvaluationValue | null>(null);
+  const actualRoomQuestionEvaluation =
+    roomQuestionEvaluation ||
+    questionEvaluations.evaluation ||
+    defaultRoomQuestionEvaluation;
   const doNotRateChecked = actualRoomQuestionEvaluation.mark === 0;
 
   const {
     apiMethodState: apiMergeRoomQuestionEvaluationState,
     fetchData: mergeRoomQuestionEvaluation,
-  } = useApiMethod<RoomQuestionEvaluationType, MergeRoomQuestionEvaluationBody>(roomQuestionEvaluationApiDeclaration.merge);
+  } = useApiMethod<RoomQuestionEvaluationType, MergeRoomQuestionEvaluationBody>(
+    roomQuestionEvaluationApiDeclaration.merge,
+  );
   const {
     data: mergedRoomQuestionEvaluation,
     process: {
@@ -78,7 +92,12 @@ export const RoomReviewQuestionEvaluation: FunctionComponent<RoomReviewQuestionE
     return () => {
       clearTimeout(requestTimeout);
     };
-  }, [roomQuestionEvaluation, questionEvaluations, roomId, mergeRoomQuestionEvaluation]);
+  }, [
+    roomQuestionEvaluation,
+    questionEvaluations,
+    roomId,
+    mergeRoomQuestionEvaluation,
+  ]);
 
   const handleDoNotRateCheck = () => {
     setRoomQuestionEvaluation({
@@ -87,7 +106,9 @@ export const RoomReviewQuestionEvaluation: FunctionComponent<RoomReviewQuestionE
     });
   };
 
-  const handleRoomQuestionEvaluationChange = (newValue: RoomQuestionEvaluationValue) => {
+  const handleRoomQuestionEvaluationChange = (
+    newValue: RoomQuestionEvaluationValue,
+  ) => {
     setRoomQuestionEvaluation(newValue);
   };
 
@@ -96,7 +117,11 @@ export const RoomReviewQuestionEvaluation: FunctionComponent<RoomReviewQuestionE
       openedByDefault
       question={createFakeQuestion(questionEvaluations)}
       checked={doNotRateChecked}
-      checkboxLabel={<Typography size='m' bold>{localizationCaptions[LocalizationKey.DoNotRate]}</Typography>}
+      checkboxLabel={
+        <Typography size="m" bold>
+          {localizationCaptions[LocalizationKey.DoNotRate]}
+        </Typography>
+      }
       onCheck={handleDoNotRateCheck}
     >
       <RoomQuestionEvaluation
@@ -105,24 +130,24 @@ export const RoomReviewQuestionEvaluation: FunctionComponent<RoomReviewQuestionE
         validateComment
         onChange={handleRoomQuestionEvaluationChange}
       />
-      <div className='text-left h-1.125'>
+      <div className="text-left h-1.125">
         {mergedRoomQuestionEvaluation && (
-          <Typography size='s'>
+          <Typography size="s">
             <Icon name={IconNames.CheckmarkDone} />
             {localizationCaptions[LocalizationKey.Saved]}
           </Typography>
         )}
-        {loadingMergeRoomQuestionEvaluation && (<Loader />)}
+        {loadingMergeRoomQuestionEvaluation && <Loader />}
         {errorMergeRoomQuestionEvaluation && (
-          <Typography size='s' error>{localizationCaptions[LocalizationKey.Error]}: {errorMergeRoomQuestionEvaluation}</Typography>
+          <Typography size="s" error>
+            {localizationCaptions[LocalizationKey.Error]}:{' '}
+            {errorMergeRoomQuestionEvaluation}
+          </Typography>
         )}
       </div>
       <Gap sizeRem={1.5} />
-      <div
-        className='text-right cursor-pointer'
-        onClick={onDetailsOpen}
-      >
-        <Typography size='s' secondary>
+      <div className="text-right cursor-pointer" onClick={onDetailsOpen}>
+        <Typography size="s" secondary>
           {localizationCaptions[LocalizationKey.QuestionAnswerDetails]}
         </Typography>
       </div>

@@ -19,7 +19,7 @@ export const pathnames = {
   categories: '/categories',
   categoriesCreate: '/categories/create',
   categoriesEdit: '/categories/edit/:id',
-  logoutError: '/logoutError'
+  logoutError: '/logoutError',
 };
 
 export const enum IconNames {
@@ -74,7 +74,7 @@ export const reactionIcon: Record<string, IconNames> = {
   Like: IconNames.Like,
   Dislike: IconNames.Dislike,
   CodeEditor: IconNames.CodeEditor,
-}
+};
 
 export const enum EventName {
   CodeEditor = 'CodeEditor',
@@ -86,4 +86,4 @@ export enum HttpResponseCode {
   Ok = 200,
   Unauthorized = 401,
   Forbidden = 403,
-};
+}

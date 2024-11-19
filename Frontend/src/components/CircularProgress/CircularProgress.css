@@ -24,7 +24,7 @@
 }
 
 @property --progress {
-  syntax: "<number>";
+  syntax: '<number>';
   inherits: false;
   initial-value: 0;
 }

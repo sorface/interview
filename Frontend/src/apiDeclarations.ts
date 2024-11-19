@@ -1,8 +1,21 @@
-import { ApiContractGet, ApiContractPatch, ApiContractPost, ApiContractPut } from './types/apiContracts';
+import {
+  ApiContractGet,
+  ApiContractPatch,
+  ApiContractPost,
+  ApiContractPut,
+} from './types/apiContracts';
 import { Question, QuestionType } from './types/question';
 import { Tag } from './types/tag';
 import { Reaction } from './types/reaction';
-import { Room, RoomAccessType, RoomInvite, RoomQuestion, RoomQuestionState, RoomStateAdditionalStatefulPayload, RoomStatus } from './types/room';
+import {
+  Room,
+  RoomAccessType,
+  RoomInvite,
+  RoomQuestion,
+  RoomQuestionState,
+  RoomStateAdditionalStatefulPayload,
+  RoomStatus,
+} from './types/room';
 import { User, UserType } from './types/user';
 import { Category } from './types/category';
 
@@ -13,7 +26,7 @@ export interface PaginationUrlParams {
 
 export interface CreateRoomBody {
   name: string;
-  questions: Array<{ id: Question['id']; order: number; }>;
+  questions: Array<{ id: Question['id']; order: number }>;
   experts: Array<User['id']>;
   examinees: Array<User['id']>;
   tags: Array<Tag['id']>;
@@ -199,7 +212,7 @@ export const roomQuestionEvaluationApiDeclaration = {
 
 export interface CreateQuestionBody {
   value: string;
-  tags: Array<Tag['id']>
+  tags: Array<Tag['id']>;
   type: QuestionType;
   categoryId: Category['id'];
   codeEditor: Question['codeEditor'] | null;
@@ -236,8 +249,8 @@ export const questionsApiDeclaration = {
     method: 'GET',
     baseUrl: '/questions/archived',
     urlParams: {
-      'PageSize': params.PageSize,
-      'PageNumber': params.PageNumber,
+      PageSize: params.PageSize,
+      PageNumber: params.PageNumber,
     },
   }),
   get: (id: Question['id']): ApiContractGet => ({
@@ -335,7 +348,9 @@ export const roomParticipantApiDeclaration = {
     baseUrl: '/room-participants',
     urlParams: params,
   }),
-  changeParticipantStatus: (body: ChangeParticipantStatusBody): ApiContractPatch => ({
+  changeParticipantStatus: (
+    body: ChangeParticipantStatusBody,
+  ): ApiContractPatch => ({
     method: 'PATCH',
     baseUrl: '/room-participants',
     body,
@@ -345,7 +360,7 @@ export const roomParticipantApiDeclaration = {
 export interface GetRoomReviewsParams {
   'Page.PageSize': number;
   'Page.PageNumber': number;
-  'Filter.RoomId': Room['id'],
+  'Filter.RoomId': Room['id'];
 }
 
 export interface UpsertRoomReviewsBody {
@@ -443,8 +458,10 @@ export const categoriesApiDeclaration = {
       'Page.PageSize': params.PageSize,
       'Page.PageNumber': params.PageNumber,
       Name: params.name,
-      ...(typeof params.showOnlyWithoutParent === 'boolean' && ({ 'Filter.ShowOnlyWithoutParent': params.showOnlyWithoutParent })),
-      ...(params.parentId && ({ 'Filter.ParentId': params.parentId })),
+      ...(typeof params.showOnlyWithoutParent === 'boolean' && {
+        'Filter.ShowOnlyWithoutParent': params.showOnlyWithoutParent,
+      }),
+      ...(params.parentId && { 'Filter.ParentId': params.parentId }),
     },
   }),
   get: (id: Category['id']): ApiContractGet => ({

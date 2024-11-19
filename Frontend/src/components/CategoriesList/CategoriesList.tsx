@@ -2,7 +2,10 @@ import { FunctionComponent, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Category } from '../../types/category';
-import { GetCategoriesParams, categoriesApiDeclaration } from '../../apiDeclarations';
+import {
+  GetCategoriesParams,
+  categoriesApiDeclaration,
+} from '../../apiDeclarations';
 import { Loader } from '../Loader/Loader';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
@@ -28,8 +31,14 @@ export const CategoriesList: FunctionComponent<CategoriesListProps> = ({
   onCategoryClick,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
-  const { apiMethodState: questionsState, fetchData } = useApiMethod<Category[], GetCategoriesParams>(categoriesApiDeclaration.getPage);
-  const { process: { loading, error }, data } = questionsState;
+  const { apiMethodState: questionsState, fetchData } = useApiMethod<
+    Category[],
+    GetCategoriesParams
+  >(categoriesApiDeclaration.getPage);
+  const {
+    process: { loading, error },
+    data,
+  } = questionsState;
 
   useEffect(() => {
     fetchData({
@@ -45,29 +54,31 @@ export const CategoriesList: FunctionComponent<CategoriesListProps> = ({
     return (
       <div
         key={category.id}
-        role='link'
+        role="link"
         className={`categories-list-item ${category.id === activeId ? 'active' : ''}`}
         onClick={() => onCategoryClick(category)}
       >
         <span>{category.name}</span>
-        {!parentId && (
-          <Icon size='s' name={IconNames.ChevronForward} />
-        )}
+        {!parentId && <Icon size="s" name={IconNames.ChevronForward} />}
       </div>
-    )
+    );
   };
 
   return (
-    <div className='categories-list overflow-x-hidden overflow-y-auto min-h-4'>
+    <div className="categories-list overflow-x-hidden overflow-y-auto min-h-4">
       {loading && (
-        <div className='categories-list-item h-fit'>
+        <div className="categories-list-item h-fit">
           <Loader />
         </div>
       )}
-      {error && <span>{localizationCaptions[LocalizationKey.Error]}: {error}</span>}
+      {error && (
+        <span>
+          {localizationCaptions[LocalizationKey.Error]}: {error}
+        </span>
+      )}
       {data?.map(createCategoryItem)}
       {!parentId && (
-        <div className='categories-list-item'>
+        <div className="categories-list-item">
           <Link to={pathnames.questionsArchive}>
             {localizationCaptions[LocalizationKey.QuestionsArchive]}
           </Link>

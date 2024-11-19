@@ -26,7 +26,9 @@ export const HeaderWithLink: FunctionComponent<HeaderWithLinkProps> = ({
     <Field className="header-with-link">
       {linkVisible && (
         <Link to={path}>
-          <Button className={`button-link float-${linkFloat}`}>{linkCaption}</Button>
+          <Button className={`button-link float-${linkFloat}`}>
+            {linkCaption}
+          </Button>
         </Link>
       )}
       {!!title && <span>{title}</span>}

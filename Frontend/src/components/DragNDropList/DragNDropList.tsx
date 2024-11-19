@@ -33,7 +33,11 @@ export const DragNDropList = <T extends DragNDropListItem>({
       previewElRef.current = crt;
       previewContainerRef.current.appendChild(crt);
     }
-    e.dataTransfer.setDragImage(crt, e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+    e.dataTransfer.setDragImage(
+      crt,
+      e.nativeEvent.offsetX,
+      e.nativeEvent.offsetY,
+    );
   };
 
   const handleDragEnd = () => {
@@ -57,7 +61,10 @@ export const DragNDropList = <T extends DragNDropListItem>({
     }
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, targetItem: T) => {
+  const handleDragOver = (
+    e: React.DragEvent<HTMLDivElement>,
+    targetItem: T,
+  ) => {
     e.preventDefault();
     if (!draggingItem || targetItem === draggingItem) {
       return;
@@ -71,14 +78,16 @@ export const DragNDropList = <T extends DragNDropListItem>({
 
   return (
     <div ref={containerRef}>
-      <div ref={previewContainerRef} style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}></div>
+      <div
+        ref={previewContainerRef}
+        style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}
+      ></div>
       {items.map((item, index) => (
         <div
           key={item.id}
           draggable="true"
           className={`cursor-move ${item === draggingItem ? 'opacity-0' : ''}`}
-          onDragStart={(e) =>
-            handleDragStart(e, item)}
+          onDragStart={(e) => handleDragStart(e, item)}
           onDragEnd={handleDragEnd}
           onDragOver={(e) => handleDragOver(e, item)}
           onDrop={(e) => handleDrop(e, item)}

@@ -11,11 +11,7 @@ export const Wrapper: FunctionComponent<QuestionCreateFieldProps> = ({
   className,
   children,
 }) => {
-  return (
-    <div className={`flex flex-col ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={`flex flex-col ${className}`}>{children}</div>;
 };
 
 export const Label: FunctionComponent<QuestionCreateFieldProps> = ({
@@ -25,7 +21,7 @@ export const Label: FunctionComponent<QuestionCreateFieldProps> = ({
   return (
     <>
       <div className={`${className}`}>
-        <Typography size='m' bold>
+        <Typography size="m" bold>
           {children}
         </Typography>
       </div>
@@ -38,11 +34,7 @@ export const Content: FunctionComponent<QuestionCreateFieldProps> = ({
   className,
   children,
 }) => {
-  return (
-    <div className={`flex-1 ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={`flex-1 ${className}`}>{children}</div>;
 };
 
 const QuestionCreateField = {

@@ -6,13 +6,11 @@ interface OpenIconProps {
   sizeRem: number;
 }
 
-export const OpenIcon: FunctionComponent<OpenIconProps> = ({
-  sizeRem,
-}) => {
+export const OpenIcon: FunctionComponent<OpenIconProps> = ({ sizeRem }) => {
   const styleSize = `${sizeRem}rem`;
   return (
     <div
-      className='open-icon'
+      className="open-icon"
       style={{
         width: styleSize,
         height: styleSize,

@@ -9,7 +9,7 @@ interface UseReactionsStatusParams {
 interface ReactionTimeout {
   reactionType: string;
   remainingTime: number;
-};
+}
 
 type UserReactionsTimeout = Map<User['id'], ReactionTimeout | null>;
 
@@ -75,7 +75,9 @@ export const useReactionsStatus = ({
       const delta = time - prevTime;
       const updated = updateTimeouts(userReactionsTimeoutRef.current, delta);
       if (updated) {
-        setActiveReactions(timeoutToActiveReactions(userReactionsTimeoutRef.current));
+        setActiveReactions(
+          timeoutToActiveReactions(userReactionsTimeoutRef.current),
+        );
       }
       prevTime = time;
     };
@@ -99,7 +101,9 @@ export const useReactionsStatus = ({
           userId,
           lastWsMessageParsed.Type || '',
         );
-        setActiveReactions(timeoutToActiveReactions(userReactionsTimeoutRef.current));
+        setActiveReactions(
+          timeoutToActiveReactions(userReactionsTimeoutRef.current),
+        );
         break;
       default:
         break;

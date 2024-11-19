@@ -25,4 +25,8 @@ export interface ApiContractPatch {
   body: any;
 }
 
-export type ApiContract = ApiContractGet | ApiContractPost | ApiContractPut | ApiContractPatch;
+export type ApiContract =
+  | ApiContractGet
+  | ApiContractPost
+  | ApiContractPut
+  | ApiContractPatch;

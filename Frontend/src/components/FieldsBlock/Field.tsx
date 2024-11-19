@@ -5,7 +5,10 @@ interface FieldProps {
   children: ReactNode;
 }
 
-export const Field: FunctionComponent<FieldProps> = ({ children, className }) => (
+export const Field: FunctionComponent<FieldProps> = ({
+  children,
+  className,
+}) => (
   <>
     <div className={`field-wrap ${className || ''}`}>{children}</div>
   </>

@@ -8,8 +8,14 @@ interface FieldsBlockProps {
   children: ReactNode;
 }
 
-export const FieldsBlock: FunctionComponent<FieldsBlockProps> = ({ children, withMargin, className }) => (
-  <div className={`fields-block ${className || ''} ${withMargin ? 'with-margin' : ''}`}>
+export const FieldsBlock: FunctionComponent<FieldsBlockProps> = ({
+  children,
+  withMargin,
+  className,
+}) => (
+  <div
+    className={`fields-block ${className || ''} ${withMargin ? 'with-margin' : ''}`}
+  >
     <div className="fields-wrap flex flex-col overflow-auto">{children}</div>
   </div>
 );

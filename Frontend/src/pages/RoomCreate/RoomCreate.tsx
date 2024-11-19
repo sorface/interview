@@ -1,6 +1,19 @@
-import React, { ChangeEvent, Fragment, FunctionComponent, useCallback, useEffect, useState } from 'react';
+import React, {
+  ChangeEvent,
+  Fragment,
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CreateRoomBody, RoomEditBody, RoomIdParam, roomInviteApiDeclaration, roomsApiDeclaration } from '../../apiDeclarations';
+import {
+  CreateRoomBody,
+  RoomEditBody,
+  RoomIdParam,
+  roomInviteApiDeclaration,
+  roomsApiDeclaration,
+} from '../../apiDeclarations';
 import { Field } from '../../components/FieldsBlock/Field';
 import { Loader } from '../../components/Loader/Loader';
 import { IconNames } from '../../constants';
@@ -8,7 +21,12 @@ import { useApiMethod } from '../../hooks/useApiMethod';
 import { Question } from '../../types/question';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
-import { Room, RoomAccessType, RoomInvite, RoomQuestionListItem } from '../../types/room';
+import {
+  Room,
+  RoomAccessType,
+  RoomInvite,
+  RoomQuestionListItem,
+} from '../../types/room';
 import { DragNDropList } from '../../components/DragNDropList/DragNDropList';
 import { SwitcherButton } from '../../components/SwitcherButton/SwitcherButton';
 import { ModalFooter } from '../../components/ModalFooter/ModalFooter';
@@ -43,12 +61,15 @@ const formatTime = (value: Date) => {
   return `${hours}:${minutes}`;
 };
 
-const parseScheduledStartTime = (scheduledStartTime: string, durationSec?: number) => {
+const parseScheduledStartTime = (
+  scheduledStartTime: string,
+  durationSec?: number,
+) => {
   const parsed = new Date(scheduledStartTime);
   const parsedDuration = new Date(scheduledStartTime);
   if (durationSec) {
     parsedDuration.setSeconds(parsedDuration.getSeconds() + durationSec);
-  };
+  }
   return {
     date: formatDate(parsed),
     startTime: formatTime(parsed),
@@ -75,7 +96,7 @@ const parseRoomDate = (roomFields: RoomFields) => {
 };
 
 const formatDuration = (durationSec: number) => {
-  const hours = Math.floor((durationSec / (60 * 60)));
+  const hours = Math.floor(durationSec / (60 * 60));
   const minutes = Math.floor((durationSec / 60) % 60);
   return `${padTime(hours)}:${padTime(minutes)}`;
 };
@@ -105,19 +126,30 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
 }) => {
   const localizationCaptions = useLocalizationCaptions();
   const navigate = useNavigate();
-  const { apiMethodState, fetchData } = useApiMethod<Room, CreateRoomBody>(roomsApiDeclaration.create);
-  const { process: { loading, error }, data: createdRoom } = apiMethodState;
-
-  const { apiMethodState: apiRoomMethodState, fetchData: fetchRoom } = useApiMethod<Room, Room['id']>(roomsApiDeclaration.getById);
-  const { process: { loading: loadingRoom, error: errorRoom }, data: room } = apiRoomMethodState;
-
-  const { apiMethodState: apiRoomEditMethodState, fetchData: fetchRoomEdit } = useApiMethod<Room, RoomEditBody>(roomsApiDeclaration.edit);
-  const { process: { loading: loadingRoomEdit, error: errorRoomEdit }, data: editedRoom } = apiRoomEditMethodState;
-
+  const { apiMethodState, fetchData } = useApiMethod<Room, CreateRoomBody>(
+    roomsApiDeclaration.create,
+  );
   const {
-    apiMethodState: apiRoomInvitesState,
-    fetchData: fetchRoomInvites,
-  } = useApiMethod<RoomInvite[], RoomIdParam>(roomInviteApiDeclaration.get);
+    process: { loading, error },
+    data: createdRoom,
+  } = apiMethodState;
+
+  const { apiMethodState: apiRoomMethodState, fetchData: fetchRoom } =
+    useApiMethod<Room, Room['id']>(roomsApiDeclaration.getById);
+  const {
+    process: { loading: loadingRoom, error: errorRoom },
+    data: room,
+  } = apiRoomMethodState;
+
+  const { apiMethodState: apiRoomEditMethodState, fetchData: fetchRoomEdit } =
+    useApiMethod<Room, RoomEditBody>(roomsApiDeclaration.edit);
+  const {
+    process: { loading: loadingRoomEdit, error: errorRoomEdit },
+    data: editedRoom,
+  } = apiRoomEditMethodState;
+
+  const { apiMethodState: apiRoomInvitesState, fetchData: fetchRoomInvites } =
+    useApiMethod<RoomInvite[], RoomIdParam>(roomInviteApiDeclaration.get);
   const {
     process: { loading: roomInvitesLoading, error: roomInvitesError },
     data: roomInvitesData,
@@ -130,15 +162,19 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     endTime: '',
   });
   const parsedRoomDate = parseRoomDate(roomFields);
-  const [selectedQuestions, setSelectedQuestions] = useState<RoomQuestionListItem[]>([]);
-  const [creationStep, setCreationStep] = useState<CreationStep>(CreationStep.Step1);
+  const [selectedQuestions, setSelectedQuestions] = useState<
+    RoomQuestionListItem[]
+  >([]);
+  const [creationStep, setCreationStep] = useState<CreationStep>(
+    CreationStep.Step1,
+  );
   const [questionsView, setQuestionsView] = useState(false);
   const [uiError, setUiError] = useState('');
-  const modalTitle = questionsView ?
-    localizationCaptions[LocalizationKey.AddingRoomQuestions] :
-    editRoomId ?
-      localizationCaptions[LocalizationKey.EditRoom] :
-      localizationCaptions[LocalizationKey.NewRoom];
+  const modalTitle = questionsView
+    ? localizationCaptions[LocalizationKey.AddingRoomQuestions]
+    : editRoomId
+      ? localizationCaptions[LocalizationKey.EditRoom]
+      : localizationCaptions[LocalizationKey.NewRoom];
 
   const totalLoading = loading || loadingRoom || loadingRoomEdit;
   const totalError = error || errorRoom || errorRoomEdit || uiError;
@@ -154,13 +190,19 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     if (!room) {
       return;
     }
-    const parsedScheduledStartTime = room.scheduledStartTime && parseScheduledStartTime(room.scheduledStartTime, room.timer?.durationSec);
+    const parsedScheduledStartTime =
+      room.scheduledStartTime &&
+      parseScheduledStartTime(room.scheduledStartTime, room.timer?.durationSec);
     setRoomFields((rf) => ({
       ...rf,
       ...room,
       date: parsedScheduledStartTime ? parsedScheduledStartTime.date : '',
-      startTime: parsedScheduledStartTime ? parsedScheduledStartTime.startTime : '',
-      endTime: parsedScheduledStartTime ? parsedScheduledStartTime.endTime || '' : '',
+      startTime: parsedScheduledStartTime
+        ? parsedScheduledStartTime.startTime
+        : '',
+      endTime: parsedScheduledStartTime
+        ? parsedScheduledStartTime.endTime || ''
+        : '',
     }));
     setSelectedQuestions(room.questions.sort(sortRoomQuestion));
   }, [room]);
@@ -195,8 +237,13 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     const roomStartTime = roomFields.startTime.split(':');
     roomDateStart.setHours(parseInt(roomStartTime[0]));
     roomDateStart.setMinutes(parseInt(roomStartTime[1]));
-    if (roomDateStart.getTime() < (Date.now() - 1000 * 60 * roomStartTimeShiftMinutes)) {
-      return localizationCaptions[LocalizationKey.RoomStartTimeMustBeGreaterError];
+    if (
+      roomDateStart.getTime() <
+      Date.now() - 1000 * 60 * roomStartTimeShiftMinutes
+    ) {
+      return localizationCaptions[
+        LocalizationKey.RoomStartTimeMustBeGreaterError
+      ];
     }
     if (selectedQuestions.length === 0) {
       return localizationCaptions[LocalizationKey.RoomEmptyQuestionsListError];
@@ -221,14 +268,20 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
       fetchRoomEdit({
         id: editRoomId,
         name: roomFields.name,
-        questions: selectedQuestions.map((question, index) => ({ ...question, order: index })),
+        questions: selectedQuestions.map((question, index) => ({
+          ...question,
+          order: index,
+        })),
         scheduleStartTime: parsedRoomDate.roomDateStart.toISOString(),
         durationSec: parsedRoomDate.duration,
       });
     } else {
       fetchData({
         name: roomFields.name,
-        questions: selectedQuestions.map((question, index) => ({ id: question.id, order: index })),
+        questions: selectedQuestions.map((question, index) => ({
+          id: question.id,
+          order: index,
+        })),
         experts: [],
         examinees: [],
         tags: [],
@@ -239,12 +292,13 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     }
   };
 
-  const handleChangeField = (fieldName: keyof RoomFields) => (e: ChangeEvent<HTMLInputElement>) => {
-    setRoomFields({
-      ...roomFields,
-      [fieldName]: e.target.value,
-    });
-  };
+  const handleChangeField =
+    (fieldName: keyof RoomFields) => (e: ChangeEvent<HTMLInputElement>) => {
+      setRoomFields({
+        ...roomFields,
+        [fieldName]: e.target.value,
+      });
+    };
 
   const handleQuestionsSave = (questions: RoomQuestionListItem[]) => {
     setSelectedQuestions(questions);
@@ -252,7 +306,9 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
   };
 
   const handleQuestionRemove = (question: Question) => {
-    const newSelectedQuestions = selectedQuestions.filter(q => q.id !== question.id);
+    const newSelectedQuestions = selectedQuestions.filter(
+      (q) => q.id !== question.id,
+    );
     setSelectedQuestions(newSelectedQuestions);
   };
 
@@ -268,8 +324,8 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     if (totalError) {
       return (
         <>
-          <Typography size='m' error>
-            <div className='flex'>
+          <Typography size="m" error>
+            <div className="flex">
               <Icon name={IconNames.Information} />
               <Gap sizeRem={0.25} horizontal />
               {totalError}
@@ -289,19 +345,24 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     return <></>;
   }, [totalError, totalLoading]);
 
-  const renderQuestionItem = (question: RoomQuestionListItem, index: number) => (
+  const renderQuestionItem = (
+    question: RoomQuestionListItem,
+    index: number,
+  ) => (
     <Fragment>
-      <div className='flex w-full'>
-        <div className='flex flex-col w-1.75 text-right text-grey2'>
+      <div className="flex w-full">
+        <div className="flex flex-col w-1.75 text-right text-grey2">
           <Gap sizeRem={1} />
-          <Typography size='xxl' bold>{index + 1}</Typography>
+          <Typography size="xxl" bold>
+            {index + 1}
+          </Typography>
         </div>
         <Gap sizeRem={1} horizontal />
-        <div className='flex-1'>
+        <div className="flex-1">
           <QuestionItem question={question} onRemove={handleQuestionRemove} />
         </div>
       </div>
-      {(index !== selectedQuestions.length - 1) && <Gap sizeRem={0.25} />}
+      {index !== selectedQuestions.length - 1 && <Gap sizeRem={0.25} />}
     </Fragment>
   );
 
@@ -310,62 +371,70 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
       <>
         <RoomCreateField.Wrapper>
           <RoomCreateField.Label>
-            <label htmlFor="roomName"><Typography size='m' bold>{localizationCaptions[LocalizationKey.RoomName]}</Typography></label>
+            <label htmlFor="roomName">
+              <Typography size="m" bold>
+                {localizationCaptions[LocalizationKey.RoomName]}
+              </Typography>
+            </label>
           </RoomCreateField.Label>
-          <RoomCreateField.Content className='flex flex-1'>
+          <RoomCreateField.Content className="flex flex-1">
             <input
               id="roomName"
               name={nameFieldName}
               value={roomFields.name}
               onChange={handleChangeField('name')}
-              className='flex-1'
+              className="flex-1"
               type="text"
               required
             />
           </RoomCreateField.Content>
         </RoomCreateField.Wrapper>
-        <div className='px-1'>
-          <Typography size='s'>
+        <div className="px-1">
+          <Typography size="s">
             {localizationCaptions[LocalizationKey.RoomNamePrompt]}
           </Typography>
         </div>
         <Gap sizeRem={1.5} />
         <RoomCreateField.Wrapper>
           <RoomCreateField.Label>
-            <label htmlFor="roomDate"><Typography size='m' bold>{localizationCaptions[LocalizationKey.RoomDateAndTime]}</Typography></label>
+            <label htmlFor="roomDate">
+              <Typography size="m" bold>
+                {localizationCaptions[LocalizationKey.RoomDateAndTime]}
+              </Typography>
+            </label>
           </RoomCreateField.Label>
-          <RoomCreateField.Content className='flex items-center'>
+          <RoomCreateField.Content className="flex items-center">
             <input
-              id='roomDate'
+              id="roomDate"
               name={dateFieldName}
               value={roomFields.date}
-              type='date'
+              type="date"
               required
-              className='mr-0.5'
+              className="mr-0.5"
               onChange={handleChangeField('date')}
             />
             <input
-              id='roomTimeStart'
+              id="roomTimeStart"
               name={startTimeFieldName}
               value={roomFields.startTime}
-              type='time'
+              type="time"
               required
-              className='mr-0.5'
+              className="mr-0.5"
               onChange={handleChangeField('startTime')}
             />
-            <span className='mr-0.5'>
-              <Typography size='s'>-</Typography>
+            <span className="mr-0.5">
+              <Typography size="s">-</Typography>
             </span>
             <input
-              id='roomTimeEnd'
+              id="roomTimeEnd"
               name={endTimeFieldName}
               value={roomFields.endTime}
-              type='time'
+              type="time"
               onChange={handleChangeField('endTime')}
             />
             <Gap sizeRem={1.5} horizontal />
             {!!roomFields.endTime && (
-              <Typography size='m'>
+              <Typography size="m">
                 {localizationCaptions[LocalizationKey.RoomDuration]}:{' '}
                 {formatDuration(parsedRoomDate.duration)}
               </Typography>
@@ -375,8 +444,10 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         <Gap sizeRem={2} />
 
         <RoomCreateField.Wrapper>
-          <RoomCreateField.Label className='self-start'>
-            <Typography size='m' bold>{localizationCaptions[LocalizationKey.RoomQuestions]}</Typography>
+          <RoomCreateField.Label className="self-start">
+            <Typography size="m" bold>
+              {localizationCaptions[LocalizationKey.RoomQuestions]}
+            </Typography>
           </RoomCreateField.Label>
           <RoomCreateField.Content>
             <Gap sizeRem={0.5} />
@@ -386,16 +457,20 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
               onItemsChange={setSelectedQuestions}
             />
             {!!selectedQuestions.length && <Gap sizeRem={1.5} />}
-            <Button variant='active2' onClick={handleQuestionsViewOpen}>
-              <Icon size='s' name={IconNames.Add} />
+            <Button variant="active2" onClick={handleQuestionsViewOpen}>
+              <Icon size="s" name={IconNames.Add} />
               <Gap sizeRem={0.5} horizontal />
               {localizationCaptions[LocalizationKey.AddRoomQuestions]}
             </Button>
           </RoomCreateField.Content>
         </RoomCreateField.Wrapper>
         <ModalFooter>
-          <Button onClick={onClose}>{localizationCaptions[LocalizationKey.Cancel]}</Button>
-          <Button variant='active' onClick={handleCreateRoom}>{localizationCaptions[LocalizationKey.Continue]}</Button>
+          <Button onClick={onClose}>
+            {localizationCaptions[LocalizationKey.Cancel]}
+          </Button>
+          <Button variant="active" onClick={handleCreateRoom}>
+            {localizationCaptions[LocalizationKey.Continue]}
+          </Button>
         </ModalFooter>
       </>
     ),
@@ -408,7 +483,9 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
           roomInvitesLoading={roomInvitesLoading}
         />
         <ModalFooter>
-          <Button variant='active' onClick={onClose}>{localizationCaptions[LocalizationKey.Continue]}</Button>
+          <Button variant="active" onClick={onClose}>
+            {localizationCaptions[LocalizationKey.Continue]}
+          </Button>
         </ModalFooter>
       </>
     ),
@@ -416,24 +493,28 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
 
   return (
     <ModalWithProgressWarning
-      warningCaption={localizationCaptions[LocalizationKey.CurrentRoomNotBeSaved]}
+      warningCaption={
+        localizationCaptions[LocalizationKey.CurrentRoomNotBeSaved]
+      }
       contentLabel={modalTitle}
       open={open}
       wide
       onClose={onClose}
     >
-      <div className='text-left'>
+      <div className="text-left">
         {!questionsView && (
           <>
             <SwitcherButton
               items={[
                 {
                   id: 1,
-                  content: localizationCaptions[LocalizationKey.CreateRoomStep1],
+                  content:
+                    localizationCaptions[LocalizationKey.CreateRoomStep1],
                 },
                 {
                   id: 2,
-                  content: localizationCaptions[LocalizationKey.CreateRoomStep2],
+                  content:
+                    localizationCaptions[LocalizationKey.CreateRoomStep2],
                 },
               ]}
               activeIndex={creationStep}
@@ -448,9 +529,9 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
             onCancel={handleQuestionsViewClose}
             onSave={handleQuestionsSave}
           />
-        ) :
+        ) : (
           stepView[creationStep]
-        }
+        )}
       </div>
     </ModalWithProgressWarning>
   );

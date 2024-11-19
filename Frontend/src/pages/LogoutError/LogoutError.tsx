@@ -19,11 +19,11 @@ export const LogoutError: FunctionComponent = () => {
   }, [auth, navigate]);
 
   return (
-    <div className='h-full flex flex-col items-center justify-center'>
-      <Typography size='m' secondary>
+    <div className="h-full flex flex-col items-center justify-center">
+      <Typography size="m" secondary>
         {localizationCaptions[LocalizationKey.LoadingAccountError]}
       </Typography>
-      <Typography size='m' secondary>
+      <Typography size="m" secondary>
         {localizationCaptions[LocalizationKey.WeAwareOfProblem]}
       </Typography>
     </div>

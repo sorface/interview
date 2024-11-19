@@ -23,20 +23,27 @@ const initialState: ApiMethodState = {
   data: null,
 };
 
-type ApiMethodAction = {
-  name: 'startLoad';
-} | {
-  name: 'setData';
-  payload: any;
-} | {
-  name: 'setError';
-  payload: string;
-} | {
-  name: 'setCode';
-  payload: number;
-};
+type ApiMethodAction =
+  | {
+      name: 'startLoad';
+    }
+  | {
+      name: 'setData';
+      payload: any;
+    }
+  | {
+      name: 'setError';
+      payload: string;
+    }
+  | {
+      name: 'setCode';
+      payload: number;
+    };
 
-const apiMethodReducer = (state: ApiMethodState, action: ApiMethodAction): ApiMethodState => {
+const apiMethodReducer = (
+  state: ApiMethodState,
+  action: ApiMethodAction,
+): ApiMethodState => {
   switch (action.name) {
     case 'startLoad':
       return {
@@ -53,8 +60,8 @@ const apiMethodReducer = (state: ApiMethodState, action: ApiMethodAction): ApiMe
         process: {
           ...state.process,
           loading: false,
-          error: action.payload
-        }
+          error: action.payload,
+        },
       };
     case 'setData':
       return {
@@ -63,7 +70,7 @@ const apiMethodReducer = (state: ApiMethodState, action: ApiMethodAction): ApiMe
           loading: false,
           error: null,
         },
-        data: action.payload
+        data: action.payload,
       };
     case 'setCode':
       return {
@@ -83,15 +90,16 @@ const createUrlParam = (name: string, value: string) =>
 
 const createFetchUrl = (apiContract: ApiContract) => {
   if (apiContract.urlParams) {
-    const params =
-      Object.entries(apiContract.urlParams)
-        .map(([paramName, paramValue]) => {
-          if (Array.isArray(paramValue)) {
-            return paramValue.map(val => createUrlParam(paramName, val)).join('&');
-          }
-          return createUrlParam(paramName, paramValue);
-        })
-        .join('&');
+    const params = Object.entries(apiContract.urlParams)
+      .map(([paramName, paramValue]) => {
+        if (Array.isArray(paramValue)) {
+          return paramValue
+            .map((val) => createUrlParam(paramName, val))
+            .join('&');
+        }
+        return createUrlParam(paramName, paramValue);
+      })
+      .join('&');
     return `${REACT_APP_BACKEND_URL}${apiContract.baseUrl}?${params}`;
   }
   return `${REACT_APP_BACKEND_URL}${apiContract.baseUrl}`;
@@ -118,7 +126,9 @@ const createFetchRequestInit = (apiContract: ApiContract) => {
 
 type AnyObject = Record<string, any>;
 
-const getResponseContent = async (response: Response): Promise<AnyObject | string> => {
+const getResponseContent = async (
+  response: Response,
+): Promise<AnyObject | string> => {
   const contentType = response.headers.get('content-type');
   if (!contentType || !contentType.includes('application/json')) {
     return await response.text();
@@ -129,22 +139,23 @@ const getResponseContent = async (response: Response): Promise<AnyObject | strin
 const getResponseError = (
   response: Response,
   responseContent: AnyObject | string,
-  apiContract: ApiContract
+  apiContract: ApiContract,
 ) => {
-  if (
-    typeof responseContent === 'string' ||
-    !responseContent.message
-  ) {
+  if (typeof responseContent === 'string' || !responseContent.message) {
     return `${apiContract.method} ${apiContract.baseUrl} ${response.status}`;
   }
   return responseContent.message;
-}
+};
 
-export const useApiMethod = <ResponseData, RequestData = AnyObject>(apiContractCall: (data: RequestData) => ApiContract) => {
+export const useApiMethod = <ResponseData, RequestData = AnyObject>(
+  apiContractCall: (data: RequestData) => ApiContract,
+) => {
   const navigate = useNavigate();
   const [apiMethodState, dispatch] = useReducer(apiMethodReducer, initialState);
   const { logoutState, logout } = useLogout();
-  const { process: { logoutError } } = logoutState;
+  const {
+    process: { logoutError },
+  } = logoutState;
 
   useEffect(() => {
     if (!logoutError) {
@@ -153,8 +164,9 @@ export const useApiMethod = <ResponseData, RequestData = AnyObject>(apiContractC
     navigate(pathnames.logoutError);
   }, [logoutError, navigate]);
 
-  const fetchData = useCallback(async (requestData: RequestData) => {
-    dispatch({ name: 'startLoad' });
+  const fetchData = useCallback(
+    async (requestData: RequestData) => {
+      dispatch({ name: 'startLoad' });
       const apiContract = apiContractCall(requestData);
       try {
         const response = await fetch(
@@ -172,17 +184,25 @@ export const useApiMethod = <ResponseData, RequestData = AnyObject>(apiContractC
 
         const responseData = await getResponseContent(response);
         if (!response.ok) {
-          const errorMessage = getResponseError(response, responseData, apiContract);
+          const errorMessage = getResponseError(
+            response,
+            responseData,
+            apiContract,
+          );
           throw new Error(errorMessage);
         }
         dispatch({ name: 'setData', payload: responseData });
       } catch (err: any) {
         dispatch({
           name: 'setError',
-          payload: err.message || `Failed to fetch ${apiContract.method} ${apiContract.baseUrl}`,
+          payload:
+            err.message ||
+            `Failed to fetch ${apiContract.method} ${apiContract.baseUrl}`,
         });
       }
-  }, [apiContractCall, logout]);
+    },
+    [apiContractCall, logout],
+  );
 
   return {
     apiMethodState: apiMethodState as ApiMethodState<ResponseData>,

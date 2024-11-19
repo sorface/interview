@@ -23,26 +23,28 @@ export const Session: FunctionComponent = () => {
 
   return (
     <>
-      <PageHeader
-        title={localizationCaptions[LocalizationKey.Settings]}
-      />
-      <div className='flex-1 flex items-center justify-center'>
-        <div className='flex-1 flex flex-col items-center'>
+      <PageHeader title={localizationCaptions[LocalizationKey.Settings]} />
+      <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex flex-col items-center">
           <UserAvatar
             nickname={auth?.nickname || ''}
             src={auth?.avatar}
-            size='xl'
+            size="xl"
           />
           <Gap sizeRem={1} />
-          <Typography size='l' bold>{auth?.nickname || ''}</Typography>
+          <Typography size="l" bold>
+            {auth?.nickname || ''}
+          </Typography>
           <Gap sizeRem={2} />
-          <div className='w-full max-w-29.25 grid grid-cols-settings-list gap-y-1'>
+          <div className="w-full max-w-29.25 grid grid-cols-settings-list gap-y-1">
             <ThemeSwitch />
             <LangSwitch />
             <RecognitionLangSwitch />
           </div>
           <Gap sizeRem={2} />
-          <Button variant='danger' className='max-w-12' onClick={handleLogOut}>{localizationCaptions[LocalizationKey.LogOut]}</Button>
+          <Button variant="danger" className="max-w-12" onClick={handleLogOut}>
+            {localizationCaptions[LocalizationKey.LogOut]}
+          </Button>
           <Gap sizeRem={10.625} />
         </div>
       </div>

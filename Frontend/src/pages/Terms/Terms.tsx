@@ -17,26 +17,32 @@ export const Terms: FunctionComponent = () => {
   const { lang } = useContext(LocalizationContext);
   const localizationCaptions = useLocalizationCaptions();
 
-  const interpolate =
-    (text: string, searchRegExp: RegExp, replaceWith: string) =>
-      text.replace(searchRegExp, replaceWith);
+  const interpolate = (
+    text: string,
+    searchRegExp: RegExp,
+    replaceWith: string,
+  ) => text.replace(searchRegExp, replaceWith);
 
-  const interpolateAll =
-    (text: string, searchRegExps: RegExp[], replaceWith: string[]) =>
-      searchRegExps.reduce(
-        (accum, currRegExp, index) => interpolate(accum, currRegExp, replaceWith[index]),
-        text,
-      );
+  const interpolateAll = (
+    text: string,
+    searchRegExps: RegExp[],
+    replaceWith: string[],
+  ) =>
+    searchRegExps.reduce(
+      (accum, currRegExp, index) =>
+        interpolate(accum, currRegExp, replaceWith[index]),
+      text,
+    );
 
   const termsUrl = `${document.location.origin}${pathnames.terms} `;
 
   const renderTerm = (term: Term, index: number) => (
     <Fragment key={term.title}>
-      <Typography size='xxl' bold>
+      <Typography size="xxl" bold>
         {`${index + 1}. ${term.title}`}
       </Typography>
       <Gap sizeRem={1} />
-      <Typography size='m'>
+      <Typography size="m">
         {interpolateAll(
           term.description,
           [/\[NAME\]/g, /\[NAME URL\]/g],
@@ -49,17 +55,13 @@ export const Terms: FunctionComponent = () => {
 
   return (
     <>
-      <PageHeader
-        title={localizationCaptions[LocalizationKey.AppName]}
-      />
-      <div className='text-left flex flex-col overflow-auto'>
-        <Typography size='xxl' bold>
+      <PageHeader title={localizationCaptions[LocalizationKey.AppName]} />
+      <div className="text-left flex flex-col overflow-auto">
+        <Typography size="xxl" bold>
           {localizationCaptions[LocalizationKey.TermsOfUsage]}
         </Typography>
         <Gap sizeRem={1} />
-        <Typography size='m'>
-          {terms[lang].disclaimer}
-        </Typography>
+        <Typography size="m">{terms[lang].disclaimer}</Typography>
         <Gap sizeRem={2} />
         {terms[lang].items.map(renderTerm)}
       </div>

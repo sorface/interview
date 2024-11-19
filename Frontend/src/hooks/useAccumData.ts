@@ -13,15 +13,12 @@ export const useAccumData = <T extends object>(currentData: T[] | null) => {
     }
     const sameData = compareObjects(
       currentData[currentData.length - 1],
-      allDataRef.current[allDataRef.current.length - 1]
+      allDataRef.current[allDataRef.current.length - 1],
     );
     if (sameData) {
       return;
     }
-    allDataRef.current = [
-      ...allDataRef.current,
-      ...currentData,
-    ];
+    allDataRef.current = [...allDataRef.current, ...currentData];
     setAccumData(allDataRef.current);
   }, [currentData]);
 

@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactNode } from 'react'
+import { FunctionComponent, ReactNode } from 'react';
 import { IconNames } from '../../../../constants';
 import { Button } from '../../../../components/Button/Button';
 import { Loader } from '../../../../components/Loader/Loader';
@@ -17,7 +17,7 @@ const Wrapper: FunctionComponent<WrapperProps> = ({
 }) => {
   return (
     <div
-      className='absolute flex flex-col p-0.625 w-2.5 rounded-1.25 bg-room-tools-panel-bg backdrop-blur z-1'
+      className="absolute flex flex-col p-0.625 w-2.5 rounded-1.25 bg-room-tools-panel-bg backdrop-blur z-1"
       style={{
         right: rightPos || '0.5rem',
         bottom: bottomPos || '0.5rem',
@@ -38,7 +38,9 @@ const ButtonsGroupWrapper: FunctionComponent<ButtonsGroupWrapperProps> = ({
   children,
 }) => {
   return (
-    <div className={`flex flex-col ${noPaddingBottom ? '' : 'pb-1.5'} first-button:rounded-t-0.75 last-button:rounded-b-0.75`}>
+    <div
+      className={`flex flex-col ${noPaddingBottom ? '' : 'pb-1.5'} first-button:rounded-t-0.75 last-button:rounded-b-0.75`}
+    >
       {children}
     </div>
   );
@@ -73,23 +75,24 @@ const SwitchButton: FunctionComponent<SwitchButtonProps> = ({
     <Button
       variant={danger ? 'toolsPanelDanger' : 'toolsPanel'}
       disabled={htmlDisabled}
-      className='w-2.5 h-2.5 z-1'
+      className="w-2.5 h-2.5 z-1"
       onClick={onClick}
     >
       {loading ? (
         <Loader />
       ) : (
-        <div className='absolute z-1'>
+        <div className="absolute z-1">
           <Icon name={iconName} />
         </div>
       )}
       {typeof progress === 'number' && (
         <div
-          className='relative w-full h-full bg-grey3 origin-bottom'
+          className="relative w-full h-full bg-grey3 origin-bottom"
           style={{
             transform: `scaleY(${Math.min(Math.max(progress, 0.01), 1).toFixed(2)})`,
           }}
-        />)}
+        />
+      )}
     </Button>
   );
 };

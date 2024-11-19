@@ -6,12 +6,8 @@ export interface LocalizationCaptionProps {
   captionKey: LocalizationKey;
 }
 
-export const LocalizationCaption: FunctionComponent<LocalizationCaptionProps> = ({
-  captionKey,
-}) => {
-  return (
-    <>
-      {useLocalizationCaptions()[captionKey]}
-    </>
-  );
+export const LocalizationCaption: FunctionComponent<
+  LocalizationCaptionProps
+> = ({ captionKey }) => {
+  return <>{useLocalizationCaptions()[captionKey]}</>;
 };

@@ -1,6 +1,13 @@
-import React, { FunctionComponent, memo, useContext, useEffect, useMemo, useRef } from 'react'
-import { useAnimations, useFBX, useGLTF } from '@react-three/drei'
-import { GroupProps, useFrame, useLoader } from '@react-three/fiber'
+import React, {
+  FunctionComponent,
+  memo,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
+import { useAnimations, useFBX, useGLTF } from '@react-three/drei';
+import { GroupProps, useFrame, useLoader } from '@react-three/fiber';
 import { FileLoader, Group, MathUtils, Object3DEventMap } from 'three';
 import { LocalizationContext } from '../../../../context/LocalizationContext';
 
@@ -23,23 +30,25 @@ interface HrAvatarProps {
   speaking: boolean;
 }
 
-const AiAssistantComponent:FunctionComponent<GroupProps & HrAvatarProps> = (props) => {
+const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = (
+  props,
+) => {
   const { lang } = useContext(LocalizationContext);
   const { nodes, materials } = useGLTF(modelUrl);
   const { animations: idleAnimation } = useFBX(animationUrl);
   const animation = 'Idle';
   const script = 'hi-all';
-  const audio = useMemo(() => new Audio(`/audios/${lang}/${script}.mp3`), [script, lang]);
+  const audio = useMemo(
+    () => new Audio(`/audios/${lang}/${script}.mp3`),
+    [script, lang],
+  );
   const jsonFile = useLoader(FileLoader, `/audios/${lang}/${script}.json`);
   const lipsync = JSON.parse(String(jsonFile));
 
   idleAnimation[0].name = animation;
 
   const group = useRef<Group<Object3DEventMap> | null>(null);
-  const { actions } = useAnimations(
-    [idleAnimation[0]],
-    group
-  );
+  const { actions } = useAnimations([idleAnimation[0]], group);
 
   useFrame(() => {
     const currentAudioTime = audio.currentTime;
@@ -75,7 +84,7 @@ const AiAssistantComponent:FunctionComponent<GroupProps & HrAvatarProps> = (prop
           ],
           0,
           // @ts-ignore
-          morphTargetSmoothing
+          morphTargetSmoothing,
         );
 
         // @ts-ignore
@@ -90,7 +99,7 @@ const AiAssistantComponent:FunctionComponent<GroupProps & HrAvatarProps> = (prop
           ],
           0,
           // @ts-ignore
-          morphTargetSmoothing
+          morphTargetSmoothing,
         );
       }
     });
@@ -137,7 +146,7 @@ const AiAssistantComponent:FunctionComponent<GroupProps & HrAvatarProps> = (prop
             ],
             1,
             // @ts-ignore
-            morphTargetSmoothing
+            morphTargetSmoothing,
           );
           // @ts-ignore
           nodes.Wolf3D_Teeth.morphTargetInfluences[
@@ -157,7 +166,7 @@ const AiAssistantComponent:FunctionComponent<GroupProps & HrAvatarProps> = (prop
             ],
             1,
             // @ts-ignore
-            morphTargetSmoothing
+            morphTargetSmoothing,
           );
         }
 
@@ -190,26 +199,92 @@ const AiAssistantComponent:FunctionComponent<GroupProps & HrAvatarProps> = (prop
   return (
     <group {...props} ref={group} dispose={null}>
       <primitive object={nodes.Hips} />
-      {/* @ts-ignore */}
-      <skinnedMesh geometry={nodes.Wolf3D_Body.geometry} material={materials.Wolf3D_Body} skeleton={nodes.Wolf3D_Body.skeleton} />
-      {/* @ts-ignore */}
-      <skinnedMesh geometry={nodes.Wolf3D_Outfit_Bottom.geometry} material={materials.Wolf3D_Outfit_Bottom} skeleton={nodes.Wolf3D_Outfit_Bottom.skeleton} />
-      {/* @ts-ignore */}
-      <skinnedMesh geometry={nodes.Wolf3D_Outfit_Footwear.geometry} material={materials.Wolf3D_Outfit_Footwear} skeleton={nodes.Wolf3D_Outfit_Footwear.skeleton} />
-      {/* @ts-ignore */}
-      <skinnedMesh geometry={nodes.Wolf3D_Outfit_Top.geometry} material={materials.Wolf3D_Outfit_Top} skeleton={nodes.Wolf3D_Outfit_Top.skeleton} />
-      {/* @ts-ignore */}
-      <skinnedMesh geometry={nodes.Wolf3D_Hair.geometry} material={materials.Wolf3D_Hair} skeleton={nodes.Wolf3D_Hair.skeleton} />
-      {/* @ts-ignore */}
-      <skinnedMesh name="EyeLeft" geometry={nodes.EyeLeft.geometry} material={materials.Wolf3D_Eye} skeleton={nodes.EyeLeft.skeleton} morphTargetDictionary={nodes.EyeLeft.morphTargetDictionary} morphTargetInfluences={nodes.EyeLeft.morphTargetInfluences} />
-      {/* @ts-ignore */}
-      <skinnedMesh name="EyeRight" geometry={nodes.EyeRight.geometry} material={materials.Wolf3D_Eye} skeleton={nodes.EyeRight.skeleton} morphTargetDictionary={nodes.EyeRight.morphTargetDictionary} morphTargetInfluences={nodes.EyeRight.morphTargetInfluences} />
-      {/* @ts-ignore */}
-      <skinnedMesh name="Wolf3D_Head" geometry={nodes.Wolf3D_Head.geometry} material={materials.Wolf3D_Skin} skeleton={nodes.Wolf3D_Head.skeleton} morphTargetDictionary={nodes.Wolf3D_Head.morphTargetDictionary} morphTargetInfluences={nodes.Wolf3D_Head.morphTargetInfluences} />
-      {/* @ts-ignore */}
-      <skinnedMesh name="Wolf3D_Teeth" geometry={nodes.Wolf3D_Teeth.geometry} material={materials.Wolf3D_Teeth} skeleton={nodes.Wolf3D_Teeth.skeleton} morphTargetDictionary={nodes.Wolf3D_Teeth.morphTargetDictionary} morphTargetInfluences={nodes.Wolf3D_Teeth.morphTargetInfluences} />
+      <skinnedMesh
+        // @ts-ignore
+        geometry={nodes.Wolf3D_Body.geometry}
+        material={materials.Wolf3D_Body}
+        // @ts-ignore
+        skeleton={nodes.Wolf3D_Body.skeleton}
+      />
+      <skinnedMesh
+        // @ts-ignore
+        geometry={nodes.Wolf3D_Outfit_Bottom.geometry}
+        // @ts-ignore
+        material={materials.Wolf3D_Outfit_Bottom}
+        // @ts-ignore
+        skeleton={nodes.Wolf3D_Outfit_Bottom.skeleton}
+      />
+      <skinnedMesh
+        // @ts-ignore
+        geometry={nodes.Wolf3D_Outfit_Footwear.geometry}
+        material={materials.Wolf3D_Outfit_Footwear}
+        // @ts-ignore
+        skeleton={nodes.Wolf3D_Outfit_Footwear.skeleton}
+      />
+      <skinnedMesh
+        // @ts-ignore
+        geometry={nodes.Wolf3D_Outfit_Top.geometry}
+        material={materials.Wolf3D_Outfit_Top}
+        // @ts-ignore
+        skeleton={nodes.Wolf3D_Outfit_Top.skeleton}
+      />
+      <skinnedMesh
+        // @ts-ignore
+        geometry={nodes.Wolf3D_Hair.geometry}
+        material={materials.Wolf3D_Hair}
+        // @ts-ignore
+        skeleton={nodes.Wolf3D_Hair.skeleton}
+      />
+      <skinnedMesh
+        name="EyeLeft"
+        // @ts-ignore
+        geometry={nodes.EyeLeft.geometry}
+        material={materials.Wolf3D_Eye}
+        // @ts-ignore
+        skeleton={nodes.EyeLeft.skeleton}
+        // @ts-ignore
+        morphTargetDictionary={nodes.EyeLeft.morphTargetDictionary}
+        // @ts-ignore
+        morphTargetInfluences={nodes.EyeLeft.morphTargetInfluences}
+      />
+      <skinnedMesh
+        name="EyeRight"
+        // @ts-ignore
+        geometry={nodes.EyeRight.geometry}
+        material={materials.Wolf3D_Eye}
+        // @ts-ignore
+        skeleton={nodes.EyeRight.skeleton}
+        // @ts-ignore
+        morphTargetDictionary={nodes.EyeRight.morphTargetDictionary}
+        // @ts-ignore
+        morphTargetInfluences={nodes.EyeRight.morphTargetInfluences}
+      />
+      <skinnedMesh
+        name="Wolf3D_Head"
+        // @ts-ignore
+        geometry={nodes.Wolf3D_Head.geometry}
+        material={materials.Wolf3D_Skin}
+        // @ts-ignore
+        skeleton={nodes.Wolf3D_Head.skeleton}
+        // @ts-ignore
+        morphTargetDictionary={nodes.Wolf3D_Head.morphTargetDictionary}
+        // @ts-ignore
+        morphTargetInfluences={nodes.Wolf3D_Head.morphTargetInfluences}
+      />
+      <skinnedMesh
+        name="Wolf3D_Teeth"
+        // @ts-ignore
+        geometry={nodes.Wolf3D_Teeth.geometry}
+        material={materials.Wolf3D_Teeth}
+        // @ts-ignore
+        skeleton={nodes.Wolf3D_Teeth.skeleton}
+        // @ts-ignore
+        morphTargetDictionary={nodes.Wolf3D_Teeth.morphTargetDictionary}
+        // @ts-ignore
+        morphTargetInfluences={nodes.Wolf3D_Teeth.morphTargetInfluences}
+      />
     </group>
-  )
-}
+  );
+};
 
 export const AiAssistant = memo(AiAssistantComponent);

@@ -9,13 +9,14 @@ interface MarkProps {
   dislikes: number;
 }
 
-export const Mark: FunctionComponent<MarkProps> = ({
-  likes,
-  dislikes,
-}) => {
+export const Mark: FunctionComponent<MarkProps> = ({ likes, dislikes }) => {
   const localizationCaptions = useLocalizationCaptions();
-  const [markWithComment, setMarkWithComment] = useState<string>(localizationCaptions[LocalizationKey.MarkNotCalculated]);
-  const [markPostfix, setMarkPostfix] = useState<string>(localizationCaptions[LocalizationKey.MarkNotCalculated]);
+  const [markWithComment, setMarkWithComment] = useState<string>(
+    localizationCaptions[LocalizationKey.MarkNotCalculated],
+  );
+  const [markPostfix, setMarkPostfix] = useState<string>(
+    localizationCaptions[LocalizationKey.MarkNotCalculated],
+  );
 
   useEffect(() => {
     const getMarkWithComment = (mark: number) => {
@@ -42,7 +43,7 @@ export const Mark: FunctionComponent<MarkProps> = ({
     };
 
     const totalCount = likes + dislikes;
-    const mark = likes / totalCount * 10 / 2;
+    const mark = ((likes / totalCount) * 10) / 2;
     const newMarkWithComment = getMarkWithComment(mark);
     const markPostfix = getMarkPostfix(mark);
     setMarkWithComment(newMarkWithComment);
@@ -52,7 +53,9 @@ export const Mark: FunctionComponent<MarkProps> = ({
   return (
     <div className="mark">
       <div>{markWithComment}</div>
-      <div className="mark-postfix">{localizationCaptions[LocalizationKey.MarkSmmary]}. {markPostfix}</div>
+      <div className="mark-postfix">
+        {localizationCaptions[LocalizationKey.MarkSmmary]}. {markPostfix}
+      </div>
     </div>
   );
 };
