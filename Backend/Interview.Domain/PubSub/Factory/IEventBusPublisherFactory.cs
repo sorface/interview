@@ -1,4 +1,4 @@
-﻿namespace Interview.Infrastructure.WebSocket.PubSub.Factory;
+namespace Interview.Domain.PubSub.Factory;
 
 public interface IEventBusPublisherFactory
 {

@@ -1,3 +1,3 @@
-namespace Interview.Infrastructure.WebSocket.PubSub.Events;
+namespace Interview.Domain.PubSub.Events;
 
 public record EventBusRoomEventKey(Guid RoomId) : EventBusKey;

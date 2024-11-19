@@ -1,4 +1,4 @@
-namespace Interview.Infrastructure.WebSocket.PubSub;
+namespace Interview.Domain.PubSub;
 
 public interface IEventBusKey
 {

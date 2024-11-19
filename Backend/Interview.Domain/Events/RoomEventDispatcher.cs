@@ -1,6 +1,9 @@
 using System.Collections.Concurrent;
+using System.Text.Json;
 using System.Threading.Channels;
 using Interview.Domain.Events.Events;
+using Interview.Domain.PubSub.Events;
+using Interview.Domain.PubSub.Factory;
 
 namespace Interview.Domain.Events;
 
@@ -8,9 +11,16 @@ public class RoomEventDispatcher : IRoomEventDispatcher
 {
     private readonly ConcurrentDictionary<Guid, Channel<IRoomEvent>> _queue = new();
     private readonly SemaphoreSlim _semaphore = new(1);
+    private readonly IEventBusPublisherFactory _publisherFactory;
+
+    public RoomEventDispatcher(IEventBusPublisherFactory publisherFactory)
+    {
+        _publisherFactory = publisherFactory;
+    }
 
     public IEnumerable<IRoomEvent> Read()
     {
+        yield break;
         foreach (var value in _queue.Values)
         {
             IRoomEvent? roomEvent = null;
@@ -33,8 +43,9 @@ public class RoomEventDispatcher : IRoomEventDispatcher
         }
     }
 
-    public async Task WriteAsync(IRoomEvent @event, CancellationToken cancellationToken = default)
+    public async Task WriteDirectlyAsync(IRoomEvent @event, CancellationToken cancellationToken = default)
     {
+        return;
         try
         {
             var channel = GetChannel(@event.RoomId);
@@ -48,24 +59,15 @@ public class RoomEventDispatcher : IRoomEventDispatcher
         _semaphore.Release();
     }
 
-    public Task DropEventsAsync(Guid roomId, CancellationToken cancellationToken = default)
+    public async Task WriteAsync(IRoomEvent @event, CancellationToken cancellationToken = default)
     {
-        if (!_queue.TryRemove(roomId, out var channel))
+        await WriteDirectlyAsync(@event, cancellationToken);
+        var publisher = await _publisherFactory.CreateAsync(cancellationToken);
+        var sendAllInRoomEventBusEvent = new SendAllInRoomEventBusEvent
         {
-            return Task.CompletedTask;
-        }
-
-        _semaphore.Release();
-        try
-        {
-            channel.Writer.TryComplete();
-        }
-        catch
-        {
-            // ignore
-        }
-
-        return Task.CompletedTask;
+            Event = JsonSerializer.SerializeToUtf8Bytes(@event),
+        };
+        await publisher.PublishAsync(new EventBusRoomEventKey(@event.RoomId), sendAllInRoomEventBusEvent, cancellationToken);
     }
 
     public Task WaitAsync(CancellationToken cancellationToken = default)

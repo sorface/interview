@@ -1,43 +1,50 @@
-﻿using System.Text.Json;
-using Interview.Infrastructure.WebSocket.PubSub.Events;
+using System.Text.Json;
+using Interview.Domain.PubSub;
+using Interview.Domain.PubSub.Events;
+using Interview.Domain.PubSub.Factory;
 using StackExchange.Redis;
 
-namespace Interview.Infrastructure.WebSocket.PubSub.Factory;
+namespace Interview.Infrastructure.WebSocket.PubSub;
 
 public class RedisPubSubFactoryConfiguration
 {
-    public required string ConnectionString { get; set; }
+    public required ConfigurationOptions Configuration { get; set; }
 }
 
 public sealed class RedisEventBusFactory : IEventBusPublisherFactory, IEventBusSubscriberFactory, IAsyncDisposable
 {
-    private readonly string _connectionString;
+    private readonly ConfigurationOptions _configuration;
     private ConnectionMultiplexer? _connectionMultiplexer;
 
     public RedisEventBusFactory(RedisPubSubFactoryConfiguration configuration)
     {
-        _connectionString = configuration.ConnectionString;
+        _configuration = configuration.Configuration;
     }
 
     async Task<IEventBusPublisher> IEventBusPublisherFactory.CreateAsync(CancellationToken cancellationToken)
     {
-        _connectionMultiplexer ??= await ConnectionMultiplexer.ConnectAsync(_connectionString);
+        _connectionMultiplexer ??= await CreateConnectionMultiplexerAsync();
         var subscriber = _connectionMultiplexer.GetSubscriber();
         return new EventBus(subscriber);
     }
 
     async Task<IEventBusSubscriber> IEventBusSubscriberFactory.CreateAsync(CancellationToken cancellationToken)
     {
-        _connectionMultiplexer ??= await ConnectionMultiplexer.ConnectAsync(_connectionString);
+        _connectionMultiplexer ??= await CreateConnectionMultiplexerAsync();
         var subscriber = _connectionMultiplexer.GetSubscriber();
         return new EventBus(subscriber);
     }
-    
+
+    private Task<ConnectionMultiplexer> CreateConnectionMultiplexerAsync()
+    {
+        return ConnectionMultiplexer.ConnectAsync(_configuration);
+    }
+
     public ValueTask DisposeAsync()
     {
         return _connectionMultiplexer?.DisposeAsync() ?? ValueTask.CompletedTask;
     }
-    
+
     private sealed class EventBus : IEventBus
     {
         private readonly ISubscriber _subscriber;
@@ -47,11 +54,11 @@ public sealed class RedisEventBusFactory : IEventBusPublisherFactory, IEventBusS
             _subscriber = subscriber;
         }
 
-        public async Task<IAsyncDisposable> SubscribeAsync<TKey>(TKey key, Action<TKey, EventBusEvent?> callback, CancellationToken cancellationToken)
+        public Task<IAsyncDisposable> SubscribeAsync<TKey>(TKey key, Action<TKey, EventBusEvent?> callback, CancellationToken cancellationToken)
             where TKey : IEventBusKey
         {
             var redisKey = CreateKey(key);
-            await _subscriber.SubscribeAsync(redisKey, (_, value) =>
+            _subscriber.Subscribe(redisKey, (_, value) =>
             {
                 if (!value.HasValue)
                 {
@@ -64,8 +71,8 @@ public sealed class RedisEventBusFactory : IEventBusPublisherFactory, IEventBusS
                     callback(key, ev);
                 }
             });
-            
-            return new Unsubscriber(_subscriber, redisKey);
+
+            return Task.FromResult<IAsyncDisposable>(new Unsubscriber(_subscriber, redisKey));
         }
 
         public Task PublishAsync<TKey>(TKey key, EventBusEvent roomEventBusEvent, CancellationToken cancellationToken)
@@ -81,7 +88,7 @@ public sealed class RedisEventBusFactory : IEventBusPublisherFactory, IEventBusS
             var buildStringKey = key.BuildStringKey();
             return new RedisChannel(buildStringKey, RedisChannel.PatternMode.Auto);
         }
-        
+
         private sealed class Unsubscriber : IAsyncDisposable
         {
             private readonly ISubscriber _subscriber;

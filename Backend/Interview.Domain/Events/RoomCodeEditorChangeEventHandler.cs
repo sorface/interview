@@ -50,7 +50,12 @@ public class RoomCodeEditorChangeEventHandler
         {
             Enabled = enabled,
         };
-        var @event = new RoomCodeEditorEnabledEvent(roomId, payload, _currentUserAccessor.GetUserIdOrThrow());
+        var @event = new RoomCodeEditorEnabledEvent
+        {
+            RoomId = roomId,
+            Value = payload,
+            CreatedById = _currentUserAccessor.GetUserIdOrThrow(),
+        };
         await _eventDispatcher.WriteAsync(@event, cancellationToken);
     }
 }

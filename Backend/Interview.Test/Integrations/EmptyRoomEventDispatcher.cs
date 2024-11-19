@@ -8,10 +8,10 @@ namespace Interview.Test.Integrations
         public IEnumerable<IRoomEvent> Read()
             => Enumerable.Empty<IRoomEvent>();
 
-        public Task WriteAsync(IRoomEvent @event, CancellationToken cancellationToken = default)
+        public Task WriteDirectlyAsync(IRoomEvent @event, CancellationToken cancellationToken = default)
             => Task.CompletedTask;
 
-        public Task DropEventsAsync(Guid roomId, CancellationToken cancellationToken = default)
+        public Task WriteAsync(IRoomEvent @event, CancellationToken cancellationToken = default)
             => Task.CompletedTask;
 
         public Task WaitAsync(CancellationToken cancellationToken = default)

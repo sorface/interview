@@ -25,7 +25,14 @@ public class ChatMessageWebSocketByNameEventHandler : WebSocketByNameEventHandle
             Message = message ?? string.Empty,
             Nickname = detail.User.Nickname,
         };
-        var @event = new RoomEvent<UserMessageEventPayload>(detail.RoomId, EventType.ChatMessage, payload, false, detail.UserId);
+        var @event = new RoomMessageEvent
+        {
+            RoomId = detail.RoomId,
+            Type = EventType.ChatMessage,
+            Value = payload,
+            CreatedById = detail.UserId,
+        };
         return _eventDispatcher.WriteAsync(@event, cancellationToken);
     }
 }
+

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Interview.Infrastructure.WebSocket.PubSub;
+namespace Interview.Domain.PubSub;
 
 public class JsonDerivedTypeByNameAttribute<T> : JsonDerivedTypeAttribute
 {

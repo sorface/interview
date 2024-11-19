@@ -1,8 +1,8 @@
+using Interview.Domain.PubSub.Factory;
 using Interview.Infrastructure.WebSocket.Events;
 using Interview.Infrastructure.WebSocket.Events.ConnectionListener;
 using Interview.Infrastructure.WebSocket.Events.Handlers;
 using Interview.Infrastructure.WebSocket.PubSub;
-using Interview.Infrastructure.WebSocket.PubSub.Factory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IO;
@@ -34,7 +34,7 @@ public static class ServiceCollectionExt
 
         self.AddHostedService<EventSenderJob>();
         self.AddHostedService<EventStorage2DatabaseBackgroundService>();
-        
+
         var subFactoryConfiguration = new PubSubFactoryConfiguration();
         pubSubFactoryConfiguration.Invoke(subFactoryConfiguration);
         subFactoryConfiguration.AddServices(self);
@@ -52,7 +52,7 @@ public sealed class PubSubFactoryConfiguration
         _configuration = null;
         _implementation = typeof(MemoryEventBusFactory);
     }
-    
+
     public void UseRedis(RedisPubSubFactoryConfiguration configuration)
     {
         _configuration = configuration;

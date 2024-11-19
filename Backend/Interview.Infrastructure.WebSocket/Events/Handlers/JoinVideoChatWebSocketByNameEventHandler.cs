@@ -64,7 +64,13 @@ public class JoinVideoChatWebSocketByNameEventHandler : WebSocketByNameEventHand
                 ParticipantType = e.ParticipantType,
             }).ToList();
         var strPayload = _serializer.SerializePayloadAsString(users);
-        var newEvent = new RoomEvent(detail.RoomId, "all users", strPayload, false, detail.UserId);
+        var newEvent = new RoomEvent
+        {
+            RoomId = detail.RoomId,
+            Type = "all users",
+            Value = strPayload,
+            CreatedById = detail.UserId,
+        };
         var provider = new CachedRoomEventProvider(newEvent, _serializer);
         var sender = new WebSocketEventSender(_webSocketEventSender, detail.WebSocket);
         await _eventSenderAdapter.SendAsync(provider, sender, cancellationToken);

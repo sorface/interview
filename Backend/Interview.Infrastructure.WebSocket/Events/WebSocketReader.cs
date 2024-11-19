@@ -2,11 +2,19 @@ using System.Buffers;
 using System.Net.WebSockets;
 using System.Text.Json;
 using Interview.Domain.Database;
+using Interview.Domain.Events;
+using Interview.Domain.Events.Events;
+using Interview.Domain.Events.Events.Serializers;
+using Interview.Domain.Events.Sender;
 using Interview.Domain.Events.Storage;
+using Interview.Domain.PubSub.Events;
+using Interview.Domain.PubSub.Factory;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.Rooms.Service;
 using Interview.Domain.Users;
 using Interview.Infrastructure.WebSocket.Events.Handlers;
+using Interview.Infrastructure.WebSocket.PubSub;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IO;
@@ -19,16 +27,37 @@ public class WebSocketReader
     private readonly IWebSocketEventHandler[] _handlers;
     private readonly IHotEventStorage _hotEventStorage;
     private readonly ILogger<WebSocketReader> _logger;
+    private readonly IEventBusSubscriberFactory _eventBusSubscriberFactory;
+    private readonly IEventBusPublisherFactory _publisherFactory;
+    private readonly IRoomEventDispatcher _dispatcher;
+    private readonly IRoomEventSerializer _serializer;
+    private readonly IRoomEventSerializer _roomEventSerializer;
+    private readonly ILogger<WebSocketEventSender> _webSocketEventSender;
+    private readonly IEventSenderAdapter _eventSenderAdapter;
 
     public WebSocketReader(
         RecyclableMemoryStreamManager manager,
         IEnumerable<IWebSocketEventHandler> handlers,
         IHotEventStorage hotEventStorage,
-        ILogger<WebSocketReader> logger)
+        ILogger<WebSocketReader> logger,
+        IEventBusSubscriberFactory eventBusSubscriberFactory,
+        IEventBusPublisherFactory publisherFactory,
+        IRoomEventDispatcher dispatcher,
+        IRoomEventSerializer serializer,
+        IRoomEventSerializer roomEventSerializer,
+        ILogger<WebSocketEventSender> webSocketEventSender,
+        IEventSenderAdapter eventSenderAdapter)
     {
         _manager = manager;
         _hotEventStorage = hotEventStorage;
         _logger = logger;
+        _eventBusSubscriberFactory = eventBusSubscriberFactory;
+        _publisherFactory = publisherFactory;
+        _dispatcher = dispatcher;
+        _serializer = serializer;
+        _roomEventSerializer = roomEventSerializer;
+        _webSocketEventSender = webSocketEventSender;
+        _eventSenderAdapter = eventSenderAdapter;
         _handlers = handlers.OrderBy(e => e.Order).ToArray();
     }
 
@@ -36,15 +65,54 @@ public class WebSocketReader
         User user,
         Room room,
         EVRoomParticipantType participantType,
-        IServiceProvider scopedServiceProvider,
+        IServiceScopeFactory serviceScopeFactory,
         System.Net.WebSockets.WebSocket webSocket,
         CancellationToken ct)
     {
+        var subscriber = await _eventBusSubscriberFactory.CreateAsync(ct);
+        var publisher = await _publisherFactory.CreateAsync(ct);
+        var eventBusRoomEventKey = new EventBusRoomEventKey(room.Id);
+        await using var roomEventSubscriber = await subscriber.SubscribeAsync(eventBusRoomEventKey, (key, @event) =>
+        {
+            if (@event is null)
+            {
+                return;
+            }
+
+            var task = @event.Match<Task>(
+                async busEvent =>
+                {
+                    var webSocketEvent = JsonSerializer.Deserialize<WebSocketEvent>(busEvent.Event);
+                    if (webSocketEvent is null)
+                    {
+                        return;
+                    }
+
+                    await ProcessWebSocketEventAsync(user, room, participantType, serviceScopeFactory, webSocket, webSocketEvent, ct);
+                },
+                async busEvent =>
+                {
+                    var @event = JsonSerializer.Deserialize<IRoomEvent>(busEvent.Event);
+                    var statefulEvents = new List<IRoomEvent>();
+                    await ProcessEventAsync(@event, statefulEvents, webSocket, ct);
+                    await UpdateRoomStateAsync(serviceScopeFactory, statefulEvents, ct);
+
+                    // return _dispatcher.WriteDirectlyAsync(@event, ct);
+                });
+            task.ConfigureAwait(false).GetAwaiter().GetResult();
+        }, ct);
+
         while (!webSocket.ShouldCloseWebSocket())
         {
             try
             {
-                await HandleAsync(user, room, participantType, scopedServiceProvider, webSocket, ct);
+                var deserializeResult = await DeserializeResultAsync(webSocket, ct);
+                if (deserializeResult is null)
+                {
+                    continue;
+                }
+
+                await ProcessWebSocketEventAsync(user, room, participantType, serviceScopeFactory, webSocket, deserializeResult, ct);
             }
             catch (Exception e)
             {
@@ -56,33 +124,20 @@ public class WebSocketReader
         }
     }
 
-    private async Task HandleAsync(
-        User user,
-        Room room,
-        EVRoomParticipantType participantType,
-        IServiceProvider scopedServiceProvider,
-        System.Net.WebSockets.WebSocket webSocket,
-        CancellationToken ct)
+    private async Task ProcessWebSocketEventAsync(User user,
+                                                  Room room,
+                                                  EVRoomParticipantType participantType,
+                                                  IServiceScopeFactory serviceScopeFactory,
+                                                  System.Net.WebSockets.WebSocket webSocket,
+                                                  WebSocketEvent webSocketEvent,
+                                                  CancellationToken ct)
     {
-        var deserializeResult = await DeserializeResultAsync(webSocket, ct);
-        if (webSocket.ShouldCloseWebSocket())
-        {
-            return;
-        }
-
-        if (deserializeResult is null)
-        {
-            return;
-        }
-
-        var appDbContext = scopedServiceProvider.GetRequiredService<AppDbContext>();
-        appDbContext.ChangeTracker.Clear();
-
-        await SaveEventAsync(room, user, deserializeResult, ct);
+        using var scope = serviceScopeFactory.CreateScope();
+        await SaveEventAsync(room, user, webSocketEvent, ct);
         var socketEventDetail = new SocketEventDetail(
-            scopedServiceProvider,
+            scope.ServiceProvider,
             webSocket,
-            deserializeResult,
+            webSocketEvent,
             user,
             room,
             participantType);
@@ -113,7 +168,7 @@ public class WebSocketReader
     {
         WebSocketEvent? deserializeResult = null;
         using var buffer = new PoolItem(8192);
-        using var ms = _manager.GetStream();
+        await using var ms = _manager.GetStream();
         WebSocketReceiveResult result;
         do
         {
@@ -152,6 +207,57 @@ public class WebSocketReader
             CreatedById = user.Id,
         };
         return _hotEventStorage.AddAsync(storageEvent, ct);
+    }
+
+    private async Task ProcessEventAsync(
+        IRoomEvent currentEvent,
+        List<IRoomEvent> statefulEvents,
+        System.Net.WebSockets.WebSocket socket,
+        CancellationToken cancellationToken)
+    {
+        if (currentEvent.Stateful)
+        {
+            statefulEvents.Add(currentEvent);
+        }
+
+        var provider = new CachedRoomEventProvider(currentEvent, _roomEventSerializer);
+        _logger.LogDebug("Start sending {@Event}", currentEvent);
+        var sender = new WebSocketEventSender(_webSocketEventSender, socket);
+        await _eventSenderAdapter.SendAsync(provider, sender, cancellationToken);
+    }
+
+    private async Task UpdateRoomStateAsync(IServiceScopeFactory serviceScopeFactory, List<IRoomEvent> statefulEvents, CancellationToken cancellationToken)
+    {
+        if (statefulEvents.Count <= 0)
+        {
+            return;
+        }
+
+        try
+        {
+            await using var dbScope = serviceScopeFactory.CreateAsyncScope();
+            var service = dbScope.ServiceProvider.GetRequiredService<IRoomServiceWithoutPermissionCheck>();
+            foreach (var roomEvent in statefulEvents)
+            {
+                try
+                {
+                    var payload = roomEvent.BuildStringPayload(_serializer);
+                    await service.UpsertRoomStateAsync(
+                        roomEvent.RoomId,
+                        roomEvent.Type,
+                        payload ?? string.Empty,
+                        cancellationToken);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "During update {Type} room state", roomEvent.Type);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Fails to update room states");
+        }
     }
 
     private class PoolItem : IDisposable

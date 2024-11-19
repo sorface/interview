@@ -1,24 +1,26 @@
-﻿using System.Collections.Concurrent;
-using Interview.Infrastructure.WebSocket.PubSub.Events;
+using System.Collections.Concurrent;
+using Interview.Domain.PubSub.Events;
 
-namespace Interview.Infrastructure.WebSocket.PubSub.Factory;
+namespace Interview.Domain.PubSub.Factory;
 
 public sealed class MemoryEventBusFactory : IEventBusPublisherFactory, IEventBusSubscriberFactory
 {
+    private readonly Lazy<MemoryEventBus> _lazyEventBus = new(() => new MemoryEventBus());
+
     Task<IEventBusPublisher> IEventBusPublisherFactory.CreateAsync(CancellationToken cancellationToken)
     {
-        return Task.FromResult<IEventBusPublisher>(new MemoryEventBus());
+        return Task.FromResult<IEventBusPublisher>(_lazyEventBus.Value);
     }
 
     Task<IEventBusSubscriber> IEventBusSubscriberFactory.CreateAsync(CancellationToken cancellationToken)
     {
-        return Task.FromResult<IEventBusSubscriber>(new MemoryEventBus());
+        return Task.FromResult<IEventBusSubscriber>(_lazyEventBus.Value);
     }
-    
+
     private sealed class MemoryEventBus : IEventBus
     {
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<object, Action<IEventBusKey, EventBusEvent?>>> _mapping = new();
-        
+
         public Task<IAsyncDisposable> SubscribeAsync<TKey>(TKey key, Action<TKey, EventBusEvent?> callback, CancellationToken cancellationToken)
             where TKey : IEventBusKey
         {
@@ -39,10 +41,10 @@ public sealed class MemoryEventBusFactory : IEventBusPublisherFactory, IEventBus
                     action(key, roomEventBusEvent);
                 }
             }
-            
+
             return Task.CompletedTask;
         }
-        
+
         private sealed class Unsubscriber : IAsyncDisposable
         {
             private readonly string _key;

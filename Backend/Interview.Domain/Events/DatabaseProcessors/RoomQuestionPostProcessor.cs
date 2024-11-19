@@ -30,7 +30,12 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
 
     public override async ValueTask ProcessAddedAsync(RoomQuestion entity, CancellationToken cancellationToken)
     {
-        var @event = new RoomQuestionAddEvent(entity.RoomId, new RoomQuestionAddEventPayload(entity.QuestionId, entity.State.EnumValue), _currentUserAccessor.GetUserIdOrThrow());
+        var @event = new RoomQuestionAddEvent
+        {
+            RoomId = entity.RoomId,
+            Value = new RoomQuestionAddEventPayload(entity.QuestionId, entity.State.EnumValue),
+            CreatedById = _currentUserAccessor.GetUserIdOrThrow(),
+        };
 
         await _eventDispatcher.WriteAsync(@event, cancellationToken);
     }
@@ -45,10 +50,12 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
             return;
         }
 
-        var @event = new RoomQuestionChangeEvent(
-            current.RoomId,
-            new RoomQuestionChangeEventPayload(current.QuestionId, original.State.EnumValue, current.State.EnumValue),
-            _currentUserAccessor.GetUserIdOrThrow());
+        var @event = new RoomQuestionChangeEvent
+        {
+            RoomId = current.RoomId,
+            Value = new RoomQuestionChangeEventPayload(current.QuestionId, original.State.EnumValue, current.State.EnumValue),
+            CreatedById = _currentUserAccessor.GetUserIdOrThrow(),
+        };
 
         await _eventDispatcher.WriteAsync(@event, cancellationToken);
 

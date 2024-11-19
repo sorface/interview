@@ -1,6 +1,6 @@
-using Interview.Infrastructure.WebSocket.PubSub.Events;
+using Interview.Domain.PubSub.Events;
 
-namespace Interview.Infrastructure.WebSocket.PubSub;
+namespace Interview.Domain.PubSub;
 
 public interface IEventBus : IEventBusSubscriber, IEventBusPublisher
 {

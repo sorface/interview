@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Net;
 using System.Reflection;
+using System.Security.Authentication;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Ardalis.SmartEnum.SystemTextJson;
@@ -13,11 +14,13 @@ using Interview.Infrastructure.WebSocket;
 using Interview.Infrastructure.WebSocket.Events;
 using Interview.Infrastructure.WebSocket.Events.ConnectionListener;
 using Interview.Infrastructure.WebSocket.Events.Handlers;
+using Interview.Infrastructure.WebSocket.PubSub;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IO;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 
 namespace Interview.Backend;
 
@@ -73,7 +76,19 @@ public class ServiceConfigurator
 
         serviceCollection.AddSingleton(new OAuthServiceDispatcher(_configuration));
 
-        serviceCollection.AddWebSocketServices(configuration => configuration.UseInMemory());
+        serviceCollection.AddWebSocketServices(configuration =>
+        {
+            RedisEnvironmentConfigure.Configure(_configuration,
+                (host, port, username, password) =>
+                {
+                    var configurationOptions = ConfigurationOptions.Parse($@"{host}:{port},password={password}");
+                    configuration.UseRedis(new RedisPubSubFactoryConfiguration
+                    {
+                        Configuration = configurationOptions,
+                    });
+                },
+                configuration.UseInMemory);
+        });
 
         serviceCollection.Configure<ForwardedHeadersOptions>(options =>
         {
@@ -139,6 +154,9 @@ public class ServiceConfigurator
                             options.Configuration = $@"{host}:{port},password={password}";
                             options.InstanceName = "sorface.interview.session.";
                         });
+
+                        serviceCollection.AddDistributedMemoryCache();
+                        builder.UseEmpty();
                     },
                     () =>
                     {
