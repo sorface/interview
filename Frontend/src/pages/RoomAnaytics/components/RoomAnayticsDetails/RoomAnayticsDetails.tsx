@@ -8,6 +8,7 @@ import { LocalizationKey } from '../../../../localization';
 import { Theme, ThemeContext } from '../../../../context/ThemeContext';
 import { QuestionAnswerDetails } from '../../../../components/QuestionAnswerDetails/QuestionAnswerDetails';
 import { Gap } from '../../../../components/Gap/Gap';
+import { Typography } from '../../../../components/Typography/Typography';
 
 interface RoomAnayticsDetailsProps {
   data: Analytics | null;
@@ -28,6 +29,12 @@ export const RoomAnayticsDetails: FunctionComponent<
 
   return (
     <div>
+      <div className='w-full text-left'>
+        <Typography size='m'>
+          {openedQuestion?.value || ''}
+        </Typography>
+      </div>
+      <Gap sizeRem={1.25} />
       <SwitcherButton
         items={[
           {
