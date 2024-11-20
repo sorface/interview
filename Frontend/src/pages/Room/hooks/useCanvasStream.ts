@@ -13,6 +13,7 @@ import { useSelfieSegmentation } from './useSelfieSegmentation';
 import { AuthContext } from '../../../context/AuthContext';
 
 interface UseCanvasStreamParams {
+  enabled: boolean;
   width: number;
   height: number;
   frameRate: number;
@@ -68,6 +69,7 @@ const fillNoCamera = (
 };
 
 export const useCanvasStream = ({
+  enabled,
   width,
   height,
   frameRate,
@@ -166,6 +168,9 @@ export const useCanvasStream = ({
   }, [video, context, width, height, cameraStream, selfieSegmentation]);
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
     const canvas = document.createElement('canvas');
     const newVideo = document.createElement('video');
     newVideo.width = canvas.width = width;
@@ -184,7 +189,7 @@ export const useCanvasStream = ({
     setVideo(newVideo);
     setContext(canvasContext);
     setMediaStream(new MediaStream([videoTrack]));
-  }, [frameRate, height, width, userNickname, avatar]);
+  }, [frameRate, height, width, userNickname, enabled, avatar]);
 
   useEffect(() => {
     if (!context) {
