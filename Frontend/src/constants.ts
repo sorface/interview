@@ -1,5 +1,5 @@
 export const inviteParamName = 'invite';
-export const roomReviewMaxLength = 250;
+export const roomReviewMaxLength = 500;
 
 export const pathnames = {
   home: '/:redirect?',

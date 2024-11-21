@@ -115,10 +115,6 @@ export const RoomAnaytics: FunctionComponent = () => {
     (participant) => participant.type === 'Examinee',
   );
 
-  const openedQuestionDetailsTitle = data?.questions.find(
-    (question) => question.id === openedQuestionDetails,
-  )?.value;
-
   useEffect(() => {
     if (!id) {
       throw new Error('Room id not found');
@@ -192,7 +188,7 @@ export const RoomAnaytics: FunctionComponent = () => {
     <>
       <Modal
         open={!!openedQuestionDetails}
-        contentLabel={`${localizationCaptions[LocalizationKey.QuestionAnswerDetails]} "${openedQuestionDetailsTitle}"`}
+        contentLabel={localizationCaptions[LocalizationKey.QuestionAnswerDetails]}
         onClose={handleQuestionDetailsClose}
       >
         <RoomAnayticsDetails
@@ -390,14 +386,14 @@ export const RoomAnaytics: FunctionComponent = () => {
                 iconName={IconNames.HelpCircle}
                 captionLine1={
                   localizationCaptions[
-                    LocalizationKey
-                      .CloseRoomWithoutQuestionEvaluationWarningLine1
+                  LocalizationKey
+                    .CloseRoomWithoutQuestionEvaluationWarningLine1
                   ]
                 }
                 captionLine2={
                   localizationCaptions[
-                    LocalizationKey
-                      .CloseRoomWithoutQuestionEvaluationWarningLine2
+                  LocalizationKey
+                    .CloseRoomWithoutQuestionEvaluationWarningLine2
                   ]
                 }
               />

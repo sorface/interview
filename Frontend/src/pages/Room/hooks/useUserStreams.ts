@@ -49,6 +49,7 @@ export const useUserStreams = () => {
   );
   const userVideoStreamRef = useRef<MediaStream | null>(null);
   const canvasMediaStream = useCanvasStream({
+    enabled: !!selectedCameraId,
     width: videoConstraints.width,
     height: videoConstraints.height,
     frameRate: videoConstraints.frameRate,

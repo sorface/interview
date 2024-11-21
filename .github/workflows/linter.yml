@@ -4,9 +4,8 @@ on:
   push:
     paths-ignore:
       - "**.md"
-      - 'Frontend'
-      - 'Frontend'
-      - '.github'
+      - 'Frontend/**'
+      - '.github/**'
 
 jobs:
   lint:
