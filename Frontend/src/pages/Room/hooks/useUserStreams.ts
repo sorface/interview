@@ -38,7 +38,7 @@ export const useUserStreams = () => {
     useState<MediaDeviceInfo['deviceId']>();
   const [micEnabled, setMicEnabled] = useState(true);
   const [cameraEnabled, setCameraEnabled] = useState(true);
-  const [backgroundRemoveEnabled, setBackgroundRemoveEnabled] = useState(true);
+  const [backgroundRemoveEnabled, setBackgroundRemoveEnabled] = useState(false);
   const [userAudioStream, setUserAudioStream] = useState<MediaStream | null>(
     null,
   );
