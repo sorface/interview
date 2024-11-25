@@ -168,28 +168,33 @@ export const useCanvasStream = ({
   }, [video, context, width, height, cameraStream, selfieSegmentation]);
 
   useEffect(() => {
-    if (!enabled) {
-      return;
-    }
     const canvas = document.createElement('canvas');
-    const newVideo = document.createElement('video');
-    newVideo.width = canvas.width = width;
-    newVideo.height = canvas.height = height;
-    newVideo.muted = true;
-    newVideo.autoplay = true;
-    newVideo.playsInline = true;
+    canvas.width = width;
+    canvas.height = height;
     const canvasContext = canvas.getContext('2d');
     if (!canvasContext) {
       throw new Error('Failed to get context for blank stream');
     }
-    const stream = canvas.captureStream(frameRate);
+    setContext(canvasContext);
+  }, [width, height]);
+
+  useEffect(() => {
+    if (!enabled || !context) {
+      return;
+    }
+    const newVideo = document.createElement('video');
+    newVideo.width = width;
+    newVideo.height = height;
+    newVideo.muted = true;
+    newVideo.autoplay = true;
+    newVideo.playsInline = true;
+    const stream = context.canvas.captureStream(frameRate);
     const videoTrack = stream.getVideoTracks()[0];
     videoTrack.enabled = true;
-    fillNoCamera(canvasContext, userNickname, avatar);
+    fillNoCamera(context, userNickname, avatar);
     setVideo(newVideo);
-    setContext(canvasContext);
     setMediaStream(new MediaStream([videoTrack]));
-  }, [frameRate, height, width, userNickname, enabled, avatar]);
+  }, [frameRate, height, width, userNickname, enabled, avatar, context]);
 
   useEffect(() => {
     if (!context) {
