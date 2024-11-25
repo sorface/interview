@@ -19,6 +19,9 @@
 .gap-12 {
   gap: 3rem;
 }
+.block {
+  display: block;
+}
 .flex {
   display: flex;
 }
