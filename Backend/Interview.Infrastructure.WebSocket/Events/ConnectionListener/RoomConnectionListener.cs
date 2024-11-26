@@ -5,7 +5,7 @@ using Interview.Domain.Connections;
 
 namespace Interview.Infrastructure.WebSocket.Events.ConnectionListener;
 
-public class RoomConnectionListener : IActiveRoomSource, IConnectionListener, IWebSocketConnectionSource
+public class RoomConnectionListener : IActiveRoomSource, IConnectionListener
 {
     private readonly ConcurrentDictionary<Guid, ImmutableList<WebSocketConnectDetail>> _activeRooms = new();
 
@@ -29,18 +29,6 @@ public class RoomConnectionListener : IActiveRoomSource, IConnectionListener, IW
             (_, list) => list.Remove(detail));
     }
 
-    public bool TryGetConnections(Guid roomId, [NotNullWhen(true)] out IReadOnlyCollection<System.Net.WebSockets.WebSocket>? connections)
-    {
-        if (!_activeRooms.TryGetValue(roomId, out var details) || details.Count == 0)
-        {
-            connections = default;
-            return false;
-        }
-
-        connections = details.Select(e => e.WebSocket).ToList();
-        return true;
-    }
-
     public bool TryGetConnectionsByPredicate(Guid roomId, Func<WebSocketConnectDetail, bool> predicate, [NotNullWhen(true)] out IReadOnlyCollection<System.Net.WebSockets.WebSocket>? connections)
     {
         if (!_activeRooms.TryGetValue(roomId, out var details) || details.Count == 0)
@@ -52,11 +40,4 @@ public class RoomConnectionListener : IActiveRoomSource, IConnectionListener, IW
         connections = details.Where(predicate).Select(e => e.WebSocket).ToList();
         return true;
     }
-}
-
-public interface IWebSocketConnectionSource
-{
-    bool TryGetConnections(
-        Guid roomId,
-        [NotNullWhen(true)] out IReadOnlyCollection<System.Net.WebSockets.WebSocket>? connections);
 }

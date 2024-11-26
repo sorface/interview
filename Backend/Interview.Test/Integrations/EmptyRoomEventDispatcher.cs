@@ -5,16 +5,7 @@ namespace Interview.Test.Integrations
 {
     public class EmptyRoomEventDispatcher : IRoomEventDispatcher
     {
-        public IEnumerable<IRoomEvent> Read()
-            => Enumerable.Empty<IRoomEvent>();
-
-        public Task WriteDirectlyAsync(IRoomEvent @event, CancellationToken cancellationToken = default)
-            => Task.CompletedTask;
-
         public Task WriteAsync(IRoomEvent @event, CancellationToken cancellationToken = default)
-            => Task.CompletedTask;
-
-        public Task WaitAsync(CancellationToken cancellationToken = default)
             => Task.CompletedTask;
     }
 }

@@ -32,7 +32,6 @@ public static class ServiceCollectionExt
                 .WithSingletonLifetime();
         });
 
-        self.AddHostedService<EventSenderJob>();
         self.AddHostedService<EventStorage2DatabaseBackgroundService>();
 
         var subFactoryConfiguration = new PubSubFactoryConfiguration();
