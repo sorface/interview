@@ -1,3 +1,4 @@
+using Interview.Domain.Events;
 using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Domain.Rooms.RoomParticipants;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +13,7 @@ public class CodeWebSocketByNameEventHandler : WebSocketByNameEventHandlerBase
     {
     }
 
-    protected override string SupportType => "code";
+    protected override string SupportType => EventType.CodeEditorChange;
 
     protected override async Task HandleEventAsync(SocketEventDetail detail, string? payload, CancellationToken cancellationToken)
     {

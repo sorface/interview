@@ -35,4 +35,3 @@ public class ChatMessageWebSocketByNameEventHandler : WebSocketByNameEventHandle
         return _eventDispatcher.WriteAsync(@event, cancellationToken);
     }
 }
-

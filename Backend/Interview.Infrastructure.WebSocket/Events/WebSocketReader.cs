@@ -1,7 +1,6 @@
 using System.Buffers;
 using System.Net.WebSockets;
 using System.Text.Json;
-using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Events;
 using Interview.Domain.Events.Events.Serializers;
@@ -14,7 +13,6 @@ using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.Service;
 using Interview.Domain.Users;
 using Interview.Infrastructure.WebSocket.Events.Handlers;
-using Interview.Infrastructure.WebSocket.PubSub;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IO;
@@ -71,33 +69,36 @@ public class WebSocketReader
     {
         var subscriber = await _eventBusSubscriberFactory.CreateAsync(ct);
         var eventBusRoomEventKey = new EventBusRoomEventKey(room.Id);
-        await using var roomEventSubscriber = await subscriber.SubscribeAsync(eventBusRoomEventKey, (key, @event) =>
-        {
-            if (@event is null)
+        await using var roomEventSubscriber = await subscriber.SubscribeAsync(
+            eventBusRoomEventKey,
+            (key, @event) =>
             {
-                return;
-            }
-
-            var task = @event.Match<Task>(
-                async busEvent =>
+                if (@event is null)
                 {
-                    var webSocketEvent = JsonSerializer.Deserialize<WebSocketEvent>(busEvent.Event);
-                    if (webSocketEvent is null)
+                    return;
+                }
+
+                var task = @event.Match<Task>(
+                    async busEvent =>
                     {
-                        return;
-                    }
+                        var webSocketEvent = JsonSerializer.Deserialize<WebSocketEvent>(busEvent.Event);
+                        if (webSocketEvent is null)
+                        {
+                            return;
+                        }
 
-                    await ProcessWebSocketEventAsync(user, room, participantType, serviceScopeFactory, webSocket, webSocketEvent, ct);
-                },
-                async busEvent =>
-                {
-                    var @event = JsonSerializer.Deserialize<IRoomEvent>(busEvent.Event);
-                    var statefulEvents = new List<IRoomEvent>();
-                    await ProcessEventAsync(@event, statefulEvents, webSocket, ct);
-                    await UpdateRoomStateAsync(serviceScopeFactory, statefulEvents, ct);
-                });
-            task.ConfigureAwait(false).GetAwaiter().GetResult();
-        }, ct);
+                        await ProcessWebSocketEventAsync(user, room, participantType, serviceScopeFactory, webSocket, webSocketEvent, ct);
+                    },
+                    async busEvent =>
+                    {
+                        var jsonParsedEvent = JsonSerializer.Deserialize<IRoomEvent>(busEvent.Event) ?? throw new Exception("Unable to parse event");
+                        var statefulEvents = new List<IRoomEvent>();
+                        await ProcessEventAsync(jsonParsedEvent, statefulEvents, webSocket, ct);
+                        await UpdateRoomStateAsync(serviceScopeFactory, statefulEvents, ct);
+                    });
+                task.ConfigureAwait(false).GetAwaiter().GetResult();
+            },
+            ct);
 
         while (!webSocket.ShouldCloseWebSocket())
         {

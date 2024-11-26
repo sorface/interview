@@ -1,27 +1,13 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Net.WebSockets;
-using Interview.Domain.Rooms;
-using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain;
 using Interview.Domain.Rooms.Service;
 using Interview.Domain.Users;
 using Interview.Infrastructure.WebSocket.Events;
 using Interview.Infrastructure.WebSocket.Events.ConnectionListener;
-using Interview.Infrastructure.WebSocket.PubSub;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket;
-
-public sealed class WebSocketConnectHandlerRequest
-{
-    public required System.Net.WebSockets.WebSocket WebSocket { get; set; }
-
-    public required User User { get; set; }
-
-    public required Guid RoomId { get; set; }
-
-    public required IServiceProvider ServiceProvider { get; set; }
-}
 
 public class WebSocketConnectionHandler
 {
@@ -68,32 +54,6 @@ public class WebSocketConnectionHandler
         }
     }
 
-    private async Task<WebSocketConnectDetail?> HandleAsyncCore(WebSocketConnectHandlerRequest request, CancellationToken ct)
-    {
-        var (dbRoom, participant) = await _roomService.AddParticipantAsync(request.RoomId, request.User.Id, ct);
-
-        var participantType = participant.Type.EnumValue;
-        var detail = new WebSocketConnectDetail(request.WebSocket, dbRoom, request.User, participantType);
-
-        await HandleListenersSafely(
-            nameof(IConnectionListener.OnConnectAsync),
-            e => e.OnConnectAsync(detail, ct));
-
-        var waitTask = CreateWaitTask(ct);
-        var readerTask = Task.Run(
-            () => _webSocketReader.ReadAsync(
-                request.User,
-                dbRoom,
-                participantType,
-                request.ServiceProvider.GetRequiredService<IServiceScopeFactory>(),
-                request.WebSocket,
-                ct),
-            ct);
-        await Task.WhenAny(waitTask, readerTask);
-        await CloseSafely(request.WebSocket, WebSocketCloseStatus.NormalClosure, string.Empty, ct);
-        return detail;
-    }
-
     private static async Task CreateWaitTask(CancellationToken cancellationToken)
     {
         var cst = new TaskCompletionSource<object>();
@@ -119,6 +79,25 @@ public class WebSocketConnectionHandler
         }
     }
 
+    private async Task<WebSocketConnectDetail?> HandleAsyncCore(WebSocketConnectHandlerRequest request, CancellationToken ct)
+    {
+        var (dbRoom, participant) = await _roomService.AddParticipantAsync(request.RoomId, request.User.Id, ct);
+
+        var participantType = participant.Type.EnumValue;
+        var detail = new WebSocketConnectDetail(request.WebSocket, dbRoom, request.User, participantType);
+
+        await HandleListenersSafely(
+            nameof(IConnectionListener.OnConnectAsync),
+            e => e.OnConnectAsync(detail, ct));
+
+        var waitTask = CreateWaitTask(ct);
+        var scopeFactory = request.ServiceProvider.GetRequiredService<CurrentUserServiceScopeFactory>();
+        var readerTask = Task.Run(() => _webSocketReader.ReadAsync(request.User, dbRoom, participantType, scopeFactory, request.WebSocket, ct), ct);
+        await Task.WhenAny(waitTask, readerTask);
+        await CloseSafely(request.WebSocket, WebSocketCloseStatus.NormalClosure, string.Empty, ct);
+        return detail;
+    }
+
     private async Task HandleListenersSafely(string actionName, Func<IConnectionListener, Task> map)
     {
         var tasks = _connectListeners.Select(map);
@@ -131,4 +110,15 @@ public class WebSocketConnectionHandler
             _logger.LogError(e, "During {Action}", actionName);
         }
     }
+}
+
+public sealed class WebSocketConnectHandlerRequest
+{
+    public required System.Net.WebSockets.WebSocket WebSocket { get; set; }
+
+    public required User User { get; set; }
+
+    public required Guid RoomId { get; set; }
+
+    public required IServiceProvider ServiceProvider { get; set; }
 }

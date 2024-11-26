@@ -35,4 +35,3 @@ public class VoiceRecognitionWebSocketByNameEventHandler : WebSocketByNameEventH
         return _eventDispatcher.WriteAsync(@event, cancellationToken);
     }
 }
-

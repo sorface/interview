@@ -6,11 +6,6 @@ using StackExchange.Redis;
 
 namespace Interview.Infrastructure.WebSocket.PubSub;
 
-public class RedisPubSubFactoryConfiguration
-{
-    public required ConfigurationOptions Configuration { get; set; }
-}
-
 public sealed class RedisEventBusFactory : IEventBusPublisherFactory, IEventBusSubscriberFactory, IAsyncDisposable
 {
     private readonly ConfigurationOptions _configuration;
@@ -19,6 +14,11 @@ public sealed class RedisEventBusFactory : IEventBusPublisherFactory, IEventBusS
     public RedisEventBusFactory(RedisPubSubFactoryConfiguration configuration)
     {
         _configuration = configuration.Configuration;
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return _connectionMultiplexer?.DisposeAsync() ?? ValueTask.CompletedTask;
     }
 
     async Task<IEventBusPublisher> IEventBusPublisherFactory.CreateAsync(CancellationToken cancellationToken)
@@ -38,11 +38,6 @@ public sealed class RedisEventBusFactory : IEventBusPublisherFactory, IEventBusS
     private Task<ConnectionMultiplexer> CreateConnectionMultiplexerAsync()
     {
         return ConnectionMultiplexer.ConnectAsync(_configuration);
-    }
-
-    public ValueTask DisposeAsync()
-    {
-        return _connectionMultiplexer?.DisposeAsync() ?? ValueTask.CompletedTask;
     }
 
     private sealed class EventBus : IEventBus
@@ -103,4 +98,9 @@ public sealed class RedisEventBusFactory : IEventBusPublisherFactory, IEventBusS
             public ValueTask DisposeAsync() => new(_subscriber.UnsubscribeAsync(_key));
         }
     }
+}
+
+public class RedisPubSubFactoryConfiguration
+{
+    public required ConfigurationOptions Configuration { get; set; }
 }
