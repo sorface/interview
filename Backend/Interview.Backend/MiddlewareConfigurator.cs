@@ -3,6 +3,7 @@ using Interview.Backend.Errors;
 using Interview.Backend.WebSocket.Configuration;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Interview.Backend;
 
@@ -17,6 +18,7 @@ public class MiddlewareConfigurator
 
     public void AddMiddlewares()
     {
+        _app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedProto, });
         _app.UseMiddleware<ExceptionMiddleware>();
         _app.UseForwardedHeaders();
         if (_app.Environment.IsPreProduction() || _app.Environment.IsProduction())

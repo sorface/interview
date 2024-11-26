@@ -26,8 +26,6 @@ serviceConfigurator.AddServices(builder.Services);
 
 var app = builder.Build();
 
-app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedProto, });
-
 await MigrateDbAsync(app);
 
 var middlewareConfigurator = new MiddlewareConfigurator(app);

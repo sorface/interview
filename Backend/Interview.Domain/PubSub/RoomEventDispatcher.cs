@@ -1,11 +1,10 @@
-using System.Collections.Concurrent;
 using System.Text.Json;
-using System.Threading.Channels;
+using Interview.Domain.Events;
 using Interview.Domain.Events.Events;
 using Interview.Domain.PubSub.Events;
 using Interview.Domain.PubSub.Factory;
 
-namespace Interview.Domain.Events;
+namespace Interview.Domain.PubSub;
 
 public class RoomEventDispatcher : IRoomEventDispatcher
 {
@@ -19,10 +18,17 @@ public class RoomEventDispatcher : IRoomEventDispatcher
     public async Task WriteAsync(IRoomEvent @event, CancellationToken cancellationToken = default)
     {
         var publisher = await _publisherFactory.CreateAsync(cancellationToken);
+        var eventAsBytes = JsonSerializer.SerializeToUtf8Bytes(@event);
         var sendAllInRoomEventBusEvent = new SendAllInRoomEventBusEvent
         {
-            Event = JsonSerializer.SerializeToUtf8Bytes(@event),
+            Event = eventAsBytes,
         };
         await publisher.PublishAsync(new EventBusRoomEventKey(@event.RoomId), sendAllInRoomEventBusEvent, cancellationToken);
+
+        if (@event.Stateful)
+        {
+            var handleStatefulEventInRoomEvent = new ReceivedEventBusEvent { Event = eventAsBytes, };
+            await publisher.PublishAsync(new HandleStatefulEventInRoomEventKey(), handleStatefulEventInRoomEvent, cancellationToken);
+        }
     }
 }

@@ -7,6 +7,7 @@ using Interview.Domain.Events.DatabaseProcessors;
 using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Events.Sender;
 using Interview.Domain.Events.Storage;
+using Interview.Domain.PubSub;
 using Interview.Domain.Repository;
 using Interview.Domain.Users;
 using Interview.Infrastructure;
