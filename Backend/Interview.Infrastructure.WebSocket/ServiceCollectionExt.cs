@@ -68,6 +68,7 @@ public sealed class PubSubFactoryConfiguration
         serviceCollection.AddSingleton(_implementation);
         serviceCollection.AddSingleton<IEventBusPublisherFactory>(provider => (IEventBusPublisherFactory)provider.GetRequiredService(_implementation));
         serviceCollection.AddSingleton<IEventBusSubscriberFactory>(provider => (IEventBusSubscriberFactory)provider.GetRequiredService(_implementation));
+        serviceCollection.AddSingleton<HandleStatefulEventHandler>();
         if (_configuration is not null)
         {
             serviceCollection.AddSingleton(_configuration);

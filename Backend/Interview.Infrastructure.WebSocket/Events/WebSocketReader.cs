@@ -26,9 +26,6 @@ public class WebSocketReader
     private readonly IHotEventStorage _hotEventStorage;
     private readonly ILogger<WebSocketReader> _logger;
     private readonly IEventBusSubscriberFactory _eventBusSubscriberFactory;
-    private readonly IEventBusPublisherFactory _publisherFactory;
-    private readonly IRoomEventDispatcher _dispatcher;
-    private readonly IRoomEventSerializer _serializer;
     private readonly IRoomEventSerializer _roomEventSerializer;
     private readonly ILogger<WebSocketEventSender> _webSocketEventSender;
     private readonly IEventSenderAdapter _eventSenderAdapter;
@@ -39,9 +36,6 @@ public class WebSocketReader
         IHotEventStorage hotEventStorage,
         ILogger<WebSocketReader> logger,
         IEventBusSubscriberFactory eventBusSubscriberFactory,
-        IEventBusPublisherFactory publisherFactory,
-        IRoomEventDispatcher dispatcher,
-        IRoomEventSerializer serializer,
         IRoomEventSerializer roomEventSerializer,
         ILogger<WebSocketEventSender> webSocketEventSender,
         IEventSenderAdapter eventSenderAdapter)
@@ -50,9 +44,6 @@ public class WebSocketReader
         _hotEventStorage = hotEventStorage;
         _logger = logger;
         _eventBusSubscriberFactory = eventBusSubscriberFactory;
-        _publisherFactory = publisherFactory;
-        _dispatcher = dispatcher;
-        _serializer = serializer;
         _roomEventSerializer = roomEventSerializer;
         _webSocketEventSender = webSocketEventSender;
         _eventSenderAdapter = eventSenderAdapter;
@@ -71,7 +62,7 @@ public class WebSocketReader
         var eventBusRoomEventKey = new EventBusRoomEventKey(room.Id);
         await using var roomEventSubscriber = await subscriber.SubscribeAsync(
             eventBusRoomEventKey,
-            (key, @event) =>
+            (_, @event) =>
             {
                 if (@event is null)
                 {
@@ -92,9 +83,10 @@ public class WebSocketReader
                     async busEvent =>
                     {
                         var jsonParsedEvent = JsonSerializer.Deserialize<IRoomEvent>(busEvent.Event) ?? throw new Exception("Unable to parse event");
-                        var statefulEvents = new List<IRoomEvent>();
-                        await ProcessEventAsync(jsonParsedEvent, statefulEvents, webSocket, ct);
-                        await UpdateRoomStateAsync(serviceScopeFactory, statefulEvents, ct);
+                        var provider = new CachedRoomEventProvider(jsonParsedEvent, _roomEventSerializer);
+                        _logger.LogDebug("Start sending {@Event}", jsonParsedEvent);
+                        var sender = new WebSocketEventSender(_webSocketEventSender, webSocket);
+                        await _eventSenderAdapter.SendAsync(provider, sender, ct);
                     });
                 task.ConfigureAwait(false).GetAwaiter().GetResult();
             },
@@ -205,57 +197,6 @@ public class WebSocketReader
             CreatedById = user.Id,
         };
         return _hotEventStorage.AddAsync(storageEvent, ct);
-    }
-
-    private async Task ProcessEventAsync(
-        IRoomEvent currentEvent,
-        List<IRoomEvent> statefulEvents,
-        System.Net.WebSockets.WebSocket socket,
-        CancellationToken cancellationToken)
-    {
-        if (currentEvent.Stateful)
-        {
-            statefulEvents.Add(currentEvent);
-        }
-
-        var provider = new CachedRoomEventProvider(currentEvent, _roomEventSerializer);
-        _logger.LogDebug("Start sending {@Event}", currentEvent);
-        var sender = new WebSocketEventSender(_webSocketEventSender, socket);
-        await _eventSenderAdapter.SendAsync(provider, sender, cancellationToken);
-    }
-
-    private async Task UpdateRoomStateAsync(IServiceScopeFactory serviceScopeFactory, List<IRoomEvent> statefulEvents, CancellationToken cancellationToken)
-    {
-        if (statefulEvents.Count <= 0)
-        {
-            return;
-        }
-
-        try
-        {
-            await using var dbScope = serviceScopeFactory.CreateAsyncScope();
-            var service = dbScope.ServiceProvider.GetRequiredService<IRoomServiceWithoutPermissionCheck>();
-            foreach (var roomEvent in statefulEvents)
-            {
-                try
-                {
-                    var payload = roomEvent.BuildStringPayload(_serializer);
-                    await service.UpsertRoomStateAsync(
-                        roomEvent.RoomId,
-                        roomEvent.Type,
-                        payload ?? string.Empty,
-                        cancellationToken);
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, "During update {Type} room state", roomEvent.Type);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Fails to update room states");
-        }
     }
 
     private class PoolItem : IDisposable

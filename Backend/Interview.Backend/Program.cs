@@ -3,6 +3,7 @@ using Interview.Backend.AppEvents;
 using Interview.Backend.Healthy;
 using Interview.Backend.Logging;
 using Interview.Domain.Database;
+using Interview.Infrastructure.WebSocket.Events;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +26,9 @@ HealthConfigurator.Configure(builder.Environment, builder.Services, builder.Conf
 serviceConfigurator.AddServices(builder.Services);
 
 var app = builder.Build();
+
+var handleStatefulEventHandler = app.Services.GetRequiredService<HandleStatefulEventHandler>();
+await handleStatefulEventHandler.AddHandlerAsync(CancellationToken.None);
 
 await MigrateDbAsync(app);
 

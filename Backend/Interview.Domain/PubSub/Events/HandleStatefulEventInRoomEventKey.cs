@@ -1,3 +1,3 @@
-﻿namespace Interview.Domain.PubSub.Events;
+namespace Interview.Domain.PubSub.Events;
 
 public record HandleStatefulEventInRoomEventKey : EventBusKey;
