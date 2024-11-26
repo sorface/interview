@@ -70,7 +70,6 @@ public class WebSocketReader
         CancellationToken ct)
     {
         var subscriber = await _eventBusSubscriberFactory.CreateAsync(ct);
-        var publisher = await _publisherFactory.CreateAsync(ct);
         var eventBusRoomEventKey = new EventBusRoomEventKey(room.Id);
         await using var roomEventSubscriber = await subscriber.SubscribeAsync(eventBusRoomEventKey, (key, @event) =>
         {
@@ -96,8 +95,6 @@ public class WebSocketReader
                     var statefulEvents = new List<IRoomEvent>();
                     await ProcessEventAsync(@event, statefulEvents, webSocket, ct);
                     await UpdateRoomStateAsync(serviceScopeFactory, statefulEvents, ct);
-
-                    // return _dispatcher.WriteDirectlyAsync(@event, ct);
                 });
             task.ConfigureAwait(false).GetAwaiter().GetResult();
         }, ct);
