@@ -6,25 +6,18 @@ namespace Interview.Backend;
 public class DevDbInitializer
 {
     private readonly AppDbContext _appDbContext;
-    private readonly IWebHostEnvironment _environment;
     private readonly IConfiguration _configuration;
     private readonly ILogger<DevDbInitializer> _logger;
 
-    public DevDbInitializer(AppDbContext appDbContext, IWebHostEnvironment environment, IConfiguration configuration, ILogger<DevDbInitializer> logger)
+    public DevDbInitializer(AppDbContext appDbContext, IConfiguration configuration, ILogger<DevDbInitializer> logger)
     {
         _appDbContext = appDbContext;
-        _environment = environment;
         _configuration = configuration;
         _logger = logger;
     }
 
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
-        if (!_environment.IsDevelopment())
-        {
-            return;
-        }
-
         await AddDevUserAsync(cancellationToken);
         await AddInitialDataAsync(cancellationToken);
     }
