@@ -1,5 +1,8 @@
 using Interview.Domain.Categories;
 using Interview.Domain.Database;
+using Interview.Domain.Questions.CodeEditors;
+using Interview.Domain.Questions.QuestionAnswers;
+using Interview.Domain.Rooms.RoomConfigurations;
 
 namespace Interview.Backend;
 
@@ -45,7 +48,27 @@ public class DevDbInitializer
             await _appDbContext.SaveChangesAsync(cancellationToken);
         }
 
-        var questions = dbData.Questions.Select(e => new Question(e.Value) { Id = e.Id, CategoryId = e.CategoryId, });
+        var questions = dbData.Questions.Select(e => new Question(e.Value)
+        {
+            Id = e.Id,
+            CategoryId = e.CategoryId,
+            Answers = e.Answers?.Select(a => new QuestionAnswer
+            {
+                Title = a.Title,
+                Content = a.Content,
+                CodeEditor = a.CodeEditor,
+                QuestionId = default,
+                Question = null,
+            }).ToList() ?? new List<QuestionAnswer>(),
+            CodeEditor = e.CodeEditor is null
+                ? null
+                : new QuestionCodeEditor
+                {
+                    Content = e.CodeEditor.Content,
+                    Source = EVRoomCodeEditorChangeSource.System,
+                    Lang = e.CodeEditor.Lang,
+                },
+        });
         await _appDbContext.Questions.AddRangeAsync(questions, cancellationToken);
         await _appDbContext.SaveChangesAsync(cancellationToken);
     }
@@ -130,5 +153,25 @@ public class DevDbInitializer
         public required string Value { get; set; }
 
         public Guid? CategoryId { get; set; }
+
+        public List<InitialQuestionAnswer>? Answers { get; set; }
+
+        public InitialQuestionCodeEditor? CodeEditor { get; set; }
+    }
+
+    private sealed class InitialQuestionAnswer
+    {
+        public required string Title { get; set; }
+
+        public required string Content { get; set; }
+
+        public required bool CodeEditor { get; set; }
+    }
+
+    private sealed class InitialQuestionCodeEditor
+    {
+        public required string Lang { get; set; }
+
+        public required string Content { get; set; }
     }
 }
