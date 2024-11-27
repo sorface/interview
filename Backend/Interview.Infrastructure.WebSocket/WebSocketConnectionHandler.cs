@@ -9,6 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket;
 
+/// <summary>
+/// Web socket connection handler.
+/// </summary>
 public class WebSocketConnectionHandler
 {
     private readonly ILogger<WebSocketConnectionHandler> _logger;

@@ -3,6 +3,7 @@ using Interview.Backend;
 using Interview.DependencyInjection;
 using Interview.Domain.Users;
 using Interview.Infrastructure.WebSocket;
+using Interview.Infrastructure.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Net;
 using System.Reflection;
-using System.Security.Authentication;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Ardalis.SmartEnum.SystemTextJson;
@@ -10,15 +9,11 @@ using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Swagger;
 using Interview.DependencyInjection;
 using Interview.Domain.Rooms.RoomQuestions;
-using Interview.Infrastructure.WebSocket;
-using Interview.Infrastructure.WebSocket.Events;
-using Interview.Infrastructure.WebSocket.Events.ConnectionListener;
-using Interview.Infrastructure.WebSocket.Events.Handlers;
 using Interview.Infrastructure.WebSocket.PubSub;
+using Interview.Infrastructure.WebSockets;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IO;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 
