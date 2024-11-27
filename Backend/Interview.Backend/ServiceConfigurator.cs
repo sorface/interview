@@ -154,9 +154,6 @@ public class ServiceConfigurator
                             options.Configuration = $@"{host}:{port},password={password}";
                             options.InstanceName = "sorface.interview.session.";
                         });
-
-                        serviceCollection.AddDistributedMemoryCache();
-                        builder.UseEmpty();
                     },
                     () =>
                     {
