@@ -10,11 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("oauth.json", true);
 builder.Configuration.AddJsonFile("events.json", true);
 builder.Configuration.AddEnvironmentVariables("INTERVIEW_BACKEND_");
-
-if (builder.Environment.IsDevelopment())
-{
-    builder.Configuration.AddJsonFile("initial.dev.db.json", true);
-}
+builder.Configuration.AddJsonFile("initial.db.json", true);
 
 // Add services to the container.
 var serviceConfigurator = new ServiceConfigurator(builder.Environment, builder.Configuration);
@@ -46,6 +42,6 @@ async Task MigrateDbAsync(WebApplication webApplication)
     await applier.ApplyEventsAsync(appDbContext, CancellationToken.None);
 
     var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<DevDbInitializer>>();
-    var initializer = new DevDbInitializer(appDbContext, app.Environment, app.Configuration, logger);
+    var initializer = new DevDbInitializer(appDbContext, app.Configuration, logger);
     await initializer.InitializeAsync(CancellationToken.None);
 }
