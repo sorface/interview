@@ -54,7 +54,18 @@
       {
         "Id": "5CD8A255-DE9D-4080-91C4-E6E1F41A6519",
         "Value": "What's a heap?",
-        "CategoryId": "5CD8A255-DE9D-4080-91C4-E6E1F41A6519"
+        "CategoryId": "5CD8A255-DE9D-4080-91C4-E6E1F41A6519",
+        "Answers": [
+          {
+            "Title": "Test ans1",
+            "Content": "",
+            "CodeEditor": false
+          }
+        ],
+        "CodeEditor": {
+          "Content": "Console.WriteLine(\"Hello world\");",
+          "Lang": "Csharp"
+        }
       },
       {
         "Id": "4AC063D2-0986-4049-B795-D612DF18EF44",

@@ -1,30 +1,26 @@
 using Interview.Domain.Categories;
 using Interview.Domain.Database;
+using Interview.Domain.Questions.CodeEditors;
+using Interview.Domain.Questions.QuestionAnswers;
+using Interview.Domain.Rooms.RoomConfigurations;
 
 namespace Interview.Backend;
 
 public class DevDbInitializer
 {
     private readonly AppDbContext _appDbContext;
-    private readonly IWebHostEnvironment _environment;
     private readonly IConfiguration _configuration;
     private readonly ILogger<DevDbInitializer> _logger;
 
-    public DevDbInitializer(AppDbContext appDbContext, IWebHostEnvironment environment, IConfiguration configuration, ILogger<DevDbInitializer> logger)
+    public DevDbInitializer(AppDbContext appDbContext, IConfiguration configuration, ILogger<DevDbInitializer> logger)
     {
         _appDbContext = appDbContext;
-        _environment = environment;
         _configuration = configuration;
         _logger = logger;
     }
 
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
-        if (!_environment.IsDevelopment())
-        {
-            return;
-        }
-
         await AddDevUserAsync(cancellationToken);
         await AddInitialDataAsync(cancellationToken);
     }
@@ -52,7 +48,27 @@ public class DevDbInitializer
             await _appDbContext.SaveChangesAsync(cancellationToken);
         }
 
-        var questions = dbData.Questions.Select(e => new Question(e.Value) { Id = e.Id, CategoryId = e.CategoryId, });
+        var questions = dbData.Questions.Select(e => new Question(e.Value)
+        {
+            Id = e.Id,
+            CategoryId = e.CategoryId,
+            Answers = e.Answers?.Select(a => new QuestionAnswer
+            {
+                Title = a.Title,
+                Content = a.Content,
+                CodeEditor = a.CodeEditor,
+                QuestionId = default,
+                Question = null,
+            }).ToList() ?? new List<QuestionAnswer>(),
+            CodeEditor = e.CodeEditor is null
+                ? null
+                : new QuestionCodeEditor
+                {
+                    Content = e.CodeEditor.Content,
+                    Source = EVRoomCodeEditorChangeSource.System,
+                    Lang = e.CodeEditor.Lang,
+                },
+        });
         await _appDbContext.Questions.AddRangeAsync(questions, cancellationToken);
         await _appDbContext.SaveChangesAsync(cancellationToken);
     }
@@ -137,5 +153,25 @@ public class DevDbInitializer
         public required string Value { get; set; }
 
         public Guid? CategoryId { get; set; }
+
+        public List<InitialQuestionAnswer>? Answers { get; set; }
+
+        public InitialQuestionCodeEditor? CodeEditor { get; set; }
+    }
+
+    private sealed class InitialQuestionAnswer
+    {
+        public required string Title { get; set; }
+
+        public required string Content { get; set; }
+
+        public required bool CodeEditor { get; set; }
+    }
+
+    private sealed class InitialQuestionCodeEditor
+    {
+        public required string Lang { get; set; }
+
+        public required string Content { get; set; }
     }
 }
