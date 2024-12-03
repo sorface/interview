@@ -162,7 +162,7 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
       return;
     }
     setQuestionValue(question.value);
-    setCodeEditor(question.codeEditor);
+    setCodeEditor(question.codeEditor || null);
     setAnswers(question.answers);
   }, [question]);
 
@@ -217,6 +217,7 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
       answers: answersForRequest,
       codeEditor,
     });
+    console.log('codeEditor: ', codeEditor);
   };
 
   const handleTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
