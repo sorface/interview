@@ -217,7 +217,6 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
       answers: answersForRequest,
       codeEditor,
     });
-    console.log('codeEditor: ', codeEditor);
   };
 
   const handleTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
