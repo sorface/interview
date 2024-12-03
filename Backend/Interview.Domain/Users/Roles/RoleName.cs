@@ -49,6 +49,7 @@ public sealed class RoleName : SmartEnum<RoleName>
             SEPermission.RoomCreate,
             SEPermission.TagFindPage,
             SEPermission.QuestionCreate,
+            SEPermission.QuestionUpdate,
             SEPermission.FindCategoryPage,
             SEPermission.GetCategoryById,
             SEPermission.QuestionArchive,
