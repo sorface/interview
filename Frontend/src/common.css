@@ -337,6 +337,9 @@
 .border-none {
   border: none;
 }
+.\!border-b-none {
+  border-bottom: none !important;
+}
 .p-0 {
   padding: 0rem;
 }
@@ -808,4 +811,7 @@
 }
 .break-all {
   word-break: break-all;
+}
+.right-1 {
+  right: 1rem;
 }
