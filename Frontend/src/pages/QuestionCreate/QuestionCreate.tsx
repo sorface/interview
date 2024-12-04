@@ -162,7 +162,7 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
       return;
     }
     setQuestionValue(question.value);
-    setCodeEditor(question.codeEditor);
+    setCodeEditor(question.codeEditor || null);
     setAnswers(question.answers);
   }, [question]);
 

@@ -229,6 +229,7 @@ export const enum LocalizationKey {
   UserConnectedToRoom,
   NotEnoughRights,
   WebcamBackgroundBlur,
+  Feedback,
 }
 
 export const LocalizationCaptions: Record<
@@ -493,6 +494,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.UserConnectedToRoom]: 'connected',
     [LocalizationKey.NotEnoughRights]: 'Insufficient rights to view content',
     [LocalizationKey.WebcamBackgroundBlur]: 'Background blur',
+    [LocalizationKey.Feedback]: 'Feedback',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.AppName]: 'Interview Platform',
@@ -755,5 +757,6 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.NotEnoughRights]:
       'Недостаточно прав для просмотра содержимого',
     [LocalizationKey.WebcamBackgroundBlur]: 'Размытие фона',
+    [LocalizationKey.Feedback]: 'Обратная связь',
   },
 };
