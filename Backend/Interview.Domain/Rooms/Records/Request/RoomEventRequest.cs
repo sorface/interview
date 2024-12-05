@@ -20,5 +20,12 @@ public sealed class RoomEventRequest : IEventRequest
         AdditionalData = additionalData;
     }
 
-    public IRoomEvent ToRoomEvent(bool stateful) => new RoomEvent<RoomEventUserPayload>(RoomId, Type, new RoomEventUserPayload(UserId, AdditionalData), stateful, UserId);
+    public IRoomEvent ToRoomEvent(bool stateful) => new RoomUserEvent
+    {
+        RoomId = RoomId,
+        Type = Type,
+        Value = new RoomEventUserPayload(UserId, AdditionalData),
+        Stateful = stateful,
+        CreatedById = UserId,
+    };
 }

@@ -1,54 +1,30 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Interview.Domain.Events.Events.Serializers;
 
 namespace Interview.Domain.Events.Events;
 
 public class RoomEvent : RoomEvent<string>
 {
-    public RoomEvent(Guid roomId, string type, string? value, bool stateful, Guid createdById)
-        : base(roomId, type, value, stateful, createdById)
-    {
-    }
-
-    public RoomEvent(Guid id, Guid roomId, string type, string? value, bool stateful, DateTime createdAt, Guid createdById)
-        : base(id, roomId, type, value, stateful, createdAt, createdById)
-    {
-    }
 }
 
 [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:File may only contain a single type", Justification = "Can't have two files with same name")]
-public class RoomEvent<T> : IRoomEvent<T>
+public abstract class RoomEvent<T> : IRoomEvent<T>
 {
-    public Guid Id { get; }
+    public Guid Id { get; init; } = Guid.NewGuid();
 
-    public Guid RoomId { get; }
+    public required Guid RoomId { get; init; }
 
-    public string Type { get; }
+    public string Type { get; init; } = string.Empty;
 
-    public bool Stateful { get; }
+    public bool Stateful { get; init; }
 
-    public DateTime CreatedAt { get; }
+    public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 
-    public Guid CreatedById { get; }
+    public required Guid CreatedById { get; init; }
 
-    public T? Value { get; }
-
-    public RoomEvent(Guid id, Guid roomId, string type, T? value, bool stateful, DateTime createdAt, Guid createdById)
-    {
-        Id = id;
-        RoomId = roomId;
-        Type = type;
-        Value = value;
-        Stateful = stateful;
-        CreatedAt = createdAt;
-        CreatedById = createdById;
-    }
-
-    public RoomEvent(Guid roomId, string type, T? value, bool stateful, Guid createdById)
-        : this(Guid.NewGuid(), roomId, type, value, stateful, DateTime.UtcNow, createdById)
-    {
-    }
+    public required T? Value { get; init; }
 
     public string? BuildStringPayload(IRoomEventSerializer serializer)
     {
