@@ -3,7 +3,6 @@ using Interview.Backend.AppEvents;
 using Interview.Backend.Healthy;
 using Interview.Backend.Logging;
 using Interview.Domain.Database;
-using Interview.Infrastructure.WebSocket.Events;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,8 +22,7 @@ serviceConfigurator.AddServices(builder.Services);
 
 var app = builder.Build();
 
-var handleStatefulEventHandler = app.Services.GetRequiredService<HandleStatefulEventHandler>();
-await handleStatefulEventHandler.AddHandlerAsync(CancellationToken.None);
+app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedProto, });
 
 await MigrateDbAsync(app);
 

@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Interview.Domain.Events.Events.Serializers;
 
 namespace Interview.Domain.Events.Events;
@@ -20,8 +19,4 @@ public sealed class RoomEventUserPayload : IPayloadBuilder
     {
         return serializer.SerializePayloadAsString(AdditionalData);
     }
-}
-
-public sealed class RoomUserEvent : RoomEvent<RoomEventUserPayload>
-{
 }

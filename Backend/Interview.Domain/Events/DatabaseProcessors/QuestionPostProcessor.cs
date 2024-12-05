@@ -28,12 +28,7 @@ public class QuestionPostProcessor : EntityPostProcessor<Question>
         {
             var questionEventPayload = new QuestionChangeEventPayload(current.Id, original.Value, current.Value);
 
-            var @event = new QuestionChangeEvent
-            {
-                RoomId = roomId,
-                Value = questionEventPayload,
-                CreatedById = _currentUserAccessor.GetUserIdOrThrow(),
-            };
+            var @event = new QuestionChangeEvent(roomId, questionEventPayload, _currentUserAccessor.GetUserIdOrThrow());
 
             await _eventDispatcher.WriteAsync(@event, cancellationToken);
         }
