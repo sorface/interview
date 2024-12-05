@@ -20,13 +20,11 @@ public class RoomQuestionReactionPostProcessor : EntityPostProcessor<RoomQuestio
         RoomQuestionReaction entity,
         CancellationToken cancellationToken)
     {
-        var @event = new RoomQuestionReactionEvent
-        {
-            RoomId = entity.RoomQuestion!.Room!.Id,
-            Type = entity.Reaction!.Type.Name,
-            Value = new RoomQuestionReactionPayload { Payload = entity.Payload, UserId = entity.Sender!.Id },
-            CreatedById = _currentUserAccessor.GetUserIdOrThrow(),
-        };
+        var @event = new RoomQuestionReactionEvent(
+            entity.RoomQuestion!.Room!.Id,
+            entity.Reaction!.Type.Name,
+            new RoomQuestionReactionPayload { Payload = entity.Payload, UserId = entity.Sender!.Id },
+            _currentUserAccessor.GetUserIdOrThrow());
 
         await _eventDispatcher.WriteAsync(@event, cancellationToken);
     }
