@@ -43,9 +43,9 @@ public class UserServiceTest
         );
 
         var userService = new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext),
-            new AdminUsers(), new PermissionRepository(appDbContext), securityService);
+            new PermissionRepository(appDbContext), securityService, appDbContext);
         var user = new User("Dima", "1");
-        var upsertUser = await userService.UpsertByExternalIdAsync(user);
+        var upsertUser = await userService.UpsertByIdAsync(user);
 
         var expectedUser = new User(entity.Id, user.Nickname, user.ExternalId);
         expectedUser.UpdateCreateDate(user.CreateDate);
@@ -68,13 +68,12 @@ public class UserServiceTest
             new CachedCurrentUserAccessor(new CurrentUserAccessor(), appDbContext),
             new RoomParticipantRepository(appDbContext)
         );
-        var userService =
-            new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext), adminUsers,
-                new PermissionRepository(appDbContext), securityService);
+        var userService = new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext),
+                new PermissionRepository(appDbContext), securityService, appDbContext);
         var user = new User(nickname, "1");
         user.Roles.Add(new Role(expectedRoleName));
 
-        var upsertUser = await userService.UpsertByExternalIdAsync(user);
+        var upsertUser = await userService.UpsertByIdAsync(user);
 
         var savedUser = await appDbContext.Users.SingleAsync(e => e.Id == upsertUser.Id);
         upsertUser.Should().BeEquivalentTo(savedUser);
@@ -94,10 +93,10 @@ public class UserServiceTest
             new RoomParticipantRepository(appDbContext)
         );
         var userService = new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext),
-            new AdminUsers(), new PermissionRepository(appDbContext), securityService);
+            new PermissionRepository(appDbContext), securityService, appDbContext);
         var user = new User("Dima", "1");
 
-        var error = await Assert.ThrowsAsync<Domain.NotFoundException>(async () => await userService.UpsertByExternalIdAsync(user));
+        var error = await Assert.ThrowsAsync<Domain.NotFoundException>(async () => await userService.UpsertByIdAsync(user));
 
         error.Message.Should().NotBeNull().And.NotBeEmpty();
     }

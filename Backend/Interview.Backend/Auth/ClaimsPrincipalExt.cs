@@ -20,16 +20,16 @@ public static class ClaimsPrincipalExt
         var profileId = self.Claims.FirstOrDefault(e => e.Type == "principal-id");
         var nickname = self.Claims.FirstOrDefault(e => e.Type == "sub");
 
-        if (profileId == null || nickname == null)
+        if (profileId is null || nickname is null)
         {
             return null;
         }
 
         var id = self.Claims.FirstOrDefault(e => e.Type == UserClaimConstants.UserId);
 
-        var user = new User(nickname.Value, profileId.Value);
+        var user = new User(Guid.Parse(profileId.Value), nickname.Value, profileId.Value);
 
-        if (id != null && Guid.TryParse(id.Value, out var typedId))
+        if (id is not null && Guid.TryParse(id.Value, out var typedId))
         {
             user.Id = typedId;
         }

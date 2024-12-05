@@ -10,7 +10,7 @@ public static class ServiceCollectionExt
 {
     public static void AddAppAuth(this IServiceCollection self, OpenIdConnectOptions openIdConnectOptions)
     {
-        self.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        self.AddAuthentication()
             .AddJwtBearer(options =>
             {
                 options.MetadataAddress = $@"{openIdConnectOptions.Issuer}{openIdConnectOptions.MetadataPath}";
@@ -42,7 +42,8 @@ public static class ServiceCollectionExt
                         }
 
                         var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
-                        var upsertUser = await userService.UpsertByExternalIdAsync(user);
+
+                        var upsertUser = await userService.UpsertByIdAsync(user);
 
                         context.Principal!.EnrichRolesWithId(upsertUser);
                     },

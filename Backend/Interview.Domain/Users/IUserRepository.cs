@@ -10,7 +10,7 @@ public interface IUserRepository : IRepository<User>
 
     Task<List<User>> GetByRoleAsync(RoleName roleName, CancellationToken cancellationToken = default);
 
-    Task<User?> FindByExternalIdAsync(string twitchIdentity, CancellationToken cancellationToken = default);
+    Task<User?> FindByExternalIdAsync(string externalId, CancellationToken cancellationToken = default);
 
     public Task<Dictionary<string, List<PermissionItem>>> FindPermissionByUserId(
         Guid id, CancellationToken cancellationToken = default);

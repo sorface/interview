@@ -1346,6 +1346,9 @@ namespace Interview.Migrations.Postgres.Migrations
 
                     b.HasIndex("CreatedById");
 
+                    b.HasIndex("ExternalId")
+                        .IsUnique();
+
                     b.ToTable("Users");
                 });
 

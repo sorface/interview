@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Interview.Domain.Database;
 using Interview.Domain.Permissions;
 using Interview.Domain.Users;
 using Interview.Domain.Users.Permissions;
@@ -16,6 +17,7 @@ public class UserServiceTest
     private readonly Mock<IRoleRepository> _mockRoleRepository;
     private readonly Mock<IPermissionRepository> _mockPermissionRepository;
     private readonly Mock<ISecurityService> _mockSecurityService;
+    private readonly Mock<AppDbContext> _mockMemoryDatabase;
 
     private readonly UserService _userService;
 
@@ -25,9 +27,14 @@ public class UserServiceTest
         _mockRoleRepository = new Mock<IRoleRepository>();
         _mockPermissionRepository = new Mock<IPermissionRepository>();
         _mockSecurityService = new Mock<ISecurityService>();
+        _mockMemoryDatabase = new Mock<AppDbContext>();
 
-        _userService = new UserService(_mockUserRepository.Object, _mockRoleRepository.Object, new AdminUsers(),
-            _mockPermissionRepository.Object, _mockSecurityService.Object);
+        _userService = new UserService(
+            _mockUserRepository.Object, 
+            _mockRoleRepository.Object, 
+            _mockPermissionRepository.Object, 
+            _mockSecurityService.Object, 
+            _mockMemoryDatabase.Object);
     }
 
     [Fact]
@@ -44,7 +51,7 @@ public class UserServiceTest
             .Returns(() => Task.FromResult(new List<Role>()));
 
         var throwsAsync = await Assert.ThrowsAsync<Domain.NotFoundException>(
-            async () => await _userService.UpsertByExternalIdAsync(user));
+            async () => await _userService.UpsertByIdAsync(user));
 
         throwsAsync.Message.Should().NotBeNull().And.NotBeEmpty();
 

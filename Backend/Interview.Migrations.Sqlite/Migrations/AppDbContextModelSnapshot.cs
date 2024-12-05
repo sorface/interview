@@ -1341,6 +1341,9 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasIndex("CreatedById");
 
+                    b.HasIndex("ExternalId")
+                        .IsUnique();
+
                     b.ToTable("Users");
                 });
 
