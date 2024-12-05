@@ -66,7 +66,7 @@ export interface RoomState {
 export interface RoomReview {
   id: string;
   user: User;
-  roomId: Room['id'],
+  roomId: Room['id'];
   review: string;
   state: 'Open' | 'Closed';
 }
@@ -85,11 +85,7 @@ export interface RoomParticipant {
   userType: UserType;
 }
 
-export type RoomQuestionState =
-  'Open' |
-  'Closed' |
-  'Active';
-
+export type RoomQuestionState = 'Open' | 'Closed' | 'Active';
 
 export interface RoomQuestion {
   id: string;

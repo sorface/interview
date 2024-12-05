@@ -77,7 +77,7 @@ public class SorfaceTokenService
 
             await httpClient.SendAsync(request, httpContent.RequestAborted);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             // ignored
         }

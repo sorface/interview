@@ -30,18 +30,18 @@ export const Home: FunctionComponent = () => {
       />
       <div>
         <Gap sizeRem={7.25} />
-        <Typography size='l'>
+        <Typography size="l">
           {localizationCaptions[LocalizationKey.LoginRequired]}
         </Typography>
         <Gap sizeRem={2.25} />
         <HomeAction />
         <Gap sizeRem={0.5} />
         <div>
-          <Typography size='s'>
+          <Typography size="s">
             {localizationCaptions[LocalizationKey.TermsOfUsageAcceptance]}
           </Typography>
           <Link to={pathnames.terms}>
-            <Typography size='s'>
+            <Typography size="s">
               {localizationCaptions[LocalizationKey.TermsOfUsage]}
             </Typography>
           </Link>

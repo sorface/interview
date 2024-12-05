@@ -1,12 +1,32 @@
-import { FunctionComponent, useCallback, useContext, useEffect, useState } from 'react';
+import {
+  FunctionComponent,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { ActiveQuestionSelector } from '../../../../components/ActiveQuestionSelector/ActiveQuestionSelector';
-import { Room, RoomQuestion, RoomQuestionEvaluation as RoomQuestionEvaluationType } from '../../../../types/room';
+import {
+  Room,
+  RoomQuestion,
+  RoomQuestionEvaluation as RoomQuestionEvaluationType,
+} from '../../../../types/room';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
-import { ChangeActiveQuestionBody, GetRoomQuestionEvaluationParams, MergeRoomQuestionEvaluationBody, roomQuestionApiDeclaration, roomQuestionEvaluationApiDeclaration, roomsApiDeclaration } from '../../../../apiDeclarations';
+import {
+  ChangeActiveQuestionBody,
+  GetRoomQuestionEvaluationParams,
+  MergeRoomQuestionEvaluationBody,
+  roomQuestionApiDeclaration,
+  roomQuestionEvaluationApiDeclaration,
+  roomsApiDeclaration,
+} from '../../../../apiDeclarations';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { Gap } from '../../../../components/Gap/Gap';
-import { RoomQuestionEvaluation, RoomQuestionEvaluationValue } from '../RoomQuestionEvaluation/RoomQuestionEvaluation';
+import {
+  RoomQuestionEvaluation,
+  RoomQuestionEvaluationValue,
+} from '../RoomQuestionEvaluation/RoomQuestionEvaluation';
 import { Loader } from '../../../../components/Loader/Loader';
 import { Typography } from '../../../../components/Typography/Typography';
 import { Icon } from '../Icon/Icon';
@@ -37,15 +57,21 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
   const localizationCaptions = useLocalizationCaptions();
   const { room, roomParticipant } = useContext(RoomContext);
   const readOnly = roomParticipant?.userType !== 'Expert';
-  const [roomQuestionEvaluation, setRoomQuestionEvaluation] = useState<RoomQuestionEvaluationValue | null>(null);
+  const [roomQuestionEvaluation, setRoomQuestionEvaluation] =
+    useState<RoomQuestionEvaluationValue | null>(null);
   const [reviewWarning, setReviewWarning] = useState(false);
 
   const {
     apiMethodState: apiSendActiveQuestionState,
     fetchData: sendRoomActiveQuestion,
-  } = useApiMethod<unknown, ChangeActiveQuestionBody>(roomQuestionApiDeclaration.changeActiveQuestion);
+  } = useApiMethod<unknown, ChangeActiveQuestionBody>(
+    roomQuestionApiDeclaration.changeActiveQuestion,
+  );
   const {
-    process: { loading: loadingRoomActiveQuestion, error: errorRoomActiveQuestion },
+    process: {
+      loading: loadingRoomActiveQuestion,
+      error: errorRoomActiveQuestion,
+    },
   } = apiSendActiveQuestionState;
 
   const {
@@ -59,7 +85,9 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
   const {
     apiMethodState: apiRoomQuestionEvaluationState,
     fetchData: getRoomQuestionEvaluation,
-  } = useApiMethod<RoomQuestionEvaluationType, GetRoomQuestionEvaluationParams>(roomQuestionEvaluationApiDeclaration.get);
+  } = useApiMethod<RoomQuestionEvaluationType, GetRoomQuestionEvaluationParams>(
+    roomQuestionEvaluationApiDeclaration.get,
+  );
   const {
     data: loadedRoomQuestionEvaluation,
     process: {
@@ -72,7 +100,9 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
   const {
     apiMethodState: apiMergeRoomQuestionEvaluationState,
     fetchData: mergeRoomQuestionEvaluation,
-  } = useApiMethod<RoomQuestionEvaluationType, MergeRoomQuestionEvaluationBody>(roomQuestionEvaluationApiDeclaration.merge);
+  } = useApiMethod<RoomQuestionEvaluationType, MergeRoomQuestionEvaluationBody>(
+    roomQuestionEvaluationApiDeclaration.merge,
+  );
   const {
     data: mergedRoomQuestionEvaluation,
     process: {
@@ -81,17 +111,23 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
     },
   } = apiMergeRoomQuestionEvaluationState;
 
-  const getRoomQuestionEvaluationError = responseCodeRoomQuestionEvaluation !== notFoundCode ? errorRoomQuestionEvaluation : null;
-  const totalLoadingRoomQuestionEvaluation = loadingRoomQuestionEvaluation || loadingMergeRoomQuestionEvaluation;
-  const totalErrorRoomQuestionEvaluation = errorMergeRoomQuestionEvaluation || getRoomQuestionEvaluationError;
+  const getRoomQuestionEvaluationError =
+    responseCodeRoomQuestionEvaluation !== notFoundCode
+      ? errorRoomQuestionEvaluation
+      : null;
+  const totalLoadingRoomQuestionEvaluation =
+    loadingRoomQuestionEvaluation || loadingMergeRoomQuestionEvaluation;
+  const totalErrorRoomQuestionEvaluation =
+    errorMergeRoomQuestionEvaluation || getRoomQuestionEvaluationError;
 
   const currentQuestionOrder = initialQuestion?.order || -1;
-  const openQuestions = roomQuestions
-    .filter(roomQuestion => roomQuestion.state === 'Open');
-  const openQuestionsIds = openQuestions
-    .map(roomQuestion => roomQuestion.id);
-  const nextQuestion = openQuestions
-    .find(roomQuestion => roomQuestion.order > currentQuestionOrder);
+  const openQuestions = roomQuestions.filter(
+    (roomQuestion) => roomQuestion.state === 'Open',
+  );
+  const openQuestionsIds = openQuestions.map((roomQuestion) => roomQuestion.id);
+  const nextQuestion = openQuestions.find(
+    (roomQuestion) => roomQuestion.order > currentQuestionOrder,
+  );
 
   useEffect(() => {
     if (readOnly || !room || !initialQuestion) {
@@ -107,7 +143,9 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
     if (!roomQuestionEvaluation) {
       return;
     }
-    const activeQuestion = roomQuestions?.find(question => question.state === 'Active');
+    const activeQuestion = roomQuestions?.find(
+      (question) => question.state === 'Active',
+    );
     const roomId = room?.id;
     if (!activeQuestion || !roomId) {
       return;
@@ -125,7 +163,12 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
     return () => {
       clearTimeout(requestTimeout);
     };
-  }, [roomQuestionEvaluation, room?.id, roomQuestions, mergeRoomQuestionEvaluation]);
+  }, [
+    roomQuestionEvaluation,
+    room?.id,
+    roomQuestions,
+    mergeRoomQuestionEvaluation,
+  ]);
 
   useEffect(() => {
     if (!loadedRoomQuestionEvaluation) {
@@ -142,17 +185,20 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
       mark: null,
       review: '',
     });
-  }, [responseCodeRoomQuestionEvaluation])
+  }, [responseCodeRoomQuestionEvaluation]);
 
-  const handleQuestionSelect = useCallback((question: RoomQuestion) => {
-    if (!room) {
-      throw new Error('Error sending reaction. Room not found.');
-    }
-    sendRoomActiveQuestion({
-      roomId: room.id,
-      questionId: question.id,
-    });
-  }, [room, sendRoomActiveQuestion]);
+  const handleQuestionSelect = useCallback(
+    (question: RoomQuestion) => {
+      if (!room) {
+        throw new Error('Error sending reaction. Room not found.');
+      }
+      sendRoomActiveQuestion({
+        roomId: room.id,
+        questionId: question.id,
+      });
+    },
+    [room, sendRoomActiveQuestion],
+  );
 
   const handleNextQuestion = () => {
     if (!room) {
@@ -184,8 +230,12 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
     fetchRoomStartReview(room.id);
   }, [room?.id, fetchRoomStartReview]);
 
-  const handleRoomQuestionEvaluationChange = (newValue: RoomQuestionEvaluationValue) => {
-    const activeQuestion = roomQuestions?.find(question => question.state === 'Active');
+  const handleRoomQuestionEvaluationChange = (
+    newValue: RoomQuestionEvaluationValue,
+  ) => {
+    const activeQuestion = roomQuestions?.find(
+      (question) => question.state === 'Active',
+    );
     const roomId = room?.id;
     if (!activeQuestion || !roomId) {
       return;
@@ -194,24 +244,24 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
   };
 
   return (
-    <div className='videochat-field !w-21 text-left flex flex-col'>
-      <div className='flex-1 flex flex-col py-1.5 px-1.25 bg-wrap rounded-1.125'>
+    <div className="videochat-field !w-21 text-left flex flex-col">
+      <div className="flex-1 flex flex-col py-1.5 px-1.25 bg-wrap rounded-1.125">
         {!initialQuestion && (
           <>
-            <Typography size='xxl' bold>
+            <Typography size="xxl" bold>
               {localizationCaptions[LocalizationKey.WaitingInterviewStart]}
             </Typography>
             <Gap sizeRem={2} />
           </>
         )}
-        <div className='flex flex-col'>
-          {(!!room && !initialQuestion) && (
+        <div className="flex flex-col">
+          {!!room && !initialQuestion && (
             <>
-              <div className='flex'>
-                <Icon size='s' name={IconNames.TodayOutline} />
+              <div className="flex">
+                <Icon size="s" name={IconNames.TodayOutline} />
                 <Gap sizeRem={1} horizontal />
                 <RoomDateAndTime
-                  typographySize='m'
+                  typographySize="m"
                   scheduledStartTime={room.scheduledStartTime}
                   timer={room.timer}
                   mini
@@ -231,37 +281,37 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
             onSelect={handleQuestionSelect}
           />
         </div>
-        {(!initialQuestion && !readOnly) && (
-          <div className='mt-auto'>
+        {!initialQuestion && !readOnly && (
+          <div className="mt-auto">
             <Button
-              className='w-full flex items-center'
-              variant='active'
+              className="w-full flex items-center"
+              variant="active"
               onClick={handleNextQuestion}
             >
-              {roomQuestionsLoading || loadingRoomActiveQuestion || loadingRoomStartReview ? (
+              {roomQuestionsLoading ||
+              loadingRoomActiveQuestion ||
+              loadingRoomStartReview ? (
                 <Loader />
               ) : (
                 <>
-                  <span>
-                    {localizationCaptions[LocalizationKey.StartRoom]}
-                  </span>
+                  <span>{localizationCaptions[LocalizationKey.StartRoom]}</span>
                   <Gap sizeRem={0.5} horizontal />
                   <Icon name={IconNames.PlayOutline} />
                 </>
               )}
             </Button>
             <Gap sizeRem={1} />
-            <Typography size='s' secondary>
+            <Typography size="s" secondary>
               {localizationCaptions[LocalizationKey.RoomStartDescription]}
             </Typography>
           </div>
         )}
       </div>
-      {(!readOnly && initialQuestion) && (
+      {!readOnly && initialQuestion && (
         <>
           <Gap sizeRem={0.375} />
-          <div className='py-1.5 px-1.25 bg-wrap rounded-1.125'>
-            {(!loadingRoomQuestionEvaluation && roomQuestionEvaluation) ? (
+          <div className="py-1.5 px-1.25 bg-wrap rounded-1.125">
+            {!loadingRoomQuestionEvaluation && roomQuestionEvaluation ? (
               <RoomQuestionEvaluation
                 value={roomQuestionEvaluation}
                 onChange={handleRoomQuestionEvaluationChange}
@@ -270,57 +320,90 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
               <Loader />
             )}
             <Gap sizeRem={1} />
-            <div className='text-left h-1.125'>
+            <div className="text-left h-1.125">
               {mergedRoomQuestionEvaluation && (
-                <Typography size='s'>
+                <Typography size="s">
                   <Icon name={IconNames.CheckmarkDone} />
                   {localizationCaptions[LocalizationKey.Saved]}
                 </Typography>
               )}
-              {totalLoadingRoomQuestionEvaluation && (<Loader />)}
+              {totalLoadingRoomQuestionEvaluation && <Loader />}
               {totalErrorRoomQuestionEvaluation && (
-                <div>{localizationCaptions[LocalizationKey.Error]}: {totalErrorRoomQuestionEvaluation}</div>
+                <div>
+                  {localizationCaptions[LocalizationKey.Error]}:{' '}
+                  {totalErrorRoomQuestionEvaluation}
+                </div>
               )}
-              {errorRoomActiveQuestion && <div>{localizationCaptions[LocalizationKey.ErrorSendingActiveQuestion]}</div>}
-              {errorRoomStartReview && <div>{localizationCaptions[LocalizationKey.Error]}: {errorRoomStartReview}</div>}
+              {errorRoomActiveQuestion && (
+                <div>
+                  {
+                    localizationCaptions[
+                      LocalizationKey.ErrorSendingActiveQuestion
+                    ]
+                  }
+                </div>
+              )}
+              {errorRoomStartReview && (
+                <div>
+                  {localizationCaptions[LocalizationKey.Error]}:{' '}
+                  {errorRoomStartReview}
+                </div>
+              )}
             </div>
             <Gap sizeRem={1.8125} />
             <Button
-              className='w-full flex items-center'
-              variant='active'
-              onClick={nextQuestion ? handleNextQuestion : handleReviewWarningOpen}
+              className="w-full flex items-center"
+              variant="active"
+              onClick={
+                nextQuestion ? handleNextQuestion : handleReviewWarningOpen
+              }
             >
-              {roomQuestionsLoading || loadingRoomActiveQuestion || loadingRoomStartReview ? (
+              {roomQuestionsLoading ||
+              loadingRoomActiveQuestion ||
+              loadingRoomStartReview ? (
                 <Loader />
               ) : (
                 <>
                   <span>
-                    {localizationCaptions[
-                      nextQuestion ?
-                        LocalizationKey.NextRoomQuestion :
-                        LocalizationKey.StartReviewRoom
-                    ]
+                    {
+                      localizationCaptions[
+                        nextQuestion
+                          ? LocalizationKey.NextRoomQuestion
+                          : LocalizationKey.StartReviewRoom
+                      ]
                     }
                   </span>
                   <Gap sizeRem={0.5} horizontal />
-                  <Icon name={nextQuestion ? IconNames.ChevronForward : IconNames.Stop} />
+                  <Icon
+                    name={
+                      nextQuestion ? IconNames.ChevronForward : IconNames.Stop
+                    }
+                  />
                 </>
               )}
             </Button>
           </div>
           <Modal
             open={reviewWarning}
-            contentLabel=''
+            contentLabel=""
             onClose={handleReviewWarningClose}
           >
             <ModalWarningContent
-              captionLine1={localizationCaptions[LocalizationKey.StartReviewRoom]}
-              captionLine2={localizationCaptions[LocalizationKey.StartReviewRoomModalTitle]}
+              captionLine1={
+                localizationCaptions[LocalizationKey.StartReviewRoom]
+              }
+              captionLine2={
+                localizationCaptions[LocalizationKey.StartReviewRoomModalTitle]
+              }
               iconName={IconNames.HelpCircle}
             />
             <ModalFooter>
-              <Button onClick={handleReviewWarningClose}>{localizationCaptions[LocalizationKey.Cancel]}</Button>
-              <Button onClick={handleStartReviewRoom} variant='active'>{localizationCaptions[LocalizationKey.Save]}</Button>
+              <Button onClick={handleReviewWarningClose}>
+                {localizationCaptions[LocalizationKey.Cancel]}
+              </Button>
+              <Button onClick={handleStartReviewRoom} variant="active">
+                {localizationCaptions[LocalizationKey.Save]}
+              </Button>
             </ModalFooter>
           </Modal>
         </>

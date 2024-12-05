@@ -47,7 +47,7 @@ export const ItemsGrid = <T extends object>({
 
   useEffect(() => {
     resetAccumData();
-  }, [triggerResetAccumData, resetAccumData])
+  }, [triggerResetAccumData, resetAccumData]);
 
   const noRecords = dataDisplayed && !loading && !accumData.length;
 
@@ -56,15 +56,15 @@ export const ItemsGrid = <T extends object>({
       {noRecords && (
         <div className="items-grid-no-data text-grey3">
           <Gap sizeRem={7.25} />
-          <Typography size='m'>
+          <Typography size="m">
             {localizationCaptions[LocalizationKey.NoRecords]}
           </Typography>
         </div>
       )}
       <ul className="items-grid m-0">
         {!!error && (
-          <Typography size='m' error>
-            <div className='flex items-center'>
+          <Typography size="m" error>
+            <div className="flex items-center">
               <Icon name={IconNames.Information} />
               <Gap sizeRem={0.25} horizontal />
               <div>
@@ -73,18 +73,15 @@ export const ItemsGrid = <T extends object>({
             </div>
           </Typography>
         )}
-        {!noRecords && (
-          accumData.map(renderItem)
-        )}
-        {(loading || !dataDisplayed) && loaders.map((loader, index) => (
-          <div key={`loader${index}`} className={loaderClassName}>
-            <div
-              style={{ height: loader.height || '1.8rem' }}
-            >
-              <Loader />
+        {!noRecords && accumData.map(renderItem)}
+        {(loading || !dataDisplayed) &&
+          loaders.map((loader, index) => (
+            <div key={`loader${index}`} className={loaderClassName}>
+              <div style={{ height: loader.height || '1.8rem' }}>
+                <Loader />
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
         {!noRecords && nextPageAvailable && (
           <InfinitePaginator onNextPage={handleNextPage} />
         )}

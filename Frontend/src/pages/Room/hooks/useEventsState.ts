@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
-import { RoomState, RoomStateAdditionalStatefulPayload } from '../../../types/room';
+import {
+  RoomState,
+  RoomStateAdditionalStatefulPayload,
+} from '../../../types/room';
 
 export type EventsState = Record<string, string | boolean | null>;
 
@@ -19,8 +22,11 @@ export const useEventsState = ({
       return;
     }
     const parsedStates: EventsState = {};
-    roomState.states.forEach(roomState =>
-      parsedStates[roomState.type] = (JSON.parse(roomState.payload) as RoomStateAdditionalStatefulPayload).value
+    roomState.states.forEach(
+      (roomState) =>
+        (parsedStates[roomState.type] = (
+          JSON.parse(roomState.payload) as RoomStateAdditionalStatefulPayload
+        ).value),
     );
     setEventsState(parsedStates);
   }, [roomState]);
@@ -35,7 +41,9 @@ export const useEventsState = ({
         return;
       }
       const stateType = parsedData.Type;
-      const stateValue = (parsedData.Value.AdditionalData as RoomStateAdditionalStatefulPayload).value;
+      const stateValue = (
+        parsedData.Value.AdditionalData as RoomStateAdditionalStatefulPayload
+      ).value;
       const oldValue = eventsState[stateType];
       if (oldValue !== stateValue) {
         setEventsState({
@@ -43,8 +51,7 @@ export const useEventsState = ({
           [stateType]: stateValue,
         });
       }
-    } catch {
-    }
+    } catch {}
   }, [lastWsMessage, eventsState]);
 
   return eventsState;

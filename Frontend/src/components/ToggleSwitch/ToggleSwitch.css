@@ -20,25 +20,25 @@
   bottom: 0;
   background-color: var(--active-nav-tab);
   border-radius: var(--border-radius);
-  transition: .4s;
+  transition: 0.4s;
 }
 
 .toggle-switch .slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 0.875rem;
   width: 0.875rem;
   left: 1px;
   bottom: 1px;
   background-color: white;
   border-radius: 50%;
-  transition: .4s;
+  transition: 0.4s;
 }
 
-.toggle-switch input:checked+.slider {
+.toggle-switch input:checked + .slider {
   background-color: var(--slider-checked);
 }
 
-.toggle-switch input:checked+.slider:before {
+.toggle-switch input:checked + .slider:before {
   transform: translateX(1rem);
 }

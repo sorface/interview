@@ -32,7 +32,12 @@ const ProcessWrapperComponent: FunctionComponent<ProcessWrapperProps> = ({
   if (error) {
     return (
       <Field>
-        <div>{errorPrefix || <LocalizationCaption captionKey={LocalizationKey.Error} />}: {error}</div>
+        <div>
+          {errorPrefix || (
+            <LocalizationCaption captionKey={LocalizationKey.Error} />
+          )}
+          : {error}
+        </div>
       </Field>
     );
   }
@@ -40,22 +45,20 @@ const ProcessWrapperComponent: FunctionComponent<ProcessWrapperProps> = ({
   if (loading) {
     return (
       <>
-        {
-          (loaders || [{}]).map((loader, index) => (
-            <Field key={`loader${index}`}>
-              <div
-                style={{ height: loader.height || '1.8rem' }}
-                className="process-wrapper-loader"
-              >
-                {!!loadingPrefix && index === 0 ? (
-                  <div>{loadingPrefix}</div>
-                ) : (
-                  <Loader />
-                )}
-              </div>
-            </Field>
-          ))
-        }
+        {(loaders || [{}]).map((loader, index) => (
+          <Field key={`loader${index}`}>
+            <div
+              style={{ height: loader.height || '1.8rem' }}
+              className="process-wrapper-loader"
+            >
+              {!!loadingPrefix && index === 0 ? (
+                <div>{loadingPrefix}</div>
+              ) : (
+                <Loader />
+              )}
+            </div>
+          </Field>
+        ))}
       </>
     );
   }

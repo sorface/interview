@@ -22,11 +22,11 @@ public class Question : ArchiveEntity
 
     public Guid? CodeEditorId { get; internal set; }
 
-    public QuestionCodeEditor? CodeEditor { get; internal set; }
+    public QuestionCodeEditor? CodeEditor { get; set; }
 
     public List<Tag> Tags { get; internal set; } = new();
 
-    public List<QuestionAnswer> Answers { get; internal set; } = new();
+    public List<QuestionAnswer> Answers { get; set; } = new();
 
     public SEQuestionType Type { get; internal set; } = default!;
 

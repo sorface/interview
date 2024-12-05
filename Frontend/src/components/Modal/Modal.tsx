@@ -43,9 +43,7 @@ export const Modal: FunctionComponent<ModalProps> = ({
           <Icon secondary name={IconNames.Close} />
         </Button>
       </div>
-      <div className="modal-content overflow-auto">
-        {children}
-      </div>
+      <div className="modal-content overflow-auto">{children}</div>
     </ModalInternal>
   );
 };

@@ -19,7 +19,7 @@ export interface UserStreamsContextType {
   updateDevices: () => void;
 }
 
-const noop = () => { };
+const noop = () => {};
 
 const defaultValue: UserStreamsContextType = {
   userAudioStream: null,
@@ -39,4 +39,5 @@ const defaultValue: UserStreamsContextType = {
   updateDevices: noop,
 };
 
-export const UserStreamsContext = createContext<UserStreamsContextType>(defaultValue);
+export const UserStreamsContext =
+  createContext<UserStreamsContextType>(defaultValue);

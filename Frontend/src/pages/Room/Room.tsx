@@ -1,5 +1,17 @@
-import { FunctionComponent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { useParams, Navigate, useNavigate, generatePath } from 'react-router-dom';
+import {
+  FunctionComponent,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import {
+  useParams,
+  Navigate,
+  useNavigate,
+  generatePath,
+} from 'react-router-dom';
 import useWebSocket from 'react-use-websocket';
 import toast from 'react-hot-toast';
 import {
@@ -74,7 +86,9 @@ export const Room: FunctionComponent = () => {
   const {
     apiMethodState: apiApplyRoomInviteState,
     fetchData: fetchApplyRoomInvite,
-  } = useApiMethod<RoomInvite, ApplyRoomInviteBody>(roomInviteApiDeclaration.apply);
+  } = useApiMethod<RoomInvite, ApplyRoomInviteBody>(
+    roomInviteApiDeclaration.apply,
+  );
   const {
     process: { loading: applyRoomInviteLoading, error: applyRoomInviteError },
     data: applyRoomInviteData,
@@ -82,9 +96,12 @@ export const Room: FunctionComponent = () => {
 
   const [roomInReview, setRoomInReview] = useState(false);
   const [reactionsVisible, setReactionsVisible] = useState(false);
-  const [currentQuestionId, setCurrentQuestionId] = useState<RoomQuestion['id']>();
+  const [currentQuestionId, setCurrentQuestionId] =
+    useState<RoomQuestion['id']>();
   const [currentQuestion, setCurrentQuestion] = useState<RoomQuestion>();
-  const [wsRoomTimer, setWsRoomTimer] = useState<RoomType['timer'] | null>(null);
+  const [wsRoomTimer, setWsRoomTimer] = useState<RoomType['timer'] | null>(
+    null,
+  );
   const [messagesChatEnabled, setMessagesChatEnabled] = useState(false);
   const [welcomeScreen, setWelcomeScreen] = useState(true);
   const [recognitionEnabled, setRecognitionEnabled] = useState(false);
@@ -100,18 +117,25 @@ export const Room: FunctionComponent = () => {
     }
     return false;
   };
-  const { lastMessage, readyState, sendMessage } = useWebSocket(checkWebSocketReadyToConnect() ? socketUrl : null);
+  const { lastMessage, readyState, sendMessage } = useWebSocket(
+    checkWebSocketReadyToConnect() ? socketUrl : null,
+  );
   const wsClosed = readyState === 3 || readyState === 2;
-  const lastWsMessageParsed = useMemo(() => parseWsMessage(lastMessage), [lastMessage]);
+  const lastWsMessageParsed = useMemo(
+    () => parseWsMessage(lastMessage),
+    [lastMessage],
+  );
   // ScreenShare
   // const { screenStream, requestScreenStream } = useScreenStream();
   const localizationCaptions = useLocalizationCaptions();
 
   const handleVoiceRecognition = (transcript: string) => {
-    sendMessage(JSON.stringify({
-      Type: 'voice-recognition',
-      Value: transcript,
-    }));
+    sendMessage(
+      JSON.stringify({
+        Type: 'voice-recognition',
+        Value: transcript,
+      }),
+    );
   };
 
   const { recognitionNotSupported } = useSpeechRecognition({
@@ -124,32 +148,36 @@ export const Room: FunctionComponent = () => {
     maxCount: 9,
   });
 
-  const { apiMethodState, fetchData } = useApiMethod<RoomType, RoomType['id']>(roomsApiDeclaration.getById);
-  const { process: { loading, error }, data: room } = apiMethodState;
-
+  const { apiMethodState, fetchData } = useApiMethod<RoomType, RoomType['id']>(
+    roomsApiDeclaration.getById,
+  );
   const {
-    apiMethodState: apiRoomQuestions,
-    fetchData: getRoomQuestions,
-  } = useApiMethod<Array<RoomQuestion>, GetRoomQuestionsBody>(roomQuestionApiDeclaration.getRoomQuestions);
+    process: { loading, error },
+    data: room,
+  } = apiMethodState;
+
+  const { apiMethodState: apiRoomQuestions, fetchData: getRoomQuestions } =
+    useApiMethod<Array<RoomQuestion>, GetRoomQuestionsBody>(
+      roomQuestionApiDeclaration.getRoomQuestions,
+    );
   const {
     data: roomQuestions,
-    process: {
-      loading: roomQuestionsLoading,
-    }
+    process: { loading: roomQuestionsLoading },
   } = apiRoomQuestions;
 
   const {
     apiMethodState: apiRoomParticipantState,
     fetchData: getRoomParticipant,
-  } = useApiMethod<RoomParticipant, GetRoomParticipantParams>(roomsApiDeclaration.getParticipant);
+  } = useApiMethod<RoomParticipant, GetRoomParticipantParams>(
+    roomsApiDeclaration.getParticipant,
+  );
   const {
-    data: roomParticipant, process: { loading: roomParticipantLoading, error: roomParticipantError },
+    data: roomParticipant,
+    process: { loading: roomParticipantLoading, error: roomParticipantError },
   } = apiRoomParticipantState;
 
-  const {
-    apiMethodState: apiRoomInvitesState,
-    fetchData: fetchRoomInvites,
-  } = useApiMethod<RoomInvite[], RoomIdParam>(roomInviteApiDeclaration.get);
+  const { apiMethodState: apiRoomInvitesState, fetchData: fetchRoomInvites } =
+    useApiMethod<RoomInvite[], RoomIdParam>(roomInviteApiDeclaration.get);
   const {
     process: { loading: roomInvitesLoading, error: roomInvitesError },
     data: roomInvitesData,
@@ -158,27 +186,36 @@ export const Room: FunctionComponent = () => {
   const {
     apiMethodState: apiGenerateRoomInviteState,
     fetchData: fetchGenerateRoomInvite,
-  } = useApiMethod<RoomInvite, GenerateRoomInviteBody>(roomInviteApiDeclaration.generate);
+  } = useApiMethod<RoomInvite, GenerateRoomInviteBody>(
+    roomInviteApiDeclaration.generate,
+  );
   const {
-    process: { loading: generateRoomInviteLoading, error: generateRoomInviteError },
+    process: {
+      loading: generateRoomInviteLoading,
+      error: generateRoomInviteError,
+    },
     data: generateRoomInviteData,
   } = apiGenerateRoomInviteState;
 
   const {
     apiMethodState: apiGenerateRoomAllInvitesState,
     fetchData: fetchGenerateRoomAllInvites,
-  } = useApiMethod<RoomInvite, RoomIdParam>(roomInviteApiDeclaration.generateAll);
+  } = useApiMethod<RoomInvite, RoomIdParam>(
+    roomInviteApiDeclaration.generateAll,
+  );
   const {
-    process: { loading: generateRoomAllInvitesLoading, error: generateRoomAllInvitesError },
+    process: {
+      loading: generateRoomAllInvitesLoading,
+      error: generateRoomAllInvitesError,
+    },
     data: generateRoomAllInvitesData,
   } = apiGenerateRoomAllInvitesState;
 
-  const roomParticipantWillLoaded = roomParticipant === null && !roomParticipantError;
+  const roomParticipantWillLoaded =
+    roomParticipant === null && !roomParticipantError;
 
-  const {
-    apiMethodState: apiRoomStateState,
-    fetchData: fetchRoomState,
-  } = useApiMethod<RoomState, RoomType['id']>(roomsApiDeclaration.getState);
+  const { apiMethodState: apiRoomStateState, fetchData: fetchRoomState } =
+    useApiMethod<RoomState, RoomType['id']>(roomsApiDeclaration.getState);
   const {
     process: { loading: loadingRoomState, error: errorRoomState },
     data: roomState,
@@ -195,7 +232,9 @@ export const Room: FunctionComponent = () => {
   const roomTimer = wsRoomTimer || room?.timer;
   const eventsState = useEventsState({ roomState, lastWsMessage: lastMessage });
   const [codeEditorEnabled, setCodeEditorEnabled] = useState(false);
-  const codeEditorLanguage = String(eventsState[EventName.CodeEditorLanguage]) as CodeEditorLang;
+  const codeEditorLanguage = String(
+    eventsState[EventName.CodeEditorLanguage],
+  ) as CodeEditorLang;
 
   const currentUserExpert = roomParticipant?.userType === 'Expert';
   const currentUserExaminee = roomParticipant?.userType === 'Examinee';
@@ -203,12 +242,7 @@ export const Room: FunctionComponent = () => {
 
   const userStreams = useUserStreams();
   const { playJoinRoomSound, playChatMessageSound } = useRoomSounds();
-  const {
-    peers,
-    videoOrder,
-    peerToStream,
-    allUsers,
-  } = useVideoChat({
+  const { peers, videoOrder, peerToStream, allUsers } = useVideoChat({
     viewerMode,
     lastWsMessageParsed,
     userAudioStream: userStreams.userAudioStream,
@@ -250,7 +284,12 @@ export const Room: FunctionComponent = () => {
     fetchRoomInvites({
       roomId: id,
     });
-  }, [generateRoomInviteData, generateRoomAllInvitesData, id, fetchRoomInvites]);
+  }, [
+    generateRoomInviteData,
+    generateRoomAllInvitesData,
+    id,
+    fetchRoomInvites,
+  ]);
 
   useEffect(() => {
     if (inviteParam && !applyRoomInviteData) {
@@ -269,7 +308,16 @@ export const Room: FunctionComponent = () => {
       RoomId: id,
       UserId: auth.id,
     });
-  }, [id, auth?.id, inviteParam, applyRoomInviteData, fetchData, fetchRoomState, updateQuestions, getRoomParticipant]);
+  }, [
+    id,
+    auth?.id,
+    inviteParam,
+    applyRoomInviteData,
+    fetchData,
+    fetchRoomState,
+    updateQuestions,
+    getRoomParticipant,
+  ]);
 
   useEffect(() => {
     if (!room) {
@@ -299,14 +347,16 @@ export const Room: FunctionComponent = () => {
         default:
           break;
       }
-    } catch { }
+    } catch {}
   }, [lastWsMessageParsed]);
 
   useEffect(() => {
     if (!room || !roomQuestions) {
       return;
     }
-    const activeQuestion = roomQuestions.find(question => question.state === 'Active');
+    const activeQuestion = roomQuestions.find(
+      (question) => question.state === 'Active',
+    );
     if (!activeQuestion) {
       return;
     }
@@ -362,7 +412,7 @@ export const Room: FunctionComponent = () => {
         default:
           break;
       }
-    } catch { }
+    } catch {}
   }, [id, auth, lastMessage, playChatMessageSound, updateQuestions]);
 
   useEffect(() => {
@@ -377,17 +427,15 @@ export const Room: FunctionComponent = () => {
   //   requestScreenStream();
   // };
 
-  const loaders = [
-    {},
-    {},
-    { height: '890px' }
-  ];
+  const loaders = [{}, {}, { height: '890px' }];
 
   const handleWelcomeScreenClose = () => {
     setWelcomeScreen(false);
-    sendMessage(JSON.stringify({
-      Type: "join video chat",
-    }));
+    sendMessage(
+      JSON.stringify({
+        Type: 'join video chat',
+      }),
+    );
   };
 
   const handleSwitchMessagesChat = (index: number) => {
@@ -448,12 +496,17 @@ export const Room: FunctionComponent = () => {
   };
 
   if (roomInReview && id) {
-    return <Navigate to={getCloseRedirectLink(id, currentUserExpert)} replace />;
+    return (
+      <Navigate to={getCloseRedirectLink(id, currentUserExpert)} replace />
+    );
   }
 
   if (wsClosed) {
     return (
-      <MessagePage title={localizationCaptions[LocalizationKey.ConnectionError]} message={localizationCaptions[LocalizationKey.RoomConnectionError]}>
+      <MessagePage
+        title={localizationCaptions[LocalizationKey.ConnectionError]}
+        message={localizationCaptions[LocalizationKey.RoomConnectionError]}
+      >
         <Link to={pathnames.highlightRooms}>
           <Button>{localizationCaptions[LocalizationKey.Exit]}</Button>
         </Link>
@@ -462,27 +515,39 @@ export const Room: FunctionComponent = () => {
   }
 
   return (
-    <RoomContext.Provider value={{
-      room,
-      roomParticipant,
-      roomState,
-      viewerMode,
-      lastWsMessageParsed,
-      codeEditorEnabled,
-      codeEditorLanguage,
-      peers,
-      videoOrder,
-      peerToStream,
-      allUsers,
-      sendWsMessage: sendMessage,
-      setCodeEditorEnabled,
-    }}>
+    <RoomContext.Provider
+      value={{
+        room,
+        roomParticipant,
+        roomState,
+        viewerMode,
+        lastWsMessageParsed,
+        codeEditorEnabled,
+        codeEditorLanguage,
+        peers,
+        videoOrder,
+        peerToStream,
+        allUsers,
+        sendWsMessage: sendMessage,
+        setCodeEditorEnabled,
+      }}
+    >
       <UserStreamsContext.Provider value={userStreams}>
         <MainContentWrapper withMargin className="room-wrapper">
           <EnterVideoChatModal
             open={welcomeScreen}
-            loading={loading || loadingRoomState || roomParticipantLoading || roomParticipantWillLoaded || applyRoomInviteLoading || readyState === connectingReadyState}
-            error={applyRoomInviteError && localizationCaptions[LocalizationKey.ErrorApplyRoomInvite]}
+            loading={
+              loading ||
+              loadingRoomState ||
+              roomParticipantLoading ||
+              roomParticipantWillLoaded ||
+              applyRoomInviteLoading ||
+              readyState === connectingReadyState
+            }
+            error={
+              applyRoomInviteError &&
+              localizationCaptions[LocalizationKey.ErrorApplyRoomInvite]
+            }
             onClose={handleWelcomeScreenClose}
           />
           {!welcomeScreen && (
@@ -491,8 +556,16 @@ export const Room: FunctionComponent = () => {
                 open={invitationsOpen}
                 roomId={id || ''}
                 roomInvitesData={roomInvitesData}
-                roomInvitesError={roomInvitesError || generateRoomInviteError || generateRoomAllInvitesError}
-                roomInvitesLoading={roomInvitesLoading || generateRoomInviteLoading || generateRoomAllInvitesLoading}
+                roomInvitesError={
+                  roomInvitesError ||
+                  generateRoomInviteError ||
+                  generateRoomAllInvitesError
+                }
+                roomInvitesLoading={
+                  roomInvitesLoading ||
+                  generateRoomInviteLoading ||
+                  generateRoomAllInvitesLoading
+                }
                 onRequestClose={handleInvitationsClose}
                 onGenerateInvite={handleInviteGenerate}
                 onGenerateAllInvites={handleInvitesAllGenerate}
@@ -503,10 +576,14 @@ export const Room: FunctionComponent = () => {
               />
               <ProcessWrapper
                 loading={loading}
-                loadingPrefix={localizationCaptions[LocalizationKey.LoadingRoom]}
+                loadingPrefix={
+                  localizationCaptions[LocalizationKey.LoadingRoom]
+                }
                 loaders={loaders}
                 error={error}
-                errorPrefix={localizationCaptions[LocalizationKey.ErrorLoadingRoom]}
+                errorPrefix={
+                  localizationCaptions[LocalizationKey.ErrorLoadingRoom]
+                }
               >
                 <div className="room-page">
                   <div className="room-page-main">
@@ -515,20 +592,30 @@ export const Room: FunctionComponent = () => {
                         <span
                           className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
                         >
-                          <Link to={pathnames.highlightRooms} className='no-underline'>
-                            <div className='room-page-header-wrapper flex items-center'>
-                              <div className='w-2.375 pr-1'>
-                                <img className='w-2.375 h-2.375 rounded-0.375' src='/logo192.png' alt='site logo' />
+                          <Link
+                            to={pathnames.highlightRooms}
+                            className="no-underline"
+                          >
+                            <div className="room-page-header-wrapper flex items-center">
+                              <div className="w-2.375 pr-1">
+                                <img
+                                  className="w-2.375 h-2.375 rounded-0.375"
+                                  src="/logo192.png"
+                                  alt="site logo"
+                                />
                               </div>
                               <h3>{room?.name}</h3>
                             </div>
                           </Link>
                         </span>
                       </div>
-                      <div className='flex'>
+                      <div className="flex">
                         {!!roomTimer?.startTime && (
                           <>
-                            <RoomTimer durationSec={roomTimer.durationSec} startTime={roomTimer.startTime} />
+                            <RoomTimer
+                              durationSec={roomTimer.durationSec}
+                              startTime={roomTimer.startTime}
+                            />
                             <Gap sizeRem={0.5} horizontal />
                           </>
                         )}
@@ -537,14 +624,16 @@ export const Room: FunctionComponent = () => {
                             {
                               id: 0,
                               content: (
-                                <div className='flex items-center'>
+                                <div className="flex items-center">
                                   <div>
                                     {localizationCaptions[LocalizationKey.Chat]}
                                   </div>
                                   {!!unreadChatMessages && (
                                     <>
                                       <Gap sizeRem={0.5} horizontal />
-                                      <UnreadChatMessagesCounter value={unreadChatMessages} />
+                                      <UnreadChatMessagesCounter
+                                        value={unreadChatMessages}
+                                      />
                                     </>
                                   )}
                                 </div>
@@ -553,31 +642,44 @@ export const Room: FunctionComponent = () => {
                             {
                               id: 1,
                               content: (
-                                <div className='flex items-center'>
+                                <div className="flex items-center">
                                   <div>
-                                    {localizationCaptions[LocalizationKey.RoomParticipants]}
+                                    {
+                                      localizationCaptions[
+                                        LocalizationKey.RoomParticipants
+                                      ]
+                                    }
                                   </div>
                                   <Gap sizeRem={0.5} horizontal />
-                                  <div>
-                                    {peers.length + 1}
-                                  </div>
+                                  <div>{peers.length + 1}</div>
                                 </div>
                               ),
                             },
                           ]}
                           activeIndex={messagesChatEnabled ? 0 : 1}
-                          variant='alternative'
+                          variant="alternative"
                           onClick={handleSwitchMessagesChat}
                         />
                       </div>
                     </div>
                     <div className="room-page-main-content">
-                      <div className='room-columns'>
-                        {errorRoomState && <div>{localizationCaptions[LocalizationKey.ErrorLoadingRoomState]}...</div>}
+                      <div className="room-columns">
+                        {errorRoomState && (
+                          <div>
+                            {
+                              localizationCaptions[
+                                LocalizationKey.ErrorLoadingRoomState
+                              ]
+                            }
+                            ...
+                          </div>
+                        )}
                         {(currentUserExpert || viewerMode) && (
                           <RoomQuestionPanel
                             roomQuestionsLoading={roomQuestionsLoading}
-                            roomQuestions={roomQuestions?.sort(sortRoomQuestion) || []}
+                            roomQuestions={
+                              roomQuestions?.sort(sortRoomQuestion) || []
+                            }
                             initialQuestion={currentQuestion}
                           />
                         )}

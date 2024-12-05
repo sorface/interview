@@ -30,7 +30,9 @@ export const Typography: FunctionComponent<TypographyProps> = ({
   });
 
   return (
-    <span className={`typography typography-${size} ${bold ? 'typography-bold' : ''} ${error ? errorClassName : ''} ${secondary ? secondaryClassName : ''}`}>
+    <span
+      className={`typography typography-${size} ${bold ? 'typography-bold' : ''} ${error ? errorClassName : ''} ${secondary ? secondaryClassName : ''}`}
+    >
       {children}
     </span>
   );

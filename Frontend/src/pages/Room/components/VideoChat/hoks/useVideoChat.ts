@@ -4,7 +4,10 @@ import toast from 'react-hot-toast';
 import { User, UserType } from '../../../../../types/user';
 import { usePeerStream } from '../../../hooks/usePeerStream';
 import { AuthContext } from '../../../../../context/AuthContext';
-import { createAudioAnalyser, frequencyBinCount } from '../utils/createAudioAnalyser';
+import {
+  createAudioAnalyser,
+  frequencyBinCount,
+} from '../utils/createAudioAnalyser';
 import { getAverageVolume } from '../utils/getAverageVolume';
 import { ParsedWsMessage } from '../../../utils/parseWsMessage';
 import { checkIsAudioStream } from '../utils/checkIsAudioStream';
@@ -33,14 +36,19 @@ export interface PeerMeta {
 const audioVolumeThreshold = 10.0;
 const updateLoudedUserTimeout = 5000;
 
-const removeDuplicates = (peersRef: React.MutableRefObject<PeerMeta[]>, newPeerMeta: PeerMeta) =>
-  peersRef.current.filter(peer =>
-    peer.peerID !== newPeerMeta.peerID ? true : peer.screenShare !== newPeerMeta.screenShare
+const removeDuplicates = (
+  peersRef: React.MutableRefObject<PeerMeta[]>,
+  newPeerMeta: PeerMeta,
+) =>
+  peersRef.current.filter((peer) =>
+    peer.peerID !== newPeerMeta.peerID
+      ? true
+      : peer.screenShare !== newPeerMeta.screenShare,
   );
 
 const getAllUsers = (data: PeerMeta[], auth: User | null) => {
   const users: Map<User['id'], Pick<User, 'nickname' | 'avatar'>> = new Map();
-  data.forEach(peer => {
+  data.forEach((peer) => {
     users.set(peer.peerID, {
       nickname: peer.nickname,
       avatar: peer.avatar,
@@ -80,53 +88,60 @@ export const useVideoChat = ({
     [auth?.id || '']: 1,
   });
 
-  const createPeer = useCallback((to: string, forViewer?: boolean, screenShare?: boolean) => {
-    if (viewerMode) {
-      sendWsMessage(JSON.stringify({
-        Type: 'sending signal',
-        Value: JSON.stringify({
-          To: to,
-          Signal: 'fake-viewer-signal',
-          ScreenShare: false,
+  const createPeer = useCallback(
+    (to: string, forViewer?: boolean, screenShare?: boolean) => {
+      if (viewerMode) {
+        sendWsMessage(
+          JSON.stringify({
+            Type: 'sending signal',
+            Value: JSON.stringify({
+              To: to,
+              Signal: 'fake-viewer-signal',
+              ScreenShare: false,
+            }),
+          }),
+        );
+        return new Peer();
+      }
+
+      const streams: MediaStream[] = [];
+      userAudioStream && streams.push(userAudioStream);
+      // ScreenShare
+      // if (screenShare) {
+      //   screenStream && streams.push(screenStream);
+      // } else {
+      userVideoStream && streams.push(userVideoStream);
+      // }
+
+      const peer = new Peer({
+        initiator: true,
+        trickle: false,
+        streams,
+        ...((forViewer || screenShare) && {
+          offerOptions: {
+            offerToReceiveAudio: false,
+            offerToReceiveVideo: false,
+          },
         }),
-      }));
-      return new Peer();
-    }
+      });
 
-    const streams: MediaStream[] = [];
-    userAudioStream && streams.push(userAudioStream);
-    // ScreenShare
-    // if (screenShare) {
-    //   screenStream && streams.push(screenStream);
-    // } else {
-    userVideoStream && streams.push(userVideoStream);
-    // }
+      peer.on('signal', (signal) => {
+        sendWsMessage(
+          JSON.stringify({
+            Type: 'sending signal',
+            Value: JSON.stringify({
+              To: to,
+              Signal: JSON.stringify(signal),
+              ScreenShare: screenShare,
+            }),
+          }),
+        );
+      });
 
-    const peer = new Peer({
-      initiator: true,
-      trickle: false,
-      streams,
-      ...((forViewer || screenShare) && {
-        offerOptions: {
-          offerToReceiveAudio: false,
-          offerToReceiveVideo: false,
-        },
-      }),
-    });
-
-    peer.on('signal', signal => {
-      sendWsMessage(JSON.stringify({
-        Type: 'sending signal',
-        Value: JSON.stringify({
-          To: to,
-          Signal: JSON.stringify(signal),
-          ScreenShare: screenShare,
-        }),
-      }));
-    });
-
-    return peer;
-  }, [userAudioStream, userVideoStream, viewerMode, sendWsMessage]);
+      return peer;
+    },
+    [userAudioStream, userVideoStream, viewerMode, sendWsMessage],
+  );
 
   useEffect(() => {
     const frequencyData = new Uint8Array(frequencyBinCount);
@@ -137,7 +152,9 @@ export const useVideoChat = ({
       let newLouderUserId = '';
       let louderVolume = -1;
       const result: Record<string, number> = {};
-      for (const [userId, analyser] of Object.entries(userIdToAudioAnalyser.current)) {
+      for (const [userId, analyser] of Object.entries(
+        userIdToAudioAnalyser.current,
+      )) {
         analyser.getByteFrequencyData(frequencyData);
         const averageVolume = getAverageVolume(frequencyData);
         if (averageVolume < audioVolumeThreshold) {
@@ -176,37 +193,45 @@ export const useVideoChat = ({
         cancelAnimationFrame(requestRef.current);
       }
     };
-
   }, [auth, louderUserId]);
 
-  const addPeer = useCallback((incomingSignal: Peer.SignalData, callerID: string, screenShare?: boolean) => {
-    const streams: MediaStream[] = [];
-    if (!screenShare) {
-      userAudioStream && streams.push(userAudioStream);
-      userVideoStream && streams.push(userVideoStream);
-    }
+  const addPeer = useCallback(
+    (
+      incomingSignal: Peer.SignalData,
+      callerID: string,
+      screenShare?: boolean,
+    ) => {
+      const streams: MediaStream[] = [];
+      if (!screenShare) {
+        userAudioStream && streams.push(userAudioStream);
+        userVideoStream && streams.push(userVideoStream);
+      }
 
-    const peer = new Peer({
-      initiator: false,
-      trickle: false,
-      streams,
-    });
+      const peer = new Peer({
+        initiator: false,
+        trickle: false,
+        streams,
+      });
 
-    peer.on('signal', signal => {
-      sendWsMessage(JSON.stringify({
-        Type: 'returning signal',
-        Value: JSON.stringify({
-          To: callerID,
-          Signal: JSON.stringify(signal),
-          ScreenShare: screenShare,
-        }),
-      }));
-    });
+      peer.on('signal', (signal) => {
+        sendWsMessage(
+          JSON.stringify({
+            Type: 'returning signal',
+            Value: JSON.stringify({
+              To: callerID,
+              Signal: JSON.stringify(signal),
+              ScreenShare: screenShare,
+            }),
+          }),
+        );
+      });
 
-    peer.signal(incomingSignal);
+      peer.signal(incomingSignal);
 
-    return peer;
-  }, [userAudioStream, userVideoStream, sendWsMessage]);
+      return peer;
+    },
+    [userAudioStream, userVideoStream, sendWsMessage],
+  );
 
   useEffect(() => {
     if (!lastWsMessageParsed || !auth) {
@@ -218,7 +243,7 @@ export const useVideoChat = ({
       const screenShare = false;
       switch (lastWsMessageParsed?.Type) {
         case 'all users':
-          lastWsMessageParsed.Value.forEach(userInChat => {
+          lastWsMessageParsed.Value.forEach((userInChat) => {
             if (userInChat.Id === auth.id) {
               return;
             }
@@ -239,10 +264,11 @@ export const useVideoChat = ({
               if (!audioStream) {
                 return;
               }
-              userIdToAudioAnalyser.current[newPeerMeta.targetUserId] = createAudioAnalyser(stream);
+              userIdToAudioAnalyser.current[newPeerMeta.targetUserId] =
+                createAudioAnalyser(stream);
             });
 
-            peersRef.current.push(newPeerMeta)
+            peersRef.current.push(newPeerMeta);
           });
           setPeers([...peersRef.current]);
           break;
@@ -266,7 +292,8 @@ export const useVideoChat = ({
               if (!audioStream) {
                 return;
               }
-              userIdToAudioAnalyser.current[newPeerMeta.targetUserId] = createAudioAnalyser(stream);
+              userIdToAudioAnalyser.current[newPeerMeta.targetUserId] =
+                createAudioAnalyser(stream);
             });
 
             peersRef.current = removeDuplicates(peersRef, newPeerMeta);
@@ -292,7 +319,11 @@ export const useVideoChat = ({
             break;
           }
           if (viewerMode || screenShare) {
-            const peer = addPeer(JSON.parse(lastWsMessageParsed.Value.Signal), fromUser.Id, screenShare);
+            const peer = addPeer(
+              JSON.parse(lastWsMessageParsed.Value.Signal),
+              fromUser.Id,
+              screenShare,
+            );
             addPeerStream(fromUser.Id, peer, true);
             const newPeerMeta: PeerMeta = {
               peerID: fromUser.Id,
@@ -311,12 +342,16 @@ export const useVideoChat = ({
               if (!audioStream || screenShare) {
                 return;
               }
-              userIdToAudioAnalyser.current[newPeerMeta.targetUserId] = createAudioAnalyser(stream);
+              userIdToAudioAnalyser.current[newPeerMeta.targetUserId] =
+                createAudioAnalyser(stream);
             });
             setPeers([...peersRef.current]);
             break;
           }
-          const peer = addPeer(JSON.parse(lastWsMessageParsed.Value.Signal), fromUser.Id);
+          const peer = addPeer(
+            JSON.parse(lastWsMessageParsed.Value.Signal),
+            fromUser.Id,
+          );
           addPeerStream(fromUser.Id, peer, true);
           const newPeerMeta: PeerMeta = {
             peerID: fromUser.Id,
@@ -335,18 +370,23 @@ export const useVideoChat = ({
             if (!audioStream || screenShare) {
               return;
             }
-            userIdToAudioAnalyser.current[newPeerMeta.targetUserId] = createAudioAnalyser(stream);
+            userIdToAudioAnalyser.current[newPeerMeta.targetUserId] =
+              createAudioAnalyser(stream);
           });
           setPeers([...peersRef.current]);
           break;
         case 'user left':
           const leftUserId = lastWsMessageParsed.Value.Id;
-          const leftUserPeer = peersRef.current.find(p => p.targetUserId === leftUserId);
+          const leftUserPeer = peersRef.current.find(
+            (p) => p.targetUserId === leftUserId,
+          );
           if (leftUserPeer) {
             removePeerStream(leftUserPeer.peerID);
             leftUserPeer.peer.destroy();
           }
-          const peersAfterLeft = peersRef.current.filter(p => p.targetUserId !== leftUserId);
+          const peersAfterLeft = peersRef.current.filter(
+            (p) => p.targetUserId !== leftUserId,
+          );
           peersRef.current = peersAfterLeft;
           setPeers([...peersRef.current]);
           setVideoOrder({
@@ -355,8 +395,10 @@ export const useVideoChat = ({
           });
           break;
         case 'receiving returned signal':
-          const item = peersRef.current.find(p =>
-            p.peerID === lastWsMessageParsed.Value.From && (screenShare ? p.screenShare : true)
+          const item = peersRef.current.find(
+            (p) =>
+              p.peerID === lastWsMessageParsed.Value.From &&
+              (screenShare ? p.screenShare : true),
           );
           if (item) {
             item.peer.signal(lastWsMessageParsed.Value.Signal);
@@ -368,9 +410,17 @@ export const useVideoChat = ({
     } catch (err) {
       console.error('parse ws message error: ', err);
     }
-  }, [auth, lastWsMessageParsed, viewerMode, addPeer, createPeer, addPeerStream, removePeerStream]);
+  }, [
+    auth,
+    lastWsMessageParsed,
+    viewerMode,
+    addPeer,
+    createPeer,
+    addPeerStream,
+    removePeerStream,
+  ]);
 
-  // ScreenShare  
+  // ScreenShare
   // useEffect(() => {
   //   if (screenStream && auth?.id) {
   //     try {
@@ -407,7 +457,7 @@ export const useVideoChat = ({
         case 'user joined':
           const fromUser = lastWsMessageParsed.Value.From;
           toast.success(
-            `${fromUser.Nickname} ${localizationCaptions[LocalizationKey.UserConnectedToRoom]}`
+            `${fromUser.Nickname} ${localizationCaptions[LocalizationKey.UserConnectedToRoom]}`,
           );
           playJoinRoomSound();
           break;
@@ -424,8 +474,9 @@ export const useVideoChat = ({
       return;
     }
     try {
-      userIdToAudioAnalyser.current[auth.id] = createAudioAnalyser(userAudioStream);
-    } catch { }
+      userIdToAudioAnalyser.current[auth.id] =
+        createAudioAnalyser(userAudioStream);
+    } catch {}
   }, [userAudioStream, auth?.id]);
 
   return {

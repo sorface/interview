@@ -20,7 +20,9 @@ export const QuestionAnswers: FunctionComponent<QuestionAnswersProps> = ({
     [Theme.Light]: 'invertedActive' as const,
     [Theme.Dark]: 'invertedAlternative' as const,
   });
-  const [selectedAnswer, setSelectedAnswer] = useState<QuestionAnswer | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<QuestionAnswer | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!answers[0]) {
@@ -30,30 +32,38 @@ export const QuestionAnswers: FunctionComponent<QuestionAnswersProps> = ({
   }, [answers]);
 
   return (
-    <div className='text-left'>
-      {answers.map(answer => (
+    <div className="text-left">
+      {answers.map((answer) => (
         <Button
           key={answer.id}
-          variant={answer === selectedAnswer ? buttonThemeActiveVariant : 'inverted'}
-          className='mr-0.25'
+          variant={
+            answer === selectedAnswer ? buttonThemeActiveVariant : 'inverted'
+          }
+          className="mr-0.25"
           onClick={() => setSelectedAnswer(answer)}
         >
-          <Typography size='m'>
-            {answer.title}
-          </Typography>
+          <Typography size="m">{answer.title}</Typography>
         </Button>
       ))}
       {!!selectedAnswer && (
         <>
           <Gap sizeRem={1} />
           <CodeEditor
-            language={(selectedAnswer.codeEditor && codeEditor) ? codeEditor.lang : CodeEditorLang.Plaintext}
-            languages={[(selectedAnswer.codeEditor && codeEditor) ? codeEditor.lang : CodeEditorLang.Plaintext]}
+            language={
+              selectedAnswer.codeEditor && codeEditor
+                ? codeEditor.lang
+                : CodeEditorLang.Plaintext
+            }
+            languages={[
+              selectedAnswer.codeEditor && codeEditor
+                ? codeEditor.lang
+                : CodeEditorLang.Plaintext,
+            ]}
             value={selectedAnswer.content}
             readOnly
             scrollBeyondLastLine={false}
             alwaysConsumeMouseWheel={false}
-            className='h-32.25'
+            className="h-32.25"
           />
         </>
       )}

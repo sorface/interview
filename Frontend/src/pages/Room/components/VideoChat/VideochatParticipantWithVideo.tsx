@@ -10,13 +10,9 @@ interface VideochatParticipantWithVideoProps {
   reaction?: string | null;
 }
 
-export const VideochatParticipantWithVideo: FunctionComponent<VideochatParticipantWithVideoProps> = ({
-  order,
-  children,
-  avatar,
-  nickname,
-  reaction,
-}) => {
+export const VideochatParticipantWithVideo: FunctionComponent<
+  VideochatParticipantWithVideoProps
+> = ({ order, children, avatar, nickname, reaction }) => {
   const orderSafe = order || 2;
   return (
     <div
@@ -24,22 +20,15 @@ export const VideochatParticipantWithVideo: FunctionComponent<VideochatParticipa
       style={{ order: orderSafe }}
     >
       {!!reaction && (
-        <div className='videochat-caption videochat-overlay videochat-participant-reactions'>
+        <div className="videochat-caption videochat-overlay videochat-participant-reactions">
           <ParticipantReactions reaction={reaction} />
         </div>
       )}
-      <div className='videochat-caption videochat-overlay videochat-participant-name'>
-        {avatar && (
-          <UserAvatar
-            src={avatar}
-            nickname={nickname || ''}
-          />
-        )}
+      <div className="videochat-caption videochat-overlay videochat-participant-name">
+        {avatar && <UserAvatar src={avatar} nickname={nickname || ''} />}
         {nickname}
       </div>
-      <div className='h-full'>
-        {children}
-      </div>
+      <div className="h-full">{children}</div>
     </div>
   );
 };

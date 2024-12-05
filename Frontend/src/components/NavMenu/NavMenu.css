@@ -7,7 +7,10 @@
   --height: calc(100vh - (var(--margin) * 2 + var(--menu-padding) * 2));
   --menu-item-expanded-padding-x: 1.5rem;
   --caption-padding-left: 1rem;
-  --caption-width: calc(var(--width-expanded) - var(--menu-padding) - var(--icon-width) - var(--caption-padding-left) - var(--menu-item-expanded-padding-x));
+  --caption-width: calc(
+    var(--width-expanded) - var(--menu-padding) - var(--icon-width) -
+      var(--caption-padding-left) - var(--menu-item-expanded-padding-x)
+  );
   display: inline-flex;
   margin: var(--margin);
   margin-right: 0rem;
@@ -158,8 +161,12 @@
 }
 
 @keyframes slide {
-  0% { left: 0rem; }
-  100% { left: calc(var(--width-expanded) + var(--menu-padding) * 2 + 0.125rem); }
+  0% {
+    left: 0rem;
+  }
+  100% {
+    left: calc(var(--width-expanded) + var(--menu-padding) * 2 + 0.125rem);
+  }
 }
 
 .nav-menu-overlay-gap {
@@ -206,13 +213,15 @@
   transition: 0.1s !important;
 }
 
-.nav-menu-overlay .categories-list-item:hover, .categories-list-item.active {
+.nav-menu-overlay .categories-list-item:hover,
+.categories-list-item.active {
   text-decoration: none !important;
   color: var(--nav-category-item-active-color);
   background-color: var(--nav-item-color-hover-background);
 }
 
-.categories-list-item:hover svg, .categories-list-item.active svg {
+.categories-list-item:hover svg,
+.categories-list-item.active svg {
   opacity: 1;
 }
 
@@ -229,6 +238,10 @@
 }
 
 @keyframes slide-opacity {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

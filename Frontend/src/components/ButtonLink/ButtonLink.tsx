@@ -17,5 +17,5 @@ export const ButtonLink: FunctionComponent<ButtonLinkPorps> = ({
     <Link to={path}>
       <Button className="button-link">{caption}</Button>
     </Link>
-  )
+  );
 };

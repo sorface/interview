@@ -8,6 +8,7 @@ import { LocalizationKey } from '../../../../localization';
 import { Theme, ThemeContext } from '../../../../context/ThemeContext';
 import { QuestionAnswerDetails } from '../../../../components/QuestionAnswerDetails/QuestionAnswerDetails';
 import { Gap } from '../../../../components/Gap/Gap';
+import { Typography } from '../../../../components/Typography/Typography';
 
 interface RoomAnayticsDetailsProps {
   data: Analytics | null;
@@ -16,19 +17,24 @@ interface RoomAnayticsDetailsProps {
   roomId: string | undefined;
 }
 
-export const RoomAnayticsDetails: FunctionComponent<RoomAnayticsDetailsProps> = ({
-  data,
-  allUsers,
-  openedQuestionDetails,
-  roomId,
-}) => {
+export const RoomAnayticsDetails: FunctionComponent<
+  RoomAnayticsDetailsProps
+> = ({ data, allUsers, openedQuestionDetails, roomId }) => {
   const localizationCaptions = useLocalizationCaptions();
   const { themeInUi } = useContext(ThemeContext);
   const [activeTab, setActiveTab] = useState<0 | 1>(0);
-  const openedQuestion = data?.questions.find(question => question.id === openedQuestionDetails);
+  const openedQuestion = data?.questions.find(
+    (question) => question.id === openedQuestionDetails,
+  );
 
   return (
     <div>
+      <div className='w-full text-left'>
+        <Typography size='m'>
+          {openedQuestion?.value || ''}
+        </Typography>
+      </div>
+      <Gap sizeRem={1.25} />
       <SwitcherButton
         items={[
           {
@@ -50,9 +56,14 @@ export const RoomAnayticsDetails: FunctionComponent<RoomAnayticsDetailsProps> = 
       {activeTab === 0 && (
         <ReviewUserGrid>
           {openedQuestion?.users
-            .filter(questionUser => allUsers.get(questionUser.id)?.participantType === 'Expert')
-            .filter(questionUser => data?.completed ? !!questionUser.evaluation : true)
-            .map(questionUser => {
+            .filter(
+              (questionUser) =>
+                allUsers.get(questionUser.id)?.participantType === 'Expert',
+            )
+            .filter((questionUser) =>
+              data?.completed ? !!questionUser.evaluation : true,
+            )
+            .map((questionUser) => {
               return (
                 <ReviewUserOpinion
                   key={questionUser.id}
@@ -63,7 +74,7 @@ export const RoomAnayticsDetails: FunctionComponent<RoomAnayticsDetailsProps> = 
             })}
         </ReviewUserGrid>
       )}
-      {(activeTab === 1 && openedQuestion) && (
+      {activeTab === 1 && openedQuestion && (
         <QuestionAnswerDetails
           questionId={openedQuestion.id}
           questionTitle={openedQuestion.value}

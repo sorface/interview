@@ -16,12 +16,12 @@ export const RoomParticipants: FunctionComponent<RoomParticipantsProps> = ({
   const localizeParticipantType = useParticipantTypeLocalization();
 
   return (
-    <div className='room-participants'>
-      {participants.map(roomParticipant => (
-        <div key={roomParticipant.id} className='room-participant'>
+    <div className="room-participants">
+      {participants.map((roomParticipant) => (
+        <div key={roomParticipant.id} className="room-participant">
           <Tooltip
             id={`user-tooltip-${roomParticipant.id}`}
-            place='top'
+            place="top"
             content={`${roomParticipant.nickname} (${localizeParticipantType(roomParticipant.type)})`}
           />
           <UserAvatar

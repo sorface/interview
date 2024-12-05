@@ -7,7 +7,7 @@ import { padTime } from '../../../../utils/padTime';
 const updateIntervalMs = 1000;
 
 const formatTime = (timeMs: number) => {
-  const hours = Math.floor((timeMs / (1000 * 60 * 60)));
+  const hours = Math.floor(timeMs / (1000 * 60 * 60));
   const minutes = Math.floor((timeMs / 1000 / 60) % 60);
   const seconds = Math.floor((timeMs / 1000) % 60);
   return `${padTime(hours)}:${padTime(minutes)}:${padTime(seconds)}`;
@@ -46,7 +46,7 @@ export const RoomTimer: FunctionComponent<RoomTimerProps> = ({
     <div className="flex items-center justify-center px-1 py-0.625 bg-wrap rounded-2">
       <Icon name={IconNames.Time} />
       <Gap sizeRem={0.25} horizontal />
-      <div className='w-4 text-left'>
+      <div className="w-4 text-left">
         {formatTime(remainingTimeMs <= 0 ? 0 : remainingTimeMs)}
       </div>
     </div>

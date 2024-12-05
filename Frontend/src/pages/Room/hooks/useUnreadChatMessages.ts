@@ -34,8 +34,13 @@ export const useUnreadChatMessages = ({
       setLastReadMessageId(lastWsMessageParsed.Id);
       unreadChatMessagesRef.current++;
       setUnreadChatMessages(unreadChatMessagesRef.current);
-    } catch { }
-  }, [lastWsMessageParsed, messagesChatEnabled, unreadChatMessages, lastReadMessageId]);
+    } catch {}
+  }, [
+    lastWsMessageParsed,
+    messagesChatEnabled,
+    unreadChatMessages,
+    lastReadMessageId,
+  ]);
 
   useEffect(() => {
     if (!messagesChatEnabled) {
@@ -46,6 +51,7 @@ export const useUnreadChatMessages = ({
   }, [messagesChatEnabled]);
 
   return {
-    unreadChatMessages: unreadChatMessages > maxCount ? `${maxCount}+` : unreadChatMessages,
+    unreadChatMessages:
+      unreadChatMessages > maxCount ? `${maxCount}+` : unreadChatMessages,
   };
 };

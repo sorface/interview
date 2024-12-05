@@ -27,31 +27,47 @@ export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
   const currentUser = allUsers.get(user.id);
 
   return (
-    <div className='text-left'>
-      <div className='flex justify-between'>
-        <div className='flex'>
-          <UserAvatar size='m' nickname={currentUser?.nickname || ''} src={currentUser?.avatar} />
+    <div className="text-left">
+      <div className="flex justify-between">
+        <div className="flex">
+          <UserAvatar
+            size="m"
+            nickname={currentUser?.nickname || ''}
+            src={currentUser?.avatar}
+          />
           <Gap sizeRem={1} horizontal />
-          <div className='flex flex-col break-all'>
-            <Typography size='m' bold>{currentUser?.nickname}</Typography>
-            <span className='opacity-0.5'>
-              <Typography size='m' bold>
-                {currentUser && localizeParticipantType(currentUser.participantType)}
+          <div className="flex flex-col break-all">
+            <Typography size="m" bold>
+              {currentUser?.nickname}
+            </Typography>
+            <span className="opacity-0.5">
+              <Typography size="m" bold>
+                {currentUser &&
+                  localizeParticipantType(currentUser.participantType)}
               </Typography>
             </span>
           </div>
         </div>
         <div>
           <CircularProgress
-            value={typeof user.evaluation?.mark === 'number' ? user.evaluation.mark * 10 : null}
-            caption={typeof user.evaluation?.mark === 'number' ? user.evaluation.mark.toFixed(1) : null}
-            size='s'
+            value={
+              typeof user.evaluation?.mark === 'number'
+                ? user.evaluation.mark * 10
+                : null
+            }
+            caption={
+              typeof user.evaluation?.mark === 'number'
+                ? user.evaluation.mark.toFixed(1)
+                : null
+            }
+            size="s"
           />
         </div>
       </div>
       <Gap sizeRem={1} />
-      <Typography size='m' secondary={!user.evaluation?.review}>
-        {user.evaluation?.review ?? localizationCaptions[LocalizationKey.RoomReviewWaiting]}
+      <Typography size="m" secondary={!user.evaluation?.review}>
+        {user.evaluation?.review ??
+          localizationCaptions[LocalizationKey.RoomReviewWaiting]}
       </Typography>
     </div>
   );

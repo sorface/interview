@@ -49,7 +49,7 @@ export const UserAvatar: FunctionComponent<UserAvatarProps> = ({
   return (
     <img
       src={src}
-      className={`user-avatar shrink-0 ${getSizeClassName(size)}`}
+      className={`user-avatar block shrink-0 ${getSizeClassName(size)}`}
       alt={`${nickname} avatar`}
       {...restProps}
     />

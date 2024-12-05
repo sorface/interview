@@ -11,12 +11,10 @@ export const ModalFooter: FunctionComponent<ModalFooterProps> = ({
   children,
 }) => {
   return (
-    <div className='modal-footer bottom-0 sticky'>
+    <div className="modal-footer bottom-0 sticky">
       <Gap sizeRem={1.25} />
-      <div className='flex justify-end modal-footer-content'>
-        {children}
-      </div>
+      <div className="flex justify-end modal-footer-content">{children}</div>
       <Gap sizeRem={1.25} />
     </div>
-  )
+  );
 };

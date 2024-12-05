@@ -54,36 +54,41 @@ export const RoomInvitations: FunctionComponent<RoomInvitationsProps> = ({
         </div>
       )}
       {roomInvitesError && (
-        <div>{localizationCaptions[LocalizationKey.Error]}: {roomInvitesError}</div>
+        <div>
+          {localizationCaptions[LocalizationKey.Error]}: {roomInvitesError}
+        </div>
       )}
       <RoomCreateField.Wrapper>
         <RoomCreateField.Content>
-          {!roomInvitesLoading && roomInvitesData?.sort(sortInvites).map((roomInvite, index) => {
-            const lastItem = index === roomInvitesData.length - 1;
-            const invitePath = generatePath(pathnames.room, {
-              id: roomId,
-              [inviteParamName]: roomInvite.inviteId,
-            });
-            const inviteUrlDispaly = `${window.location.origin}${invitePath}`;
+          {!roomInvitesLoading &&
+            roomInvitesData?.sort(sortInvites).map((roomInvite, index) => {
+              const lastItem = index === roomInvitesData.length - 1;
+              const invitePath = generatePath(pathnames.room, {
+                id: roomId,
+                [inviteParamName]: roomInvite.inviteId,
+              });
+              const inviteUrlDispaly = `${window.location.origin}${invitePath}`;
 
-            return (
-              <Fragment key={roomInvite.inviteId}>
-                <div>
-                  <Typography size='m' bold>{localizeParticipantType(roomInvite.participantType)}</Typography>
-                  <Gap sizeRem={0.5} />
-                  <Button
-                    variant='active2'
-                    onClick={() => handleCopyToClipboard(inviteUrlDispaly)}
-                  >
-                    <Icon name={IconNames.Link} />
-                    <Gap sizeRem={0.5} horizontal />
-                    {localizationCaptions[LocalizationKey.InviteViaLink]}
-                  </Button>
-                </div>
-                {!lastItem && <Gap sizeRem={1.5} />}
-              </Fragment>
-            );
-          })}
+              return (
+                <Fragment key={roomInvite.inviteId}>
+                  <div>
+                    <Typography size="m" bold>
+                      {localizeParticipantType(roomInvite.participantType)}
+                    </Typography>
+                    <Gap sizeRem={0.5} />
+                    <Button
+                      variant="active2"
+                      onClick={() => handleCopyToClipboard(inviteUrlDispaly)}
+                    >
+                      <Icon name={IconNames.Link} />
+                      <Gap sizeRem={0.5} horizontal />
+                      {localizationCaptions[LocalizationKey.InviteViaLink]}
+                    </Button>
+                  </div>
+                  {!lastItem && <Gap sizeRem={1.5} />}
+                </Fragment>
+              );
+            })}
         </RoomCreateField.Content>
       </RoomCreateField.Wrapper>
     </div>

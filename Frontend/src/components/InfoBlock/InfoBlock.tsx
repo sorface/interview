@@ -1,6 +1,6 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent } from 'react';
 
-interface InfoBlockProps extends React.ButtonHTMLAttributes<HTMLDivElement> { }
+interface InfoBlockProps extends React.ButtonHTMLAttributes<HTMLDivElement> {}
 
 export const InfoBlock: FunctionComponent<InfoBlockProps> = (props) => {
   return (

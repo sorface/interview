@@ -18,12 +18,12 @@ export interface RoomContextType {
   peers: PeerMeta[];
   videoOrder: Record<string, number>;
   peerToStream: UsePeerStreamState;
-  allUsers: Map<string, Pick<User, "nickname" | "avatar">>;
+  allUsers: Map<string, Pick<User, 'nickname' | 'avatar'>>;
   sendWsMessage: SendMessage;
   setCodeEditorEnabled: (enabled: boolean) => void;
 }
 
-const noop = () => { };
+const noop = () => {};
 
 const defaultValue: RoomContextType = {
   room: null,

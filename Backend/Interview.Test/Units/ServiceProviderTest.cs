@@ -2,6 +2,8 @@ using FluentAssertions;
 using Interview.Backend;
 using Interview.DependencyInjection;
 using Interview.Domain.Users;
+using Interview.Infrastructure.WebSocket;
+using Interview.Infrastructure.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,7 +28,7 @@ namespace Interview.Test.Units
                 EventStorageConfigurator = builder => builder.UseEmpty(),
             };
             webAppBuilder.Services.AddAppServices(option);
-            ServiceConfigurator.AddWebSocketServices(webAppBuilder.Services);
+            webAppBuilder.Services.AddWebSocketServices(configuration => configuration.UseInMemory());
 
             var webApp = webAppBuilder.Build();
             webApp.Should().NotBeNull();

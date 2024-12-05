@@ -1,5 +1,14 @@
-import { ChangeEvent, FunctionComponent, useCallback, useEffect, useState } from 'react';
-import { GetQuestionsParams, questionsApiDeclaration } from '../../apiDeclarations';
+import {
+  ChangeEvent,
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
+import {
+  GetQuestionsParams,
+  questionsApiDeclaration,
+} from '../../apiDeclarations';
 import { ProcessWrapper } from '../ProcessWrapper/ProcessWrapper';
 import { Paginator } from '../../components/Paginator/Paginator';
 import { useApiMethod } from '../../hooks/useApiMethod';
@@ -25,8 +34,14 @@ export const QuestionsSelector: FunctionComponent<QuestionsSelectorProps> = ({
 }) => {
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const [searchValue, setSearchValue] = useState('');
-  const { apiMethodState, fetchData } = useApiMethod<Question[], GetQuestionsParams>(questionsApiDeclaration.getPage);
-  const { process: { loading, error }, data: questions } = apiMethodState;
+  const { apiMethodState, fetchData } = useApiMethod<
+    Question[],
+    GetQuestionsParams
+  >(questionsApiDeclaration.getPage);
+  const {
+    process: { loading, error },
+    data: questions,
+  } = apiMethodState;
   const questionsSafe: Question[] = questions || [];
 
   useEffect(() => {
@@ -39,48 +54,52 @@ export const QuestionsSelector: FunctionComponent<QuestionsSelectorProps> = ({
     });
   }, [fetchData, pageNumber, searchValue]);
 
-  const handleCheckboxChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = event.target;
-    if (!questions) {
-      return;
-    }
-    const questionItem = questions.find(
-      question => question.id === value
-    );
-    if (!questionItem) {
-      throw new Error('Question item not found in state');
-    }
-    if (checked) {
-      onSelect(questionItem);
-    } else {
-      onUnselect(questionItem);
-    }
-  }, [questions, onSelect, onUnselect]);
+  const handleCheckboxChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const { value, checked } = event.target;
+      if (!questions) {
+        return;
+      }
+      const questionItem = questions.find((question) => question.id === value);
+      if (!questionItem) {
+        throw new Error('Question item not found in state');
+      }
+      if (checked) {
+        onSelect(questionItem);
+      } else {
+        onUnselect(questionItem);
+      }
+    },
+    [questions, onSelect, onUnselect],
+  );
 
-  const createQuestionItem = useCallback((question: Question) => (
-    <li key={question.id} className='questions-selector-item'>
-      <input
-        id={`input-${question.id}`}
-        type="checkbox"
-        value={question.id}
-        checked={selected.some(que => que.id === question.id)}
-        onChange={handleCheckboxChange}
-      />
-      <label htmlFor={`input-${question.id}`}>
-        {question.value} [
-        {question.tags.map(tag => (
-          <span
-            key={tag.id}
-            className='questions-selector-item-tag'
-            style={{ borderColor: `#${tag.hexValue}` }}
-          >
-            {tag.value}
-          </span>
-        ))}
-        ]
-      </label>
-    </li>
-  ), [selected, handleCheckboxChange]);
+  const createQuestionItem = useCallback(
+    (question: Question) => (
+      <li key={question.id} className="questions-selector-item">
+        <input
+          id={`input-${question.id}`}
+          type="checkbox"
+          value={question.id}
+          checked={selected.some((que) => que.id === question.id)}
+          onChange={handleCheckboxChange}
+        />
+        <label htmlFor={`input-${question.id}`}>
+          {question.value} [
+          {question.tags.map((tag) => (
+            <span
+              key={tag.id}
+              className="questions-selector-item-tag"
+              style={{ borderColor: `#${tag.hexValue}` }}
+            >
+              {tag.value}
+            </span>
+          ))}
+          ]
+        </label>
+      </li>
+    ),
+    [selected, handleCheckboxChange],
+  );
 
   const handleNextPage = useCallback(() => {
     setPageNumber(pageNumber + 1);
@@ -92,13 +111,13 @@ export const QuestionsSelector: FunctionComponent<QuestionsSelectorProps> = ({
 
   return (
     <>
-      <QustionsSearch
-        onSearchChange={setSearchValue}
-      />
+      <QustionsSearch onSearchChange={setSearchValue} />
       <ProcessWrapper
         loading={loading}
         error={error}
-        loaders={Array.from({ length: pageSize + 1 }, () => ({ height: '0.25rem' }))}
+        loaders={Array.from({ length: pageSize + 1 }, () => ({
+          height: '0.25rem',
+        }))}
       >
         <>
           <ul className="questions-selector">
