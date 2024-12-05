@@ -23,7 +23,6 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.20" />
         <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.20" />
         <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="7.0.20" />
-        <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.3.2" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.18" />
         <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
         <PackageReference Include="Serilog.Formatting.Elasticsearch" Version="10.0.0" />
@@ -43,6 +42,7 @@
     
     <ItemGroup>
         <ProjectReference Include="..\Interview.DependencyInjection\Interview.DependencyInjection.csproj" />
+        <ProjectReference Include="..\Interview.Infrastructure.WebSocket\Interview.Infrastructure.WebSocket.csproj" />
         <ProjectReference Include="..\Interview.Infrastructure\Interview.Infrastructure.csproj" />
         <ProjectReference Include="..\Interview.Migrations.Postgres\Interview.Migrations.Postgres.csproj" />
         <ProjectReference Include="..\Interview.Migrations.Sqlite\Interview.Migrations.Sqlite.csproj" />

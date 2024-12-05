@@ -49,7 +49,12 @@ public class RoomTimerPostProcessor : EntityPostProcessor<Room>
             StartTime = current.Timer.ActualStartTime.Value,
         };
 
-        var @event = new RoomTimerStartEvent(current.Id, roomTimer, _currentUserAccessor.GetUserIdOrThrow());
+        var @event = new RoomTimerStartEvent
+        {
+            RoomId = current.Id,
+            Value = roomTimer,
+            CreatedById = _currentUserAccessor.GetUserIdOrThrow(),
+        };
 
         await _eventDispatcher.WriteAsync(@event, cancellationToken);
     }
