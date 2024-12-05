@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using Interview.Domain.Events.DatabaseProcessors.Records.Room;
 using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Rooms.RoomQuestions;
