@@ -53,7 +53,7 @@ public sealed class RedisEventBusFactory : IEventBusPublisherFactory, IEventBusS
             where TKey : IEventBusKey
         {
             var redisKey = CreateKey(key);
-            _subscriber.Subscribe(redisKey, (_, value) =>
+            Action<RedisChannel, RedisValue> handler = (_, value) =>
             {
                 if (!value.HasValue)
                 {
@@ -65,9 +65,10 @@ public sealed class RedisEventBusFactory : IEventBusPublisherFactory, IEventBusS
                     var ev = JsonSerializer.Deserialize<EventBusEvent>(content);
                     callback(key, ev);
                 }
-            });
+            };
+            _subscriber.Subscribe(redisKey, handler);
 
-            return Task.FromResult<IAsyncDisposable>(new Unsubscriber(_subscriber, redisKey));
+            return Task.FromResult<IAsyncDisposable>(new Unsubscriber(_subscriber, redisKey, handler));
         }
 
         public Task PublishAsync<TKey>(TKey key, EventBusEvent roomEventBusEvent, CancellationToken cancellationToken)
@@ -88,14 +89,16 @@ public sealed class RedisEventBusFactory : IEventBusPublisherFactory, IEventBusS
         {
             private readonly ISubscriber _subscriber;
             private readonly RedisChannel _key;
+            private readonly Action<RedisChannel, RedisValue> _handler;
 
-            public Unsubscriber(ISubscriber subscriber, RedisChannel key)
+            public Unsubscriber(ISubscriber subscriber, RedisChannel key, Action<RedisChannel, RedisValue> handler)
             {
                 _subscriber = subscriber;
                 _key = key;
+                _handler = handler;
             }
 
-            public ValueTask DisposeAsync() => new(_subscriber.UnsubscribeAsync(_key));
+            public ValueTask DisposeAsync() => new(_subscriber.UnsubscribeAsync(_key, _handler));
         }
     }
 }
