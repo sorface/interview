@@ -45,7 +45,7 @@ public static class ServiceCollectionExt
 
         self.Scan(selector =>
         {
-            var assemblies = new[] { typeof(UserRepository).Assembly, typeof(RoomQuestionReactionPostProcessor).Assembly, typeof(RoomQuestionPreProcessor).Assembly };
+            var assemblies = new[] { typeof(UserRepository).Assembly, typeof(RoomQuestionReactionPostProcessor).Assembly, typeof(RoomQuestionPostProcessor).Assembly };
             selector.FromAssemblies(assemblies.Distinct())
                 .AddClasses(filter => filter.AssignableTo(typeof(IRepository<>)))
                 .AsImplementedInterfaces()
