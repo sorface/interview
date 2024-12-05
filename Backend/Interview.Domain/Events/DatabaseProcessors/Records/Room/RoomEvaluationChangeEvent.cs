@@ -1,13 +1,12 @@
-using System.Text.Json.Serialization;
 using Interview.Domain.Events.Events;
 
 namespace Interview.Domain.Events.DatabaseProcessors.Records.Room;
 
 public class RoomEvaluationChangeEvent : RoomEvent<RoomEvaluationChangeEventPayload>
 {
-    public RoomEvaluationChangeEvent()
+    public RoomEvaluationChangeEvent(Guid roomId, RoomEvaluationChangeEventPayload payload, Guid createdById)
+        : base(roomId, EventType.RoomQuestionEvaluationModify, payload, false, createdById)
     {
-        Type = EventType.RoomQuestionEvaluationModify;
     }
 }
 

@@ -7,10 +7,8 @@ using Interview.Domain.Events.DatabaseProcessors;
 using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Events.Sender;
 using Interview.Domain.Events.Storage;
-using Interview.Domain.PubSub;
 using Interview.Domain.Repository;
 using Interview.Domain.Users;
-using Interview.Infrastructure;
 using Interview.Infrastructure.Certificates.Pdf;
 using Interview.Infrastructure.Events;
 using Interview.Infrastructure.Users;
@@ -87,8 +85,6 @@ public static class ServiceCollectionExt
         self.AddScoped<IEditableCurrentUserAccessor>(provider => provider.GetRequiredService<CurrentUserAccessor>());
         self.Decorate<IEditableCurrentUserAccessor, CachedCurrentUserAccessor>();
         self.AddScoped<ICurrentUserAccessor>(e => e.GetRequiredService<IEditableCurrentUserAccessor>());
-        self.AddSingleton<IServiceScopeFactory, CurrentUserServiceScopeFactory>();
-        self.AddScoped<CurrentUserServiceScopeFactory>();
 
         self.AddScoped<ICurrentPermissionAccessor, CurrentPermissionAccessor>();
         self.AddEventServices(option);

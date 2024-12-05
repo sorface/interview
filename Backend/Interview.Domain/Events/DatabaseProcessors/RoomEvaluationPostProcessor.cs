@@ -25,12 +25,7 @@ public class RoomEvaluationPostProcessor : EntityPostProcessor<RoomQuestionEvalu
         await HandleEvent(entity, cancellationToken, (roomId, questionId) =>
         {
             var evaluationPayload = new RoomEvaluationAddEventPayload(questionId);
-            return new RoomEvaluationAddEvent
-            {
-                RoomId = roomId,
-                Value = evaluationPayload,
-                CreatedById = _currentUserAccessor.GetUserIdOrThrow(),
-            };
+            return new RoomEvaluationAddEvent(roomId, evaluationPayload, _currentUserAccessor.GetUserIdOrThrow());
         });
     }
 
@@ -39,12 +34,7 @@ public class RoomEvaluationPostProcessor : EntityPostProcessor<RoomQuestionEvalu
         await HandleEvent(current, cancellationToken, (roomId, questionId) =>
         {
             var evaluationPayload = new RoomEvaluationChangeEventPayload(questionId);
-            return new RoomEvaluationChangeEvent
-            {
-                RoomId = roomId,
-                Value = evaluationPayload,
-                CreatedById = _currentUserAccessor.GetUserIdOrThrow(),
-            };
+            return new RoomEvaluationChangeEvent(roomId, evaluationPayload, _currentUserAccessor.GetUserIdOrThrow());
         });
     }
 
