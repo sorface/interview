@@ -30,22 +30,32 @@ public class HandleStatefulEventHandler
 
     public async Task AddHandlerAsync(CancellationToken cancellationToken)
     {
-        var subscriber = await _eventBusSubscriberFactory.CreateAsync(cancellationToken);
-        await subscriber.SubscribeAsync(
-            new HandleStatefulEventInRoomEventKey(),
-            (_, @event) =>
-            {
-                if (@event is null)
+        _logger.LogInformation("Before subscribe to event bus");
+        try
+        {
+            var subscriber = await _eventBusSubscriberFactory.CreateAsync(cancellationToken);
+            await subscriber.SubscribeAsync(
+                new HandleStatefulEventInRoomEventKey(),
+                (_, @event) =>
                 {
-                    return;
-                }
+                    if (@event is null)
+                    {
+                        return;
+                    }
 
-                var task = @event.Match<Task>(
-                    HandleReceiveEventAsync,
-                    busEvent => Task.CompletedTask);
-                task.ConfigureAwait(false).GetAwaiter().GetResult();
-            },
-            cancellationToken);
+                    var task = @event.Match<Task>(
+                        HandleReceiveEventAsync,
+                        busEvent => Task.CompletedTask);
+                    task.ConfigureAwait(false).GetAwaiter().GetResult();
+                },
+                cancellationToken);
+
+            _logger.LogInformation("After subscribe to event bus");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "During subscribe to event bus");
+        }
     }
 
     private async Task HandleReceiveEventAsync(ReceivedEventBusEvent busEvent)

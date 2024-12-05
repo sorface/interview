@@ -9,6 +9,7 @@ using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Internal;
+using Microsoft.Extensions.Logging;
 
 namespace Interview.Domain.Events.DatabaseProcessors;
 
@@ -19,6 +20,7 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
     private readonly RoomCodeEditorChangeEventHandler _roomCodeEditorChangeEventHandler;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly IRoomConfigurationRepository _roomConfigurationRepository;
+    private readonly ILogger<RoomQuestionPostProcessor> _logger;
 
     private readonly ISystemClock _clock;
     private readonly RoomEventProviderFactory _roomEventProviderFactory;
@@ -32,7 +34,8 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
         IRoomConfigurationRepository roomConfigurationRepository,
         ISystemClock clock,
         RoomEventProviderFactory roomEventProviderFactory,
-        IRoomEventDeserializer eventDeserializer)
+        IRoomEventDeserializer eventDeserializer,
+        ILogger<RoomQuestionPostProcessor> logger)
     {
         _eventDispatcher = eventDispatcher;
         _db = db;
@@ -42,6 +45,7 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
         _clock = clock;
         _roomEventProviderFactory = roomEventProviderFactory;
         _eventDeserializer = eventDeserializer;
+        _logger = logger;
     }
 
     public override async ValueTask ProcessAddedAsync(RoomQuestion entity, CancellationToken cancellationToken)
@@ -121,6 +125,14 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
             .OrderByDescending(e => e.StartActiveDate)
             .Select(e => ((DateTime StartActiveDate, DateTime EndActiveDate)?)e)
             .FirstOrDefaultAsync(cancellationToken);
+        if (lastActiveQuestionTime is null)
+        {
+            _logger.LogTrace("Not found last active question time {QuestionId}", current.QuestionId);
+        }
+        else
+        {
+            _logger.LogTrace("Found last active question time {QuestionId} {StartTime} {EndTime}", current.QuestionId, lastActiveQuestionTime?.StartActiveDate, lastActiveQuestionTime?.EndActiveDate);
+        }
 
         if (lastActiveQuestionTime is not null)
         {
@@ -131,6 +143,15 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
                 To = lastActiveQuestionTime.Value.EndActiveDate,
             };
             var lastCodeEditorState = await eventProvider.GetLatestEventAsync(codeEditorContentRequest, cancellationToken);
+            if (lastCodeEditorState is null)
+            {
+                _logger.LogTrace("Not found code editor content for {QuestionId}", current.QuestionId);
+            }
+            else
+            {
+                _logger.LogTrace("Found code editor content for {QuestionId} {Content}", current.QuestionId, lastCodeEditorState.Payload);
+            }
+
             if (lastCodeEditorState is not null)
             {
                 return lastCodeEditorState.Payload;
