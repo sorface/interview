@@ -19,38 +19,50 @@ public class RoomCodeEditorChangeEventHandler
         _currentUserAccessor = currentUserAccessor;
     }
 
-    public async Task HandleAsync(Guid roomId, bool enabled, EVRoomCodeEditorChangeSource source, CancellationToken cancellationToken)
+    public async Task HandleAsync(Request request, CancellationToken cancellationToken)
     {
         var roomConfiguration = await _db.RoomConfiguration.Include(e => e.Room)
-            .FirstOrDefaultAsync(e => e.Id == roomId, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == request.RoomId, cancellationToken);
         if (roomConfiguration is null)
         {
             roomConfiguration = new RoomConfiguration
             {
-                Id = roomId,
-                CodeEditorEnabled = enabled,
+                Id = request.RoomId,
+                CodeEditorEnabled = request.Enabled,
                 CodeEditorContent = null,
-                CodeEditorChangeSource = source,
+                CodeEditorChangeSource = request.Source,
             };
             await _db.RoomConfiguration.AddAsync(roomConfiguration, cancellationToken);
-            await _db.SaveChangesAsync(cancellationToken);
+            if (request.SaveChanges)
+            {
+                await _db.SaveChangesAsync(cancellationToken);
+            }
         }
         else
         {
-            if (roomConfiguration.CodeEditorEnabled == enabled)
+            if (roomConfiguration.CodeEditorEnabled == request.Enabled)
             {
                 return;
             }
 
-            roomConfiguration.CodeEditorEnabled = enabled;
-            await _db.SaveChangesAsync(cancellationToken);
+            roomConfiguration.CodeEditorEnabled = request.Enabled;
+
+            if (request.SaveChanges)
+            {
+                await _db.SaveChangesAsync(cancellationToken);
+            }
         }
 
         var payload = new RoomCodeEditorEnabledEvent.Payload
         {
-            Enabled = enabled,
+            Enabled = request.Enabled,
         };
-        var @event = new RoomCodeEditorEnabledEvent(roomId, payload, _currentUserAccessor.GetUserIdOrThrow());
+        var @event = new RoomCodeEditorEnabledEvent(request.RoomId, payload, _currentUserAccessor.GetUserIdOrThrow());
         await _eventDispatcher.WriteAsync(@event, cancellationToken);
+    }
+
+    public record Request(Guid RoomId, bool Enabled, EVRoomCodeEditorChangeSource Source)
+    {
+        public bool SaveChanges { get; init; } = true;
     }
 }
