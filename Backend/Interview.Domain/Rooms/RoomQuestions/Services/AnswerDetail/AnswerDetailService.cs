@@ -49,7 +49,8 @@ public class AnswerDetailService : ISelfScopeService
         }
 
         var eventProvider = await _roomEventProviderFactory.CreateProviderAsync(request.RoomId, cancellationToken);
-        await foreach (var (startActiveDate, endActiveDate) in GetActiveQuestionDateAsync(request, eventProvider, cancellationToken))
+        var facade = new RoomEventActiveQuestionProvider(eventProvider, _eventDeserializer, _clock);
+        await foreach (var (startActiveDate, endActiveDate) in facade.GetActiveQuestionDateAsync(request.QuestionId, cancellationToken))
         {
             var res = await eventProvider
                 .GetEventsAsync(new EPStorageEventRequest { Type = EventType.VoiceRecognition, From = startActiveDate, To = endActiveDate }, cancellationToken);
@@ -86,34 +87,5 @@ public class AnswerDetailService : ISelfScopeService
                 };
             })
             .ToList();
-    }
-
-    private async IAsyncEnumerable<(DateTime StartActiveDate, DateTime EndActiveDate)> GetActiveQuestionDateAsync(
-        RoomQuestionAnswerDetailRequest request, IRoomEventProvider roomEventStorage, [EnumeratorCancellation] CancellationToken cancellationToken)
-    {
-        var changedRooms = await roomEventStorage
-            .GetEventsAsync(new EPStorageEventRequest { Type = EventType.ChangeRoomQuestionState, From = null, To = null, }, cancellationToken);
-
-        var list = changedRooms
-            .Where(e => e.Payload is not null)
-            .Select(e => new { Payload = _eventDeserializer.Deserialize<RoomQuestionChangeEventPayload>(e.Payload!), CreateAt = e.CreatedAt, })
-            .OrderBy(e => e.CreateAt)
-            .ToList();
-        foreach (var e in list)
-        {
-            if (e.Payload is null || e.Payload.QuestionId != request.QuestionId || e.Payload.NewState != RoomQuestionStateType.Active)
-            {
-                continue;
-            }
-
-            var minDate = e.CreateAt;
-            var endActiveDate = list
-                .Where(evDetail => evDetail.Payload is not null && evDetail.Payload.QuestionId == request.QuestionId && evDetail.Payload.OldState == RoomQuestionStateType.Active &&
-                            evDetail.CreateAt > minDate)
-                .Select(evDetail => (DateTime?)evDetail.CreateAt)
-                .FirstOrDefault();
-
-            yield return (minDate, endActiveDate ?? _clock.UtcNow.UtcDateTime);
-        }
     }
 }
