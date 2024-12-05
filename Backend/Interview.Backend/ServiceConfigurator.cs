@@ -7,17 +7,15 @@ using Ardalis.SmartEnum.SystemTextJson;
 using Interview.Backend.Auth;
 using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Swagger;
-using Interview.Backend.WebSocket;
-using Interview.Backend.WebSocket.Events;
-using Interview.Backend.WebSocket.Events.ConnectionListener;
-using Interview.Backend.WebSocket.Events.Handlers;
 using Interview.DependencyInjection;
 using Interview.Domain.Rooms.RoomQuestions;
+using Interview.Infrastructure.WebSocket.PubSub;
+using Interview.Infrastructure.WebSockets;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IO;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 
 namespace Interview.Backend;
 
@@ -30,22 +28,6 @@ public class ServiceConfigurator
     {
         _environment = environment;
         _configuration = configuration;
-    }
-
-    public static void AddWebSocketServices(IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddSingleton<RecyclableMemoryStreamManager>();
-        serviceCollection.AddScoped<WebSocketReader>();
-        serviceCollection.Scan(selector =>
-        {
-            selector.FromAssemblies(typeof(IWebSocketEventHandler).Assembly)
-                .AddClasses(f => f.AssignableTo<IWebSocketEventHandler>())
-                .As<IWebSocketEventHandler>()
-                .WithScopedLifetime()
-                .AddClasses(f => f.AssignableTo<IConnectionListener>())
-                .AsSelfWithInterfaces()
-                .WithSingletonLifetime();
-        });
     }
 
     public void AddServices(IServiceCollection serviceCollection)
@@ -87,13 +69,22 @@ public class ServiceConfigurator
 
         AddAppServices(serviceCollection);
 
-        serviceCollection.AddHostedService<EventSenderJob>();
-
         serviceCollection.AddSingleton(new OAuthServiceDispatcher(_configuration));
 
-        AddWebSocketServices(serviceCollection);
+        serviceCollection.AddWebSocketServices(configuration =>
+        {
+            RedisEnvironmentConfigure.Configure(_configuration,
+                (host, port, username, password) =>
+                {
+                    var configurationOptions = ConfigurationOptions.Parse($@"{host}:{port},password={password}");
+                    configuration.UseRedis(new RedisPubSubFactoryConfiguration
+                    {
+                        Configuration = configurationOptions,
+                    });
+                },
+                configuration.UseInMemory);
+        });
 
-        serviceCollection.Configure<ChatBotAccount>(_configuration.GetSection(nameof(ChatBotAccount)));
         serviceCollection.Configure<ForwardedHeadersOptions>(options =>
         {
             options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -101,7 +92,6 @@ public class ServiceConfigurator
         AddRateLimiter(serviceCollection);
 
         AddSwagger(serviceCollection);
-        serviceCollection.AddHostedService<EventStorage2DatabaseBackgroundService>();
     }
 
     private void AddAppServices(IServiceCollection serviceCollection)

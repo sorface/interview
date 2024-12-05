@@ -19,7 +19,12 @@ public class RoomPostProcessor : EntityPostProcessor<Room>
     public override async ValueTask ProcessModifiedAsync(Room original, Room current, CancellationToken cancellationToken)
     {
         var @event = original.Status != current.Status
-            ? new RoomChangeStatusEvent(current.Id, current.Status.EnumValue.ToString(), _currentUserAccessor.GetUserIdOrThrow())
+            ? new RoomChangeStatusEvent
+            {
+                RoomId = current.Id,
+                Value = current.Status.EnumValue.ToString(),
+                CreatedById = _currentUserAccessor.GetUserIdOrThrow(),
+            }
             : null;
 
         if (@event is null)
