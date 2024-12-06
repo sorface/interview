@@ -4,13 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Infrastructure.RoomQuestions;
 
-public class RoomQuestionRepository : EfRepository<RoomQuestion>, IRoomQuestionRepository
+public class RoomQuestionRepository(AppDbContext db) : EfRepository<RoomQuestion>(db), IRoomQuestionRepository
 {
-    public RoomQuestionRepository(AppDbContext db)
-        : base(db)
-    {
-    }
-
     public async Task<bool> CloseActiveQuestionAsync(Guid roomId, CancellationToken cancellationToken)
     {
         var roomQuestion = await FindFirstByRoomAndStateAsync(

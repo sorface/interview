@@ -10,15 +10,8 @@ namespace Interview.Backend.Categories;
 
 [ApiController]
 [Route("api/category")]
-public class CategoryController : ControllerBase
+public class CategoryController(ICategoryService categoryService) : ControllerBase
 {
-    private readonly ICategoryService _categoryService;
-
-    public CategoryController(ICategoryService categoryService)
-    {
-        _categoryService = categoryService;
-    }
-
     /// <summary>
     /// Getting a category by ID.
     /// </summary>
@@ -31,7 +24,7 @@ public class CategoryController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<CategoryResponse> FindById(Guid id)
     {
-        return _categoryService.FindByIdAsync(id, HttpContext.RequestAborted);
+        return categoryService.FindByIdAsync(id, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -45,7 +38,7 @@ public class CategoryController : ControllerBase
     [ProducesResponseType(typeof(IPagedList<CategoryResponse>), StatusCodes.Status200OK)]
     public Task<IPagedList<CategoryResponse>> FindPage([FromQuery] CategoryPageRequest request)
     {
-        return _categoryService.FindPageAsync(request, HttpContext.RequestAborted);
+        return categoryService.FindPageAsync(request, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -59,7 +52,7 @@ public class CategoryController : ControllerBase
     [ProducesResponseType(typeof(IPagedList<CategoryResponse>), StatusCodes.Status200OK)]
     public Task<IPagedList<CategoryResponse>> FindArchivePage([FromQuery] CategoryPageRequest request)
     {
-        return _categoryService.FindArchivePageAsync(request, HttpContext.RequestAborted);
+        return categoryService.FindArchivePageAsync(request, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -74,7 +67,7 @@ public class CategoryController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<CategoryResponse> Archive(Guid id)
     {
-        return _categoryService.ArchiveAsync(id, HttpContext.RequestAborted);
+        return categoryService.ArchiveAsync(id, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -89,7 +82,7 @@ public class CategoryController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<CategoryResponse> Unarchive(Guid id)
     {
-        return _categoryService.UnarchiveAsync(id, HttpContext.RequestAborted);
+        return categoryService.UnarchiveAsync(id, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -104,7 +97,7 @@ public class CategoryController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<ActionResult<CategoryResponse>> Create(CategoryEditRequest request)
     {
-        return _categoryService.CreateAsync(request, HttpContext.RequestAborted).ToResponseAsync();
+        return categoryService.CreateAsync(request, HttpContext.RequestAborted).ToResponseAsync();
     }
 
     /// <summary>
@@ -120,6 +113,6 @@ public class CategoryController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<ActionResult<CategoryResponse>> Update(Guid id, CategoryEditRequest request)
     {
-        return _categoryService.UpdateAsync(id, request, HttpContext.RequestAborted).ToResponseAsync();
+        return categoryService.UpdateAsync(id, request, HttpContext.RequestAborted).ToResponseAsync();
     }
 }

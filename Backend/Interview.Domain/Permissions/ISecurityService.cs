@@ -28,33 +28,21 @@ public interface ISecurityService : IService
     bool HasPermission(SEPermission permission);
 }
 
-public class SecurityService : ISecurityService
+public class SecurityService(
+    ICurrentPermissionAccessor currentPermissionAccessor,
+    ICurrentUserAccessor currentUserAccessor,
+    IRoomParticipantRepository roomParticipantRepository)
+    : ISecurityService
 {
-    private readonly ICurrentUserAccessor _currentUserAccessor;
-
-    private readonly ICurrentPermissionAccessor _currentPermissionAccessor;
-
-    private readonly IRoomParticipantRepository _roomParticipantRepository;
-
-    public SecurityService(
-        ICurrentPermissionAccessor currentPermissionAccessor,
-        ICurrentUserAccessor currentUserAccessor,
-        IRoomParticipantRepository roomParticipantRepository)
-    {
-        _currentPermissionAccessor = currentPermissionAccessor;
-        _currentUserAccessor = currentUserAccessor;
-        _roomParticipantRepository = roomParticipantRepository;
-    }
-
     public async Task EnsureRoomPermissionAsync(Guid roomId, SEPermission action, CancellationToken cancellationToken)
     {
-        var userId = _currentUserAccessor.UserId;
+        var userId = currentUserAccessor.UserId;
         if (userId is null)
         {
             throw AccessDeniedException.CreateForAction(action.Name);
         }
 
-        var participantPermission = await _roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(roomId, userId.Value, cancellationToken);
+        var participantPermission = await roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(roomId, userId.Value, cancellationToken);
 
         // The user may not yet be a member of the room.
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
@@ -68,14 +56,14 @@ public class SecurityService : ISecurityService
 
     public Task EnsurePermissionAsync(SEPermission action, CancellationToken cancellationToken)
     {
-        if (_currentUserAccessor.IsAdmin())
+        if (currentUserAccessor.IsAdmin())
         {
             return Task.CompletedTask;
         }
 
-        var isProtectedResource = _currentPermissionAccessor.IsProtectedResource(action.Name);
+        var isProtectedResource = currentPermissionAccessor.IsProtectedResource(action.Name);
 
-        if (isProtectedResource && _currentUserAccessor.HasPermission(action.Name) is false)
+        if (isProtectedResource && currentUserAccessor.HasPermission(action.Name) is false)
         {
             throw AccessDeniedException.CreateForAction(action.Name);
         }
@@ -83,13 +71,13 @@ public class SecurityService : ISecurityService
         return Task.CompletedTask;
     }
 
-    public User? CurrentUser() => _currentUserAccessor.UserDetailed;
+    public User? CurrentUser() => currentUserAccessor.UserDetailed;
 
-    public Guid? CurrentUserId() => _currentUserAccessor.UserId;
+    public Guid? CurrentUserId() => currentUserAccessor.UserId;
 
-    public bool IsAdmin() => _currentUserAccessor.IsAdmin();
+    public bool IsAdmin() => currentUserAccessor.IsAdmin();
 
-    public bool HasRole(RoleName roleName) => _currentUserAccessor.HasRole(roleName);
+    public bool HasRole(RoleName roleName) => currentUserAccessor.HasRole(roleName);
 
-    public bool HasPermission(SEPermission permission) => _currentUserAccessor.HasPermission(permission.Name);
+    public bool HasPermission(SEPermission permission) => currentUserAccessor.HasPermission(permission.Name);
 }

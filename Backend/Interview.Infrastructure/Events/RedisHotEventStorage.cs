@@ -134,27 +134,18 @@ public class RedisHotEventStorage : IHotEventStorage
         public required Guid CreatedById { get; set; }
     }
 
-    private class Visitor<T> : ExpressionVisitor
+    private class Visitor<T>(ParameterExpression newParameter, ParameterExpression replaceParameter) : ExpressionVisitor
     {
-        private readonly ParameterExpression _newParameter;
-        private readonly ParameterExpression _replaceParameter;
-
-        public Visitor(ParameterExpression newParameter, ParameterExpression replaceParameter)
-        {
-            _newParameter = newParameter;
-            _replaceParameter = replaceParameter;
-        }
-
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            return _replaceParameter == node ? _newParameter : node;
+            return replaceParameter == node ? newParameter : node;
         }
 
         protected override Expression VisitMember(MemberExpression node)
         {
             // only properties are allowed if you use fields then you need to extend
             // this method to handle them
-            if (node.Member.MemberType != System.Reflection.MemberTypes.Property || node.Expression != _replaceParameter)
+            if (node.Member.MemberType != System.Reflection.MemberTypes.Property || node.Expression != replaceParameter)
             {
                 return node;
             }

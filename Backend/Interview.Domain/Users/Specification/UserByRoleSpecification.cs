@@ -3,10 +3,4 @@ using NSpecifications;
 
 namespace Interview.Domain.Users.Specification;
 
-public sealed class UserByRoleSpecification : Spec<User>
-{
-    public UserByRoleSpecification(RoleName name)
-        : base(e => e.Roles.Any(r => r.Name == name))
-    {
-    }
-}
+public sealed class UserByRoleSpecification(RoleName name) : Spec<User>(e => Enumerable.Any(e.Roles, r => r.Name == name));

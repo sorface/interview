@@ -11,15 +11,8 @@ namespace Interview.Backend.Questions;
 
 [ApiController]
 [Route("api/questions")]
-public class QuestionController : ControllerBase
+public class QuestionController(IQuestionService questionService) : ControllerBase
 {
-    private readonly IQuestionService _questionService;
-
-    public QuestionController(IQuestionService questionService)
-    {
-        _questionService = questionService;
-    }
-
     /// <summary>
     /// Getting a Question page.
     /// </summary>
@@ -31,7 +24,7 @@ public class QuestionController : ControllerBase
     [ProducesResponseType(typeof(IPagedList<QuestionItem>), StatusCodes.Status200OK)]
     public Task<IPagedList<QuestionItem>> GetPage([FromQuery] FindPageRequest request)
     {
-        return _questionService.FindPageAsync(request, HttpContext.RequestAborted);
+        return questionService.FindPageAsync(request, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -45,7 +38,7 @@ public class QuestionController : ControllerBase
     [ProducesResponseType(typeof(QuestionItem), StatusCodes.Status200OK)]
     public Task<IPagedList<QuestionItem>> Unarchive([FromQuery] PageRequest pageRequest)
     {
-        return _questionService.FindPageArchiveAsync(pageRequest.PageNumber, pageRequest.PageSize, HttpContext.RequestAborted);
+        return questionService.FindPageArchiveAsync(pageRequest.PageNumber, pageRequest.PageSize, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -60,7 +53,7 @@ public class QuestionController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<QuestionItem> GetById(Guid id)
     {
-        return _questionService.FindByIdAsync(id, HttpContext.RequestAborted);
+        return questionService.FindByIdAsync(id, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -75,7 +68,7 @@ public class QuestionController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<QuestionItem>> Create(QuestionCreateRequest request)
     {
-        var question = await _questionService.CreateAsync(request, null, HttpContext.RequestAborted);
+        var question = await questionService.CreateAsync(request, null, HttpContext.RequestAborted);
 
         return ServiceResult.Created(question).ToActionResult();
     }
@@ -93,7 +86,7 @@ public class QuestionController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<QuestionItem> Update(Guid id, QuestionEditRequest request)
     {
-        return _questionService.UpdateAsync(id, request, HttpContext.RequestAborted);
+        return questionService.UpdateAsync(id, request, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -108,7 +101,7 @@ public class QuestionController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<QuestionItem> ArchiveAsync(Guid id)
     {
-        return _questionService.ArchiveAsync(id, HttpContext.RequestAborted);
+        return questionService.ArchiveAsync(id, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -123,7 +116,7 @@ public class QuestionController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<QuestionItem> Unarchive(Guid id)
     {
-        return _questionService.UnarchiveAsync(id, HttpContext.RequestAborted);
+        return questionService.UnarchiveAsync(id, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -138,6 +131,6 @@ public class QuestionController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<QuestionItem> DeletePermanently(Guid id)
     {
-        return _questionService.DeletePermanentlyAsync(id, HttpContext.RequestAborted);
+        return questionService.DeletePermanentlyAsync(id, HttpContext.RequestAborted);
     }
 }

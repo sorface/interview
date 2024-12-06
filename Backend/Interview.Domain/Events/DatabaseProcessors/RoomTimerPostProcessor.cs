@@ -7,24 +7,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Domain.Events.DatabaseProcessors;
 
-public class RoomTimerPostProcessor : EntityPostProcessor<Room>
+public class RoomTimerPostProcessor(
+    IRoomEventDispatcher eventDispatcher,
+    ILogger<RoomTimerPostProcessor> logger,
+    AppDbContext db,
+    ICurrentUserAccessor currentUserAccessor)
+    : EntityPostProcessor<Room>
 {
-    private readonly IRoomEventDispatcher _eventDispatcher;
-    private readonly ILogger<RoomTimerPostProcessor> _logger;
-    private readonly AppDbContext _db;
-    private readonly ICurrentUserAccessor _currentUserAccessor;
-
-    public RoomTimerPostProcessor(
-        IRoomEventDispatcher eventDispatcher,
-        ILogger<RoomTimerPostProcessor> logger,
-        AppDbContext db,
-        ICurrentUserAccessor currentUserAccessor)
-    {
-        _eventDispatcher = eventDispatcher;
-        _logger = logger;
-        _db = db;
-        _currentUserAccessor = currentUserAccessor;
-    }
+    private readonly ILogger<RoomTimerPostProcessor> _logger = logger;
 
     public override async ValueTask ProcessModifiedAsync(
         Room original,
@@ -36,7 +26,7 @@ public class RoomTimerPostProcessor : EntityPostProcessor<Room>
             return;
         }
 
-        await _db.Entry(current).Reference(e => e.Timer).LoadAsync(cancellationToken);
+        await db.Entry(current).Reference(e => e.Timer).LoadAsync(cancellationToken);
 
         if (current.Timer?.ActualStartTime is null)
         {
@@ -53,9 +43,9 @@ public class RoomTimerPostProcessor : EntityPostProcessor<Room>
         {
             RoomId = current.Id,
             Value = roomTimer,
-            CreatedById = _currentUserAccessor.GetUserIdOrThrow(),
+            CreatedById = currentUserAccessor.GetUserIdOrThrow(),
         };
 
-        await _eventDispatcher.WriteAsync(@event, cancellationToken);
+        await eventDispatcher.WriteAsync(@event, cancellationToken);
     }
 }

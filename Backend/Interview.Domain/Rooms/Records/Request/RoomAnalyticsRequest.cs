@@ -1,11 +1,6 @@
 namespace Interview.Domain.Rooms.Records.Request;
 
-public class RoomAnalyticsRequest
+public class RoomAnalyticsRequest(Guid roomId)
 {
-    public Guid RoomId { get; }
-
-    public RoomAnalyticsRequest(Guid roomId)
-    {
-        RoomId = roomId;
-    }
+    public Guid RoomId { get; } = roomId;
 }

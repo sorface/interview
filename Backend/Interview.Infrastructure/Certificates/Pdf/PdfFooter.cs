@@ -4,15 +4,8 @@ using QuestPDF.Infrastructure;
 
 namespace Interview.Infrastructure.Certificates.Pdf;
 
-internal class PdfFooter : IComponent
+internal class PdfFooter(CertificateDetail detail) : IComponent
 {
-    private readonly CertificateDetail _detail;
-
-    public PdfFooter(CertificateDetail detail)
-    {
-        _detail = detail;
-    }
-
     public void Compose(IContainer container)
     {
         container.Row(descriptor =>
@@ -34,13 +27,13 @@ internal class PdfFooter : IComponent
                             .PaddingRight(5)
                             .Text(txt =>
                             {
-                                txt.Span(_detail.Date.ToString("dd-MM-yyyy"));
+                                txt.Span(detail.Date.ToString("dd-MM-yyyy"));
                                 txt.AlignCenter();
                             });
                     });
             });
 
-            descriptor.AutoItem().MinWidth(350).AlignRight().Text(_detail.Sign);
+            descriptor.AutoItem().MinWidth(350).AlignRight().Text(detail.Sign);
         });
     }
 }

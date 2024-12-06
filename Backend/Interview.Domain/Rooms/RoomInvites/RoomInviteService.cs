@@ -10,69 +10,60 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Domain.Rooms.RoomInvites;
 
-public class RoomInviteService : IRoomInviteService
+public class RoomInviteService(
+    AppDbContext db,
+    IRoomParticipantServiceWithoutPermissionCheck roomParticipantService,
+    ILogger<RoomInviteService> logger)
+    : IRoomInviteService
 {
-    private readonly AppDbContext _db;
-    private readonly IRoomParticipantServiceWithoutPermissionCheck _roomParticipantService;
-    private readonly ILogger<RoomInviteService> _logger;
-
-    public RoomInviteService(AppDbContext db,
-                             IRoomParticipantServiceWithoutPermissionCheck roomParticipantService,
-                             ILogger<RoomInviteService> logger)
-    {
-        _db = db;
-        _roomParticipantService = roomParticipantService;
-        _logger = logger;
-    }
-
     public async Task<RoomInviteResponse> ApplyInvite(
         Guid inviteId,
         Guid userId,
         CancellationToken cancellationToken = default)
     {
-        var invite = await _db.Invites.Where(invite => invite.Id == inviteId).FirstOrDefaultAsync(cancellationToken);
+        var invite = await db.Invites.Where(invite => invite.Id == inviteId).FirstOrDefaultAsync(cancellationToken);
 
         if (invite is null)
         {
-            _logger.LogError("invite not found with id {inviteId}", inviteId);
+            logger.LogError("invite not found with id {inviteId}", inviteId);
             throw NotFoundException.Create<Invite>(inviteId);
         }
 
-        _logger.LogInformation("invite found with id {inviteId}", inviteId);
+        logger.LogInformation("invite found with id {inviteId}", inviteId);
         if (invite.UsesCurrent >= invite.UsesMax)
         {
-            _logger.LogError("invite with id {inviteId} has max count used {inviteUseCurrent}/{inviteUseMax}", inviteId, invite.UsesCurrent, invite.UsesMax);
+            logger.LogError("invite with id {inviteId} has max count used {inviteUseCurrent}/{inviteUseMax}", inviteId, invite.UsesCurrent, invite.UsesMax);
             throw new UserException("The invitation has already been used");
         }
 
-        var roomInvite = await _db.RoomInvites
+        var roomInvite = await db.RoomInvites
             .Include(inviteItem => inviteItem.Room)
             .Where(roomInviteItem => roomInviteItem.InviteId == inviteId)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (roomInvite is null)
         {
-            _logger.LogError("room invite not found by invite id {inviteId}", inviteId);
+            logger.LogError("room invite not found by invite id {inviteId}", inviteId);
             throw new NotFoundException("Invite not found for any rooms");
         }
 
-        _logger.LogInformation("room invite found by invite id {inviteId}", inviteId);
+        logger.LogInformation("room invite found by invite id {inviteId}", inviteId);
 
         if (roomInvite.Room is null)
         {
-            _logger.LogError("room invite not sync with something room's {inviteId}", inviteId);
+            logger.LogError("room invite not sync with something room's {inviteId}", inviteId);
             throw new NotFoundException("The invitation no longer belongs to the room");
         }
 
         if (roomInvite.Room.CreatedById == userId)
         {
-            _logger.LogError("You cannot apply an invite {inviteId} to a room in which you are the creator", inviteId);
+            logger.LogError("You cannot apply an invite {inviteId} to a room in which you are the creator", inviteId);
             throw new UserException("You cannot apply an invite to a room in which you are the creator");
         }
 
-        _logger.LogInformation("found room [id -> {roomId}] which joined for invite [id -> {inviteId}]", roomInvite.RoomId, inviteId);
+        logger.LogInformation("found room [id -> {roomId}] which joined for invite [id -> {inviteId}]", roomInvite.RoomId, inviteId);
 
-        var user = await _db.Users.Where(user => user.Id == userId)
+        var user = await db.Users.Where(user => user.Id == userId)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (user is null)
@@ -80,26 +71,26 @@ public class RoomInviteService : IRoomInviteService
             throw new NotFoundException("The current user was not found");
         }
 
-        _logger.LogInformation("User with id [{userId}] for invite found {inviteId}", user.Id, inviteId);
+        logger.LogInformation("User with id [{userId}] for invite found {inviteId}", user.Id, inviteId);
 
-        return await _db.RunTransactionAsync(async _ =>
+        return await db.RunTransactionAsync(async _ =>
             {
-                var participant = await _db.RoomParticipants
+                var participant = await db.RoomParticipants
                     .Include(e => e.Room)
                     .Where(participant => participant.User.Id == userId && participant.Room.Id == roomInvite.RoomId)
                     .FirstOrDefaultAsync(cancellationToken);
 
                 if (participant is null)
                 {
-                    _logger.LogInformation("Room participant not found in room [id -> {roomId}] by user [id -> {userId}]", user.Id, inviteId);
+                    logger.LogInformation("Room participant not found in room [id -> {roomId}] by user [id -> {userId}]", user.Id, inviteId);
 
-                    var participants = await _roomParticipantService.CreateAsync(
+                    var participants = await roomParticipantService.CreateAsync(
                         roomInvite.Room.Id,
                         new[] { (user, roomInvite.Room, roomInvite.ParticipantType ?? SERoomParticipantType.Viewer) },
                         cancellationToken);
                     var roomParticipant = participants.First();
 
-                    _logger.LogInformation(
+                    logger.LogInformation(
                         "Created participant room [id -> {participantId}, type -> {participantType}] for room [id -> {roomId}] and user [id -> {userId}]",
                         roomParticipant.Id,
                         roomParticipant.Type,
@@ -107,7 +98,7 @@ public class RoomInviteService : IRoomInviteService
                         userId);
 
                     await UpdateInviteLimit(roomInvite, cancellationToken);
-                    await _db.SaveChangesAsync(cancellationToken);
+                    await db.SaveChangesAsync(cancellationToken);
 
                     return new RoomInviteResponse
                     {
@@ -126,7 +117,7 @@ public class RoomInviteService : IRoomInviteService
                         UserId = participant.UserId,
                         UserType = roomInvite.ParticipantType.EnumValue,
                     };
-                    await _roomParticipantService.ChangeStatusAsync(roomParticipantChangeStatusRequest, cancellationToken);
+                    await roomParticipantService.ChangeStatusAsync(roomParticipantChangeStatusRequest, cancellationToken);
                 }
 
                 // await UpdateInviteLimit(roomInvite, cancellationToken);
@@ -147,19 +138,19 @@ public class RoomInviteService : IRoomInviteService
         int inviteMaxCount,
         CancellationToken cancellationToken)
     {
-        await _db.RoomInvites
+        await db.RoomInvites
             .Where(roomInvite => roomInvite.RoomId == roomId && participantType == roomInvite.ParticipantType)
             .ExecuteDeleteAsync(cancellationToken);
 
         var invite = new Invite(inviteMaxCount);
 
-        await _db.Invites.AddAsync(invite, cancellationToken);
+        await db.Invites.AddAsync(invite, cancellationToken);
 
         var newRoomInvite = new RoomInvite(invite.Id, roomId, participantType);
 
-        await _db.RoomInvites.AddAsync(newRoomInvite, cancellationToken);
+        await db.RoomInvites.AddAsync(newRoomInvite, cancellationToken);
 
-        await _db.SaveChangesAsync(cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
 
         return new RoomInviteResponse
         {
@@ -176,33 +167,33 @@ public class RoomInviteService : IRoomInviteService
 
         if (roomInvite.Invite!.UsesCurrent < roomInvite.Invite!.UsesMax)
         {
-            _logger.LogInformation("room invite [id -> {roomInviteId}] increment use count to {currentCount}", roomInvite.Id, roomInvite.Invite!.UsesCurrent);
+            logger.LogInformation("room invite [id -> {roomInviteId}] increment use count to {currentCount}", roomInvite.Id, roomInvite.Invite!.UsesCurrent);
 
-            _db.Invites.Update(roomInvite.Invite);
+            db.Invites.Update(roomInvite.Invite);
 
-            await _db.SaveChangesAsync(cancellationToken);
+            await db.SaveChangesAsync(cancellationToken);
 
             return;
         }
 
-        _logger.LogInformation("generate new 5 invites for room [id -> {roomId}]", roomInvite.RoomId);
+        logger.LogInformation("generate new 5 invites for room [id -> {roomId}]", roomInvite.RoomId);
 
         var regenerateInvite = new Invite(5);
 
-        _logger.LogInformation("remove old invite for room [id -> {roomId}]", roomInvite.RoomId);
+        logger.LogInformation("remove old invite for room [id -> {roomId}]", roomInvite.RoomId);
 
-        _db.Invites.Remove(roomInvite.Invite);
+        db.Invites.Remove(roomInvite.Invite);
 
-        _logger.LogInformation("add new room invite for room [id -> {roomId}]", roomInvite.RoomId);
+        logger.LogInformation("add new room invite for room [id -> {roomId}]", roomInvite.RoomId);
 
-        await _db.Invites.AddAsync(regenerateInvite, cancellationToken);
+        await db.Invites.AddAsync(regenerateInvite, cancellationToken);
 
         var newRoomInvite = new RoomInvite(regenerateInvite, roomInvite.Room!, roomInvite.ParticipantType!);
 
-        await _db.RoomInvites.AddAsync(newRoomInvite, cancellationToken);
+        await db.RoomInvites.AddAsync(newRoomInvite, cancellationToken);
 
-        _db.RoomInvites.Remove(roomInvite);
+        db.RoomInvites.Remove(roomInvite);
 
-        await _db.SaveChangesAsync(cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
     }
 }

@@ -6,19 +6,8 @@ using Interview.Domain.Rooms.RoomConfigurations;
 
 namespace Interview.Backend;
 
-public class DevDbInitializer
+public class DevDbInitializer(AppDbContext appDbContext, IConfiguration configuration, ILogger<DevDbInitializer> logger)
 {
-    private readonly AppDbContext _appDbContext;
-    private readonly IConfiguration _configuration;
-    private readonly ILogger<DevDbInitializer> _logger;
-
-    public DevDbInitializer(AppDbContext appDbContext, IConfiguration configuration, ILogger<DevDbInitializer> logger)
-    {
-        _appDbContext = appDbContext;
-        _configuration = configuration;
-        _logger = logger;
-    }
-
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
         await AddDevUserAsync(cancellationToken);
@@ -27,25 +16,25 @@ public class DevDbInitializer
 
     private async Task AddInitialDataAsync(CancellationToken cancellationToken)
     {
-        var dbData = _configuration.GetSection(nameof(InitialDbData)).Get<InitialDbData>();
+        var dbData = configuration.GetSection(nameof(InitialDbData)).Get<InitialDbData>();
         if (dbData is null)
         {
-            _logger.LogInformation("Not found Initial Database Data");
+            logger.LogInformation("Not found Initial Database Data");
             return;
         }
 
         var requiredCategories = dbData.Categories.Select(e => e.Id).ToList();
-        if (_appDbContext.Categories.Any(e => requiredCategories.Contains(e.Id)))
+        if (appDbContext.Categories.Any(e => requiredCategories.Contains(e.Id)))
         {
-            _logger.LogInformation("The initial data has already been added and you don't need to add anything.");
+            logger.LogInformation("The initial data has already been added and you don't need to add anything.");
             return;
         }
 
         foreach (var initialCategories in dbData.GetCategoriesForCreate())
         {
             var categories = initialCategories.Select(e => new Category { Name = e.Name, Id = e.Id, ParentId = e.ParentId, });
-            await _appDbContext.Categories.AddRangeAsync(categories, cancellationToken);
-            await _appDbContext.SaveChangesAsync(cancellationToken);
+            await appDbContext.Categories.AddRangeAsync(categories, cancellationToken);
+            await appDbContext.SaveChangesAsync(cancellationToken);
         }
 
         var questions = dbData.Questions.Select(e => new Question(e.Value)
@@ -69,14 +58,14 @@ public class DevDbInitializer
                     Lang = e.CodeEditor.Lang,
                 },
         });
-        await _appDbContext.Questions.AddRangeAsync(questions, cancellationToken);
-        await _appDbContext.SaveChangesAsync(cancellationToken);
+        await appDbContext.Questions.AddRangeAsync(questions, cancellationToken);
+        await appDbContext.SaveChangesAsync(cancellationToken);
     }
 
     private async Task AddDevUserAsync(CancellationToken cancellationToken)
     {
         var testUserId = Guid.Parse("b5a05f34-e44d-11ed-b49f-e8e34e3377ec");
-        if (_appDbContext.Users.Any(e => e.Id == testUserId))
+        if (appDbContext.Users.Any(e => e.Id == testUserId))
         {
             return;
         }
@@ -87,11 +76,11 @@ public class DevDbInitializer
             Avatar = null,
             Roles =
             {
-                (await _appDbContext.Roles.FindAsync(RoleName.User.Id))!,
+                (await appDbContext.Roles.FindAsync(RoleName.User.Id))!,
             },
         };
-        await _appDbContext.Users.AddAsync(addUser, cancellationToken);
-        await _appDbContext.SaveChangesAsync(cancellationToken);
+        await appDbContext.Users.AddAsync(addUser, cancellationToken);
+        await appDbContext.SaveChangesAsync(cancellationToken);
     }
 
     private sealed class InitialDbData

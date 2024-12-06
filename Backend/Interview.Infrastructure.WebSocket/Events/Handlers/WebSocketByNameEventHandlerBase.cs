@@ -3,14 +3,9 @@ using Microsoft.Extensions.Logging;
 namespace Interview.Infrastructure.WebSocket.Events.Handlers;
 
 #pragma warning disable SA1402
-public abstract class WebSocketByNameEventHandlerBase<TPayload> : WebSocketEventHandlerBase<TPayload>
+public abstract class WebSocketByNameEventHandlerBase<TPayload>(ILogger<WebSocketByNameEventHandlerBase<TPayload>> logger) : WebSocketEventHandlerBase<TPayload>(logger)
 #pragma warning restore SA1402
 {
-    protected WebSocketByNameEventHandlerBase(ILogger<WebSocketByNameEventHandlerBase<TPayload>> logger)
-        : base(logger)
-    {
-    }
-
     protected abstract string SupportType { get; }
 
     protected override ValueTask<bool> IsSupportTaskAsync(SocketEventDetail detail, CancellationToken cancellationToken)
@@ -20,12 +15,7 @@ public abstract class WebSocketByNameEventHandlerBase<TPayload> : WebSocketEvent
     }
 }
 
-public abstract class WebSocketByNameEventHandlerBase : WebSocketByNameEventHandlerBase<string>
+public abstract class WebSocketByNameEventHandlerBase(ILogger<WebSocketByNameEventHandlerBase> logger) : WebSocketByNameEventHandlerBase<string>(logger)
 {
-    protected WebSocketByNameEventHandlerBase(ILogger<WebSocketByNameEventHandlerBase> logger)
-        : base(logger)
-    {
-    }
-
     protected override string? ParsePayload(WebSocketEvent @event) => @event.Value;
 }

@@ -3,10 +3,4 @@ using Interview.Domain.Tags;
 
 namespace Interview.Infrastructure.Tags;
 
-public class TagRepository : EfRepository<Tag>, ITagRepository
-{
-    public TagRepository(AppDbContext db)
-        : base(db)
-    {
-    }
-}
+public class TagRepository(AppDbContext db) : EfRepository<Tag>(db), ITagRepository;

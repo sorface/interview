@@ -1,17 +1,10 @@
 namespace Interview.Domain.Events.DatabaseProcessors.Records.Question;
 
-public sealed class QuestionChangeEventPayload
+public sealed class QuestionChangeEventPayload(Guid questionId, string oldValue, string newValue)
 {
-    public Guid QuestionId { get; }
+    public Guid QuestionId { get; } = questionId;
 
-    public string OldValue { get; }
+    public string OldValue { get; } = oldValue;
 
-    public string NewValue { get; }
-
-    public QuestionChangeEventPayload(Guid questionId, string oldValue, string newValue)
-    {
-        QuestionId = questionId;
-        OldValue = oldValue;
-        NewValue = newValue;
-    }
+    public string NewValue { get; } = newValue;
 }

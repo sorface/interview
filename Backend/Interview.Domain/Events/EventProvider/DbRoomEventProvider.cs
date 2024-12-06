@@ -4,21 +4,12 @@ using NSpecifications;
 
 namespace Interview.Domain.Events.EventProvider;
 
-public sealed class DbRoomEventProvider : IRoomEventProvider
+public sealed class DbRoomEventProvider(AppDbContext db, Guid roomId) : IRoomEventProvider
 {
-    private readonly AppDbContext _db;
-    private readonly Guid _roomId;
-
-    public DbRoomEventProvider(AppDbContext db, Guid roomId)
-    {
-        _db = db;
-        _roomId = roomId;
-    }
-
     public async Task<IEnumerable<EPStorageEvent>> GetEventsAsync(EPStorageEventRequest request, CancellationToken cancellationToken)
     {
         var spec = BuildSpecification(request);
-        var res = await _db.RoomEvents.AsNoTracking()
+        var res = await db.RoomEvents.AsNoTracking()
             .Where(spec)
             .OrderBy(e => e.CreateDate)
             .Select(e => new EPStorageEvent
@@ -35,7 +26,7 @@ public sealed class DbRoomEventProvider : IRoomEventProvider
     public Task<EPStorageEvent?> GetLatestEventAsync(EPStorageEventRequest request, CancellationToken cancellationToken)
     {
         var spec = BuildSpecification(request);
-        return _db.RoomEvents.AsNoTracking()
+        return db.RoomEvents.AsNoTracking()
             .Where(spec)
             .OrderByDescending(e => e.CreateDate)
             .Select(e => new EPStorageEvent
@@ -65,7 +56,7 @@ public sealed class DbRoomEventProvider : IRoomEventProvider
 
     private ASpec<DbRoomEvent> BuildSpecification(EPStorageEventRequest request)
     {
-        ASpec<DbRoomEvent> spec = new Spec<DbRoomEvent>(e => e.RoomId == _roomId && e.Type == request.Type);
+        ASpec<DbRoomEvent> spec = new Spec<DbRoomEvent>(e => e.RoomId == roomId && e.Type == request.Type);
         if (request.From is not null)
         {
             var dateFrom = ToUtc(request.From.Value);

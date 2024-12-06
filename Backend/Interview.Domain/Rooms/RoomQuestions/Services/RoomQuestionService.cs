@@ -12,38 +12,22 @@ using NSpecifications;
 
 namespace Interview.Domain.Rooms.RoomQuestions.Services;
 
-public class RoomQuestionService : IRoomQuestionService
+public class RoomQuestionService(
+    IRoomQuestionRepository roomQuestionRepository,
+    IRoomRepository roomRepository,
+    IQuestionRepository questionRepository,
+    IQuestionService questionService,
+    AnswerDetailService roomQuestionService,
+    AppDbContext db)
+    : IRoomQuestionService
 {
-    private readonly IRoomQuestionRepository _roomQuestionRepository;
-    private readonly IQuestionRepository _questionRepository;
-    private readonly IRoomRepository _roomRepository;
-    private readonly IQuestionService _questionService;
-    private readonly AppDbContext _db;
-    private readonly AnswerDetailService _roomQuestionService;
-
-    public RoomQuestionService(
-        IRoomQuestionRepository roomQuestionRepository,
-        IRoomRepository roomRepository,
-        IQuestionRepository questionRepository,
-        IQuestionService questionService,
-        AnswerDetailService roomQuestionService,
-        AppDbContext db)
-    {
-        _roomQuestionRepository = roomQuestionRepository;
-        _roomRepository = roomRepository;
-        _questionRepository = questionRepository;
-        _questionService = questionService;
-        _db = db;
-        _roomQuestionService = roomQuestionService;
-    }
-
     public Task<RoomQuestionAnswerDetailResponse> GetAnswerDetailsAsync(RoomQuestionAnswerDetailRequest request, CancellationToken cancellationToken)
-        => _roomQuestionService.GetAnswerDetailsAsync(request, cancellationToken);
+        => roomQuestionService.GetAnswerDetailsAsync(request, cancellationToken);
 
     public async Task<RoomQuestionDetail> ChangeActiveQuestionAsync(
         RoomQuestionChangeActiveRequest request, CancellationToken cancellationToken = default)
     {
-        var roomQuestion = await _roomQuestionRepository.FindFirstByQuestionIdAndRoomIdAsync(
+        var roomQuestion = await roomQuestionRepository.FindFirstByQuestionIdAndRoomIdAsync(
             request.QuestionId, request.RoomId, cancellationToken);
 
         if (roomQuestion is null)
@@ -58,19 +42,19 @@ public class RoomQuestionService : IRoomQuestionService
 
         var specification = new Spec<Room>(r => r.Id == request.RoomId && r.Status == SERoomStatus.New);
 
-        var room = await _roomRepository.FindFirstOrDefaultAsync(specification, cancellationToken);
+        var room = await roomRepository.FindFirstOrDefaultAsync(specification, cancellationToken);
 
         if (room is not null)
         {
             room.Status = SERoomStatus.Active;
-            await _roomRepository.UpdateAsync(room, cancellationToken);
+            await roomRepository.UpdateAsync(room, cancellationToken);
         }
 
-        await _roomQuestionRepository.CloseActiveQuestionAsync(request.RoomId, cancellationToken);
+        await roomQuestionRepository.CloseActiveQuestionAsync(request.RoomId, cancellationToken);
 
         roomQuestion.State = RoomQuestionState.Active;
 
-        await _roomQuestionRepository.UpdateAsync(roomQuestion, cancellationToken);
+        await roomQuestionRepository.UpdateAsync(roomQuestion, cancellationToken);
 
         return new RoomQuestionDetail
         {
@@ -87,7 +71,7 @@ public class RoomQuestionService : IRoomQuestionService
         CancellationToken cancellationToken = default)
     {
         var hasRoom =
-            await _roomRepository.HasAsync(new Spec<Room>(room => room.Id == roomId), cancellationToken);
+            await roomRepository.HasAsync(new Spec<Room>(room => room.Id == roomId), cancellationToken);
 
         if (hasRoom is false)
         {
@@ -95,7 +79,7 @@ public class RoomQuestionService : IRoomQuestionService
         }
 
         var requiredQuestions = request.Select(e => e.QuestionId).ToHashSet();
-        var dbRoomQuestions = await _db.RoomQuestions.Where(e => requiredQuestions.Contains(e.QuestionId)).ToListAsync(cancellationToken);
+        var dbRoomQuestions = await db.RoomQuestions.Where(e => requiredQuestions.Contains(e.QuestionId)).ToListAsync(cancellationToken);
         requiredQuestions.ExceptWith(dbRoomQuestions.Select(e => e.QuestionId));
         if (requiredQuestions.Count > 0)
         {
@@ -111,7 +95,7 @@ public class RoomQuestionService : IRoomQuestionService
             dbQuestion.Order = order;
         }
 
-        await _db.SaveChangesAsync(cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
         return ServiceResult.Ok();
     }
 
@@ -128,7 +112,7 @@ public class RoomQuestionService : IRoomQuestionService
         Guid questionId;
         if (request.QuestionId is not null)
         {
-            var roomQuestion = await _roomQuestionRepository.FindFirstByQuestionIdAndRoomIdAsync(
+            var roomQuestion = await roomQuestionRepository.FindFirstByQuestionIdAndRoomIdAsync(
                 request.QuestionId.Value, request.RoomId, cancellationToken);
 
             if (roomQuestion is not null)
@@ -145,18 +129,18 @@ public class RoomQuestionService : IRoomQuestionService
                 throw new UserException("The expectation was to get data to create a question");
             }
 
-            var createdQuestion = await _questionService.CreateAsync(request.Question, request.RoomId, cancellationToken);
+            var createdQuestion = await questionService.CreateAsync(request.Question, request.RoomId, cancellationToken);
             questionId = createdQuestion.Id;
         }
 
-        var room = await _roomRepository.FindByIdAsync(request.RoomId, cancellationToken);
+        var room = await roomRepository.FindByIdAsync(request.RoomId, cancellationToken);
 
         if (room is null)
         {
             throw NotFoundException.Create<Room>(request.RoomId);
         }
 
-        var question = await _questionRepository.FindByIdAsync(questionId, cancellationToken);
+        var question = await questionRepository.FindByIdAsync(questionId, cancellationToken);
 
         if (question is null)
         {
@@ -173,7 +157,7 @@ public class RoomQuestionService : IRoomQuestionService
             Order = request.Order,
         };
 
-        await _roomQuestionRepository.CreateAsync(newRoomQuestion, cancellationToken);
+        await roomQuestionRepository.CreateAsync(newRoomQuestion, cancellationToken);
 
         return new RoomQuestionDetail
         {
@@ -188,7 +172,7 @@ public class RoomQuestionService : IRoomQuestionService
         RoomQuestionsRequest request, CancellationToken cancellationToken = default)
     {
         var hasRoom =
-            await _roomRepository.HasAsync(new Spec<Room>(room => room.Id == request.RoomId), cancellationToken);
+            await roomRepository.HasAsync(new Spec<Room>(room => room.Id == request.RoomId), cancellationToken);
 
         if (hasRoom is false)
         {
@@ -196,7 +180,7 @@ public class RoomQuestionService : IRoomQuestionService
         }
 
         var states = request.States.Select(e => RoomQuestionState.FromValue((int)e)).ToList();
-        var questions = await _db.RoomQuestions
+        var questions = await db.RoomQuestions
             .Include(e => e.Question).ThenInclude(e => e.Answers)
             .AsNoTracking()
             .Where(rq => rq.Room!.Id == request.RoomId && states.Contains(rq.State!))

@@ -45,27 +45,16 @@ public sealed class MemoryEventBusFactory : IEventBusPublisherFactory, IEventBus
             return Task.CompletedTask;
         }
 
-        private sealed class Unsubscriber : IAsyncDisposable
+        private sealed class Unsubscriber(string key, MemoryEventBus root, object callback) : IAsyncDisposable
         {
-            private readonly string _key;
-            private readonly MemoryEventBus _root;
-            private readonly object _callback;
-
-            public Unsubscriber(string key, MemoryEventBus root, object callback)
-            {
-                _key = key;
-                _root = root;
-                _callback = callback;
-            }
-
             public ValueTask DisposeAsync()
             {
-                if (!_root._mapping.TryGetValue(_key, out var items))
+                if (!root._mapping.TryGetValue(key, out var items))
                 {
                     return ValueTask.CompletedTask;
                 }
 
-                items.TryRemove(_callback, out _);
+                items.TryRemove(callback, out _);
                 return ValueTask.CompletedTask;
             }
         }

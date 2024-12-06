@@ -7,60 +7,53 @@ using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Interview.Backend;
 
-public class MiddlewareConfigurator
+public class MiddlewareConfigurator(WebApplication app)
 {
-    private readonly WebApplication _app;
-
-    public MiddlewareConfigurator(WebApplication app)
-    {
-        _app = app;
-    }
-
     public void AddMiddlewares()
     {
-        _app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedProto, });
-        _app.UseMiddleware<ExceptionMiddleware>();
-        _app.UseForwardedHeaders();
-        if (_app.Environment.IsPreProduction() || _app.Environment.IsProduction())
+        app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedProto, });
+        app.UseMiddleware<ExceptionMiddleware>();
+        app.UseForwardedHeaders();
+        if (app.Environment.IsPreProduction() || app.Environment.IsProduction())
         {
-            _app.UseHsts();
+            app.UseHsts();
         }
 
-        _app.UseHttpsRedirection();
+        app.UseHttpsRedirection();
 
-        _app.UseCookiePolicy(new CookiePolicyOptions { MinimumSameSitePolicy = SameSiteMode.Lax, HttpOnly = HttpOnlyPolicy.None, });
+        app.UseCookiePolicy(new CookiePolicyOptions { MinimumSameSitePolicy = SameSiteMode.Lax, HttpOnly = HttpOnlyPolicy.None, });
 
-        _app.UseWebSockets();
+        app.UseWebSockets();
 
-        if (_app.Environment.IsDevelopment())
+        if (app.Environment.IsDevelopment())
         {
-            _app.UseWebSocketsAuthorization(new WebSocketAuthorizationOptions
+            app.UseWebSocketsAuthorization(new WebSocketAuthorizationOptions
             {
                 CookieName = WebSocketAuthorizationOptions.DefaultCookieName,
                 WebSocketQueryName = "Authorization",
             });
         }
 
-        _app.UseCors("All");
+        app.UseCors("All");
 
-        _app.UseRateLimiter();
+        app.UseRateLimiter();
 
-        var logger = _app.Services.GetRequiredService<ILogger<MiddlewareConfigurator>>();
+        var logger = app.Services.GetRequiredService<ILogger<MiddlewareConfigurator>>();
 
-        _app.Use((context, func) =>
+        app.Use((context, func) =>
         {
             logger.LogInformation("Request {Path}", context.Request.Path);
 
             return func();
         });
 
-        _app.UseAuthentication();
-        _app.UseAuthorization();
+        app.UseAuthentication();
+        app.UseAuthorization();
 
-        var cookieExpTimeConfig = _app.Configuration.GetSection("AccessTokenExpiredTime");
-        _app.UseAccessTokenExpiredTimeCookie("ate_t", new CookieOptions { Domain = cookieExpTimeConfig.GetValue<string>("Domain"), Secure = true, });
+        var cookieExpTimeConfig = app.Configuration.GetSection("AccessTokenExpiredTime");
+        app.UseAccessTokenExpiredTimeCookie("ate_t", new CookieOptions { Domain = cookieExpTimeConfig.GetValue<string>("Domain"), Secure = true, });
 
-        _app.Use((context, func) =>
+        app.Use((context, func) =>
         {
             var upsertUser = context.User.ToUser();
             logger.LogInformation(
@@ -79,7 +72,7 @@ public class MiddlewareConfigurator
             return func();
         });
 
-        _app.Use((context, func) =>
+        app.Use((context, func) =>
         {
             var upsertUser = context.User.ToUser();
 
@@ -94,12 +87,12 @@ public class MiddlewareConfigurator
             return func();
         });
 
-        _app.UseSwagger();
-        _app.UseSwaggerUI();
+        app.UseSwagger();
+        app.UseSwaggerUI();
 
-        _app.MapControllers();
+        app.MapControllers();
 
-        _app.MapHealthChecks("/actuator/health/liveness", new HealthCheckOptions { Predicate = r => r.Name.Contains("liveness"), });
-        _app.MapHealthChecks("/actuator/health/readiness");
+        app.MapHealthChecks("/actuator/health/liveness", new HealthCheckOptions { Predicate = r => r.Name.Contains("liveness"), });
+        app.MapHealthChecks("/actuator/health/readiness");
     }
 }

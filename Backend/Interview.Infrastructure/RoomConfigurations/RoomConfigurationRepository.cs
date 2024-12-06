@@ -4,13 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Infrastructure.RoomConfigurations;
 
-public class RoomConfigurationRepository : EfRepository<RoomConfiguration>, IRoomConfigurationRepository
+public class RoomConfigurationRepository(AppDbContext db) : EfRepository<RoomConfiguration>(db), IRoomConfigurationRepository
 {
-    public RoomConfigurationRepository(AppDbContext db)
-        : base(db)
-    {
-    }
-
     public async Task UpsertCodeStateAsync(UpsertCodeStateRequest request, CancellationToken cancellationToken)
     {
         var room = await Db.Rooms.Include(e => e.Configuration)

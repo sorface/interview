@@ -9,13 +9,8 @@ using X.PagedList;
 
 namespace Interview.Infrastructure.Users;
 
-public class UserRepository : EfRepository<User>, IUserRepository
+public class UserRepository(AppDbContext db) : EfRepository<User>(db), IUserRepository
 {
-    public UserRepository(AppDbContext db)
-        : base(db)
-    {
-    }
-
     public Task<User?> FindByNicknameAsync(string nickname, CancellationToken cancellationToken = default)
     {
         return ApplyIncludes(Set)

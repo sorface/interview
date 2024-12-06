@@ -15,37 +15,19 @@ using X.PagedList;
 
 namespace Interview.Domain.Questions.Services;
 
-public class QuestionService : IQuestionService
+public class QuestionService(
+    IQuestionRepository questionRepository,
+    IQuestionNonArchiveRepository questionNonArchiveRepository,
+    ArchiveService<Question> archiveService,
+    ITagRepository tagRepository,
+    IRoomMembershipChecker roomMembershipChecker,
+    ICurrentUserAccessor currentUserAccessor,
+    AppDbContext db)
+    : IQuestionService
 {
-    private readonly IQuestionRepository _questionRepository;
-    private readonly IQuestionNonArchiveRepository _questionNonArchiveRepository;
-    private readonly ArchiveService<Question> _archiveService;
-    private readonly ITagRepository _tagRepository;
-    private readonly IRoomMembershipChecker _roomMembershipChecker;
-    private readonly ICurrentUserAccessor _currentUserAccessor;
-    private readonly AppDbContext _db;
-
-    public QuestionService(
-        IQuestionRepository questionRepository,
-        IQuestionNonArchiveRepository questionNonArchiveRepository,
-        ArchiveService<Question> archiveService,
-        ITagRepository tagRepository,
-        IRoomMembershipChecker roomMembershipChecker,
-        ICurrentUserAccessor currentUserAccessor,
-        AppDbContext db)
-    {
-        _questionRepository = questionRepository;
-        _questionNonArchiveRepository = questionNonArchiveRepository;
-        _archiveService = archiveService;
-        _tagRepository = tagRepository;
-        _roomMembershipChecker = roomMembershipChecker;
-        _currentUserAccessor = currentUserAccessor;
-        _db = db;
-    }
-
     public async Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken)
     {
-        var currentUserId = _currentUserAccessor.UserId ?? Guid.Empty;
+        var currentUserId = currentUserAccessor.UserId ?? Guid.Empty;
         ASpec<Question> spec = new Spec<Question>(e => e.Type == SEQuestionType.Public || e.CreatedById == currentUserId);
 
         if (request.Tags is not null && request.Tags.Count > 0)
@@ -64,7 +46,7 @@ public class QuestionService : IQuestionService
             spec &= new Spec<Question>(e => e.CategoryId == request.CategoryId);
         }
 
-        return await _questionNonArchiveRepository.GetPageDetailedAsync(
+        return await questionNonArchiveRepository.GetPageDetailedAsync(
             spec, QuestionItem.Mapper, request.Page.PageNumber, request.Page.PageSize, cancellationToken);
     }
 
@@ -72,7 +54,7 @@ public class QuestionService : IQuestionService
         int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
         var isArchiveSpecification = new Spec<Question>(question => question.IsArchived);
-        return _questionRepository
+        return questionRepository
             .GetPageDetailedAsync(isArchiveSpecification, QuestionItem.Mapper, pageNumber, pageSize, cancellationToken);
     }
 
@@ -81,15 +63,15 @@ public class QuestionService : IQuestionService
     {
         if (roomId is not null)
         {
-            await _roomMembershipChecker.EnsureCurrentUserMemberOfRoomAsync(roomId.Value, cancellationToken);
+            await roomMembershipChecker.EnsureCurrentUserMemberOfRoomAsync(roomId.Value, cancellationToken);
         }
 
         var value = EnsureValidQuestionValue(request.Value);
         QuestionAnswer.EnsureValid(request.Answers?.Select(e => new QuestionAnswer.Validate(e)), request.CodeEditor is not null);
-        var categoryValidateResult = await Category.ValidateCategoryAsync(_db, request.CategoryId, cancellationToken);
+        var categoryValidateResult = await Category.ValidateCategoryAsync(db, request.CategoryId, cancellationToken);
         categoryValidateResult?.Throw();
 
-        var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
+        var tags = await Tag.EnsureValidTagsAsync(tagRepository, request.Tags, cancellationToken);
         var result = new Question(value)
         {
             Tags = tags,
@@ -120,7 +102,7 @@ public class QuestionService : IQuestionService
             }
         }
 
-        await _questionRepository.CreateAsync(result, cancellationToken);
+        await questionRepository.CreateAsync(result, cancellationToken);
 
         return new QuestionItem
         {
@@ -129,7 +111,7 @@ public class QuestionService : IQuestionService
             Tags = result.Tags.Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, })
                 .ToList(),
             Category = result.CategoryId is not null ?
-                await _db.Categories.AsNoTracking()
+                await db.Categories.AsNoTracking()
                     .Where(e => e.Id == result.CategoryId)
                     .Select(e => new CategoryResponse
                     {
@@ -151,7 +133,7 @@ public class QuestionService : IQuestionService
 
         SEQuestionType GetQuestionType()
         {
-            if (request.Type == EVQuestionType.Public && !_currentUserAccessor.IsAdmin())
+            if (request.Type == EVQuestionType.Public && !currentUserAccessor.IsAdmin())
             {
                 throw new AccessDeniedException("You cannot create a public question.");
             }
@@ -164,7 +146,7 @@ public class QuestionService : IQuestionService
         Guid id, QuestionEditRequest request, CancellationToken cancellationToken = default)
     {
         var value = EnsureValidQuestionValue(request.Value);
-        var entity = await _db.Questions
+        var entity = await db.Questions
             .Include(e => e.Answers)
             .Include(e => e.CodeEditor)
             .Include(e => e.Category)
@@ -205,10 +187,10 @@ public class QuestionService : IQuestionService
 
         QuestionAnswer.EnsureValid(request.Answers?.Select(e => new QuestionAnswer.Validate(e)), request.CodeEditor is not null);
 
-        var categoryValidateResult = await Category.ValidateCategoryAsync(_db, request.CategoryId, cancellationToken);
+        var categoryValidateResult = await Category.ValidateCategoryAsync(db, request.CategoryId, cancellationToken);
         categoryValidateResult?.Throw();
 
-        var tags = await Tag.EnsureValidTagsAsync(_tagRepository, request.Tags, cancellationToken);
+        var tags = await Tag.EnsureValidTagsAsync(tagRepository, request.Tags, cancellationToken);
 
         if (request.CodeEditor is not null && entity.CodeEditor is not null)
         {
@@ -220,7 +202,7 @@ public class QuestionService : IQuestionService
             // remove exists code editor
             if (entity.CodeEditor is not null)
             {
-                _db.QuestionCodeEditors.Remove(entity.CodeEditor);
+                db.QuestionCodeEditors.Remove(entity.CodeEditor);
                 entity.CodeEditor = null;
             }
 
@@ -241,7 +223,7 @@ public class QuestionService : IQuestionService
         entity.Tags.Clear();
         entity.Tags.AddRange(tags);
 
-        await _questionRepository.UpdateAsync(entity, cancellationToken);
+        await questionRepository.UpdateAsync(entity, cancellationToken);
 
         return await ToQuestionItemAsync(entity, cancellationToken);
     }
@@ -249,7 +231,7 @@ public class QuestionService : IQuestionService
     public async Task<QuestionItem> FindByIdAsync(
         Guid id, CancellationToken cancellationToken = default)
     {
-        var question = await _db.Questions.AsNoTracking()
+        var question = await db.Questions.AsNoTracking()
             .Include(e => e.Tags)
             .Include(e => e.Category)
             .Include(e => e.CodeEditor)
@@ -269,20 +251,20 @@ public class QuestionService : IQuestionService
     public async Task<QuestionItem> DeletePermanentlyAsync(
         Guid id, CancellationToken cancellationToken = default)
     {
-        var question = await _questionRepository.FindByIdDetailedAsync(id, cancellationToken);
+        var question = await questionRepository.FindByIdDetailedAsync(id, cancellationToken);
 
         if (question == null)
         {
             throw NotFoundException.Create<Question>(id);
         }
 
-        await _questionRepository.DeletePermanentlyAsync(question, cancellationToken);
+        await questionRepository.DeletePermanentlyAsync(question, cancellationToken);
         return await ToQuestionItemAsync(question, cancellationToken);
     }
 
     public async Task<QuestionItem> ArchiveAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var archiveQuestion = await _archiveService.ArchiveAsync(id, cancellationToken);
+        var archiveQuestion = await archiveService.ArchiveAsync(id, cancellationToken);
 
         return new QuestionItem
         {
@@ -298,7 +280,7 @@ public class QuestionService : IQuestionService
 
     public async Task<QuestionItem> UnarchiveAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var unarchiveQuestion = await _archiveService.UnarchiveAsync(id, cancellationToken);
+        var unarchiveQuestion = await archiveService.UnarchiveAsync(id, cancellationToken);
 
         return new QuestionItem
         {
@@ -328,7 +310,7 @@ public class QuestionService : IQuestionService
         var category = entity.Category;
         if (category is null && entity.CategoryId is not null)
         {
-            category = await _db.Categories.AsNoTracking().FirstOrDefaultAsync(e => e.Id == entity.CategoryId, cancellationToken);
+            category = await db.Categories.AsNoTracking().FirstOrDefaultAsync(e => e.Id == entity.CategoryId, cancellationToken);
         }
 
         return new QuestionItem

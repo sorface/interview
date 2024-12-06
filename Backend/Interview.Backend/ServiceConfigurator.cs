@@ -20,20 +20,11 @@ using StackExchange.Redis;
 
 namespace Interview.Backend;
 
-public class ServiceConfigurator
+public class ServiceConfigurator(IHostEnvironment environment, IConfiguration configuration)
 {
-    private readonly IHostEnvironment _environment;
-    private readonly IConfiguration _configuration;
-
-    public ServiceConfigurator(IHostEnvironment environment, IConfiguration configuration)
-    {
-        _environment = environment;
-        _configuration = configuration;
-    }
-
     public void AddServices(IServiceCollection serviceCollection)
     {
-        var corsOptions = _configuration.GetSection(nameof(CorsOptions)).Get<CorsOptions>();
+        var corsOptions = configuration.GetSection(nameof(CorsOptions)).Get<CorsOptions>();
 
         serviceCollection.AddCors(options =>
         {
@@ -70,20 +61,20 @@ public class ServiceConfigurator
 
         AddAppServices(serviceCollection);
 
-        serviceCollection.AddSingleton(new OAuthServiceDispatcher(_configuration));
+        serviceCollection.AddSingleton(new OAuthServiceDispatcher(configuration));
 
-        serviceCollection.AddWebSocketServices(configuration =>
+        serviceCollection.AddWebSocketServices(configuration1 =>
         {
-            RedisEnvironmentConfigure.Configure(_configuration,
+            RedisEnvironmentConfigure.Configure(configuration,
                 (host, port, username, password) =>
                 {
                     var configurationOptions = ConfigurationOptions.Parse($@"{host}:{port},password={password}");
-                    configuration.UseRedis(new RedisPubSubFactoryConfiguration
+                    configuration1.UseRedis(new RedisPubSubFactoryConfiguration
                     {
                         Configuration = configurationOptions,
                     });
                 },
-                configuration.UseInMemory);
+                configuration1.UseInMemory);
         });
 
         serviceCollection.Configure<ForwardedHeadersOptions>(options =>
@@ -97,34 +88,34 @@ public class ServiceConfigurator
 
     private void AddAppServices(IServiceCollection serviceCollection)
     {
-        var sorfaceAuth = new OAuthServiceDispatcher(_configuration).GetAuthService("sorface") ?? throw new Exception("Not found \"sorface\" section");
+        var sorfaceAuth = new OAuthServiceDispatcher(configuration).GetAuthService("sorface") ?? throw new Exception("Not found \"sorface\" section");
 
         serviceCollection.AddSingleton(sorfaceAuth);
         serviceCollection.AddHttpClient();
         serviceCollection.AddSingleton<SorfacePrincipalValidator>();
         serviceCollection.AddSingleton<SorfaceTokenService>();
 
-        var adminUsers = _configuration.GetSection(nameof(AdminUsers))
+        var adminUsers = configuration.GetSection(nameof(AdminUsers))
             .Get<AdminUsers>() ?? throw new ArgumentException($"Not found \"{nameof(AdminUsers)}\" section");
 
         var serviceOption = new DependencyInjectionAppServiceOption
         {
             DbConfigurator = optionsBuilder =>
             {
-                var connectionString = _configuration.GetConnectionString("database");
-                var database = _configuration.GetConnectionString("type")
+                var connectionString = configuration.GetConnectionString("database");
+                var database = configuration.GetConnectionString("type")
                     ?.ToLower()
                     .Trim();
                 var customDb = !string.IsNullOrWhiteSpace(database);
 
-                if ((_environment.IsDevelopment() && !customDb) || "sqlite".Equals(database, StringComparison.InvariantCultureIgnoreCase))
+                if ((environment.IsDevelopment() && !customDb) || "sqlite".Equals(database, StringComparison.InvariantCultureIgnoreCase))
                 {
                     optionsBuilder.UseSqlite(
                         connectionString,
                         builder => builder.MigrationsAssembly(typeof(Migrations.Sqlite.AppDbContextFactory).Assembly
                             .FullName));
                 }
-                else if ((_environment.IsPreProduction() && !customDb) || "postgres".Equals(database, StringComparison.InvariantCultureIgnoreCase))
+                else if ((environment.IsPreProduction() && !customDb) || "postgres".Equals(database, StringComparison.InvariantCultureIgnoreCase))
                 {
                     AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
                     optionsBuilder.UseNpgsql(
@@ -140,7 +131,7 @@ public class ServiceConfigurator
             AdminUsers = adminUsers,
             EventStorageConfigurator = builder =>
             {
-                RedisEnvironmentConfigure.Configure(_configuration,
+                RedisEnvironmentConfigure.Configure(configuration,
                     (host, port, username, password) =>
                     {
                         builder.UseRedis($@"redis://{username}:{password}@{host}:{port}");
@@ -225,7 +216,7 @@ public class ServiceConfigurator
             options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
             options.CustomSchemaIds(type => (type.FullName ?? type.Name).Replace("+", "_"));
 
-            var swaggerOption = _configuration.GetSection(nameof(SwaggerOption)).Get<SwaggerOption>();
+            var swaggerOption = configuration.GetSection(nameof(SwaggerOption)).Get<SwaggerOption>();
             if (!string.IsNullOrEmpty(swaggerOption?.RoutePrefix))
             {
                 options.DocumentFilter<SwaggerDocumentFilter>(swaggerOption.RoutePrefix);

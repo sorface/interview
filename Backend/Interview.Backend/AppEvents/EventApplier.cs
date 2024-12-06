@@ -5,15 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Backend.AppEvents;
 
-public class EventApplier
+public class EventApplier(IConfiguration configuration)
 {
-    private readonly IConfiguration _configuration;
-
-    public EventApplier(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
-
     public async Task ApplyEventsAsync(AppDbContext db, CancellationToken cancellationToken)
     {
         var events = GetInitialEvents();
@@ -95,7 +88,7 @@ public class EventApplier
 
     private InitialEvent[] GetInitialEvents()
     {
-        var initialEventsSection = _configuration.GetSection("InitialEvents");
+        var initialEventsSection = configuration.GetSection("InitialEvents");
         var events = initialEventsSection?.Get<InitialEvent[]>();
         return events ?? Array.Empty<InitialEvent>();
     }

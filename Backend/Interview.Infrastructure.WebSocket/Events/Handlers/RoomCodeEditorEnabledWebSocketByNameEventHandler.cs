@@ -7,13 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket.Events.Handlers;
 
-public class RoomCodeEditorEnabledWebSocketByNameEventHandler : WebSocketByNameEventHandlerBase<RoomCodeEditorEnabledEvent.Payload>
+public class RoomCodeEditorEnabledWebSocketByNameEventHandler(ILogger<RoomCodeEditorEnabledWebSocketByNameEventHandler> logger)
+    : WebSocketByNameEventHandlerBase<RoomCodeEditorEnabledEvent.Payload>(logger)
 {
-    public RoomCodeEditorEnabledWebSocketByNameEventHandler(ILogger<RoomCodeEditorEnabledWebSocketByNameEventHandler> logger)
-        : base(logger)
-    {
-    }
-
     protected override string SupportType => EventType.RoomCodeEditorEnabled;
 
     protected override Task HandleEventAsync(SocketEventDetail detail, RoomCodeEditorEnabledEvent.Payload? message, CancellationToken cancellationToken)

@@ -11,27 +11,20 @@ using Interview.Domain.Tags;
 
 namespace Interview.Domain.Rooms;
 
-public class Room : Entity
+public class Room(string name, SERoomAccessType accessType) : Entity
 {
-    public Room(string name, SERoomAccessType accessType)
-    {
-        Name = name;
-        Status = SERoomStatus.New;
-        AccessType = accessType;
-    }
-
     private Room()
         : this(string.Empty, SERoomAccessType.Public)
     {
     }
 
-    public string Name { get; internal set; }
+    public string Name { get; internal set; } = name;
 
     public DateTime ScheduleStartTime { get; internal set; }
 
-    public SERoomAccessType AccessType { get; internal set; }
+    public SERoomAccessType AccessType { get; internal set; } = accessType;
 
-    public SERoomStatus Status { get; internal set; }
+    public SERoomStatus Status { get; internal set; } = SERoomStatus.New;
 
     public RoomConfiguration? Configuration { get; set; }
 

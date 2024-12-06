@@ -4,17 +4,11 @@ using Interview.Domain.Events.Events.Serializers;
 
 namespace Interview.Domain.Events.Events;
 
-public sealed class RoomEventUserPayload : IPayloadBuilder
+public sealed class RoomEventUserPayload(Guid userId, Dictionary<string, object>? additionalData = null) : IPayloadBuilder
 {
-    public Guid UserId { get; }
+    public Guid UserId { get; } = userId;
 
-    public Dictionary<string, object>? AdditionalData { get; }
-
-    public RoomEventUserPayload(Guid userId, Dictionary<string, object>? additionalData = null)
-    {
-        UserId = userId;
-        AdditionalData = additionalData;
-    }
+    public Dictionary<string, object>? AdditionalData { get; } = additionalData;
 
     public string? BuildPayload(IRoomEventSerializer serializer)
     {

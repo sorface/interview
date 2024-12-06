@@ -20,15 +20,8 @@ namespace Interview.Backend.Rooms;
 
 [ApiController]
 [Route("api/rooms")]
-public class RoomController : ControllerBase
+public class RoomController(IRoomService roomService) : ControllerBase
 {
-    private readonly IRoomService _roomService;
-
-    public RoomController(IRoomService roomService)
-    {
-        _roomService = roomService;
-    }
-
     /// <summary>
     /// Getting a Room page.
     /// </summary>
@@ -48,7 +41,7 @@ public class RoomController : ControllerBase
         [FromQuery] RoomPageDetailRequestFilter? filter)
     {
         logger.LogInformation("Find room page {UserId} {Name}", userAccessor.UserId, filter?.Name);
-        return _roomService.FindPageAsync(
+        return roomService.FindPageAsync(
             filter ?? new RoomPageDetailRequestFilter(),
             request.PageNumber,
             request.PageSize,
@@ -66,7 +59,7 @@ public class RoomController : ControllerBase
     [ProducesResponseType(typeof(List<RoomCalendarItem>), StatusCodes.Status200OK)]
     public Task<List<RoomCalendarItem>> GetCalendar([FromQuery] RoomCalendarRequest request)
     {
-        return _roomService.GetCalendarAsync(request, HttpContext.RequestAborted);
+        return roomService.GetCalendarAsync(request, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -80,7 +73,7 @@ public class RoomController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<RoomDetail> GetById(Guid id)
     {
-        return _roomService.FindByIdAsync(id, HttpContext.RequestAborted);
+        return roomService.FindByIdAsync(id, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -94,7 +87,7 @@ public class RoomController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<ActualRoomStateResponse> GetRoomState(Guid id)
     {
-        return _roomService.GetActualStateAsync(id);
+        return roomService.GetActualStateAsync(id);
     }
 
     /// <summary>
@@ -110,7 +103,7 @@ public class RoomController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public async Task<MessageResponse> UpsertRoomState(Guid id, string type, [FromBody] UpsertRoomRequestApi request)
     {
-        await _roomService.UpsertRoomStateAsync(id, type, request.Payload, HttpContext.RequestAborted);
+        await roomService.UpsertRoomStateAsync(id, type, request.Payload, HttpContext.RequestAborted);
         return MessageResponse.Ok;
     }
 
@@ -126,7 +119,7 @@ public class RoomController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public async Task<MessageResponse> DeleteRoomState(Guid id, string type)
     {
-        await _roomService.DeleteRoomStateAsync(id, type, HttpContext.RequestAborted);
+        await roomService.DeleteRoomStateAsync(id, type, HttpContext.RequestAborted);
         return MessageResponse.Ok;
     }
 
@@ -152,7 +145,7 @@ public class RoomController : ControllerBase
             ScheduleStartTime = request.ScheduleStartTime,
         };
 
-        var room = await _roomService.CreateAsync(domainRequest, HttpContext.RequestAborted);
+        var room = await roomService.CreateAsync(domainRequest, HttpContext.RequestAborted);
         return ServiceResult.Created(room).ToActionResult();
     }
 
@@ -167,7 +160,7 @@ public class RoomController : ControllerBase
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     public Task<RoomItem> PatchUpdate(Guid id, [FromBody] RoomUpdateRequest request)
     {
-        return _roomService.UpdateAsync(id, request);
+        return roomService.UpdateAsync(id, request);
     }
 
     /// <summary>
@@ -181,7 +174,7 @@ public class RoomController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<Analytics> GetAnalytics(Guid id)
     {
-        return _roomService.GetAnalyticsAsync(new RoomAnalyticsRequest(id), HttpContext.RequestAborted);
+        return roomService.GetAnalyticsAsync(new RoomAnalyticsRequest(id), HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -204,7 +197,7 @@ public class RoomController : ControllerBase
 
         var request = new RoomAnalyticsRequest(id);
 
-        return _roomService.GetAnalyticsSummaryAsync(request, HttpContext.RequestAborted);
+        return roomService.GetAnalyticsSummaryAsync(request, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -218,7 +211,7 @@ public class RoomController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult> CloseRoom(Guid id)
     {
-        await _roomService.CloseAsync(id, HttpContext.RequestAborted);
+        await roomService.CloseAsync(id, HttpContext.RequestAborted);
 
         return Ok();
     }
@@ -234,7 +227,7 @@ public class RoomController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult> StartReviewRoom(Guid id)
     {
-        await _roomService.StartReviewAsync(id, HttpContext.RequestAborted);
+        await roomService.StartReviewAsync(id, HttpContext.RequestAborted);
 
         return Ok();
     }
@@ -256,7 +249,7 @@ public class RoomController : ControllerBase
         }
 
         var sendRequest = request.ToDomainRequest(user.Id);
-        await _roomService.SendEventRequestAsync(sendRequest, HttpContext.RequestAborted);
+        await roomService.SendEventRequestAsync(sendRequest, HttpContext.RequestAborted);
         return Ok();
     }
 
@@ -277,6 +270,6 @@ public class RoomController : ControllerBase
         [FromServices] ICurrentUserAccessor currentUserAccessor)
     {
         var request = new TranscriptionRequest { RoomId = roomId, UserId = currentUserAccessor.GetUserIdOrThrow(), TranscriptionTypeMap = options, };
-        return _roomService.GetTranscriptionAsync(request, HttpContext.RequestAborted);
+        return roomService.GetTranscriptionAsync(request, HttpContext.RequestAborted);
     }
 }

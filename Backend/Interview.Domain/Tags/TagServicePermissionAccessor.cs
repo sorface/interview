@@ -7,32 +7,23 @@ using X.PagedList;
 
 namespace Interview.Domain.Tags;
 
-public class TagServicePermissionAccessor : ITagService, IServiceDecorator
+public class TagServicePermissionAccessor(ITagService service, ISecurityService securityService) : ITagService, IServiceDecorator
 {
-    private readonly ITagService _service;
-    private readonly ISecurityService _securityService;
-
-    public TagServicePermissionAccessor(ITagService service, ISecurityService securityService)
-    {
-        _service = service;
-        _securityService = securityService;
-    }
-
     public async Task<IPagedList<TagItem>> FindTagsPageAsync(string? value, int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
-        await _securityService.EnsurePermissionAsync(SEPermission.TagFindPage, cancellationToken);
-        return await _service.FindTagsPageAsync(value, pageNumber, pageSize, cancellationToken);
+        await securityService.EnsurePermissionAsync(SEPermission.TagFindPage, cancellationToken);
+        return await service.FindTagsPageAsync(value, pageNumber, pageSize, cancellationToken);
     }
 
     public async Task<Result<ServiceResult<TagItem>, ServiceError>> CreateTagAsync(TagEditRequest request, CancellationToken cancellationToken)
     {
-        await _securityService.EnsurePermissionAsync(SEPermission.TagCreate, cancellationToken);
-        return await _service.CreateTagAsync(request, cancellationToken);
+        await securityService.EnsurePermissionAsync(SEPermission.TagCreate, cancellationToken);
+        return await service.CreateTagAsync(request, cancellationToken);
     }
 
     public async Task<Result<ServiceResult<TagItem>, ServiceError>> UpdateTagAsync(Guid id, TagEditRequest request, CancellationToken cancellationToken)
     {
-        await _securityService.EnsurePermissionAsync(SEPermission.TagUpdate, cancellationToken);
-        return await _service.UpdateTagAsync(id, request, cancellationToken);
+        await securityService.EnsurePermissionAsync(SEPermission.TagUpdate, cancellationToken);
+        return await service.UpdateTagAsync(id, request, cancellationToken);
     }
 }

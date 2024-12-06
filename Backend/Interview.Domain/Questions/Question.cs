@@ -6,19 +6,14 @@ using Interview.Domain.Tags;
 
 namespace Interview.Domain.Questions;
 
-public class Question : ArchiveEntity
+public class Question(string value) : ArchiveEntity
 {
-    public Question(string value)
-    {
-        Value = value;
-    }
-
     private Question()
         : this(string.Empty)
     {
     }
 
-    public string Value { get; internal set; }
+    public string Value { get; internal set; } = value;
 
     public Guid? CodeEditorId { get; internal set; }
 
