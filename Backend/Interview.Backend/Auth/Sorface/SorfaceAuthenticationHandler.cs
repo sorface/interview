@@ -13,8 +13,7 @@ public class SorfaceAuthenticationHandler : OAuthHandler<SorfaceAuthenticationOp
     public SorfaceAuthenticationHandler(IOptionsMonitor<SorfaceAuthenticationOptions> options,
                                         ILoggerFactory logger,
                                         UrlEncoder encoder,
-                                        ISystemClock clock,
-                                        SorfaceTokenService sorfaceTokenService) : base(options, logger, encoder, clock)
+                                        SorfaceTokenService sorfaceTokenService) : base(options, logger, encoder)
     {
         _sorfaceTokenService = sorfaceTokenService;
     }
