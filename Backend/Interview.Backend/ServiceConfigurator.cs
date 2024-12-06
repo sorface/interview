@@ -13,6 +13,7 @@ using Interview.Infrastructure.WebSocket.PubSub;
 using Interview.Infrastructure.WebSockets;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
@@ -189,7 +190,7 @@ public class ServiceConfigurator
                 */
                 return RateLimitPartition.GetNoLimiter(IPAddress.Loopback);
             });
-            _.OnRejected = (context, token) =>
+            _.OnRejected = (OnRejectedContext context, CancellationToken token) =>
             {
                 if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
                 {

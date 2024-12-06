@@ -2,6 +2,7 @@ using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Responses;
 using Interview.Backend.Users;
 using Interview.Domain.Users.Service;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.Controllers;
 
@@ -24,7 +25,7 @@ public static class ServiceCollectionExt
             })
             .AddCookie(options =>
             {
-                options.Events.OnValidatePrincipal = context =>
+                options.Events.OnValidatePrincipal = (CookieValidatePrincipalContext context) =>
                 {
                     var descriptor = context.HttpContext.GetEndpoint()?.Metadata.OfType<ControllerActionDescriptor>().FirstOrDefault();
 
@@ -43,13 +44,13 @@ public static class ServiceCollectionExt
                 options.Cookie.Name = authorizationService.CookieName;
                 options.Cookie.Domain = authorizationService.CookieDomain;
 
-                options.Events.OnRedirectToAccessDenied = context =>
+                options.Events.OnRedirectToAccessDenied = (RedirectContext<CookieAuthenticationOptions> context) =>
                 {
                     context.Response.StatusCode = 403;
                     context.Response.WriteAsJsonAsync(new MessageResponse { Message = "Forbidden", });
                     return Task.CompletedTask;
                 };
-                options.Events.OnRedirectToLogin = context =>
+                options.Events.OnRedirectToLogin = (RedirectContext<CookieAuthenticationOptions> context) =>
                 {
                     context.Response.StatusCode = 401;
                     context.Response.WriteAsJsonAsync(new MessageResponse { Message = "Unauthorized", });
