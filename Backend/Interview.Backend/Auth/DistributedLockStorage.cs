@@ -6,7 +6,7 @@ public class DistributedLockStorage(IDistributedCache distributedCache) : IDistr
 {
     private static readonly string DEFAULTPREFIX = "LOCK:";
 
-    private static readonly byte[] EMPTYBYTEARRAY = { 0 };
+    private static readonly byte[] EMPTYBYTEARRAY = [0];
 
     public Task LockAsync(string key, TimeSpan lifetimeLockRecord, CancellationToken cancellationToken = default)
     {

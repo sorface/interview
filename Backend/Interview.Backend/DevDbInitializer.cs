@@ -48,7 +48,7 @@ public class DevDbInitializer(AppDbContext appDbContext, IConfiguration configur
                 CodeEditor = a.CodeEditor,
                 QuestionId = default,
                 Question = null,
-            }).ToList() ?? new List<QuestionAnswer>(),
+            }).ToList() ?? [],
             CodeEditor = e.CodeEditor is null
                 ? null
                 : new QuestionCodeEditor

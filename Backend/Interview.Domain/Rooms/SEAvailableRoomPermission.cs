@@ -66,7 +66,7 @@ public class SEAvailableRoomPermission(SEPermission name, Guid value) : SmartEnu
     public static readonly SEAvailableRoomPermission RoomQuestionEvaluationFind = new(SEPermission.RoomQuestionEvaluationFind, new Guid("49cb7cd3-7329-4098-9ac1-c3972ba09138"));
     public static readonly SEAvailableRoomPermission GetRoomQuestionAnswerDetails = new(SEPermission.GetRoomQuestionAnswerDetails, new Guid("BA198396-D07A-4054-95D0-4FE0BA393ECD"));
 
-    public static readonly SEAvailableRoomPermission[] CreatorRoomAvailablePermissions = new[] { RoomInviteGet, };
+    public static readonly SEAvailableRoomPermission[] CreatorRoomAvailablePermissions = [RoomInviteGet];
 
     public SEPermission Permission { get; } = name;
 }

@@ -10,7 +10,7 @@ public class UserDetail
 
     public string? Avatar { get; init; } = string.Empty;
 
-    public List<string> Roles { get; init; } = new();
+    public List<string> Roles { get; init; } = [];
 
-    public List<PermissionDetail> Permissions { get; init; } = new();
+    public List<PermissionDetail> Permissions { get; init; } = [];
 }

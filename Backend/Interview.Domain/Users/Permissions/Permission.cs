@@ -13,5 +13,5 @@ public class Permission(SEPermission permission) : Entity(permission.Id)
 
     public SEPermission Type { get; set; } = permission;
 
-    public List<RoomParticipant> Participants = new();
+    public List<RoomParticipant> Participants = [];
 }

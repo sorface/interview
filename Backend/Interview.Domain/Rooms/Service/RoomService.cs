@@ -293,7 +293,7 @@ public sealed class RoomService(
         if (!request.Experts.Contains(currentUserId) && !request.Examinees.Contains(currentUserId))
         {
             // If the current user is not listed as a member of the room, add him/her with the role 'Expert'
-            requestExperts = requestExperts.Concat(new[] { currentUserId }).ToList();
+            requestExperts = requestExperts.Concat([currentUserId]).ToList();
         }
 
         EnsureValidScheduleStartTime(request.ScheduleStartTime, null);
@@ -503,7 +503,7 @@ public sealed class RoomService(
             {
                 var participants = await roomParticipantService.CreateAsync(
                     roomId,
-                    new[] { (user, currentRoom, SERoomParticipantType.Viewer) },
+                    [(user, currentRoom, SERoomParticipantType.Viewer)],
                     cancellationToken);
                 participant = participants.First();
                 return (currentRoom, participant);
@@ -676,7 +676,7 @@ public sealed class RoomService(
 
     public async Task<List<RoomInviteResponse>> GenerateInvitesAsync(Guid roomId, CancellationToken cancellationToken = default)
     {
-        List<RoomInviteResponse> invites = new();
+        List<RoomInviteResponse> invites = [];
 
         foreach (var participantType in SERoomParticipantType.List)
         {
@@ -789,7 +789,7 @@ public sealed class RoomService(
             }
             else
             {
-                response[option.ResponseName] = result?.Take(option.Last).ToList() ?? new List<IStorageEvent>();
+                response[option.ResponseName] = result?.Take(option.Last).ToList() ?? [];
             }
         }
 
@@ -856,7 +856,7 @@ public sealed class RoomService(
             {
                 var participants = await roomParticipantService.CreateAsync(
                     roomId,
-                    new[] { (user, room, SERoomParticipantType.Viewer) },
+                    [(user, room, SERoomParticipantType.Viewer)],
                     cancellationToken);
                 participant = participants.First();
 

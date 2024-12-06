@@ -52,8 +52,8 @@ public class EventApplier(IConfiguration configuration)
     {
         foreach (var (type, existsEvent) in existsEvents)
         {
-            existsEvent.Roles ??= new List<Role>();
-            existsEvent.ParticipantTypes ??= new List<SERoomParticipantType>();
+            existsEvent.Roles ??= [];
+            existsEvent.ParticipantTypes ??= [];
             var dbRoles = existsEvent.Roles.Select(e => e.Name.EnumValue).ToHashSet();
             var initialEvent = searchEvents[type];
             dbRoles.SymmetricExceptWith(initialEvent.Roles);
@@ -90,6 +90,6 @@ public class EventApplier(IConfiguration configuration)
     {
         var initialEventsSection = configuration.GetSection("InitialEvents");
         var events = initialEventsSection?.Get<InitialEvent[]>();
-        return events ?? Array.Empty<InitialEvent>();
+        return events ?? [];
     }
 }

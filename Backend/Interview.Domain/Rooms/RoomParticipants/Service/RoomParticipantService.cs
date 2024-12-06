@@ -58,7 +58,7 @@ public class RoomParticipantService(
         }
 
         participant.Type = participantType;
-        await AddDefaultPermissionsAsync(roomCreatorId, new[] { participant }, cancellationToken);
+        await AddDefaultPermissionsAsync(roomCreatorId, [participant], cancellationToken);
         await roomParticipantRepository.UpdateAsync(participant, cancellationToken);
 
         return new RoomParticipantDetail
@@ -108,7 +108,7 @@ public class RoomParticipantService(
             throw NotFoundException.Create<Room>(request.UserId);
         }
 
-        var roomParticipants = await CreateCoreAsync(room.CreatedById ?? currentUserAccessor.UserId, new[] { (user, room, participantType) }, cancellationToken);
+        var roomParticipants = await CreateCoreAsync(room.CreatedById ?? currentUserAccessor.UserId, [(user, room, participantType)], cancellationToken);
         var roomParticipant = roomParticipants.First();
         await roomParticipantRepository.CreateAsync(roomParticipant, cancellationToken);
 
@@ -160,7 +160,7 @@ public class RoomParticipantService(
         var requiredPermissions = participantTypes
             .SelectMany(e => e.DefaultRoomPermission)
             .Select(e => e.Id)
-            .Concat(new[] { SEPermission.RoomInviteGet.Id })
+            .Concat([SEPermission.RoomInviteGet.Id])
             .ToHashSet();
 
         var permissions = await permissionRepository.FindByIdsAsync(requiredPermissions, cancellationToken);

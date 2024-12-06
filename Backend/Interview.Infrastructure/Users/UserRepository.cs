@@ -50,7 +50,7 @@ public class UserRepository(AppDbContext db) : EfRepository<User>(db), IUserRepo
             .Where(user => user.Id == id)
             .FirstOrDefaultAsync(cancellationToken);
 
-        var userPermissions = (user?.Permissions ?? new List<Permission>()).Select(it => it.Id).ToHashSet();
+        var userPermissions = (user?.Permissions ?? []).Select(it => it.Id).ToHashSet();
 
         var dictionary = Db.Permissions.ToList()
             .Aggregate(
@@ -65,7 +65,7 @@ public class UserRepository(AppDbContext db) : EfRepository<User>(db), IUserRepo
                     }
                     else
                     {
-                        dict.Add(item.Type.Name, new List<PermissionItem>(new[] { permissionItem }));
+                        dict.Add(item.Type.Name, [..new[] { permissionItem }]);
                     }
 
                     return dict;

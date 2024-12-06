@@ -141,12 +141,11 @@ public class SorfacePrincipalValidator(
         var expirationValue = DateTime.UtcNow.AddSeconds(tokenResponse.ExpiresIn!.Value)
             .ToString("o", CultureInfo.InvariantCulture);
 
-        context.Properties.StoreTokens(new[]
-        {
+        context.Properties.StoreTokens([
             new AuthenticationToken { Name = SorfaceTokenDefaults.RefreshTokenName, Value = tokenResponse.RefreshToken },
             new AuthenticationToken { Name = SorfaceTokenDefaults.AccessTokenName, Value = tokenResponse.AccessToken },
-            new AuthenticationToken { Name = SorfaceTokenDefaults.ExpirationTokenName, Value = expirationValue },
-        });
+            new AuthenticationToken { Name = SorfaceTokenDefaults.ExpirationTokenName, Value = expirationValue }
+        ]);
 
         context.ShouldRenew = true;
     }

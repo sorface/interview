@@ -30,5 +30,5 @@ public class RoomParticipant : Entity
 
     public RoomReview? Review { get; set; }
 
-    public List<Permission> Permissions { get; set; } = new();
+    public List<Permission> Permissions { get; set; } = [];
 }

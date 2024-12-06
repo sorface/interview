@@ -18,12 +18,12 @@ public class UserServiceTest
     {
         get
         {
-            yield return new object[] { "Dima", new AdminUsers(), RoleName.User };
+            yield return ["Dima", new AdminUsers(), RoleName.User];
 
-            yield return new object[]
-            {
-                "Dima", new AdminUsers() { TwitchNicknames = new[] { "Dima" } }, RoleName.Admin
-            };
+            yield return
+            [
+                "Dima", new AdminUsers() { TwitchNicknames = ["Dima"] }, RoleName.Admin
+            ];
         }
     }
 

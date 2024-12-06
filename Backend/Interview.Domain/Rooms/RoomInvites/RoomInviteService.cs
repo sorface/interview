@@ -86,7 +86,7 @@ public class RoomInviteService(
 
                     var participants = await roomParticipantService.CreateAsync(
                         roomInvite.Room.Id,
-                        new[] { (user, roomInvite.Room, roomInvite.ParticipantType ?? SERoomParticipantType.Viewer) },
+                        [(user, roomInvite.Room, roomInvite.ParticipantType ?? SERoomParticipantType.Viewer)],
                         cancellationToken);
                     var roomParticipant = participants.First();
 

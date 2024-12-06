@@ -53,7 +53,7 @@ public class RoomServiceTest
         var roomPatchUpdateRequest = new RoomUpdateRequest
         {
             Name = "New_Value_Name_Room",
-            Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } },
+            Questions = [new() { Id = question.Id, Order = 0 }],
         };
 
         _ = await roomService.UpdateAsync(savedRoom.Id, roomPatchUpdateRequest);
@@ -84,7 +84,7 @@ public class RoomServiceTest
         var roomPatchUpdateRequest = new RoomUpdateRequest
         {
             Name = "New_Value_Name_Room",
-            Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } },
+            Questions = [new() { Id = question.Id, Order = 0 }],
         };
 
         _ = await roomService.UpdateAsync(savedRoom.Id, roomPatchUpdateRequest);
@@ -277,62 +277,60 @@ public class RoomServiceTest
 
         var expectAnalytics = new AnalyticsSummary
         {
-            Questions = new List<AnalyticsSummaryQuestion>
-            {
+            Questions =
+            [
                 new()
                 {
                     Id = questions[0].Id,
                     Value = questions[0].Value,
-                    Experts = new List<AnalyticsSummaryExpert>
-                    {
+                    Experts =
+                    [
                         new()
                         {
                             Nickname = users[1].Nickname,
-                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>
-                            {
-                                new() { Id = ReactionType.Like.Id, Type = ReactionType.Like.Name, Count = 2, }
-                            }
+                            ReactionsSummary =
+                                [new() { Id = ReactionType.Like.Id, Type = ReactionType.Like.Name, Count = 2, }]
                         }
-                    },
-                    Viewers = new List<AnalyticsSummaryViewer>
-                    {
+                    ],
+                    Viewers =
+                    [
                         new()
                         {
-                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>
-                            {
+                            ReactionsSummary =
+                            [
                                 new() { Id = ReactionType.Like.Id, Type = ReactionType.Like.Name, Count = 1, },
                                 new() { Id = ReactionType.Dislike.Id, Type = ReactionType.Dislike.Name, Count = 1, }
-                            },
-                        },
-                    }
+                            ],
+                        }
+
+                    ]
                 },
+
                 new()
                 {
                     Id = questions[1].Id,
                     Value = questions[1].Value,
-                    Experts = new List<AnalyticsSummaryExpert>
-                    {
+                    Experts =
+                    [
                         new()
                         {
                             Nickname = users[1].Nickname,
-                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>
-                            {
-                                new() { Id = ReactionType.Dislike.Id, Type = ReactionType.Dislike.Name, Count = 1, }
-                            }
+                            ReactionsSummary =
+                                [new() { Id = ReactionType.Dislike.Id, Type = ReactionType.Dislike.Name, Count = 1, }]
                         }
-                    },
-                    Viewers = new List<AnalyticsSummaryViewer>
-                    {
+                    ],
+                    Viewers =
+                    [
                         new()
                         {
-                            ReactionsSummary = new List<Analytics.AnalyticsReactionSummary>
-                            {
-                                new() { Id = ReactionType.Dislike.Id, Type = ReactionType.Dislike.Name, Count = 2, },
-                            }
+                            ReactionsSummary =
+                            [
+                                new() { Id = ReactionType.Dislike.Id, Type = ReactionType.Dislike.Name, Count = 2, }
+                            ]
                         }
-                    },
+                    ],
                 }
-            }
+            ]
         };
 
         var analyticsResult = await roomService.GetAnalyticsSummaryAsync(new RoomAnalyticsRequest(room1.Id));
@@ -413,11 +411,11 @@ public class RoomServiceTest
 
         var roomCalendarResponse = await roomService.GetCalendarAsync(new RoomCalendarRequest
         {
-            RoomStatus = new HashSet<EVRoomStatus>
-            {
+            RoomStatus =
+            [
                 EVRoomStatus.Active,
                 EVRoomStatus.Review
-            },
+            ],
             TimeZoneOffset = -180
         });
 
@@ -641,7 +639,7 @@ public class RoomServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var roomPatchUpdateRequest = new RoomUpdateRequest { Name = "new_value_name_room", Questions = new List<RoomQuestionRequest>(), };
+        var roomPatchUpdateRequest = new RoomUpdateRequest { Name = "new_value_name_room", Questions = [], };
         var roomId = Guid.NewGuid();
 
         var roomService = CreateRoomService(appDbContext);
@@ -669,7 +667,7 @@ public class RoomServiceTest
         var roomPatchUpdateRequest = new RoomUpdateRequest
         {
             Name = "test",
-            Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } },
+            Questions = [new() { Id = question.Id, Order = 0 }],
             DurationSec = durationSec
         };
 
@@ -704,7 +702,7 @@ public class RoomServiceTest
         var roomPatchUpdateRequest = new RoomUpdateRequest
         {
             Name = "test",
-            Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } },
+            Questions = [new() { Id = question.Id, Order = 0 }],
             DurationSec = null
         };
 
@@ -740,7 +738,7 @@ public class RoomServiceTest
         var roomPatchUpdateRequest = new RoomUpdateRequest
         {
             Name = "test",
-            Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 0 } },
+            Questions = [new() { Id = question.Id, Order = 0 }],
             DurationSec = durationSec
         };
 
@@ -771,10 +769,10 @@ public class RoomServiceTest
         var roomService = CreateRoomService(appDbContext, user);
         var roomCreateRequest = new RoomCreateRequest
         {
-            Questions = new List<RoomQuestionRequest> { new() { Id = question.Id, Order = 10 } },
-            Experts = new HashSet<Guid>(),
-            Examinees = new HashSet<Guid>(),
-            Tags = new HashSet<Guid>(),
+            Questions = [new() { Id = question.Id, Order = 10 }],
+            Experts = [],
+            Examinees = [],
+            Tags = [],
             Name = "My room",
             AccessType = SERoomAccessType.Public,
             ScheduleStartTime = new DateTime(2024, 1, 1, 0, 0, 0),
@@ -803,8 +801,8 @@ public class RoomServiceTest
         appDbContext.Questions.AddRange(question1, question2, question3);
         var initialRoom = new Room("My room", SERoomAccessType.Public)
         {
-            Questions = new List<RoomQuestion>
-            {
+            Questions =
+            [
                 new()
                 {
                     RoomId = default,
@@ -814,6 +812,7 @@ public class RoomServiceTest
                     State = RoomQuestionState.Open,
                     Order = 5
                 },
+
                 new()
                 {
                     RoomId = default,
@@ -822,8 +821,9 @@ public class RoomServiceTest
                     Question = null,
                     State = RoomQuestionState.Open,
                     Order = -4
-                },
-            }
+                }
+
+            ]
         };
         appDbContext.Rooms.Add(initialRoom);
         appDbContext.SaveChanges();
@@ -833,8 +833,8 @@ public class RoomServiceTest
         var roomUpdateRequest = new RoomUpdateRequest
         {
             Name = "My room 2",
-            Tags = new HashSet<Guid>(),
-            Questions = new List<RoomQuestionRequest> { new() { Id = question2.Id, Order = 128 }, new() { Id = question3.Id, Order = -1000, } }
+            Tags = [],
+            Questions = [new() { Id = question2.Id, Order = 128 }, new() { Id = question3.Id, Order = -1000, }]
         };
 
         var createdRoom = await roomService.UpdateAsync(initialRoom.Id, roomUpdateRequest, CancellationToken.None);

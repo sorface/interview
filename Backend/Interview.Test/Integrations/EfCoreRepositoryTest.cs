@@ -140,11 +140,10 @@ public class EfCoreRepositoryTest
 
         await using var context = PrepareContext();
         var repository = new UserRepository(context);
-        var expectedUser = new StaticPagedList<User>(new[]
-        {
+        var expectedUser = new StaticPagedList<User>([
             CreateUserWithoutRoles(TestUserId),
-            CreateUserWithoutRoles(TestUserId2),
-        }, pageNumber, pageSize, pageSize);
+            CreateUserWithoutRoles(TestUserId2)
+        ], pageNumber, pageSize, pageSize);
 
         var dbUser = await repository.GetPageAsync(pageNumber, pageSize);
 
@@ -160,11 +159,10 @@ public class EfCoreRepositoryTest
         await using var context = PrepareContext();
         var repository = new UserRepository(context);
         var mapper = CreateShortUserWhithoutRolesMapper();
-        var expectedUser = new StaticPagedList<ShortUserWithoutRoles>(new[]
-        {
+        var expectedUser = new StaticPagedList<ShortUserWithoutRoles>([
             mapper.Map(CreateUserWithoutRoles(TestUserId)),
-            mapper.Map(CreateUserWithoutRoles(TestUserId2)),
-        }, pageNumber, pageSize, pageSize);
+            mapper.Map(CreateUserWithoutRoles(TestUserId2))
+        ], pageNumber, pageSize, pageSize);
 
         var dbUser = await repository.GetPageAsync(mapper, pageNumber, pageSize);
 
@@ -179,11 +177,10 @@ public class EfCoreRepositoryTest
 
         await using var context = PrepareContext();
         var repository = new UserRepository(context);
-        var expectedUser = new StaticPagedList<User>(new[]
-        {
+        var expectedUser = new StaticPagedList<User>([
             CreateUserWithRoles(TestUserId),
-            CreateUserWithRoles(TestUserId2),
-        }, pageNumber, pageSize, pageSize);
+            CreateUserWithRoles(TestUserId2)
+        ], pageNumber, pageSize, pageSize);
 
         var dbUser = await repository.GetPageDetailedAsync(pageNumber, pageSize);
 
@@ -200,11 +197,10 @@ public class EfCoreRepositoryTest
         await using var context = PrepareContext();
         var repository = new UserRepository(context);
         var mapper = CreateShortUserWithRolesMapper();
-        var expectedUser = new StaticPagedList<ShortUserWithRoles>(new[]
-        {
+        var expectedUser = new StaticPagedList<ShortUserWithRoles>([
             mapper.Map(CreateUserWithRoles(TestUserId)),
-            mapper.Map(CreateUserWithRoles(TestUserId2)),
-        }, pageNumber, pageSize, pageSize);
+            mapper.Map(CreateUserWithRoles(TestUserId2))
+        ], pageNumber, pageSize, pageSize);
 
         var dbUser = await repository.GetPageDetailedAsync(mapper, pageNumber, pageSize);
 
@@ -275,6 +271,6 @@ public class EfCoreRepositoryTest
     {
         public Guid Id { get; set; }
         public string Nickname { get; set; } = string.Empty;
-        public List<string> Roles { get; set; } = new List<string>();
+        public List<string> Roles { get; set; } = [];
     }
 }

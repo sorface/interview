@@ -30,15 +30,15 @@ public class Room(string name, SERoomAccessType accessType) : Entity
 
     public RoomTimer? Timer { get; set; }
 
-    public List<RoomQuestion> Questions { get; set; } = new();
+    public List<RoomQuestion> Questions { get; set; } = [];
 
-    public List<RoomParticipant> Participants { get; set; } = new();
+    public List<RoomParticipant> Participants { get; set; } = [];
 
-    public List<RoomState> RoomStates { get; set; } = new();
+    public List<RoomState> RoomStates { get; set; } = [];
 
-    public List<Tag> Tags { get; set; } = new();
+    public List<Tag> Tags { get; set; } = [];
 
-    public List<RoomInvite> Invites { get; set; } = new();
+    public List<RoomInvite> Invites { get; set; } = [];
 
     public QueuedRoomEvent? QueuedRoomEvent { get; set; }
 }

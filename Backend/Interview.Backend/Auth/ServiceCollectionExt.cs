@@ -12,8 +12,8 @@ public static class ServiceCollectionExt
 {
     private static readonly Dictionary<Type, string[]> DISABLEDCONTROLLER = new()
     {
-        [typeof(AuthController)] = new[] { nameof(AuthController.SignIn), nameof(AuthController.SignOutImpl) },
-        [typeof(UserController)] = new[] { nameof(UserController.GetMyself) },
+        [typeof(AuthController)] = [nameof(AuthController.SignIn), nameof(AuthController.SignOutImpl)],
+        [typeof(UserController)] = [nameof(UserController.GetMyself)],
     };
 
     public static void AddAppAuth(this IServiceCollection self, AuthorizationService authorizationService)

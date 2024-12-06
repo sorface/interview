@@ -272,7 +272,7 @@ public class QuestionService(
             Value = archiveQuestion.Value,
             Tags = archiveQuestion.Tags
                 .Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, }).ToList(),
-            Answers = new List<QuestionAnswerResponse>(),
+            Answers = [],
             CodeEditor = null,
             Category = null,
         };
@@ -288,7 +288,7 @@ public class QuestionService(
             Value = unarchiveQuestion.Value,
             Tags = unarchiveQuestion.Tags
                 .Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, }).ToList(),
-            Answers = new List<QuestionAnswerResponse>(),
+            Answers = [],
             CodeEditor = null,
             Category = null,
         };

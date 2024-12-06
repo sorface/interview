@@ -9,8 +9,8 @@ using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Swagger;
 using Interview.DependencyInjection;
 using Interview.Domain.Rooms.RoomQuestions;
+using Interview.Infrastructure.WebSocket;
 using Interview.Infrastructure.WebSocket.PubSub;
-using Interview.Infrastructure.WebSockets;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
@@ -31,7 +31,7 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
             options.AddPolicy("All", policy =>
             {
                 policy
-                    .WithOrigins(corsOptions?.AllowedOrigins.ToArray() ?? Array.Empty<string>())
+                    .WithOrigins(corsOptions?.AllowedOrigins.ToArray() ?? [])
                     .SetIsOriginAllowedToAllowWildcardSubdomains()
                     .AllowCredentials()
                     .AllowAnyMethod()

@@ -137,7 +137,7 @@ public class RoomController(IRoomService roomService) : ControllerBase
         {
             Name = request.Name,
             AccessType = SERoomAccessType.FromName(request.AccessType),
-            Questions = request.Questions ?? new List<RoomQuestionRequest>(),
+            Questions = request.Questions ?? [],
             Experts = request.Experts,
             Examinees = request.Examinees,
             Tags = request.Tags,

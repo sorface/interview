@@ -163,7 +163,7 @@ public class CategoryService(AppDbContext db, ArchiveService<Category> archiveSe
                 .Where(e => e.ParentId != null && actualParent.Contains(e.ParentId.Value))
                 .Select(e => e.Id)
                 .ToListAsync(cancellationToken);
-            actualParent = new HashSet<Guid>();
+            actualParent = [];
             foreach (var id in childrenNLevel)
             {
                 if (children.Add(id))

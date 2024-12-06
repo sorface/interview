@@ -25,11 +25,11 @@ public class User(Guid id, string nickname, string externalId) : Entity(id)
 
     public string ExternalId { get; private set; } = externalId;
 
-    public List<Role> Roles { get; private set; } = new List<Role>();
+    public List<Role> Roles { get; private set; } = [];
 
-    public List<Permission> Permissions { get; private set; } = new List<Permission>();
+    public List<Permission> Permissions { get; private set; } = [];
 
-    public List<RoomQuestionEvaluation> RoomQuestionEvaluations { get; private set; } = new();
+    public List<RoomQuestionEvaluation> RoomQuestionEvaluations { get; private set; } = [];
 
-    public List<RoomParticipant> RoomParticipants { get; private set; } = new();
+    public List<RoomParticipant> RoomParticipants { get; private set; } = [];
 }
