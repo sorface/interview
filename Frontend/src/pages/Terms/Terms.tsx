@@ -7,6 +7,7 @@ import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Typography } from '../../components/Typography/Typography';
 import { Gap } from '../../components/Gap/Gap';
 import { LocalizationContext } from '../../context/LocalizationContext';
+import { REACT_APP_NAME } from '../../config';
 
 interface Term {
   title: string;
@@ -46,7 +47,7 @@ export const Terms: FunctionComponent = () => {
         {interpolateAll(
           term.description,
           [/\[NAME\]/g, /\[NAME URL\]/g],
-          [localizationCaptions[LocalizationKey.AppName], termsUrl],
+          [REACT_APP_NAME, termsUrl],
         )}
       </Typography>
       <Gap sizeRem={2} />
@@ -55,7 +56,7 @@ export const Terms: FunctionComponent = () => {
 
   return (
     <>
-      <PageHeader title={localizationCaptions[LocalizationKey.AppName]} />
+      <PageHeader title={REACT_APP_NAME} />
       <div className="text-left flex flex-col overflow-auto">
         <Typography size="xxl" bold>
           {localizationCaptions[LocalizationKey.TermsOfUsage]}

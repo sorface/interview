@@ -1,14 +1,13 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { App } from './App';
-import { LocalizationKey } from './localization';
-import { useLocalizationCaptions } from './hooks/useLocalizationCaptions';
+import { REACT_APP_NAME } from './config';
 
 describe('App', () => {
   test('renders app name', () => {
     render(<App />);
     const apNameElement = screen.getByRole('link', {
-      name: useLocalizationCaptions()[LocalizationKey.AppName],
+      name: REACT_APP_NAME,
     });
     expect(apNameElement).toBeInTheDocument();
   });
