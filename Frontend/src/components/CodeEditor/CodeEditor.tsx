@@ -1,7 +1,9 @@
 import {
   ChangeEventHandler,
   FunctionComponent,
-  useContext, useEffect, useRef,
+  useContext,
+  useEffect,
+  useRef,
   useState,
 } from 'react';
 import Editor, {
@@ -85,21 +87,18 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
     monaco.editor.defineTheme('my-dark', theme);
   };
 
-
-
-  const saveKeyboardCallback = (e: KeyboardEvent) => {
-    if (e.key === 's' && (navigator.userAgent.includes('Mac') ? e.metaKey : e.ctrlKey)) {
-      e.preventDefault();
-    }
-  }
-
-  // Catch Ctr+S (prevent default)
   useEffect(() => {
+    const handleCodeEditorKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 's' && (navigator.userAgent.includes('Mac') ? e.metaKey : e.ctrlKey)) {
+        e.preventDefault();
+      }
+    }
+
     const codeEditorComponent = codeEditorComponentRef.current;
-    codeEditorComponent?.addEventListener("keydown", saveKeyboardCallback, false);
+    codeEditorComponent?.addEventListener("keydown", handleCodeEditorKeyDown, false);
 
     return () => {
-      codeEditorComponent?.removeEventListener("keydown", saveKeyboardCallback, false);
+      codeEditorComponent?.removeEventListener("keydown", handleCodeEditorKeyDown, false);
     };
   }, []);
 
