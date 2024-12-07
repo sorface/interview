@@ -15,10 +15,14 @@ import { Feedback } from './components/Feedback/Feedback';
 import { REACT_APP_FEEDBACK_IFRAME_URL } from './config';
 
 import './App.css';
+import {useCatchCtrS} from "./hooks/useCatchCtrS";
 
 export const App: FunctionComponent = () => {
   const { getMeState, loadMe } = useGetMeApi();
   const { logout } = useLogout();
+
+  useCatchCtrS();
+
   const {
     process: { loading, error, code },
     user,
