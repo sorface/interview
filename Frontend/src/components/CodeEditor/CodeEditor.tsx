@@ -95,12 +95,13 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
 
   // Catch Ctr+S (prevent default)
   useEffect(() => {
-    codeEditorComponentRef.current?.addEventListener("keydown", saveKeyboardCallback, false);
+    const codeEditorComponent = codeEditorComponentRef.current;
+    codeEditorComponent?.addEventListener("keydown", saveKeyboardCallback, false);
 
     return () => {
-      codeEditorComponentRef.current?.removeEventListener("keydown", saveKeyboardCallback, false);
+      codeEditorComponent?.removeEventListener("keydown", saveKeyboardCallback, false);
     };
-  });
+  }, []);
 
   return (
     <div
