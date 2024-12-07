@@ -1,7 +1,7 @@
 import {
   ChangeEventHandler,
   FunctionComponent,
-  useContext,
+  useContext, useEffect, useRef,
   useState,
 } from 'react';
 import Editor, {
@@ -56,6 +56,8 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   const { themeInUi } = useContext(ThemeContext);
   const [fontSize, setFontSize] = useState(defaultCodeEditorFontSize);
 
+  const codeEditorComponentRef = useRef<HTMLDivElement | null>(null);
+
   const handleFontSizeChange: ChangeEventHandler<HTMLSelectElement> = (
     event,
   ) => {
@@ -83,9 +85,27 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
     monaco.editor.defineTheme('my-dark', theme);
   };
 
+
+
+  const saveKeyboardCallback = (e: KeyboardEvent) => {
+    if (e.key === 's' && (navigator.userAgent.includes('Mac') ? e.metaKey : e.ctrlKey)) {
+      e.preventDefault();
+    }
+  }
+
+  // Catch Ctr+S (prevent default)
+  useEffect(() => {
+    codeEditorComponentRef.current?.addEventListener("keydown", saveKeyboardCallback, false);
+
+    return () => {
+      codeEditorComponentRef.current?.removeEventListener("keydown", saveKeyboardCallback, false);
+    };
+  });
+
   return (
     <div
       className={`code-editor flex flex-col rounded-1.125 overflow-hidden ${className}`}
+      ref={codeEditorComponentRef}
     >
       <div className="code-editor-tools">
         <select
