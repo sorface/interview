@@ -43,7 +43,7 @@ public class UserServiceTest
         );
 
         var userService = new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext),
-            new AdminUsers(), new PermissionRepository(appDbContext), securityService);
+            new PermissionRepository(appDbContext), securityService);
         var user = new User("Dima", "1");
         var upsertUser = await userService.UpsertByExternalIdAsync(user);
 
@@ -57,8 +57,7 @@ public class UserServiceTest
 
     [Theory(DisplayName = "'UpsertByTwitchIdentityAsync' when there is no such user in the database")]
     [MemberData(nameof(UpsertUsersWhenUserNotExistsInDatabaseData))]
-    public async Task UpsertUsersWhenUserNotExistsInDatabase(string nickname, AdminUsers adminUsers,
-        RoleName expectedRoleName)
+    public async Task UpsertUsersWhenUserNotExistsInDatabase(string nickname, RoleName expectedRoleName)
     {
         var clock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(clock);
@@ -69,8 +68,7 @@ public class UserServiceTest
             new RoomParticipantRepository(appDbContext)
         );
         var userService =
-            new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext), adminUsers,
-                new PermissionRepository(appDbContext), securityService);
+            new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext), new PermissionRepository(appDbContext), securityService);
         var user = new User(nickname, "1");
         user.Roles.Add(new Role(expectedRoleName));
 
@@ -94,7 +92,7 @@ public class UserServiceTest
             new RoomParticipantRepository(appDbContext)
         );
         var userService = new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext),
-            new AdminUsers(), new PermissionRepository(appDbContext), securityService);
+            new PermissionRepository(appDbContext), securityService);
         var user = new User("Dima", "1");
 
         var error = await Assert.ThrowsAsync<Domain.NotFoundException>(async () => await userService.UpsertByExternalIdAsync(user));

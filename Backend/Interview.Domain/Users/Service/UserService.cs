@@ -11,13 +11,10 @@ namespace Interview.Domain.Users.Service;
 public sealed class UserService(
     IUserRepository userRepository,
     IRoleRepository roleRepository,
-    AdminUsers adminUsers,
     IPermissionRepository permissionRepository,
     ISecurityService securityService)
     : IUserService
 {
-    private readonly AdminUsers _adminUsers = adminUsers;
-
     public Task<IPagedList<UserDetail>> FindPageAsync(
         int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
