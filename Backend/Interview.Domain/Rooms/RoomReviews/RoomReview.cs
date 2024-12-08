@@ -6,8 +6,8 @@ namespace Interview.Domain.Rooms.RoomReviews;
 public class RoomReview : Entity
 {
     public RoomReview(RoomParticipant participant)
+        : this(participant, SERoomReviewState.Open)
     {
-        Participant = participant;
     }
 
     public RoomReview(RoomParticipant participant, SERoomReviewState state)
@@ -16,11 +16,7 @@ public class RoomReview : Entity
         State = state;
     }
 
-    private RoomReview()
-    {
-    }
-
-    public RoomParticipant Participant;
+    public RoomParticipant Participant { get; private set; }
 
     public string Review { get; set; } = string.Empty;
 

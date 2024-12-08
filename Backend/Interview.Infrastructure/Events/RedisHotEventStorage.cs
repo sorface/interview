@@ -26,7 +26,7 @@ public class RedisHotEventStorage : IHotEventStorage
             // If there have been changes to the model, the index must be recreated.
             _redis.Connection.DropIndex(typeof(RedisEvent));
         }
-        catch (Exception e)
+        catch (Exception)
         {
             // ignore
         }

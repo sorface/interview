@@ -181,7 +181,7 @@ public class RoomQuestionService(
 
         var states = request.States.Select(e => RoomQuestionState.FromValue((int)e)).ToList();
         var questions = await db.RoomQuestions
-            .Include(e => e.Question).ThenInclude(e => e.Answers)
+            .Include(e => e.Question).ThenInclude(e => e!.Answers)
             .AsNoTracking()
             .Where(rq => rq.Room!.Id == request.RoomId && states.Contains(rq.State!))
             .OrderBy(e => e.Order)

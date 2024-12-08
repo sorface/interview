@@ -663,7 +663,7 @@ public sealed class RoomService(
     {
         return db.RoomInvites.AsNoTracking()
             .Include(roomInvite => roomInvite.Invite)
-            .Where(e => e.RoomId == roomId && e.InviteId != null && e.ParticipantType != null)
+            .Where(e => e.RoomId == roomId && e.ParticipantType != null)
             .Select(e => new RoomInviteResponse
             {
                 InviteId = e.InviteId,

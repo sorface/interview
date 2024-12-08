@@ -25,10 +25,7 @@ public class UserAccessorDbContextInterceptor(IServiceProvider serviceProvider) 
     }
 }
 
-#pragma warning disable SA1402
-public sealed class LazyPreProcessors
-#pragma warning restore SA1402
-    (IServiceProvider serviceProvider)
+public sealed class LazyPreProcessors(IServiceProvider serviceProvider)
 {
     private readonly Lazy<List<IEntityPreProcessor>> _preProcessors = new(
         () => serviceProvider.GetServices<IEntityPreProcessor>().ToList());
