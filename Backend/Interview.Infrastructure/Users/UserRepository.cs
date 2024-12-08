@@ -65,7 +65,7 @@ public class UserRepository(AppDbContext db) : EfRepository<User>(db), IUserRepo
                     }
                     else
                     {
-                        dict.Add(item.Type.Name, [..new[] { permissionItem }]);
+                        dict.Add(item.Type.Name, [.. new[] { permissionItem }]);
                     }
 
                     return dict;

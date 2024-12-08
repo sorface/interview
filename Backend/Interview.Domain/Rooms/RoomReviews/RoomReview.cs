@@ -16,6 +16,12 @@ public class RoomReview : Entity
         State = state;
     }
 
+    // ReSharper disable once UnusedMember.Local
+    private RoomReview()
+    {
+        Participant = null!;
+    }
+
     public RoomParticipant Participant { get; private set; }
 
     public string Review { get; set; } = string.Empty;

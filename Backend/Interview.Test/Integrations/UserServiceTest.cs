@@ -18,12 +18,8 @@ public class UserServiceTest
     {
         get
         {
-            yield return ["Dima", new AdminUsers(), RoleName.User];
-
-            yield return
-            [
-                "Dima", new AdminUsers() { TwitchNicknames = ["Dima"] }, RoleName.Admin
-            ];
+            yield return ["Dima", RoleName.User];
+            yield return ["Dima", RoleName.Admin];
         }
     }
 
