@@ -12,24 +12,13 @@ namespace Interview.Infrastructure.WebSocket;
 /// <summary>
 /// Web socket connection handler.
 /// </summary>
-public class WebSocketConnectionHandler
+public class WebSocketConnectionHandler(
+    IRoomService roomService,
+    WebSocketReader webSocketReader,
+    IEnumerable<IConnectionListener> connectionListeners,
+    ILogger<WebSocketConnectionHandler> logger)
 {
-    private readonly ILogger<WebSocketConnectionHandler> _logger;
-    private readonly IRoomService _roomService;
-    private readonly IConnectionListener[] _connectListeners;
-    private readonly WebSocketReader _webSocketReader;
-
-    public WebSocketConnectionHandler(
-        IRoomService roomService,
-        WebSocketReader webSocketReader,
-        IEnumerable<IConnectionListener> connectionListeners,
-        ILogger<WebSocketConnectionHandler> logger)
-    {
-        _roomService = roomService;
-        _connectListeners = connectionListeners.ToArray();
-        _webSocketReader = webSocketReader;
-        _logger = logger;
-    }
+    private readonly IConnectionListener[] _connectListeners = connectionListeners.ToArray();
 
     public async Task HandleAsync(WebSocketConnectHandlerRequest request, CancellationToken ct)
     {
@@ -84,7 +73,7 @@ public class WebSocketConnectionHandler
 
     private async Task<WebSocketConnectDetail?> HandleAsyncCore(WebSocketConnectHandlerRequest request, CancellationToken ct)
     {
-        var (dbRoom, participant) = await _roomService.AddParticipantAsync(request.RoomId, request.User.Id, ct);
+        var (dbRoom, participant) = await roomService.AddParticipantAsync(request.RoomId, request.User.Id, ct);
 
         var participantType = participant.Type.EnumValue;
         var detail = new WebSocketConnectDetail(request.WebSocket, dbRoom, request.User, participantType);
@@ -95,7 +84,7 @@ public class WebSocketConnectionHandler
 
         var waitTask = CreateWaitTask(ct);
         var scopeFactory = request.ServiceProvider.GetRequiredService<CurrentUserServiceScopeFactory>();
-        var readerTask = Task.Run(() => _webSocketReader.ReadAsync(request.User, dbRoom, participantType, scopeFactory, request.WebSocket, ct), ct);
+        var readerTask = Task.Run(() => webSocketReader.ReadAsync(request.User, dbRoom, participantType, scopeFactory, request.WebSocket, ct), ct);
         await Task.WhenAny(waitTask, readerTask);
         await CloseSafely(request.WebSocket, WebSocketCloseStatus.NormalClosure, string.Empty, ct);
         return detail;
@@ -110,7 +99,7 @@ public class WebSocketConnectionHandler
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "During {Action}", actionName);
+            logger.LogError(e, "During {Action}", actionName);
         }
     }
 }

@@ -46,7 +46,7 @@ public class QuestionServiceTest
                     question.Type = faker.Random.Bool() ? SEQuestionType.Private : SEQuestionType.Public;
                 }
 
-                yield return new object[] { rooms, questions, };
+                yield return [rooms, questions];
             }
         }
     }
@@ -93,16 +93,10 @@ public class QuestionServiceTest
                 Content = "t",
                 Lang = "ts"
             },
-            Answers = new List<QuestionAnswerEditRequest>
-            {
-                new()
-                {
-                    Content = "test content",
-                    CodeEditor = codeEditor,
-                    Title = "test title",
-                    Id = null
-                }
-            },
+            Answers =
+            [
+                new() { Content = "test content", CodeEditor = codeEditor, Title = "test title", Id = null }
+            ],
         };
         var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
         var dbQuestion = await appDbContext.Questions
@@ -130,8 +124,8 @@ public class QuestionServiceTest
 
         var question = new Question(value: DefaultQuestionValue)
         {
-            Answers = new List<QuestionAnswer>
-            {
+            Answers =
+            [
                 new()
                 {
                     Title = "test title",
@@ -140,7 +134,7 @@ public class QuestionServiceTest
                     QuestionId = default,
                     Question = null
                 }
-            }
+            ]
         };
         var category = new Category { Name = "Test", };
         appDbContext.Categories.Add(category);
@@ -158,16 +152,10 @@ public class QuestionServiceTest
                 Content = "t",
                 Lang = "ts"
             },
-            Answers = new List<QuestionAnswerEditRequest>
-            {
-                new()
-                {
-                    Id = question.Answers[0].Id,
-                    Title = "test title 1",
-                    Content = "test content 1",
-                    CodeEditor = !question.Answers[0].CodeEditor
-                }
-            }
+            Answers =
+            [
+                new() { Id = question.Answers[0].Id, Title = "test title 1", Content = "test content 1", CodeEditor = !question.Answers[0].CodeEditor }
+            ]
         };
         var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
         var dbQuestion = await appDbContext.Questions
@@ -195,8 +183,8 @@ public class QuestionServiceTest
 
         var question = new Question(value: DefaultQuestionValue)
         {
-            Answers = new List<QuestionAnswer>
-            {
+            Answers =
+            [
                 new()
                 {
                     Title = "test title",
@@ -205,7 +193,7 @@ public class QuestionServiceTest
                     QuestionId = default,
                     Question = null
                 }
-            }
+            ]
         };
         var category = new Category { Name = "Test", };
         appDbContext.Categories.Add(category);
@@ -223,23 +211,12 @@ public class QuestionServiceTest
                 Content = "t",
                 Lang = "ts"
             },
-            Answers = new List<QuestionAnswerEditRequest>
-            {
-                new()
-                {
-                    Content = "new test content",
-                    CodeEditor = codeEditor,
-                    Title = "new test title",
-                    Id = null
-                },
-                new()
-                {
-                    Id = question.Answers[0].Id,
-                    Title = "test title 1",
-                    Content = "test content 1",
-                    CodeEditor = !question.Answers[0].CodeEditor
-                }
-            },
+            Answers =
+            [
+                new() { Content = "new test content", CodeEditor = codeEditor, Title = "new test title", Id = null },
+
+                new() { Id = question.Answers[0].Id, Title = "test title 1", Content = "test content 1", CodeEditor = !question.Answers[0].CodeEditor }
+            ],
         };
         var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
         var dbQuestion = await appDbContext.Questions
@@ -271,8 +248,8 @@ public class QuestionServiceTest
 
         var question = new Question(value: DefaultQuestionValue)
         {
-            Answers = new List<QuestionAnswer>
-            {
+            Answers =
+            [
                 new()
                 {
                     Title = "test title",
@@ -281,7 +258,7 @@ public class QuestionServiceTest
                     QuestionId = default,
                     Question = null
                 }
-            }
+            ]
         };
         var category = new Category { Name = "Test", };
         appDbContext.Categories.Add(category);
@@ -320,8 +297,8 @@ public class QuestionServiceTest
 
         var question = new Question(value: DefaultQuestionValue)
         {
-            Answers = new List<QuestionAnswer>
-            {
+            Answers =
+            [
                 new()
                 {
                     Title = "test title",
@@ -330,7 +307,7 @@ public class QuestionServiceTest
                     QuestionId = default,
                     Question = null
                 }
-            }
+            ]
         };
         var category = new Category { Name = "Test", };
         appDbContext.Categories.Add(category);
@@ -348,16 +325,10 @@ public class QuestionServiceTest
                 Content = "t",
                 Lang = "ts"
             },
-            Answers = new List<QuestionAnswerEditRequest>
-            {
-                new()
-                {
-                    Content = "new test content",
-                    CodeEditor = codeEditor,
-                    Title = "new test title",
-                    Id = null
-                }
-            },
+            Answers =
+            [
+                new() { Content = "new test content", CodeEditor = codeEditor, Title = "new test title", Id = null }
+            ],
         };
         var updatedQuestion = await questionService.UpdateAsync(question.Id, questionEditRequest);
         var dbQuestion = await appDbContext.Questions

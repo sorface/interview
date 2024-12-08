@@ -6,22 +6,16 @@ using Microsoft.Extensions.Options;
 
 namespace Interview.Backend.Auth.Sorface;
 
-public class SorfaceAuthenticationHandler : OAuthHandler<SorfaceAuthenticationOptions>
+public class SorfaceAuthenticationHandler(
+    IOptionsMonitor<SorfaceAuthenticationOptions> options,
+    ILoggerFactory logger,
+    UrlEncoder encoder,
+    SorfaceTokenService sorfaceTokenService)
+    : OAuthHandler<SorfaceAuthenticationOptions>(options, logger, encoder)
 {
-    private readonly SorfaceTokenService _sorfaceTokenService;
-
-    public SorfaceAuthenticationHandler(IOptionsMonitor<SorfaceAuthenticationOptions> options,
-                                        ILoggerFactory logger,
-                                        UrlEncoder encoder,
-                                        ISystemClock clock,
-                                        SorfaceTokenService sorfaceTokenService) : base(options, logger, encoder, clock)
-    {
-        _sorfaceTokenService = sorfaceTokenService;
-    }
-
     protected override async Task<AuthenticationTicket> CreateTicketAsync(ClaimsIdentity identity, AuthenticationProperties properties, OAuthTokenResponse tokens)
     {
-        using var document = await _sorfaceTokenService.GetTokenPrincipalAsync(tokens.AccessToken, Context.RequestAborted);
+        using var document = await sorfaceTokenService.GetTokenPrincipalAsync(tokens.AccessToken, Context.RequestAborted);
 
         var principal = new ClaimsPrincipal(identity);
 

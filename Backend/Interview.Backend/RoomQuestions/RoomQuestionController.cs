@@ -10,15 +10,8 @@ namespace Interview.Backend.RoomQuestions;
 
 [ApiController]
 [Route("api/room-questions")]
-public class RoomQuestionController : ControllerBase
+public class RoomQuestionController(IRoomQuestionService roomQuestionService) : ControllerBase
 {
-    private readonly IRoomQuestionService _roomQuestionService;
-
-    public RoomQuestionController(IRoomQuestionService roomQuestionService)
-    {
-        _roomQuestionService = roomQuestionService;
-    }
-
     /// <summary>
     /// Changing the current question.
     /// </summary>
@@ -30,7 +23,7 @@ public class RoomQuestionController : ControllerBase
     [ProducesResponseType(typeof(RoomQuestionDetail), StatusCodes.Status200OK)]
     public Task<RoomQuestionDetail> ChangeActiveQuestion(RoomQuestionChangeActiveRequest request)
     {
-        return _roomQuestionService.ChangeActiveQuestionAsync(request, HttpContext.RequestAborted);
+        return roomQuestionService.ChangeActiveQuestionAsync(request, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -44,7 +37,7 @@ public class RoomQuestionController : ControllerBase
     [ProducesResponseType(typeof(List<RoomQuestionResponse>), StatusCodes.Status200OK)]
     public Task<List<RoomQuestionResponse>> FindRoomQuestions([FromQuery] RoomQuestionsRequest request)
     {
-        return _roomQuestionService.FindQuestionsAsync(request, HttpContext.RequestAborted);
+        return roomQuestionService.FindQuestionsAsync(request, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -59,6 +52,6 @@ public class RoomQuestionController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<RoomQuestionAnswerDetailResponse> GetAnswerQuestionDetailsAsync([FromQuery] RoomQuestionAnswerDetailRequest request)
     {
-        return _roomQuestionService.GetAnswerDetailsAsync(request, HttpContext.RequestAborted);
+        return roomQuestionService.GetAnswerDetailsAsync(request, HttpContext.RequestAborted);
     }
 }

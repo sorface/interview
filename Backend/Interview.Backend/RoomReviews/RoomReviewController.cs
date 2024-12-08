@@ -14,15 +14,8 @@ using X.PagedList;
 namespace Interview.Backend.RoomReviews;
 
 [Route("api/room-reviews")]
-public class RoomReviewController : ControllerBase
+public class RoomReviewController(IRoomReviewService roomReviewService) : ControllerBase
 {
-    private readonly IRoomReviewService _roomReviewService;
-
-    public RoomReviewController(IRoomReviewService roomReviewService)
-    {
-        _roomReviewService = roomReviewService;
-    }
-
     /// <summary>
     /// Getting a room reviews page.
     /// </summary>
@@ -34,7 +27,7 @@ public class RoomReviewController : ControllerBase
     [ProducesResponseType(typeof(List<RoomReviewDetail>), StatusCodes.Status200OK)]
     public Task<IPagedList<RoomReviewPageDetail>> FindPage([FromQuery] RoomReviewPageRequest request)
     {
-        return _roomReviewService.FindPageAsync(request, HttpContext.RequestAborted);
+        return roomReviewService.FindPageAsync(request, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -53,7 +46,7 @@ public class RoomReviewController : ControllerBase
     {
         var userId = currentUserAccessor.GetUserIdOrThrow();
         var request = new UserRoomReviewRequest { UserId = userId, RoomId = roomId, };
-        return _roomReviewService.GetUserRoomReviewAsync(request, HttpContext.RequestAborted);
+        return roomReviewService.GetUserRoomReviewAsync(request, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -76,7 +69,7 @@ public class RoomReviewController : ControllerBase
             throw new AccessDeniedException("Current user not found");
         }
 
-        var roomReviewDetail = await _roomReviewService.CreateAsync(request, user.Id, HttpContext.RequestAborted);
+        var roomReviewDetail = await roomReviewService.CreateAsync(request, user.Id, HttpContext.RequestAborted);
 
         return ServiceResult.Created(roomReviewDetail).ToActionResult();
     }
@@ -95,7 +88,7 @@ public class RoomReviewController : ControllerBase
     public async Task<ActionResult<UpsertReviewResponse>> UpsertAsync([FromBody] RoomReviewCreateRequest request, [FromServices] ICurrentUserAccessor currentUserAccessor)
     {
         var userId = currentUserAccessor.GetUserIdOrThrow();
-        var upsertResult = await _roomReviewService.UpsertAsync(request, userId, HttpContext.RequestAborted);
+        var upsertResult = await roomReviewService.UpsertAsync(request, userId, HttpContext.RequestAborted);
         return (upsertResult.Created ? ServiceResult.Created(upsertResult) : ServiceResult.Ok(upsertResult)).ToActionResult();
     }
 
@@ -112,7 +105,7 @@ public class RoomReviewController : ControllerBase
     [Obsolete("It is deprecated, please use /api/room-reviews/upsert instead.")]
     public Task<RoomReviewDetail> Update([FromRoute] Guid id, [FromBody] RoomReviewUpdateRequest request)
     {
-        return _roomReviewService.UpdateAsync(id, request, HttpContext.RequestAborted);
+        return roomReviewService.UpdateAsync(id, request, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -129,6 +122,6 @@ public class RoomReviewController : ControllerBase
     {
         var userId = currentUserAccessor.GetUserIdOrThrow();
 
-        return await _roomReviewService.CompleteAsync(request, userId, HttpContext.RequestAborted);
+        return await roomReviewService.CompleteAsync(request, userId, HttpContext.RequestAborted);
     }
 }

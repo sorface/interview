@@ -6,27 +6,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket.Events.Handlers;
 
-public class ReturningSignalWebSocketByNameEventHandler : WebSocketByNameEventHandlerBase<ReturningSignalWebSocketByNameEventHandler.ReceivePayload>
+public class ReturningSignalWebSocketByNameEventHandler(
+    ILogger<WebSocketByNameEventHandlerBase<ReturningSignalWebSocketByNameEventHandler.ReceivePayload>> logger,
+    IVideChatConnectionProvider userWebSocketConnectionProvider,
+    ILogger<WebSocketEventSender> webSocketEventSender,
+    IEventSenderAdapter eventSenderAdapter,
+    IRoomEventSerializer serializer)
+    : WebSocketByNameEventHandlerBase<ReturningSignalWebSocketByNameEventHandler.ReceivePayload>(logger)
 {
-    private readonly IVideChatConnectionProvider _userWebSocketConnectionProvider;
-    private readonly ILogger<WebSocketEventSender> _webSocketEventSender;
-    private readonly IEventSenderAdapter _eventSenderAdapter;
-    private readonly IRoomEventSerializer _serializer;
-
-    public ReturningSignalWebSocketByNameEventHandler(
-        ILogger<WebSocketByNameEventHandlerBase<ReceivePayload>> logger,
-        IVideChatConnectionProvider userWebSocketConnectionProvider,
-        ILogger<WebSocketEventSender> webSocketEventSender,
-        IEventSenderAdapter eventSenderAdapter,
-        IRoomEventSerializer serializer)
-        : base(logger)
-    {
-        _userWebSocketConnectionProvider = userWebSocketConnectionProvider;
-        _webSocketEventSender = webSocketEventSender;
-        _eventSenderAdapter = eventSenderAdapter;
-        _serializer = serializer;
-    }
-
     protected override string SupportType => "returning signal";
 
     protected override async Task HandleEventAsync(SocketEventDetail detail, ReceivePayload? payload, CancellationToken cancellationToken)
@@ -36,14 +23,14 @@ public class ReturningSignalWebSocketByNameEventHandler : WebSocketByNameEventHa
             return;
         }
 
-        if (!_userWebSocketConnectionProvider.TryGetConnections(payload.To, detail.RoomId, out var connections))
+        if (!userWebSocketConnectionProvider.TryGetConnections(payload.To, detail.RoomId, out var connections))
         {
             Logger.LogWarning("Not found {To} user connections. {RoomId} current {UserId}", payload.To, detail.RoomId, detail.UserId);
             return;
         }
 
         var receivingReturnedSignalPayload = new { Signal = payload.Signal, From = detail.UserId, ScreenShare = payload.ScreenShare };
-        var strPayload = _serializer.SerializePayloadAsString(receivingReturnedSignalPayload);
+        var strPayload = serializer.SerializePayloadAsString(receivingReturnedSignalPayload);
         var sendEvent = new RoomEvent
         {
             RoomId = detail.RoomId,
@@ -51,11 +38,11 @@ public class ReturningSignalWebSocketByNameEventHandler : WebSocketByNameEventHa
             Value = strPayload,
             CreatedById = detail.UserId,
         };
-        var provider = new CachedRoomEventProvider(sendEvent, _serializer);
+        var provider = new CachedRoomEventProvider(sendEvent, serializer);
         foreach (var webSocket in connections)
         {
-            var sender = new WebSocketEventSender(_webSocketEventSender, webSocket);
-            await _eventSenderAdapter.SendAsync(provider, sender, cancellationToken);
+            var sender = new WebSocketEventSender(webSocketEventSender, webSocket);
+            await eventSenderAdapter.SendAsync(provider, sender, cancellationToken);
         }
     }
 

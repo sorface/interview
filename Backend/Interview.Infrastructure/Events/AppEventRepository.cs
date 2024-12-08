@@ -3,10 +3,4 @@ using Interview.Domain.Events;
 
 namespace Interview.Infrastructure.Events;
 
-public class AppEventRepository : EfRepository<AppEvent>, IAppEventRepository
-{
-    public AppEventRepository(AppDbContext db)
-        : base(db)
-    {
-    }
-}
+public class AppEventRepository(AppDbContext db) : EfRepository<AppEvent>(db), IAppEventRepository;

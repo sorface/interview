@@ -4,19 +4,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Domain;
 
-public class ArchiveService<T>
+public class ArchiveService<T>(AppDbContext db)
     where T : ArchiveEntity
 {
-    private readonly AppDbContext _db;
-
-    public ArchiveService(AppDbContext db)
-    {
-        _db = db;
-    }
-
     public async Task<T> ArchiveAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var set = _db.Set<T>();
+        var set = db.Set<T>();
         var question = await set.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
         if (question == null)
@@ -25,13 +18,13 @@ public class ArchiveService<T>
         }
 
         question.IsArchived = true;
-        await _db.SaveChangesAsync(cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
         return question;
     }
 
     public async Task<T> UnarchiveAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var set = _db.Set<T>();
+        var set = db.Set<T>();
         var question = await set.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
         if (question == null)
@@ -45,7 +38,7 @@ public class ArchiveService<T>
         }
 
         question.IsArchived = false;
-        await _db.SaveChangesAsync(cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
         return question;
     }
 }

@@ -6,32 +6,19 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket.Events.Handlers;
 
-public class JoinVideoChatWebSocketByNameEventHandler : WebSocketByNameEventHandlerBase
+public class JoinVideoChatWebSocketByNameEventHandler(
+    ILogger<JoinVideoChatWebSocketByNameEventHandler> logger,
+    IVideChatConnectionProvider videChatConnectionProvider,
+    ILogger<WebSocketEventSender> webSocketEventSender,
+    IEventSenderAdapter eventSenderAdapter,
+    IRoomEventSerializer serializer)
+    : WebSocketByNameEventHandlerBase(logger)
 {
-    private readonly IVideChatConnectionProvider _videChatConnectionProvider;
-    private readonly ILogger<WebSocketEventSender> _webSocketEventSender;
-    private readonly IEventSenderAdapter _eventSenderAdapter;
-    private readonly IRoomEventSerializer _serializer;
-
-    public JoinVideoChatWebSocketByNameEventHandler(
-        ILogger<JoinVideoChatWebSocketByNameEventHandler> logger,
-        IVideChatConnectionProvider videChatConnectionProvider,
-        ILogger<WebSocketEventSender> webSocketEventSender,
-        IEventSenderAdapter eventSenderAdapter,
-        IRoomEventSerializer serializer)
-        : base(logger)
-    {
-        _videChatConnectionProvider = videChatConnectionProvider;
-        _webSocketEventSender = webSocketEventSender;
-        _eventSenderAdapter = eventSenderAdapter;
-        _serializer = serializer;
-    }
-
     protected override string SupportType => "join video chat";
 
     protected override async Task HandleEventAsync(SocketEventDetail detail, string? payload, CancellationToken cancellationToken)
     {
-        var successConnectResult = await _videChatConnectionProvider.TryConnectAsync(detail, cancellationToken);
+        var successConnectResult = await videChatConnectionProvider.TryConnectAsync(detail, cancellationToken);
         if (!successConnectResult)
         {
             return;
@@ -49,7 +36,7 @@ public class JoinVideoChatWebSocketByNameEventHandler : WebSocketByNameEventHand
 
     private async Task SendEventsAsync(SocketEventDetail detail, CancellationToken cancellationToken)
     {
-        if (!_videChatConnectionProvider.TryGetConnections(detail.RoomId, out var subscribers))
+        if (!videChatConnectionProvider.TryGetConnections(detail.RoomId, out var subscribers))
         {
             return;
         }
@@ -63,7 +50,7 @@ public class JoinVideoChatWebSocketByNameEventHandler : WebSocketByNameEventHand
                 Avatar = e.User.Avatar,
                 ParticipantType = e.ParticipantType,
             }).ToList();
-        var strPayload = _serializer.SerializePayloadAsString(users);
+        var strPayload = serializer.SerializePayloadAsString(users);
         var newEvent = new RoomEvent
         {
             RoomId = detail.RoomId,
@@ -71,8 +58,8 @@ public class JoinVideoChatWebSocketByNameEventHandler : WebSocketByNameEventHand
             Value = strPayload,
             CreatedById = detail.UserId,
         };
-        var provider = new CachedRoomEventProvider(newEvent, _serializer);
-        var sender = new WebSocketEventSender(_webSocketEventSender, detail.WebSocket);
-        await _eventSenderAdapter.SendAsync(provider, sender, cancellationToken);
+        var provider = new CachedRoomEventProvider(newEvent, serializer);
+        var sender = new WebSocketEventSender(webSocketEventSender, detail.WebSocket);
+        await eventSenderAdapter.SendAsync(provider, sender, cancellationToken);
     }
 }

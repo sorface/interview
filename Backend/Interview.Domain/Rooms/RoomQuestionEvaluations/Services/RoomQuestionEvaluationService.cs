@@ -8,29 +8,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Domain.Rooms.RoomQuestionEvaluations.Services;
 
-public class RoomQuestionEvaluationService : IRoomQuestionEvaluationService
+public class RoomQuestionEvaluationService(
+    IRoomQuestionRepository roomQuestionRepository,
+    IRoomParticipantRepository roomParticipantRepository,
+    AppDbContext db,
+    IRoomMembershipChecker membershipChecker)
+    : IRoomQuestionEvaluationService
 {
-    private readonly IRoomQuestionRepository _roomQuestionRepository;
-    private readonly IRoomParticipantRepository _roomParticipantRepository;
-    private readonly AppDbContext _db;
-    private readonly IRoomMembershipChecker _membershipChecker;
-
-    public RoomQuestionEvaluationService(
-        IRoomQuestionRepository roomQuestionRepository,
-        IRoomParticipantRepository roomParticipantRepository,
-        AppDbContext db,
-        IRoomMembershipChecker membershipChecker)
-    {
-        _roomQuestionRepository = roomQuestionRepository;
-        _roomParticipantRepository = roomParticipantRepository;
-        _db = db;
-        _membershipChecker = membershipChecker;
-    }
-
     public async Task<List<RoomQuestionEvaluationResponse>> GetUserRoomQuestionEvaluationsAsync(UserRoomQuestionEvaluationsRequest request, CancellationToken cancellationToken)
     {
-        await _membershipChecker.EnsureUserMemberOfRoomAsync(request.UserId, request.RoomId, cancellationToken);
-        return await _db.RoomQuestions
+        await membershipChecker.EnsureUserMemberOfRoomAsync(request.UserId, request.RoomId, cancellationToken);
+        return await db.RoomQuestions
             .Include(e => e.Question)
             .Include(e => e.Evaluations)
             .Where(e => e.RoomId == request.RoomId && e.State == RoomQuestionState.Closed)
@@ -56,7 +44,7 @@ public class RoomQuestionEvaluationService : IRoomQuestionEvaluationService
     public async Task<QuestionEvaluationDetail> FindByRoomIdAndQuestionIdAsync(QuestionEvaluationGetRequest request, CancellationToken cancellationToken)
     {
         await ValidateQuestionEvaluation(request.RoomId, request.UserId, cancellationToken);
-        var evaluation = await _db.RoomQuestionEvaluation
+        var evaluation = await db.RoomQuestionEvaluation
             .Include(e1 => e1.RoomQuestion)
             .Where(e3 => e3.RoomQuestion!.QuestionId == request.QuestionId && e3.RoomQuestion!.RoomId == request.RoomId && e3.CreatedById == request.UserId)
             .Select((Expression<Func<RoomQuestionEvaluation, QuestionEvaluationDetail>>)(e => new QuestionEvaluationDetail
@@ -77,14 +65,14 @@ public class RoomQuestionEvaluationService : IRoomQuestionEvaluationService
     public async Task<QuestionEvaluationDetail> MergeAsync(QuestionEvaluationMergeRequest mergeRequest, CancellationToken cancellationToken)
     {
         await ValidateQuestionEvaluation(mergeRequest.RoomId, mergeRequest.UserId, cancellationToken);
-        var questionEvaluation = await _db.RoomQuestionEvaluation
+        var questionEvaluation = await db.RoomQuestionEvaluation
             .Include(e1 => e1.RoomQuestion)
             .ThenInclude(e => e!.Room)
             .Where(e3 => e3.RoomQuestion!.QuestionId == mergeRequest.QuestionId && e3.RoomQuestion!.RoomId == mergeRequest.RoomId && e3.CreatedById == mergeRequest.UserId)
             .FirstOrDefaultAsync(cancellationToken);
         if (questionEvaluation is null)
         {
-            var roomQuestion = await _roomQuestionRepository.FindFirstByQuestionIdAndRoomIdAsync(mergeRequest.QuestionId, mergeRequest.RoomId, cancellationToken);
+            var roomQuestion = await roomQuestionRepository.FindFirstByQuestionIdAndRoomIdAsync(mergeRequest.QuestionId, mergeRequest.RoomId, cancellationToken);
             if (roomQuestion is null)
             {
                 throw new NotFoundException("Not found question in the room");
@@ -98,8 +86,8 @@ public class RoomQuestionEvaluationService : IRoomQuestionEvaluationService
                 State = SERoomQuestionEvaluationState.Draft,
                 RoomQuestionId = roomQuestion.Id,
             };
-            await _db.RoomQuestionEvaluation.AddAsync(questionEvaluation, cancellationToken);
-            await _db.SaveChangesAsync(cancellationToken);
+            await db.RoomQuestionEvaluation.AddAsync(questionEvaluation, cancellationToken);
+            await db.SaveChangesAsync(cancellationToken);
         }
         else
         {
@@ -110,7 +98,7 @@ public class RoomQuestionEvaluationService : IRoomQuestionEvaluationService
 
             questionEvaluation.Review = mergeRequest.Review;
             questionEvaluation.Mark = mergeRequest.Mark;
-            await _db.SaveChangesAsync(cancellationToken);
+            await db.SaveChangesAsync(cancellationToken);
         }
 
         return new QuestionEvaluationDetail { Id = questionEvaluation.Id, Mark = questionEvaluation.Mark, Review = questionEvaluation.Review, };
@@ -118,13 +106,13 @@ public class RoomQuestionEvaluationService : IRoomQuestionEvaluationService
 
     private async Task ValidateQuestionEvaluation(Guid roomId, Guid userId, CancellationToken cancellationToken)
     {
-        var hasRoom = await _db.Rooms.AnyAsync(e => e.Id == roomId, cancellationToken);
+        var hasRoom = await db.Rooms.AnyAsync(e => e.Id == roomId, cancellationToken);
         if (!hasRoom)
         {
             throw NotFoundException.Create<Room>(roomId);
         }
 
-        var roomParticipant = await _roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(roomId, userId, cancellationToken);
+        var roomParticipant = await roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(roomId, userId, cancellationToken);
         if (roomParticipant is null)
         {
             throw new AccessDeniedException("The user is not a member of the room");

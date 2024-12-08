@@ -4,15 +4,10 @@ using Microsoft.Extensions.Logging;
 namespace Interview.Infrastructure.WebSocket.Events.Handlers
 {
 #pragma warning disable SA1402
-    public abstract class WebSocketEventHandlerBase<TPayload> : IWebSocketEventHandler
+    public abstract class WebSocketEventHandlerBase<TPayload>(ILogger<WebSocketEventHandlerBase<TPayload>> logger) : IWebSocketEventHandler
 #pragma warning restore SA1402
     {
-        protected readonly ILogger<WebSocketEventHandlerBase<TPayload>> Logger;
-
-        protected WebSocketEventHandlerBase(ILogger<WebSocketEventHandlerBase<TPayload>> logger)
-        {
-            Logger = logger;
-        }
+        protected readonly ILogger<WebSocketEventHandlerBase<TPayload>> Logger = logger;
 
         public virtual int Order => 0;
 

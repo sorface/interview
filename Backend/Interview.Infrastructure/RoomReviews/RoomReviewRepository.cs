@@ -8,13 +8,8 @@ using X.PagedList;
 
 namespace Interview.Infrastructure.RoomReviews;
 
-public class RoomReviewRepository : EfRepository<RoomReview>, IRoomReviewRepository
+public class RoomReviewRepository(AppDbContext db) : EfRepository<RoomReview>(db), IRoomReviewRepository
 {
-    public RoomReviewRepository(AppDbContext db)
-        : base(db)
-    {
-    }
-
     public Task<IPagedList<RoomReviewPageDetail>> GetDetailedPageAsync(ISpecification<RoomReview> specification,
                                                                        int pageNumber,
                                                                        int pageSize,

@@ -5,13 +5,8 @@ using X.PagedList;
 
 namespace Interview.Infrastructure.Rooms;
 
-public class QueuedRoomEventRepository : EfRepository<QueuedRoomEvent>, IQueuedRoomEventRepository
+public class QueuedRoomEventRepository(AppDbContext db) : EfRepository<QueuedRoomEvent>(db), IQueuedRoomEventRepository
 {
-    public QueuedRoomEventRepository(AppDbContext db)
-        : base(db)
-    {
-    }
-
     public Task<IPagedList<Guid>> GetNotProcessedRoomsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
         return Db.Rooms.AsNoTracking()

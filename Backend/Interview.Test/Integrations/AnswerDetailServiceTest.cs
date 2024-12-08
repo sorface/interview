@@ -33,14 +33,14 @@ public class AnswerDetailServiceTest
                          new DateTime(2024, 1, 1, 10, 00, 00),
                          new DateTime(2024, 1, 1, 14, 13, 9)))
             {
-                yield return new object[] { new List<GenerateData> { item, } };
+                yield return [new List<GenerateData> { item, }];
             }
 
             var i1 = GenerateAllCases(new DateTime(2024, 1, 1, 10, 00, 00), new DateTime(2024, 1, 1, 14, 13, 9)).ToList();
             var i2 = GenerateAllCases(new DateTime(2024, 2, 13, 2, 3, 55), new DateTime(2024, 2, 23, 23, 8, 55)).ToList();
             foreach (var generateDatase in i1.SelectMany(_ => i2, (data, generateData) => new List<GenerateData> { data, generateData }))
             {
-                yield return new object[] { generateDatase };
+                yield return [generateDatase];
             }
 
             var i3 = GenerateAllCases(new DateTime(2024, 2, 23, 23, 8, 55), new DateTime(2024, 2, 24, 2, 0, 2)).ToList();
@@ -48,7 +48,7 @@ public class AnswerDetailServiceTest
                          .SelectMany(_ => i2, (data, generateData) => (Item1: data, Item2: generateData))
                          .SelectMany(_ => i3, (list, data) => new List<GenerateData> { list.Item1, list.Item2, data }))
             {
-                yield return new object[] { generateDatase };
+                yield return [generateDatase];
             }
 
             static IEnumerable<GenerateData> GenerateAllCases(DateTime start, DateTime end)

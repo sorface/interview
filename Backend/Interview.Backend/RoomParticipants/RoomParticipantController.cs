@@ -10,15 +10,8 @@ namespace Interview.Backend.RoomParticipants;
 
 [ApiController]
 [Route("api/room-participants")]
-public class RoomParticipantController : ControllerBase
+public class RoomParticipantController(IRoomParticipantService roomParticipantService) : ControllerBase
 {
-    private readonly IRoomParticipantService _roomParticipantService;
-
-    public RoomParticipantController(IRoomParticipantService roomParticipantService)
-    {
-        _roomParticipantService = roomParticipantService;
-    }
-
     /// <summary>
     /// Getting a list of room participants.
     /// </summary>
@@ -29,7 +22,7 @@ public class RoomParticipantController : ControllerBase
     [ProducesResponseType(typeof(RoomParticipantDetail), StatusCodes.Status200OK)]
     public Task<RoomParticipantDetail> FindByRoomIdAndUserId([FromQuery] RoomParticipantGetRequest request)
     {
-        return _roomParticipantService.FindByRoomIdAndUserIdAsync(request, HttpContext.RequestAborted);
+        return roomParticipantService.FindByRoomIdAndUserIdAsync(request, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -43,7 +36,7 @@ public class RoomParticipantController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<RoomParticipantDetail>> Create([FromBody] RoomParticipantCreateRequest request)
     {
-        var roomParticipant = await _roomParticipantService.CreateAsync(request, HttpContext.RequestAborted);
+        var roomParticipant = await roomParticipantService.CreateAsync(request, HttpContext.RequestAborted);
 
         return ServiceResult.Created(roomParticipant).ToActionResult();
     }
@@ -59,6 +52,6 @@ public class RoomParticipantController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<RoomParticipantDetail> ChangeStatus([FromBody] RoomParticipantChangeStatusRequest request)
     {
-        return _roomParticipantService.ChangeStatusAsync(request, HttpContext.RequestAborted);
+        return roomParticipantService.ChangeStatusAsync(request, HttpContext.RequestAborted);
     }
 }

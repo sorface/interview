@@ -6,18 +6,11 @@ using Interview.Domain.PubSub.Factory;
 
 namespace Interview.Domain.PubSub;
 
-public class RoomEventDispatcher : IRoomEventDispatcher
+public class RoomEventDispatcher(IEventBusPublisherFactory publisherFactory) : IRoomEventDispatcher
 {
-    private readonly IEventBusPublisherFactory _publisherFactory;
-
-    public RoomEventDispatcher(IEventBusPublisherFactory publisherFactory)
-    {
-        _publisherFactory = publisherFactory;
-    }
-
     public async Task WriteAsync(IRoomEvent @event, CancellationToken cancellationToken = default)
     {
-        var publisher = await _publisherFactory.CreateAsync(cancellationToken);
+        var publisher = await publisherFactory.CreateAsync(cancellationToken);
         var eventAsBytes = JsonSerializer.SerializeToUtf8Bytes(@event);
         var sendAllInRoomEventBusEvent = new SendAllInRoomEventBusEvent
         {

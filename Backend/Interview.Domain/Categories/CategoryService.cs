@@ -10,20 +10,11 @@ using X.PagedList;
 
 namespace Interview.Domain.Categories;
 
-public class CategoryService : ICategoryService
+public class CategoryService(AppDbContext db, ArchiveService<Category> archiveService) : ICategoryService
 {
-    private readonly AppDbContext _db;
-    private readonly ArchiveService<Category> _archiveService;
-
-    public CategoryService(AppDbContext db, ArchiveService<Category> archiveService)
-    {
-        _db = db;
-        _archiveService = archiveService;
-    }
-
     public async Task<CategoryResponse> FindByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        var response = await _db.Categories.AsNoTracking()
+        var response = await db.Categories.AsNoTracking()
             .Where(e => e.Id == id)
             .Select(CategoryResponse.Mapper.Expression)
             .FirstOrDefaultAsync(cancellationToken);
@@ -59,8 +50,8 @@ public class CategoryService : ICategoryService
             Name = request.Name,
             ParentId = request.ParentId,
         };
-        await _db.Categories.AddAsync(category, cancellationToken);
-        await _db.SaveChangesAsync(cancellationToken);
+        await db.Categories.AddAsync(category, cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
         var response = CategoryResponse.Mapper.Map(category);
         return ServiceResult.Ok(response);
     }
@@ -74,7 +65,7 @@ public class CategoryService : ICategoryService
         }
 
         request.Name = request.Name!.Trim();
-        var category = await _db.Categories.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        var category = await db.Categories.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
         if (category is null)
         {
             return ServiceError.NotFound($"Not found category by id '{id}'");
@@ -96,27 +87,27 @@ public class CategoryService : ICategoryService
 
         category.Name = request.Name;
         category.ParentId = request.ParentId;
-        await _db.SaveChangesAsync(cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
         var response = CategoryResponse.Mapper.Map(category);
         return ServiceResult.Ok(response);
     }
 
     public async Task<CategoryResponse> ArchiveAsync(Guid id, CancellationToken cancellationToken)
     {
-        var result = await _archiveService.ArchiveAsync(id, cancellationToken);
+        var result = await archiveService.ArchiveAsync(id, cancellationToken);
         return CategoryResponse.Mapper.Map(result);
     }
 
     public async Task<CategoryResponse> UnarchiveAsync(Guid id, CancellationToken cancellationToken)
     {
-        var result = await _archiveService.UnarchiveAsync(id, cancellationToken);
+        var result = await archiveService.UnarchiveAsync(id, cancellationToken);
         return CategoryResponse.Mapper.Map(result);
     }
 
     private async Task<IPagedList<CategoryResponse>> FindPageCoreAsync(bool archive, CategoryPageRequest request, CancellationToken cancellationToken)
     {
         var filter = await BuildSpecificationAsync(archive, request, cancellationToken);
-        return await _db.Categories
+        return await db.Categories
             .AsNoTracking()
             .Where(filter)
             .OrderBy(e => e.Name)
@@ -158,7 +149,7 @@ public class CategoryService : ICategoryService
 
     private async Task<HashSet<Guid>> GetAllChildrenAsync(Guid categoryId, CancellationToken cancellationToken)
     {
-        var childrenList = await _db.Categories
+        var childrenList = await db.Categories
             .AsNoTracking()
             .Where(e => e.ParentId == categoryId)
             .Select(e => e.Id)
@@ -167,12 +158,12 @@ public class CategoryService : ICategoryService
         var actualParent = children;
         while (actualParent.Count > 0)
         {
-            var childrenNLevel = await _db.Categories
+            var childrenNLevel = await db.Categories
                 .AsNoTracking()
                 .Where(e => e.ParentId != null && actualParent.Contains(e.ParentId.Value))
                 .Select(e => e.Id)
                 .ToListAsync(cancellationToken);
-            actualParent = new HashSet<Guid>();
+            actualParent = [];
             foreach (var id in childrenNLevel)
             {
                 if (children.Add(id))
@@ -192,6 +183,6 @@ public class CategoryService : ICategoryService
             return Task.FromResult<ServiceError?>(ServiceError.Error("Category should not be empty"));
         }
 
-        return Category.ValidateParentAsync(_db, request.ParentId, cancellationToken);
+        return Category.ValidateParentAsync(db, request.ParentId, cancellationToken);
     }
 }

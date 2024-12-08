@@ -1,17 +1,12 @@
 namespace Interview.Domain.Users;
 
-public sealed class CurrentUserAccessor : IEditableCurrentUserAccessor
+public sealed class CurrentUserAccessor(User? currentUser) : IEditableCurrentUserAccessor
 {
-    private User? _currentUser;
+    private User? _currentUser = currentUser;
 
     public CurrentUserAccessor()
         : this(null)
     {
-    }
-
-    public CurrentUserAccessor(User? currentUser)
-    {
-        _currentUser = currentUser;
     }
 
     public Guid? UserId => _currentUser?.Id;

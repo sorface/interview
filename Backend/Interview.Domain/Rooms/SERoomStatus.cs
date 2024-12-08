@@ -2,7 +2,7 @@ using Ardalis.SmartEnum;
 
 namespace Interview.Domain.Rooms;
 
-public class SERoomStatus : SmartEnum<SERoomStatus, char>
+public class SERoomStatus(string name, char value, EVRoomStatus enumValue) : SmartEnum<SERoomStatus, char>(name, value)
 {
     public static readonly SERoomStatus New = new SERoomStatus("New", 'N', EVRoomStatus.New);
 
@@ -12,13 +12,7 @@ public class SERoomStatus : SmartEnum<SERoomStatus, char>
 
     public static readonly SERoomStatus Close = new SERoomStatus("Closed", 'C', EVRoomStatus.Close);
 
-    public SERoomStatus(string name, char value, EVRoomStatus enumValue)
-        : base(name, value)
-    {
-        EnumValue = enumValue;
-    }
-
-    public EVRoomStatus EnumValue { get; }
+    public EVRoomStatus EnumValue { get; } = enumValue;
 
     public static SERoomStatus FromEnum(EVRoomStatus enumValue)
     {

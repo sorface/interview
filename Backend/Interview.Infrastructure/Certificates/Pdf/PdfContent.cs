@@ -4,15 +4,8 @@ using QuestPDF.Infrastructure;
 
 namespace Interview.Infrastructure.Certificates.Pdf;
 
-internal class PdfContent : IComponent
+internal class PdfContent(CertificateDetail detail) : IComponent
 {
-    private readonly CertificateDetail _detail;
-
-    public PdfContent(CertificateDetail detail)
-    {
-        _detail = detail;
-    }
-
     public void Compose(IContainer container)
     {
         container
@@ -25,10 +18,10 @@ internal class PdfContent : IComponent
                 column.Item().Text(text =>
                 {
                     text.Span("Result: ");
-                    text.Span(_detail.Grade.Name).Underline();
+                    text.Span(detail.Grade.Name).Underline();
                 });
 
-                column.Item().Text(_detail.Description);
+                column.Item().Text(detail.Description);
             });
     }
 }

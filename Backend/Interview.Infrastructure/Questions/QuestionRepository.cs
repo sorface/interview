@@ -4,13 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Infrastructure.Questions;
 
-public class QuestionRepository : EfRepository<Question>, IQuestionRepository
+public class QuestionRepository(AppDbContext db) : EfRepository<Question>(db), IQuestionRepository
 {
-    public QuestionRepository(AppDbContext db)
-        : base(db)
-    {
-    }
-
     public Task DeletePermanentlyAsync(Question entity, CancellationToken cancellationToken = default)
     {
         return Db.RunTransactionAsync(async _ =>

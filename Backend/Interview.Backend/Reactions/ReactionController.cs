@@ -9,15 +9,8 @@ namespace Interview.Backend.Reactions;
 
 [ApiController]
 [Route("api/reactions")]
-public class ReactionController : ControllerBase
+public class ReactionController(IReactionService reactionService) : ControllerBase
 {
-    private readonly IReactionService _reactionService;
-
-    public ReactionController(IReactionService reactionService)
-    {
-        _reactionService = reactionService;
-    }
-
     /// <summary>
     /// Getting a list of reactions.
     /// </summary>
@@ -27,5 +20,5 @@ public class ReactionController : ControllerBase
     [Authorize]
     [ProducesResponseType(typeof(IPagedList<ReactionDetail>), StatusCodes.Status200OK)]
     public Task<IPagedList<ReactionDetail>> GetPage([FromQuery] PageRequest request) =>
-        _reactionService.FindPageAsync(request.PageNumber, request.PageSize, HttpContext.RequestAborted);
+        reactionService.FindPageAsync(request.PageNumber, request.PageSize, HttpContext.RequestAborted);
 }

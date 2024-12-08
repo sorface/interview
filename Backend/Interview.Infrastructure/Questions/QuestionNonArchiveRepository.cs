@@ -3,10 +3,4 @@ using Interview.Domain.Questions;
 
 namespace Interview.Infrastructure.Questions;
 
-public class QuestionNonArchiveRepository : EfNonArchiveRepository<Question>, IQuestionNonArchiveRepository
-{
-    public QuestionNonArchiveRepository(AppDbContext db)
-        : base(db)
-    {
-    }
-}
+public class QuestionNonArchiveRepository(AppDbContext db) : EfNonArchiveRepository<Question>(db), IQuestionNonArchiveRepository;

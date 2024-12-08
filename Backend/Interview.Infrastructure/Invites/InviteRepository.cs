@@ -3,10 +3,4 @@ using Interview.Domain.Invites;
 
 namespace Interview.Infrastructure.Invites;
 
-public class InviteRepository : EfRepository<Invite>, IInviteRepository
-{
-    public InviteRepository(AppDbContext db)
-        : base(db)
-    {
-    }
-}
+public class InviteRepository(AppDbContext db) : EfRepository<Invite>(db), IInviteRepository;

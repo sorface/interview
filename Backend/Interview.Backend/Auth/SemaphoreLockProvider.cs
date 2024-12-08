@@ -2,17 +2,10 @@ using System.Collections.Concurrent;
 
 namespace Interview.Backend.Auth
 {
-    public class SemaphoreLockProvider<T>
+    public class SemaphoreLockProvider<T>(ILogger<SemaphoreLockProvider<T>> logger)
         where T : notnull
     {
         private static readonly ConcurrentDictionary<T, SemaphoreSlim> LOCKSTORE = new();
-
-        private readonly ILogger<SemaphoreLockProvider<T>> _logger;
-
-        public SemaphoreLockProvider(ILogger<SemaphoreLockProvider<T>> logger)
-        {
-            _logger = logger;
-        }
 
         /// <summary>
         /// Asynchronously puts thread to wait (according to the given ID)
@@ -39,7 +32,7 @@ namespace Interview.Backend.Auth
 
             semaphore.Release();
 
-            _logger.LogDebug($@"current capacity semaphore store {LOCKSTORE.Count}");
+            logger.LogDebug($@"current capacity semaphore store {LOCKSTORE.Count}");
         }
     }
 }

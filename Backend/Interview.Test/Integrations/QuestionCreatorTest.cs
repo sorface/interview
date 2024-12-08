@@ -33,7 +33,7 @@ public class QuestionCreatorTest
                 {
                     word += new string('*', 3 - word.Length);
                 }
-                yield return new object?[] { word, room, };
+                yield return [word, room];
             }
         }
     }
@@ -64,25 +64,17 @@ public class QuestionCreatorTest
         var creator = CreateQuestionCreate(appDbContext, roomMemberChecker.Object);
         var questionCreateRequest = new QuestionCreateRequest
         {
-            Tags = new HashSet<Guid>(),
+            Tags = [],
             Value = value,
             Type = EVQuestionType.Private,
             CategoryId = category.Id,
-            Answers = new List<QuestionAnswerCreateRequest>
-            {
-                new()
-                {
-                    Title = "#1",
-                    Content = "test",
-                    CodeEditor = false
-                },
-                new()
-                {
-                    Title = "#2",
-                    Content = "test 2",
-                    CodeEditor = false
-                },
-            },
+            Answers =
+            [
+                new() { Title = "#1", Content = "test", CodeEditor = false },
+
+                new() { Title = "#2", Content = "test 2", CodeEditor = false }
+
+            ],
             CodeEditor = new QuestionCodeEditorEditRequest
             {
                 Content = "my content",
@@ -127,11 +119,11 @@ public class QuestionCreatorTest
         var creator = CreateQuestionCreate(appDbContext, roomMemberChecker.Object);
         var questionCreateRequest = new QuestionCreateRequest
         {
-            Tags = new HashSet<Guid>(),
+            Tags = [],
             Value = "Test",
             Type = EVQuestionType.Private,
             CategoryId = category.Id,
-            Answers = new List<QuestionAnswerCreateRequest>(),
+            Answers = [],
             CodeEditor = null,
         };
         await Assert.ThrowsAsync<UnavailableException>(() => creator.CreateAsync(questionCreateRequest, room.Id, CancellationToken.None));

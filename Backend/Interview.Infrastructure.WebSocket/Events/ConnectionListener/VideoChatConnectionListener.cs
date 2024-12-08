@@ -12,26 +12,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket.Events.ConnectionListener;
 
-public class VideoChatConnectionListener : IConnectionListener, IVideChatConnectionProvider
+public class VideoChatConnectionListener(
+    ILogger<VideoChatConnectionListener> logger,
+    ILogger<WebSocketEventSender> webSocketEventSender,
+    IEventSenderAdapter eventSenderAdapter,
+    IRoomEventSerializer serializer)
+    : IConnectionListener, IVideChatConnectionProvider
 {
     private readonly ConcurrentDictionary<Guid, ImmutableList<Payload>> _store = new();
     private readonly ConcurrentDictionary<(Guid UserId, Guid RoomId), ImmutableList<System.Net.WebSockets.WebSocket>> _storeByUserAndRoom = new();
-    private readonly ILogger<VideoChatConnectionListener> _logger;
-    private readonly ILogger<WebSocketEventSender> _webSocketEventSender;
-    private readonly IEventSenderAdapter _eventSenderAdapter;
-    private readonly IRoomEventSerializer _serializer;
-
-    public VideoChatConnectionListener(
-        ILogger<VideoChatConnectionListener> logger,
-        ILogger<WebSocketEventSender> webSocketEventSender,
-        IEventSenderAdapter eventSenderAdapter,
-        IRoomEventSerializer serializer)
-    {
-        _logger = logger;
-        _webSocketEventSender = webSocketEventSender;
-        _eventSenderAdapter = eventSenderAdapter;
-        _serializer = serializer;
-    }
 
     public Task OnConnectAsync(WebSocketConnectDetail detail, CancellationToken cancellationToken)
     {
@@ -65,7 +54,7 @@ public class VideoChatConnectionListener : IConnectionListener, IVideChatConnect
         if (disconnectUser && TryGetConnections(detail.Room.Id, out var connections))
         {
             var payload = new { Id = detail.User.Id, };
-            var payloadJson = _serializer.SerializePayloadAsString(payload);
+            var payloadJson = serializer.SerializePayloadAsString(payload);
             var sendEvent = new RoomEvent
             {
                 RoomId = detail.Room.Id,
@@ -73,12 +62,12 @@ public class VideoChatConnectionListener : IConnectionListener, IVideChatConnect
                 Value = payloadJson,
                 CreatedById = detail.User.Id,
             };
-            var provider = new CachedRoomEventProvider(sendEvent, _serializer);
+            var provider = new CachedRoomEventProvider(sendEvent, serializer);
 
             foreach (var (_, _, webSocket) in connections)
             {
-                var sender = new WebSocketEventSender(_webSocketEventSender, webSocket);
-                await _eventSenderAdapter.SendAsync(provider, sender, cancellationToken);
+                var sender = new WebSocketEventSender(webSocketEventSender, webSocket);
+                await eventSenderAdapter.SendAsync(provider, sender, cancellationToken);
             }
         }
     }
@@ -89,7 +78,7 @@ public class VideoChatConnectionListener : IConnectionListener, IVideChatConnect
         var roomParticipant = await participantRepository.FindByRoomIdAndUserIdDetailedAsync(detail.RoomId, detail.UserId, cancellationToken);
         if (roomParticipant is null)
         {
-            _logger.LogWarning("Not found room participant {RoomId} {UserId}", detail.RoomId, detail.UserId);
+            logger.LogWarning("Not found room participant {RoomId} {UserId}", detail.RoomId, detail.UserId);
             return false;
         }
 

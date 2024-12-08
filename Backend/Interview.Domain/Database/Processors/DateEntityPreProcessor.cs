@@ -4,34 +4,25 @@ using Microsoft.Extensions.Internal;
 
 namespace Interview.Domain.Database.Processors;
 
-public class DateEntityPreProcessor : AbstractPreProcessor
+public class DateEntityPreProcessor(ICurrentUserAccessor currentUserAccessor, ISystemClock clock) : AbstractPreProcessor
 {
-    private readonly ICurrentUserAccessor _currentUserAccessor;
-    private readonly ISystemClock _clock;
-
     public bool TestEnv { get; init; }
-
-    public DateEntityPreProcessor(ICurrentUserAccessor currentUserAccessor, ISystemClock clock)
-    {
-        _currentUserAccessor = currentUserAccessor;
-        _clock = clock;
-    }
 
     protected override void AddEntityHandler(Entity entity, CancellationToken cancellationToken = default)
     {
-        entity.UpdateCreateDate(_clock.UtcNow.UtcDateTime);
+        entity.UpdateCreateDate(clock.UtcNow.UtcDateTime);
         if (TestEnv)
         {
-            entity.CreatedById ??= _currentUserAccessor.UserId;
+            entity.CreatedById ??= currentUserAccessor.UserId;
         }
         else
         {
-            entity.CreatedById = _currentUserAccessor.UserId;
+            entity.CreatedById = currentUserAccessor.UserId;
         }
     }
 
     protected override void ModifyOriginalEntityHandler(Entity entity, CancellationToken cancellationToken = default)
     {
-        entity.UpdateUpdateDate(_clock.UtcNow.UtcDateTime);
+        entity.UpdateUpdateDate(clock.UtcNow.UtcDateTime);
     }
 }

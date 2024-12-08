@@ -9,29 +9,18 @@ namespace Interview.Domain.Events.EventProvider;
 /// <summary>
 /// RoomEventProvider extension.
 /// </summary>
-public class RoomEventActiveQuestionProvider
+public class RoomEventActiveQuestionProvider(IRoomEventProvider roomEventStorage, IRoomEventDeserializer eventDeserializer, ISystemClock clock)
 {
-    private readonly IRoomEventProvider _roomEventStorage;
-    private readonly IRoomEventDeserializer _eventDeserializer;
-    private readonly ISystemClock _clock;
-
-    public RoomEventActiveQuestionProvider(IRoomEventProvider roomEventStorage, IRoomEventDeserializer eventDeserializer, ISystemClock clock)
-    {
-        _roomEventStorage = roomEventStorage;
-        _eventDeserializer = eventDeserializer;
-        _clock = clock;
-    }
-
     public async IAsyncEnumerable<(DateTime StartActiveDate, DateTime EndActiveDate)> GetActiveQuestionDateAsync(
         Guid questionId,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var changedRooms = await _roomEventStorage
+        var changedRooms = await roomEventStorage
             .GetEventsAsync(new EPStorageEventRequest { Type = EventType.ChangeRoomQuestionState, From = null, To = null, }, cancellationToken);
 
         var list = changedRooms
             .Where(e => e.Payload is not null)
-            .Select(e => new { Payload = _eventDeserializer.Deserialize<RoomQuestionChangeEventPayload>(e.Payload!), CreateAt = e.CreatedAt, })
+            .Select(e => new { Payload = eventDeserializer.Deserialize<RoomQuestionChangeEventPayload>(e.Payload!), CreateAt = e.CreatedAt, })
             .OrderBy(e => e.CreateAt)
             .ToList();
         foreach (var e in list)
@@ -48,7 +37,7 @@ public class RoomEventActiveQuestionProvider
                 .Select(evDetail => (DateTime?)evDetail.CreateAt)
                 .FirstOrDefault();
 
-            yield return (minDate, endActiveDate ?? _clock.UtcNow.UtcDateTime);
+            yield return (minDate, endActiveDate ?? clock.UtcNow.UtcDateTime);
         }
     }
 }

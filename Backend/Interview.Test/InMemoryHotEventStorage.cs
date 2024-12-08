@@ -6,7 +6,7 @@ namespace Interview.Test;
 
 public sealed class InMemoryHotEventStorage : IHotEventStorage
 {
-    private readonly List<IStorageEvent> _storage = new();
+    private readonly List<IStorageEvent> _storage = [];
 
     public ValueTask AddAsync(IStorageEvent @event, CancellationToken cancellationToken)
     {

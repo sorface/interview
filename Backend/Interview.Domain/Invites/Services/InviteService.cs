@@ -3,7 +3,7 @@ using Interview.Domain.Repository;
 
 namespace Interview.Domain.Invites.Services;
 
-public class InviteService : IInviteService
+public class InviteService(IInviteRepository inviteRepository) : IInviteService
 {
     private static readonly Mapper<Invite, InvitationItem> _MAPPERINVITATIONITEM = new(
         invitation => new InvitationItem
@@ -17,15 +17,8 @@ public class InviteService : IInviteService
             OwnerId = invitation.CreatedById,
         });
 
-    private readonly IInviteRepository _inviteRepository;
-
-    public InviteService(IInviteRepository inviteRepository)
-    {
-        _inviteRepository = inviteRepository;
-    }
-
     public async Task<InvitationItem?> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await _inviteRepository.FindByIdDetailedAsync(id, _MAPPERINVITATIONITEM, cancellationToken);
+        return await inviteRepository.FindByIdDetailedAsync(id, _MAPPERINVITATIONITEM, cancellationToken);
     }
 }

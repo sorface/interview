@@ -5,15 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Backend.AppEvents;
 
-public class EventApplier
+public class EventApplier(IConfiguration configuration)
 {
-    private readonly IConfiguration _configuration;
-
-    public EventApplier(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
-
     public async Task ApplyEventsAsync(AppDbContext db, CancellationToken cancellationToken)
     {
         var events = GetInitialEvents();
@@ -59,8 +52,8 @@ public class EventApplier
     {
         foreach (var (type, existsEvent) in existsEvents)
         {
-            existsEvent.Roles ??= new List<Role>();
-            existsEvent.ParticipantTypes ??= new List<SERoomParticipantType>();
+            existsEvent.Roles ??= [];
+            existsEvent.ParticipantTypes ??= [];
             var dbRoles = existsEvent.Roles.Select(e => e.Name.EnumValue).ToHashSet();
             var initialEvent = searchEvents[type];
             dbRoles.SymmetricExceptWith(initialEvent.Roles);
@@ -95,8 +88,8 @@ public class EventApplier
 
     private InitialEvent[] GetInitialEvents()
     {
-        var initialEventsSection = _configuration.GetSection("InitialEvents");
+        var initialEventsSection = configuration.GetSection("InitialEvents");
         var events = initialEventsSection?.Get<InitialEvent[]>();
-        return events ?? Array.Empty<InitialEvent>();
+        return events ?? [];
     }
 }
