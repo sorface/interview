@@ -47,8 +47,8 @@ public class UserServiceTest
         expectedUser.UpdateCreateDate(user.CreateDate);
         expectedUser.Roles.AddRange(entity.Roles);
         expectedUser.Permissions.AddRange(entity.Permissions);
-        var excluder = CreateDatesExcluder();
-        upsertUser.Should().BeEquivalentTo(expectedUser, e => e.Excluding(excluder));
+        var datesForExcluding = CreateDatesExcluder();
+        upsertUser.Should().BeEquivalentTo(expectedUser, e => e.Excluding(datesForExcluding));
     }
 
     [Theory(DisplayName = "'UpsertByTwitchIdentityAsync' when there is no such user in the database")]
