@@ -16,7 +16,7 @@ jobs:
       - name: Setup .NET SDK # detected from global.json
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '7.0.x'
+          dotnet-version: '9.0.x'
       - name: Add Problem Matcher for dotnet-format
         uses: xt0rted/dotnet-format-problem-matcher@v1.2.0
       - name: Lint
