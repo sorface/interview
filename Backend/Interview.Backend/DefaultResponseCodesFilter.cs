@@ -12,18 +12,16 @@ namespace Interview.Backend;
 /// </summary>
 public class DefaultResponseCodesFilter : IOperationFilter
 {
-    private readonly Dictionary<string, OpenApiResponse> _defaultResponses = new(new[]
-    {
+    private readonly Dictionary<string, OpenApiResponse> _defaultResponses = new([
         CreateMessageResponseOpenApiResponse(HttpStatusCode.InternalServerError, "Error content"),
         CreateMessageResponseOpenApiResponse(HttpStatusCode.BadRequest, "Error content"),
-        CreateMessageResponseOpenApiResponse(HttpStatusCode.TooManyRequests, "Too many requests"),
-    });
+        CreateMessageResponseOpenApiResponse(HttpStatusCode.TooManyRequests, "Too many requests")
+    ]);
 
-    private readonly Dictionary<string, OpenApiResponse> _authResponses = new(new[]
-    {
+    private readonly Dictionary<string, OpenApiResponse> _authResponses = new([
         CreateMessageResponseOpenApiResponse(HttpStatusCode.Unauthorized, "Unauthorized"),
-        CreateMessageResponseOpenApiResponse(HttpStatusCode.Forbidden, "Forbidden"),
-    });
+        CreateMessageResponseOpenApiResponse(HttpStatusCode.Forbidden, "Forbidden")
+    ]);
 
     /// <inheritdoc/>
     public void Apply(OpenApiOperation operation, OperationFilterContext context)

@@ -12,18 +12,11 @@ public interface IPooledDbContextInterceptor<in TContext>
     void OnReturn(TContext dbContext);
 }
 
-public class UserAccessorDbContextInterceptor : IPooledDbContextInterceptor<AppDbContext>
+public class UserAccessorDbContextInterceptor(IServiceProvider serviceProvider) : IPooledDbContextInterceptor<AppDbContext>
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public UserAccessorDbContextInterceptor(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
-
     public void OnCreate(AppDbContext dbContext)
     {
-        dbContext.Processors = new LazyPreProcessors(_serviceProvider);
+        dbContext.Processors = new LazyPreProcessors(serviceProvider);
     }
 
     public void OnReturn(AppDbContext dbContext)
@@ -32,21 +25,13 @@ public class UserAccessorDbContextInterceptor : IPooledDbContextInterceptor<AppD
     }
 }
 
-#pragma warning disable SA1402
-public sealed class LazyPreProcessors
-#pragma warning restore SA1402
+public sealed class LazyPreProcessors(IServiceProvider serviceProvider)
 {
-    private readonly Lazy<List<IEntityPreProcessor>> _preProcessors;
+    private readonly Lazy<List<IEntityPreProcessor>> _preProcessors = new(
+        () => serviceProvider.GetServices<IEntityPreProcessor>().ToList());
 
-    private readonly Lazy<List<IEntityPostProcessor>> _postProcessors;
-
-    public LazyPreProcessors(IServiceProvider serviceProvider)
-    {
-        _preProcessors = new Lazy<List<IEntityPreProcessor>>(
-            () => serviceProvider.GetServices<IEntityPreProcessor>().ToList());
-        _postProcessors = new Lazy<List<IEntityPostProcessor>>(
-            () => serviceProvider.GetServices<IEntityPostProcessor>().ToList());
-    }
+    private readonly Lazy<List<IEntityPostProcessor>> _postProcessors = new(
+        () => serviceProvider.GetServices<IEntityPostProcessor>().ToList());
 
     public List<IEntityPreProcessor> PreProcessors => _preProcessors.Value;
 

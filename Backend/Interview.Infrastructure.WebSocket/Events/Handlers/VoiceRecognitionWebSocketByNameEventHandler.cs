@@ -4,18 +4,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket.Events.Handlers;
 
-public class VoiceRecognitionWebSocketByNameEventHandler : WebSocketByNameEventHandlerBase
+public class VoiceRecognitionWebSocketByNameEventHandler(
+    IRoomEventDispatcher eventDispatcher,
+    ILogger<WebSocketByNameEventHandlerBase> logger)
+    : WebSocketByNameEventHandlerBase(logger)
 {
-    private readonly IRoomEventDispatcher _eventDispatcher;
-
-    public VoiceRecognitionWebSocketByNameEventHandler(
-        IRoomEventDispatcher eventDispatcher,
-        ILogger<WebSocketByNameEventHandlerBase> logger)
-        : base(logger)
-    {
-        _eventDispatcher = eventDispatcher;
-    }
-
     protected override string SupportType => "voice-recognition";
 
     protected override Task HandleEventAsync(SocketEventDetail detail, string? message, CancellationToken cancellationToken)
@@ -32,6 +25,6 @@ public class VoiceRecognitionWebSocketByNameEventHandler : WebSocketByNameEventH
             Value = payload,
             CreatedById = detail.UserId,
         };
-        return _eventDispatcher.WriteAsync(@event, cancellationToken);
+        return eventDispatcher.WriteAsync(@event, cancellationToken);
     }
 }

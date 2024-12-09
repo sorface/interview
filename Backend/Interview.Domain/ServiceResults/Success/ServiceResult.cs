@@ -34,15 +34,10 @@ public class ServiceResult : IEquatable<ServiceResult>
 }
 
 #pragma warning disable SA1402
-public abstract class ServiceResult<T> : IEquatable<ServiceResult<T>>, IEquatable<T>
+public abstract class ServiceResult<T>(T value) : IEquatable<ServiceResult<T>>, IEquatable<T>
 #pragma warning restore SA1402
 {
-    public T Value { get; }
-
-    public ServiceResult(T value)
-    {
-        Value = value;
-    }
+    public T Value { get; } = value;
 
     public abstract TRes Match<TRes>(
         Func<OkServiceResult<T>, TRes> ok,

@@ -11,22 +11,15 @@ namespace Interview.Backend.Users;
 
 [ApiController]
 [Route("api/users")]
-public class UserController : ControllerBase
+public class UserController(IUserService userService) : ControllerBase
 {
-    private readonly IUserService _userService;
-
-    public UserController(IUserService userService)
-    {
-        _userService = userService;
-    }
-
     [Authorize]
     [HttpGet]
     [Produces("application/json")]
     [ProducesResponseType(typeof(IPagedList<UserDetail>), StatusCodes.Status200OK)]
     public Task<IPagedList<UserDetail>> FindPage([FromQuery] PageRequest request)
     {
-        return _userService.FindPageAsync(request.PageNumber, request.PageSize, HttpContext.RequestAborted);
+        return userService.FindPageAsync(request.PageNumber, request.PageSize, HttpContext.RequestAborted);
     }
 
     [Authorize]
@@ -36,7 +29,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<UserDetail> FindByNickname([FromRoute] string nickname)
     {
-        return _userService.FindByNicknameAsync(nickname, HttpContext.RequestAborted);
+        return userService.FindByNicknameAsync(nickname, HttpContext.RequestAborted);
     }
 
     [Authorize]
@@ -46,7 +39,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<IPagedList<UserDetail>> FindByRole([FromQuery] PageRequest pageRequest, [FromRoute] RoleNameType role)
     {
-        return _userService.FindByRoleAsync(pageRequest.PageNumber, pageRequest.PageSize, role, HttpContext.RequestAborted);
+        return userService.FindByRoleAsync(pageRequest.PageNumber, pageRequest.PageSize, role, HttpContext.RequestAborted);
     }
 
     [Authorize]
@@ -56,7 +49,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<IPagedList<UserDetail>> FindAdmins([FromQuery] PageRequest pageRequest)
     {
-        return _userService.FindByRoleAsync(pageRequest.PageNumber, pageRequest.PageSize, RoleNameType.Admin, HttpContext.RequestAborted);
+        return userService.FindByRoleAsync(pageRequest.PageNumber, pageRequest.PageSize, RoleNameType.Admin, HttpContext.RequestAborted);
     }
 
     [Authorize]
@@ -65,7 +58,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(UserDetail), StatusCodes.Status200OK)]
     public Task<UserDetail> GetMyself()
     {
-        return _userService.GetSelfAsync();
+        return userService.GetSelfAsync();
     }
 
     [Authorize]
@@ -74,7 +67,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(Dictionary<string, List<PermissionItem>>), StatusCodes.Status200OK)]
     public async Task<Dictionary<string, List<PermissionItem>>> GetPermissions(Guid id)
     {
-        return await _userService.GetPermissionsAsync(id, HttpContext.RequestAborted);
+        return await userService.GetPermissionsAsync(id, HttpContext.RequestAborted);
     }
 
     [Authorize]
@@ -83,6 +76,6 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(PermissionItem), StatusCodes.Status200OK)]
     public async Task<PermissionItem> GetPermissions(Guid id, [FromBody] PermissionModifyRequest request)
     {
-        return await _userService.ChangePermissionAsync(id, request, HttpContext.RequestAborted);
+        return await userService.ChangePermissionAsync(id, request, HttpContext.RequestAborted);
     }
 }

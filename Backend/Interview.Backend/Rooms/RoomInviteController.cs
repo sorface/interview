@@ -9,15 +9,8 @@ namespace Interview.Backend.Rooms;
 
 [ApiController]
 [Route("api/rooms/invites")]
-public class RoomInviteController : ControllerBase
+public class RoomInviteController(IRoomService roomService) : ControllerBase
 {
-    private readonly IRoomService _roomService;
-
-    public RoomInviteController(IRoomService roomService)
-    {
-        _roomService = roomService;
-    }
-
     /// <summary>
     /// Getting a Room invites by room id.
     /// </summary>
@@ -28,7 +21,7 @@ public class RoomInviteController : ControllerBase
     [ProducesResponseType(typeof(RoomInviteResponse), StatusCodes.Status200OK)]
     public Task<List<RoomInviteResponse>> GetRoomInvites(Guid roomId)
     {
-        return _roomService.GetInvitesAsync(roomId, HttpContext.RequestAborted);
+        return roomService.GetInvitesAsync(roomId, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -46,7 +39,7 @@ public class RoomInviteController : ControllerBase
         [FromRoute(Name = "roomId")] Guid roomId,
         [FromQuery(Name = "inviteId")] Guid inviteId)
     {
-        return _roomService.ApplyInvite(roomId, inviteId, HttpContext.RequestAborted);
+        return roomService.ApplyInvite(roomId, inviteId, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -61,7 +54,7 @@ public class RoomInviteController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
     public Task<List<RoomInviteResponse>> GenerateInvites([FromRoute(Name = "id")] Guid id)
     {
-        return _roomService.GenerateInvitesAsync(id, HttpContext.RequestAborted);
+        return roomService.GenerateInvitesAsync(id, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -76,6 +69,6 @@ public class RoomInviteController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
     public Task<RoomInviteResponse> GenerateInvite(RoomInviteGeneratedRequest request)
     {
-        return _roomService.GenerateInviteAsync(request, HttpContext.RequestAborted);
+        return roomService.GenerateInviteAsync(request, HttpContext.RequestAborted);
     }
 }

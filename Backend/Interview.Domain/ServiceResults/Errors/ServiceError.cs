@@ -1,13 +1,8 @@
 namespace Interview.Domain.ServiceResults.Errors;
 
-public class ServiceError : IEquatable<ServiceError>
+public class ServiceError(string message) : IEquatable<ServiceError>
 {
-    public string Message { get; }
-
-    public ServiceError(string message)
-    {
-        Message = message;
-    }
+    public string Message { get; } = message;
 
     public static ServiceError NotFound(string message) => new NotFoundServiceError(message);
 

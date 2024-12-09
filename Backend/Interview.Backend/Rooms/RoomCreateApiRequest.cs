@@ -11,13 +11,13 @@ public class RoomCreateApiRequest
 
     public string AccessType { get; set; } = SERoomAccessType.Public.Name;
 
-    public List<RoomQuestionRequest> Questions { get; set; } = new();
+    public List<RoomQuestionRequest> Questions { get; set; } = [];
 
-    public HashSet<Guid> Experts { get; set; } = new();
+    public HashSet<Guid> Experts { get; set; } = [];
 
-    public HashSet<Guid> Examinees { get; set; } = new();
+    public HashSet<Guid> Examinees { get; set; } = [];
 
-    public HashSet<Guid> Tags { get; set; } = new();
+    public HashSet<Guid> Tags { get; set; } = [];
 
     public long? Duration { get; set; }
 

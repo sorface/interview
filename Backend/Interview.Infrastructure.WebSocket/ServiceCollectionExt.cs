@@ -1,5 +1,4 @@
 using Interview.Domain.PubSub.Factory;
-using Interview.Infrastructure.WebSocket;
 using Interview.Infrastructure.WebSocket.Events;
 using Interview.Infrastructure.WebSocket.Events.ConnectionListener;
 using Interview.Infrastructure.WebSocket.Events.Handlers;
@@ -8,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IO;
 
-namespace Interview.Infrastructure.WebSockets;
+namespace Interview.Infrastructure.WebSocket;
 
 /// <summary>
 /// ServiceCollectionExt.

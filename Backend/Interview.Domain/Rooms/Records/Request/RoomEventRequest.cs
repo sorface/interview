@@ -2,23 +2,16 @@ using Interview.Domain.Events.Events;
 
 namespace Interview.Domain.Rooms.Records.Request;
 
-public sealed class RoomEventRequest : IEventRequest
+public sealed class RoomEventRequest(Guid roomId, Guid userId, string type, Dictionary<string, object>? additionalData)
+    : IEventRequest
 {
-    public Guid RoomId { get; }
+    public Guid RoomId { get; } = roomId;
 
-    public Guid UserId { get; }
+    public Guid UserId { get; } = userId;
 
-    public string Type { get; }
+    public string Type { get; } = type;
 
-    public Dictionary<string, object>? AdditionalData { get; }
-
-    public RoomEventRequest(Guid roomId, Guid userId, string type, Dictionary<string, object>? additionalData)
-    {
-        RoomId = roomId;
-        UserId = userId;
-        Type = type;
-        AdditionalData = additionalData;
-    }
+    public Dictionary<string, object>? AdditionalData { get; } = additionalData;
 
     public IRoomEvent ToRoomEvent(bool stateful) => new RoomUserEvent
     {

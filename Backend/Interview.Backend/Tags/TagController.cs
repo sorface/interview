@@ -10,15 +10,8 @@ namespace Interview.Backend.Tags;
 
 [ApiController]
 [Route("api/tags")]
-public class TagController : ControllerBase
+public class TagController(ITagService tagService) : ControllerBase
 {
-    private readonly ITagService _tagService;
-
-    public TagController(ITagService tagService)
-    {
-        _tagService = tagService;
-    }
-
     /// <summary>
     /// Getting a available tags page.
     /// </summary>
@@ -31,7 +24,7 @@ public class TagController : ControllerBase
     [ProducesResponseType(typeof(IPagedList<TagItem>), StatusCodes.Status200OK)]
     public Task<IPagedList<TagItem>> GetTagPage([FromQuery] string? value, [FromQuery] PageRequest request)
     {
-        return _tagService.FindTagsPageAsync(value, request.PageNumber, request.PageSize, HttpContext.RequestAborted);
+        return tagService.FindTagsPageAsync(value, request.PageNumber, request.PageSize, HttpContext.RequestAborted);
     }
 
     /// <summary>
@@ -46,7 +39,7 @@ public class TagController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<ActionResult<TagItem>> CreateTag(TagEditRequest request)
     {
-        return _tagService.CreateTagAsync(request, HttpContext.RequestAborted).ToResponseAsync();
+        return tagService.CreateTagAsync(request, HttpContext.RequestAborted).ToResponseAsync();
     }
 
     /// <summary>
@@ -62,6 +55,6 @@ public class TagController : ControllerBase
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<ActionResult<TagItem>> UpdateTag(Guid id, TagEditRequest request)
     {
-        return _tagService.UpdateTagAsync(id, request, HttpContext.RequestAborted).ToResponseAsync();
+        return tagService.UpdateTagAsync(id, request, HttpContext.RequestAborted).ToResponseAsync();
     }
 }

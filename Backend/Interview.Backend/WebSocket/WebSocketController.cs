@@ -10,17 +10,8 @@ namespace Interview.Backend.WebSocket;
 
 [ApiController]
 [Route("[controller]")]
-public class WebSocketController : ControllerBase
+public class WebSocketController(WebSocketConnectionHandler connectionHandler, ILogger<WebSocketController> logger) : ControllerBase
 {
-    private readonly WebSocketConnectionHandler _connectionHandler;
-    private readonly ILogger<WebSocketController> _logger;
-
-    public WebSocketController(WebSocketConnectionHandler connectionHandler, ILogger<WebSocketController> logger)
-    {
-        _connectionHandler = connectionHandler;
-        _logger = logger;
-    }
-
     [Authorize]
     [HttpGet("/ws")]
     public async Task Get()
@@ -32,7 +23,7 @@ public class WebSocketController : ControllerBase
 
         using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
 
-        _logger.LogInformation("WebSocket connection established");
+        logger.LogInformation("WebSocket connection established");
 
         if (!TryGetUser(out var user))
         {
@@ -54,7 +45,7 @@ public class WebSocketController : ControllerBase
                 RoomId = roomId.Value,
                 ServiceProvider = HttpContext.RequestServices,
             };
-            await _connectionHandler.HandleAsync(webSocketConnectHandlerRequest, CancellationToken.None);
+            await connectionHandler.HandleAsync(webSocketConnectHandlerRequest, CancellationToken.None);
         }
         catch (OperationCanceledException)
         {

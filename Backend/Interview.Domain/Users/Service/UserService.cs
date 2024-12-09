@@ -8,28 +8,13 @@ using X.PagedList;
 
 namespace Interview.Domain.Users.Service;
 
-public sealed class UserService : IUserService
+public sealed class UserService(
+    IUserRepository userRepository,
+    IRoleRepository roleRepository,
+    IPermissionRepository permissionRepository,
+    ISecurityService securityService)
+    : IUserService
 {
-    private readonly IUserRepository _userRepository;
-    private readonly IRoleRepository _roleRepository;
-    private readonly AdminUsers _adminUsers;
-    private readonly IPermissionRepository _permissionRepository;
-    private readonly ISecurityService _securityService;
-
-    public UserService(
-        IUserRepository userRepository,
-        IRoleRepository roleRepository,
-        AdminUsers adminUsers,
-        IPermissionRepository permissionRepository,
-        ISecurityService securityService)
-    {
-        _userRepository = userRepository;
-        _roleRepository = roleRepository;
-        _adminUsers = adminUsers;
-        _permissionRepository = permissionRepository;
-        _securityService = securityService;
-    }
-
     public Task<IPagedList<UserDetail>> FindPageAsync(
         int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
@@ -42,13 +27,13 @@ public sealed class UserService : IUserService
             TwitchIdentity = user.ExternalId,
         });
 
-        return _userRepository.GetPageDetailedAsync(mapperUserDetail, pageNumber, pageSize, cancellationToken);
+        return userRepository.GetPageDetailedAsync(mapperUserDetail, pageNumber, pageSize, cancellationToken);
     }
 
     public async Task<UserDetail> FindByNicknameAsync(
         string nickname, CancellationToken cancellationToken = default)
     {
-        var user = await _userRepository.FindByNicknameAsync(nickname, cancellationToken);
+        var user = await userRepository.FindByNicknameAsync(nickname, cancellationToken);
 
         if (user is null)
         {
@@ -67,7 +52,7 @@ public sealed class UserService : IUserService
 
     public async Task<User?> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var user = await _userRepository.FindByIdAsync(id, cancellationToken);
+        var user = await userRepository.FindByIdAsync(id, cancellationToken);
 
         if (user is null)
         {
@@ -79,7 +64,7 @@ public sealed class UserService : IUserService
 
     public Task<UserDetail> GetSelfAsync()
     {
-        var user = _securityService.CurrentUser();
+        var user = securityService.CurrentUser();
 
         if (user is null)
         {
@@ -99,7 +84,7 @@ public sealed class UserService : IUserService
 
     public async Task<User> UpsertByExternalIdAsync(User user, CancellationToken cancellationToken = default)
     {
-        var existingUser = await _userRepository.FindByExternalIdAsync(user.ExternalId, cancellationToken);
+        var existingUser = await userRepository.FindByExternalIdAsync(user.ExternalId, cancellationToken);
 
         var roles = user.Roles.DefaultIfEmpty(new Role(RoleName.User));
 
@@ -121,7 +106,7 @@ public sealed class UserService : IUserService
             var permissions = await GetDefaultUserPermission(existingUser, cancellationToken);
             existingUser.Permissions.AddRange(permissions);
 
-            await _userRepository.UpdateAsync(existingUser, cancellationToken);
+            await userRepository.UpdateAsync(existingUser, cancellationToken);
 
             return existingUser;
         }
@@ -134,7 +119,7 @@ public sealed class UserService : IUserService
         var defaultUserPermissions = await GetDefaultUserPermission(insertUser, cancellationToken);
         insertUser.Permissions.AddRange(defaultUserPermissions);
 
-        await _userRepository.CreateAsync(insertUser, cancellationToken);
+        await userRepository.CreateAsync(insertUser, cancellationToken);
 
         return insertUser;
     }
@@ -157,7 +142,7 @@ public sealed class UserService : IUserService
             TwitchIdentity = user.ExternalId,
         });
 
-        return _userRepository.GetPageAsync(spec, mapper, pageNumber, pageSize, cancellationToken);
+        return userRepository.GetPageAsync(spec, mapper, pageNumber, pageSize, cancellationToken);
     }
 
     public async Task<Dictionary<string, List<PermissionItem>>> GetPermissionsAsync(
@@ -166,14 +151,14 @@ public sealed class UserService : IUserService
     {
         var specification = new Spec<User>(userItem => userItem.Id == id);
 
-        var user = await _userRepository.FindFirstOrDefaultAsync(specification, cancellationToken);
+        var user = await userRepository.FindFirstOrDefaultAsync(specification, cancellationToken);
 
         if (user is null)
         {
             throw NotFoundException.Create<User>(id);
         }
 
-        return await _userRepository.FindPermissionByUserId(id, cancellationToken);
+        return await userRepository.FindPermissionByUserId(id, cancellationToken);
     }
 
     public async Task<PermissionItem> ChangePermissionAsync(
@@ -181,7 +166,7 @@ public sealed class UserService : IUserService
         PermissionModifyRequest permissionModifyRequest,
         CancellationToken cancellationToken)
     {
-        var user = await _userRepository.FindByIdDetailedAsync(id, cancellationToken);
+        var user = await userRepository.FindByIdDetailedAsync(id, cancellationToken);
 
         if (user is null)
         {
@@ -189,7 +174,7 @@ public sealed class UserService : IUserService
         }
 
         var storagePermission =
-            await _permissionRepository.FindByIdAsync(permissionModifyRequest.Id, cancellationToken);
+            await permissionRepository.FindByIdAsync(permissionModifyRequest.Id, cancellationToken);
 
         if (storagePermission is null)
         {
@@ -221,7 +206,7 @@ public sealed class UserService : IUserService
             containsPermission = false;
         }
 
-        await _userRepository.UpdateAsync(user, cancellationToken);
+        await userRepository.UpdateAsync(user, cancellationToken);
 
         return new PermissionItem(storagePermission.Type, containsPermission);
     }
@@ -229,7 +214,7 @@ public sealed class UserService : IUserService
     private Task<List<Role>> GetUserRolesAsync(IEnumerable<Role> roles, CancellationToken cancellationToken)
     {
         var roleNames = roles.Select(r => r.Name);
-        return _roleRepository.FindAsync(new Spec<Role>(role => roleNames.Contains(role.Name)), cancellationToken);
+        return roleRepository.FindAsync(new Spec<Role>(role => roleNames.Contains(role.Name)), cancellationToken);
     }
 
     private Task<List<Permission>> GetDefaultUserPermission(User user, CancellationToken cancellationToken = default)
@@ -240,6 +225,6 @@ public sealed class UserService : IUserService
             .ToHashSet();
 
         var specification = new Spec<Permission>(e => permissionTypes.Contains(e.Type) && !existsPermissions.Contains(e.Id));
-        return _permissionRepository.FindAsync(specification, cancellationToken);
+        return permissionRepository.FindAsync(specification, cancellationToken);
     }
 }

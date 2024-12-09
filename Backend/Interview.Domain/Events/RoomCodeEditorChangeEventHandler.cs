@@ -6,22 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Domain.Events;
 
-public class RoomCodeEditorChangeEventHandler
+public class RoomCodeEditorChangeEventHandler(AppDbContext db, IRoomEventDispatcher eventDispatcher, ICurrentUserAccessor currentUserAccessor)
 {
-    private readonly AppDbContext _db;
-    private readonly IRoomEventDispatcher _eventDispatcher;
-    private readonly ICurrentUserAccessor _currentUserAccessor;
-
-    public RoomCodeEditorChangeEventHandler(AppDbContext db, IRoomEventDispatcher eventDispatcher, ICurrentUserAccessor currentUserAccessor)
-    {
-        _db = db;
-        _eventDispatcher = eventDispatcher;
-        _currentUserAccessor = currentUserAccessor;
-    }
-
     public async Task HandleAsync(Request request, CancellationToken cancellationToken)
     {
-        var roomConfiguration = await _db.RoomConfiguration.Include(e => e.Room)
+        var roomConfiguration = await db.RoomConfiguration.Include(e => e.Room)
             .FirstOrDefaultAsync(e => e.Id == request.RoomId, cancellationToken);
         if (roomConfiguration is null)
         {
@@ -32,10 +21,10 @@ public class RoomCodeEditorChangeEventHandler
                 CodeEditorContent = null,
                 CodeEditorChangeSource = request.Source,
             };
-            await _db.RoomConfiguration.AddAsync(roomConfiguration, cancellationToken);
+            await db.RoomConfiguration.AddAsync(roomConfiguration, cancellationToken);
             if (request.SaveChanges)
             {
-                await _db.SaveChangesAsync(cancellationToken);
+                await db.SaveChangesAsync(cancellationToken);
             }
         }
         else
@@ -49,7 +38,7 @@ public class RoomCodeEditorChangeEventHandler
 
             if (request.SaveChanges)
             {
-                await _db.SaveChangesAsync(cancellationToken);
+                await db.SaveChangesAsync(cancellationToken);
             }
         }
 
@@ -61,9 +50,9 @@ public class RoomCodeEditorChangeEventHandler
         {
             RoomId = request.RoomId,
             Value = payload,
-            CreatedById = _currentUserAccessor.GetUserIdOrThrow(),
+            CreatedById = currentUserAccessor.GetUserIdOrThrow(),
         };
-        await _eventDispatcher.WriteAsync(@event, cancellationToken);
+        await eventDispatcher.WriteAsync(@event, cancellationToken);
     }
 
     public record Request(Guid RoomId, bool Enabled, EVRoomCodeEditorChangeSource Source)

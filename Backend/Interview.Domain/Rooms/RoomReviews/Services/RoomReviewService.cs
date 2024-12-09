@@ -12,36 +12,20 @@ using X.PagedList;
 
 namespace Interview.Domain.Rooms.RoomReviews.Services;
 
-public class RoomReviewService : IRoomReviewService
+public class RoomReviewService(
+    IRoomReviewRepository roomReviewRepository,
+    IRoomRepository roomRepository,
+    IRoomQuestionEvaluationRepository roomQuestionEvaluationRepository,
+    IRoomMembershipChecker membershipChecker,
+    AppDbContext db,
+    IRoomParticipantRepository roomParticipantRepository)
+    : IRoomReviewService
 {
-    private readonly IRoomReviewRepository _roomReviewRepository;
-    private readonly IRoomParticipantRepository _roomParticipantRepository;
-    private readonly IRoomRepository _roomRepository;
-    private readonly IRoomQuestionEvaluationRepository _roomQuestionEvaluationRepository;
-    private readonly IRoomMembershipChecker _membershipChecker;
-    private readonly AppDbContext _db;
-
-    public RoomReviewService(
-        IRoomReviewRepository roomReviewRepository,
-        IRoomRepository roomRepository,
-        IRoomQuestionEvaluationRepository roomQuestionEvaluationRepository,
-        IRoomMembershipChecker membershipChecker,
-        AppDbContext db,
-        IRoomParticipantRepository roomParticipantRepository)
-    {
-        _roomReviewRepository = roomReviewRepository;
-        _roomRepository = roomRepository;
-        _roomQuestionEvaluationRepository = roomQuestionEvaluationRepository;
-        _membershipChecker = membershipChecker;
-        _db = db;
-        _roomParticipantRepository = roomParticipantRepository;
-    }
-
     public async Task<UserRoomReviewResponse?> GetUserRoomReviewAsync(UserRoomReviewRequest request, CancellationToken cancellationToken)
     {
-        await _membershipChecker.EnsureUserMemberOfRoomAsync(request.UserId, request.RoomId, cancellationToken);
+        await membershipChecker.EnsureUserMemberOfRoomAsync(request.UserId, request.RoomId, cancellationToken);
 
-        var review = await _db.RoomReview
+        var review = await db.RoomReview
             .Include(e => e.Participant)
             .AsNoTracking()
             .Where(e => e.Participant.Room.Id == request.RoomId && e.Participant.User.Id == request.UserId)
@@ -66,7 +50,7 @@ public class RoomReviewService : IRoomReviewService
             specification &= new Spec<RoomReview>(review => review.State == state);
         }
 
-        return _roomReviewRepository.GetDetailedPageAsync(
+        return roomReviewRepository.GetDetailedPageAsync(
             specification,
             request.Page.PageNumber,
             request.Page.PageSize,
@@ -75,7 +59,7 @@ public class RoomReviewService : IRoomReviewService
 
     public async Task<RoomReviewDetail> CreateAsync(RoomReviewCreateRequest request, Guid userId, CancellationToken cancellationToken = default)
     {
-        var roomParticipant = await _roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(request.RoomId, userId, cancellationToken);
+        var roomParticipant = await roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(request.RoomId, userId, cancellationToken);
 
         if (roomParticipant is null)
         {
@@ -89,14 +73,14 @@ public class RoomReviewService : IRoomReviewService
 
         var roomReview = new RoomReview(roomParticipant) { Review = request.Review, };
 
-        await _roomReviewRepository.CreateAsync(roomReview, cancellationToken);
+        await roomReviewRepository.CreateAsync(roomReview, cancellationToken);
 
         return RoomReviewDetailMapper.Instance.Map(roomReview);
     }
 
     public async Task<UpsertReviewResponse> UpsertAsync(RoomReviewCreateRequest request, Guid userId, CancellationToken cancellationToken = default)
     {
-        return await _db.RunTransactionAsync<UpsertReviewResponse>(async ct =>
+        return await db.RunTransactionAsync<UpsertReviewResponse>(async ct =>
             {
                 var roomParticipant = await FindParticipantWithValidateAsync(request.RoomId, userId, ct);
 
@@ -108,7 +92,7 @@ public class RoomReviewService : IRoomReviewService
                 {
                     review = new RoomReview(roomParticipant) { Review = request.Review };
 
-                    await _roomReviewRepository.CreateAsync(review, ct);
+                    await roomReviewRepository.CreateAsync(review, ct);
 
                     created = true;
                 }
@@ -121,7 +105,7 @@ public class RoomReviewService : IRoomReviewService
 
                     review.Review = request.Review;
 
-                    await _roomReviewRepository.UpdateAsync(review, ct);
+                    await roomReviewRepository.UpdateAsync(review, ct);
                 }
 
                 return RoomReviewDetailMapper.InstanceUpsert(created).Map(review);
@@ -131,7 +115,7 @@ public class RoomReviewService : IRoomReviewService
 
     public Task<RoomCompleteResponse> CompleteAsync(RoomReviewCompletionRequest request, Guid userId, CancellationToken cancellationToken = default)
     {
-        return _db.RunTransactionAsync<RoomCompleteResponse>(async ct =>
+        return db.RunTransactionAsync<RoomCompleteResponse>(async ct =>
             {
                 var roomCompleteResponse = new RoomCompleteResponse { AutoClosed = false, };
 
@@ -151,9 +135,9 @@ public class RoomReviewService : IRoomReviewService
 
                 resultReview.State = SERoomReviewState.Closed;
 
-                await _roomQuestionEvaluationRepository.SubmitAsync(request.RoomId, userId, ct);
+                await roomQuestionEvaluationRepository.SubmitAsync(request.RoomId, userId, ct);
 
-                var roomReadyClose = await _roomRepository.IsReadyToCloseAsync(request.RoomId, ct);
+                var roomReadyClose = await roomRepository.IsReadyToCloseAsync(request.RoomId, ct);
 
                 if (roomReadyClose)
                 {
@@ -161,10 +145,10 @@ public class RoomReviewService : IRoomReviewService
 
                     var room = roomParticipant.Room;
                     room.Status = SERoomStatus.Close;
-                    await _roomRepository.UpdateAsync(room, ct);
+                    await roomRepository.UpdateAsync(room, ct);
                 }
 
-                await _db.SaveChangesAsync(ct);
+                await db.SaveChangesAsync(ct);
 
                 return roomCompleteResponse;
             },
@@ -173,7 +157,7 @@ public class RoomReviewService : IRoomReviewService
 
     public async Task<RoomReviewDetail> UpdateAsync(Guid id, RoomReviewUpdateRequest request, CancellationToken cancellationToken = default)
     {
-        var resultReview = await _roomReviewRepository.FindByIdDetailedAsync(id, cancellationToken);
+        var resultReview = await roomReviewRepository.FindByIdDetailedAsync(id, cancellationToken);
 
         if (resultReview is null)
         {
@@ -201,14 +185,14 @@ public class RoomReviewService : IRoomReviewService
 
         resultReview.State = state;
 
-        await _roomReviewRepository.UpdateAsync(resultReview, cancellationToken);
+        await roomReviewRepository.UpdateAsync(resultReview, cancellationToken);
 
         return RoomReviewDetailMapper.Instance.Map(resultReview);
     }
 
     private async Task<RoomParticipant> FindParticipantWithValidateAsync(Guid roomId, Guid userId, CancellationToken cancellationToken)
     {
-        var roomParticipant = await _roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(roomId, userId, cancellationToken);
+        var roomParticipant = await roomParticipantRepository.FindByRoomIdAndUserIdDetailedAsync(roomId, userId, cancellationToken);
 
         if (roomParticipant is null)
         {

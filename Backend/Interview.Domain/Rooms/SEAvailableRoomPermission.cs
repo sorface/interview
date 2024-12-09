@@ -6,7 +6,7 @@ namespace Interview.Domain.Rooms;
 /// <summary>
 /// AvailableRoomPermission Smart enum.
 /// </summary>
-public class SEAvailableRoomPermission : SmartEnum<SEAvailableRoomPermission, Guid>
+public class SEAvailableRoomPermission(SEPermission name, Guid value) : SmartEnum<SEAvailableRoomPermission, Guid>(name.Name, value)
 {
     public static readonly SEAvailableRoomPermission RoomReviewUpdate = new(SEPermission.RoomReviewUpdate, new Guid("95D476A0-EB0E-470D-9C57-A0EC8A2E4CD6"));
 
@@ -66,13 +66,7 @@ public class SEAvailableRoomPermission : SmartEnum<SEAvailableRoomPermission, Gu
     public static readonly SEAvailableRoomPermission RoomQuestionEvaluationFind = new(SEPermission.RoomQuestionEvaluationFind, new Guid("49cb7cd3-7329-4098-9ac1-c3972ba09138"));
     public static readonly SEAvailableRoomPermission GetRoomQuestionAnswerDetails = new(SEPermission.GetRoomQuestionAnswerDetails, new Guid("BA198396-D07A-4054-95D0-4FE0BA393ECD"));
 
-    public SEAvailableRoomPermission(SEPermission name, Guid value)
-        : base(name.Name, value)
-    {
-        Permission = name;
-    }
+    public static readonly SEAvailableRoomPermission[] CreatorRoomAvailablePermissions = [RoomInviteGet];
 
-    public static readonly SEAvailableRoomPermission[] CreatorRoomAvailablePermissions = new[] { RoomInviteGet, };
-
-    public SEPermission Permission { get; }
+    public SEPermission Permission { get; } = name;
 }

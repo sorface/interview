@@ -15,8 +15,8 @@ public class AppDbContextTest
 
         var room = new Room("Test room", SERoomAccessType.Public)
         {
-            Questions = new List<RoomQuestion>
-            {
+            Questions =
+            [
                 new()
                 {
                     Question = new Question("Value 1"),
@@ -26,7 +26,7 @@ public class AppDbContextTest
                     Room = null,
                     Order = 0,
                 }
-            }
+            ]
         };
         appDbContext.Add(room);
         appDbContext.SaveChanges();

@@ -7,19 +7,9 @@ using Interview.Domain.Users;
 
 namespace Interview.Domain.Events.DatabaseProcessors;
 
-public class RoomEvaluationPostProcessor : EntityPostProcessor<RoomQuestionEvaluation>
+public class RoomEvaluationPostProcessor(IRoomEventDispatcher eventDispatcher, AppDbContext databaseContext, ICurrentUserAccessor currentUserAccessor)
+    : EntityPostProcessor<RoomQuestionEvaluation>
 {
-    private readonly IRoomEventDispatcher _eventDispatcher;
-    private readonly AppDbContext _databaseContext;
-    private readonly ICurrentUserAccessor _currentUserAccessor;
-
-    public RoomEvaluationPostProcessor(IRoomEventDispatcher eventDispatcher, AppDbContext databaseContext, ICurrentUserAccessor currentUserAccessor)
-    {
-        _eventDispatcher = eventDispatcher;
-        _databaseContext = databaseContext;
-        _currentUserAccessor = currentUserAccessor;
-    }
-
     public override async ValueTask ProcessAddedAsync(RoomQuestionEvaluation entity, CancellationToken cancellationToken)
     {
         await HandleEvent(entity, cancellationToken, (roomId, questionId) =>
@@ -29,7 +19,7 @@ public class RoomEvaluationPostProcessor : EntityPostProcessor<RoomQuestionEvalu
             {
                 RoomId = roomId,
                 Value = evaluationPayload,
-                CreatedById = _currentUserAccessor.GetUserIdOrThrow(),
+                CreatedById = currentUserAccessor.GetUserIdOrThrow(),
             };
         });
     }
@@ -43,7 +33,7 @@ public class RoomEvaluationPostProcessor : EntityPostProcessor<RoomQuestionEvalu
             {
                 RoomId = roomId,
                 Value = evaluationPayload,
-                CreatedById = _currentUserAccessor.GetUserIdOrThrow(),
+                CreatedById = currentUserAccessor.GetUserIdOrThrow(),
             };
         });
     }
@@ -53,7 +43,7 @@ public class RoomEvaluationPostProcessor : EntityPostProcessor<RoomQuestionEvalu
     {
         if (entity.RoomQuestion is null)
         {
-            await _databaseContext.Entry(entity).Reference(e => e.RoomQuestion).LoadAsync(cancellationToken);
+            await databaseContext.Entry(entity).Reference(e => e.RoomQuestion).LoadAsync(cancellationToken);
         }
 
         if (entity.RoomQuestion is null)
@@ -62,6 +52,6 @@ public class RoomEvaluationPostProcessor : EntityPostProcessor<RoomQuestionEvalu
         }
 
         var @event = funcEventMapper.Invoke(entity.RoomQuestion.RoomId, entity.RoomQuestion.QuestionId);
-        await _eventDispatcher.WriteAsync(@event, cancellationToken);
+        await eventDispatcher.WriteAsync(@event, cancellationToken);
     }
 }

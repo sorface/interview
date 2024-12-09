@@ -6,27 +6,22 @@ using Interview.Domain.Tags;
 
 namespace Interview.Domain.Questions;
 
-public class Question : ArchiveEntity
+public class Question(string value) : ArchiveEntity
 {
-    public Question(string value)
-    {
-        Value = value;
-    }
-
     private Question()
         : this(string.Empty)
     {
     }
 
-    public string Value { get; internal set; }
+    public string Value { get; internal set; } = value;
 
     public Guid? CodeEditorId { get; internal set; }
 
     public QuestionCodeEditor? CodeEditor { get; set; }
 
-    public List<Tag> Tags { get; internal set; } = new();
+    public List<Tag> Tags { get; internal set; } = [];
 
-    public List<QuestionAnswer> Answers { get; set; } = new();
+    public List<QuestionAnswer> Answers { get; set; } = [];
 
     public SEQuestionType Type { get; internal set; } = default!;
 

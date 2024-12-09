@@ -9,31 +9,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket.Events;
 
-public class HandleStatefulEventHandler
+public class HandleStatefulEventHandler(
+    IEventBusSubscriberFactory eventBusSubscriberFactory,
+    IServiceScopeFactory serviceScopeFactory,
+    IRoomEventSerializer serializer,
+    ILogger<HandleStatefulEventHandler> logger)
 {
-    private readonly IEventBusSubscriberFactory _eventBusSubscriberFactory;
-    private readonly IServiceScopeFactory _serviceScopeFactory;
-    private readonly IRoomEventSerializer _serializer;
-    private readonly ILogger<HandleStatefulEventHandler> _logger;
-
-    public HandleStatefulEventHandler(
-        IEventBusSubscriberFactory eventBusSubscriberFactory,
-        IServiceScopeFactory serviceScopeFactory,
-        IRoomEventSerializer serializer,
-        ILogger<HandleStatefulEventHandler> logger)
-    {
-        _eventBusSubscriberFactory = eventBusSubscriberFactory;
-        _serviceScopeFactory = serviceScopeFactory;
-        _serializer = serializer;
-        _logger = logger;
-    }
-
     public async Task AddHandlerAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Before subscribe to event bus");
+        logger.LogInformation("Before subscribe to event bus");
         try
         {
-            var subscriber = await _eventBusSubscriberFactory.CreateAsync(cancellationToken);
+            var subscriber = await eventBusSubscriberFactory.CreateAsync(cancellationToken);
             await subscriber.SubscribeAsync(
                 new HandleStatefulEventInRoomEventKey(),
                 (_, @event) =>
@@ -50,11 +37,11 @@ public class HandleStatefulEventHandler
                 },
                 cancellationToken);
 
-            _logger.LogInformation("After subscribe to event bus");
+            logger.LogInformation("After subscribe to event bus");
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "During subscribe to event bus");
+            logger.LogError(e, "During subscribe to event bus");
         }
     }
 
@@ -63,11 +50,11 @@ public class HandleStatefulEventHandler
         try
         {
             var roomEvent = JsonSerializer.Deserialize<IRoomEvent>(busEvent.Event) ?? throw new Exception("Unable to parse event");
-            await using var dbScope = _serviceScopeFactory.CreateAsyncScope();
+            await using var dbScope = serviceScopeFactory.CreateAsyncScope();
             var service = dbScope.ServiceProvider.GetRequiredService<IRoomServiceWithoutPermissionCheck>();
             try
             {
-                var payload = roomEvent.BuildStringPayload(_serializer);
+                var payload = roomEvent.BuildStringPayload(serializer);
                 await service.UpsertRoomStateAsync(
                     roomEvent.RoomId,
                     roomEvent.Type,
@@ -76,12 +63,12 @@ public class HandleStatefulEventHandler
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "During update {Type} room state", roomEvent.Type);
+                logger.LogError(e, "During update {Type} room state", roomEvent.Type);
             }
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Fails to update room states");
+            logger.LogError(e, "Fails to update room states");
         }
     }
 }

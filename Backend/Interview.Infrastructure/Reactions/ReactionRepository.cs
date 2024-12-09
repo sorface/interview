@@ -4,13 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Infrastructure.Reactions;
 
-public class ReactionRepository : EfRepository<Reaction>, IReactionRepository
+public class ReactionRepository(AppDbContext db) : EfRepository<Reaction>(db), IReactionRepository
 {
-    public ReactionRepository(AppDbContext db)
-        : base(db)
-    {
-    }
-
     public Task<Reaction?> FindByReactionTypeAsync(ReactionType reactionType, CancellationToken cancellationToken = default)
     {
         return Set.FirstOrDefaultAsync(e => e.Type == reactionType, cancellationToken);

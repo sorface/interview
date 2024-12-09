@@ -7,47 +7,38 @@ namespace Interview.Backend.Auth;
 
 [ApiController]
 [Route("api")]
-public class AuthController : ControllerBase
+public class AuthController(
+    OAuthServiceDispatcher oAuthDispatcher,
+    ILogger<AuthController> logger,
+    SorfaceTokenService sorfaceTokenService)
+    : ControllerBase
 {
-    private readonly OAuthServiceDispatcher _oAuthDispatcher;
-    private readonly ILogger<AuthController> _logger;
-    private readonly SorfaceTokenService _sorfaceTokenService;
-
-    public AuthController(OAuthServiceDispatcher oAuthDispatcher,
-                          ILogger<AuthController> logger,
-                          SorfaceTokenService sorfaceTokenService)
-    {
-        _oAuthDispatcher = oAuthDispatcher;
-        _logger = logger;
-        _sorfaceTokenService = sorfaceTokenService;
-    }
-
     [HttpGet("login/{scheme}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(typeof(string), 400)]
     public IResult SignIn(string scheme, [FromQuery] string redirectUri)
     {
-        _logger.LogInformation("Start SignIn {scheme}", scheme);
-        if (!_oAuthDispatcher.HasAuthService(scheme))
+        logger.LogInformation("Start SignIn {scheme}", scheme);
+        if (!oAuthDispatcher.HasAuthService(scheme))
         {
-            _logger.LogInformation("Not found service authorization with id {scheme}", scheme);
+            logger.LogInformation("Not found service authorization with id {scheme}", scheme);
             return Results.BadRequest($"Not found service authorization with id ${scheme}");
         }
 
         var redirectUriWithoutFragment = GetDomain(redirectUri);
-        var authorizationService = _oAuthDispatcher.GetAuthService(scheme);
-        _logger.LogInformation("Get {AuthService} by {scheme}", authorizationService?.GetType().Name, scheme);
+        var authorizationService = oAuthDispatcher.GetAuthService(scheme);
+        logger.LogInformation("Get {AuthService} by {scheme}", authorizationService?.GetType().Name, scheme);
         if (authorizationService != null && !authorizationService.AvailableLoginRedirects.Contains(redirectUriWithoutFragment))
         {
-            _logger.LogWarning("Redirect link {redirectUri} is not available", redirectUri);
+            logger.LogWarning("Redirect link {redirectUri} is not available", redirectUri);
             return Results.BadRequest($"Redirect link {redirectUri} is not available");
         }
 
         var authenticationProperties = new AuthenticationProperties { RedirectUri = redirectUri, };
 
-        _logger.LogDebug("Before change");
+        logger.LogDebug("Before change");
         var signIn = Results.Challenge(authenticationProperties, authenticationSchemes: new List<string> { scheme });
-        _logger.LogDebug("After change");
+        logger.LogDebug("After change");
         return signIn;
 
         static string GetDomain(string uri)
@@ -75,7 +66,7 @@ public class AuthController : ControllerBase
 
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme, new AuthenticationProperties());
 
-        await _sorfaceTokenService.RevokeTokenAsync(HttpContext, accessToken);
+        await sorfaceTokenService.RevokeTokenAsync(HttpContext, accessToken);
     }
 
     [HttpPost("refresh")]

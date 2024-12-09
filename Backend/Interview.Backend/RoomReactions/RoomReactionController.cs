@@ -12,15 +12,8 @@ namespace Interview.Backend.RoomReactions;
 
 [ApiController]
 [Route("api/room-reactions")]
-public class RoomReactionController : ControllerBase
+public class RoomReactionController(IRoomQuestionReactionService roomQuestionReactionService) : ControllerBase
 {
-    private readonly IRoomQuestionReactionService _roomQuestionReactionService;
-
-    public RoomReactionController(IRoomQuestionReactionService roomQuestionReactionService)
-    {
-        _roomQuestionReactionService = roomQuestionReactionService;
-    }
-
     /// <summary>
     ///  Creates a reaction from the user to an active question in the room.
     /// </summary>
@@ -41,7 +34,7 @@ public class RoomReactionController : ControllerBase
         }
 
         var roomQuestionReaction =
-            await _roomQuestionReactionService.CreateAsync(request, user.Id, HttpContext.RequestAborted);
+            await roomQuestionReactionService.CreateAsync(request, user.Id, HttpContext.RequestAborted);
 
         return ServiceResult.Created(roomQuestionReaction).ToActionResult();
     }

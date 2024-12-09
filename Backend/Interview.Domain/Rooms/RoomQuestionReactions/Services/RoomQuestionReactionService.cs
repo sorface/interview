@@ -6,25 +6,13 @@ using Interview.Domain.Users;
 
 namespace Interview.Domain.Rooms.RoomQuestionReactions.Services;
 
-public class RoomQuestionReactionService : IRoomQuestionReactionService
+public class RoomQuestionReactionService(
+    IRoomQuestionReactionRepository roomQuestionReactionRepository,
+    IRoomQuestionRepository questionRepository,
+    IReactionRepository reactionRepository,
+    IUserRepository userRepository)
+    : IRoomQuestionReactionService
 {
-    private readonly IRoomQuestionReactionRepository _roomQuestionReactionRepository;
-    private readonly IRoomQuestionRepository _questionRepository;
-    private readonly IReactionRepository _reactionRepository;
-    private readonly IUserRepository _userRepository;
-
-    public RoomQuestionReactionService(
-        IRoomQuestionReactionRepository roomQuestionReactionRepository,
-        IRoomQuestionRepository questionRepository,
-        IReactionRepository reactionRepository,
-        IUserRepository userRepository)
-    {
-        _roomQuestionReactionRepository = roomQuestionReactionRepository;
-        _questionRepository = questionRepository;
-        _reactionRepository = reactionRepository;
-        _userRepository = userRepository;
-    }
-
     /// <summary>
     /// Creates a reaction from the user to an active question in the room.
     /// </summary>
@@ -37,14 +25,14 @@ public class RoomQuestionReactionService : IRoomQuestionReactionService
         Guid userId,
         CancellationToken cancellationToken)
     {
-        var user = await _userRepository.FindByIdAsync(userId, cancellationToken);
+        var user = await userRepository.FindByIdAsync(userId, cancellationToken);
 
         if (user is null)
         {
             throw NotFoundException.Create<User>(userId);
         }
 
-        var roomQuestion = await _questionRepository.FindFirstByRoomAndStateAsync(
+        var roomQuestion = await questionRepository.FindFirstByRoomAndStateAsync(
             request.RoomId,
             RoomQuestionState.Active,
             cancellationToken);
@@ -54,7 +42,7 @@ public class RoomQuestionReactionService : IRoomQuestionReactionService
             throw new UserException($"Active question not found in room id {request.RoomId}");
         }
 
-        var reaction = await _reactionRepository.FindByIdAsync(request.ReactionId, cancellationToken);
+        var reaction = await reactionRepository.FindByIdAsync(request.ReactionId, cancellationToken);
 
         if (reaction is null)
         {
@@ -69,7 +57,7 @@ public class RoomQuestionReactionService : IRoomQuestionReactionService
             Payload = request.Payload,
         };
 
-        await _roomQuestionReactionRepository.CreateAsync(questionReaction, cancellationToken);
+        await roomQuestionReactionRepository.CreateAsync(questionReaction, cancellationToken);
 
         return new RoomQuestionReactionDetail
         {

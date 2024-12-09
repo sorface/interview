@@ -5,17 +5,11 @@ using X.PagedList;
 
 namespace Interview.Domain.Database;
 
-public abstract class EfRepository<T> : IRepository<T>
+public abstract class EfRepository<T>(AppDbContext db) : IRepository<T>
     where T : Entity
 {
-    protected readonly AppDbContext Db;
-    protected readonly DbSet<T> Set;
-
-    public EfRepository(AppDbContext db)
-    {
-        Db = db;
-        Set = db.Set<T>();
-    }
+    protected readonly AppDbContext Db = db;
+    protected readonly DbSet<T> Set = db.Set<T>();
 
     public Task<bool> HasAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
     {

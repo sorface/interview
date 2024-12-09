@@ -13,51 +13,28 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Domain.Events.DatabaseProcessors;
 
-public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
+public class RoomQuestionPostProcessor(
+    IRoomEventDispatcher eventDispatcher,
+    AppDbContext db,
+    RoomCodeEditorChangeEventHandler roomCodeEditorChangeEventHandler,
+    ICurrentUserAccessor currentUserAccessor,
+    IRoomConfigurationRepository roomConfigurationRepository,
+    ISystemClock clock,
+    RoomEventProviderFactory roomEventProviderFactory,
+    IRoomEventDeserializer eventDeserializer,
+    ILogger<RoomQuestionPostProcessor> logger)
+    : EntityPostProcessor<RoomQuestion>
 {
-    private readonly IRoomEventDispatcher _eventDispatcher;
-    private readonly AppDbContext _db;
-    private readonly RoomCodeEditorChangeEventHandler _roomCodeEditorChangeEventHandler;
-    private readonly ICurrentUserAccessor _currentUserAccessor;
-    private readonly IRoomConfigurationRepository _roomConfigurationRepository;
-    private readonly ILogger<RoomQuestionPostProcessor> _logger;
-
-    private readonly ISystemClock _clock;
-    private readonly RoomEventProviderFactory _roomEventProviderFactory;
-    private readonly IRoomEventDeserializer _eventDeserializer;
-
-    public RoomQuestionPostProcessor(
-        IRoomEventDispatcher eventDispatcher,
-        AppDbContext db,
-        RoomCodeEditorChangeEventHandler roomCodeEditorChangeEventHandler,
-        ICurrentUserAccessor currentUserAccessor,
-        IRoomConfigurationRepository roomConfigurationRepository,
-        ISystemClock clock,
-        RoomEventProviderFactory roomEventProviderFactory,
-        IRoomEventDeserializer eventDeserializer,
-        ILogger<RoomQuestionPostProcessor> logger)
-    {
-        _eventDispatcher = eventDispatcher;
-        _db = db;
-        _roomCodeEditorChangeEventHandler = roomCodeEditorChangeEventHandler;
-        _currentUserAccessor = currentUserAccessor;
-        _roomConfigurationRepository = roomConfigurationRepository;
-        _clock = clock;
-        _roomEventProviderFactory = roomEventProviderFactory;
-        _eventDeserializer = eventDeserializer;
-        _logger = logger;
-    }
-
     public override async ValueTask ProcessAddedAsync(RoomQuestion entity, CancellationToken cancellationToken)
     {
         var @event = new RoomQuestionAddEvent
         {
             RoomId = entity.RoomId,
             Value = new RoomQuestionAddEventPayload(entity.QuestionId, entity.State.EnumValue),
-            CreatedById = _currentUserAccessor.GetUserIdOrThrow(),
+            CreatedById = currentUserAccessor.GetUserIdOrThrow(),
         };
 
-        await _eventDispatcher.WriteAsync(@event, cancellationToken);
+        await eventDispatcher.WriteAsync(@event, cancellationToken);
     }
 
     public override async ValueTask ProcessModifiedAsync(
@@ -74,10 +51,10 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
         {
             RoomId = current.RoomId,
             Value = new RoomQuestionChangeEventPayload(current.QuestionId, original.State.EnumValue, current.State.EnumValue),
-            CreatedById = _currentUserAccessor.GetUserIdOrThrow(),
+            CreatedById = currentUserAccessor.GetUserIdOrThrow(),
         };
 
-        await _eventDispatcher.WriteAsync(@event, cancellationToken);
+        await eventDispatcher.WriteAsync(@event, cancellationToken);
 
         if (current.State == RoomQuestionState.Active)
         {
@@ -89,7 +66,7 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
                 await ChangeCodeEditorContentAsync(current, cancellationToken);
             }
 
-            await _db.SaveChangesAsync(cancellationToken);
+            await db.SaveChangesAsync(cancellationToken);
         }
     }
 
@@ -100,7 +77,7 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
         {
             SaveChanges = false,
         };
-        await _roomCodeEditorChangeEventHandler.HandleAsync(request, cancellationToken);
+        await roomCodeEditorChangeEventHandler.HandleAsync(request, cancellationToken);
     }
 
     private async Task ChangeCodeEditorContentAsync(RoomQuestion current, CancellationToken cancellationToken)
@@ -113,13 +90,13 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
             ChangeCodeEditorContentSource = EVRoomCodeEditorChangeSource.System,
             SaveChanges = false,
         };
-        await _roomConfigurationRepository.UpsertCodeStateAsync(upsertCodeStateRequest, cancellationToken);
+        await roomConfigurationRepository.UpsertCodeStateAsync(upsertCodeStateRequest, cancellationToken);
     }
 
     private async ValueTask<string?> GetCodeEditorContentAsync(RoomQuestion current, CancellationToken cancellationToken)
     {
-        var eventProvider = await _roomEventProviderFactory.CreateProviderAsync(current.RoomId, cancellationToken);
-        var facade = new RoomEventActiveQuestionProvider(eventProvider, _eventDeserializer, _clock);
+        var eventProvider = await roomEventProviderFactory.CreateProviderAsync(current.RoomId, cancellationToken);
+        var facade = new RoomEventActiveQuestionProvider(eventProvider, eventDeserializer, clock);
         var lastActiveQuestionTime = await facade
             .GetActiveQuestionDateAsync(current.QuestionId, cancellationToken)
             .OrderByDescending(e => e.StartActiveDate)
@@ -127,11 +104,11 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
             .FirstOrDefaultAsync(cancellationToken);
         if (lastActiveQuestionTime is null)
         {
-            _logger.LogTrace("Not found last active question time {QuestionId}", current.QuestionId);
+            logger.LogTrace("Not found last active question time {QuestionId}", current.QuestionId);
         }
         else
         {
-            _logger.LogTrace("Found last active question time {QuestionId} {StartTime} {EndTime}", current.QuestionId, lastActiveQuestionTime?.StartActiveDate, lastActiveQuestionTime?.EndActiveDate);
+            logger.LogTrace("Found last active question time {QuestionId} {StartTime} {EndTime}", current.QuestionId, lastActiveQuestionTime?.StartActiveDate, lastActiveQuestionTime?.EndActiveDate);
         }
 
         if (lastActiveQuestionTime is not null)
@@ -145,11 +122,11 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
             var lastCodeEditorState = await eventProvider.GetLatestEventAsync(codeEditorContentRequest, cancellationToken);
             if (lastCodeEditorState is null)
             {
-                _logger.LogTrace("Not found code editor content for {QuestionId}", current.QuestionId);
+                logger.LogTrace("Not found code editor content for {QuestionId}", current.QuestionId);
             }
             else
             {
-                _logger.LogTrace("Found code editor content for {QuestionId} {Content}", current.QuestionId, lastCodeEditorState.Payload);
+                logger.LogTrace("Found code editor content for {QuestionId} {Content}", current.QuestionId, lastCodeEditorState.Payload);
             }
 
             if (lastCodeEditorState is not null)
@@ -169,7 +146,7 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
             return content;
         }
 
-        var resultContent = await _db.Questions
+        var resultContent = await db.Questions
             .AsNoTracking()
             .Include(e => e.CodeEditor)
             .Where(e => e.Id == current.QuestionId)
@@ -185,7 +162,7 @@ public class RoomQuestionPostProcessor : EntityPostProcessor<RoomQuestion>
             return new RoomCodeEditorEnabledEvent.Payload { Enabled = roomQuestion.Question.CodeEditorId is not null, };
         }
 
-        var hasCodeEditor = await _db.Questions
+        var hasCodeEditor = await db.Questions
             .Where(e => e.Id == roomQuestion.QuestionId)
             .AnyAsync(e => e.CodeEditorId != null, cancellationToken);
         return new RoomCodeEditorEnabledEvent.Payload { Enabled = hasCodeEditor, };

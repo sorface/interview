@@ -6,15 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Domain.Rooms.Service;
 
-public sealed class RoomAnalyticService : ISelfScopeService
+public sealed class RoomAnalyticService(AppDbContext db) : ISelfScopeService
 {
-    private readonly AppDbContext _db;
-
-    public RoomAnalyticService(AppDbContext db)
-    {
-        _db = db;
-    }
-
     public async Task<Analytics> GetAsync(RoomAnalyticsRequest request, CancellationToken cancellationToken = default)
     {
         var analytics = await GetAnalyticsCoreAsync(request.RoomId, cancellationToken);
@@ -42,7 +35,7 @@ public sealed class RoomAnalyticService : ISelfScopeService
 
     private async Task<Analytics?> GetAnalyticsCoreAsync(Guid roomId, CancellationToken ct)
     {
-        var res = await _db.Rooms.AsNoTracking()
+        var res = await db.Rooms.AsNoTracking()
             .Include(e => e.Questions).ThenInclude(e => e.Question)
             .Include(e => e.Participants)
             .Where(e => e.Id == roomId)
@@ -68,7 +61,7 @@ public sealed class RoomAnalyticService : ISelfScopeService
             return null;
         }
 
-        var userReview = await _db.RoomParticipants.AsNoTracking()
+        var userReview = await db.RoomParticipants.AsNoTracking()
             .Include(e => e.Room)
             .Include(e => e.User)
             .ThenInclude(e => e.RoomQuestionEvaluations.Where(rqe => rqe.RoomQuestion!.RoomId == roomId))
@@ -120,7 +113,7 @@ public sealed class RoomAnalyticService : ISelfScopeService
 
     private Task<List<Analytics.AnalyticsUser>> GetUsersByQuestionIdAsync(Guid roomId, Guid questionId, CancellationToken ct)
     {
-        return _db.RoomParticipants.AsNoTracking()
+        return db.RoomParticipants.AsNoTracking()
             .Include(e => e.Room)
             .Include(e => e.User).ThenInclude(e =>
                 e.RoomQuestionEvaluations.Where(rqe => rqe.RoomQuestion!.RoomId == roomId && rqe.RoomQuestion!.QuestionId == questionId))

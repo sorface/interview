@@ -3,14 +3,9 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Interview.Backend.Swagger
 {
-    public class SwaggerDocumentFilter : IDocumentFilter
+    public class SwaggerDocumentFilter(string prefix) : IDocumentFilter
     {
-        private readonly string _prefix;
-
-        public SwaggerDocumentFilter(string prefix)
-        {
-            _prefix = prefix.StartsWith('/') ? prefix : "/" + prefix;
-        }
+        private readonly string _prefix = prefix.StartsWith('/') ? prefix : "/" + prefix;
 
         public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {

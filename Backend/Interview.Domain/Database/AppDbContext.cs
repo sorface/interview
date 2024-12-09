@@ -27,16 +27,11 @@ using RoomConfiguration = Interview.Domain.Rooms.RoomConfigurations.RoomConfigur
 
 namespace Interview.Domain.Database;
 
-public class AppDbContext : DbContext
+public class AppDbContext(DbContextOptions options) : DbContext(options)
 {
     public ISystemClock SystemClock { get; set; } = new SystemClock();
 
     public LazyPreProcessors Processors { get; set; } = null!;
-
-    public AppDbContext(DbContextOptions options)
-        : base(options)
-    {
-    }
 
     public DbSet<User> Users { get; private set; } = null!;
 
