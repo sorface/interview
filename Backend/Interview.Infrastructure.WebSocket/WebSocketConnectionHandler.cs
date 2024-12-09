@@ -113,7 +113,7 @@ public class WebSocketConnectionHandler(
             new("RoomId", dbRoom.Id),
             new("RoomName", dbRoom.Name),
             new("ParticipantId", participant.Id),
-            new("ParticipantUserId", participant.UserId),
+            new("UserId", participant.UserId),
         };
         if (participant.User?.Nickname is not null)
         {
