@@ -1,5 +1,7 @@
 using System.Net.WebSockets;
 using Interview.Domain;
+using Interview.Domain.Rooms;
+using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.Service;
 using Interview.Domain.Users;
 using Interview.Infrastructure.WebSocket.Events;
@@ -74,20 +76,51 @@ public class WebSocketConnectionHandler(
     private async Task<WebSocketConnectDetail?> HandleAsyncCore(WebSocketConnectHandlerRequest request, CancellationToken ct)
     {
         var (dbRoom, participant) = await roomService.AddParticipantAsync(request.RoomId, request.User.Id, ct);
+        using var scope = CreateLoggingScope(dbRoom, participant);
+        logger.LogInformation("Connect to room");
 
-        var participantType = participant.Type.EnumValue;
-        var detail = new WebSocketConnectDetail(request.WebSocket, dbRoom, request.User, participantType);
+        try
+        {
+            var participantType = participant.Type.EnumValue;
+            var detail = new WebSocketConnectDetail(request.WebSocket, dbRoom, request.User, participantType);
 
-        await HandleListenersSafely(
-            nameof(IConnectionListener.OnConnectAsync),
-            e => e.OnConnectAsync(detail, ct));
+            await HandleListenersSafely(
+                nameof(IConnectionListener.OnConnectAsync),
+                e => e.OnConnectAsync(detail, ct));
 
-        var waitTask = CreateWaitTask(ct);
-        var scopeFactory = request.ServiceProvider.GetRequiredService<CurrentUserServiceScopeFactory>();
-        var readerTask = Task.Run(() => webSocketReader.ReadAsync(request.User, dbRoom, participantType, scopeFactory, request.WebSocket, ct), ct);
-        await Task.WhenAny(waitTask, readerTask);
-        await CloseSafely(request.WebSocket, WebSocketCloseStatus.NormalClosure, string.Empty, ct);
-        return detail;
+            var waitTask = CreateWaitTask(ct);
+            var scopeFactory = request.ServiceProvider.GetRequiredService<CurrentUserServiceScopeFactory>();
+            var readerTask = Task.Run(() => webSocketReader.ReadAsync(request.User, dbRoom, participantType, scopeFactory, request.WebSocket, ct), ct);
+            await Task.WhenAny(waitTask, readerTask);
+            await CloseSafely(request.WebSocket, WebSocketCloseStatus.NormalClosure, string.Empty, ct);
+            return detail;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Failed to connect to room {CloseStatus} {WebSocketState}", request.WebSocket.CloseStatus, request.WebSocket.State);
+            throw;
+        }
+        finally
+        {
+            logger.LogInformation("Disconnect from room");
+        }
+    }
+
+    private IDisposable? CreateLoggingScope(Room dbRoom, RoomParticipant participant)
+    {
+        var keyValuePairs = new List<KeyValuePair<string, object>>
+        {
+            new("RoomId", dbRoom.Id),
+            new("RoomName", dbRoom.Name),
+            new("ParticipantId", participant.Id),
+            new("ParticipantUserId", participant.UserId),
+        };
+        if (participant.User?.Nickname is not null)
+        {
+            keyValuePairs.Add(new KeyValuePair<string, object>("Nickname", participant.User.Nickname));
+        }
+
+        return logger.BeginScope(keyValuePairs);
     }
 
     private async Task HandleListenersSafely(string actionName, Func<IConnectionListener, Task> map)
