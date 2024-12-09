@@ -1,4 +1,4 @@
-import { ChangeEventHandler, FunctionComponent, useContext } from 'react';
+import { ChangeEventHandler, useContext } from 'react';
 import { LocalizationKey } from '../../localization';
 import {
   LocalizationContext,
