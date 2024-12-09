@@ -7,8 +7,18 @@ import {
 import { LocalizationCaption } from '../LocalizationCaption/LocalizationCaption';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Typography } from '../Typography/Typography';
+import {
+  SwitcherButton,
+  SwitcherButtonContent,
+} from '../SwitcherButton/SwitcherButton';
 
-export const LangSwitch: FunctionComponent = () => {
+interface LangSwitchProps {
+  elementType?: 'switcherButton' | 'select';
+}
+
+export const LangSwitch = ({
+  elementType = 'select',
+}: LangSwitchProps): JSX.Element => {
   const { lang, setLang } = useContext(LocalizationContext);
   const localizationCaptions = useLocalizationCaptions();
 
@@ -23,7 +33,7 @@ export const LangSwitch: FunctionComponent = () => {
     setLang(e.target.value as LocalizationLang);
   };
 
-  return (
+  const select = (
     <>
       <div className="text-left flex items-center">
         <Typography size="m">
@@ -39,4 +49,35 @@ export const LangSwitch: FunctionComponent = () => {
       </select>
     </>
   );
+
+  const switcherButton = () => {
+    const items: [SwitcherButtonContent, SwitcherButtonContent] = [
+      {
+        id: LocalizationLang.en,
+        content: LocalizationLang.en.toLocaleUpperCase(),
+      },
+      {
+        id: LocalizationLang.ru,
+        content: LocalizationLang.ru.toLocaleUpperCase(),
+      },
+    ];
+
+    return (
+      <SwitcherButton
+        items={items}
+        activeIndex={items.findIndex((i) => i.id === lang) as 0 | 1}
+        variant="alternative"
+        onClick={(activeIndex) =>
+          setLang(items[activeIndex].id as LocalizationLang)
+        }
+      />
+    );
+  };
+
+  const elements = {
+    select: select,
+    switcherButton: switcherButton(),
+  };
+
+  return elements[elementType];
 };

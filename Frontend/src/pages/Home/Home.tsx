@@ -8,6 +8,7 @@ import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Gap } from '../../components/Gap/Gap';
 import { Typography } from '../../components/Typography/Typography';
+import { LangSwitch } from '../../components/LangSwitch/LangSwitch';
 
 export const Home: FunctionComponent = () => {
   const auth = useContext(AuthContext);
@@ -25,8 +26,7 @@ export const Home: FunctionComponent = () => {
   return (
     <>
       <PageHeader title={localizationCaptions[LocalizationKey.AppName]} />
-      <div>
-        <Gap sizeRem={7.25} />
+      <div className="flex flex-1 flex-col justify-center items-center">
         <Typography size="l">
           {localizationCaptions[LocalizationKey.LoginRequired]}
         </Typography>
@@ -43,6 +43,9 @@ export const Home: FunctionComponent = () => {
             </Typography>
           </Link>
         </div>
+      </div>
+      <div className="flex justify-center">
+        <LangSwitch elementType="switcherButton" />
       </div>
     </>
   );
