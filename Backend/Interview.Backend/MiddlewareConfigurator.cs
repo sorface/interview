@@ -57,17 +57,10 @@ public class MiddlewareConfigurator(WebApplication app)
         {
             var upsertUser = context.User.ToUser();
             logger.LogInformation(
-                "Request {Path} authorized user [{nickname} {id}] TIME: {time}",
+                "Request {Path} authorized user [{nickname} {id}]",
                 context.Request.Path,
                 upsertUser?.Nickname,
-                upsertUser?.Id,
-                UnixTime());
-
-            static long UnixTime()
-            {
-                var epochStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                return (DateTime.UtcNow - epochStart).Ticks * 100;
-            }
+                upsertUser?.Id);
 
             return func();
         });
