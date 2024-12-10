@@ -9,13 +9,8 @@ using X.PagedList;
 
 namespace Interview.Infrastructure.Users;
 
-public class UserRepository : EfRepository<User>, IUserRepository
+public class UserRepository(AppDbContext db) : EfRepository<User>(db), IUserRepository
 {
-    public UserRepository(AppDbContext db)
-        : base(db)
-    {
-    }
-
     public Task<User?> FindByNicknameAsync(string nickname, CancellationToken cancellationToken = default)
     {
         return ApplyIncludes(Set)
@@ -55,7 +50,7 @@ public class UserRepository : EfRepository<User>, IUserRepository
             .Where(user => user.Id == id)
             .FirstOrDefaultAsync(cancellationToken);
 
-        var userPermissions = (user?.Permissions ?? new List<Permission>()).Select(it => it.Id).ToHashSet();
+        var userPermissions = (user?.Permissions ?? []).Select(it => it.Id).ToHashSet();
 
         var dictionary = Db.Permissions.ToList()
             .Aggregate(
@@ -70,7 +65,7 @@ public class UserRepository : EfRepository<User>, IUserRepository
                     }
                     else
                     {
-                        dict.Add(item.Type.Name, new List<PermissionItem>(new[] { permissionItem }));
+                        dict.Add(item.Type.Name, [.. new[] { permissionItem }]);
                     }
 
                     return dict;

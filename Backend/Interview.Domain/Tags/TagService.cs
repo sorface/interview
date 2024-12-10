@@ -8,15 +8,8 @@ using X.PagedList;
 
 namespace Interview.Domain.Tags;
 
-public class TagService : ITagService
+public class TagService(ITagRepository tagRepository) : ITagService
 {
-    private readonly ITagRepository _tagRepository;
-
-    public TagService(ITagRepository tagRepository)
-    {
-        _tagRepository = tagRepository;
-    }
-
     public Task<IPagedList<TagItem>> FindTagsPageAsync(
         string? value, int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
@@ -34,7 +27,7 @@ public class TagService : ITagService
         var specification = !string.IsNullOrWhiteSpace(value) ?
             new Spec<Tag>(tag => tag.Value.ToLower().Contains(value)) :
             Spec<Tag>.Any;
-        return _tagRepository.GetPageAsync(specification, mapper, pageNumber, pageSize, cancellationToken);
+        return tagRepository.GetPageAsync(specification, mapper, pageNumber, pageSize, cancellationToken);
     }
 
     public async Task<Result<ServiceResult<TagItem>, ServiceError>> CreateTagAsync(TagEditRequest request, CancellationToken cancellationToken)
@@ -51,7 +44,7 @@ public class TagService : ITagService
         }
 
         request.Value = request.Value.Trim();
-        var hasTag = await _tagRepository.HasAsync(new Spec<Tag>(e => e.Value == request.Value), cancellationToken);
+        var hasTag = await tagRepository.HasAsync(new Spec<Tag>(e => e.Value == request.Value), cancellationToken);
         if (hasTag)
         {
             return ServiceError.Error($"Already exists tag '{request.Value}'");
@@ -62,7 +55,7 @@ public class TagService : ITagService
             Value = request.Value,
             HexColor = hexValue,
         };
-        await _tagRepository.CreateAsync(tag, cancellationToken);
+        await tagRepository.CreateAsync(tag, cancellationToken);
         return ServiceResult.Created(new TagItem
         {
             Id = tag.Id,
@@ -84,13 +77,13 @@ public class TagService : ITagService
         }
 
         request.Value = request.Value.Trim();
-        var hasTag = await _tagRepository.HasAsync(new Spec<Tag>(e => e.Value == request.Value && e.Id != id), cancellationToken);
+        var hasTag = await tagRepository.HasAsync(new Spec<Tag>(e => e.Value == request.Value && e.Id != id), cancellationToken);
         if (hasTag)
         {
             return ServiceError.Error($"Already exists tag '{request.Value}'");
         }
 
-        var tag = await _tagRepository.FindByIdAsync(id, cancellationToken);
+        var tag = await tagRepository.FindByIdAsync(id, cancellationToken);
         if (tag is null)
         {
             return ServiceError.NotFound($"Not found tag by id '{id}'");
@@ -98,7 +91,7 @@ public class TagService : ITagService
 
         tag.Value = request.Value;
         tag.HexColor = request.HexValue ?? string.Empty;
-        await _tagRepository.UpdateAsync(tag, cancellationToken);
+        await tagRepository.UpdateAsync(tag, cancellationToken);
         return ServiceResult.Ok(new TagItem
         {
             Id = tag.Id,

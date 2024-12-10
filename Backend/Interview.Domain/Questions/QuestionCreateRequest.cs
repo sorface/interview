@@ -7,7 +7,7 @@ public sealed class QuestionCreateRequest
 {
     public string Value { get; set; } = string.Empty;
 
-    public HashSet<Guid> Tags { get; set; } = new();
+    public HashSet<Guid> Tags { get; set; } = [];
 
     public required EVQuestionType Type { get; set; }
 

@@ -12,15 +12,8 @@ namespace Interview.Backend.RoomEvaluations;
 
 [ApiController]
 [Route("api/room-evaluations")]
-public class RoomQuestionEvaluationController : ControllerBase
+public class RoomQuestionEvaluationController(IRoomQuestionEvaluationService roomQuestionEvaluationService) : ControllerBase
 {
-    private readonly IRoomQuestionEvaluationService _roomQuestionEvaluationService;
-
-    public RoomQuestionEvaluationController(IRoomQuestionEvaluationService roomQuestionEvaluationService)
-    {
-        _roomQuestionEvaluationService = roomQuestionEvaluationService;
-    }
-
     /// <summary>
     /// Getting a current user room evaluations.
     /// </summary>
@@ -37,7 +30,7 @@ public class RoomQuestionEvaluationController : ControllerBase
     {
         var userId = currentUserAccessor.GetUserIdOrThrow();
         var request = new UserRoomQuestionEvaluationsRequest { UserId = userId, RoomId = roomId, };
-        return _roomQuestionEvaluationService.GetUserRoomQuestionEvaluationsAsync(request, HttpContext.RequestAborted);
+        return roomQuestionEvaluationService.GetUserRoomQuestionEvaluationsAsync(request, HttpContext.RequestAborted);
     }
 
     [Authorize]
@@ -55,7 +48,7 @@ public class RoomQuestionEvaluationController : ControllerBase
 
         var questionEvaluationGetRequest = new QuestionEvaluationGetRequest { UserId = user.Id, RoomId = request.RoomId, QuestionId = request.QuestionId, };
 
-        return await _roomQuestionEvaluationService.FindByRoomIdAndQuestionIdAsync(questionEvaluationGetRequest, HttpContext.RequestAborted);
+        return await roomQuestionEvaluationService.FindByRoomIdAndQuestionIdAsync(questionEvaluationGetRequest, HttpContext.RequestAborted);
     }
 
     [Authorize]
@@ -80,6 +73,6 @@ public class RoomQuestionEvaluationController : ControllerBase
             Review = request.Review,
         };
 
-        return await _roomQuestionEvaluationService.MergeAsync(questionEvaluationMergeRequest, HttpContext.RequestAborted);
+        return await roomQuestionEvaluationService.MergeAsync(questionEvaluationMergeRequest, HttpContext.RequestAborted);
     }
 }

@@ -5,12 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Infrastructure.RoomQuestionEvaluations;
 
-public class RoomQuestionEvaluationRepository : EfRepository<RoomQuestionEvaluation>, IRoomQuestionEvaluationRepository
+public class RoomQuestionEvaluationRepository(AppDbContext db) : EfRepository<RoomQuestionEvaluation>(db), IRoomQuestionEvaluationRepository
 {
-    public RoomQuestionEvaluationRepository(AppDbContext db) : base(db)
-    {
-    }
-
     public async Task<RoomQuestionEvaluation?> FindByActiveQuestionRoomAsync(Guid roomId, Guid userId, CancellationToken cancellationToken)
     {
         var question = await Db.RoomQuestions

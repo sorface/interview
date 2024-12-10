@@ -7,26 +7,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket.Events.Handlers;
 
-public class ExpertReviewTypingWebSocketEventHandler : WebSocketByNameEventHandlerBase
+public class ExpertReviewTypingWebSocketEventHandler(
+    ILogger<ExpertReviewTypingWebSocketEventHandler> logger,
+    IEventSenderAdapter eventSenderAdapter,
+    RoomConnectionListener roomConnectionListener,
+    ILogger<WebSocketEventSender> webSocketEventSender,
+    IRoomEventSerializer serializer)
+    : WebSocketByNameEventHandlerBase(logger)
 {
-    private readonly ILogger<ExpertReviewTypingWebSocketEventHandler> _logger;
-    private readonly ILogger<WebSocketEventSender> _webSocketEventSender;
-    private readonly IEventSenderAdapter _eventSenderAdapter;
-    private readonly RoomConnectionListener _roomConnectionListener;
-    private readonly IRoomEventSerializer _serializer;
-
-    public ExpertReviewTypingWebSocketEventHandler(ILogger<ExpertReviewTypingWebSocketEventHandler> logger,
-                                                   IEventSenderAdapter eventSenderAdapter,
-                                                   RoomConnectionListener roomConnectionListener,
-                                                   ILogger<WebSocketEventSender> webSocketEventSender,
-                                                   IRoomEventSerializer serializer) : base(logger)
-    {
-        _logger = logger;
-        _eventSenderAdapter = eventSenderAdapter;
-        _roomConnectionListener = roomConnectionListener;
-        _webSocketEventSender = webSocketEventSender;
-        _serializer = serializer;
-    }
+    private readonly ILogger<ExpertReviewTypingWebSocketEventHandler> _logger = logger;
 
     protected override string SupportType => "expert-review-typing";
 
@@ -37,7 +26,7 @@ public class ExpertReviewTypingWebSocketEventHandler : WebSocketByNameEventHandl
             return;
         }
 
-        if (!_roomConnectionListener.TryGetConnectionsByPredicate(
+        if (!roomConnectionListener.TryGetConnectionsByPredicate(
                 detail.RoomId,
                 e => e.ParticipantType == EVRoomParticipantType.Expert && e.User.Id != detail.UserId,
                 out var connections))
@@ -53,7 +42,7 @@ public class ExpertReviewTypingWebSocketEventHandler : WebSocketByNameEventHandl
             ParticipantType = detail.ParticipantType,
         };
 
-        var payloadStr = _serializer.SerializePayloadAsString(payloadForSerialization);
+        var payloadStr = serializer.SerializePayloadAsString(payloadForSerialization);
         var sendEvent = new RoomEvent
         {
             RoomId = detail.RoomId,
@@ -61,11 +50,11 @@ public class ExpertReviewTypingWebSocketEventHandler : WebSocketByNameEventHandl
             Value = payloadStr,
             CreatedById = detail.UserId,
         };
-        var provider = new CachedRoomEventProvider(sendEvent, _serializer);
+        var provider = new CachedRoomEventProvider(sendEvent, serializer);
         foreach (var webSocket in connections)
         {
-            var sender = new WebSocketEventSender(_webSocketEventSender, webSocket);
-            await _eventSenderAdapter.SendAsync(provider, sender, cancellationToken);
+            var sender = new WebSocketEventSender(webSocketEventSender, webSocket);
+            await eventSenderAdapter.SendAsync(provider, sender, cancellationToken);
         }
     }
 }

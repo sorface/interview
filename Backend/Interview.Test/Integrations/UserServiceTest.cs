@@ -18,12 +18,8 @@ public class UserServiceTest
     {
         get
         {
-            yield return new object[] { "Dima", new AdminUsers(), RoleName.User };
-
-            yield return new object[]
-            {
-                "Dima", new AdminUsers() { TwitchNicknames = new[] { "Dima" } }, RoleName.Admin
-            };
+            yield return ["Dima", RoleName.User];
+            yield return ["Dima", RoleName.Admin];
         }
     }
 
@@ -43,7 +39,7 @@ public class UserServiceTest
         );
 
         var userService = new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext),
-            new AdminUsers(), new PermissionRepository(appDbContext), securityService);
+            new PermissionRepository(appDbContext), securityService);
         var user = new User("Dima", "1");
         var upsertUser = await userService.UpsertByExternalIdAsync(user);
 
@@ -51,14 +47,13 @@ public class UserServiceTest
         expectedUser.UpdateCreateDate(user.CreateDate);
         expectedUser.Roles.AddRange(entity.Roles);
         expectedUser.Permissions.AddRange(entity.Permissions);
-        var excluder = CreateDatesExcluder();
-        upsertUser.Should().BeEquivalentTo(expectedUser, e => e.Excluding(excluder));
+        var datesForExcluding = CreateDatesExcluder();
+        upsertUser.Should().BeEquivalentTo(expectedUser, e => e.Excluding(datesForExcluding));
     }
 
     [Theory(DisplayName = "'UpsertByTwitchIdentityAsync' when there is no such user in the database")]
     [MemberData(nameof(UpsertUsersWhenUserNotExistsInDatabaseData))]
-    public async Task UpsertUsersWhenUserNotExistsInDatabase(string nickname, AdminUsers adminUsers,
-        RoleName expectedRoleName)
+    public async Task UpsertUsersWhenUserNotExistsInDatabase(string nickname, RoleName expectedRoleName)
     {
         var clock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(clock);
@@ -69,8 +64,7 @@ public class UserServiceTest
             new RoomParticipantRepository(appDbContext)
         );
         var userService =
-            new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext), adminUsers,
-                new PermissionRepository(appDbContext), securityService);
+            new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext), new PermissionRepository(appDbContext), securityService);
         var user = new User(nickname, "1");
         user.Roles.Add(new Role(expectedRoleName));
 
@@ -94,7 +88,7 @@ public class UserServiceTest
             new RoomParticipantRepository(appDbContext)
         );
         var userService = new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext),
-            new AdminUsers(), new PermissionRepository(appDbContext), securityService);
+            new PermissionRepository(appDbContext), securityService);
         var user = new User("Dima", "1");
 
         var error = await Assert.ThrowsAsync<Domain.NotFoundException>(async () => await userService.UpsertByExternalIdAsync(user));

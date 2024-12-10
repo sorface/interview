@@ -5,22 +5,13 @@ using Microsoft.AspNetCore.Authentication;
 
 namespace Interview.Backend.Auth.Sorface;
 
-public class SorfaceTokenService
+public class SorfaceTokenService(AuthorizationService options, IHttpClientFactory httpClientFactory)
 {
     private const string AnErrorOccurredWhileRetrievingTheUserProfile =
         "An error occurred while retrieving the user profile.";
 
     private const string AnErrorOccurredWhileRetrievingTheRefreshToken =
         "An error occurred while retrieving refresh token.";
-
-    private readonly AuthorizationService _options;
-    private readonly IHttpClientFactory _httpClientFactory;
-
-    public SorfaceTokenService(AuthorizationService options, IHttpClientFactory httpClientFactory)
-    {
-        _options = options;
-        _httpClientFactory = httpClientFactory;
-    }
 
     public async Task<RefreshTokenObject?> RefreshTokenAsync(string? refreshToken, CancellationToken cancellationToken = default)
     {
@@ -31,16 +22,16 @@ public class SorfaceTokenService
 
         var form = new List<KeyValuePair<string, string>> { new("refresh_token", $"{refreshToken}"), new("grant_type", "refresh_token"), };
 
-        using var request = new HttpRequestMessage(HttpMethod.Post, _options.TokenEndpoint) { Content = new FormUrlEncodedContent(form), };
+        using var request = new HttpRequestMessage(HttpMethod.Post, options.TokenEndpoint) { Content = new FormUrlEncodedContent(form), };
 
-        var chars = $"{_options.ClientId}:{_options.ClientSecret}";
+        var chars = $"{options.ClientId}:{options.ClientSecret}";
 
         var bytes = Encoding.UTF8.GetBytes(chars);
         var base64Secret = Convert.ToBase64String(bytes);
 
         request.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64Secret);
 
-        using var response = await _httpClientFactory.CreateClient()
+        using var response = await httpClientFactory.CreateClient()
             .SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
@@ -64,16 +55,16 @@ public class SorfaceTokenService
 
         var form = new List<KeyValuePair<string, string>> { new("token", $"{accessToken}"), };
 
-        using var request = new HttpRequestMessage(HttpMethod.Post, _options.RevokeTokenEndpoint) { Content = new FormUrlEncodedContent(form), };
+        using var request = new HttpRequestMessage(HttpMethod.Post, options.RevokeTokenEndpoint) { Content = new FormUrlEncodedContent(form), };
 
-        var chars = $"{_options.ClientId}:{_options.ClientSecret}";
+        var chars = $"{options.ClientId}:{options.ClientSecret}";
 
         var bytes = Encoding.UTF8.GetBytes(chars);
         request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(bytes));
 
         try
         {
-            var httpClient = _httpClientFactory.CreateClient();
+            var httpClient = httpClientFactory.CreateClient();
 
             await httpClient.SendAsync(request, httpContent.RequestAborted);
         }
@@ -94,14 +85,14 @@ public class SorfaceTokenService
 
         var form = new List<KeyValuePair<string, string>> { new("token", $"{accessToken}"), };
 
-        using var request = new HttpRequestMessage(HttpMethod.Post, _options.UserInformationEndpoint) { Content = new FormUrlEncodedContent(form), };
+        using var request = new HttpRequestMessage(HttpMethod.Post, options.UserInformationEndpoint) { Content = new FormUrlEncodedContent(form), };
 
-        var chars = $"{_options.ClientId}:{_options.ClientSecret}";
+        var chars = $"{options.ClientId}:{options.ClientSecret}";
 
         var bytes = Encoding.UTF8.GetBytes(chars);
         request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(bytes));
 
-        using var response = await _httpClientFactory.CreateClient()
+        using var response = await httpClientFactory.CreateClient()
             .SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
 
         if (!response.IsSuccessStatusCode)

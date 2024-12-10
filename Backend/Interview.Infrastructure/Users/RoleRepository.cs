@@ -4,12 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Infrastructure.Users;
 
-public class RoleRepository : EfRepository<Role>, IRoleRepository
+public class RoleRepository(AppDbContext db) : EfRepository<Role>(db), IRoleRepository
 {
-    public RoleRepository(AppDbContext db)
-        : base(db)
-    {
-    }
-
     protected override IQueryable<Role> ApplyIncludes(DbSet<Role> set) => set;
 }

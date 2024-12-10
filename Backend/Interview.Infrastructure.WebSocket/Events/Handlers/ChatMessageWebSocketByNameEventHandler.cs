@@ -4,18 +4,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket.Events.Handlers;
 
-public class ChatMessageWebSocketByNameEventHandler : WebSocketByNameEventHandlerBase
+public class ChatMessageWebSocketByNameEventHandler(
+    IRoomEventDispatcher eventDispatcher,
+    ILogger<WebSocketByNameEventHandlerBase> logger)
+    : WebSocketByNameEventHandlerBase(logger)
 {
-    private readonly IRoomEventDispatcher _eventDispatcher;
-
-    public ChatMessageWebSocketByNameEventHandler(
-        IRoomEventDispatcher eventDispatcher,
-        ILogger<WebSocketByNameEventHandlerBase> logger)
-        : base(logger)
-    {
-        _eventDispatcher = eventDispatcher;
-    }
-
     protected override string SupportType => "chat-message";
 
     protected override Task HandleEventAsync(SocketEventDetail detail, string? message, CancellationToken cancellationToken)
@@ -32,6 +25,6 @@ public class ChatMessageWebSocketByNameEventHandler : WebSocketByNameEventHandle
             Value = payload,
             CreatedById = detail.UserId,
         };
-        return _eventDispatcher.WriteAsync(@event, cancellationToken);
+        return eventDispatcher.WriteAsync(@event, cancellationToken);
     }
 }

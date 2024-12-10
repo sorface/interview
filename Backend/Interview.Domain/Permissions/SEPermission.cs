@@ -2,7 +2,8 @@ using Ardalis.SmartEnum;
 
 namespace Interview.Domain.Permissions;
 
-public class SEPermission : SmartEnum<SEPermission>
+public class SEPermission(Guid id, string name, string description, EVPermission value)
+    : SmartEnum<SEPermission>(name, (int)value)
 {
     public static readonly SEPermission Unknown = new(
         Guid.Parse("129319c5-2bff-46a6-8539-5fc6bf77983e"),
@@ -418,14 +419,7 @@ public class SEPermission : SmartEnum<SEPermission>
         "Getting a schedule of meetings",
         EVPermission.GetRoomCalendar);
 
-    public Guid Id { get; }
+    public Guid Id { get; } = id;
 
-    public string Description { get; }
-
-    public SEPermission(Guid id, string name, string description, EVPermission value)
-        : base(name, (int)value)
-    {
-        Id = id;
-        Description = description;
-    }
+    public string Description { get; } = description;
 }

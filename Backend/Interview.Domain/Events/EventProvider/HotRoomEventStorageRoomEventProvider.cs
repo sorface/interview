@@ -3,22 +3,13 @@ using NSpecifications;
 
 namespace Interview.Domain.Events.EventProvider;
 
-public sealed class HotRoomEventStorageRoomEventProvider : IRoomEventProvider
+public sealed class HotRoomEventStorageRoomEventProvider(IHotEventStorage hotEventStorage, Guid id) : IRoomEventProvider
 {
-    private readonly IHotEventStorage _hotEventStorage;
-    private readonly Guid _roomId;
-
-    public HotRoomEventStorageRoomEventProvider(IHotEventStorage hotEventStorage, Guid roomId)
-    {
-        _hotEventStorage = hotEventStorage;
-        _roomId = roomId;
-    }
-
     public async Task<IEnumerable<EPStorageEvent>> GetEventsAsync(EPStorageEventRequest request, CancellationToken cancellationToken)
     {
         const int DefaultChunkSize = 500;
         var spec = BuildSpecification(request);
-        var changedRooms = await _hotEventStorage
+        var changedRooms = await hotEventStorage
             .GetBySpecAsync(spec, DefaultChunkSize, cancellationToken)
             .ToListAsync(cancellationToken: cancellationToken);
 
@@ -30,7 +21,7 @@ public sealed class HotRoomEventStorageRoomEventProvider : IRoomEventProvider
     public async Task<EPStorageEvent?> GetLatestEventAsync(EPStorageEventRequest request, CancellationToken cancellationToken)
     {
         var spec = BuildSpecification(request);
-        var lastCodeEditorState = await _hotEventStorage
+        var lastCodeEditorState = await hotEventStorage
             .GetLatestBySpecAsync(spec, 1, cancellationToken)
             .FirstOrDefaultAsync(cancellationToken);
         return lastCodeEditorState?.Select(ToStorageEvent).FirstOrDefault();
@@ -49,7 +40,7 @@ public sealed class HotRoomEventStorageRoomEventProvider : IRoomEventProvider
 
     private ASpec<IStorageEvent> BuildSpecification(EPStorageEventRequest request)
     {
-        var roomId = _roomId;
+        var roomId = id;
         var type = request.Type;
         ASpec<IStorageEvent> spec = new Spec<IStorageEvent>(e => e.RoomId == roomId && e.Type == type);
         if (request.From is not null)

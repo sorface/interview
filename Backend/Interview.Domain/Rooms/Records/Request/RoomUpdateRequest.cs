@@ -4,7 +4,7 @@ public class RoomUpdateRequest
 {
     public string? Name { get; set; }
 
-    public HashSet<Guid> Tags { get; set; } = new();
+    public HashSet<Guid> Tags { get; set; } = [];
 
     public required List<RoomQuestionRequest> Questions { get; init; }
 

@@ -11,41 +11,34 @@ using Interview.Domain.Tags;
 
 namespace Interview.Domain.Rooms;
 
-public class Room : Entity
+public class Room(string name, SERoomAccessType accessType) : Entity
 {
-    public Room(string name, SERoomAccessType accessType)
-    {
-        Name = name;
-        Status = SERoomStatus.New;
-        AccessType = accessType;
-    }
-
     private Room()
         : this(string.Empty, SERoomAccessType.Public)
     {
     }
 
-    public string Name { get; internal set; }
+    public string Name { get; internal set; } = name;
 
     public DateTime ScheduleStartTime { get; internal set; }
 
-    public SERoomAccessType AccessType { get; internal set; }
+    public SERoomAccessType AccessType { get; internal set; } = accessType;
 
-    public SERoomStatus Status { get; internal set; }
+    public SERoomStatus Status { get; internal set; } = SERoomStatus.New;
 
     public RoomConfiguration? Configuration { get; set; }
 
     public RoomTimer? Timer { get; set; }
 
-    public List<RoomQuestion> Questions { get; set; } = new();
+    public List<RoomQuestion> Questions { get; set; } = [];
 
-    public List<RoomParticipant> Participants { get; set; } = new();
+    public List<RoomParticipant> Participants { get; set; } = [];
 
-    public List<RoomState> RoomStates { get; set; } = new();
+    public List<RoomState> RoomStates { get; set; } = [];
 
-    public List<Tag> Tags { get; set; } = new();
+    public List<Tag> Tags { get; set; } = [];
 
-    public List<RoomInvite> Invites { get; set; } = new();
+    public List<RoomInvite> Invites { get; set; } = [];
 
     public QueuedRoomEvent? QueuedRoomEvent { get; set; }
 }

@@ -11,24 +11,12 @@ using Microsoft.Extensions.Internal;
 
 namespace Interview.Domain.Rooms.RoomQuestions.Services.AnswerDetail;
 
-public class AnswerDetailService : ISelfScopeService
+public class AnswerDetailService(ISystemClock clock, RoomEventProviderFactory roomEventProviderFactory, AppDbContext db, IRoomEventDeserializer eventDeserializer)
+    : ISelfScopeService
 {
-    private readonly ISystemClock _clock;
-    private readonly RoomEventProviderFactory _roomEventProviderFactory;
-    private readonly AppDbContext _db;
-    private readonly IRoomEventDeserializer _eventDeserializer;
-
-    public AnswerDetailService(ISystemClock clock, RoomEventProviderFactory roomEventProviderFactory, AppDbContext db, IRoomEventDeserializer eventDeserializer)
-    {
-        _clock = clock;
-        _roomEventProviderFactory = roomEventProviderFactory;
-        _db = db;
-        _eventDeserializer = eventDeserializer;
-    }
-
     public async Task<RoomQuestionAnswerDetailResponse> GetAnswerDetailsAsync(RoomQuestionAnswerDetailRequest request, CancellationToken cancellationToken)
     {
-        var roomQuestion = await _db.RoomQuestions
+        var roomQuestion = await db.RoomQuestions
             .Include(e => e.Room)
                 .ThenInclude(e => e!.QueuedRoomEvent)
             .Include(e => e.Question)
@@ -48,8 +36,8 @@ public class AnswerDetailService : ISelfScopeService
             throw NotFoundException.Create<RoomQuestion>((request.RoomId, "RoomId"), (request.QuestionId, "QuestionId"));
         }
 
-        var eventProvider = await _roomEventProviderFactory.CreateProviderAsync(request.RoomId, cancellationToken);
-        var facade = new RoomEventActiveQuestionProvider(eventProvider, _eventDeserializer, _clock);
+        var eventProvider = await roomEventProviderFactory.CreateProviderAsync(request.RoomId, cancellationToken);
+        var facade = new RoomEventActiveQuestionProvider(eventProvider, eventDeserializer, clock);
         await foreach (var (startActiveDate, endActiveDate) in facade.GetActiveQuestionDateAsync(request.QuestionId, cancellationToken))
         {
             var res = await eventProvider

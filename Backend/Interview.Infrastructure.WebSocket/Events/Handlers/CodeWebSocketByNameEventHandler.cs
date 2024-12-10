@@ -6,13 +6,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket.Events.Handlers;
 
-public class CodeWebSocketByNameEventHandler : WebSocketByNameEventHandlerBase
+public class CodeWebSocketByNameEventHandler(ILogger<WebSocketByNameEventHandlerBase> logger) : WebSocketByNameEventHandlerBase(logger)
 {
-    public CodeWebSocketByNameEventHandler(ILogger<WebSocketByNameEventHandlerBase> logger)
-        : base(logger)
-    {
-    }
-
     protected override string SupportType => EventType.CodeEditorChange;
 
     protected override async Task HandleEventAsync(SocketEventDetail detail, string? payload, CancellationToken cancellationToken)
