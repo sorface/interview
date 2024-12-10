@@ -104,11 +104,6 @@ public sealed class UserService : IUserService
             {
                 var foundUser = await _userRepository.FindByExternalIdAsync(user.ExternalId, cancellationToken);
 
-                if (foundUser is not null)
-                {
-                    return foundUser;
-                }
-
                 var roles = user.Roles.DefaultIfEmpty(new Role(RoleName.User));
 
                 var userRoles = await GetUserRolesAsync(roles, cancellationToken);
@@ -118,18 +113,18 @@ public sealed class UserService : IUserService
                     throw new NotFoundException(ExceptionMessage.UserRoleNotFound());
                 }
 
-                // if (foundUser is not null)
-                // {
-                //     foundUser.Roles.Clear();
-                //     foundUser.Roles.AddRange(userRoles);
-                //
-                //     var permissions = await GetDefaultUserPermission(foundUser, cancellationToken);
-                //     foundUser.Permissions.AddRange(permissions);
-                //
-                //     await _userRepository.UpdateAsync(foundUser, cancellationToken);
-                //
-                //     return foundUser;
-                // }
+                if (foundUser is not null)
+                {
+                    foundUser.Roles.Clear();
+                    foundUser.Roles.AddRange(userRoles);
+
+                    var permissions = await GetDefaultUserPermission(foundUser, cancellationToken);
+                    foundUser.Permissions.AddRange(permissions);
+
+                    await _userRepository.UpdateAsync(foundUser, cancellationToken);
+
+                    return foundUser;
+                }
 
                 var insertUser = new User(user.Id, user.Nickname, user.ExternalId) { Avatar = user.Avatar };
 
