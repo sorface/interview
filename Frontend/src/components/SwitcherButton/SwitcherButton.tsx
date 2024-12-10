@@ -5,7 +5,7 @@ import './SwitcherButton.css';
 
 type ActiveIndex = 0 | 1;
 
-interface SwitcherButtonContent {
+export interface SwitcherButtonContent {
   id: string | number;
   content: ReactNode;
 }

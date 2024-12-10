@@ -33,10 +33,11 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
     location.pathname,
   );
   const authenticated = !!user;
+  const hasNavMenu = !fullScreenPage && authenticated;
 
   return (
     <>
-      {!fullScreenPage && <NavMenu admin={admin} />}
+      {hasNavMenu && <NavMenu admin={admin} />}
       <div className={`App ${fullScreenPage ? 'full-screen-page' : ''}`}>
         <div className="App-content">
           <Routes>
