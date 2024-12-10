@@ -23,26 +23,45 @@ serviceConfigurator.AddServices(builder.Services);
 
 var app = builder.Build();
 
-var handleStatefulEventHandler = app.Services.GetRequiredService<HandleStatefulEventHandler>();
-await handleStatefulEventHandler.AddHandlerAsync(CancellationToken.None);
+app.Logger.LogInformation("Build web application {Environment}", app.Environment.EnvironmentName);
 
-await MigrateDbAsync(app);
+try
+{
+    var handleStatefulEventHandler = app.Services.GetRequiredService<HandleStatefulEventHandler>();
+    await handleStatefulEventHandler.AddHandlerAsync(CancellationToken.None);
 
-var middlewareConfigurator = new MiddlewareConfigurator(app);
-middlewareConfigurator.AddMiddlewares();
+    await MigrateDbAsync(app);
 
-app.Run();
+    app.Logger.LogInformation("Add middlewares...");
+    var middlewareConfigurator = new MiddlewareConfigurator(app);
+    middlewareConfigurator.AddMiddlewares();
+
+    app.Logger.LogInformation("Application starting...");
+    app.Run();
+}
+catch (Exception e)
+{
+    app.Logger.LogError(e, "During run app");
+    throw;
+}
+finally
+{
+    app.Logger.LogInformation("Application stopped...");
+}
 
 async Task MigrateDbAsync(WebApplication webApplication)
 {
+    webApplication.Logger.LogInformation("Apply migrations...");
     using var serviceScope = webApplication.Services.CreateScope();
     var appDbContext = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
 
     await appDbContext.Database.MigrateAsync();
 
+    webApplication.Logger.LogInformation("Apply InitialEvents...");
     var applier = new EventApplier(app.Configuration);
     await applier.ApplyEventsAsync(appDbContext, CancellationToken.None);
 
+    webApplication.Logger.LogInformation("Apply InitialDb...");
     var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<DevDbInitializer>>();
     var initializer = new DevDbInitializer(appDbContext, app.Configuration, logger);
     await initializer.InitializeAsync(CancellationToken.None);
