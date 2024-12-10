@@ -16,7 +16,7 @@ import { LocalizationCaption } from '../LocalizationCaption/LocalizationCaption'
 import { CategoriesList } from '../CategoriesList/CategoriesList';
 import { Category } from '../../types/category';
 import { Typography } from '../Typography/Typography';
-import { REACT_APP_BUILD_HASH } from '../../config';
+import { REACT_APP_NAME, REACT_APP_BUILD_HASH } from '../../config';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 import './NavMenu.css';
@@ -204,7 +204,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
               className="nav-menu-item-caption move-transition"
               style={{ width: collapsed ? '0rem' : 'var(--caption-width)' }}
             >
-              <LocalizationCaption captionKey={LocalizationKey.AppName} />
+              {REACT_APP_NAME}
             </h1>
           </NavLink>
           <div className="flex flex-col overflow-x-hidden overflow-y-auto">

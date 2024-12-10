@@ -8,6 +8,7 @@ import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Gap } from '../../components/Gap/Gap';
 import { Typography } from '../../components/Typography/Typography';
+import { REACT_APP_NAME } from '../../config';
 
 export const Home: FunctionComponent = () => {
   const auth = useContext(AuthContext);
@@ -24,7 +25,9 @@ export const Home: FunctionComponent = () => {
 
   return (
     <>
-      <PageHeader title={localizationCaptions[LocalizationKey.AppName]} />
+      <PageHeader
+        title={REACT_APP_NAME}
+      />
       <div>
         <Gap sizeRem={7.25} />
         <Typography size="l">
