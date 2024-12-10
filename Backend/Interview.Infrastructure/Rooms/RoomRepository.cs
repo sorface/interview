@@ -15,13 +15,8 @@ using X.PagedList;
 
 namespace Interview.Infrastructure.Rooms;
 
-public class RoomRepository : EfRepository<Room>, IRoomRepository
+public class RoomRepository(AppDbContext db) : EfRepository<Room>(db), IRoomRepository
 {
-    public RoomRepository(AppDbContext db)
-        : base(db)
-    {
-    }
-
     public Task<bool> HasUserAsync(Guid roomId, Guid userId, CancellationToken cancellationToken = default)
     {
         return Set

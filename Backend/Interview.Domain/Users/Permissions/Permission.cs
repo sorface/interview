@@ -4,20 +4,14 @@ using Entity = Interview.Domain.Repository.Entity;
 
 namespace Interview.Domain.Users.Permissions;
 
-public class Permission : Entity
+public class Permission(SEPermission permission) : Entity(permission.Id)
 {
-    public Permission(SEPermission permission)
-        : base(permission.Id)
-    {
-        Type = permission;
-    }
-
     private Permission()
         : this(SEPermission.Unknown)
     {
     }
 
-    public SEPermission Type { get; set; }
+    public SEPermission Type { get; set; } = permission;
 
-    public List<RoomParticipant> Participants = new();
+    public List<RoomParticipant> Participants = [];
 }

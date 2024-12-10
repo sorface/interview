@@ -7,13 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket.Events.Handlers;
 
-public sealed class AppEventWebSocketEventHandler : WebSocketEventHandlerBase<Dictionary<string, object>>
+public sealed class AppEventWebSocketEventHandler(ILogger<WebSocketEventHandlerBase<Dictionary<string, object>>> logger)
+    : WebSocketEventHandlerBase<Dictionary<string, object>>(logger)
 {
-    public AppEventWebSocketEventHandler(ILogger<WebSocketEventHandlerBase<Dictionary<string, object>>> logger)
-        : base(logger)
-    {
-    }
-
     public override int Order => int.MaxValue;
 
     protected override async ValueTask<bool> IsSupportTaskAsync(SocketEventDetail detail, CancellationToken cancellationToken)

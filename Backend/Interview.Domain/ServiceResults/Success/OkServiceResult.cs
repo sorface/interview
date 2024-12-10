@@ -1,12 +1,7 @@
 namespace Interview.Domain.ServiceResults.Success;
 
-public sealed class OkServiceResult<T> : ServiceResult<T>
+public sealed class OkServiceResult<T>(T value) : ServiceResult<T>(value)
 {
-    public OkServiceResult(T value)
-        : base(value)
-    {
-    }
-
     public override TRes Match<TRes>(
         Func<OkServiceResult<T>, TRes> ok,
         Func<CreateServiceResult<T>, TRes> create,

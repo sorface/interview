@@ -3,14 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Domain.Database;
 
-public abstract class EfNonArchiveRepository<T> : EfRepository<T>, INonArchiveRepository<T>
+public abstract class EfNonArchiveRepository<T>(AppDbContext db) : EfRepository<T>(db), INonArchiveRepository<T>
     where T : ArchiveEntity
 {
-    protected EfNonArchiveRepository(AppDbContext db)
-        : base(db)
-    {
-    }
-
     protected override IQueryable<T> ApplyIncludes(DbSet<T> set) => set.Where(it => !it.IsArchived);
 
     protected override IQueryable<T> ApplyNonDetail(DbSet<T> set) => set.Where(it => !it.IsArchived);

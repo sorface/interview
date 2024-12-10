@@ -199,14 +199,9 @@ public class WebSocketReader
         return _hotEventStorage.AddAsync(storageEvent, ct);
     }
 
-    private class PoolItem : IDisposable
+    private class PoolItem(int size) : IDisposable
     {
-        public byte[] Buffer { get; }
-
-        public PoolItem(int size)
-        {
-            Buffer = ArrayPool<byte>.Shared.Rent(size);
-        }
+        public byte[] Buffer { get; } = ArrayPool<byte>.Shared.Rent(size);
 
         public void Dispose()
         {

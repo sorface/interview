@@ -4,13 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Infrastructure.RoomParticipants;
 
-public class RoomParticipantRepository : EfRepository<RoomParticipant>, IRoomParticipantRepository
+public class RoomParticipantRepository(AppDbContext db) : EfRepository<RoomParticipant>(db), IRoomParticipantRepository
 {
-    public RoomParticipantRepository(AppDbContext db)
-        : base(db)
-    {
-    }
-
     public Task<RoomParticipant?> FindByRoomIdAndUserIdDetailedAsync(
         Guid roomId, Guid userId, CancellationToken cancellationToken = default)
     {

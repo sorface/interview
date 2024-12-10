@@ -21,13 +21,13 @@ public class RoomQuestionEvaluationServiceTest
     {
         get
         {
-            yield return new object[]
-            {
+            yield return
+            [
                 Array.Empty<RoomQuestionTest>(),
-                Array.Empty<RoomQuestionEvaluationResponse>(),
-            };
-            yield return new object[]
-            {
+                Array.Empty<RoomQuestionEvaluationResponse>()
+            ];
+            yield return
+            [
                 new RoomQuestionTest[]
                 {
                     new()
@@ -84,9 +84,9 @@ public class RoomQuestionEvaluationServiceTest
                         },
                     },
                 }
-            };
-            yield return new object[]
-            {
+            ];
+            yield return
+            [
                 new RoomQuestionTest[]
                 {
                     new()
@@ -143,9 +143,9 @@ public class RoomQuestionEvaluationServiceTest
                         },
                     }
                 }
-            };
-            yield return new object[]
-            {
+            ];
+            yield return
+            [
                 new RoomQuestionTest[]
                 {
                     new()
@@ -202,7 +202,7 @@ public class RoomQuestionEvaluationServiceTest
                         },
                     },
                 }
-            };
+            ];
         }
     }
 

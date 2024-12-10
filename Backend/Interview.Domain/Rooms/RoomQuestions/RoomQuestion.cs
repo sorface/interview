@@ -16,7 +16,7 @@ public class RoomQuestion : Entity
 
     public required RoomQuestionState State { get; set; }
 
-    public List<RoomQuestionEvaluation> Evaluations { get; set; } = new();
+    public List<RoomQuestionEvaluation> Evaluations { get; set; } = [];
 
     public required int Order { get; set; }
 }

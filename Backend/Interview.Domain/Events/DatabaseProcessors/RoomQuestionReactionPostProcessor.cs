@@ -5,17 +5,8 @@ using Interview.Domain.Users;
 
 namespace Interview.Domain.Events.DatabaseProcessors;
 
-public class RoomQuestionReactionPostProcessor : EntityPostProcessor<RoomQuestionReaction>
+public class RoomQuestionReactionPostProcessor(IRoomEventDispatcher eventDispatcher, ICurrentUserAccessor currentUserAccessor) : EntityPostProcessor<RoomQuestionReaction>
 {
-    private readonly IRoomEventDispatcher _eventDispatcher;
-    private readonly ICurrentUserAccessor _currentUserAccessor;
-
-    public RoomQuestionReactionPostProcessor(IRoomEventDispatcher eventDispatcher, ICurrentUserAccessor currentUserAccessor)
-    {
-        _eventDispatcher = eventDispatcher;
-        _currentUserAccessor = currentUserAccessor;
-    }
-
     public override async ValueTask ProcessAddedAsync(
         RoomQuestionReaction entity,
         CancellationToken cancellationToken)
@@ -25,9 +16,9 @@ public class RoomQuestionReactionPostProcessor : EntityPostProcessor<RoomQuestio
             RoomId = entity.RoomQuestion!.Room!.Id,
             Type = entity.Reaction!.Type.Name,
             Value = new RoomQuestionReactionPayload { Payload = entity.Payload, UserId = entity.Sender!.Id },
-            CreatedById = _currentUserAccessor.GetUserIdOrThrow(),
+            CreatedById = currentUserAccessor.GetUserIdOrThrow(),
         };
 
-        await _eventDispatcher.WriteAsync(@event, cancellationToken);
+        await eventDispatcher.WriteAsync(@event, cancellationToken);
     }
 }

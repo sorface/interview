@@ -14,7 +14,7 @@ public class Category : ArchiveEntity
 
     public Category? Parent { get; set; }
 
-    public List<Question> Questions { get; set; } = new();
+    public List<Question> Questions { get; set; } = [];
 
     public static async Task<ServiceError?> ValidateCategoryAsync(AppDbContext db, Guid? id, CancellationToken cancellationToken)
     {

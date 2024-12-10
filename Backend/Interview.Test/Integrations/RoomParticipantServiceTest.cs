@@ -19,9 +19,9 @@ public class RoomParticipantServiceTest
     {
         get
         {
-            yield return new object[] { SERoomParticipantType.Viewer };
-            yield return new object[] { SERoomParticipantType.Examinee };
-            yield return new object[] { SERoomParticipantType.Expert };
+            yield return [SERoomParticipantType.Viewer];
+            yield return [SERoomParticipantType.Examinee];
+            yield return [SERoomParticipantType.Expert];
         }
     }
 
@@ -33,7 +33,7 @@ public class RoomParticipantServiceTest
             {
                 foreach (var newType in SERoomParticipantType.List.Where(e => e != initialType))
                 {
-                    yield return new object[] { initialType, newType };
+                    yield return [initialType, newType];
                 }
             }
         }

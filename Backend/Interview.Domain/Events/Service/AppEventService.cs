@@ -7,33 +7,24 @@ using X.PagedList;
 
 namespace Interview.Domain.Events.Service;
 
-public class AppEventService : IAppEventService
+public class AppEventService(IAppEventRepository eventRepository, IRoleRepository roleRepository) : IAppEventService
 {
-    private readonly IAppEventRepository _eventRepository;
-    private readonly IRoleRepository _roleRepository;
-
-    public AppEventService(IAppEventRepository eventRepository, IRoleRepository roleRepository)
-    {
-        _eventRepository = eventRepository;
-        _roleRepository = roleRepository;
-    }
-
     public async Task<IPagedList<AppEventItem>> FindPageAsync(
         int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
-        var res = await _eventRepository.GetPageDetailedAsync(new AppEventItemParticipantTypeMapper(), pageNumber, pageSize, cancellationToken);
+        var res = await eventRepository.GetPageDetailedAsync(new AppEventItemParticipantTypeMapper(), pageNumber, pageSize, cancellationToken);
         return new StaticPagedList<AppEventItem>(res.Select(e => e.ToAppEventItem()), res);
     }
 
     public async Task<AppEventItem?> FindByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        var res = await _eventRepository.FindByIdDetailedAsync(id, new AppEventItemParticipantTypeMapper(), cancellationToken);
+        var res = await eventRepository.FindByIdDetailedAsync(id, new AppEventItemParticipantTypeMapper(), cancellationToken);
         return res?.ToAppEventItem();
     }
 
     public async Task<AppEventItem?> FindByTypeAsync(string type, CancellationToken cancellationToken)
     {
-        var res = await _eventRepository.FindFirstOrDefaultDetailedAsync(new Spec<AppEvent>(e => e.Type == type), new AppEventItemParticipantTypeMapper(), cancellationToken);
+        var res = await eventRepository.FindFirstOrDefaultDetailedAsync(new Spec<AppEvent>(e => e.Type == type), new AppEventItemParticipantTypeMapper(), cancellationToken);
         return res?.ToAppEventItem();
     }
 
@@ -57,14 +48,14 @@ public class AppEventService : IAppEventService
             throw new UserException("An unknown role is specified.");
         }
 
-        var hasEvent = await _eventRepository.HasAsync(new Spec<AppEvent>(e => e.Type == type), cancellationToken);
+        var hasEvent = await eventRepository.HasAsync(new Spec<AppEvent>(e => e.Type == type), cancellationToken);
         if (hasEvent)
         {
             throw new UserException("An event with this type already exists.");
         }
 
         var requestedRoleIds = request.Roles.Select(e => RoleName.FromValue((int)e).Id).ToList();
-        var roles = await _roleRepository.FindByIdsAsync(requestedRoleIds, cancellationToken);
+        var roles = await roleRepository.FindByIdsAsync(requestedRoleIds, cancellationToken);
         var newEvent = new AppEvent
         {
             Type = type,
@@ -72,13 +63,13 @@ public class AppEventService : IAppEventService
             Stateful = request.Stateful,
             ParticipantTypes = AppEvent.ParseParticipantTypes(type, request.ParticipantTypes),
         };
-        await _eventRepository.CreateAsync(newEvent, cancellationToken);
+        await eventRepository.CreateAsync(newEvent, cancellationToken);
         return newEvent.Id;
     }
 
     public async Task<AppEventItem> UpdateAsync(Guid id, AppEventUpdateRequest request, CancellationToken cancellationToken)
     {
-        var existingEvent = await _eventRepository.FindByIdDetailedAsync(id, cancellationToken);
+        var existingEvent = await eventRepository.FindByIdDetailedAsync(id, cancellationToken);
         if (existingEvent is null)
         {
             throw new NotFoundException($"Not found event by id {id}");
@@ -93,7 +84,7 @@ public class AppEventService : IAppEventService
         var type = request.Type?.Trim();
         if (!string.IsNullOrWhiteSpace(type))
         {
-            var hasEvent = await _eventRepository.HasAsync(new Spec<AppEvent>(e => e.Type == type), cancellationToken);
+            var hasEvent = await eventRepository.HasAsync(new Spec<AppEvent>(e => e.Type == type), cancellationToken);
             if (hasEvent)
             {
                 throw new UserException("An event with this type already exists.");
@@ -105,7 +96,7 @@ public class AppEventService : IAppEventService
         if (request.Roles is not null && request.Roles.Count > 0)
         {
             var requestedRoleIds = request.Roles.Select(e => RoleName.FromValue((int)e).Id).ToList();
-            var roles = await _roleRepository.FindByIdsAsync(requestedRoleIds, cancellationToken);
+            var roles = await roleRepository.FindByIdsAsync(requestedRoleIds, cancellationToken);
             existingEvent.Roles = roles;
         }
 
@@ -116,7 +107,7 @@ public class AppEventService : IAppEventService
 
         existingEvent.Stateful = request.Stateful;
 
-        await _eventRepository.UpdateAsync(existingEvent, cancellationToken);
+        await eventRepository.UpdateAsync(existingEvent, cancellationToken);
         return mapper.Map(existingEvent).ToAppEventItem();
     }
 }

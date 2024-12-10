@@ -47,8 +47,8 @@ public class RoomAnalyticServiceTest
         appDbContext.SaveChanges();
         var dummyRoom = new Room("test room", SERoomAccessType.Public)
         {
-            Questions = new List<RoomQuestion>
-            {
+            Questions =
+            [
                 new()
                 {
                     RoomId = default,
@@ -57,8 +57,9 @@ public class RoomAnalyticServiceTest
                     Question = new Question("test q"),
                     State = RoomQuestionState.Open,
                     Order = 0,
-                    Evaluations = new List<RoomQuestionEvaluation> { new() { RoomQuestionId = default, CreatedBy = dummyUser, Review = "dummy 2", Mark = 2 }, }
+                    Evaluations = [new() { RoomQuestionId = default, CreatedBy = dummyUser, Review = "dummy 2", Mark = 2 }]
                 },
+
                 new()
                 {
                     RoomId = default,
@@ -67,9 +68,10 @@ public class RoomAnalyticServiceTest
                     Question = new Question("test q 2"),
                     State = RoomQuestionState.Active,
                     Order = 0,
-                    Evaluations = new List<RoomQuestionEvaluation> { new() { RoomQuestionId = default, CreatedBy = dummyUser, Review = "dummy 1", Mark = 1 }, }
-                },
-            },
+                    Evaluations = [new() { RoomQuestionId = default, CreatedBy = dummyUser, Review = "dummy 1", Mark = 1 }]
+                }
+
+            ],
         };
         dummyRoom.Participants.Add(new RoomParticipant(dummyUser, dummyRoom, SERoomParticipantType.Expert));
 
@@ -206,148 +208,71 @@ public class RoomAnalyticServiceTest
 
         var expectAnalytics = new Analytics
         {
-            Questions = new List<Analytics.AnalyticsQuestion>
-            {
+            Questions =
+            [
                 new()
                 {
                     Id = questions[0].Id,
                     Value = questions[0].Value,
                     Status = RoomQuestionState.Open.Name,
-                    Users = new List<Analytics.AnalyticsUser>
-                    {
-                        new()
-                        {
-                            Id = users[0].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[1].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[2].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[3].Id,
-                            Evaluation = new()
-                            {
-                                Mark = 10,
-                                Review = "test test",
-                            },
-                        },
-                    },
+                    Users =
+                    [
+                        new() { Id = users[0].Id, Evaluation = null, },
+                        new() { Id = users[1].Id, Evaluation = null, },
+                        new() { Id = users[2].Id, Evaluation = null, },
+                        new() { Id = users[3].Id, Evaluation = new() { Mark = 10, Review = "test test", }, }
+                    ],
                     AverageMark = 10
                 },
+
                 new()
                 {
                     Id = questions[1].Id,
                     Value = questions[1].Value,
                     Status = RoomQuestionState.Closed.Name,
-                    Users = new List<Analytics.AnalyticsUser>
-                    {
-                        new()
-                        {
-                            Id = users[0].Id,
-                            Evaluation = new()
-                            {
-                                Mark = 2,
-                                Review = "test 2",
-                            },
-                        },
-                        new()
-                        {
-                            Id = users[1].Id,
-                            Evaluation = new()
-                            {
-                                Mark = 5,
-                                Review = "test",
-                            },
-                        },
-                        new()
-                        {
-                            Id = users[2].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[3].Id,
-                            Evaluation = null,
-                        },
-                    },
+                    Users =
+                    [
+                        new() { Id = users[0].Id, Evaluation = new() { Mark = 2, Review = "test 2", }, },
+                        new() { Id = users[1].Id, Evaluation = new() { Mark = 5, Review = "test", }, },
+                        new() { Id = users[2].Id, Evaluation = null, },
+                        new() { Id = users[3].Id, Evaluation = null, }
+                    ],
                     AverageMark = 3.5
                 },
+
                 new()
                 {
                     Id = questions[2].Id,
                     Value = questions[2].Value,
                     Status = RoomQuestionState.Closed.Name,
-                    Users = new List<Analytics.AnalyticsUser>
-                    {
-                        new()
-                        {
-                            Id = users[0].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[1].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[2].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[3].Id,
-                            Evaluation = null,
-                        },
-                    },
+                    Users =
+                    [
+                        new() { Id = users[0].Id, Evaluation = null, },
+                        new() { Id = users[1].Id, Evaluation = null, },
+                        new() { Id = users[2].Id, Evaluation = null, },
+                        new() { Id = users[3].Id, Evaluation = null, }
+                    ],
                     AverageMark = 0,
                 },
+
                 new()
                 {
                     Id = questions[3].Id,
                     Value = questions[3].Value,
                     Status = RoomQuestionState.Active.Name,
-                    Users = new List<Analytics.AnalyticsUser>
-                    {
-                        new()
-                        {
-                            Id = users[0].Id,
-                            Evaluation = new()
-                            {
-                                Review = "test 4444",
-                                Mark = 10
-                            },
-                        },
-                        new()
-                        {
-                            Id = users[1].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[2].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[3].Id,
-                            Evaluation = null,
-                        },
-                    },
+                    Users =
+                    [
+                        new() { Id = users[0].Id, Evaluation = new() { Review = "test 4444", Mark = 10 }, },
+                        new() { Id = users[1].Id, Evaluation = null, },
+                        new() { Id = users[2].Id, Evaluation = null, },
+                        new() { Id = users[3].Id, Evaluation = null, }
+                    ],
                     AverageMark = 10,
                 }
-            },
+            ],
             AverageMark = 8,
-            UserReview = new List<Analytics.AnalyticsUserAverageMark>
-            {
+            UserReview =
+            [
                 new()
                 {
                     UserId = users[0].Id,
@@ -357,6 +282,7 @@ public class RoomAnalyticServiceTest
                     Avatar = users[0].Avatar,
                     ParticipantType = roomParticipants[0].Type.EnumValue
                 },
+
                 new()
                 {
                     UserId = users[1].Id,
@@ -366,6 +292,7 @@ public class RoomAnalyticServiceTest
                     Avatar = users[1].Avatar,
                     ParticipantType = roomParticipants[1].Type.EnumValue
                 },
+
                 new()
                 {
                     UserId = users[2].Id,
@@ -375,6 +302,7 @@ public class RoomAnalyticServiceTest
                     Avatar = users[2].Avatar,
                     ParticipantType = roomParticipants[2].Type.EnumValue
                 },
+
                 new()
                 {
                     UserId = users[3].Id,
@@ -383,8 +311,9 @@ public class RoomAnalyticServiceTest
                     Nickname = users[3].Nickname,
                     Avatar = users[3].Avatar,
                     ParticipantType = roomParticipants[3].Type.EnumValue
-                },
-            },
+                }
+
+            ],
             Completed = true
         };
 
@@ -414,8 +343,8 @@ public class RoomAnalyticServiceTest
         appDbContext.SaveChanges();
         var dummyRoom = new Room("test room", SERoomAccessType.Public)
         {
-            Questions = new List<RoomQuestion>
-            {
+            Questions =
+            [
                 new()
                 {
                     RoomId = default,
@@ -424,8 +353,9 @@ public class RoomAnalyticServiceTest
                     Question = new Question("test q"),
                     State = RoomQuestionState.Open,
                     Order = 0,
-                    Evaluations = new List<RoomQuestionEvaluation> { new() { RoomQuestionId = default, CreatedBy = dummyUser, Review = "dummy 2", Mark = 2 }, }
+                    Evaluations = [new() { RoomQuestionId = default, CreatedBy = dummyUser, Review = "dummy 2", Mark = 2 }]
                 },
+
                 new()
                 {
                     RoomId = default,
@@ -434,9 +364,10 @@ public class RoomAnalyticServiceTest
                     Question = new Question("test q 2"),
                     State = RoomQuestionState.Active,
                     Order = 0,
-                    Evaluations = new List<RoomQuestionEvaluation> { new() { RoomQuestionId = default, CreatedBy = dummyUser, Review = "dummy 1", Mark = 1 }, }
-                },
-            },
+                    Evaluations = [new() { RoomQuestionId = default, CreatedBy = dummyUser, Review = "dummy 1", Mark = 1 }]
+                }
+
+            ],
         };
         dummyRoom.Participants.Add(new RoomParticipant(dummyUser, dummyRoom, SERoomParticipantType.Expert));
 
@@ -573,144 +504,71 @@ public class RoomAnalyticServiceTest
 
         var expectAnalytics = new Analytics
         {
-            Questions = new List<Analytics.AnalyticsQuestion>
-            {
+            Questions =
+            [
                 new()
                 {
                     Id = questions[0].Id,
                     Value = questions[0].Value,
                     Status = RoomQuestionState.Open.Name,
-                    Users = new List<Analytics.AnalyticsUser>
-                    {
-                        new()
-                        {
-                            Id = users[0].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[1].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[2].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[3].Id,
-                            Evaluation = new()
-                            {
-                                Mark = 10,
-                                Review = "test test",
-                            },
-                        },
-                    },
+                    Users =
+                    [
+                        new() { Id = users[0].Id, Evaluation = null, },
+                        new() { Id = users[1].Id, Evaluation = null, },
+                        new() { Id = users[2].Id, Evaluation = null, },
+                        new() { Id = users[3].Id, Evaluation = new() { Mark = 10, Review = "test test", }, }
+                    ],
                     AverageMark = null
                 },
+
                 new()
                 {
                     Id = questions[1].Id,
                     Value = questions[1].Value,
                     Status = RoomQuestionState.Closed.Name,
-                    Users = new List<Analytics.AnalyticsUser>
-                    {
-                        new()
-                        {
-                            Id = users[0].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[1].Id,
-                            Evaluation = new()
-                            {
-                                Mark = 5,
-                                Review = "test",
-                            },
-                        },
-                        new()
-                        {
-                            Id = users[2].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[3].Id,
-                            Evaluation = null,
-                        },
-                    },
+                    Users =
+                    [
+                        new() { Id = users[0].Id, Evaluation = null, },
+                        new() { Id = users[1].Id, Evaluation = new() { Mark = 5, Review = "test", }, },
+                        new() { Id = users[2].Id, Evaluation = null, },
+                        new() { Id = users[3].Id, Evaluation = null, }
+                    ],
                     AverageMark = null
                 },
+
                 new()
                 {
                     Id = questions[2].Id,
                     Value = questions[2].Value,
                     Status = RoomQuestionState.Closed.Name,
-                    Users = new List<Analytics.AnalyticsUser>
-                    {
-                        new()
-                        {
-                            Id = users[0].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[1].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[2].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[3].Id,
-                            Evaluation = null,
-                        },
-                    },
+                    Users =
+                    [
+                        new() { Id = users[0].Id, Evaluation = null, },
+                        new() { Id = users[1].Id, Evaluation = null, },
+                        new() { Id = users[2].Id, Evaluation = null, },
+                        new() { Id = users[3].Id, Evaluation = null, }
+                    ],
                     AverageMark = null,
                 },
+
                 new()
                 {
                     Id = questions[3].Id,
                     Value = questions[3].Value,
                     Status = RoomQuestionState.Active.Name,
-                    Users = new List<Analytics.AnalyticsUser>
-                    {
-                        new()
-                        {
-                            Id = users[0].Id,
-                            Evaluation = new()
-                            {
-                                Review = "test 4444",
-                                Mark = 10
-                            },
-                        },
-                        new()
-                        {
-                            Id = users[1].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[2].Id,
-                            Evaluation = null,
-                        },
-                        new()
-                        {
-                            Id = users[3].Id,
-                            Evaluation = null,
-                        },
-                    },
+                    Users =
+                    [
+                        new() { Id = users[0].Id, Evaluation = new() { Review = "test 4444", Mark = 10 }, },
+                        new() { Id = users[1].Id, Evaluation = null, },
+                        new() { Id = users[2].Id, Evaluation = null, },
+                        new() { Id = users[3].Id, Evaluation = null, }
+                    ],
                     AverageMark = null,
                 }
-            },
+            ],
             AverageMark = null,
-            UserReview = new List<Analytics.AnalyticsUserAverageMark>
-            {
+            UserReview =
+            [
                 new()
                 {
                     UserId = users[0].Id,
@@ -720,6 +578,7 @@ public class RoomAnalyticServiceTest
                     Avatar = users[0].Avatar,
                     ParticipantType = roomParticipants[0].Type.EnumValue
                 },
+
                 new()
                 {
                     UserId = users[1].Id,
@@ -729,6 +588,7 @@ public class RoomAnalyticServiceTest
                     Avatar = users[1].Avatar,
                     ParticipantType = roomParticipants[1].Type.EnumValue
                 },
+
                 new()
                 {
                     UserId = users[2].Id,
@@ -738,6 +598,7 @@ public class RoomAnalyticServiceTest
                     Avatar = users[2].Avatar,
                     ParticipantType = roomParticipants[2].Type.EnumValue
                 },
+
                 new()
                 {
                     UserId = users[3].Id,
@@ -746,8 +607,9 @@ public class RoomAnalyticServiceTest
                     Nickname = users[3].Nickname,
                     Avatar = users[3].Avatar,
                     ParticipantType = roomParticipants[3].Type.EnumValue
-                },
-            },
+                }
+
+            ],
             Completed = false
         };
 

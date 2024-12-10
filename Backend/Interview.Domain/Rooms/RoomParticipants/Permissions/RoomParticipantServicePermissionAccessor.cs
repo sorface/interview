@@ -6,41 +6,33 @@ using Interview.Domain.Users;
 
 namespace Interview.Domain.Rooms.RoomParticipants.Permissions;
 
-public class RoomParticipantServicePermissionAccessor : IRoomParticipantService, IServiceDecorator
+public class RoomParticipantServicePermissionAccessor(
+    IRoomParticipantService roomParticipantService,
+    ISecurityService securityService)
+    : IRoomParticipantService, IServiceDecorator
 {
-    private readonly IRoomParticipantService _roomParticipantService;
-    private readonly ISecurityService _securityService;
-
-    public RoomParticipantServicePermissionAccessor(
-        IRoomParticipantService roomParticipantService,
-        ISecurityService securityService)
-    {
-        _securityService = securityService;
-        _roomParticipantService = roomParticipantService;
-    }
-
     public async Task<RoomParticipantDetail> FindByRoomIdAndUserIdAsync(
         RoomParticipantGetRequest request,
         CancellationToken cancellationToken = default)
     {
-        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomParticipantFindByRoomIdAndUserId, cancellationToken);
-        return await _roomParticipantService.FindByRoomIdAndUserIdAsync(request, cancellationToken);
+        await securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomParticipantFindByRoomIdAndUserId, cancellationToken);
+        return await roomParticipantService.FindByRoomIdAndUserIdAsync(request, cancellationToken);
     }
 
     public async Task<RoomParticipantDetail> ChangeStatusAsync(
         RoomParticipantChangeStatusRequest request,
         CancellationToken cancellationToken = default)
     {
-        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomParticipantChangeStatus, cancellationToken);
-        return await _roomParticipantService.ChangeStatusAsync(request, cancellationToken);
+        await securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomParticipantChangeStatus, cancellationToken);
+        return await roomParticipantService.ChangeStatusAsync(request, cancellationToken);
     }
 
     public async Task<RoomParticipantDetail> CreateAsync(
         RoomParticipantCreateRequest request,
         CancellationToken cancellationToken = default)
     {
-        await _securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomParticipantCreate, cancellationToken);
-        return await _roomParticipantService.CreateAsync(request, cancellationToken);
+        await securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomParticipantCreate, cancellationToken);
+        return await roomParticipantService.CreateAsync(request, cancellationToken);
     }
 
     public Task<IReadOnlyCollection<RoomParticipant>> CreateAsync(
@@ -48,7 +40,7 @@ public class RoomParticipantServicePermissionAccessor : IRoomParticipantService,
         IReadOnlyCollection<(User User, Room Room, SERoomParticipantType Type)> participants,
         CancellationToken cancellationToken = default)
     {
-        return _roomParticipantService.CreateAsync(roomId, participants, cancellationToken);
+        return roomParticipantService.CreateAsync(roomId, participants, cancellationToken);
     }
 }
 

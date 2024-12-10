@@ -23,7 +23,7 @@ public class SecurityServiceTest
             {
                 foreach (var availablePermission in participantType.DefaultRoomPermission)
                 {
-                    yield return new object[] { participantType, availablePermission };
+                    yield return [participantType, availablePermission];
                 }
             }
         }
@@ -38,7 +38,7 @@ public class SecurityServiceTest
                 foreach (var notAvailablePermission in SEPermission.List.Where(it => !it.Equals(SEPermission.Unknown))
                              .Except(participantType.DefaultRoomPermission))
                 {
-                    yield return new object[] { participantType, notAvailablePermission };
+                    yield return [participantType, notAvailablePermission];
                 }
             }
         }

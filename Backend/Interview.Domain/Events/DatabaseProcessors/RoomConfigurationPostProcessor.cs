@@ -6,24 +6,15 @@ using Interview.Domain.Users;
 
 namespace Interview.Domain.Events.DatabaseProcessors;
 
-public class RoomConfigurationPostProcessor : EntityPostProcessor<RoomConfiguration>
+public class RoomConfigurationPostProcessor(IRoomEventDispatcher eventDispatcher, ICurrentUserAccessor currentUserAccessor) : EntityPostProcessor<RoomConfiguration>
 {
-    private readonly IRoomEventDispatcher _eventDispatcher;
-    private readonly ICurrentUserAccessor _currentUserAccessor;
-
-    public RoomConfigurationPostProcessor(IRoomEventDispatcher eventDispatcher, ICurrentUserAccessor currentUserAccessor)
-    {
-        _eventDispatcher = eventDispatcher;
-        _currentUserAccessor = currentUserAccessor;
-    }
-
     public override async ValueTask ProcessAddedAsync(RoomConfiguration entity, CancellationToken cancellationToken)
     {
         var @event = CreateEvent(entity, null);
 
         if (@event is not null)
         {
-            await _eventDispatcher.WriteAsync(@event, cancellationToken);
+            await eventDispatcher.WriteAsync(@event, cancellationToken);
         }
     }
 
@@ -32,7 +23,7 @@ public class RoomConfigurationPostProcessor : EntityPostProcessor<RoomConfigurat
         var @event = CreateEvent(current, original);
         if (@event is not null)
         {
-            await _eventDispatcher.WriteAsync(@event, cancellationToken);
+            await eventDispatcher.WriteAsync(@event, cancellationToken);
         }
     }
 
@@ -45,7 +36,7 @@ public class RoomConfigurationPostProcessor : EntityPostProcessor<RoomConfigurat
             {
                 RoomId = current.Id,
                 Value = payload,
-                CreatedById = _currentUserAccessor.GetUserIdOrThrow(),
+                CreatedById = currentUserAccessor.GetUserIdOrThrow(),
             };
         }
 
