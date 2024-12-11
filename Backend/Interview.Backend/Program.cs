@@ -6,6 +6,8 @@ using Interview.Domain.Database;
 using Interview.Infrastructure.WebSocket.Events;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Console;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("oauth.json", true);
@@ -13,13 +15,17 @@ builder.Configuration.AddJsonFile("events.json", true);
 builder.Configuration.AddEnvironmentVariables("INTERVIEW_BACKEND_");
 builder.Configuration.AddJsonFile("initial.db.json", true);
 
-// Add services to the container.
-var serviceConfigurator = new ServiceConfigurator(builder.Environment, builder.Configuration);
-
 LogConfigurator.Configure(builder.Host, builder.Services);
 HealthConfigurator.Configure(builder.Environment, builder.Services, builder.Configuration);
 
-serviceConfigurator.AddServices(builder.Services);
+using (var cmdLogger = new LoggerConfiguration()
+           .WriteTo.Console()
+           .CreateLogger())
+{
+    // Add services to the container.
+    var serviceConfigurator = new ServiceConfigurator(builder.Environment, builder.Configuration, cmdLogger.ForContext<ServiceConfigurator>());
+    serviceConfigurator.AddServices(builder.Services);
+}
 
 var app = builder.Build();
 
