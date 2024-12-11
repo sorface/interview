@@ -17,15 +17,17 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
+using ILogger = Serilog.ILogger;
 
 namespace Interview.Backend;
 
-public class ServiceConfigurator(IHostEnvironment environment, IConfiguration configuration)
+public class ServiceConfigurator(IHostEnvironment environment, IConfiguration configuration, ILogger logger)
 {
     public void AddServices(IServiceCollection serviceCollection)
     {
         var corsOptions = configuration.GetSection(nameof(CorsOptions)).Get<CorsOptions>();
 
+        logger.Information("CORS: {AllowedOrigins}", corsOptions?.AllowedOrigins);
         serviceCollection.AddCors(options =>
         {
             options.AddPolicy("All", policy =>
@@ -98,34 +100,28 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
         var adminUsers = configuration.GetSection(nameof(AdminUsers))
             .Get<AdminUsers>() ?? throw new ArgumentException($"Not found \"{nameof(AdminUsers)}\" section");
 
+        var dbProvider = GetDbProvider();
         var serviceOption = new DependencyInjectionAppServiceOption
         {
             DbConfigurator = optionsBuilder =>
             {
                 var connectionString = configuration.GetConnectionString("database");
-                var database = configuration.GetConnectionString("type")
-                    ?.ToLower()
-                    .Trim();
-                var customDb = !string.IsNullOrWhiteSpace(database);
 
-                if ((environment.IsDevelopment() && !customDb) || "sqlite".Equals(database, StringComparison.InvariantCultureIgnoreCase))
+                switch (dbProvider)
                 {
-                    optionsBuilder.UseSqlite(
-                        connectionString,
-                        builder => builder.MigrationsAssembly(typeof(Migrations.Sqlite.AppDbContextFactory).Assembly
-                            .FullName));
-                }
-                else if ((environment.IsPreProduction() && !customDb) || "postgres".Equals(database, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-                    optionsBuilder.UseNpgsql(
-                        connectionString,
-                        builder => builder.MigrationsAssembly(typeof(Migrations.Postgres.AppDbContextFactory).Assembly
-                            .FullName));
-                }
-                else
-                {
-                    throw new InvalidOperationException("Unknown environment");
+                    case DbProvider.Sqlite:
+                        optionsBuilder.UseSqlite(
+                            connectionString,
+                            builder => builder.MigrationsAssembly(typeof(Migrations.Sqlite.AppDbContextFactory).Assembly.FullName));
+                        break;
+                    case DbProvider.Postgres:
+                        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+                        optionsBuilder.UseNpgsql(
+                            connectionString,
+                            builder => builder.MigrationsAssembly(typeof(Migrations.Postgres.AppDbContextFactory).Assembly.FullName));
+                        break;
+                    default:
+                        throw new InvalidOperationException("Unknown environment");
                 }
             },
             AdminUsers = adminUsers,
@@ -134,6 +130,7 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
                 RedisEnvironmentConfigure.Configure(configuration,
                     (host, port, username, password) =>
                     {
+                        logger.Information("Use redis event storage");
                         builder.UseRedis($@"redis://{username}:{password}@{host}:{port}");
 
                         serviceCollection.AddStackExchangeRedisCache(options =>
@@ -144,6 +141,7 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
                     },
                     () =>
                     {
+                        logger.Information("Use memory event storage");
                         serviceCollection.AddDistributedMemoryCache();
                         builder.UseEmpty();
                     });
@@ -224,5 +222,34 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
 
             options.OperationFilter<DefaultResponseCodesFilter>();
         });
+    }
+
+    private DbProvider GetDbProvider()
+    {
+        var database = configuration.GetConnectionString("type")
+            ?.ToLower()
+            .Trim();
+        var customDb = !string.IsNullOrWhiteSpace(database);
+
+        if ((environment.IsDevelopment() && !customDb) || "sqlite".Equals(database, StringComparison.InvariantCultureIgnoreCase))
+        {
+            logger.Information("Use sqlite");
+            return DbProvider.Sqlite;
+        }
+
+        if ((environment.IsPreProduction() && !customDb) || "postgres".Equals(database, StringComparison.InvariantCultureIgnoreCase))
+        {
+            logger.Information("Use postgres");
+            return DbProvider.Postgres;
+        }
+
+        return DbProvider.Unknown;
+    }
+
+    private enum DbProvider
+    {
+        Unknown,
+        Postgres,
+        Sqlite,
     }
 }
