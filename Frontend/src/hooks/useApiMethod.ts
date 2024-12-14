@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer } from 'react';
-import { REACT_APP_BACKEND_URL } from '../config';
+import { VITE_BACKEND_URL } from '../config';
 import { pathnames, HttpResponseCode } from '../constants';
 import { ApiContract } from '../types/apiContracts';
 import { useLogout } from './useLogout';
@@ -100,9 +100,9 @@ const createFetchUrl = (apiContract: ApiContract) => {
         return createUrlParam(paramName, paramValue);
       })
       .join('&');
-    return `${REACT_APP_BACKEND_URL}${apiContract.baseUrl}?${params}`;
+    return `${VITE_BACKEND_URL}${apiContract.baseUrl}?${params}`;
   }
-  return `${REACT_APP_BACKEND_URL}${apiContract.baseUrl}`;
+  return `${VITE_BACKEND_URL}${apiContract.baseUrl}`;
 };
 
 const createFetchRequestInit = (apiContract: ApiContract) => {

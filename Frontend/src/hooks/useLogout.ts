@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer } from 'react';
-import { REACT_APP_BACKEND_URL } from '../config';
+import { VITE_BACKEND_URL } from '../config';
 
 interface LogoutState {
   process: {
@@ -81,7 +81,7 @@ export const useLogout = () => {
   const logout = useCallback(async () => {
     dispatch({ name: 'startLoad' });
     try {
-      const response = await fetch(`${REACT_APP_BACKEND_URL}/logout`, {
+      const response = await fetch(`${VITE_BACKEND_URL}/logout`, {
         method: 'POST',
         credentials: 'include',
       });

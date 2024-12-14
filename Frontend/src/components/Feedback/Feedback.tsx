@@ -5,7 +5,7 @@ import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { Gap } from '../Gap/Gap';
 import { Icon } from '../../pages/Room/components/Icon/Icon';
-import { REACT_APP_FEEDBACK_IFRAME_URL } from '../../config';
+import { VITE_FEEDBACK_IFRAME_URL } from '../../config';
 import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme } from '../../context/ThemeContext';
 
@@ -54,7 +54,7 @@ export const Feedback: FunctionComponent = () => {
             <iframe
               title={localizationCaptions[LocalizationKey.Feedback]}
               className="flex-1 border-none"
-              src={REACT_APP_FEEDBACK_IFRAME_URL}
+              src={VITE_FEEDBACK_IFRAME_URL}
             ></iframe>
           </div>
         </>
