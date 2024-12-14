@@ -8,4 +8,14 @@ export default defineConfig({
   define: {
     global: {},
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: process.env['REACT_APP_PROXY_TARGET'] || 'http://localhost:5043/',
+        changeOrigin: true,
+        secure: true,
+        ws: true,
+      }
+    }
+  }
 });
