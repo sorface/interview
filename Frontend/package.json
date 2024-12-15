@@ -42,7 +42,7 @@
     "start": "vite",
     "build": "tsc && vite build",
     "serve": "vite preview",
-    "lint": "eslint src",
+    "lint": "eslint",
     "prettier": "prettier . --write"
   },
   "eslintConfig": {
