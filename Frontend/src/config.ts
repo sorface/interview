@@ -14,7 +14,6 @@ const getFromEnvOrDefault = (varName: string, defaultValue: string) => {
   }
 };
 
-
 export const VITE_BACKEND_URL = getFromEnv('VITE_BACKEND_URL');
 export const VITE_WS_URL = getFromEnv('VITE_WS_URL');
 export const VITE_BUILD_HASH = getFromEnv('VITE_BUILD_HASH');

@@ -10,21 +10,21 @@ const initialState: UsePeerStreamState = new Map();
 
 type UsePeerStreamAction =
   | {
-    name: 'addPeerAudioStream';
-    payload: { peerId: string; stream: MediaStream };
-  }
+      name: 'addPeerAudioStream';
+      payload: { peerId: string; stream: MediaStream };
+    }
   | {
-    name: 'addPeerVideoStream';
-    payload: { peerId: string; stream: MediaStream };
-  }
+      name: 'addPeerVideoStream';
+      payload: { peerId: string; stream: MediaStream };
+    }
   | {
-    name: 'removePeer';
-    payload: { peerId: string };
-  }
+      name: 'removePeer';
+      payload: { peerId: string };
+    }
   | {
-    name: 'setPeerLoaded';
-    payload: { peerId: string; loaded: boolean };
-  };
+      name: 'setPeerLoaded';
+      payload: { peerId: string; loaded: boolean };
+    };
 
 const usePeerStreamReducer = (
   state: UsePeerStreamState,

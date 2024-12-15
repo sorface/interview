@@ -26,20 +26,20 @@ const initialState: ApiMethodState = {
 
 type ApiMethodAction =
   | {
-    name: 'startLoad';
-  }
+      name: 'startLoad';
+    }
   | {
-    name: 'setData';
-    payload: AnyObject | string;
-  }
+      name: 'setData';
+      payload: AnyObject | string;
+    }
   | {
-    name: 'setError';
-    payload: string;
-  }
+      name: 'setError';
+      payload: string;
+    }
   | {
-    name: 'setCode';
-    payload: number;
-  };
+      name: 'setCode';
+      payload: number;
+    };
 
 const apiMethodReducer = (
   state: ApiMethodState,
@@ -194,9 +194,10 @@ export const useApiMethod = <ResponseData, RequestData = AnyObject>(
       } catch (err: unknown) {
         dispatch({
           name: 'setError',
-          payload: err instanceof Error ?
-            err.message :
-            `Failed to fetch ${apiContract.method} ${apiContract.baseUrl}`,
+          payload:
+            err instanceof Error
+              ? err.message
+              : `Failed to fetch ${apiContract.method} ${apiContract.baseUrl}`,
         });
       }
     },

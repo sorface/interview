@@ -1,4 +1,8 @@
-import React, { ChangeEventHandler, FunctionComponent, useContext } from 'react';
+import React, {
+  ChangeEventHandler,
+  FunctionComponent,
+  useContext,
+} from 'react';
 import { Theme, ThemeContext } from '../../context/ThemeContext';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';

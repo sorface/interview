@@ -188,7 +188,9 @@ export const RoomAnaytics: FunctionComponent = () => {
     <>
       <Modal
         open={!!openedQuestionDetails}
-        contentLabel={localizationCaptions[LocalizationKey.QuestionAnswerDetails]}
+        contentLabel={
+          localizationCaptions[LocalizationKey.QuestionAnswerDetails]
+        }
         onClose={handleQuestionDetailsClose}
       >
         <RoomAnayticsDetails
@@ -386,14 +388,14 @@ export const RoomAnaytics: FunctionComponent = () => {
                 iconName={IconNames.HelpCircle}
                 captionLine1={
                   localizationCaptions[
-                  LocalizationKey
-                    .CloseRoomWithoutQuestionEvaluationWarningLine1
+                    LocalizationKey
+                      .CloseRoomWithoutQuestionEvaluationWarningLine1
                   ]
                 }
                 captionLine2={
                   localizationCaptions[
-                  LocalizationKey
-                    .CloseRoomWithoutQuestionEvaluationWarningLine2
+                    LocalizationKey
+                      .CloseRoomWithoutQuestionEvaluationWarningLine2
                   ]
                 }
               />

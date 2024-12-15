@@ -27,9 +27,9 @@ const AiAssistantExperienceComponent: FunctionComponent<
 
   const welcomeMessage = lastTranscription
     ? cleanUpTranscription(lastTranscription.value) ===
-    cleanUpTranscription(
-      localizationCaptions[LocalizationKey.AiAssistantWelcomePrompt],
-    )
+      cleanUpTranscription(
+        localizationCaptions[LocalizationKey.AiAssistantWelcomePrompt],
+      )
     : false;
 
   return (

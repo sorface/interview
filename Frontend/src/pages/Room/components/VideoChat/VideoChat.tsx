@@ -55,10 +55,7 @@ interface VideoChatProps {
   handleLeaveRoom: () => void;
 }
 
-const getChatMessageEvents = (
-  roomEventsSearch: EventsSearch,
-  type: string,
-) => {
+const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string) => {
   const roomEvents = roomEventsSearch[type];
   if (!roomEvents) {
     return [];

@@ -19,16 +19,16 @@ const initialState: LogoutState = {
 
 type LogoutAction =
   | {
-    name: 'startLoad';
-  }
+      name: 'startLoad';
+    }
   | {
-    name: 'setError';
-    payload: string;
-  }
+      name: 'setError';
+      payload: string;
+    }
   | {
-    name: 'setCode';
-    payload: number;
-  };
+      name: 'setCode';
+      payload: number;
+    };
 
 const logoutReducer = (
   state: LogoutState,

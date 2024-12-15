@@ -89,16 +89,27 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
 
   useEffect(() => {
     const handleCodeEditorKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 's' && (navigator.userAgent.includes('Mac') ? e.metaKey : e.ctrlKey)) {
+      if (
+        e.key === 's' &&
+        (navigator.userAgent.includes('Mac') ? e.metaKey : e.ctrlKey)
+      ) {
         e.preventDefault();
       }
-    }
+    };
 
     const codeEditorComponent = codeEditorComponentRef.current;
-    codeEditorComponent?.addEventListener("keydown", handleCodeEditorKeyDown, false);
+    codeEditorComponent?.addEventListener(
+      'keydown',
+      handleCodeEditorKeyDown,
+      false,
+    );
 
     return () => {
-      codeEditorComponent?.removeEventListener("keydown", handleCodeEditorKeyDown, false);
+      codeEditorComponent?.removeEventListener(
+        'keydown',
+        handleCodeEditorKeyDown,
+        false,
+      );
     };
   }, []);
 

@@ -62,57 +62,57 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = (
     Object.values(corresponding).forEach((value) => {
       if (!smoothMorphTarget) {
         // @ts-expect-error does not exist on type
-         
+
         nodes.Wolf3D_Head.morphTargetInfluences[
           // @ts-expect-error does not exist on type
-           
+
           nodes.Wolf3D_Head.morphTargetDictionary[value]
         ] = 0;
         // @ts-expect-error does not exist on type
-         
+
         nodes.Wolf3D_Teeth.morphTargetInfluences[
           // @ts-expect-error does not exist on type
-           
+
           nodes.Wolf3D_Teeth.morphTargetDictionary[value]
         ] = 0;
       } else {
         // @ts-expect-error does not exist on type
-         
+
         nodes.Wolf3D_Head.morphTargetInfluences[
           // @ts-expect-error does not exist on type
-           
+
           nodes.Wolf3D_Head.morphTargetDictionary[value]
         ] = MathUtils.lerp(
           // @ts-expect-error does not exist on type
-           
+
           nodes.Wolf3D_Head.morphTargetInfluences[
             // @ts-expect-error does not exist on type
-             
+
             nodes.Wolf3D_Head.morphTargetDictionary[value]
           ],
           0,
           // @ts-expect-error does not exist on type
-           
+
           morphTargetSmoothing,
         );
 
         // @ts-expect-error does not exist on type
-         
+
         nodes.Wolf3D_Teeth.morphTargetInfluences[
           // @ts-expect-error does not exist on type
-           
+
           nodes.Wolf3D_Teeth.morphTargetDictionary[value]
         ] = MathUtils.lerp(
           // @ts-expect-error does not exist on type
-           
+
           nodes.Wolf3D_Teeth.morphTargetInfluences[
             // @ts-expect-error does not exist on type
-             
+
             nodes.Wolf3D_Teeth.morphTargetDictionary[value]
           ],
           0,
           // @ts-expect-error does not exist on type
-           
+
           morphTargetSmoothing,
         );
       }
@@ -126,74 +126,74 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = (
       ) {
         if (!smoothMorphTarget) {
           // @ts-expect-error does not exist on type
-           
+
           nodes.Wolf3D_Head.morphTargetInfluences[
             // @ts-expect-error does not exist on type
-             
+
             nodes.Wolf3D_Head.morphTargetDictionary[
               // @ts-expect-error does not exist on type
-               
+
               corresponding[mouthCue.value]
             ]
           ] = 1;
           // @ts-expect-error does not exist on type
-           
+
           nodes.Wolf3D_Teeth.morphTargetInfluences[
             // @ts-expect-error does not exist on type
-             
+
             nodes.Wolf3D_Teeth.morphTargetDictionary[
               // @ts-expect-error does not exist on type
-               
+
               corresponding[mouthCue.value]
             ]
           ] = 1;
         } else {
           // @ts-expect-error does not exist on type
-           
+
           nodes.Wolf3D_Head.morphTargetInfluences[
             // @ts-expect-error does not exist on type
-             
+
             nodes.Wolf3D_Head.morphTargetDictionary[
               // @ts-expect-error does not exist on type
-               
+
               corresponding[mouthCue.value]
             ]
           ] = MathUtils.lerp(
             // @ts-expect-error does not exist on type
-             
+
             nodes.Wolf3D_Head.morphTargetInfluences[
               // @ts-expect-error does not exist on type
-               
+
               nodes.Wolf3D_Head.morphTargetDictionary[
                 // @ts-expect-error does not exist on type
-                 
+
                 corresponding[mouthCue.value]
               ]
             ],
             1,
             // @ts-expect-error does not exist on type
-             
+
             morphTargetSmoothing,
           );
           // @ts-expect-error does not exist on type
-           
+
           nodes.Wolf3D_Teeth.morphTargetInfluences[
             // @ts-expect-error does not exist on type
-             
+
             nodes.Wolf3D_Teeth.morphTargetDictionary[
               // @ts-expect-error does not exist on type
-               
+
               corresponding[mouthCue.value]
             ]
           ] = MathUtils.lerp(
             // @ts-expect-error does not exist on type
-             
+
             nodes.Wolf3D_Teeth.morphTargetInfluences[
               // @ts-expect-error does not exist on type
-               
+
               nodes.Wolf3D_Teeth.morphTargetDictionary[
                 // @ts-expect-error does not exist on type
-                 
+
                 corresponding[mouthCue.value]
               ]
             ],
