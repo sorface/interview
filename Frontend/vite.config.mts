@@ -1,10 +1,10 @@
-import { defineConfig } from 'vite';
+import { defineConfig, ViteUserConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react-swc';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/',
-  plugins: [react()],
+  plugins: [react()] as ViteUserConfig['plugins'],
   resolve: {
     alias: {
       'simple-peer': 'simple-peer/simplepeer.min.js',
@@ -21,5 +21,11 @@ export default defineConfig({
         ws: true,
       },
     },
+  },
+  test: {
+    include: ['src/**/*.test.(ts|tsx)'],
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './tests/setup.ts',
   },
 });
