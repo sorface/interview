@@ -10,52 +10,56 @@ const initialState: UsePeerStreamState = new Map();
 
 type UsePeerStreamAction =
   | {
-      name: 'addPeerAudioStream';
-      payload: { peerId: string; stream: MediaStream };
-    }
+    name: 'addPeerAudioStream';
+    payload: { peerId: string; stream: MediaStream };
+  }
   | {
-      name: 'addPeerVideoStream';
-      payload: { peerId: string; stream: MediaStream };
-    }
+    name: 'addPeerVideoStream';
+    payload: { peerId: string; stream: MediaStream };
+  }
   | {
-      name: 'removePeer';
-      payload: { peerId: string };
-    }
+    name: 'removePeer';
+    payload: { peerId: string };
+  }
   | {
-      name: 'setPeerLoaded';
-      payload: { peerId: string; loaded: boolean };
-    };
+    name: 'setPeerLoaded';
+    payload: { peerId: string; loaded: boolean };
+  };
 
 const usePeerStreamReducer = (
   state: UsePeerStreamState,
   action: UsePeerStreamAction,
 ): UsePeerStreamState => {
   switch (action.name) {
-    case 'addPeerAudioStream':
+    case 'addPeerAudioStream': {
       const newStateAddAudioPeer = new Map(state);
       newStateAddAudioPeer.set(action.payload.peerId, {
         ...state.get(action.payload.peerId),
         audio: action.payload.stream,
       });
       return newStateAddAudioPeer;
-    case 'addPeerVideoStream':
+    }
+    case 'addPeerVideoStream': {
       const newStateAddVideoPeer = new Map(state);
       newStateAddVideoPeer.set(action.payload.peerId, {
         ...state.get(action.payload.peerId),
         video: action.payload.stream,
       });
       return newStateAddVideoPeer;
-    case 'removePeer':
+    }
+    case 'removePeer': {
       const newStateRemovePeer = new Map(state);
       newStateRemovePeer.delete(action.payload.peerId);
       return newStateRemovePeer;
-    case 'setPeerLoaded':
+    }
+    case 'setPeerLoaded': {
       const newStateLoadedPeer = new Map(state);
       newStateLoadedPeer.set(action.payload.peerId, {
         ...state.get(action.payload.peerId),
         loaded: action.payload.loaded,
       });
       return newStateLoadedPeer;
+    }
     default:
       return state;
   }

@@ -4,8 +4,9 @@ import { pathnames, HttpResponseCode } from '../constants';
 import { ApiContract } from '../types/apiContracts';
 import { useLogout } from './useLogout';
 import { useNavigate } from 'react-router-dom';
+import { AnyObject } from '../types/anyObject';
 
-interface ApiMethodState<ResponseData = any> {
+interface ApiMethodState<ResponseData = AnyObject | string> {
   process: {
     loading: boolean;
     code: number | null;
@@ -25,20 +26,20 @@ const initialState: ApiMethodState = {
 
 type ApiMethodAction =
   | {
-      name: 'startLoad';
-    }
+    name: 'startLoad';
+  }
   | {
-      name: 'setData';
-      payload: any;
-    }
+    name: 'setData';
+    payload: AnyObject | string;
+  }
   | {
-      name: 'setError';
-      payload: string;
-    }
+    name: 'setError';
+    payload: string;
+  }
   | {
-      name: 'setCode';
-      payload: number;
-    };
+    name: 'setCode';
+    payload: number;
+  };
 
 const apiMethodReducer = (
   state: ApiMethodState,
@@ -124,8 +125,6 @@ const createFetchRequestInit = (apiContract: ApiContract) => {
   };
 };
 
-type AnyObject = Record<string, any>;
-
 const getResponseContent = async (
   response: Response,
 ): Promise<AnyObject | string> => {
@@ -192,11 +191,11 @@ export const useApiMethod = <ResponseData, RequestData = AnyObject>(
           throw new Error(errorMessage);
         }
         dispatch({ name: 'setData', payload: responseData });
-      } catch (err: any) {
+      } catch (err: unknown) {
         dispatch({
           name: 'setError',
-          payload:
-            err.message ||
+          payload: err instanceof Error ?
+            err.message :
             `Failed to fetch ${apiContract.method} ${apiContract.baseUrl}`,
         });
       }

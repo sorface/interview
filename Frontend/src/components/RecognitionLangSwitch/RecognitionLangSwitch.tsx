@@ -1,4 +1,4 @@
-import { ChangeEventHandler, FunctionComponent, useContext } from 'react';
+import React, { ChangeEventHandler, FunctionComponent, useContext } from 'react';
 import { LocalizationKey } from '../../localization';
 import {
   LocalizationContext,
@@ -41,7 +41,7 @@ export const RecognitionLangSwitch: FunctionComponent = () => {
         value={recognitionLang}
         onChange={handleRecognitionLangChange}
       >
-        {Object.entries(LocalizationLang)?.map(([_, langValue]) => (
+        {Object.entries(LocalizationLang)?.map(([, langValue]) => (
           <option key={langValue} value={langValue}>
             {langLocalization[langValue]}
           </option>

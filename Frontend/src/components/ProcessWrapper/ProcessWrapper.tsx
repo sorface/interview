@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactElement, memo } from 'react';
+import React, { FunctionComponent, ReactElement, memo } from 'react';
 import { Field } from '../FieldsBlock/Field';
 import { Loader } from '../Loader/Loader';
 import { LocalizationKey } from '../../localization';
@@ -18,7 +18,7 @@ export interface ProcessWrapperProps {
   loaders?: LoaderStyle[];
   error: string | null;
   errorPrefix?: string;
-  children: ReactElement<any, any> | null;
+  children: ReactElement | null;
 }
 
 const ProcessWrapperComponent: FunctionComponent<ProcessWrapperProps> = ({

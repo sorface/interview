@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import React, { FunctionComponent } from 'react';
 import { UserAvatar } from '../../../../components/UserAvatar/UserAvatar';
 import { ParticipantReactions } from './ParticipantReactions';
 

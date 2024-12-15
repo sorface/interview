@@ -61,44 +61,58 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = (
 
     Object.values(corresponding).forEach((value) => {
       if (!smoothMorphTarget) {
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+         
         nodes.Wolf3D_Head.morphTargetInfluences[
-          // @ts-ignore
+          // @ts-expect-error does not exist on type
+           
           nodes.Wolf3D_Head.morphTargetDictionary[value]
         ] = 0;
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+         
         nodes.Wolf3D_Teeth.morphTargetInfluences[
-          // @ts-ignore
+          // @ts-expect-error does not exist on type
+           
           nodes.Wolf3D_Teeth.morphTargetDictionary[value]
         ] = 0;
       } else {
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+         
         nodes.Wolf3D_Head.morphTargetInfluences[
-          // @ts-ignore
+          // @ts-expect-error does not exist on type
+           
           nodes.Wolf3D_Head.morphTargetDictionary[value]
         ] = MathUtils.lerp(
-          // @ts-ignore
+          // @ts-expect-error does not exist on type
+           
           nodes.Wolf3D_Head.morphTargetInfluences[
-            // @ts-ignore
+            // @ts-expect-error does not exist on type
+             
             nodes.Wolf3D_Head.morphTargetDictionary[value]
           ],
           0,
-          // @ts-ignore
+          // @ts-expect-error does not exist on type
+           
           morphTargetSmoothing,
         );
 
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+         
         nodes.Wolf3D_Teeth.morphTargetInfluences[
-          // @ts-ignore
+          // @ts-expect-error does not exist on type
+           
           nodes.Wolf3D_Teeth.morphTargetDictionary[value]
         ] = MathUtils.lerp(
-          // @ts-ignore
+          // @ts-expect-error does not exist on type
+           
           nodes.Wolf3D_Teeth.morphTargetInfluences[
-            // @ts-ignore
+            // @ts-expect-error does not exist on type
+             
             nodes.Wolf3D_Teeth.morphTargetDictionary[value]
           ],
           0,
-          // @ts-ignore
+          // @ts-expect-error does not exist on type
+           
           morphTargetSmoothing,
         );
       }
@@ -111,61 +125,80 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = (
         currentAudioTime <= mouthCue.end
       ) {
         if (!smoothMorphTarget) {
-          // @ts-ignore
+          // @ts-expect-error does not exist on type
+           
           nodes.Wolf3D_Head.morphTargetInfluences[
-            // @ts-ignore
+            // @ts-expect-error does not exist on type
+             
             nodes.Wolf3D_Head.morphTargetDictionary[
-              // @ts-ignore
+              // @ts-expect-error does not exist on type
+               
               corresponding[mouthCue.value]
             ]
           ] = 1;
-          // @ts-ignore
+          // @ts-expect-error does not exist on type
+           
           nodes.Wolf3D_Teeth.morphTargetInfluences[
-            // @ts-ignore
+            // @ts-expect-error does not exist on type
+             
             nodes.Wolf3D_Teeth.morphTargetDictionary[
-              // @ts-ignore
+              // @ts-expect-error does not exist on type
+               
               corresponding[mouthCue.value]
             ]
           ] = 1;
         } else {
-          // @ts-ignore
+          // @ts-expect-error does not exist on type
+           
           nodes.Wolf3D_Head.morphTargetInfluences[
-            // @ts-ignore
+            // @ts-expect-error does not exist on type
+             
             nodes.Wolf3D_Head.morphTargetDictionary[
-              // @ts-ignore
+              // @ts-expect-error does not exist on type
+               
               corresponding[mouthCue.value]
             ]
           ] = MathUtils.lerp(
-            // @ts-ignore
+            // @ts-expect-error does not exist on type
+             
             nodes.Wolf3D_Head.morphTargetInfluences[
-              // @ts-ignore
+              // @ts-expect-error does not exist on type
+               
               nodes.Wolf3D_Head.morphTargetDictionary[
-                // @ts-ignore
+                // @ts-expect-error does not exist on type
+                 
                 corresponding[mouthCue.value]
               ]
             ],
             1,
-            // @ts-ignore
+            // @ts-expect-error does not exist on type
+             
             morphTargetSmoothing,
           );
-          // @ts-ignore
+          // @ts-expect-error does not exist on type
+           
           nodes.Wolf3D_Teeth.morphTargetInfluences[
-            // @ts-ignore
+            // @ts-expect-error does not exist on type
+             
             nodes.Wolf3D_Teeth.morphTargetDictionary[
-              // @ts-ignore
+              // @ts-expect-error does not exist on type
+               
               corresponding[mouthCue.value]
             ]
           ] = MathUtils.lerp(
-            // @ts-ignore
+            // @ts-expect-error does not exist on type
+             
             nodes.Wolf3D_Teeth.morphTargetInfluences[
-              // @ts-ignore
+              // @ts-expect-error does not exist on type
+               
               nodes.Wolf3D_Teeth.morphTargetDictionary[
-                // @ts-ignore
+                // @ts-expect-error does not exist on type
+                 
                 corresponding[mouthCue.value]
               ]
             ],
             1,
-            // @ts-ignore
+            // @ts-expect-error does not exist on type
             morphTargetSmoothing,
           );
         }
@@ -197,90 +230,126 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = (
   }, [props.speaking, audio]);
 
   return (
+    // eslint-disable-next-line react/no-unknown-property
     <group {...props} ref={group} dispose={null}>
+      {/* eslint-disable-next-line react/no-unknown-property */}
       <primitive object={nodes.Hips} />
       <skinnedMesh
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         geometry={nodes.Wolf3D_Body.geometry}
+        // eslint-disable-next-line react/no-unknown-property
         material={materials.Wolf3D_Body}
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         skeleton={nodes.Wolf3D_Body.skeleton}
       />
       <skinnedMesh
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         geometry={nodes.Wolf3D_Outfit_Bottom.geometry}
-        // @ts-ignore
+        // eslint-disable-next-line react/no-unknown-property
         material={materials.Wolf3D_Outfit_Bottom}
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         skeleton={nodes.Wolf3D_Outfit_Bottom.skeleton}
       />
       <skinnedMesh
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         geometry={nodes.Wolf3D_Outfit_Footwear.geometry}
+        // eslint-disable-next-line react/no-unknown-property
         material={materials.Wolf3D_Outfit_Footwear}
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         skeleton={nodes.Wolf3D_Outfit_Footwear.skeleton}
       />
       <skinnedMesh
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         geometry={nodes.Wolf3D_Outfit_Top.geometry}
+        // eslint-disable-next-line react/no-unknown-property
         material={materials.Wolf3D_Outfit_Top}
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         skeleton={nodes.Wolf3D_Outfit_Top.skeleton}
       />
       <skinnedMesh
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         geometry={nodes.Wolf3D_Hair.geometry}
+        // eslint-disable-next-line react/no-unknown-property
         material={materials.Wolf3D_Hair}
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         skeleton={nodes.Wolf3D_Hair.skeleton}
       />
       <skinnedMesh
         name="EyeLeft"
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         geometry={nodes.EyeLeft.geometry}
+        // eslint-disable-next-line react/no-unknown-property
         material={materials.Wolf3D_Eye}
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         skeleton={nodes.EyeLeft.skeleton}
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         morphTargetDictionary={nodes.EyeLeft.morphTargetDictionary}
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         morphTargetInfluences={nodes.EyeLeft.morphTargetInfluences}
       />
       <skinnedMesh
         name="EyeRight"
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         geometry={nodes.EyeRight.geometry}
+        // eslint-disable-next-line react/no-unknown-property
         material={materials.Wolf3D_Eye}
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         skeleton={nodes.EyeRight.skeleton}
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         morphTargetDictionary={nodes.EyeRight.morphTargetDictionary}
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         morphTargetInfluences={nodes.EyeRight.morphTargetInfluences}
       />
       <skinnedMesh
         name="Wolf3D_Head"
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         geometry={nodes.Wolf3D_Head.geometry}
+        // eslint-disable-next-line react/no-unknown-property
         material={materials.Wolf3D_Skin}
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         skeleton={nodes.Wolf3D_Head.skeleton}
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         morphTargetDictionary={nodes.Wolf3D_Head.morphTargetDictionary}
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         morphTargetInfluences={nodes.Wolf3D_Head.morphTargetInfluences}
       />
       <skinnedMesh
         name="Wolf3D_Teeth"
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         geometry={nodes.Wolf3D_Teeth.geometry}
+        // eslint-disable-next-line react/no-unknown-property
         material={materials.Wolf3D_Teeth}
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         skeleton={nodes.Wolf3D_Teeth.skeleton}
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         morphTargetDictionary={nodes.Wolf3D_Teeth.morphTargetDictionary}
-        // @ts-ignore
+        // @ts-expect-error does not exist on type
+        // eslint-disable-next-line react/no-unknown-property
         morphTargetInfluences={nodes.Wolf3D_Teeth.morphTargetInfluences}
       />
     </group>

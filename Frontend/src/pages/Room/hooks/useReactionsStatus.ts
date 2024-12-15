@@ -92,21 +92,19 @@ export const useReactionsStatus = ({
     if (!lastWsMessageParsed) {
       return;
     }
-    switch (lastWsMessageParsed.Type) {
-      case 'Like':
-      case 'Dislike':
-        const userId = lastWsMessageParsed.Value.UserId;
-        addReactionTimeout(
-          userReactionsTimeoutRef.current,
-          userId,
-          lastWsMessageParsed.Type || '',
-        );
-        setActiveReactions(
-          timeoutToActiveReactions(userReactionsTimeoutRef.current),
-        );
-        break;
-      default:
-        break;
+    if (
+      lastWsMessageParsed.Type === 'Like' ||
+      lastWsMessageParsed.Type === 'Dislike'
+    ) {
+      const userId = lastWsMessageParsed.Value.UserId;
+      addReactionTimeout(
+        userReactionsTimeoutRef.current,
+        userId,
+        lastWsMessageParsed.Type || '',
+      );
+      setActiveReactions(
+        timeoutToActiveReactions(userReactionsTimeoutRef.current),
+      );
     }
   }, [lastWsMessageParsed]);
 

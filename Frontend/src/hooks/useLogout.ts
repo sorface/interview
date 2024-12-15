@@ -19,16 +19,16 @@ const initialState: LogoutState = {
 
 type LogoutAction =
   | {
-      name: 'startLoad';
-    }
+    name: 'startLoad';
+  }
   | {
-      name: 'setError';
-      payload: string;
-    }
+    name: 'setError';
+    payload: string;
+  }
   | {
-      name: 'setCode';
-      payload: number;
-    };
+    name: 'setCode';
+    payload: number;
+  };
 
 const logoutReducer = (
   state: LogoutState,
@@ -92,10 +92,10 @@ export const useLogout = () => {
         name: 'setCode',
         payload: response.status,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       dispatch({
         name: 'setError',
-        payload: err.message || 'Failed to logout',
+        payload: err instanceof Error ? err.message : 'Failed to logout',
       });
     }
   }, []);

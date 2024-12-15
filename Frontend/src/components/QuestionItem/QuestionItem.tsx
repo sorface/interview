@@ -1,4 +1,4 @@
-import { MouseEvent, FunctionComponent, ReactNode, useState } from 'react';
+import React, { MouseEvent, FunctionComponent, ReactNode, useState } from 'react';
 import { CodeEditorLang, Question, QuestionAnswer } from '../../types/question';
 import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';

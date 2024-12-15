@@ -1,4 +1,4 @@
-import { ChangeEventHandler, useContext } from 'react';
+import React, { ChangeEventHandler, useContext } from 'react';
 import { LocalizationKey } from '../../localization';
 import {
   LocalizationContext,
@@ -41,7 +41,7 @@ export const LangSwitch = ({
         </Typography>
       </div>
       <select className="w-full" value={lang} onChange={handleLangChange}>
-        {Object.entries(LocalizationLang)?.map(([_, langValue]) => (
+        {Object.entries(LocalizationLang)?.map(([, langValue]) => (
           <option key={langValue} value={langValue}>
             {langLocalization[langValue]}
           </option>

@@ -97,10 +97,10 @@ export const useGetMeApi = () => {
       }
       const responseJson = await response.json();
       dispatch({ name: 'setUser', payload: responseJson });
-    } catch (err: any) {
+    } catch (err: unknown) {
       dispatch({
         name: 'setError',
-        payload: err.message || 'Failed to get me',
+        payload: err instanceof Error ? err.message : 'Failed to get me',
       });
     }
   }, []);

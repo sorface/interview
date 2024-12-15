@@ -1,4 +1,4 @@
-import {
+import React, {
   Fragment,
   FunctionComponent,
   useContext,
@@ -239,7 +239,7 @@ export const RoomAnaytics: FunctionComponent = () => {
                   examinees?.length ? (
                     <div className="flex items-center">
                       {examinees.map((examinee) => (
-                        <Fragment>
+                        <Fragment key={examinee.id}>
                           <Typography size="xs">
                             <div className="flex">
                               <UserAvatar

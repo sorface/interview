@@ -1,4 +1,4 @@
-import {
+import React, {
   FunctionComponent,
   useCallback,
   useContext,
@@ -80,7 +80,7 @@ const getCloseRedirectLink = (roomId: string, currentUserExpert: boolean) => {
 export const Room: FunctionComponent = () => {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
-  let { id } = useParams();
+  const { id } = useParams();
   const { [inviteParamName]: inviteParam } = useParams();
 
   const {
@@ -347,7 +347,9 @@ export const Room: FunctionComponent = () => {
         default:
           break;
       }
-    } catch {}
+    } catch (err) {
+      console.warn(err);
+    }
   }, [lastWsMessageParsed]);
 
   useEffect(() => {
@@ -373,7 +375,7 @@ export const Room: FunctionComponent = () => {
     try {
       const parsedData = JSON.parse(lastMessage?.data);
       switch (parsedData?.Type) {
-        case 'ChatMessage':
+        case 'ChatMessage': {
           const message = parsedData?.Value?.Message;
           const nickname = parsedData?.Value?.Nickname;
           if (typeof message !== 'string') {
@@ -384,7 +386,8 @@ export const Room: FunctionComponent = () => {
           }
           playChatMessageSound();
           break;
-        case 'ChangeRoomStatus':
+        }
+        case 'ChangeRoomStatus': {
           const newStatus: RoomType['status'] = 'New';
           const reviewStatus: RoomType['status'] = 'Review';
           if (parsedData?.Value === reviewStatus) {
@@ -394,6 +397,7 @@ export const Room: FunctionComponent = () => {
             setReactionsVisible(true);
           }
           break;
+        }
         case 'ChangeRoomQuestionState':
           if (parsedData.Value.NewState !== 'Active') {
             break;
@@ -412,7 +416,9 @@ export const Room: FunctionComponent = () => {
         default:
           break;
       }
-    } catch {}
+    } catch (err) {
+      console.warn(err);
+    }
   }, [id, auth, lastMessage, playChatMessageSound, updateQuestions]);
 
   useEffect(() => {

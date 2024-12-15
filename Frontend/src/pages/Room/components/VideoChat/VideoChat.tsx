@@ -1,4 +1,4 @@
-import {
+import React, {
   FunctionComponent,
   useContext,
   useEffect,
@@ -58,7 +58,6 @@ interface VideoChatProps {
 const getChatMessageEvents = (
   roomEventsSearch: EventsSearch,
   type: string,
-  toChat: boolean,
 ) => {
   const roomEvents = roomEventsSearch[type];
   if (!roomEvents) {
@@ -90,7 +89,7 @@ const getChatMessageEvents = (
 
 const findUserByOrder = (videoOrder: Record<string, number>) => {
   const lounderUser = Object.entries(videoOrder).find(
-    ([userId, order]) => order === 1,
+    ([, order]) => order === 1,
   );
   if (lounderUser) {
     return lounderUser[0];
@@ -171,7 +170,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     // AiAssistant
     // const newTranscripts = getChatMessageEvents(roomEventsSearch, 'VoiceRecognition', false);
     const newTextMessages = [
-      ...getChatMessageEvents(roomEventsSearch, 'ChatMessage', true),
+      ...getChatMessageEvents(roomEventsSearch, 'ChatMessage'),
       {
         id: randomId(),
         userId: randomId(),
