@@ -15,7 +15,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         target:
-          process.env['REACT_APP_PROXY_TARGET'] || 'http://localhost:5043/',
+          process.env['VITE_PROXY_TARGET'] || 'http://localhost:5043/',
         changeOrigin: true,
         secure: true,
         ws: true,
