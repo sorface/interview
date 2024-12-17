@@ -147,9 +147,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   const userVideoMainContent = useRef<HTMLVideoElement>(null);
   const userVideoMainContentBackground = useRef<HTMLVideoElement>(null);
   const screenSharePeer = peers.find((peer) => peer.screenShare);
-  const [codeEditorInitialValue, setCodeEditorInitialValue] = useState<
-    string | null
-  >(null);
   const { activeReactions } = useReactionsStatus({
     lastWsMessageParsed,
   });
@@ -158,7 +155,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     if (!roomState) {
       return;
     }
-    setCodeEditorInitialValue(roomState.codeEditor.content);
     fetchRoomEventsSearch({
       roomId: roomState.id,
     });
@@ -185,31 +181,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     // AiAssistant
     // setTranscripts(newTranscripts);
   }, [roomEventsSearch, auth?.nickname, localizationCaptions]);
-
-  useEffect(() => {
-    if (codeEditorEnabled) {
-      return;
-    }
-    if (!lastWsMessageParsed || !auth) {
-      return;
-    }
-    try {
-      // ScreenShare
-      // const screenShare = !!(parsedPayload?.ScreenShare);
-      switch (lastWsMessageParsed?.Type) {
-        case 'ChangeCodeEditor':
-          if (lastWsMessageParsed.Value.Source === 'User') {
-            break;
-          }
-          setCodeEditorInitialValue(lastWsMessageParsed.Value.Content);
-          break;
-        default:
-          break;
-      }
-    } catch (err) {
-      console.error('parse ws message error: ', err);
-    }
-  }, [auth, lastWsMessageParsed, viewerMode, codeEditorEnabled]);
 
   useEffect(() => {
     if (!lastWsMessageParsed) {
@@ -323,9 +294,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   };
 
   const renderMain = () => {
-    if (codeEditorEnabled) {
-      return <RoomCodeEditor initialValue={codeEditorInitialValue} />;
-    }
     const userOrder1 = findUserByOrder(videoOrder);
     if (!userOrder1 || userOrder1 === auth?.id) {
       return (
@@ -484,7 +452,10 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         </RoomToolsPanel.ButtonsGroupWrapper>
       </RoomToolsPanel.Wrapper>
       <div className="videochat-field relative videochat-field-main bg-wrap rounded-1.125">
-        {renderMain()}
+        <RoomCodeEditor
+          visible={codeEditorEnabled}
+        />
+        {!codeEditorEnabled && renderMain()}
       </div>
 
       <div className="relative videochat-field bg-wrap rounded-1.125">
