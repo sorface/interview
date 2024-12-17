@@ -7,6 +7,7 @@ public class DbRoomEventConfiguration : EntityTypeConfigurationBase<DbRoomEvent>
 {
     protected override void ConfigureCore(EntityTypeBuilder<DbRoomEvent> builder)
     {
+        builder.HasIndex(e => new { e.RoomId, e.Type });
         builder.Property(e => e.RoomId).IsRequired();
         builder.Property(e => e.EventSenderId);
         builder.Property(e => e.Stateful).IsRequired();
