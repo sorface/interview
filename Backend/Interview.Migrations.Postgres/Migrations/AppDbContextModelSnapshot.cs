@@ -17,7 +17,7 @@ namespace Interview.Migrations.Postgres.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.20")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -149,7 +149,7 @@ namespace Interview.Migrations.Postgres.Migrations
 
                     b.HasIndex("EventSenderId");
 
-                    b.HasIndex("RoomId");
+                    b.HasIndex("RoomId", "Type");
 
                     b.ToTable("RoomEvents");
                 });
@@ -548,8 +548,7 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<Guid?>("CreatedById")
-                        .IsRequired()
+                    b.Property<Guid>("CreatedById")
                         .HasColumnType("uuid");
 
                     b.Property<int?>("Mark")
