@@ -59,13 +59,7 @@ public class RoomQuestionPostProcessor(
         if (current.State == RoomQuestionState.Active)
         {
             await ChangeCodeEditorEnabledStateAsync(current, cancellationToken);
-
-            // Changed active question
-            if (original.State != RoomQuestionState.Active)
-            {
-                await ChangeCodeEditorContentAsync(current, cancellationToken);
-            }
-
+            await ChangeCodeEditorContentAsync(current, cancellationToken);
             await db.SaveChangesAsync(cancellationToken);
         }
     }
@@ -97,11 +91,15 @@ public class RoomQuestionPostProcessor(
     {
         var eventProvider = await roomEventProviderFactory.CreateProviderAsync(current.RoomId, cancellationToken);
         var facade = new RoomEventActiveQuestionProvider(eventProvider, eventDeserializer, clock);
-        var lastActiveQuestionTime = await facade
+        var iOrderedAsyncEnumerable = await facade
             .GetActiveQuestionDateAsync(current.QuestionId, cancellationToken)
+            .Where(e => e.EndActiveDate != e.StartActiveDate)
             .OrderByDescending(e => e.StartActiveDate)
+            .ToListAsync(cancellationToken);
+        var lastActiveQuestionTime = iOrderedAsyncEnumerable
             .Select(e => ((DateTime StartActiveDate, DateTime EndActiveDate)?)e)
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefault();
+            //.FirstOrDefaultAsync(cancellationToken);
         if (lastActiveQuestionTime is null)
         {
             logger.LogTrace("Not found last active question time {QuestionId}", current.QuestionId);
