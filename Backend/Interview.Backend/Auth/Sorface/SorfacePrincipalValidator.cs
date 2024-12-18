@@ -26,7 +26,7 @@ public class SorfacePrincipalValidator(
         {
             if (context.Principal?.Identity is { IsAuthenticated: false })
             {
-                logger.LogInformation("Principal is not authenticated");
+                logger.LogDebug("Principal is not authenticated");
                 return;
             }
 
@@ -34,7 +34,7 @@ public class SorfacePrincipalValidator(
 
             if (exp is null)
             {
-                logger.LogInformation("Exp is null. not refreshed");
+                logger.LogDebug("Exp is null. not refreshed");
                 return;
             }
 
@@ -42,7 +42,7 @@ public class SorfacePrincipalValidator(
 
             if (expTime > DateTime.UtcNow)
             {
-                logger.LogInformation("Introspect access token");
+                logger.LogDebug("Introspect access token");
 
                 await IntrospectToken(context);
             }
@@ -64,15 +64,15 @@ public class SorfacePrincipalValidator(
 
                     if (await distributedLockStorage.IsLockAsync(refreshToken))
                     {
-                        logger.LogTrace("double refresh {RefreshToken} access token locked", refreshToken);
+                        logger.LogDebug("double refresh {RefreshToken} access token locked", refreshToken);
                         return;
                     }
 
-                    logger.LogTrace("Start refresh ACCESS_TOKEN with lock");
+                    logger.LogDebug("Start refresh ACCESS_TOKEN with lock");
 
                     await RefreshAccessTokenAsync(context, refreshToken, context.HttpContext.RequestAborted);
 
-                    logger.LogTrace("End refresh ACCESS_TOKEN unlock");
+                    logger.LogDebug("End refresh ACCESS_TOKEN unlock");
                 }
                 finally
                 {
@@ -107,7 +107,7 @@ public class SorfacePrincipalValidator(
 
         if (!active.GetBoolean())
         {
-            logger.LogInformation("Token refresh operation has been with result {result}", tokenPrincipal);
+            logger.LogDebug("Token refresh operation has been with result {result}", tokenPrincipal);
             context.RejectPrincipal();
             return;
         }

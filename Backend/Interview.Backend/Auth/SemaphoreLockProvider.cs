@@ -32,7 +32,7 @@ namespace Interview.Backend.Auth
 
             semaphore.Release();
 
-            logger.LogTrace("current capacity semaphore store {Count}", LOCKSTORE.Count);
+            logger.LogDebug("current capacity semaphore store {Count}", LOCKSTORE.Count);
         }
     }
 }

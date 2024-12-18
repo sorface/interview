@@ -10,6 +10,8 @@ using Interview.Domain.Users;
 using Interview.Infrastructure.RoomParticipants;
 using Interview.Infrastructure.Rooms;
 using Interview.Infrastructure.Users;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Interview.Test.Integrations;
 
@@ -111,7 +113,7 @@ public class SecurityServiceTest
     private static ISecurityService CreateService(AppDbContext dbContext, User user)
     {
         return new SecurityService(
-            new CurrentPermissionAccessor(dbContext),
+            new CurrentPermissionAccessor(dbContext, new MemoryCache(new MemoryCacheOptions()), NullLogger<CurrentPermissionAccessor>.Instance),
             new CurrentUserAccessor(user),
             new RoomParticipantRepository(dbContext));
     }

@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
+using Interview.Domain.Database;
 using Interview.Domain.Permissions;
 using Interview.Domain.Repository;
 using Interview.Domain.Users;
@@ -9,6 +10,8 @@ using Interview.Domain.Users.Service;
 using Interview.Infrastructure.RoomParticipants;
 using Interview.Infrastructure.Users;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Interview.Test.Integrations;
 
@@ -33,7 +36,7 @@ public class UserServiceTest
         await appDbContext.SaveChangesAsync();
 
         var securityService = new SecurityService(
-            new CurrentPermissionAccessor(appDbContext),
+            CreateCurrentPermissionAccessor(appDbContext),
             new CachedCurrentUserAccessor(new CurrentUserAccessor(), appDbContext),
             new RoomParticipantRepository(appDbContext)
         );
@@ -59,7 +62,7 @@ public class UserServiceTest
         await using var appDbContext = new TestAppDbContextFactory().Create(clock);
 
         var securityService = new SecurityService(
-            new CurrentPermissionAccessor(appDbContext),
+            CreateCurrentPermissionAccessor(appDbContext),
             new CachedCurrentUserAccessor(new CurrentUserAccessor(), appDbContext),
             new RoomParticipantRepository(appDbContext)
         );
@@ -83,7 +86,7 @@ public class UserServiceTest
         appDbContext.Roles.RemoveRange(appDbContext.Roles);
         await appDbContext.SaveChangesAsync();
         var securityService = new SecurityService(
-            new CurrentPermissionAccessor(appDbContext),
+            CreateCurrentPermissionAccessor(appDbContext),
             new CachedCurrentUserAccessor(new CurrentUserAccessor(), appDbContext),
             new RoomParticipantRepository(appDbContext)
         );
@@ -94,6 +97,11 @@ public class UserServiceTest
         var error = await Assert.ThrowsAsync<Domain.NotFoundException>(async () => await userService.UpsertByExternalIdAsync(user));
 
         error.Message.Should().NotBeNull().And.NotBeEmpty();
+    }
+
+    private static CurrentPermissionAccessor CreateCurrentPermissionAccessor(AppDbContext appDbContext)
+    {
+        return new CurrentPermissionAccessor(appDbContext, new MemoryCache(new MemoryCacheOptions()), NullLogger<CurrentPermissionAccessor>.Instance);
     }
 
     private static Expression<Func<IMemberInfo, bool>> CreateDatesExcluder()
