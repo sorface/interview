@@ -21,8 +21,9 @@ public class RoomEventActiveQuestionProvider(IRoomEventProvider roomEventStorage
         var list = changedRooms
             .Where(e => e.Payload is not null)
             .Select(e => new { Payload = eventDeserializer.Deserialize<RoomQuestionChangeEventPayload>(e.Payload!), CreateAt = e.CreatedAt, })
-            .OrderBy(e => e.CreateAt)
             .ToList();
+
+        list.Sort((e1, e2) => e1.CreateAt.CompareTo(e2.CreateAt));
         for (var index = 0; index < list.Count; index++)
         {
             var e = list[index];
@@ -31,7 +32,7 @@ public class RoomEventActiveQuestionProvider(IRoomEventProvider roomEventStorage
                 continue;
             }
 
-            var minDate = e.CreateAt;
+            var startDate = e.CreateAt;
             var endActiveDate = list
                 .Skip(index + 1)
                 .Where(evDetail => evDetail.Payload != null &&
@@ -41,7 +42,20 @@ public class RoomEventActiveQuestionProvider(IRoomEventProvider roomEventStorage
                 .Select(evDetail => (DateTime?)evDetail.CreateAt)
                 .FirstOrDefault();
 
-            yield return (minDate, endActiveDate ?? clock.UtcNow.LocalDateTime);
+            var endDate = CalculateEndDate(startDate, endActiveDate);
+            yield return (startDate, endDate);
         }
+    }
+
+    private DateTime CalculateEndDate(DateTime startDate, DateTime? endDate)
+    {
+        if (endDate is not null)
+        {
+            return endDate.Value;
+        }
+
+        return startDate.Kind == DateTimeKind.Local
+            ? clock.UtcNow.LocalDateTime
+            : clock.UtcNow.UtcDateTime;
     }
 }
