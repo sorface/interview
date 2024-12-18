@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import React, { FunctionComponent } from 'react';
 import { User } from '../../../../types/user';
 import { RoomQuestionEvaluation } from '../../../../types/room';
 import { Typography } from '../../../../components/Typography/Typography';

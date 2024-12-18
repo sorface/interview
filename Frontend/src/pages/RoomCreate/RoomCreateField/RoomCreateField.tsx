@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactNode } from 'react';
+import React, { FunctionComponent, ReactNode } from 'react';
 import { Gap } from '../../../components/Gap/Gap';
 
 interface RoomCreateFieldProps {

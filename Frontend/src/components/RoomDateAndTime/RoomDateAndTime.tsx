@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext } from 'react';
+import React, { FunctionComponent, useContext } from 'react';
 import { Typography, TypographyProps } from '../Typography/Typography';
 import { Gap } from '../Gap/Gap';
 import { Room } from '../../types/room';

@@ -1,4 +1,4 @@
-import { Fragment, FunctionComponent } from 'react';
+import React, { Fragment, FunctionComponent } from 'react';
 import Linkify from 'linkify-react';
 import { Typography } from '../../../../components/Typography/Typography';
 import { useThemeClassName } from '../../../../hooks/useThemeClassName';

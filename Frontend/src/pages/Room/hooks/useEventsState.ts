@@ -8,7 +8,7 @@ export type EventsState = Record<string, string | boolean | null>;
 
 interface UseEventsStateParams {
   roomState: RoomState | null;
-  lastWsMessage: MessageEvent<any> | null;
+  lastWsMessage: MessageEvent<string> | null;
 }
 
 export const useEventsState = ({
@@ -51,7 +51,9 @@ export const useEventsState = ({
           [stateType]: stateValue,
         });
       }
-    } catch {}
+    } catch (err) {
+      console.warn(err);
+    }
   }, [lastWsMessage, eventsState]);
 
   return eventsState;

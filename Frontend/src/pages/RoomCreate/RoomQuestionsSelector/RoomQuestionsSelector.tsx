@@ -1,4 +1,4 @@
-import {
+import React, {
   ChangeEventHandler,
   Fragment,
   FunctionComponent,
@@ -272,7 +272,7 @@ export const RoomQuestionsSelector: FunctionComponent<
           {localizationCaptions[LocalizationKey.Error]}: {totalError}
         </div>
       )}
-      {!!subCategory ? (
+      {subCategory ? (
         <ItemsGrid
           currentData={
             questions

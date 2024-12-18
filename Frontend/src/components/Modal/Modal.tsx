@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactNode } from 'react';
+import React, { FunctionComponent, ReactNode } from 'react';
 import ModalInternal from 'react-modal';
 import { Button } from '../Button/Button';
 import { IconNames } from '../../constants';

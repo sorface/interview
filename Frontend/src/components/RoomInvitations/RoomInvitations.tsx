@@ -1,4 +1,4 @@
-import { Fragment, FunctionComponent } from 'react';
+import React, { Fragment, FunctionComponent } from 'react';
 import { generatePath } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { RoomInvite } from '../../types/room';

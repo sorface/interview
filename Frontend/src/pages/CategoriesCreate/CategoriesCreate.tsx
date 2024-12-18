@@ -72,7 +72,7 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
   } = parentCategoriesState;
 
   const navigate = useNavigate();
-  let { id } = useParams();
+  const { id } = useParams();
   const [categoryName, setCategoryName] = useState('');
   const [categoryParent, setCategoryParent] = useState('');
 

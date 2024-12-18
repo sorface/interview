@@ -6,7 +6,7 @@ const handleRequestScreenStream = async () => {
   try {
     captureStream = await navigator.mediaDevices.getDisplayMedia({
       audio: false,
-      // @ts-ignore
+      // @ts-expect-error experimental api
       selfBrowserSurface: 'exclude',
     });
   } catch (err) {

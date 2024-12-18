@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Category } from '../../types/category';

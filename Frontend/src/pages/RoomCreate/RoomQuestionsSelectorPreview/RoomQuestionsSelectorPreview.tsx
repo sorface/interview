@@ -1,4 +1,4 @@
-import { FunctionComponent, MouseEvent } from 'react';
+import React, { FunctionComponent, MouseEvent } from 'react';
 import { RoomQuestionListItem } from '../../../types/room';
 import { useLocalizationCaptions } from '../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../localization';
