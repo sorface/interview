@@ -172,7 +172,7 @@ public class AnswerDetailServiceTest
                 Id = Guid.NewGuid(),
                 RoomId = roomId,
                 Type = EventType.ChangeRoomQuestionState,
-                Payload = serializer.SerializePayloadAsString(new RoomQuestionChangeEventPayload(nextQuestion.Id, RoomQuestionStateType.Open, RoomQuestionStateType.Active)),
+                Payload = serializer.SerializePayloadAsString(new RoomQuestionChangeEventPayload(questionId, RoomQuestionStateType.Active, RoomQuestionStateType.Closed)),
                 Stateful = false,
                 CreatedAt = end,
                 CreatedById = Guid.NewGuid(),
@@ -288,7 +288,7 @@ public class AnswerDetailServiceTest
                 RoomId = roomId,
                 Type = EventType.ChangeRoomQuestionState,
                 Stateful = false,
-                Payload = serializer.SerializePayloadAsString(new RoomQuestionChangeEventPayload(nextQuestion.Id, RoomQuestionStateType.Open, RoomQuestionStateType.Active)),
+                Payload = serializer.SerializePayloadAsString(new RoomQuestionChangeEventPayload(questionId, RoomQuestionStateType.Active, RoomQuestionStateType.Closed)),
                 EventSenderId = rootFaker.PickRandom(users).Id,
                 CreateDate = endUtc,
             });
@@ -361,7 +361,7 @@ public class AnswerDetailServiceTest
             .RuleFor(e => e.RoomId, roomId)
             .RuleFor(e => e.Type, EventType.CodeEditorChange)
             .RuleFor(e => e.Payload, f => f.Random.Words().OrDefault(f, 0.2f, string.Empty))
-            .RuleFor(e => e.CreatedAt, f => f.Date.Between(start, end).ToUniversalTime())
+            .RuleFor(e => e.CreatedAt, f => f.Date.Between(start, end))
             .RuleFor(e => e.CreatedById, f => users == null ? f.Random.Guid() : f.PickRandom(users).Id);
         return faker.GenerateForever().Take(Random.Shared.Next(1, 11)).OrderBy(e => e.CreatedAt).ToList();
     }
@@ -372,7 +372,7 @@ public class AnswerDetailServiceTest
             .RuleFor(e => e.Id, f => f.Random.Guid())
             .RuleFor(e => e.Message, f => f.Random.Words().OrDefault(f, 0.2f, string.Empty))
             .RuleFor(e => e.Nickname, f => f.Person.FullName)
-            .RuleFor(e => e.CreatedAt, f => f.Date.Between(start, end).ToUniversalTime())
+            .RuleFor(e => e.CreatedAt, f => f.Date.Between(start, end))
             .RuleFor(e => e.CreatedById, f => users == null ? f.Random.Guid() : f.PickRandom(users).Id);
         return faker.GenerateForever().Take(Random.Shared.Next(1, 11)).ToList();
     }

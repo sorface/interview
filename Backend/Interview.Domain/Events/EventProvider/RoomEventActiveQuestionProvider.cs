@@ -42,7 +42,20 @@ public class RoomEventActiveQuestionProvider(IRoomEventProvider roomEventStorage
                 .Select(evDetail => (DateTime?)evDetail.CreateAt)
                 .FirstOrDefault();
 
-            var endDate = CalculateEndDate(startDate, endActiveDate);
+            var endActiveDateByCloseStatus = list
+                .Skip(index + 1)
+                .Where(evDetail => evDetail.Payload is not null &&
+                                   evDetail.Payload.QuestionId == questionId &&
+                                   evDetail.Payload.OldState == RoomQuestionStateType.Active &&
+                                   evDetail.Payload.NewState != RoomQuestionStateType.Active &&
+                                   evDetail.CreateAt > startDate)
+                .Select(evDetail => (DateTime?)evDetail.CreateAt)
+                .FirstOrDefault();
+
+            List<DateTime?> activeDates = [endActiveDate, endActiveDateByCloseStatus];
+            activeDates.RemoveAll(date => date is null);
+
+            var endDate = CalculateEndDate(startDate, activeDates.Count > 0 ? activeDates.Max() : null);
             yield return (startDate, endDate);
         }
     }
