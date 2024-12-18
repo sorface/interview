@@ -12,8 +12,9 @@ public class SendingSignalWebSocketByNameEventHandler(
     IVideChatConnectionProvider userWebSocketConnectionProvider,
     ILogger<WebSocketEventSender> webSocketEventSender,
     IEventSenderAdapter eventSenderAdapter,
-    IRoomEventSerializer serializer)
-    : WebSocketByNameEventHandlerBase<SendingSignalWebSocketByNameEventHandler.ReceivePayload>(logger)
+    IEventSerializer serializer,
+    IEventDeserializer deserializer)
+    : WebSocketByNameEventHandlerBase<SendingSignalWebSocketByNameEventHandler.ReceivePayload>(logger, deserializer)
 {
     protected override string SupportType => "sending signal";
 

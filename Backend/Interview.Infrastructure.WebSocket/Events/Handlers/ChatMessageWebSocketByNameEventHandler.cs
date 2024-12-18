@@ -1,13 +1,15 @@
 using Interview.Domain.Events;
 using Interview.Domain.Events.Events;
+using Interview.Domain.Events.Events.Serializers;
 using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket.Events.Handlers;
 
 public class ChatMessageWebSocketByNameEventHandler(
     IRoomEventDispatcher eventDispatcher,
-    ILogger<WebSocketByNameEventHandlerBase> logger)
-    : WebSocketByNameEventHandlerBase(logger)
+    ILogger<WebSocketByNameEventHandlerBase> logger,
+    IEventDeserializer deserializer)
+    : WebSocketByNameEventHandlerBase(logger, deserializer)
 {
     protected override string SupportType => "chat-message";
 

@@ -4,5 +4,5 @@ namespace Interview.Domain.Events.Events;
 
 public interface IPayloadBuilder
 {
-    string? BuildPayload(IRoomEventSerializer serializer);
+    string? BuildPayload(IEventSerializer serializer);
 }

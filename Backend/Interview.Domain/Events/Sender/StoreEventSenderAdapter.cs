@@ -3,7 +3,7 @@ using Interview.Domain.Events.Storage;
 
 namespace Interview.Domain.Events.Sender;
 
-public class StoreEventSenderAdapter(IEventSenderAdapter root, IHotEventStorage hotEventStorage, IRoomEventSerializer serializer)
+public class StoreEventSenderAdapter(IEventSenderAdapter root, IHotEventStorage hotEventStorage, IEventSerializer serializer)
     : IEventSenderAdapter
 {
     public async Task SendAsync(

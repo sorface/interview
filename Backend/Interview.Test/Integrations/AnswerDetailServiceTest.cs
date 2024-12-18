@@ -360,7 +360,7 @@ public class AnswerDetailServiceTest
         };
     }
 
-    private static (AnswerDetailService Service, Guid RoomId, Guid QuestionId, IRoomEventSerializer Serializer) CreateService(AppDbContext db, IHotEventStorage storage, ISystemClock clock, bool addQueuedRoomEvent)
+    private static (AnswerDetailService Service, Guid RoomId, Guid QuestionId, IEventSerializer Serializer) CreateService(AppDbContext db, IHotEventStorage storage, ISystemClock clock, bool addQueuedRoomEvent)
     {
         var user = new User("test user", "ID");
         db.Users.Add(user);
@@ -395,7 +395,7 @@ public class AnswerDetailServiceTest
         var userAccessor = new CurrentUserAccessor();
         userAccessor.SetUser(user);
 
-        var jsonRoomEventSerializer = new JsonRoomEventSerializer();
+        var jsonRoomEventSerializer = new JsonEventSerializer();
         var service = new AnswerDetailService(clock, new RoomEventProviderFactory(storage, db), db, jsonRoomEventSerializer);
         return (service, room.Id, question.Id, jsonRoomEventSerializer);
     }

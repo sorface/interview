@@ -1,10 +1,11 @@
 using System.Text.Json;
+using Interview.Domain.Events.Events.Serializers;
 using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket.Events.Handlers
 {
 #pragma warning disable SA1402
-    public abstract class WebSocketEventHandlerBase<TPayload>(ILogger<WebSocketEventHandlerBase<TPayload>> logger) : IWebSocketEventHandler
+    public abstract class WebSocketEventHandlerBase<TPayload>(ILogger<WebSocketEventHandlerBase<TPayload>> logger, IEventDeserializer deserializer) : IWebSocketEventHandler
 #pragma warning restore SA1402
     {
         protected readonly ILogger<WebSocketEventHandlerBase<TPayload>> Logger = logger;
@@ -44,6 +45,6 @@ namespace Interview.Infrastructure.WebSocket.Events.Handlers
 
         protected abstract Task HandleEventAsync(SocketEventDetail detail, TPayload? payload, CancellationToken cancellationToken);
 
-        protected virtual TPayload? ParsePayload(WebSocketEvent @event) => string.IsNullOrEmpty(@event.Value) ? default : JsonSerializer.Deserialize<TPayload>(@event.Value);
+        protected virtual TPayload? ParsePayload(WebSocketEvent @event) => string.IsNullOrEmpty(@event.Value) ? default : deserializer.Deserialize<TPayload>(@event.Value);
     }
 }

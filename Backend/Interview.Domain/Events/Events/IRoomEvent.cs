@@ -33,7 +33,7 @@ public interface IRoomEvent
 
     Guid CreatedById { get; }
 
-    string? BuildStringPayload(IRoomEventSerializer serializer);
+    string? BuildStringPayload(IEventSerializer serializer);
 }
 
 public interface IRoomEvent<out T> : IRoomEvent

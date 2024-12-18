@@ -11,7 +11,7 @@ using Microsoft.Extensions.Internal;
 
 namespace Interview.Domain.Rooms.RoomQuestions.Services.AnswerDetail;
 
-public class AnswerDetailService(ISystemClock clock, RoomEventProviderFactory roomEventProviderFactory, AppDbContext db, IRoomEventDeserializer eventDeserializer)
+public class AnswerDetailService(ISystemClock clock, RoomEventProviderFactory roomEventProviderFactory, AppDbContext db, IEventDeserializer eventDeserializer)
     : ISelfScopeService
 {
     public async Task<RoomQuestionAnswerDetailResponse> GetAnswerDetailsAsync(RoomQuestionAnswerDetailRequest request, CancellationToken cancellationToken)

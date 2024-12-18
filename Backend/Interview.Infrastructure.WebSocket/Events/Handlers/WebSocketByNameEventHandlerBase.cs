@@ -1,9 +1,11 @@
+using Interview.Domain.Events.Events.Serializers;
 using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket.Events.Handlers;
 
 #pragma warning disable SA1402
-public abstract class WebSocketByNameEventHandlerBase<TPayload>(ILogger<WebSocketByNameEventHandlerBase<TPayload>> logger) : WebSocketEventHandlerBase<TPayload>(logger)
+public abstract class WebSocketByNameEventHandlerBase<TPayload>(ILogger<WebSocketByNameEventHandlerBase<TPayload>> logger, IEventDeserializer deserializer)
+    : WebSocketEventHandlerBase<TPayload>(logger, deserializer)
 #pragma warning restore SA1402
 {
     protected abstract string SupportType { get; }
@@ -15,7 +17,8 @@ public abstract class WebSocketByNameEventHandlerBase<TPayload>(ILogger<WebSocke
     }
 }
 
-public abstract class WebSocketByNameEventHandlerBase(ILogger<WebSocketByNameEventHandlerBase> logger) : WebSocketByNameEventHandlerBase<string>(logger)
+public abstract class WebSocketByNameEventHandlerBase(ILogger<WebSocketByNameEventHandlerBase> logger, IEventDeserializer deserializer)
+    : WebSocketByNameEventHandlerBase<string>(logger, deserializer)
 {
     protected override string? ParsePayload(WebSocketEvent @event) => @event.Value;
 }

@@ -12,11 +12,10 @@ public class ExpertReviewTypingWebSocketEventHandler(
     IEventSenderAdapter eventSenderAdapter,
     RoomConnectionListener roomConnectionListener,
     ILogger<WebSocketEventSender> webSocketEventSender,
-    IRoomEventSerializer serializer)
-    : WebSocketByNameEventHandlerBase(logger)
+    IEventSerializer serializer,
+    IEventDeserializer deserializer)
+    : WebSocketByNameEventHandlerBase(logger, deserializer)
 {
-    private readonly ILogger<ExpertReviewTypingWebSocketEventHandler> _logger = logger;
-
     protected override string SupportType => "expert-review-typing";
 
     protected override async Task HandleEventAsync(SocketEventDetail detail, string? payload, CancellationToken cancellationToken)

@@ -11,8 +11,9 @@ public class JoinVideoChatWebSocketByNameEventHandler(
     IVideChatConnectionProvider videChatConnectionProvider,
     ILogger<WebSocketEventSender> webSocketEventSender,
     IEventSenderAdapter eventSenderAdapter,
-    IRoomEventSerializer serializer)
-    : WebSocketByNameEventHandlerBase(logger)
+    IEventSerializer serializer,
+    IEventDeserializer deserializer)
+    : WebSocketByNameEventHandlerBase(logger, deserializer)
 {
     protected override string SupportType => "join video chat";
 

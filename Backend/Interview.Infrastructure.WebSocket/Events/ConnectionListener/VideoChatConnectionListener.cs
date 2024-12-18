@@ -16,7 +16,7 @@ public class VideoChatConnectionListener(
     ILogger<VideoChatConnectionListener> logger,
     ILogger<WebSocketEventSender> webSocketEventSender,
     IEventSenderAdapter eventSenderAdapter,
-    IRoomEventSerializer serializer)
+    IEventSerializer serializer)
     : IConnectionListener, IVideChatConnectionProvider
 {
     private readonly ConcurrentDictionary<Guid, ImmutableList<Payload>> _store = new();

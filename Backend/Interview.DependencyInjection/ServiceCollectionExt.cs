@@ -37,9 +37,9 @@ public static class ServiceCollectionExt
         self.AddSingleton<IRoomEventDispatcher, RoomEventDispatcher>();
         self.AddSingleton<ISystemClock, SystemClock>();
         self.AddSingleton(option.AdminUsers);
-        var serializer = new JsonRoomEventSerializer();
-        self.AddSingleton<IRoomEventSerializer>(serializer);
-        self.AddSingleton<IRoomEventDeserializer>(serializer);
+        var serializer = new JsonEventSerializer();
+        self.AddSingleton<IEventSerializer>(serializer);
+        self.AddSingleton<IEventDeserializer>(serializer);
 
         self.AddScoped(typeof(ArchiveService<>));
 
