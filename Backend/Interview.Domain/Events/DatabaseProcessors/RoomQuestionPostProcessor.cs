@@ -81,6 +81,18 @@ public class RoomQuestionPostProcessor(
         }
     }
 
+    /// <summary>
+    /// Returns the last state of the code editor.
+    /// The problem is that we have 2 types of code change events
+    /// 1. On the frontend side
+    /// 2. Backend side.
+    ///
+    /// We get the latest events in the required range and return the most recent one (if any)
+    /// </summary>
+    /// <param name="lastActiveQuestionTime">Last active question time.</param>
+    /// <param name="eventProvider">Event provider.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Code editor state</returns>
     private async Task<string?> GetLastCodeEditorStateAsync(
         (DateTime StartActiveDate, DateTime EndActiveDate) lastActiveQuestionTime,
         IRoomEventProvider eventProvider,
