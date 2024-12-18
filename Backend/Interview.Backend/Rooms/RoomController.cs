@@ -25,8 +25,6 @@ public class RoomController(IRoomService roomService) : ControllerBase
     /// <summary>
     /// Getting a Room page.
     /// </summary>
-    /// <param name="logger">Logger.</param>
-    /// <param name="userAccessor">User accessor.</param>
     /// <param name="request">Request.</param>
     /// <param name="filter">Search filter.</param>
     /// <returns>Page.</returns>
@@ -35,8 +33,6 @@ public class RoomController(IRoomService roomService) : ControllerBase
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(RoomReviewDetail), StatusCodes.Status200OK)]
     public Task<IPagedList<RoomPageDetail>> GetPage(
-        [FromServices] ILogger<RoomController> logger,
-        [FromServices] ICurrentUserAccessor userAccessor,
         [FromQuery] PageRequest request,
         [FromQuery] RoomPageDetailRequestFilter? filter)
     {
