@@ -26,7 +26,7 @@ public abstract class RoomEvent<T> : IRoomEvent<T>
 
     public required T? Value { get; init; }
 
-    public string? BuildStringPayload(IRoomEventSerializer serializer)
+    public string? BuildStringPayload(IEventSerializer serializer)
     {
         if (Value is null)
         {

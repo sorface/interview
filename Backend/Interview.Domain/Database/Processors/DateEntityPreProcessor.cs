@@ -10,7 +10,11 @@ public class DateEntityPreProcessor(ICurrentUserAccessor currentUserAccessor, IS
 
     protected override void AddEntityHandler(Entity entity, CancellationToken cancellationToken = default)
     {
-        entity.UpdateCreateDate(clock.UtcNow.UtcDateTime);
+        if (!TestEnv || entity.CreateDate == DateTime.MinValue)
+        {
+            entity.UpdateCreateDate(clock.UtcNow.UtcDateTime);
+        }
+
         if (TestEnv)
         {
             entity.CreatedById ??= currentUserAccessor.UserId;

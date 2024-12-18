@@ -21,8 +21,8 @@ public class RoomQuestionPostProcessor(
     IRoomConfigurationRepository roomConfigurationRepository,
     ISystemClock clock,
     RoomEventProviderFactory roomEventProviderFactory,
-    IRoomEventDeserializer eventDeserializer,
-    ILogger<RoomQuestionPostProcessor> logger)
+    IEventDeserializer eventDeserializer,
+    ILoggerFactory loggerFactory)
     : EntityPostProcessor<RoomQuestion>
 {
     public override async ValueTask ProcessAddedAsync(RoomQuestion entity, CancellationToken cancellationToken)
@@ -47,6 +47,20 @@ public class RoomQuestionPostProcessor(
             return;
         }
 
+        (DateTime StartActiveDate, DateTime EndActiveDate)? lastActiveQuestionTime = null;
+
+        var eventProvider = await roomEventProviderFactory.CreateProviderAsync(current.RoomId, cancellationToken);
+        if (current.State == RoomQuestionState.Active)
+        {
+            var facade = new RoomEventActiveQuestionProvider(eventProvider, eventDeserializer, clock);
+            lastActiveQuestionTime = await facade
+                .GetActiveQuestionDateAsync(current.QuestionId, cancellationToken)
+                .Where(e => e.EndActiveDate != e.StartActiveDate)
+                .OrderByDescending(e => e.StartActiveDate)
+                .Select(e => ((DateTime StartActiveDate, DateTime EndActiveDate)?)e)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
         var @event = new RoomQuestionChangeEvent
         {
             RoomId = current.RoomId,
@@ -59,13 +73,7 @@ public class RoomQuestionPostProcessor(
         if (current.State == RoomQuestionState.Active)
         {
             await ChangeCodeEditorEnabledStateAsync(current, cancellationToken);
-
-            // Changed active question
-            if (original.State != RoomQuestionState.Active)
-            {
-                await ChangeCodeEditorContentAsync(current, cancellationToken);
-            }
-
+            await ChangeCodeEditorContentAsync(lastActiveQuestionTime, eventProvider, current, cancellationToken);
             await db.SaveChangesAsync(cancellationToken);
         }
     }
@@ -80,9 +88,14 @@ public class RoomQuestionPostProcessor(
         await roomCodeEditorChangeEventHandler.HandleAsync(request, cancellationToken);
     }
 
-    private async Task ChangeCodeEditorContentAsync(RoomQuestion current, CancellationToken cancellationToken)
+    private async Task ChangeCodeEditorContentAsync((DateTime StartActiveDate, DateTime EndActiveDate)? lastActiveQuestionTime,
+                                                    IRoomEventProvider eventProvider,
+                                                    RoomQuestion current,
+                                                    CancellationToken cancellationToken)
     {
-        var codeEditorContent = await GetCodeEditorContentAsync(current, cancellationToken);
+        var codeEditorContentProvider = new CodeEditorContentProvider(eventProvider, eventDeserializer, db, loggerFactory.CreateLogger<CodeEditorContentProvider>());
+        var questionDetail = new CodeEditorContentProvider.QuestionDetail(current.RoomId, current.QuestionId, current.Question?.CodeEditor?.Content, current.Question?.CodeEditorId);
+        var codeEditorContent = await codeEditorContentProvider.GetCodeEditorContentAsync(lastActiveQuestionTime, questionDetail, true, cancellationToken);
         var upsertCodeStateRequest = new UpsertCodeStateRequest
         {
             RoomId = current.RoomId,
@@ -91,68 +104,6 @@ public class RoomQuestionPostProcessor(
             SaveChanges = false,
         };
         await roomConfigurationRepository.UpsertCodeStateAsync(upsertCodeStateRequest, cancellationToken);
-    }
-
-    private async ValueTask<string?> GetCodeEditorContentAsync(RoomQuestion current, CancellationToken cancellationToken)
-    {
-        var eventProvider = await roomEventProviderFactory.CreateProviderAsync(current.RoomId, cancellationToken);
-        var facade = new RoomEventActiveQuestionProvider(eventProvider, eventDeserializer, clock);
-        var lastActiveQuestionTime = await facade
-            .GetActiveQuestionDateAsync(current.QuestionId, cancellationToken)
-            .OrderByDescending(e => e.StartActiveDate)
-            .Select(e => ((DateTime StartActiveDate, DateTime EndActiveDate)?)e)
-            .FirstOrDefaultAsync(cancellationToken);
-        if (lastActiveQuestionTime is null)
-        {
-            logger.LogTrace("Not found last active question time {QuestionId}", current.QuestionId);
-        }
-        else
-        {
-            logger.LogTrace("Found last active question time {QuestionId} {StartTime} {EndTime}", current.QuestionId, lastActiveQuestionTime?.StartActiveDate, lastActiveQuestionTime?.EndActiveDate);
-        }
-
-        if (lastActiveQuestionTime is not null)
-        {
-            var codeEditorContentRequest = new EPStorageEventRequest
-            {
-                Type = EventType.CodeEditorChange,
-                From = lastActiveQuestionTime.Value.StartActiveDate,
-                To = lastActiveQuestionTime.Value.EndActiveDate,
-            };
-            var lastCodeEditorState = await eventProvider.GetLatestEventAsync(codeEditorContentRequest, cancellationToken);
-            if (lastCodeEditorState is null)
-            {
-                logger.LogTrace("Not found code editor content for {QuestionId}", current.QuestionId);
-            }
-            else
-            {
-                logger.LogTrace("Found code editor content for {QuestionId} {Content}", current.QuestionId, lastCodeEditorState.Payload);
-            }
-
-            if (lastCodeEditorState is not null)
-            {
-                return lastCodeEditorState.Payload;
-            }
-        }
-
-        if (current.Question is not null && current.Question.CodeEditorId is null)
-        {
-            return null;
-        }
-
-        var content = current.Question?.CodeEditor?.Content;
-        if (content is not null)
-        {
-            return content;
-        }
-
-        var resultContent = await db.Questions
-            .AsNoTracking()
-            .Include(e => e.CodeEditor)
-            .Where(e => e.Id == current.QuestionId)
-            .Select(e => e.CodeEditor == null ? null : e.CodeEditor.Content)
-            .FirstOrDefaultAsync(cancellationToken);
-        return resultContent;
     }
 
     private async Task<RoomCodeEditorEnabledEvent.Payload> GetCodeEditorEventPayload(RoomQuestion roomQuestion, CancellationToken cancellationToken)

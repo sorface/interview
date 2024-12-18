@@ -10,7 +10,7 @@ public sealed class RoomEventUserPayload(Guid userId, Dictionary<string, object>
 
     public Dictionary<string, object>? AdditionalData { get; } = additionalData;
 
-    public string? BuildPayload(IRoomEventSerializer serializer)
+    public string? BuildPayload(IEventSerializer serializer)
     {
         return serializer.SerializePayloadAsString(AdditionalData);
     }

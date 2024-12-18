@@ -8,46 +8,69 @@ using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Rooms.Records.Response.Detail;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Internal;
+using Microsoft.Extensions.Logging;
 
 namespace Interview.Domain.Rooms.RoomQuestions.Services.AnswerDetail;
 
-public class AnswerDetailService(ISystemClock clock, RoomEventProviderFactory roomEventProviderFactory, AppDbContext db, IRoomEventDeserializer eventDeserializer)
+public class AnswerDetailService(ISystemClock clock, RoomEventProviderFactory roomEventProviderFactory, AppDbContext db, IEventDeserializer eventDeserializer, ILoggerFactory loggerFactory)
     : ISelfScopeService
 {
     public async Task<RoomQuestionAnswerDetailResponse> GetAnswerDetailsAsync(RoomQuestionAnswerDetailRequest request, CancellationToken cancellationToken)
     {
-        var roomQuestion = await db.RoomQuestions
+        var roomQuestionTmp = await db.RoomQuestions
             .Include(e => e.Room)
                 .ThenInclude(e => e!.QueuedRoomEvent)
             .Include(e => e.Question)
                 .ThenInclude(e => e!.CodeEditor)
             .AsNoTracking()
             .Where(e => e.RoomId == request.RoomId && e.QuestionId == request.QuestionId)
-            .Select(e => new RoomQuestionAnswerDetailResponse
+            .Select(e => new
             {
                 CodeEditor = e.Question!.CodeEditor == null
                     ? null
-                    : new QuestionCodeEditorResponse { Content = e.Question!.CodeEditor!.Content, Lang = e.Question!.CodeEditor!.Lang, },
-                Details = new List<RoomQuestionAnswerDetailResponse.Detail>(),
+                    : new
+                    {
+                        Id = e.Question!.CodeEditor.Id,
+                        Content = e.Question!.CodeEditor!.Content,
+                        Lang = e.Question!.CodeEditor!.Lang,
+                    },
             })
             .FirstOrDefaultAsync(cancellationToken);
+        var roomQuestion = roomQuestionTmp is null
+            ? null
+            : new RoomQuestionAnswerDetailResponse
+            {
+                CodeEditor = roomQuestionTmp.CodeEditor is null
+                    ? null
+                    : new QuestionCodeEditorResponse
+                    {
+                        Content = roomQuestionTmp.CodeEditor.Content,
+                        Lang = roomQuestionTmp.CodeEditor.Lang,
+                    },
+                Details = new List<RoomQuestionAnswerDetailResponse.Detail>(),
+            };
+
         if (roomQuestion is null)
         {
             throw NotFoundException.Create<RoomQuestion>((request.RoomId, "RoomId"), (request.QuestionId, "QuestionId"));
         }
 
+        var questionDetails =
+            new CodeEditorContentProvider.QuestionDetail(request.RoomId, request.QuestionId, roomQuestion.CodeEditor?.Content, roomQuestionTmp?.CodeEditor?.Id);
+
         var eventProvider = await roomEventProviderFactory.CreateProviderAsync(request.RoomId, cancellationToken);
         var facade = new RoomEventActiveQuestionProvider(eventProvider, eventDeserializer, clock);
+        var codeEditorContentProvider = new CodeEditorContentProvider(eventProvider, eventDeserializer, db, loggerFactory.CreateLogger<CodeEditorContentProvider>());
         await foreach (var (startActiveDate, endActiveDate) in facade.GetActiveQuestionDateAsync(request.QuestionId, cancellationToken))
         {
             var res = await eventProvider
                 .GetEventsAsync(new EPStorageEventRequest { Type = EventType.VoiceRecognition, From = startActiveDate, To = endActiveDate }, cancellationToken);
 
-            var lastCodeEditorState = await eventProvider.GetLatestEventAsync(new EPStorageEventRequest { Type = EventType.CodeEditorChange, From = startActiveDate, To = endActiveDate }, cancellationToken);
+            var lastCodeEditorContent = await codeEditorContentProvider.GetCodeEditorContentAsync((startActiveDate, endActiveDate), questionDetails, false, cancellationToken);
             roomQuestion.Details.Add(new RoomQuestionAnswerDetailResponse.Detail
             {
                 Transcription = GetTranscriptions(res),
-                AnswerCodeEditorContent = lastCodeEditorState?.Payload,
+                AnswerCodeEditorContent = lastCodeEditorContent,
                 StartActiveDate = startActiveDate,
                 EndActiveDate = endActiveDate,
             });

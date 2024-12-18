@@ -8,12 +8,12 @@ public sealed class CachedRoomEventProvider : IRoomEventProvider
 {
     private readonly Lazy<ReadOnlyMemory<byte>> _lazy;
 
-    public CachedRoomEventProvider(IRoomEvent @event, IRoomEventSerializer roomEventSerializer)
+    public CachedRoomEventProvider(IRoomEvent @event, IEventSerializer eventSerializer)
     {
         Event = @event;
         _lazy = new Lazy<ReadOnlyMemory<byte>>(() =>
         {
-            var eventAsString = roomEventSerializer.SerializeAsString(Event);
+            var eventAsString = eventSerializer.SerializeAsString(Event);
             return Encoding.UTF8.GetBytes(eventAsString);
         });
     }

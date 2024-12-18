@@ -1,4 +1,5 @@
 using Interview.Domain.Events;
+using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Domain.Rooms.RoomParticipants;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,7 +7,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket.Events.Handlers;
 
-public class CodeWebSocketByNameEventHandler(ILogger<WebSocketByNameEventHandlerBase> logger) : WebSocketByNameEventHandlerBase(logger)
+public class CodeWebSocketByNameEventHandler(ILogger<WebSocketByNameEventHandlerBase> logger, IEventDeserializer deserializer)
+    : WebSocketByNameEventHandlerBase(logger, deserializer)
 {
     protected override string SupportType => EventType.CodeEditorChange;
 

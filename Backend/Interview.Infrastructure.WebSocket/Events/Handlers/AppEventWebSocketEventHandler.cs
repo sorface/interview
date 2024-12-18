@@ -1,4 +1,5 @@
 using Interview.Domain.Database;
+using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Service;
 using Microsoft.EntityFrameworkCore;
@@ -7,8 +8,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket.Events.Handlers;
 
-public sealed class AppEventWebSocketEventHandler(ILogger<WebSocketEventHandlerBase<Dictionary<string, object>>> logger)
-    : WebSocketEventHandlerBase<Dictionary<string, object>>(logger)
+public sealed class AppEventWebSocketEventHandler(ILogger<WebSocketEventHandlerBase<Dictionary<string, object>>> logger, IEventDeserializer deserializer)
+    : WebSocketEventHandlerBase<Dictionary<string, object>>(logger, deserializer)
 {
     public override int Order => int.MaxValue;
 

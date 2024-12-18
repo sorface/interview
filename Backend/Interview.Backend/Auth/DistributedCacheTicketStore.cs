@@ -17,7 +17,7 @@ public class DistributedCacheTicketStore(
     {
         var key = Guid.NewGuid().ToString();
 
-        logger.LogInformation($"Creating a new auth session in distributed cache with id -> {key}");
+        logger.LogDebug("Creating a new auth session in distributed cache with id -> {Key}", key);
 
         await SetupValue(key, ticket, cancellationToken);
 
@@ -28,7 +28,7 @@ public class DistributedCacheTicketStore(
 
     public Task RenewAsync(string key, AuthenticationTicket ticket, CancellationToken cancellationToken)
     {
-        logger.LogInformation($"Update a auth session in distributed cache with id -> {key}");
+        logger.LogDebug("Update a auth session in distributed cache with id -> {Key}", key);
 
         return SetupValue(key, ticket, cancellationToken);
     }
@@ -37,7 +37,7 @@ public class DistributedCacheTicketStore(
 
     public async Task<AuthenticationTicket?> RetrieveAsync(string key, CancellationToken cancellationToken)
     {
-        logger.LogInformation($"Get a auth session in distributed cache by id -> {key}");
+        logger.LogDebug("Get a auth session in distributed cache by id -> {Key}", key);
 
         var bytes = await distributedCache.GetAsync(key, cancellationToken);
         var ticket = DeserializeFromBytes(bytes);
@@ -48,7 +48,7 @@ public class DistributedCacheTicketStore(
 
     public Task RemoveAsync(string key, CancellationToken cancellationToken)
     {
-        logger.LogInformation($"Remove a auth session in distributed cache by id -> {key}");
+        logger.LogDebug("Remove a auth session in distributed cache by id -> {Key}", key);
 
         return distributedCache.RemoveAsync(key, cancellationToken);
     }

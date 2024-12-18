@@ -5,7 +5,7 @@ using Interview.Domain.Events.Events.Serializers;
 
 namespace Interview.Test.Units.Events.Serializers
 {
-    public class JsonRoomEventSerializerTest
+    public class JsonEventSerializerTest
     {
         public static IEnumerable<object?[]> SerializeAsStringData
         {
@@ -59,7 +59,7 @@ namespace Interview.Test.Units.Events.Serializers
         [MemberData(nameof(SerializeAsStringData))]
         public void SerializeAsString(string expectedResult, IRoomEvent? @event)
         {
-            var serializer = new JsonRoomEventSerializer();
+            var serializer = new JsonEventSerializer();
 
             var result = serializer.SerializeAsString(@event);
 

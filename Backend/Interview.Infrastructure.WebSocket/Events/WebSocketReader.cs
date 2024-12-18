@@ -26,7 +26,7 @@ public class WebSocketReader
     private readonly IHotEventStorage _hotEventStorage;
     private readonly ILogger<WebSocketReader> _logger;
     private readonly IEventBusSubscriberFactory _eventBusSubscriberFactory;
-    private readonly IRoomEventSerializer _roomEventSerializer;
+    private readonly IEventSerializer _roomEventSerializer;
     private readonly ILogger<WebSocketEventSender> _webSocketEventSender;
     private readonly IEventSenderAdapter _eventSenderAdapter;
 
@@ -36,7 +36,7 @@ public class WebSocketReader
         IHotEventStorage hotEventStorage,
         ILogger<WebSocketReader> logger,
         IEventBusSubscriberFactory eventBusSubscriberFactory,
-        IRoomEventSerializer roomEventSerializer,
+        IEventSerializer roomEventSerializer,
         ILogger<WebSocketEventSender> webSocketEventSender,
         IEventSenderAdapter eventSenderAdapter)
     {

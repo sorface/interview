@@ -12,7 +12,8 @@ namespace Interview.Infrastructure.WebSocket.Events;
 public class HandleStatefulEventHandler(
     IEventBusSubscriberFactory eventBusSubscriberFactory,
     IServiceScopeFactory serviceScopeFactory,
-    IRoomEventSerializer serializer,
+    IEventSerializer serializer,
+    IEventDeserializer deserializer,
     ILogger<HandleStatefulEventHandler> logger)
 {
     public async Task AddHandlerAsync(CancellationToken cancellationToken)
@@ -49,7 +50,7 @@ public class HandleStatefulEventHandler(
     {
         try
         {
-            var roomEvent = JsonSerializer.Deserialize<IRoomEvent>(busEvent.Event) ?? throw new Exception("Unable to parse event");
+            var roomEvent = deserializer.Deserialize<IRoomEvent>(busEvent.Event) ?? throw new Exception("Unable to parse event");
             await using var dbScope = serviceScopeFactory.CreateAsyncScope();
             var service = dbScope.ServiceProvider.GetRequiredService<IRoomServiceWithoutPermissionCheck>();
             try

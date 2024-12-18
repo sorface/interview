@@ -11,8 +11,9 @@ public class ReturningSignalWebSocketByNameEventHandler(
     IVideChatConnectionProvider userWebSocketConnectionProvider,
     ILogger<WebSocketEventSender> webSocketEventSender,
     IEventSenderAdapter eventSenderAdapter,
-    IRoomEventSerializer serializer)
-    : WebSocketByNameEventHandlerBase<ReturningSignalWebSocketByNameEventHandler.ReceivePayload>(logger)
+    IEventSerializer serializer,
+    IEventDeserializer deserializer)
+    : WebSocketByNameEventHandlerBase<ReturningSignalWebSocketByNameEventHandler.ReceivePayload>(logger, deserializer)
 {
     protected override string SupportType => "returning signal";
 
