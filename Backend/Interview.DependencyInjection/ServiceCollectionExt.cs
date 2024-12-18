@@ -90,6 +90,7 @@ public static class ServiceCollectionExt
         self.AddSingleton<IServiceScopeFactory, CurrentUserServiceScopeFactory>();
         self.AddScoped<CurrentUserServiceScopeFactory>();
 
+        self.AddMemoryCache();
         self.AddScoped<ICurrentPermissionAccessor, CurrentPermissionAccessor>();
         self.AddEventServices(option);
         self.AddScoped<EventStorage2DatabaseService>();

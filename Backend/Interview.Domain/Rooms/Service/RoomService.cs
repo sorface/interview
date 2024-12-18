@@ -201,6 +201,7 @@ public sealed class RoomService(
     public async Task<RoomDetail> FindByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var res = await db.Rooms
+            .AsSplitQuery()
             .Include(e => e.Participants)
             .Include(e => e.Configuration)
             .Include(e => e.Timer)
