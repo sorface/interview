@@ -16,6 +16,7 @@ public sealed class CachedCurrentUserAccessor : IEditableCurrentUserAccessor
         _lazyUser = new Lazy<User?>(() =>
         {
             return db.Users.AsNoTracking()
+                .AsSplitQuery()
                 .Include(user => user.Roles)
                 .Include(user => user.Permissions)
                 .FirstOrDefault(user => user.Id == root.UserId);

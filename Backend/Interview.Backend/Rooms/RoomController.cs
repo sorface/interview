@@ -40,7 +40,6 @@ public class RoomController(IRoomService roomService) : ControllerBase
         [FromQuery] PageRequest request,
         [FromQuery] RoomPageDetailRequestFilter? filter)
     {
-        logger.LogInformation("Find room page {UserId} {Name}", userAccessor.UserId, filter?.Name);
         return roomService.FindPageAsync(
             filter ?? new RoomPageDetailRequestFilter(),
             request.PageNumber,
