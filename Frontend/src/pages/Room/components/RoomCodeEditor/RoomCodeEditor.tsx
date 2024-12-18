@@ -43,11 +43,11 @@ const remoteCursorColor = 'var(--active)';
 const remoteSelectionColor = 'var(--active)';
 
 interface RoomCodeEditorProps {
-  initialValue: string | null;
+  visible: boolean;
 }
 
 export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
-  initialValue,
+  visible,
 }) => {
   const auth = useContext(AuthContext);
   const {
@@ -57,7 +57,7 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
     codeEditorLanguage,
     sendWsMessage,
   } = useContext(RoomContext);
-  const [value, setValue] = useState<string | null>(initialValue);
+  const [value, setValue] = useState<string | null>(null);
   const [remoteCursor, setRemoteCursor] = useState<RemoteCursor | null>(null);
   const [remoteSelection, setRemoteSelection] =
     useState<RemoteSelection | null>(null);
@@ -74,11 +74,11 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   );
 
   useEffect(() => {
-    if (typeof initialValue !== 'string') {
+    if (!roomState) {
       return;
     }
-    setValue(initialValue);
-  }, [initialValue]);
+    setValue(roomState.codeEditor.content);
+  }, [roomState]);
 
   useEffect(() => {
     if (!lastWsMessageParsed) {
@@ -253,6 +253,7 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
     if (viewerMode) {
       return;
     }
+    setValue(value || null);
     sendWsMessage(
       JSON.stringify({
         Type: 'code',
@@ -272,6 +273,10 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
       additionalData: { value: lang },
     });
   };
+
+  if (!visible) {
+    return null;
+  }
 
   return (
     <CodeEditor
