@@ -47,8 +47,4 @@
         <ProjectReference Include="..\Interview.Migrations.Postgres\Interview.Migrations.Postgres.csproj" />
         <ProjectReference Include="..\Interview.Migrations.Sqlite\Interview.Migrations.Sqlite.csproj" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="logs\" />
-    </ItemGroup>
 </Project>
