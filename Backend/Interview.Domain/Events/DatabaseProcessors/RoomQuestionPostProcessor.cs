@@ -99,11 +99,11 @@ public class RoomQuestionPostProcessor(
             .FirstOrDefaultAsync(cancellationToken);
         if (lastActiveQuestionTime is null)
         {
-            logger.LogTrace("Not found last active question time {QuestionId}", current.QuestionId);
+            logger.LogDebug("Not found last active question time {QuestionId}", current.QuestionId);
         }
         else
         {
-            logger.LogTrace("Found last active question time {QuestionId} {StartTime} {EndTime}", current.QuestionId, lastActiveQuestionTime?.StartActiveDate, lastActiveQuestionTime?.EndActiveDate);
+            logger.LogDebug("Found last active question time {QuestionId} {StartTime} {EndTime}", current.QuestionId, lastActiveQuestionTime?.StartActiveDate, lastActiveQuestionTime?.EndActiveDate);
         }
 
         if (lastActiveQuestionTime is not null)
@@ -117,25 +117,25 @@ public class RoomQuestionPostProcessor(
             var lastCodeEditorState = await eventProvider.GetLatestEventAsync(codeEditorContentRequest, cancellationToken);
             if (lastCodeEditorState is null)
             {
-                logger.LogTrace("Not found code editor content for {QuestionId} {StartTime} {EndTime}", current.QuestionId, lastActiveQuestionTime.Value.StartActiveDate, lastActiveQuestionTime.Value.EndActiveDate);
+                logger.LogDebug("Not found code editor content for {QuestionId} {StartTime} {EndTime}", current.QuestionId, lastActiveQuestionTime.Value.StartActiveDate, lastActiveQuestionTime.Value.EndActiveDate);
             }
             else
             {
-                logger.LogTrace("Found code editor content for {QuestionId} {Content} {StartTime} {EndTime}", current.QuestionId, lastCodeEditorState.Payload, lastActiveQuestionTime.Value.StartActiveDate, lastActiveQuestionTime.Value.EndActiveDate);
+                logger.LogDebug("Found code editor content for {QuestionId} {Content} {StartTime} {EndTime}", current.QuestionId, lastCodeEditorState.Payload, lastActiveQuestionTime.Value.StartActiveDate, lastActiveQuestionTime.Value.EndActiveDate);
                 return lastCodeEditorState.Payload;
             }
         }
 
         if (current.Question is not null && current.Question.CodeEditorId is null)
         {
-            logger.LogTrace("Return empty content for question without code editor");
+            logger.LogDebug("Return empty content for question without code editor");
             return null;
         }
 
         var content = current.Question?.CodeEditor?.Content;
         if (content is not null)
         {
-            logger.LogTrace("Return loaded question content {Content}", content);
+            logger.LogDebug("Return loaded question content {Content}", content);
             return content;
         }
 
@@ -145,7 +145,7 @@ public class RoomQuestionPostProcessor(
             .Where(e => e.Id == current.QuestionId)
             .Select(e => e.CodeEditor == null ? null : e.CodeEditor.Content)
             .FirstOrDefaultAsync(cancellationToken);
-        logger.LogTrace("Return db question content {Content}", resultContent);
+        logger.LogDebug("Return db question content {Content}", resultContent);
         return resultContent;
     }
 

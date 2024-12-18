@@ -26,7 +26,7 @@ public class SorfacePrincipalValidator(
         {
             if (context.Principal?.Identity is { IsAuthenticated: false })
             {
-                logger.Log(LogLevel.Information, "Principal is not authenticated");
+                logger.LogInformation("Principal is not authenticated");
                 return;
             }
 
@@ -34,7 +34,7 @@ public class SorfacePrincipalValidator(
 
             if (exp is null)
             {
-                logger.Log(LogLevel.Information, "Exp is null. not refreshed");
+                logger.LogInformation("Exp is null. not refreshed");
                 return;
             }
 
@@ -42,7 +42,7 @@ public class SorfacePrincipalValidator(
 
             if (expTime > DateTime.UtcNow)
             {
-                logger.Log(LogLevel.Information, "Introspect access token");
+                logger.LogInformation("Introspect access token");
 
                 await IntrospectToken(context);
             }
@@ -51,7 +51,7 @@ public class SorfacePrincipalValidator(
                 var refreshToken = context.Properties.GetTokenValue(SorfaceTokenDefaults.RefreshTokenName);
                 if (refreshToken is null)
                 {
-                    logger.Log(LogLevel.Warning, "reject principal");
+                    logger.LogWarning("Refresh token is null. Reject principal");
                     context.RejectPrincipal();
                     return;
                 }
@@ -64,15 +64,15 @@ public class SorfacePrincipalValidator(
 
                     if (await distributedLockStorage.IsLockAsync(refreshToken))
                     {
-                        logger.LogDebug("double refresh {} access token locked", refreshToken);
+                        logger.LogTrace("double refresh {RefreshToken} access token locked", refreshToken);
                         return;
                     }
 
-                    logger.LogDebug($"Start refresh ACCESS_TOKEN with lock");
+                    logger.LogTrace("Start refresh ACCESS_TOKEN with lock");
 
                     await RefreshAccessTokenAsync(context, refreshToken, context.HttpContext.RequestAborted);
 
-                    logger.LogDebug($"End refresh ACCESS_TOKEN unlock");
+                    logger.LogTrace("End refresh ACCESS_TOKEN unlock");
                 }
                 finally
                 {
@@ -83,7 +83,7 @@ public class SorfacePrincipalValidator(
         catch (Exception e)
         {
             context.RejectPrincipal();
-            logger.LogError(e, "during token validation");
+            logger.LogError(e, "During token validation");
         }
     }
 
@@ -125,7 +125,7 @@ public class SorfacePrincipalValidator(
         }
         catch (Exception ex)
         {
-            logger.LogDebug("token refresh error {}", ex.Message);
+            logger.LogError(ex, "Token refresh error");
             context.RejectPrincipal();
             return;
         }
