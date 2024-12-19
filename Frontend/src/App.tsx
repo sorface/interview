@@ -12,7 +12,7 @@ import { IconNames, HttpResponseCode } from './constants';
 import { LoadingAccountError } from './components/LoadingAccountError/LoadingAccountError';
 import { Icon } from './pages/Room/components/Icon/Icon';
 import { Feedback } from './components/Feedback/Feedback';
-import { REACT_APP_FEEDBACK_IFRAME_URL } from './config';
+import { VITE_FEEDBACK_IFRAME_URL } from './config';
 
 import './App.css';
 
@@ -78,7 +78,7 @@ export const App: FunctionComponent = () => {
           <AuthContext.Provider value={user}>
             <div className="App-container">
               {renderMainContent()}
-              {!!REACT_APP_FEEDBACK_IFRAME_URL && <Feedback />}
+              {!!VITE_FEEDBACK_IFRAME_URL && <Feedback />}
             </div>
           </AuthContext.Provider>
         </LocalizationProvider>

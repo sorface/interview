@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import React, { FunctionComponent } from 'react';
 import { Typography } from '../Typography/Typography';
 
 interface TextareaProps

@@ -396,7 +396,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
                     </div>
                   </Typography>
                 )}
-                {!!(!roomsHistory || loadingRoomsHistory) ? (
+                {!roomsHistory || loadingRoomsHistory ? (
                   <div className="flex justify-center items-center w-full h-full bg-wrap rounded-1.125">
                     <Loader />
                   </div>

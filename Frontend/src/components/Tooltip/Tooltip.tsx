@@ -1,4 +1,4 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import React, { ComponentProps, FunctionComponent } from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme } from '../../context/ThemeContext';

@@ -1,4 +1,4 @@
-import { FunctionComponent, MouseEventHandler } from 'react';
+import React, { FunctionComponent, MouseEventHandler } from 'react';
 import { Tag } from '../../types/tag';
 
 import './TagsView.css';

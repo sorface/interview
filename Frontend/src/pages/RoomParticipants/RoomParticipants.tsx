@@ -24,7 +24,7 @@ const userTypeFieldName = 'userType';
 
 export const RoomParticipants: FunctionComponent = () => {
   const localizationCaptions = useLocalizationCaptions();
-  let { id } = useParams();
+  const { id } = useParams();
   const { apiMethodState, fetchData } = useApiMethod<Room, Room['id']>(
     roomsApiDeclaration.getById,
   );

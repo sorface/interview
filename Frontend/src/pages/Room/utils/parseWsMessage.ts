@@ -1,3 +1,4 @@
+import { AnyObject } from '../../../types/anyObject';
 import { UserType } from '../../../types/user';
 
 export type ParsedWsMessage =
@@ -89,7 +90,7 @@ export type ParsedWsMessage =
       };
     };
 
-const parseWsPayload = (parsedData: any) => {
+const parseWsPayload = (parsedData: AnyObject) => {
   try {
     return JSON.parse(parsedData?.Value);
   } catch {
@@ -98,7 +99,7 @@ const parseWsPayload = (parsedData: any) => {
 };
 
 export const parseWsMessage = (
-  message: MessageEvent<any> | null,
+  message: MessageEvent<string> | null,
 ): ParsedWsMessage | null => {
   if (!message) {
     return null;

@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext } from 'react';
+import React, { FunctionComponent, useContext } from 'react';
 import { Modal } from '../../../../components/Modal/Modal';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../../localization';

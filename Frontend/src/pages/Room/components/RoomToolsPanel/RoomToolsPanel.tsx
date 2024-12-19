@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactNode } from 'react';
+import React, { FunctionComponent, ReactNode } from 'react';
 import { IconNames } from '../../../../constants';
 import { Button } from '../../../../components/Button/Button';
 import { Loader } from '../../../../components/Loader/Loader';

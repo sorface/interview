@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import React, { FunctionComponent } from 'react';
 import { generatePath } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';

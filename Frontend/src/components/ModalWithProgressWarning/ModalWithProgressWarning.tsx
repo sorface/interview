@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { Modal, ModalProps } from '../Modal/Modal';
 import { ModalWarningContent } from '../ModalWarningContent/ModalWarningContent';
 import { IconNames } from '../../constants';

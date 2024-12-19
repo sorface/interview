@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext, useEffect } from 'react';
+import React, { FunctionComponent, useContext, useEffect } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { useNavigate, generatePath } from 'react-router-dom';
 import { pathnames } from '../../constants';

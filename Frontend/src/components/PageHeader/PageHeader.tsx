@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactNode, useContext } from 'react';
+import React, { FunctionComponent, ReactNode, useContext } from 'react';
 import { Typography } from '../Typography/Typography';
 import { PageHeaderUserAvatar } from '../PageHeaderUserAvatar/PageHeaderUserAvatar';
 import {

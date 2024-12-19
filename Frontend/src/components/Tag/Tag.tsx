@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactNode } from 'react';
+import React, { FunctionComponent, ReactNode } from 'react';
 import { Typography } from '../Typography/Typography';
 import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme, ThemeInUi } from '../../context/ThemeContext';
