@@ -207,7 +207,6 @@ export const enum LocalizationKey {
   RoomEmptyStartTimeError,
   RoomStartTimeMustBeGreaterError,
   RoomEmptyQuestionsListError,
-  RoomEmptyCategoryError,
   InterviewHistoryTitle,
   RoomReviewSave,
   RoomReviewAlreadyGiven,
@@ -473,8 +472,6 @@ export const LocalizationCaptions: Record<
       'Meeting start time must be greater than the current time',
     [LocalizationKey.RoomEmptyQuestionsListError]:
       'Please add questions to the list of questions',
-    [LocalizationKey.RoomEmptyCategoryError]:
-      'Please select a meeting category',
     [LocalizationKey.InterviewHistoryTitle]: 'Interview history',
     [LocalizationKey.RoomReviewAlreadyGiven]:
       'You have already given feedback on the interview. Waiting for evaluation from other participants.',
@@ -741,8 +738,6 @@ export const LocalizationCaptions: Record<
       'Время начала встречи должно быть больше текущего времени',
     [LocalizationKey.RoomEmptyQuestionsListError]:
       'Пожалуйста, добавьте вопросы в список вопросов',
-    [LocalizationKey.RoomEmptyCategoryError]:
-      'Пожалуйста, выберите категорию встречи',
     [LocalizationKey.InterviewHistoryTitle]: 'История собеседований',
     [LocalizationKey.RoomReviewAlreadyGiven]:
       'Вы уже дали отзыв о собеседовании. Ожидание оценки от остальных участников.',
