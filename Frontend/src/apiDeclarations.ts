@@ -11,7 +11,6 @@ import {
   Room,
   RoomAccessType,
   RoomInvite,
-  RoomQuestion,
   RoomQuestionState,
   RoomStateAdditionalStatefulPayload,
   RoomStatus,
@@ -26,7 +25,7 @@ export interface PaginationUrlParams {
 
 export interface CreateRoomBody {
   name: string;
-  questions: Array<{ id: Question['id']; order: number }>;
+  categoryId: Category['id'];
   experts: Array<User['id']>;
   examinees: Array<User['id']>;
   tags: Array<Tag['id']>;
@@ -68,7 +67,7 @@ export interface RoomIdParam {
 export interface RoomEditBody {
   id: string;
   name: string;
-  questions: Array<Omit<RoomQuestion, 'state'>>;
+  categoryId: Category['id'];
   scheduleStartTime: Room['scheduledStartTime'];
   durationSec?: number;
 }

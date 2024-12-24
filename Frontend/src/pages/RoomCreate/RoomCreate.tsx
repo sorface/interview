@@ -1,6 +1,5 @@
 import React, {
   ChangeEvent,
-  Fragment,
   FunctionComponent,
   useCallback,
   useEffect,
@@ -8,7 +7,9 @@ import React, {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
+  categoriesApiDeclaration,
   CreateRoomBody,
+  GetCategoriesParams,
   RoomEditBody,
   RoomIdParam,
   roomInviteApiDeclaration,
@@ -18,29 +19,23 @@ import { Field } from '../../components/FieldsBlock/Field';
 import { Loader } from '../../components/Loader/Loader';
 import { IconNames } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
-import { Question } from '../../types/question';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import {
   Room,
   RoomAccessType,
   RoomInvite,
-  RoomQuestionListItem,
 } from '../../types/room';
-import { DragNDropList } from '../../components/DragNDropList/DragNDropList';
-import { SwitcherButton } from '../../components/SwitcherButton/SwitcherButton';
 import { ModalFooter } from '../../components/ModalFooter/ModalFooter';
 import { Gap } from '../../components/Gap/Gap';
 import { Typography } from '../../components/Typography/Typography';
 import { Icon } from '../Room/components/Icon/Icon';
-import { RoomQuestionsSelector } from './RoomQuestionsSelector/RoomQuestionsSelector';
-import { QuestionItem } from '../../components/QuestionItem/QuestionItem';
 import { RoomInvitations } from '../../components/RoomInvitations/RoomInvitations';
 import { RoomCreateField } from './RoomCreateField/RoomCreateField';
 import { ModalWithProgressWarning } from '../../components/ModalWithProgressWarning/ModalWithProgressWarning';
 import { Button } from '../../components/Button/Button';
 import { padTime } from '../../utils/padTime';
-import { sortRoomQuestion } from '../../utils/sortRoomQestions';
+import { Category } from '../../types/category';
 
 const nameFieldName = 'roomName';
 const dateFieldName = 'roomDate';
@@ -108,6 +103,7 @@ enum CreationStep {
 
 type RoomFields = {
   name: string;
+  categoryId: string;
   date: string;
   startTime: string;
   endTime: string;
@@ -155,29 +151,44 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     data: roomInvitesData,
   } = apiRoomInvitesState;
 
+  const {
+    apiMethodState: rootCategoriesState,
+    fetchData: fetchRootCategories,
+  } = useApiMethod<Category[], GetCategoriesParams>(
+    categoriesApiDeclaration.getPage,
+  );
+  const {
+    process: { loading: rootCategoriesLoading, error: rootCategoriesError },
+    data: rootCategories,
+  } = rootCategoriesState;
+
   const [roomFields, setRoomFields] = useState<RoomFields>({
     name: '',
+    categoryId: '',
     date: formatDate(new Date()),
     startTime: '',
     endTime: '',
   });
   const parsedRoomDate = parseRoomDate(roomFields);
-  const [selectedQuestions, setSelectedQuestions] = useState<
-    RoomQuestionListItem[]
-  >([]);
   const [creationStep, setCreationStep] = useState<CreationStep>(
     CreationStep.Step1,
   );
-  const [questionsView, setQuestionsView] = useState(false);
   const [uiError, setUiError] = useState('');
-  const modalTitle = questionsView
-    ? localizationCaptions[LocalizationKey.AddingRoomQuestions]
-    : editRoomId
-      ? localizationCaptions[LocalizationKey.EditRoom]
-      : localizationCaptions[LocalizationKey.NewRoom];
+  const modalTitle = editRoomId
+    ? localizationCaptions[LocalizationKey.EditRoom]
+    : localizationCaptions[LocalizationKey.NewRoom];
 
   const totalLoading = loading || loadingRoom || loadingRoomEdit;
   const totalError = error || errorRoom || errorRoomEdit || uiError;
+
+  useEffect(() => {
+    fetchRootCategories({
+      name: '',
+      PageNumber: 1,
+      PageSize: 30,
+      showOnlyWithoutParent: true,
+    });
+  }, [fetchRootCategories]);
 
   useEffect(() => {
     if (!editRoomId) {
@@ -204,7 +215,6 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         ? parsedScheduledStartTime.endTime || ''
         : '',
     }));
-    setSelectedQuestions(room.questions.sort(sortRoomQuestion));
   }, [room]);
 
   useEffect(() => {
@@ -245,8 +255,8 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         LocalizationKey.RoomStartTimeMustBeGreaterError
       ];
     }
-    if (selectedQuestions.length === 0) {
-      return localizationCaptions[LocalizationKey.RoomEmptyQuestionsListError];
+    if (!roomFields.categoryId) {
+      return localizationCaptions[LocalizationKey.RoomEmptyCategoryError];
     }
     return '';
   };
@@ -267,21 +277,15 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     if (editRoomId) {
       fetchRoomEdit({
         id: editRoomId,
+        categoryId: roomFields.categoryId,
         name: roomFields.name,
-        questions: selectedQuestions.map((question, index) => ({
-          ...question,
-          order: index,
-        })),
         scheduleStartTime: parsedRoomDate.roomDateStart.toISOString(),
         durationSec: parsedRoomDate.duration,
       });
     } else {
       fetchData({
         name: roomFields.name,
-        questions: selectedQuestions.map((question, index) => ({
-          id: question.id,
-          order: index,
-        })),
+        categoryId: roomFields.categoryId,
         experts: [],
         examinees: [],
         tags: [],
@@ -293,32 +297,12 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
   };
 
   const handleChangeField =
-    (fieldName: keyof RoomFields) => (e: ChangeEvent<HTMLInputElement>) => {
+    (fieldName: keyof RoomFields) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       setRoomFields({
         ...roomFields,
         [fieldName]: e.target.value,
       });
     };
-
-  const handleQuestionsSave = (questions: RoomQuestionListItem[]) => {
-    setSelectedQuestions(questions);
-    setQuestionsView(false);
-  };
-
-  const handleQuestionRemove = (question: Question) => {
-    const newSelectedQuestions = selectedQuestions.filter(
-      (q) => q.id !== question.id,
-    );
-    setSelectedQuestions(newSelectedQuestions);
-  };
-
-  const handleQuestionsViewOpen = () => {
-    setQuestionsView(true);
-  };
-
-  const handleQuestionsViewClose = () => {
-    setQuestionsView(false);
-  };
 
   const renderStatus = useCallback(() => {
     if (totalError) {
@@ -344,27 +328,6 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     }
     return <></>;
   }, [totalError, totalLoading]);
-
-  const renderQuestionItem = (
-    question: RoomQuestionListItem,
-    index: number,
-  ) => (
-    <Fragment>
-      <div className="flex w-full">
-        <div className="flex flex-col w-1.75 text-right text-grey2">
-          <Gap sizeRem={1} />
-          <Typography size="xxl" bold>
-            {index + 1}
-          </Typography>
-        </div>
-        <Gap sizeRem={1} horizontal />
-        <div className="flex-1">
-          <QuestionItem question={question} onRemove={handleQuestionRemove} />
-        </div>
-      </div>
-      {index !== selectedQuestions.length - 1 && <Gap sizeRem={0.25} />}
-    </Fragment>
-  );
 
   const stepView = {
     [CreationStep.Step1]: (
@@ -443,25 +406,37 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         </RoomCreateField.Wrapper>
         <Gap sizeRem={2} />
 
-        <RoomCreateField.Wrapper>
-          <RoomCreateField.Label className="self-start">
-            <Typography size="m" bold>
-              {localizationCaptions[LocalizationKey.RoomQuestions]}
-            </Typography>
+        <RoomCreateField.Wrapper className="w-full max-w-15.75">
+          <RoomCreateField.Label>
+            <label htmlFor="rootCategory">
+              <Typography size="m" bold>
+                {localizationCaptions[LocalizationKey.Category]}
+              </Typography>
+            </label>
           </RoomCreateField.Label>
           <RoomCreateField.Content>
-            <Gap sizeRem={0.5} />
-            <DragNDropList
-              items={selectedQuestions}
-              renderItem={renderQuestionItem}
-              onItemsChange={setSelectedQuestions}
-            />
-            {!!selectedQuestions.length && <Gap sizeRem={1.5} />}
-            <Button variant="active2" onClick={handleQuestionsViewOpen}>
-              <Icon size="s" name={IconNames.Add} />
-              <Gap sizeRem={0.5} horizontal />
-              {localizationCaptions[LocalizationKey.AddRoomQuestions]}
-            </Button>
+            {rootCategoriesError && (
+              <Typography error size='m'>{rootCategoriesError}</Typography>
+            )}
+            {rootCategoriesLoading ? (
+              <Loader />
+            ) : (
+              <select
+                id="rootCategory"
+                className="w-full"
+                value={roomFields.categoryId}
+                onChange={handleChangeField('categoryId')}
+              >
+                <option value="">
+                  {localizationCaptions[LocalizationKey.NotSelected]}
+                </option>
+                {rootCategories?.map((rootCategory) => (
+                  <option key={rootCategory.id} value={rootCategory.id}>
+                    {rootCategory.name}
+                  </option>
+                ))}
+              </select>
+            )}
           </RoomCreateField.Content>
         </RoomCreateField.Wrapper>
         <ModalFooter>
@@ -502,36 +477,8 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
       onClose={onClose}
     >
       <div className="text-left">
-        {!questionsView && (
-          <>
-            <SwitcherButton
-              items={[
-                {
-                  id: 1,
-                  content:
-                    localizationCaptions[LocalizationKey.CreateRoomStep1],
-                },
-                {
-                  id: 2,
-                  content:
-                    localizationCaptions[LocalizationKey.CreateRoomStep2],
-                },
-              ]}
-              activeIndex={creationStep}
-            />
-            <Gap sizeRem={2.25} />
-          </>
-        )}
         {renderStatus()}
-        {questionsView ? (
-          <RoomQuestionsSelector
-            preSelected={selectedQuestions}
-            onCancel={handleQuestionsViewClose}
-            onSave={handleQuestionsSave}
-          />
-        ) : (
-          stepView[creationStep]
-        )}
+        {stepView[creationStep]}
       </div>
     </ModalWithProgressWarning>
   );
