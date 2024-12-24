@@ -223,6 +223,11 @@ public class QuestionService(
         entity.Tags.Clear();
         entity.Tags.AddRange(tags);
 
+        if (request.Type is not null)
+        {
+            entity.Type = SEQuestionType.FromValue((int)request.Type.Value);
+        }
+
         await questionRepository.UpdateAsync(entity, cancellationToken);
 
         return await ToQuestionItemAsync(entity, cancellationToken);
