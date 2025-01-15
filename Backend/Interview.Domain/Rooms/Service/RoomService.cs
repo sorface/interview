@@ -307,7 +307,7 @@ public sealed class RoomService(
         if (request.CategoryId is not null)
         {
             var requiredQuestionIds = request.Questions.Select(e => e.Id).ToList();
-            var allCategories = await GetAllCategoriesAsync(request.CategoryId.Value);
+            var allCategories = await db.GetWithChildCategoriesAsync(request.CategoryId.Value, cancellationToken);
             var questionsFromCategories = await db.Questions
                 .Where(e => e.CategoryId != null && allCategories.Contains(e.CategoryId.Value) && !requiredQuestionIds.Contains(e.Id))
                 .Select(e => e.Id)
@@ -397,30 +397,6 @@ public sealed class RoomService(
                 };
             },
             cancellationToken);
-
-        async Task<HashSet<Guid>> GetAllCategoriesAsync(Guid categoryId)
-        {
-            var res = new HashSet<Guid> { categoryId };
-            var checkCategories = new List<Guid> { categoryId };
-            do
-            {
-                var tmp = await db.Categories.AsNoTracking()
-                    .Where(e => e.ParentId != null && checkCategories.Contains(e.ParentId.Value))
-                    .Select(e => e.Id)
-                    .ToListAsync(cancellationToken);
-                checkCategories.Clear();
-                foreach (var id in tmp)
-                {
-                    if (res.Add(id))
-                    {
-                        checkCategories.Add(id);
-                    }
-                }
-            }
-            while (checkCategories.Count > 0);
-
-            return res;
-        }
     }
 
     public async Task<RoomItem> UpdateAsync(Guid roomId, RoomUpdateRequest? request, CancellationToken cancellationToken = default)
