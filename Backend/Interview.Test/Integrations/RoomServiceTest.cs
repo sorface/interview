@@ -77,7 +77,7 @@ public class RoomServiceTest
 
         var question = new Question("question_value#1");
         appDbContext.Questions.AddRange(question);
-        
+
         appDbContext.RoomQuestions.AddRange(new RoomQuestion
         {
             RoomId = savedRoom.Id,
@@ -90,7 +90,7 @@ public class RoomServiceTest
 
         var category = new Category { Name = "root" };
         appDbContext.Categories.AddRange(category);
-        
+
         var categoryQuestion = new Question("question_value#2")
         {
             Category = category
@@ -857,7 +857,7 @@ public class RoomServiceTest
         appDbContext.Categories.Add(rootCategory);
         var rootQuestions = GenerateQuestions(rootCategory, 1, 5, i => "root_q:" + i).ToList();
         appDbContext.Questions.AddRange(rootQuestions);
-        
+
         var rootChild1 = new Category { Name = "rootChild1", ParentId = rootCategory.Id };
         appDbContext.Categories.Add(rootChild1);
         var rootChild1Questions = GenerateQuestions(rootChild1, 1, 5, i => "root_chld_1_q:" + i).ToList();
@@ -866,13 +866,13 @@ public class RoomServiceTest
         appDbContext.Categories.Add(rootChild2);
         var rootChild2Questions = GenerateQuestions(rootChild2, 1, 5, i => "root_chld_1_2:" + i).ToList();
         appDbContext.Questions.AddRange(rootChild2Questions);
-        
+
         foreach (var i in Enumerable.Range(1, 10))
         {
             var category = new Category { Name = "root - " + i };
             appDbContext.Categories.Add(category);
             appDbContext.Questions.AddRange(GenerateQuestions(category, 5, 10, i => "question_value#" + i));
-            
+
             foreach (var childNmb in Enumerable.Range(1, Random.Shared.Next(0, 5)))
             {
                 var chld = new Category { Name = "child: " + i + " - " + childNmb, ParentId = category.Id };
@@ -880,7 +880,7 @@ public class RoomServiceTest
                 appDbContext.Questions.AddRange(GenerateQuestions(chld, 5, 10, i => "question_value#" + i));
             }
         }
-        
+
         appDbContext.SaveChanges();
         appDbContext.ChangeTracker.Clear();
 
@@ -937,7 +937,7 @@ public class RoomServiceTest
         appDbContext.Categories.Add(rootCategory);
         var rootQuestions = GenerateQuestions(rootCategory, 1, 5, i => "root_q:" + i).ToList();
         appDbContext.Questions.AddRange(rootQuestions);
-        
+
         var rootChild1 = new Category { Name = "rootChild1", ParentId = rootCategory.Id };
         appDbContext.Categories.Add(rootChild1);
         var rootChild1Questions = GenerateQuestions(rootChild1, 1, 5, i => "root_chld_1_q:" + i).ToList();
@@ -946,13 +946,13 @@ public class RoomServiceTest
         appDbContext.Categories.Add(rootChild2);
         var rootChild2Questions = GenerateQuestions(rootChild2, 1, 5, i => "root_chld_1_2:" + i).ToList();
         appDbContext.Questions.AddRange(rootChild2Questions);
-        
+
         foreach (var i in Enumerable.Range(1, 10))
         {
             var category = new Category { Name = "root - " + i };
             appDbContext.Categories.Add(category);
             appDbContext.Questions.AddRange(GenerateQuestions(category, 5, 10, i => "question_value#" + i));
-            
+
             foreach (var childNmb in Enumerable.Range(1, Random.Shared.Next(0, 5)))
             {
                 var chld = new Category { Name = "child: " + i + " - " + childNmb, ParentId = category.Id };
@@ -960,7 +960,7 @@ public class RoomServiceTest
                 appDbContext.Questions.AddRange(GenerateQuestions(chld, 5, 10, i => "question_value#" + i));
             }
         }
-        
+
         appDbContext.SaveChanges();
         appDbContext.ChangeTracker.Clear();
 

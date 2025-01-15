@@ -21,4 +21,6 @@ public class RoomDetail
     public required DateTime? ScheduledStartTime { get; init; }
 
     public required List<RoomQuestionDetail>? Questions { get; set; }
+
+    public required RoomCategoryResponse? Category { get; set; }
 }

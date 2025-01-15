@@ -1,4 +1,5 @@
 using Interview.Domain.Repository;
+using Interview.Domain.Rooms.Records.Response.Detail;
 using Interview.Domain.Rooms.RoomQuestions;
 
 namespace Interview.Domain.Rooms.Records.Response.RoomStates;
@@ -25,6 +26,9 @@ public class ActualRoomStateResponse
             Payload = e.Payload,
             Type = e.Type,
         }).ToList(),
+        Category = room.Category != null
+            ? new RoomCategoryResponse { Id = room.Category.Id, Name = room.Category.Name }
+            : null,
     });
 
     public Guid Id { get; set; }
@@ -40,4 +44,6 @@ public class ActualRoomStateResponse
     public required CodeEditorStateResponse CodeEditor { get; set; }
 
     public required List<RoomStateResponse> States { get; set; }
+
+    public required RoomCategoryResponse? Category { get; set; }
 }

@@ -32,7 +32,7 @@ public class RoomConfiguration : EntityTypeConfigurationBase<Room>
             .IsRequired()
             .HasDefaultValue(SERoomAccessType.Public);
         builder.Property(e => e.CategoryId);
-        builder.HasOne<Category>()
+        builder.HasOne<Category>(e => e.Category)
             .WithMany()
             .HasForeignKey(e => e.CategoryId);
     }

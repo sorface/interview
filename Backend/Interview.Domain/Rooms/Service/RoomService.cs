@@ -205,6 +205,7 @@ public sealed class RoomService(
             .Include(e => e.Participants)
             .Include(e => e.Configuration)
             .Include(e => e.Timer)
+            .Include(e => e.Category)
             .Include(e => e.Questions).ThenInclude(e => e.Question).ThenInclude(e => e!.Answers)
             .Include(e => e.Questions).ThenInclude(e => e.Question).ThenInclude(e => e!.CodeEditor)
             .Select(e => new
@@ -254,8 +255,15 @@ public sealed class RoomService(
                         .ToList(),
                     CodeEditor = q.Question.CodeEditor == null
                         ? null
-                        : new QuestionCodeEditorResponse { Content = q.Question.CodeEditor.Content, Lang = q.Question.CodeEditor.Lang, },
+                        : new QuestionCodeEditorResponse
+                        {
+                            Content = q.Question.CodeEditor.Content,
+                            Lang = q.Question.CodeEditor.Lang,
+                        },
                 }).ToList(),
+                Category = e.Category != null
+                    ? new RoomCategoryResponse { Id = e.Category.Id, Name = e.Category.Name }
+                    : null,
             })
             .FirstOrDefaultAsync(room => room.Id == id, cancellationToken: cancellationToken) ?? throw NotFoundException.Create<Room>(id);
 
@@ -270,9 +278,14 @@ public sealed class RoomService(
             Type = res.Type,
             Timer = res.Timer == null
                 ? null
-                : new RoomTimerDetail { DurationSec = (long)res.Timer.Duration.TotalSeconds, StartTime = res.Timer.ActualStartTime, },
+                : new RoomTimerDetail
+                {
+                    DurationSec = (long)res.Timer.Duration.TotalSeconds,
+                    StartTime = res.Timer.ActualStartTime,
+                },
             ScheduledStartTime = res.ScheduledStartTime,
             Questions = res.Questions,
+            Category = res.Category,
         };
     }
 
@@ -627,6 +640,7 @@ public sealed class RoomService(
             .Include(e => e.Questions)
             .Include(e => e.Configuration)
             .Include(e => e.RoomStates)
+            .Include(e => e.Category)
             .Where(e => e.Id == roomId)
             .Select(ActualRoomStateResponse.Mapper.Expression)
             .FirstOrDefaultAsync(cancellationToken);
