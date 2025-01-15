@@ -65,6 +65,62 @@ public class RoomServiceTest
         foundedRoom!.Name.Should().BeEquivalentTo(roomPatchUpdateRequest.Name);
     }
 
+    [Fact]
+    public async Task Update_Room_With_Category()
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+
+        var savedRoom = new Room(DefaultRoomName, SERoomAccessType.Public);
+
+        appDbContext.Rooms.Add(savedRoom);
+
+        var question = new Question("question_value#1");
+        appDbContext.Questions.AddRange(question);
+        
+        appDbContext.RoomQuestions.AddRange(new RoomQuestion
+        {
+            RoomId = savedRoom.Id,
+            QuestionId = question.Id,
+            Room = null,
+            Question = null,
+            State = RoomQuestionState.Open,
+            Order = 0
+        });
+
+        var category = new Category { Name = "root" };
+        appDbContext.Categories.AddRange(category);
+        
+        var categoryQuestion = new Question("question_value#2")
+        {
+            Category = category
+        };
+        appDbContext.Questions.AddRange(categoryQuestion);
+
+        await appDbContext.SaveChangesAsync();
+        appDbContext.ChangeTracker.Clear();
+
+        var roomRepository = new RoomRepository(appDbContext);
+        var roomService = CreateRoomService(appDbContext);
+
+        var roomPatchUpdateRequest = new RoomUpdateRequest
+        {
+            Name = "New_Value_Name_Room",
+            Questions = [new() { Id = question.Id, Order = 0 }],
+            CategoryId = category.Id,
+        };
+
+        _ = await roomService.UpdateAsync(savedRoom.Id, roomPatchUpdateRequest);
+
+        var foundedRoom = await roomRepository.FindByIdAsync(savedRoom.Id);
+
+        foundedRoom.Should().NotBeNull();
+        foundedRoom!.Name.Should().BeEquivalentTo(roomPatchUpdateRequest.Name);
+        foundedRoom.Questions.Count.Should().Be(1);
+        foundedRoom.Questions[0].QuestionId.Should().Be(categoryQuestion.Id);
+        foundedRoom.CategoryId.Should().Be(category.Id);
+    }
+
     [Fact(DisplayName = "Patch update room with request name not null and add category")]
     public async Task PatchUpdateRoomWithRequestNameIsNotNull_And_Add_Category()
     {

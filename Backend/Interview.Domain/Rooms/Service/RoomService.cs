@@ -433,6 +433,28 @@ public sealed class RoomService(
 
         var tags = await Tag.EnsureValidTagsAsync(db.Tag, request.Tags, cancellationToken);
 
+        if (request.CategoryId != null && request.CategoryId != (foundRoom.CategoryId ?? Guid.Empty))
+        {
+            // When a user sets up a category, you must remove all questions from the room.
+            request.Questions.Clear();
+
+            var allCategories = await db.GetWithChildCategoriesAsync(request.CategoryId.Value, cancellationToken);
+            var questionsFromCategories = await db.Questions
+                .Where(e => e.CategoryId != null && allCategories.Contains(e.CategoryId.Value))
+                .Select(e => e.Id)
+                .ToListAsync(cancellationToken);
+
+            var startOrder = 0;
+            foreach (var questionsFromCategoryId in questionsFromCategories)
+            {
+                request.Questions.Add(new RoomQuestionRequest
+                {
+                    Id = questionsFromCategoryId,
+                    Order = ++startOrder,
+                });
+            }
+        }
+
         var requiredQuestions = request.Questions.Select(e => e.Id).ToHashSet();
 
         if (requiredQuestions.Count == 0)
@@ -491,6 +513,7 @@ public sealed class RoomService(
 
         foundRoom.ScheduleStartTime = request.ScheduleStartTime;
         foundRoom.Name = name;
+        foundRoom.CategoryId = request.CategoryId;
         foundRoom.Tags.Clear();
         foundRoom.Tags.AddRange(tags);
         db.Update(foundRoom);

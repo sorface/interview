@@ -11,4 +11,6 @@ public class RoomUpdateRequest
     public DateTime ScheduleStartTime { get; set; }
 
     public long? DurationSec { get; set; }
+
+    public Guid? CategoryId { get; set; }
 }
