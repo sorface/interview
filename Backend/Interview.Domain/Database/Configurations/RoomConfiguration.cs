@@ -1,3 +1,4 @@
+using Interview.Domain.Categories;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomTimers;
 using Interview.Domain.Tags;
@@ -30,5 +31,9 @@ public class RoomConfiguration : EntityTypeConfigurationBase<Room>
             .HasConversion(e => e.Value, e => SERoomAccessType.FromValue(e))
             .IsRequired()
             .HasDefaultValue(SERoomAccessType.Public);
+        builder.Property(e => e.CategoryId);
+        builder.HasOne<Category>()
+            .WithMany()
+            .HasForeignKey(e => e.CategoryId);
     }
 }
