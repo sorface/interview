@@ -138,6 +138,7 @@ public class RoomController(IRoomService roomService) : ControllerBase
             Tags = request.Tags,
             DurationSec = request.Duration,
             ScheduleStartTime = request.ScheduleStartTime,
+            CategoryId = request.CategoryId,
         };
 
         var room = await roomService.CreateAsync(domainRequest, HttpContext.RequestAborted);

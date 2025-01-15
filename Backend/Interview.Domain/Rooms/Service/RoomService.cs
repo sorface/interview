@@ -304,8 +304,29 @@ public sealed class RoomService(
         var tags = await Tag.EnsureValidTagsAsync(db.Tag, request.Tags, cancellationToken);
         var room = new Room(name, request.AccessType) { Tags = tags, ScheduleStartTime = request.ScheduleStartTime, Timer = CreateRoomTimer(request.DurationSec), };
 
-        var requiredQuestions = request.Questions.Select(e => e.Id).ToList();
+        if (request.CategoryId is not null)
+        {
+            var requiredQuestionIds = request.Questions.Select(e => e.Id).ToList();
+            var allCategories = await GetAllCategoriesAsync(request.CategoryId.Value);
+            var questionsFromCategories = await db.Questions
+                .Where(e => e.CategoryId != null && allCategories.Contains(e.CategoryId.Value) && !requiredQuestionIds.Contains(e.Id))
+                .Select(e => e.Id)
+                .ToListAsync(cancellationToken);
 
+            var startOrder = request.Questions.Count > 0
+                ? request.Questions.Select(e => e.Order).Max() + 1
+                : 0;
+            foreach (var questionsFromCategoryId in questionsFromCategories)
+            {
+                request.Questions.Add(new RoomQuestionRequest
+                {
+                    Id = questionsFromCategoryId,
+                    Order = ++startOrder,
+                });
+            }
+        }
+
+        var requiredQuestions = request.Questions.Select(e => e.Id).ToHashSet();
         if (requiredQuestions.Count == 0)
         {
             throw new UserException("The room must contain at least one question");
@@ -376,6 +397,30 @@ public sealed class RoomService(
                 };
             },
             cancellationToken);
+
+        async Task<HashSet<Guid>> GetAllCategoriesAsync(Guid categoryId)
+        {
+            var res = new HashSet<Guid> { categoryId };
+            var checkCategories = new List<Guid> { categoryId };
+            do
+            {
+                var tmp = await db.Categories.AsNoTracking()
+                    .Where(e => e.ParentId != null && checkCategories.Contains(e.ParentId.Value))
+                    .Select(e => e.Id)
+                    .ToListAsync(cancellationToken);
+                checkCategories.Clear();
+                foreach (var id in tmp)
+                {
+                    if (res.Add(id))
+                    {
+                        checkCategories.Add(id);
+                    }
+                }
+            }
+            while (checkCategories.Count > 0);
+
+            return res;
+        }
     }
 
     public async Task<RoomItem> UpdateAsync(Guid roomId, RoomUpdateRequest? request, CancellationToken cancellationToken = default)
