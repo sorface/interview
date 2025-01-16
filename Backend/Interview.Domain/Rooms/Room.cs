@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Interview.Domain.Categories;
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Domain.Rooms.RoomInvites;
@@ -41,4 +42,8 @@ public class Room(string name, SERoomAccessType accessType) : Entity
     public List<RoomInvite> Invites { get; set; } = [];
 
     public QueuedRoomEvent? QueuedRoomEvent { get; set; }
+
+    public Guid? CategoryId { get; set; }
+
+    public Category? Category { get; set; }
 }
