@@ -334,7 +334,9 @@ public sealed class RoomService(
 
             var startOrder = request.Questions.Count > 0
                 ? request.Questions.Select(e => e.Order).Max() + 1
-                : 0;
+
+                // first question should start from 0
+                : -1;
             foreach (var questionsFromCategoryId in questionsFromCategories)
             {
                 request.Questions.Add(new RoomQuestionRequest
@@ -463,7 +465,7 @@ public sealed class RoomService(
                 request.Questions.Add(new RoomQuestionRequest
                 {
                     Id = questionsFromCategoryId,
-                    Order = ++startOrder,
+                    Order = startOrder++,
                 });
             }
         }
