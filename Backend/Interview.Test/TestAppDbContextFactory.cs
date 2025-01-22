@@ -43,7 +43,7 @@ public class TestAppDbContextFactory
         if (saveChanges)
         {
             db.SaveChanges();
-            db.ChangeTracker.Clear();   
+            db.ChangeTracker.Clear();
         }
     }
 }

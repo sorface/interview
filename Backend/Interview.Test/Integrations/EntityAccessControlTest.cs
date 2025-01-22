@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Interview.Domain;
 using Interview.Domain.Database;
 using Interview.Domain.Permissions;
