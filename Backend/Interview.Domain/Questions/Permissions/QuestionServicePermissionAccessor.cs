@@ -5,7 +5,7 @@ using X.PagedList;
 
 namespace Interview.Domain.Questions.Permissions;
 
-public class QuestionServicePermissionAccessor(IQuestionService questionService, ISecurityService securityService) : IQuestionService, IServiceDecorator
+public class QuestionServicePermissionAccessor(IQuestionService questionService, ISecurityService securityService, IEntityAccessControl entityAccessControl) : IQuestionService, IServiceDecorator
 {
     public async Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken)
     {
@@ -31,6 +31,7 @@ public class QuestionServicePermissionAccessor(IQuestionService questionService,
         Guid id, QuestionEditRequest request, CancellationToken cancellationToken = default)
     {
         await securityService.EnsurePermissionAsync(SEPermission.QuestionUpdate, cancellationToken);
+        await entityAccessControl.EnsureEditPermissionAsync<Question>(id, cancellationToken);
         return await questionService.UpdateAsync(id, request, cancellationToken);
     }
 
