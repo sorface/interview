@@ -21,7 +21,7 @@ public class EntityAccessControl(ICurrentUserAccessor currentUserAccessor, AppDb
         var currentUserId = currentUserAccessor.GetUserIdOrThrow();
         var canEdit = await appDbContext.Set<T>()
             .AsNoTracking()
-            .AnyAsync(e => e.Id == entityId && (e.CreatedById == null || e.CreatedById == currentUserId), cancellationToken);
+            .AnyAsync(e => e.Id == entityId && e.CreatedById != null && e.CreatedById == currentUserId, cancellationToken);
         if (!canEdit)
         {
             throw new AccessDeniedException("You do not have permission to modify the entity.");

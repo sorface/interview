@@ -33,9 +33,17 @@ public class TestAppDbContextFactory
         };
 
         context.Database.EnsureCreated();
-        context.Users.Add(new User(Guid.Empty, "UnitTests", "UnitTestIdentity"));
-        context.SaveChanges();
-        context.ChangeTracker.Clear();
+        AddUser(context, Guid.Empty, "UnitTests");
         return context;
+    }
+
+    public static void AddUser(AppDbContext db, Guid id, string nickname, bool saveChanges = true)
+    {
+        db.Users.Add(new User(id, nickname, nickname + "Identity"));
+        if (saveChanges)
+        {
+            db.SaveChanges();
+            db.ChangeTracker.Clear();   
+        }
     }
 }
