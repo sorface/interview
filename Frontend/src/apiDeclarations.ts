@@ -483,3 +483,21 @@ export const categoriesApiDeclaration = {
     body: undefined,
   }),
 };
+
+export interface CopilotEvaluateAnswerBody {
+  transcript: string;
+  question: string;
+}
+
+export interface CopilotEvaluateAnswerResponse {
+  mark: number;
+  review: string;
+}
+
+export const copilotApiDeclaration = {
+  evaluateAnswer: (body: CopilotEvaluateAnswerBody): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: '/copilot/evaluateAnswer',
+    body,
+  }),
+};

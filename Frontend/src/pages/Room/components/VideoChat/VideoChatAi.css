@@ -1,0 +1,134 @@
+.videochat {
+  --videochat-video-width: 300px;
+  --videochat-video-height: 230px;
+}
+
+.room-columns .videochat-field {
+  margin-right: 0.75rem !important;
+  margin-top: 0rem !important;
+  margin-left: 0rem !important;
+  margin-bottom: 0.5rem !important;
+  width: var(--videochat-video-width);
+  overflow-y: visible;
+  overflow-x: hidden;
+}
+
+.room-columns .videochat-field:last-child {
+  margin-right: 0rem !important;
+}
+
+.room-columns .videochat-field-main {
+  flex: 1;
+  padding: 0rem !important;
+  overflow-y: hidden;
+}
+
+.videochat {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.videochat-field.fullscreen .videochat {
+  flex-direction: row;
+}
+
+.videochat-ai-assistant {
+  width: var(--videochat-video-width);
+  height: var(--videochat-video-height);
+}
+
+.videochat-participants {
+  width: 100%;
+  text-align: left;
+  padding-bottom: 0.25rem;
+}
+
+.videochat-participant-viewer-wrapper {
+  width: var(--videochat-video-width);
+  padding: 0.25rem 0rem;
+}
+
+.videochat-participant-viewer {
+  display: flex;
+  border: 1px solid var(--button-border-color);
+  border-radius: 1.25rem;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  height: 1.5rem;
+  animation: var(--fadeIn-animation);
+}
+
+.videochat-participant-viewer .icon {
+  font-size: 1.25rem;
+}
+
+.videochat-participant-viewer .user-avatar {
+  margin-right: 0.5rem !important;
+}
+
+.videochat-participant {
+  position: relative;
+  width: var(--videochat-video-width);
+  height: var(--videochat-video-height);
+  margin-bottom: 0.5rem;
+  animation: var(--fadeIn-animation);
+}
+
+.videochat-field.fullscreen .videochat-participant {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.videochat-participant .icon {
+  font-size: 1.5rem !important;
+}
+
+.videochat-participant-big {
+  width: var(--videochat-video-width);
+  height: var(--videochat-video-height);
+}
+
+.videochat-caption {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+}
+
+.videochat-switch-buttons button:last-child {
+  margin-right: 0rem;
+}
+
+.videochat-overlay {
+  position: absolute;
+  background-color: color-mix(in srgb, var(--form-bg), transparent 15%);
+  z-index: 1;
+}
+
+.videochat-participant-name {
+  display: flex;
+  align-items: center;
+  bottom: 1rem;
+  right: 0.5rem;
+}
+
+.videochat-participant-reactions {
+  display: flex;
+  align-items: center;
+  bottom: 2.95rem;
+  right: 0.5rem;
+}
+
+.videochat .user-avatar {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.25rem;
+}
+
+.videochat-video {
+  width: 100%;
+  height: 100%;
+  border-radius: 1.25rem;
+}

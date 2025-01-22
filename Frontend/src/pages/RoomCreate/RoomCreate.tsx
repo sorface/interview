@@ -37,6 +37,7 @@ import { Button } from '../../components/Button/Button';
 import { padTime } from '../../utils/padTime';
 import { Category } from '../../types/category';
 
+const aiRoom = true;
 const nameFieldName = 'roomName';
 const dateFieldName = 'roomDate';
 const startTimeFieldName = 'roomStartTime';
@@ -94,6 +95,12 @@ const formatDuration = (durationSec: number) => {
   const hours = Math.floor(durationSec / (60 * 60));
   const minutes = Math.floor((durationSec / 60) % 60);
   return `${padTime(hours)}:${padTime(minutes)}`;
+};
+
+const getNextHourDate = () => {
+  const currDate = new Date();
+  currDate.setHours(currDate.getHours() + 1);
+  return currDate;
 };
 
 enum CreationStep {
@@ -166,8 +173,8 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     name: '',
     categoryId: '',
     date: formatDate(new Date()),
-    startTime: '',
-    endTime: '',
+    startTime: aiRoom ? formatTime(new Date()) : '',
+    endTime: aiRoom ? formatTime(getNextHourDate()) : '',
   });
   const parsedRoomDate = parseRoomDate(roomFields);
   const [creationStep, setCreationStep] = useState<CreationStep>(
@@ -234,6 +241,9 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
   }, [createdRoom, editedRoom, fetchRoomInvites]);
 
   const getUiError = () => {
+    if (!roomFields.categoryId) {
+      return localizationCaptions[LocalizationKey.EmptyRoomCategoryError];
+    }
     if (!roomFields.name) {
       return localizationCaptions[LocalizationKey.EmptyRoomNameError];
     }
@@ -354,56 +364,60 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         </RoomCreateField.Wrapper>
         <div className="px-1">
           <Typography size="s">
-            {localizationCaptions[LocalizationKey.RoomNamePrompt]}
+            {localizationCaptions[aiRoom ? LocalizationKey.RoomNamePromptAi : LocalizationKey.RoomNamePrompt]}
           </Typography>
         </div>
-        <Gap sizeRem={1.5} />
-        <RoomCreateField.Wrapper>
-          <RoomCreateField.Label>
-            <label htmlFor="roomDate">
-              <Typography size="m" bold>
-                {localizationCaptions[LocalizationKey.RoomDateAndTime]}
-              </Typography>
-            </label>
-          </RoomCreateField.Label>
-          <RoomCreateField.Content className="flex items-center">
-            <input
-              id="roomDate"
-              name={dateFieldName}
-              value={roomFields.date}
-              type="date"
-              required
-              className="mr-0.5"
-              onChange={handleChangeField('date')}
-            />
-            <input
-              id="roomTimeStart"
-              name={startTimeFieldName}
-              value={roomFields.startTime}
-              type="time"
-              required
-              className="mr-0.5"
-              onChange={handleChangeField('startTime')}
-            />
-            <span className="mr-0.5">
-              <Typography size="s">-</Typography>
-            </span>
-            <input
-              id="roomTimeEnd"
-              name={endTimeFieldName}
-              value={roomFields.endTime}
-              type="time"
-              onChange={handleChangeField('endTime')}
-            />
-            <Gap sizeRem={1.5} horizontal />
-            {!!roomFields.endTime && (
-              <Typography size="m">
-                {localizationCaptions[LocalizationKey.RoomDuration]}:{' '}
-                {formatDuration(parsedRoomDate.duration)}
-              </Typography>
-            )}
-          </RoomCreateField.Content>
-        </RoomCreateField.Wrapper>
+        {!aiRoom && (
+          <>
+            <Gap sizeRem={1.5} />
+            <RoomCreateField.Wrapper>
+              <RoomCreateField.Label>
+                <label htmlFor="roomDate">
+                  <Typography size="m" bold>
+                    {localizationCaptions[LocalizationKey.RoomDateAndTime]}
+                  </Typography>
+                </label>
+              </RoomCreateField.Label>
+              <RoomCreateField.Content className="flex items-center">
+                <input
+                  id="roomDate"
+                  name={dateFieldName}
+                  value={roomFields.date}
+                  type="date"
+                  required
+                  className="mr-0.5"
+                  onChange={handleChangeField('date')}
+                />
+                <input
+                  id="roomTimeStart"
+                  name={startTimeFieldName}
+                  value={roomFields.startTime}
+                  type="time"
+                  required
+                  className="mr-0.5"
+                  onChange={handleChangeField('startTime')}
+                />
+                <span className="mr-0.5">
+                  <Typography size="s">-</Typography>
+                </span>
+                <input
+                  id="roomTimeEnd"
+                  name={endTimeFieldName}
+                  value={roomFields.endTime}
+                  type="time"
+                  onChange={handleChangeField('endTime')}
+                />
+                <Gap sizeRem={1.5} horizontal />
+                {!!roomFields.endTime && (
+                  <Typography size="m">
+                    {localizationCaptions[LocalizationKey.RoomDuration]}:{' '}
+                    {formatDuration(parsedRoomDate.duration)}
+                  </Typography>
+                )}
+              </RoomCreateField.Content>
+            </RoomCreateField.Wrapper>
+          </>
+        )}
         <Gap sizeRem={2} />
 
         <RoomCreateField.Wrapper className="w-full max-w-15.75">
