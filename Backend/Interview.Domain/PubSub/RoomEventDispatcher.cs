@@ -16,6 +16,7 @@ public class RoomEventDispatcher(IEventBusPublisherFactory publisherFactory) : I
         {
             Event = eventAsBytes,
         };
+
         await publisher.PublishAsync(new EventBusRoomEventKey(@event.RoomId), sendAllInRoomEventBusEvent, cancellationToken);
 
         if (@event.Stateful)
