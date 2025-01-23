@@ -110,7 +110,7 @@ public class CategoryService(AppDbContext db, ArchiveService<Category> archiveSe
         return await db.Categories
             .AsNoTracking()
             .Where(filter)
-            .OrderBy(e => e.Name)
+            .OrderBy(e => e.Order)
             .Select(CategoryResponse.Mapper.Expression)
             .ToPagedListAsync(request.Page.PageNumber, request.Page.PageSize, cancellationToken);
 

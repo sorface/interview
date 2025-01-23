@@ -113,11 +113,13 @@ public class QuestionService(
             Category = result.CategoryId is not null ?
                 await db.Categories.AsNoTracking()
                     .Where(e => e.Id == result.CategoryId)
-                    .Select(e => new CategoryResponse
+                    .OrderBy(e => e.Order)
+                    .Select(selector: e => new CategoryResponse
                     {
                         Id = e.Id,
                         Name = e.Name,
                         ParentId = e.ParentId,
+                        Order = e.Order,
                     })
                     .FirstOrDefaultAsync(cancellationToken)
                 : null,
@@ -335,6 +337,7 @@ public class QuestionService(
                     Id = category.Id,
                     Name = category.Name,
                     ParentId = category.ParentId,
+                    Order = category.Order,
                 }
                 : null,
             Answers = entity.Answers.Select(q => new QuestionAnswerResponse
