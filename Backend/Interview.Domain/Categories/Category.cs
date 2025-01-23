@@ -12,6 +12,8 @@ public class Category : ArchiveEntity
 
     public Guid? ParentId { get; set; }
 
+    public int Order { get; set; }
+
     public Category? Parent { get; set; }
 
     public List<Question> Questions { get; set; } = [];

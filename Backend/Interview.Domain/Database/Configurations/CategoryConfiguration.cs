@@ -15,5 +15,8 @@ public class CategoryConfiguration : EntityTypeConfigurationBase<Category>
             .WithMany()
             .HasForeignKey(e => e.ParentId)
             .IsRequired(false);
+        builder.Property(e => e.Order)
+            .HasDefaultValue(0)
+            .IsRequired();
     }
 }
