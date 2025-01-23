@@ -18,7 +18,9 @@ namespace Interview.Migrations.Postgres.Migrations
                 defaultValue: 0);
 
             migrationBuilder.Sql(@"WITH OrderedCategories AS (
-    SELECT ""Id"", ROW_NUMBER() OVER (ORDER BY ""Name"") AS new_order
+    SELECT
+        ""Id"",
+        ROW_NUMBER() OVER (PARTITION BY ""ParentId"" ORDER BY ""Name"") AS new_order
     FROM ""Categories""
 )
 UPDATE ""Categories""
