@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext } from 'react';
+import React, { FunctionComponent, useContext } from 'react';
 import { Theme, ThemeContext } from '../../context/ThemeContext';
 import { ToggleSwitch } from '../ToggleSwitch/ToggleSwitch';
 

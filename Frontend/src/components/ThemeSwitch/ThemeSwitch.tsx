@@ -1,4 +1,8 @@
-import { ChangeEventHandler, FunctionComponent, useContext } from 'react';
+import React, {
+  ChangeEventHandler,
+  FunctionComponent,
+  useContext,
+} from 'react';
 import { Theme, ThemeContext } from '../../context/ThemeContext';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
@@ -29,7 +33,7 @@ export const ThemeSwitch: FunctionComponent = () => {
         value={themeInSetting}
         onChange={handleThemeChange}
       >
-        {Object.entries(Theme)?.map(([_, themeValue]) => (
+        {Object.entries(Theme)?.map(([, themeValue]) => (
           <option key={themeValue} value={themeValue}>
             {themeLocalization[themeValue]}
           </option>

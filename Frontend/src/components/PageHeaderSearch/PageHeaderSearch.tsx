@@ -1,4 +1,4 @@
-import { ChangeEventHandler, FunctionComponent, useState } from 'react';
+import React, { ChangeEventHandler, FunctionComponent, useState } from 'react';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { Button } from '../Button/Button';

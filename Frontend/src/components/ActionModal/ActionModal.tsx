@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useState } from 'react';
+import React, { FunctionComponent, useCallback, useState } from 'react';
 import Modal from 'react-modal';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';

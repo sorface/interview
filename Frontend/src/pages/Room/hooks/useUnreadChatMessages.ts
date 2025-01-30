@@ -34,7 +34,9 @@ export const useUnreadChatMessages = ({
       setLastReadMessageId(lastWsMessageParsed.Id);
       unreadChatMessagesRef.current++;
       setUnreadChatMessages(unreadChatMessagesRef.current);
-    } catch {}
+    } catch (err) {
+      console.warn(err);
+    }
   }, [
     lastWsMessageParsed,
     messagesChatEnabled,

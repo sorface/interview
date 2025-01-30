@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import React, { FunctionComponent } from 'react';
 import { Room } from '../../types/room';
 import { UserAvatar } from '../UserAvatar/UserAvatar';
 import { useParticipantTypeLocalization } from '../../hooks/useParticipantTypeLocalization';

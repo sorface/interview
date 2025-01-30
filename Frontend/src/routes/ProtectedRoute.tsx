@@ -4,7 +4,7 @@ import { pathnames } from '../constants';
 
 type PrivateRouteProps = RouteProps & {
   allowed: boolean;
-  children: ReactElement<any, any> | null;
+  children: ReactElement | null;
 };
 
 export const ProtectedRoute: FunctionComponent<PrivateRouteProps> = ({

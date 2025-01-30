@@ -1,4 +1,4 @@
-import { FunctionComponent, memo } from 'react';
+import React, { FunctionComponent, memo } from 'react';
 import { Environment, useTexture } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { AiAssistant } from './AiAssistant';
@@ -41,8 +41,11 @@ const AiAssistantExperienceComponent: FunctionComponent<
         scale={2}
         speaking={welcomeMessage}
       />
+      {/* eslint-disable-next-line react/no-unknown-property */}
       <mesh position={[0, 0, 0.25]}>
+        {/* eslint-disable-next-line react/no-unknown-property */}
         <planeGeometry args={[viewport.width, viewport.height]} />
+        {/* eslint-disable-next-line react/no-unknown-property */}
         <meshBasicMaterial map={texture} />
       </mesh>
     </>

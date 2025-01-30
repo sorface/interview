@@ -105,12 +105,16 @@ export const useVideoChat = ({
       }
 
       const streams: MediaStream[] = [];
-      userAudioStream && streams.push(userAudioStream);
+      if (userAudioStream) {
+        streams.push(userAudioStream);
+      }
       // ScreenShare
       // if (screenShare) {
       //   screenStream && streams.push(screenStream);
       // } else {
-      userVideoStream && streams.push(userVideoStream);
+      if (userVideoStream) {
+        streams.push(userVideoStream);
+      }
       // }
 
       const peer = new Peer({
@@ -203,8 +207,12 @@ export const useVideoChat = ({
     ) => {
       const streams: MediaStream[] = [];
       if (!screenShare) {
-        userAudioStream && streams.push(userAudioStream);
-        userVideoStream && streams.push(userVideoStream);
+        if (userAudioStream) {
+          streams.push(userAudioStream);
+        }
+        if (userVideoStream) {
+          streams.push(userVideoStream);
+        }
       }
 
       const peer = new Peer({
@@ -242,7 +250,7 @@ export const useVideoChat = ({
       // const screenShare = !!(parsedPayload?.ScreenShare);
       const screenShare = false;
       switch (lastWsMessageParsed?.Type) {
-        case 'all users':
+        case 'all users': {
           lastWsMessageParsed.Value.forEach((userInChat) => {
             if (userInChat.Id === auth.id) {
               return;
@@ -272,7 +280,8 @@ export const useVideoChat = ({
           });
           setPeers([...peersRef.current]);
           break;
-        case 'user joined':
+        }
+        case 'user joined': {
           const fromUser = lastWsMessageParsed.Value.From;
           if (!viewerMode && fromUser.ParticipantType === 'Viewer') {
             const peer = createPeer(fromUser.Id, true);
@@ -375,7 +384,8 @@ export const useVideoChat = ({
           });
           setPeers([...peersRef.current]);
           break;
-        case 'user left':
+        }
+        case 'user left': {
           const leftUserId = lastWsMessageParsed.Value.Id;
           const leftUserPeer = peersRef.current.find(
             (p) => p.targetUserId === leftUserId,
@@ -394,7 +404,8 @@ export const useVideoChat = ({
             [louderUserId.current]: 2,
           });
           break;
-        case 'receiving returned signal':
+        }
+        case 'receiving returned signal': {
           const item = peersRef.current.find(
             (p) =>
               p.peerID === lastWsMessageParsed.Value.From &&
@@ -404,6 +415,7 @@ export const useVideoChat = ({
             item.peer.signal(lastWsMessageParsed.Value.Signal);
           }
           break;
+        }
         default:
           break;
       }
@@ -454,13 +466,14 @@ export const useVideoChat = ({
     }
     try {
       switch (lastWsMessageParsed?.Type) {
-        case 'user joined':
+        case 'user joined': {
           const fromUser = lastWsMessageParsed.Value.From;
           toast.success(
             `${fromUser.Nickname} ${localizationCaptions[LocalizationKey.UserConnectedToRoom]}`,
           );
           playJoinRoomSound();
           break;
+        }
         default:
           break;
       }
@@ -476,7 +489,9 @@ export const useVideoChat = ({
     try {
       userIdToAudioAnalyser.current[auth.id] =
         createAudioAnalyser(userAudioStream);
-    } catch {}
+    } catch (err) {
+      console.warn(err);
+    }
   }, [userAudioStream, auth?.id]);
 
   return {

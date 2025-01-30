@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useRef } from 'react';
+import React, { FunctionComponent, useEffect, useRef } from 'react';
 import { Loader } from '../../../../components/Loader/Loader';
 
 interface VideoChatVideoProps {
@@ -64,7 +64,7 @@ export const VideoChatVideo: FunctionComponent<VideoChatVideoProps> = ({
           ref={refVideo}
           className={`videochat-video relative ${cover ? 'object-cover' : ''}`}
         />
-        <audio playsInline autoPlay ref={refAudio} />
+        <audio autoPlay ref={refAudio} />
       </>
     </>
   );

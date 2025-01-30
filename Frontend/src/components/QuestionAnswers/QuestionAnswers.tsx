@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { CodeEditorLang, Question, QuestionAnswer } from '../../types/question';
 import { Button } from '../Button/Button';
 import { Typography } from '../Typography/Typography';
