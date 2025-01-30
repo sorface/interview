@@ -1,4 +1,9 @@
-import { ChangeEvent, FunctionComponent, useEffect, useState } from 'react';
+import React, {
+  ChangeEvent,
+  FunctionComponent,
+  useEffect,
+  useState,
+} from 'react';
 import { IconNames } from '../../../../constants';
 import { Icon } from '../Icon/Icon';
 

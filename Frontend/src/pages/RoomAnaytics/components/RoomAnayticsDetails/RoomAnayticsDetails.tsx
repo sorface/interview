@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext, useState } from 'react';
+import React, { FunctionComponent, useContext, useState } from 'react';
 import { ReviewUserGrid } from '../ReviewUserGrid/ReviewUserGrid';
 import { Analytics, AnalyticsUserReview } from '../../../../types/analytics';
 import { ReviewUserOpinion } from '../ReviewUserOpinion/ReviewUserOpinion';
@@ -29,10 +29,8 @@ export const RoomAnayticsDetails: FunctionComponent<
 
   return (
     <div>
-      <div className='w-full text-left'>
-        <Typography size='m'>
-          {openedQuestion?.value || ''}
-        </Typography>
+      <div className="w-full text-left">
+        <Typography size="m">{openedQuestion?.value || ''}</Typography>
       </div>
       <Gap sizeRem={1.25} />
       <SwitcherButton

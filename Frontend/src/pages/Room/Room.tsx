@@ -1,4 +1,4 @@
-import {
+import React, {
   FunctionComponent,
   useCallback,
   useContext,
@@ -25,7 +25,7 @@ import {
   roomsApiDeclaration,
 } from '../../apiDeclarations';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
-import { REACT_APP_WS_URL } from '../../config';
+import { VITE_WS_URL } from '../../config';
 import { EventName, inviteParamName, pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
@@ -83,7 +83,7 @@ const getCloseRedirectLink = (roomId: string, currentUserExpert: boolean) => {
 export const Room: FunctionComponent = () => {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
-  let { id } = useParams();
+  const { id } = useParams();
   const { [inviteParamName]: inviteParam } = useParams();
 
   const {
@@ -379,7 +379,7 @@ export const Room: FunctionComponent = () => {
     try {
       const parsedData = JSON.parse(lastMessage?.data);
       switch (parsedData?.Type) {
-        case 'ChatMessage':
+        case 'ChatMessage': {
           const message = parsedData?.Value?.Message;
           const nickname = parsedData?.Value?.Nickname;
           if (typeof message !== 'string') {
@@ -390,7 +390,8 @@ export const Room: FunctionComponent = () => {
           }
           playChatMessageSound();
           break;
-        case 'ChangeRoomStatus':
+        }
+        case 'ChangeRoomStatus': {
           const newStatus: RoomType['status'] = 'New';
           const reviewStatus: RoomType['status'] = 'Review';
           if (parsedData?.Value === reviewStatus) {
@@ -400,6 +401,7 @@ export const Room: FunctionComponent = () => {
             setReactionsVisible(true);
           }
           break;
+        }
         case 'ChangeRoomQuestionState':
           if (parsedData.Value.NewState !== 'Active') {
             break;

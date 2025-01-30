@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useReducer } from 'react';
-import { REACT_APP_BACKEND_URL } from '../config';
+import { VITE_BACKEND_URL } from '../config';
 import { pathnames, HttpResponseCode } from '../constants';
 import { ApiContract } from '../types/apiContracts';
 import { useLogout } from './useLogout';
 import { useNavigate } from 'react-router-dom';
+import { AnyObject } from '../types/anyObject';
 
-interface ApiMethodState<ResponseData = any> {
+interface ApiMethodState<ResponseData = AnyObject | string> {
   process: {
     loading: boolean;
     code: number | null;
@@ -29,7 +30,7 @@ type ApiMethodAction =
     }
   | {
       name: 'setData';
-      payload: any;
+      payload: AnyObject | string;
     }
   | {
       name: 'setError';
@@ -100,9 +101,9 @@ const createFetchUrl = (apiContract: ApiContract) => {
         return createUrlParam(paramName, paramValue);
       })
       .join('&');
-    return `${REACT_APP_BACKEND_URL}${apiContract.baseUrl}?${params}`;
+    return `${VITE_BACKEND_URL}${apiContract.baseUrl}?${params}`;
   }
-  return `${REACT_APP_BACKEND_URL}${apiContract.baseUrl}`;
+  return `${VITE_BACKEND_URL}${apiContract.baseUrl}`;
 };
 
 const createFetchRequestInit = (apiContract: ApiContract) => {
@@ -123,8 +124,6 @@ const createFetchRequestInit = (apiContract: ApiContract) => {
     body: JSON.stringify(apiContract.body),
   };
 };
-
-type AnyObject = Record<string, any>;
 
 const getResponseContent = async (
   response: Response,
@@ -192,12 +191,13 @@ export const useApiMethod = <ResponseData, RequestData = AnyObject>(
           throw new Error(errorMessage);
         }
         dispatch({ name: 'setData', payload: responseData });
-      } catch (err: any) {
+      } catch (err: unknown) {
         dispatch({
           name: 'setError',
           payload:
-            err.message ||
-            `Failed to fetch ${apiContract.method} ${apiContract.baseUrl}`,
+            err instanceof Error
+              ? err.message
+              : `Failed to fetch ${apiContract.method} ${apiContract.baseUrl}`,
         });
       }
     },

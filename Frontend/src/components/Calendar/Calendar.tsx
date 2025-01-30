@@ -1,4 +1,4 @@
-import { Fragment, FunctionComponent, useContext } from 'react';
+import React, { Fragment, FunctionComponent, useContext } from 'react';
 import { LocalizationContext } from '../../context/LocalizationContext';
 import { CalendarDay } from './CalendarDay';
 import { Typography } from '../Typography/Typography';
@@ -7,6 +7,8 @@ import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';
 import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme } from '../../context/ThemeContext';
+import { unshiftNull } from '../../utils/unshiftNull';
+import { chunkArray } from '../../utils/chunkArray';
 
 interface CalendarProps {
   loading: boolean;
@@ -39,19 +41,6 @@ const getWeekDays = (locale: string) => {
     baseDate.setDate(baseDate.getDate() + 1);
   }
   return weekDays;
-};
-
-const chunkArray = <T extends any>(array: T[], chunkSize: number) => {
-  const chunks: T[][] = [];
-  for (let i = 0; i < array.length; i += chunkSize) {
-    chunks.push(array.slice(i, i + chunkSize));
-  }
-  return chunks;
-};
-
-const unshiftNull = <T extends any>(array: T[], count: number) => {
-  const nullArray = Array.from({ length: count }).map(() => null);
-  return [...nullArray, ...array];
 };
 
 export const Calendar: FunctionComponent<CalendarProps> = ({

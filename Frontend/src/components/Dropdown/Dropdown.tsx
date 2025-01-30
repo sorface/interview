@@ -1,4 +1,4 @@
-import {
+import React, {
   FunctionComponent,
   ReactNode,
   useEffect,
@@ -41,7 +41,7 @@ export const Dropdown: FunctionComponent<DropdownProps> = ({
         return;
       }
       const containerRefTarget = containerRef.current?.contains(
-        e.target as any,
+        e.target as HTMLElement,
       );
       if (!containerRefTarget) {
         setOpen(false);

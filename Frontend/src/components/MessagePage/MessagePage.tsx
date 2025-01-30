@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactNode } from 'react';
+import React, { FunctionComponent, ReactNode } from 'react';
 import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';
 

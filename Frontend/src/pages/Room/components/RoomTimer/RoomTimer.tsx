@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { Icon } from '../Icon/Icon';
 import { IconNames } from '../../../../constants';
 import { Gap } from '../../../../components/Gap/Gap';

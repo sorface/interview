@@ -1,5 +1,5 @@
 import { useCallback, useReducer } from 'react';
-import { REACT_APP_BACKEND_URL } from '../config';
+import { VITE_BACKEND_URL } from '../config';
 import { User } from '../types/user';
 
 interface GetMeState {
@@ -85,7 +85,7 @@ export const useGetMeApi = () => {
   const loadMe = useCallback(async () => {
     dispatch({ name: 'startLoad' });
     try {
-      const response = await fetch(`${REACT_APP_BACKEND_URL}/users/self`, {
+      const response = await fetch(`${VITE_BACKEND_URL}/users/self`, {
         credentials: 'include',
       });
       dispatch({
@@ -97,10 +97,10 @@ export const useGetMeApi = () => {
       }
       const responseJson = await response.json();
       dispatch({ name: 'setUser', payload: responseJson });
-    } catch (err: any) {
+    } catch (err: unknown) {
       dispatch({
         name: 'setError',
-        payload: err.message || 'Failed to get me',
+        payload: err instanceof Error ? err.message : 'Failed to get me',
       });
     }
   }, []);
