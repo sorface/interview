@@ -71,7 +71,7 @@ import { AiAssistantScriptName } from './components/AiAssistant/AiAssistant';
 import './Room.css';
 
 const connectingReadyState = 0;
-const aiMode = true;
+const aiMode = false;
 
 const getCloseRedirectLink = (roomId: string, currentUserExpert: boolean) => {
   if (currentUserExpert) {

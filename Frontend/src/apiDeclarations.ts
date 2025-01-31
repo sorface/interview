@@ -26,7 +26,8 @@ export interface PaginationUrlParams {
 
 export interface CreateRoomBody {
   name: string;
-  questions: Array<{ id: Question['id']; order: number }>;
+  questions?: Array<{ id: Question['id']; order: number }> | null;
+  categoryId?: Category['id'] | null;
   experts: Array<User['id']>;
   examinees: Array<User['id']>;
   tags: Array<Tag['id']>;
@@ -68,7 +69,8 @@ export interface RoomIdParam {
 export interface RoomEditBody {
   id: string;
   name: string;
-  questions: Array<Omit<RoomQuestion, 'state'>>;
+  questions?: Array<Omit<RoomQuestion, 'state'>> | null;
+  categoryId?: Category['id'] | null;
   scheduleStartTime: Room['scheduledStartTime'];
   durationSec?: number;
 }
