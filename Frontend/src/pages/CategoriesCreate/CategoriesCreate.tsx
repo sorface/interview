@@ -28,6 +28,7 @@ import { Category } from '../../types/category';
 import './CategoriesCreate.css';
 
 const nameFieldName = 'categoryName';
+const orderFieldName = 'categoryOrder';
 
 export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
   edit,
@@ -75,6 +76,7 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
   let { id } = useParams();
   const [categoryName, setCategoryName] = useState('');
   const [categoryParent, setCategoryParent] = useState('');
+  const [categoryOrder, setCategoryOrder] = useState(0);
 
   const totalLoading =
     loading || updatingLoading || categoryLoading || parentCategoriesLoading;
@@ -97,6 +99,7 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
     }
     setCategoryName(category.name);
     setCategoryParent(category.parentId);
+    setCategoryOrder(category.order);
   }, [category]);
 
   useEffect(() => {
@@ -136,6 +139,10 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
     setCategoryParent(e.target.value);
   };
 
+  const handleCategoryOrderChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setCategoryOrder(+event.target.value);
+  };
+
   const handleSubmitCreate = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -143,9 +150,10 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
       fetchCreateCategory({
         name: categoryName,
         parentId: categoryParent || null,
+        order: categoryOrder,
       });
     },
-    [categoryName, categoryParent, fetchCreateCategory],
+    [categoryName, categoryParent, categoryOrder, fetchCreateCategory],
   );
 
   const handleSubmitEdit = useCallback(
@@ -158,9 +166,10 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
         id: category.id,
         name: categoryName,
         parentId: categoryParent,
+        order: categoryOrder,
       });
     },
-    [category, categoryName, categoryParent, fetchUpdateCategory],
+    [category, categoryName, categoryParent, categoryOrder, fetchUpdateCategory],
   );
 
   const renderStatus = () => {
@@ -228,6 +237,20 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
               </option>
             ))}
           </select>
+        </Field>
+        <Field>
+          <div>
+            <label htmlFor="order">
+              {localizationCaptions[LocalizationKey.CategoryOrder]}:
+            </label>
+          </div>
+          <input
+            id="order"
+            name={orderFieldName}
+            type="number"
+            value={categoryOrder}
+            onChange={handleCategoryOrderChange}
+          />
         </Field>
         <SubmitField caption={localizationCaptions[LocalizationKey.Create]} />
       </form>
