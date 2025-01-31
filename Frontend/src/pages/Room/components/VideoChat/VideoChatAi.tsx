@@ -150,7 +150,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
       return;
     }
     const newTextMessages = [
-      ...getChatMessageEvents(roomEventsSearch, 'ChatMessage', true),
+      ...getChatMessageEvents(roomEventsSearch, 'ChatMessage'),
       {
         id: randomId(),
         userId: randomId(),
