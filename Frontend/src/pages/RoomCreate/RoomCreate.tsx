@@ -118,6 +118,7 @@ type RoomFields = {
   date: string;
   startTime: string;
   endTime: string;
+  categoryId: string;
 };
 
 interface RoomCreateProps {
@@ -167,6 +168,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     date: formatDate(new Date()),
     startTime: aiRoom ? formatTime(new Date()) : '',
     endTime: aiRoom ? formatTime(getNextHourDate()) : '',
+    categoryId: '',
   });
   const parsedRoomDate = parseRoomDate(roomFields);
   const [selectedQuestions, setSelectedQuestions] = useState<
@@ -231,7 +233,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
   }, [createdRoom, editedRoom, fetchRoomInvites]);
 
   const getUiError = () => {
-    if (!roomFields.categoryId) {
+    if (aiRoom && !roomFields.categoryId) {
       return localizationCaptions[LocalizationKey.EmptyRoomCategoryError];
     }
     if (!roomFields.name) {

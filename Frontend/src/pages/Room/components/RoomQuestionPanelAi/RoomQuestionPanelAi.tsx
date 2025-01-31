@@ -1,4 +1,4 @@
-import {
+import React, {
   FunctionComponent,
   useCallback,
   useContext,
@@ -303,7 +303,7 @@ export const RoomQuestionPanelAi: FunctionComponent<RoomQuestionPanelAiProps> = 
   const addNextQuestionContext = useCallback((message: string) => {
     const normalizedWords = normalizeWords(message.trim().split(' '));
     const questionsWithTags: Question[] = [];
-    for (let word of normalizedWords) {
+    for (const word of normalizedWords) {
       questionsWithTags.push(...findQuestionsWithTag(word));
     }
     setNextQuestionsMap((oldNextQuestionsMap) => {

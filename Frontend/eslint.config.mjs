@@ -11,6 +11,6 @@ export default [
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
   {
-    ignores: ['src/setupProxy.js', 'dist', 'node_modules'],
+    ignores: ['src/setupProxy.js', 'build', 'node_modules', 'coverage'],
   },
 ];

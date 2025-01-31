@@ -1,4 +1,4 @@
-import {
+import React, {
   FunctionComponent,
   useContext,
   useEffect,
@@ -56,7 +56,6 @@ interface VideoChatAiProps {
 const getChatMessageEvents = (
   roomEventsSearch: EventsSearch,
   type: string,
-  toChat: boolean,
 ) => {
   const roomEvents = roomEventsSearch[type];
   if (!roomEvents) {

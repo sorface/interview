@@ -353,7 +353,9 @@ export const Room: FunctionComponent = () => {
         default:
           break;
       }
-    } catch { }
+    } catch (err) {
+      console.error(err);
+    }
   }, [lastWsMessageParsed]);
 
   useEffect(() => {
@@ -420,7 +422,9 @@ export const Room: FunctionComponent = () => {
         default:
           break;
       }
-    } catch { }
+    } catch (err) {
+      console.error(err);
+    }
   }, [id, auth, lastMessage, playChatMessageSound, updateQuestions]);
 
   useEffect(() => {

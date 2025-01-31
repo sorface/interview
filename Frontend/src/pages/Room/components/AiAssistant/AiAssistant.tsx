@@ -245,13 +245,19 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
   return (
     <mesh
       ref={meshRef}
+      // eslint-disable-next-line react/no-unknown-property
       position={[0, -0.5, -6]}
     >
+      {/* eslint-disable-next-line react/no-unknown-property */}
       <icosahedronGeometry args={[2, 16]} />
       <shaderMaterial
+        // eslint-disable-next-line react/no-unknown-property
         wireframe
+        // eslint-disable-next-line react/no-unknown-property
         uniforms={uniformsRef.current}
+        // eslint-disable-next-line react/no-unknown-property
         vertexShader={vertexshader}
+        // eslint-disable-next-line react/no-unknown-property
         fragmentShader={fragmentshader}
       />
     </mesh>
