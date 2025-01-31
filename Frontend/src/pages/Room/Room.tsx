@@ -112,7 +112,7 @@ export const Room: FunctionComponent = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [lastVoiceRecognition, setLastVoiceRecognition] = useState('');
   const [aiAssistantCurrentScript, setAiAssistantCurrentScript] = useState<AiAssistantScriptName>(AiAssistantScriptName.Idle);
-  const socketUrl = `${REACT_APP_WS_URL}/ws?roomId=${id}`;
+  const socketUrl = `${VITE_WS_URL}/ws?roomId=${id}`;
   const checkWebSocketReadyToConnect = () => {
     if (!inviteParam) {
       return true;
