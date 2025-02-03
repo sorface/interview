@@ -82,7 +82,7 @@ export const RoomQuestionsSelector: FunctionComponent<
     rootCategoriesLoading || subCategoriesLoading || questionsLoading;
   const totalError =
     rootCategoriesError || subCategoriesError || questionsError;
-  const triggerResetAccumData = `${inputQuestionValue}${rootCategory}${subCategory}`;
+  const triggerResetAccumData = `${debounced}${rootCategory}${subCategory}`;
 
   useEffect(() => {
     fetchRootCategories({
