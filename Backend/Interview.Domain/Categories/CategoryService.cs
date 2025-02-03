@@ -44,11 +44,14 @@ public class CategoryService(AppDbContext db, ArchiveService<Category> archiveSe
             return error;
         }
 
+        await ShiftCategoriesOrderAsync(request.ParentId, request.Order, cancellationToken);
+
         request.Name = request.Name!.Trim();
         var category = new Category
         {
             Name = request.Name,
             ParentId = request.ParentId,
+            Order = request.Order,
         };
         await db.Categories.AddAsync(category, cancellationToken);
         await db.SaveChangesAsync(cancellationToken);
@@ -71,6 +74,7 @@ public class CategoryService(AppDbContext db, ArchiveService<Category> archiveSe
             return ServiceError.NotFound($"Not found category by id '{id}'");
         }
 
+        var initialDbOrder = category.Order;
         if (request.ParentId is not null)
         {
             if (request.ParentId == id)
@@ -87,7 +91,14 @@ public class CategoryService(AppDbContext db, ArchiveService<Category> archiveSe
 
         category.Name = request.Name;
         category.ParentId = request.ParentId;
+        category.Order = request.Order;
+        if (request.Order != initialDbOrder)
+        {
+            await ShiftCategoriesOrderAsync(request.ParentId, request.Order, cancellationToken);
+        }
+
         await db.SaveChangesAsync(cancellationToken);
+
         var response = CategoryResponse.Mapper.Map(category);
         return ServiceResult.Ok(response);
     }
@@ -110,7 +121,8 @@ public class CategoryService(AppDbContext db, ArchiveService<Category> archiveSe
         return await db.Categories
             .AsNoTracking()
             .Where(filter)
-            .OrderBy(e => e.Name)
+            .OrderBy(e => e.ParentId)
+            .ThenBy(e => e.Order)
             .Select(CategoryResponse.Mapper.Expression)
             .ToPagedListAsync(request.Page.PageNumber, request.Page.PageSize, cancellationToken);
 
@@ -184,5 +196,24 @@ public class CategoryService(AppDbContext db, ArchiveService<Category> archiveSe
         }
 
         return Category.ValidateParentAsync(db, request.ParentId, cancellationToken);
+    }
+
+    private Task<int> ShiftCategoriesOrderAsync(Guid? parentId, int order, CancellationToken cancellationToken)
+    {
+        var spec = BuildSpecification(parentId) & new Spec<Category>(e => e.Order >= order);
+        return db.Categories
+            .Where(spec)
+            .ExecuteUpdateAsync(e => e.SetProperty(c => c.Order, c => c.Order + 1), cancellationToken);
+
+        ASpec<Category> BuildSpecification(Guid? parentId)
+        {
+            if (parentId is null)
+            {
+                return new Spec<Category>(e => e.ParentId == null);
+            }
+
+            var nonNullableParentId = parentId.Value;
+            return new Spec<Category>(e => e.ParentId == nonNullableParentId);
+        }
     }
 }

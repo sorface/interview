@@ -440,6 +440,7 @@ export const eventApiDeclaration = {
 export interface CreateCategoryBody {
   name: string;
   parentId: string | null;
+  order: number;
 }
 
 export interface UpdateCategoryBody extends CreateCategoryBody {

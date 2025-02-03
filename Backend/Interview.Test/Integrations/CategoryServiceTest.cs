@@ -169,9 +169,10 @@ public class CategoryServiceTest
         var result = await service.FindPageAsync(request, CancellationToken.None);
 
         result.Should().HaveCount(3);
-        result[0].Name.Should().Be("Test");
-        result[1].Name.Should().Be("Test parent 1");
-        result[2].Name.Should().Be("Test parent 2");
+        result.Should().HaveCount(3)
+            .And.ContainSingle(e => e.Name == "Test")
+            .And.ContainSingle(e => e.Name == "Test parent 1")
+            .And.ContainSingle(e => e.Name == "Test parent 2");
     }
 
     [Fact]
@@ -186,7 +187,7 @@ public class CategoryServiceTest
                 Name = "Test parent 1",
                 Parent = new Category
                 {
-                    Name = "Test parent 2"
+                    Name = "Test parent 2",
                 }
             }
         };
@@ -211,8 +212,8 @@ public class CategoryServiceTest
         };
         var result = await service.FindPageAsync(request, CancellationToken.None);
 
-        result.Should().HaveCount(2);
-        result[0].Name.Should().Be("Test parent 1");
-        result[1].Name.Should().Be("Test parent 2");
+        result.Should().HaveCount(2)
+            .And.ContainSingle(e => e.Name == "Test parent 1")
+            .And.ContainSingle(e => e.Name == "Test parent 2");
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Interview.Domain.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Interview.Migrations.Postgres.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250123123654_category_add_order")]
+    partial class category_add_order
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -403,9 +406,6 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasColumnType("integer")
                         .HasDefaultValue(0);
 
-                    b.Property<Guid?>("CategoryId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
 
@@ -429,8 +429,6 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
 
                     b.HasIndex("CreatedById");
 
@@ -1578,10 +1576,6 @@ namespace Interview.Migrations.Postgres.Migrations
 
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>
                 {
-                    b.HasOne("Interview.Domain.Categories.Category", null)
-                        .WithMany()
-                        .HasForeignKey("CategoryId");
-
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");

@@ -54,6 +54,11 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Order")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0);
+
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("TEXT");
 

@@ -14,7 +14,13 @@ public class QuestionItem
         Value = e.Value,
         Tags = e.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
         Category = e.Category != null
-            ? new CategoryResponse { Id = e.Category.Id, Name = e.Category.Name, ParentId = e.Category.ParentId, }
+            ? new CategoryResponse
+            {
+                Id = e.Category.Id,
+                Name = e.Category.Name,
+                ParentId = e.Category.ParentId,
+                Order = e.Category.Order,
+            }
             : null,
         Answers = e.Answers.Select(q => new QuestionAnswerResponse
         {
