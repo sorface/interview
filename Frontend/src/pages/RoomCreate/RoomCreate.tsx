@@ -44,7 +44,7 @@ import { SwitcherButton } from '../../components/SwitcherButton/SwitcherButton';
 import { DragNDropList } from '../../components/DragNDropList/DragNDropList';
 import { RoomQuestionsSelector } from './RoomQuestionsSelector/RoomQuestionsSelector';
 
-const aiRoom = true;
+const aiRoom = false;
 const nameFieldName = 'roomName';
 const dateFieldName = 'roomDate';
 const startTimeFieldName = 'roomStartTime';
