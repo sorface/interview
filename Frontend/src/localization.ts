@@ -120,6 +120,7 @@ export const enum LocalizationKey {
   CreateRoomStep2,
   RoomName,
   RoomNamePrompt,
+  RoomNamePromptAi,
   RoomDateAndTime,
   RoomQuestions,
   RoomSelectedQuestions,
@@ -202,9 +203,11 @@ export const enum LocalizationKey {
   AnswerDetails,
   QuestionAnswerDetails,
   EmptyRoomNameError,
+  EmptyRoomCategoryError,
   RoomEmptyStartTimeError,
   RoomStartTimeMustBeGreaterError,
   RoomEmptyQuestionsListError,
+  RoomEmptyCategoryError,
   InterviewHistoryTitle,
   RoomReviewSave,
   RoomReviewAlreadyGiven,
@@ -229,6 +232,10 @@ export const enum LocalizationKey {
   NotEnoughRights,
   WebcamBackgroundBlur,
   Feedback,
+  RateMeDescription,
+  RateMeCommand,
+  LetsBeginDescription,
+  LetsBeginCommand,
 }
 
 export const LocalizationCaptions: Record<
@@ -367,6 +374,8 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.RoomName]: 'Meeting name',
     [LocalizationKey.RoomNamePrompt]:
       'In the title, indicate the name of the candidate and the position for which the interview will be held',
+    [LocalizationKey.RoomNamePromptAi]:
+      'In the title, indicate the topics you want to cover',
     [LocalizationKey.RoomDateAndTime]: 'Date and time',
     [LocalizationKey.RoomQuestions]: 'Questions list',
     [LocalizationKey.RoomSelectedQuestions]: 'Selected questions',
@@ -457,12 +466,15 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.AnswerDetails]: 'Answer details',
     [LocalizationKey.QuestionAnswerDetails]: 'Question answer details',
     [LocalizationKey.EmptyRoomNameError]: 'Please provide the meeting name',
+    [LocalizationKey.EmptyRoomCategoryError]: 'Please provide the meeting category',
     [LocalizationKey.RoomEmptyStartTimeError]:
       'Please enter meeting start time',
     [LocalizationKey.RoomStartTimeMustBeGreaterError]:
       'Meeting start time must be greater than the current time',
     [LocalizationKey.RoomEmptyQuestionsListError]:
       'Please add questions to the list of questions',
+    [LocalizationKey.RoomEmptyCategoryError]:
+      'Please select a meeting category',
     [LocalizationKey.InterviewHistoryTitle]: 'Interview history',
     [LocalizationKey.RoomReviewAlreadyGiven]:
       'You have already given feedback on the interview. Waiting for evaluation from other participants.',
@@ -493,6 +505,10 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.NotEnoughRights]: 'Insufficient rights to view content',
     [LocalizationKey.WebcamBackgroundBlur]: 'Background blur',
     [LocalizationKey.Feedback]: 'Feedback',
+    [LocalizationKey.RateMeDescription]: 'At the end of your answer, say "{RateMeCommand}" and assistant will rate you.',
+    [LocalizationKey.RateMeCommand]: 'rate me',
+    [LocalizationKey.LetsBeginDescription]: 'To start an interview, say "{LetsStartCommand}".',
+    [LocalizationKey.LetsBeginCommand]: 'let\'s begin',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -625,6 +641,8 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.RoomName]: 'Имя встречи',
     [LocalizationKey.RoomNamePrompt]:
       'В названии укажите имя кандидата и должность, на которую пройдет собеседование',
+    [LocalizationKey.RoomNamePromptAi]:
+      'В названии укажите темы, которые хотите затронуть',
     [LocalizationKey.RoomDateAndTime]: 'Дата и время',
     [LocalizationKey.RoomQuestions]: 'Список вопросов',
     [LocalizationKey.RoomSelectedQuestions]: 'Выбрано вопросов',
@@ -716,12 +734,15 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.AnswerDetails]: 'Детали ответа',
     [LocalizationKey.QuestionAnswerDetails]: 'Детали ответа на вопрос',
     [LocalizationKey.EmptyRoomNameError]: 'Пожалуйста, укажите имя встречи',
+    [LocalizationKey.EmptyRoomCategoryError]: 'Пожалуйста, укажите категорию встречи',
     [LocalizationKey.RoomEmptyStartTimeError]:
       'Пожалуйста, укажите время начала встречи',
     [LocalizationKey.RoomStartTimeMustBeGreaterError]:
       'Время начала встречи должно быть больше текущего времени',
     [LocalizationKey.RoomEmptyQuestionsListError]:
       'Пожалуйста, добавьте вопросы в список вопросов',
+    [LocalizationKey.RoomEmptyCategoryError]:
+      'Пожалуйста, выберите категорию встречи',
     [LocalizationKey.InterviewHistoryTitle]: 'История собеседований',
     [LocalizationKey.RoomReviewAlreadyGiven]:
       'Вы уже дали отзыв о собеседовании. Ожидание оценки от остальных участников.',
@@ -755,5 +776,9 @@ export const LocalizationCaptions: Record<
       'Недостаточно прав для просмотра содержимого',
     [LocalizationKey.WebcamBackgroundBlur]: 'Размытие фона',
     [LocalizationKey.Feedback]: 'Обратная связь',
+    [LocalizationKey.RateMeDescription]: 'В конце ответа скажите "{RateMeCommand}" и ассистент оценит вас.',
+    [LocalizationKey.RateMeCommand]: 'оцени меня',
+    [LocalizationKey.LetsBeginDescription]: 'Для начала собеседования скажите "{LetsStartCommand}".',
+    [LocalizationKey.LetsBeginCommand]: 'давай начнём',
   },
 };

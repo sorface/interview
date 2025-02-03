@@ -264,6 +264,7 @@ csharp_space_between_square_brackets = false
 csharp_prefer_braces = true:silent
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = true
+dotnet_diagnostic.SA1101.severity=none
 dotnet_diagnostic.SA1206.severity=none
 dotnet_diagnostic.SA1201.severity=none
 dotnet_diagnostic.SA1401.severity=none

@@ -39,6 +39,7 @@ import {
 import { RoomQuestionPanel } from './components/RoomQuestionPanel/RoomQuestionPanel';
 import { ProcessWrapper } from '../../components/ProcessWrapper/ProcessWrapper';
 import { VideoChat } from './components/VideoChat/VideoChat';
+import { VideoChatAi } from './components/VideoChat/VideoChatAi';
 import { Link } from 'react-router-dom';
 import { EnterVideoChatModal } from './components/VideoChat/EnterVideoChatModal';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
@@ -65,10 +66,12 @@ import { RoomContext } from './context/RoomContext';
 import { useVideoChat } from './components/VideoChat/hoks/useVideoChat';
 import { useUserStreams } from './hooks/useUserStreams';
 import { useRoomSounds } from './hooks/useRoomSounds';
+import { AiAssistantScriptName } from './components/AiAssistant/AiAssistant';
 
 import './Room.css';
 
 const connectingReadyState = 0;
+const aiMode = false;
 
 const getCloseRedirectLink = (roomId: string, currentUserExpert: boolean) => {
   if (currentUserExpert) {
@@ -107,6 +110,8 @@ export const Room: FunctionComponent = () => {
   const [recognitionEnabled, setRecognitionEnabled] = useState(false);
   const [invitationsOpen, setInvitationsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [lastVoiceRecognition, setLastVoiceRecognition] = useState('');
+  const [aiAssistantCurrentScript, setAiAssistantCurrentScript] = useState<AiAssistantScriptName>(AiAssistantScriptName.Idle);
   const socketUrl = `${VITE_WS_URL}/ws?roomId=${id}`;
   const checkWebSocketReadyToConnect = () => {
     if (!inviteParam) {
@@ -130,6 +135,7 @@ export const Room: FunctionComponent = () => {
   const localizationCaptions = useLocalizationCaptions();
 
   const handleVoiceRecognition = (transcript: string) => {
+    setLastVoiceRecognition(transcript);
     sendMessage(
       JSON.stringify({
         Type: 'voice-recognition',
@@ -348,7 +354,7 @@ export const Room: FunctionComponent = () => {
           break;
       }
     } catch (err) {
-      console.warn(err);
+      console.error(err);
     }
   }, [lastWsMessageParsed]);
 
@@ -417,7 +423,7 @@ export const Room: FunctionComponent = () => {
           break;
       }
     } catch (err) {
-      console.warn(err);
+      console.error(err);
     }
   }, [id, auth, lastMessage, playChatMessageSound, updateQuestions]);
 
@@ -527,6 +533,7 @@ export const Room: FunctionComponent = () => {
         roomParticipant,
         roomState,
         viewerMode,
+        lastVoiceRecognition,
         lastWsMessageParsed,
         codeEditorEnabled,
         codeEditorLanguage,
@@ -534,8 +541,12 @@ export const Room: FunctionComponent = () => {
         videoOrder,
         peerToStream,
         allUsers,
+        aiAssistantScript: aiAssistantCurrentScript,
+        recognitionEnabled,
         sendWsMessage: sendMessage,
         setCodeEditorEnabled,
+        setAiAssistantCurrentScript,
+        setRecognitionEnabled,
       }}
     >
       <UserStreamsContext.Provider value={userStreams}>
@@ -593,94 +604,99 @@ export const Room: FunctionComponent = () => {
               >
                 <div className="room-page">
                   <div className="room-page-main">
-                    <div className="room-page-header justify-between">
-                      <div>
-                        <span
-                          className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
-                        >
-                          <Link
-                            to={pathnames.highlightRooms}
-                            className="no-underline"
+                    {aiMode && (
+                      <Gap sizeRem={0.75} />
+                    )}
+                    {!aiMode && (
+                      <div className="room-page-header justify-between">
+                        <div>
+                          <span
+                            className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
                           >
-                            <div className="room-page-header-wrapper flex items-center">
-                              <div className="w-2.375 pr-1">
-                                <img
-                                  className="w-2.375 h-2.375 rounded-0.375"
-                                  src="/logo192.png"
-                                  alt="site logo"
-                                />
+                            <Link
+                              to={pathnames.highlightRooms}
+                              className="no-underline"
+                            >
+                              <div className="room-page-header-wrapper flex items-center">
+                                <div className="w-2.375 pr-1">
+                                  <img
+                                    className="w-2.375 h-2.375 rounded-0.375"
+                                    src="/logo192.png"
+                                    alt="site logo"
+                                  />
+                                </div>
+                                <h3>{room?.name}</h3>
                               </div>
-                              <h3>{room?.name}</h3>
-                            </div>
-                          </Link>
-                        </span>
-                      </div>
-                      <div className="flex">
-                        {!!roomTimer?.startTime && (
-                          <>
-                            <RoomTimer
-                              durationSec={roomTimer.durationSec}
-                              startTime={roomTimer.startTime}
-                            />
-                            <Gap sizeRem={0.5} horizontal />
-                          </>
-                        )}
-                        <SwitcherButton
-                          items={[
-                            {
-                              id: 0,
-                              content: (
-                                <div className="flex items-center">
-                                  <div>
-                                    {localizationCaptions[LocalizationKey.Chat]}
+                            </Link>
+                          </span>
+                        </div>
+                        <div className="flex">
+                          {!!roomTimer?.startTime && (
+                            <>
+                              <RoomTimer
+                                durationSec={roomTimer.durationSec}
+                                startTime={roomTimer.startTime}
+                              />
+                              <Gap sizeRem={0.5} horizontal />
+                            </>
+                          )}
+                          <SwitcherButton
+                            items={[
+                              {
+                                id: 0,
+                                content: (
+                                  <div className="flex items-center">
+                                    <div>
+                                      {localizationCaptions[LocalizationKey.Chat]}
+                                    </div>
+                                    {!!unreadChatMessages && (
+                                      <>
+                                        <Gap sizeRem={0.5} horizontal />
+                                        <UnreadChatMessagesCounter
+                                          value={unreadChatMessages}
+                                        />
+                                      </>
+                                    )}
                                   </div>
-                                  {!!unreadChatMessages && (
-                                    <>
-                                      <Gap sizeRem={0.5} horizontal />
-                                      <UnreadChatMessagesCounter
-                                        value={unreadChatMessages}
-                                      />
-                                    </>
-                                  )}
-                                </div>
-                              ),
-                            },
-                            {
-                              id: 1,
-                              content: (
-                                <div className="flex items-center">
-                                  <div>
-                                    {
-                                      localizationCaptions[
+                                ),
+                              },
+                              {
+                                id: 1,
+                                content: (
+                                  <div className="flex items-center">
+                                    <div>
+                                      {
+                                        localizationCaptions[
                                         LocalizationKey.RoomParticipants
-                                      ]
-                                    }
+                                        ]
+                                      }
+                                    </div>
+                                    <Gap sizeRem={0.5} horizontal />
+                                    <div>{peers.length + 1}</div>
                                   </div>
-                                  <Gap sizeRem={0.5} horizontal />
-                                  <div>{peers.length + 1}</div>
-                                </div>
-                              ),
-                            },
-                          ]}
-                          activeIndex={messagesChatEnabled ? 0 : 1}
-                          variant="alternative"
-                          onClick={handleSwitchMessagesChat}
-                        />
+                                ),
+                              },
+                            ]}
+                            activeIndex={messagesChatEnabled ? 0 : 1}
+                            variant="alternative"
+                            onClick={handleSwitchMessagesChat}
+                          />
+                        </div>
                       </div>
-                    </div>
+                    )}
                     <div className="room-page-main-content">
                       <div className="room-columns">
                         {errorRoomState && (
                           <div>
                             {
                               localizationCaptions[
-                                LocalizationKey.ErrorLoadingRoomState
+                              LocalizationKey.ErrorLoadingRoomState
                               ]
                             }
                             ...
                           </div>
                         )}
-                        {(currentUserExpert || viewerMode) && (
+                        {(!aiMode && (currentUserExpert || viewerMode)) && (
                           <RoomQuestionPanel
                             roomQuestionsLoading={roomQuestionsLoading}
                             roomQuestions={
@@ -689,22 +705,42 @@ export const Room: FunctionComponent = () => {
                             initialQuestion={currentQuestion}
                           />
                         )}
-                        <VideoChat
-                          messagesChatEnabled={messagesChatEnabled}
-                          recognitionNotSupported={recognitionNotSupported}
-                          recognitionEnabled={recognitionEnabled}
-                          reactionsVisible={reactionsVisible}
-                          currentUserExpert={currentUserExpert}
-                          loadingRoomStartReview={loadingRoomStartReview}
-                          errorRoomStartReview={errorRoomStartReview}
-                          // ScreenShare
-                          // screenStream={screenStream}
-                          setRecognitionEnabled={setRecognitionEnabled}
-                          handleInvitationsOpen={handleInvitationsOpen}
-                          handleStartReviewRoom={handleStartReviewRoom}
-                          handleSettingsOpen={handleSettingsOpen}
-                          handleLeaveRoom={handleLeaveRoom}
-                        />
+                        {aiMode ? (
+                          <VideoChatAi
+                            messagesChatEnabled={messagesChatEnabled}
+                            recognitionNotSupported={recognitionNotSupported}
+                            currentUserExpert={currentUserExpert}
+                            loadingRoomStartReview={loadingRoomStartReview}
+                            errorRoomStartReview={errorRoomStartReview}
+                            // ScreenShare
+                            // screenStream={screenStream}
+                            roomQuestionsLoading={roomQuestionsLoading}
+                            roomQuestions={
+                              roomQuestions?.sort(sortRoomQuestion) || []
+                            }
+                            initialQuestion={currentQuestion}
+                            handleStartReviewRoom={handleStartReviewRoom}
+                            handleSettingsOpen={handleSettingsOpen}
+                            handleLeaveRoom={handleLeaveRoom}
+                          />
+                        ) : (
+                          <VideoChat
+                            messagesChatEnabled={messagesChatEnabled}
+                            recognitionNotSupported={recognitionNotSupported}
+                            recognitionEnabled={recognitionEnabled}
+                            reactionsVisible={reactionsVisible}
+                            currentUserExpert={currentUserExpert}
+                            loadingRoomStartReview={loadingRoomStartReview}
+                            errorRoomStartReview={errorRoomStartReview}
+                            // ScreenShare
+                            // screenStream={screenStream}
+                            setRecognitionEnabled={setRecognitionEnabled}
+                            handleInvitationsOpen={handleInvitationsOpen}
+                            handleStartReviewRoom={handleStartReviewRoom}
+                            handleSettingsOpen={handleSettingsOpen}
+                            handleLeaveRoom={handleLeaveRoom}
+                          />
+                        )}
                       </div>
                     </div>
                   </div>
