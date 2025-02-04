@@ -417,7 +417,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
                 danger
               />
             }
-            position="left"
+            translateRem={{ x: -14.25, y: -6.75 }}
           >
             {loadingRoomStartReview && <Loader />}
             {errorRoomStartReview && (
@@ -448,9 +448,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         </RoomToolsPanel.ButtonsGroupWrapper>
       </RoomToolsPanel.Wrapper>
       <div className="videochat-field relative videochat-field-main bg-wrap rounded-1.125">
-        <RoomCodeEditor
-          visible={codeEditorEnabled}
-        />
+        <RoomCodeEditor visible={codeEditorEnabled} />
         {!codeEditorEnabled && renderMain()}
       </div>
 

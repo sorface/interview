@@ -8,7 +8,13 @@ import React, {
   useState,
 } from 'react';
 import { GroupProps, useFrame } from '@react-three/fiber';
-import { BufferGeometry, Material, Mesh, NormalBufferAttributes, Object3DEventMap } from 'three';
+import {
+  BufferGeometry,
+  Material,
+  Mesh,
+  NormalBufferAttributes,
+  Object3DEventMap,
+} from 'three';
 import { LocalizationContext } from '../../../../context/LocalizationContext';
 import { Theme, ThemeContext } from '../../../../context/ThemeContext';
 
@@ -147,8 +153,15 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
 }) => {
   const { lang } = useContext(LocalizationContext);
   const { themeInUi } = useContext(ThemeContext);
-  const meshRef = useRef<Mesh<BufferGeometry<NormalBufferAttributes>, Material | Material[], Object3DEventMap> | null>(null);
-  const [analyser, setAnalyser] = useState<{ node: AnalyserNode, context: AudioContext } | null>(null);
+  const meshRef = useRef<Mesh<
+    BufferGeometry<NormalBufferAttributes>,
+    Material | Material[],
+    Object3DEventMap
+  > | null>(null);
+  const [analyser, setAnalyser] = useState<{
+    node: AnalyserNode;
+    context: AudioContext;
+  } | null>(null);
   const analyserDataArrayRef = useRef(new Uint8Array(0));
   const uniformsRef = useRef({
     u_time: { type: 'f', value: 0.0 },
@@ -160,18 +173,27 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
   const audios = useMemo(() => {
     const result: Record<AiAssistantScriptName, HTMLAudioElement> = {
       [AiAssistantScriptName.Idle]: new Audio(),
-      [AiAssistantScriptName.Welcome]: new Audio(`/audios/${lang}/${AiAssistantScriptName.Welcome}.mp3`),
-      [AiAssistantScriptName.PleaseAnswer]: new Audio(`/audios/${lang}/${AiAssistantScriptName.PleaseAnswer}.mp3`),
-      [AiAssistantScriptName.GoodAnswer]: new Audio(`/audios/${lang}/${AiAssistantScriptName.GoodAnswer}.mp3`),
-      [AiAssistantScriptName.NeedTrain]: new Audio(`/audios/${lang}/${AiAssistantScriptName.NeedTrain}.mp3`),
+      [AiAssistantScriptName.Welcome]: new Audio(
+        `/audios/${lang}/${AiAssistantScriptName.Welcome}.mp3`,
+      ),
+      [AiAssistantScriptName.PleaseAnswer]: new Audio(
+        `/audios/${lang}/${AiAssistantScriptName.PleaseAnswer}.mp3`,
+      ),
+      [AiAssistantScriptName.GoodAnswer]: new Audio(
+        `/audios/${lang}/${AiAssistantScriptName.GoodAnswer}.mp3`,
+      ),
+      [AiAssistantScriptName.NeedTrain]: new Audio(
+        `/audios/${lang}/${AiAssistantScriptName.NeedTrain}.mp3`,
+      ),
     };
     return result;
   }, [lang]);
 
   useEffect(() => {
-    const color = themeInUi === Theme.Dark ?
-      [0.7255, 0.1333, 0.1098] :
-      [0.8784, 0.2784, 0.2275];
+    const color =
+      themeInUi === Theme.Dark
+        ? [0.7255, 0.1333, 0.1098]
+        : [0.8784, 0.2784, 0.2275];
     uniformsRef.current.u_red.value = color[0];
     uniformsRef.current.u_green.value = color[1];
     uniformsRef.current.u_blue.value = color[2];
@@ -187,7 +209,7 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
 
     const bufferLength = analyser.frequencyBinCount;
     analyserDataArrayRef.current = new Uint8Array(bufferLength);
-    setAnalyser({ node: analyser, context, });
+    setAnalyser({ node: analyser, context });
   }, []);
 
   const audioSources = useMemo(() => {
@@ -195,11 +217,25 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
       return null;
     }
     const result: Record<AiAssistantScriptName, MediaElementAudioSourceNode> = {
-      [AiAssistantScriptName.Idle]: analyser.context.createMediaElementSource(audios[AiAssistantScriptName.Idle]),
-      [AiAssistantScriptName.Welcome]: analyser.context.createMediaElementSource(audios[AiAssistantScriptName.Welcome]),
-      [AiAssistantScriptName.PleaseAnswer]: analyser.context.createMediaElementSource(audios[AiAssistantScriptName.PleaseAnswer]),
-      [AiAssistantScriptName.GoodAnswer]: analyser.context.createMediaElementSource(audios[AiAssistantScriptName.GoodAnswer]),
-      [AiAssistantScriptName.NeedTrain]: analyser.context.createMediaElementSource(audios[AiAssistantScriptName.NeedTrain]),
+      [AiAssistantScriptName.Idle]: analyser.context.createMediaElementSource(
+        audios[AiAssistantScriptName.Idle],
+      ),
+      [AiAssistantScriptName.Welcome]:
+        analyser.context.createMediaElementSource(
+          audios[AiAssistantScriptName.Welcome],
+        ),
+      [AiAssistantScriptName.PleaseAnswer]:
+        analyser.context.createMediaElementSource(
+          audios[AiAssistantScriptName.PleaseAnswer],
+        ),
+      [AiAssistantScriptName.GoodAnswer]:
+        analyser.context.createMediaElementSource(
+          audios[AiAssistantScriptName.GoodAnswer],
+        ),
+      [AiAssistantScriptName.NeedTrain]:
+        analyser.context.createMediaElementSource(
+          audios[AiAssistantScriptName.NeedTrain],
+        ),
     };
     return result;
   }, [analyser, audios]);
@@ -235,7 +271,8 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
           meshRef.current.rotation.y += delta * 0.025;
           meshRef.current.rotation.x += delta * 0.025;
           if (loading) {
-            uniformsRef.current.u_frequency.value = Math.sin(performance.now() / 20000) * 20;
+            uniformsRef.current.u_frequency.value =
+              Math.sin(performance.now() / 20000) * 20;
           }
         }
       }

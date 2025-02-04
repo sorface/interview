@@ -113,6 +113,8 @@ export const enum LocalizationKey {
   SearchByTags,
   BuildHash,
   CreateRoom,
+  CreateRoomClassic,
+  CreateRoomAi,
   NewRoom,
   EditRoom,
   AddingRoomQuestions,
@@ -367,6 +369,8 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.SearchByTags]: 'Search by tags',
     [LocalizationKey.BuildHash]: 'Build',
     [LocalizationKey.CreateRoom]: 'Create meeting',
+    [LocalizationKey.CreateRoomClassic]: 'Classic meeting',
+    [LocalizationKey.CreateRoomAi]: 'Interview with AI',
     [LocalizationKey.NewRoom]: 'New room',
     [LocalizationKey.EditRoom]: 'Editing room',
     [LocalizationKey.AddingRoomQuestions]: 'Adding Interview Questions',
@@ -468,7 +472,8 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.AnswerDetails]: 'Answer details',
     [LocalizationKey.QuestionAnswerDetails]: 'Question answer details',
     [LocalizationKey.EmptyRoomNameError]: 'Please provide the meeting name',
-    [LocalizationKey.EmptyRoomCategoryError]: 'Please provide the meeting category',
+    [LocalizationKey.EmptyRoomCategoryError]:
+      'Please provide the meeting category',
     [LocalizationKey.RoomEmptyStartTimeError]:
       'Please enter meeting start time',
     [LocalizationKey.RoomStartTimeMustBeGreaterError]:
@@ -507,10 +512,12 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.NotEnoughRights]: 'Insufficient rights to view content',
     [LocalizationKey.WebcamBackgroundBlur]: 'Background blur',
     [LocalizationKey.Feedback]: 'Feedback',
-    [LocalizationKey.RateMeDescription]: 'At the end of your answer, say "{RateMeCommand}" and assistant will rate you.',
+    [LocalizationKey.RateMeDescription]:
+      'At the end of your answer, say "{RateMeCommand}" and assistant will rate you.',
     [LocalizationKey.RateMeCommand]: 'rate me',
-    [LocalizationKey.LetsBeginDescription]: 'To start an interview, say "{LetsStartCommand}".',
-    [LocalizationKey.LetsBeginCommand]: 'let\'s begin',
+    [LocalizationKey.LetsBeginDescription]:
+      'To start an interview, say "{LetsStartCommand}".',
+    [LocalizationKey.LetsBeginCommand]: "let's begin",
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -634,6 +641,8 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.SearchByTags]: 'Поиск по тэгам',
     [LocalizationKey.BuildHash]: 'Сборка',
     [LocalizationKey.CreateRoom]: 'Создать встречу',
+    [LocalizationKey.CreateRoomClassic]: 'Классическая встреча',
+    [LocalizationKey.CreateRoomAi]: 'Собеседование с AI',
     [LocalizationKey.NewRoom]: 'Новая комната',
     [LocalizationKey.EditRoom]: 'Редактирование комнаты',
     [LocalizationKey.AddingRoomQuestions]:
@@ -737,7 +746,8 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.AnswerDetails]: 'Детали ответа',
     [LocalizationKey.QuestionAnswerDetails]: 'Детали ответа на вопрос',
     [LocalizationKey.EmptyRoomNameError]: 'Пожалуйста, укажите имя встречи',
-    [LocalizationKey.EmptyRoomCategoryError]: 'Пожалуйста, укажите категорию встречи',
+    [LocalizationKey.EmptyRoomCategoryError]:
+      'Пожалуйста, укажите категорию встречи',
     [LocalizationKey.RoomEmptyStartTimeError]:
       'Пожалуйста, укажите время начала встречи',
     [LocalizationKey.RoomStartTimeMustBeGreaterError]:
@@ -779,9 +789,11 @@ export const LocalizationCaptions: Record<
       'Недостаточно прав для просмотра содержимого',
     [LocalizationKey.WebcamBackgroundBlur]: 'Размытие фона',
     [LocalizationKey.Feedback]: 'Обратная связь',
-    [LocalizationKey.RateMeDescription]: 'В конце ответа скажите "{RateMeCommand}" и ассистент оценит вас.',
+    [LocalizationKey.RateMeDescription]:
+      'В конце ответа скажите "{RateMeCommand}" и ассистент оценит вас.',
     [LocalizationKey.RateMeCommand]: 'оцени меня',
-    [LocalizationKey.LetsBeginDescription]: 'Для начала собеседования скажите "{LetsStartCommand}".',
+    [LocalizationKey.LetsBeginDescription]:
+      'Для начала собеседования скажите "{LetsStartCommand}".',
     [LocalizationKey.LetsBeginCommand]: 'давай начнём',
   },
 };

@@ -32,6 +32,8 @@ import { RoomsHistory } from '../../components/RoomsHistory/RoomsHistory';
 import { getRoomLink } from '../../utils/getRoomLink';
 import { Loader } from '../../components/Loader/Loader';
 import { Typography } from '../../components/Typography/Typography';
+import { ContextMenu } from '../../components/ContextMenu/ContextMenu';
+import { checkAiAccess } from '../../utils/checkAiAccess';
 
 import './Rooms.css';
 
@@ -79,6 +81,7 @@ interface RoomsProps {
 
 export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
   const auth = useContext(AuthContext);
+  const userHasAiAccess = checkAiAccess(auth);
   const localizationCaptions = useLocalizationCaptions();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const { apiMethodState, fetchData } = useApiMethod<Room[], GetRoomPageParams>(
@@ -110,6 +113,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
   const [searchValue, setSearchValue] = useState('');
   const closed = mode === RoomsPageMode.Closed;
   const [createEditModalOpened, setCreateEditModalOpened] = useState(false);
+  const [aiRoom, setAiRoom] = useState(false);
   const [editingRoomId, setEditingRoomId] = useState<Room['id'] | null>(null);
   const [roomsUpdateTrigger, setRoomsUpdateTrigger] = useState(0);
   const [monthStartDate, setMonthStartDate] = useState(initialMonthStartDate);
@@ -206,7 +210,13 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
     setPageNumber(pageNumber + 1);
   }, [pageNumber]);
 
-  const handleOpenCreateModal = () => {
+  const handleOpenCreateModalClassic = () => {
+    setAiRoom(false);
+    setCreateEditModalOpened(true);
+  };
+
+  const handleOpenCreateModalAi = () => {
+    setAiRoom(true);
     setCreateEditModalOpened(true);
   };
 
@@ -303,6 +313,18 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
     );
   };
 
+  const renderCreateRoomButton = () => (
+    <Button
+      variant="active"
+      className="h-2.5"
+      aria-hidden={userHasAiAccess}
+      onClick={userHasAiAccess ? undefined : handleOpenCreateModalClassic}
+    >
+      <Icon name={IconNames.Add} />
+      {localizationCaptions[LocalizationKey.CreateRoom]}
+    </Button>
+  );
+
   return (
     <>
       <PageHeader
@@ -310,18 +332,32 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
         searchValue={searchValueInput}
         onSearchChange={setSearchValueInput}
       >
-        <Button
-          variant="active"
-          className="h-2.5"
-          onClick={handleOpenCreateModal}
-        >
-          <Icon name={IconNames.Add} />
-          {localizationCaptions[LocalizationKey.CreateRoom]}
-        </Button>
+        {userHasAiAccess ? (
+          <ContextMenu
+            translateRem={{ x: -3.75, y: 0.25 }}
+            toggleContent={renderCreateRoomButton()}
+          >
+            {[
+              <ContextMenu.Item
+                key="CreateClassicRoom"
+                title={localizationCaptions[LocalizationKey.CreateRoomClassic]}
+                onClick={handleOpenCreateModalClassic}
+              />,
+              <ContextMenu.Item
+                key="CreateAiRoom"
+                title={localizationCaptions[LocalizationKey.CreateRoomAi]}
+                onClick={handleOpenCreateModalAi}
+              />,
+            ]}
+          </ContextMenu>
+        ) : (
+          renderCreateRoomButton()
+        )}
       </PageHeader>
       <div className="rooms-page flex-1 overflow-auto">
         {createEditModalOpened && (
           <RoomCreate
+            aiRoom={aiRoom}
             editRoomId={editingRoomId || null}
             open={createEditModalOpened}
             onClose={handleCloseCreateEditModal}
@@ -349,7 +385,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
                 <Gap sizeRem={2.25} />
                 <Button
                   className="h-2.5 text-grey3"
-                  onClick={handleOpenCreateModal}
+                  onClick={handleOpenCreateModalClassic}
                 >
                   <Icon name={IconNames.Add} />
                   {localizationCaptions[LocalizationKey.CreateRoom]}

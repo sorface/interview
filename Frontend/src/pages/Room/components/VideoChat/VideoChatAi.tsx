@@ -53,10 +53,7 @@ interface VideoChatAiProps {
   handleLeaveRoom: () => void;
 }
 
-const getChatMessageEvents = (
-  roomEventsSearch: EventsSearch,
-  type: string,
-) => {
+const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string) => {
   const roomEvents = roomEventsSearch[type];
   if (!roomEvents) {
     return [];
@@ -257,9 +254,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
         <Gap sizeRem={1.5 * 2.5} />
         <RoomQuestionPanelAi
           roomQuestionsLoading={roomQuestionsLoading}
-          roomQuestions={
-            roomQuestions?.sort(sortRoomQuestion) || []
-          }
+          roomQuestions={roomQuestions?.sort(sortRoomQuestion) || []}
           initialQuestion={initialQuestion}
         />
         <video
@@ -323,11 +318,11 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                   enabled={true}
                   iconEnabledName={IconNames.Call}
                   iconDisabledName={IconNames.Call}
-                  onClick={currentUserExpert ? () => { } : handleLeaveRoom}
+                  onClick={currentUserExpert ? () => {} : handleLeaveRoom}
                   danger
                 />
               }
-              position="left"
+              translateRem={{ x: -14.25, y: -6.75 }}
             >
               {loadingRoomStartReview && <Loader />}
               {errorRoomStartReview && (
@@ -344,7 +339,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                 <ContextMenu.Item
                   title={
                     localizationCaptions[
-                    LocalizationKey.CompleteAndEvaluateCandidate
+                      LocalizationKey.CompleteAndEvaluateCandidate
                     ]
                   }
                   onClick={handleStartReviewRoom}
@@ -363,11 +358,12 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
 
   return (
     <>
-      <div className='w-full flex justify-center'>
-        <div style={{ maxWidth: '840px' }} className="w-full flex flex-col videochat-field relative videochat-field-main rounded-1.125">
-          <RoomCodeEditor
-            visible={codeEditorEnabled}
-          />
+      <div className="w-full flex justify-center">
+        <div
+          style={{ maxWidth: '840px' }}
+          className="w-full flex flex-col videochat-field relative videochat-field-main rounded-1.125"
+        >
+          <RoomCodeEditor visible={codeEditorEnabled} />
           {!codeEditorEnabled && renderMain()}
         </div>
       </div>

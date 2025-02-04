@@ -169,7 +169,13 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
         order: categoryOrder,
       });
     },
-    [category, categoryName, categoryParent, categoryOrder, fetchUpdateCategory],
+    [
+      category,
+      categoryName,
+      categoryParent,
+      categoryOrder,
+      fetchUpdateCategory,
+    ],
   );
 
   const renderStatus = () => {
