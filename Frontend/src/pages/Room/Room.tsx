@@ -71,7 +71,6 @@ import { AiAssistantScriptName } from './components/AiAssistant/AiAssistant';
 import './Room.css';
 
 const connectingReadyState = 0;
-const aiMode = false;
 
 const getCloseRedirectLink = (roomId: string, currentUserExpert: boolean) => {
   if (currentUserExpert) {
@@ -111,7 +110,8 @@ export const Room: FunctionComponent = () => {
   const [invitationsOpen, setInvitationsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [lastVoiceRecognition, setLastVoiceRecognition] = useState('');
-  const [aiAssistantCurrentScript, setAiAssistantCurrentScript] = useState<AiAssistantScriptName>(AiAssistantScriptName.Idle);
+  const [aiAssistantCurrentScript, setAiAssistantCurrentScript] =
+    useState<AiAssistantScriptName>(AiAssistantScriptName.Idle);
   const socketUrl = `${VITE_WS_URL}/ws?roomId=${id}`;
   const checkWebSocketReadyToConnect = () => {
     if (!inviteParam) {
@@ -245,6 +245,7 @@ export const Room: FunctionComponent = () => {
   const currentUserExpert = roomParticipant?.userType === 'Expert';
   const currentUserExaminee = roomParticipant?.userType === 'Examinee';
   const viewerMode = !(currentUserExpert || currentUserExaminee);
+  const aiRoom = !!room?.category;
 
   const userStreams = useUserStreams();
   const { playJoinRoomSound, playChatMessageSound } = useRoomSounds();
@@ -604,10 +605,8 @@ export const Room: FunctionComponent = () => {
               >
                 <div className="room-page">
                   <div className="room-page-main">
-                    {aiMode && (
-                      <Gap sizeRem={0.75} />
-                    )}
-                    {!aiMode && (
+                    {aiRoom && <Gap sizeRem={0.75} />}
+                    {!aiRoom && (
                       <div className="room-page-header justify-between">
                         <div>
                           <span
@@ -647,7 +646,11 @@ export const Room: FunctionComponent = () => {
                                 content: (
                                   <div className="flex items-center">
                                     <div>
-                                      {localizationCaptions[LocalizationKey.Chat]}
+                                      {
+                                        localizationCaptions[
+                                          LocalizationKey.Chat
+                                        ]
+                                      }
                                     </div>
                                     {!!unreadChatMessages && (
                                       <>
@@ -667,7 +670,7 @@ export const Room: FunctionComponent = () => {
                                     <div>
                                       {
                                         localizationCaptions[
-                                        LocalizationKey.RoomParticipants
+                                          LocalizationKey.RoomParticipants
                                         ]
                                       }
                                     </div>
@@ -690,13 +693,13 @@ export const Room: FunctionComponent = () => {
                           <div>
                             {
                               localizationCaptions[
-                              LocalizationKey.ErrorLoadingRoomState
+                                LocalizationKey.ErrorLoadingRoomState
                               ]
                             }
                             ...
                           </div>
                         )}
-                        {(!aiMode && (currentUserExpert || viewerMode)) && (
+                        {!aiRoom && (currentUserExpert || viewerMode) && (
                           <RoomQuestionPanel
                             roomQuestionsLoading={roomQuestionsLoading}
                             roomQuestions={
@@ -705,7 +708,7 @@ export const Room: FunctionComponent = () => {
                             initialQuestion={currentQuestion}
                           />
                         )}
-                        {aiMode ? (
+                        {aiRoom ? (
                           <VideoChatAi
                             messagesChatEnabled={messagesChatEnabled}
                             recognitionNotSupported={recognitionNotSupported}

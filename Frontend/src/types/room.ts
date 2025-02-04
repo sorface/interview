@@ -22,6 +22,10 @@ export interface Room {
   status: RoomStatus;
   questions: RoomQuestionListItem[];
   scheduledStartTime: string;
+  category?: {
+    id: string;
+    name: string;
+  };
   timer?: {
     durationSec: number;
     startTime?: string;

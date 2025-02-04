@@ -20,12 +20,12 @@ const getInitialState = (): VoiceRecognitionAccumState => ({
 
 type VoiceRecognitionAccumAction =
   | {
-    name: 'reset';
-  }
+      name: 'reset';
+    }
   | {
-    name: 'addTranscript';
-    payload: { value: string; command: VoiceRecognitionCommand; };
-  };
+      name: 'addTranscript';
+      payload: { value: string; command: VoiceRecognitionCommand };
+    };
 
 const checkIsCommandTranscript = (transcript: string, command: string[]) => {
   const words = transcript.toLowerCase().split(' ');
@@ -47,7 +47,6 @@ const apiMethodReducer = (
       return {
         command: action.payload.command,
         value: state.value + action.payload.value,
-
       };
     default:
       return state;
@@ -55,7 +54,10 @@ const apiMethodReducer = (
 };
 
 export const useVoiceRecognitionAccum = () => {
-  const [apiMethodState, dispatch] = useReducer(apiMethodReducer, getInitialState());
+  const [apiMethodState, dispatch] = useReducer(
+    apiMethodReducer,
+    getInitialState(),
+  );
   const localizationCaptions = useLocalizationCaptions();
 
   const resetVoiceRecognitionAccum = useCallback(() => {
@@ -64,22 +66,26 @@ export const useVoiceRecognitionAccum = () => {
     });
   }, []);
 
-  const addVoiceRecognitionAccumTranscript = useCallback((transcript: string) => {
-    const rateMeCommandLocalized = localizationCaptions[LocalizationKey.RateMeCommand].split(' ');
-    const letsStartCommandLocalized = localizationCaptions[LocalizationKey.LetsBeginCommand].split(' ');
-    dispatch({
-      name: 'addTranscript',
-      payload: {
-        command:
-          checkIsCommandTranscript(transcript, rateMeCommandLocalized) ?
-            VoiceRecognitionCommand.RateMe :
-            checkIsCommandTranscript(transcript, letsStartCommandLocalized) ?
-              VoiceRecognitionCommand.LetsStart :
-              VoiceRecognitionCommand.None,
-        value: transcript,
-      },
-    });
-  }, [localizationCaptions]);
+  const addVoiceRecognitionAccumTranscript = useCallback(
+    (transcript: string) => {
+      const rateMeCommandLocalized =
+        localizationCaptions[LocalizationKey.RateMeCommand].split(' ');
+      const letsStartCommandLocalized =
+        localizationCaptions[LocalizationKey.LetsBeginCommand].split(' ');
+      dispatch({
+        name: 'addTranscript',
+        payload: {
+          command: checkIsCommandTranscript(transcript, rateMeCommandLocalized)
+            ? VoiceRecognitionCommand.RateMe
+            : checkIsCommandTranscript(transcript, letsStartCommandLocalized)
+              ? VoiceRecognitionCommand.LetsStart
+              : VoiceRecognitionCommand.None,
+          value: transcript,
+        },
+      });
+    },
+    [localizationCaptions],
+  );
 
   return {
     recognitionAccum: apiMethodState.value,

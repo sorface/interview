@@ -44,7 +44,6 @@ import { SwitcherButton } from '../../components/SwitcherButton/SwitcherButton';
 import { DragNDropList } from '../../components/DragNDropList/DragNDropList';
 import { RoomQuestionsSelector } from './RoomQuestionsSelector/RoomQuestionsSelector';
 
-const aiRoom = false;
 const nameFieldName = 'roomName';
 const dateFieldName = 'roomDate';
 const startTimeFieldName = 'roomStartTime';
@@ -124,12 +123,14 @@ type RoomFields = {
 };
 
 interface RoomCreateProps {
+  aiRoom: boolean;
   editRoomId: string | null;
   open: boolean;
   onClose: () => void;
 }
 
 export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
+  aiRoom,
   editRoomId,
   open,
   onClose,
@@ -344,6 +345,17 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
       });
     };
 
+  const handleChangeCategoryField = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const [id, name] = e.target.value.split('|');
+    setRoomFields({
+      ...roomFields,
+      categoryId: id,
+      name: name,
+    });
+  };
+
   const handleQuestionsSave = (questions: RoomQuestionListItem[]) => {
     setSelectedQuestions(questions);
     setQuestionsView(false);
@@ -413,37 +425,35 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
   const stepView = {
     [CreationStep.Step1]: (
       <>
-        <RoomCreateField.Wrapper>
-          <RoomCreateField.Label>
-            <label htmlFor="roomName">
-              <Typography size="m" bold>
-                {localizationCaptions[LocalizationKey.RoomName]}
+        {!aiRoom && (
+          <>
+            <RoomCreateField.Wrapper>
+              <RoomCreateField.Label>
+                <label htmlFor="roomName">
+                  <Typography size="m" bold>
+                    {localizationCaptions[LocalizationKey.RoomName]}
+                  </Typography>
+                </label>
+              </RoomCreateField.Label>
+              <RoomCreateField.Content className="flex flex-1">
+                <input
+                  id="roomName"
+                  name={nameFieldName}
+                  value={roomFields.name}
+                  onChange={handleChangeField('name')}
+                  className="flex-1"
+                  type="text"
+                  required
+                />
+              </RoomCreateField.Content>
+            </RoomCreateField.Wrapper>
+            <div className="px-1">
+              <Typography size="s">
+                {localizationCaptions[LocalizationKey.RoomNamePrompt]}
               </Typography>
-            </label>
-          </RoomCreateField.Label>
-          <RoomCreateField.Content className="flex flex-1">
-            <input
-              id="roomName"
-              name={nameFieldName}
-              value={roomFields.name}
-              onChange={handleChangeField('name')}
-              className="flex-1"
-              type="text"
-              required
-            />
-          </RoomCreateField.Content>
-        </RoomCreateField.Wrapper>
-        <div className="px-1">
-          <Typography size="s">
-            {
-              localizationCaptions[
-                aiRoom
-                  ? LocalizationKey.RoomNamePromptAi
-                  : LocalizationKey.RoomNamePrompt
-              ]
-            }
-          </Typography>
-        </div>
+            </div>
+          </>
+        )}
         {!aiRoom && (
           <>
             <Gap sizeRem={1.5} />
@@ -493,9 +503,9 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
                 )}
               </RoomCreateField.Content>
             </RoomCreateField.Wrapper>
+            <Gap sizeRem={2} />
           </>
         )}
-        <Gap sizeRem={2} />
 
         {!aiRoom && (
           <RoomCreateField.Wrapper>
@@ -543,13 +553,16 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
                   id="rootCategory"
                   className="w-full"
                   value={roomFields.categoryId}
-                  onChange={handleChangeField('categoryId')}
+                  onChange={handleChangeCategoryField}
                 >
                   <option value="">
                     {localizationCaptions[LocalizationKey.NotSelected]}
                   </option>
                   {rootCategories?.map((rootCategory) => (
-                    <option key={rootCategory.id} value={rootCategory.id}>
+                    <option
+                      key={rootCategory.id}
+                      value={`${rootCategory.id}|${rootCategory.name}`}
+                    >
                       {rootCategory.name}
                     </option>
                   ))}

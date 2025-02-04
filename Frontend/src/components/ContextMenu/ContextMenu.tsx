@@ -6,7 +6,7 @@ import { Typography } from '../Typography/Typography';
 import { ButtonProps } from '../Button/Button';
 
 export interface ContextMenuProps {
-  position?: 'bottom-left' | 'bottom-right' | 'left';
+  translateRem: { x: number; y: number };
   toggleContent?: DropdownProps['toggleContent'];
   useButton?: DropdownProps['useButton'];
   buttonVariant?: ButtonProps['variant'];
@@ -14,26 +14,23 @@ export interface ContextMenuProps {
 }
 
 const ContextMenuComponent: FunctionComponent<ContextMenuProps> = ({
-  position,
+  translateRem,
   toggleContent,
   useButton,
   buttonVariant,
   children,
 }) => {
   const defaultToggleContent = <Icon name={IconNames.EllipsisVertical} />;
-  const positionClassName =
-    position === 'bottom-right'
-      ? 'translate-x--11.375-y-0.25'
-      : position === 'left'
-        ? 'translate-x--14.25-y--6.75'
-        : '';
 
   return (
     <Dropdown
       toggleContent={toggleContent || defaultToggleContent}
       useButton={useButton}
       buttonVariant={buttonVariant}
-      contentClassName={`w-13.75 rounded-0.75 ${positionClassName}`}
+      contentClassName="w-13.75 rounded-0.75"
+      contentStyle={{
+        transform: `translate(${translateRem.x}rem, ${translateRem.y}rem)`,
+      }}
     >
       <div className="bg-wrap py-0.5">{children}</div>
     </Dropdown>
