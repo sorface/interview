@@ -315,7 +315,8 @@ public sealed class RoomService(
         var experts = await FindByIdsOrErrorAsync(db.Users, requestExperts, "experts", cancellationToken);
         var examinees = await FindByIdsOrErrorAsync(db.Users, request.Examinees, "examinees", cancellationToken);
         var tags = await Tag.EnsureValidTagsAsync(db.Tag, request.Tags, cancellationToken);
-        var room = new Room(name, request.AccessType)
+        var type = request.CategoryId is not null ? SERoomType.AI : SERoomType.Standard;
+        var room = new Room(name, request.AccessType, type)
         {
             Tags = tags,
             ScheduleStartTime = request.ScheduleStartTime,

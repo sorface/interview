@@ -82,7 +82,7 @@ public class RoomReviewServiceTest
         var (service, userId, roomId) = CreateService(memoryDatabase, true, SERoomStatus.Review);
 
         var user = new User(Guid.NewGuid(), "test_nickname", Guid.NewGuid().ToString());
-        var room = new Room("TEST", SERoomAccessType.Private);
+        var room = new Room("TEST", SERoomAccessType.Private, SERoomType.Standard);
 
         var roomParticipant = new RoomParticipant(user, room, SERoomParticipantType.Expert);
 
@@ -130,7 +130,7 @@ public class RoomReviewServiceTest
         var question = new Question("question_test");
         var question1 = new Question("question_test_1");
 
-        var room = new Room("test", SERoomAccessType.Private) { Status = SERoomStatus.Review, };
+        var room = new Room("test", SERoomAccessType.Private, SERoomType.Standard) { Status = SERoomStatus.Review, };
 
         await memoryDatabase.Users.AddRangeAsync(user1, user2);
         await memoryDatabase.Rooms.AddAsync(room, ct);
@@ -271,7 +271,7 @@ public class RoomReviewServiceTest
     {
         var user = new User("test user", "ID");
         db.Users.Add(user);
-        var room = new Room("MY ROOM", SERoomAccessType.Private) { Status = roomStatus == null ? SERoomStatus.Active : roomStatus };
+        var room = new Room("MY ROOM", SERoomAccessType.Private, SERoomType.Standard) { Status = roomStatus == null ? SERoomStatus.Active : roomStatus };
         db.Rooms.Add(room);
         db.SaveChanges();
 

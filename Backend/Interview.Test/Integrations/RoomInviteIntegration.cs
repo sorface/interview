@@ -34,7 +34,7 @@ public class RoomInviteIntegration
         appDbContext.Invites.Add(invite);
         await appDbContext.SaveChangesAsync();
 
-        var room = new Room(name: "something", SERoomAccessType.Private);
+        var room = new Room(name: "something", SERoomAccessType.Private, SERoomType.Standard);
 
         appDbContext.Rooms.Add(room);
         await appDbContext.SaveChangesAsync();
@@ -83,7 +83,7 @@ public class RoomInviteIntegration
         var invite = new Invite(5);
 
         appDbContext.Invites.Add(invite);
-        var room = new Room(name: "something", SERoomAccessType.Private);
+        var room = new Room(name: "something", SERoomAccessType.Private, SERoomType.Standard);
 
         appDbContext.Rooms.Add(room);
         var roomInvite = new RoomInvite(invite, room, SERoomParticipantType.Expert);
@@ -135,7 +135,7 @@ public class RoomInviteIntegration
         await appDbContext.SaveChangesAsync();
 
         appDbContext.Invites.Add(invite);
-        var room = new Room(name: "something", SERoomAccessType.Private);
+        var room = new Room(name: "something", SERoomAccessType.Private, SERoomType.Standard);
         await appDbContext.SaveChangesAsync();
 
         appDbContext.Rooms.Add(room);
