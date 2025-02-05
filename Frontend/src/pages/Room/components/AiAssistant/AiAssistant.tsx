@@ -1,6 +1,7 @@
 import React, {
   FunctionComponent,
   memo,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -143,12 +144,14 @@ export enum AiAssistantScriptName {
 }
 
 interface HrAvatarProps {
-  loading: boolean;
+  loading?: boolean;
+  trackMouse?: boolean;
   currentScript: AiAssistantScriptName;
 }
 
 const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
   loading,
+  trackMouse,
   currentScript,
 }) => {
   const { lang } = useContext(LocalizationContext);
@@ -164,7 +167,7 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
   } | null>(null);
   const analyserDataArrayRef = useRef(new Uint8Array(0));
   const uniformsRef = useRef({
-    u_time: { type: 'f', value: 0.0 },
+    u_time: { type: 'f', value: 10.0 },
     u_frequency: { type: 'f', value: 0.0 },
     u_red: { type: 'f', value: 0.0 },
     u_green: { type: 'f', value: 0.0 },
@@ -199,7 +202,7 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
     uniformsRef.current.u_blue.value = color[2];
   }, [themeInUi]);
 
-  useEffect(() => {
+  const initAnalyser = useCallback(() => {
     const context = new AudioContext();
     const analyser = context.createAnalyser();
 
@@ -211,6 +214,13 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
     analyserDataArrayRef.current = new Uint8Array(bufferLength);
     setAnalyser({ node: analyser, context });
   }, []);
+
+  useEffect(() => {
+    if (analyser || currentScript === AiAssistantScriptName.Idle) {
+      return;
+    }
+    initAnalyser();
+  }, [analyser, currentScript, initAnalyser]);
 
   const audioSources = useMemo(() => {
     if (!analyser) {
@@ -241,7 +251,11 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
   }, [analyser, audios]);
 
   useEffect(() => {
-    if (!analyser || !audioSources) {
+    if (
+      !analyser ||
+      !audioSources ||
+      currentScript === AiAssistantScriptName.Idle
+    ) {
       return;
     }
     audioSources[currentScript].connect(analyser.node);
@@ -251,10 +265,14 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
   }, [currentScript, analyser, audioSources]);
 
   useEffect(() => {
+    if (currentScript === AiAssistantScriptName.Idle) {
+      return;
+    }
     audios[currentScript].play();
   }, [currentScript, audios]);
 
   useFrame((_, delta) => {
+    uniformsRef.current.u_time.value += delta;
     if (analyser) {
       const dataArr = analyserDataArrayRef.current;
       analyser.node.getByteFrequencyData(dataArr);
@@ -265,19 +283,44 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
       avg /= dataArr.length;
 
       uniformsRef.current.u_frequency.value = avg;
-      uniformsRef.current.u_time.value += delta;
-      if (avg === 0.0) {
-        if (meshRef.current) {
-          meshRef.current.rotation.y += delta * 0.025;
-          meshRef.current.rotation.x += delta * 0.025;
-          if (loading) {
-            uniformsRef.current.u_frequency.value =
-              Math.sin(performance.now() / 20000) * 20;
-          }
-        }
+      if (avg !== 0) {
+        return;
+      }
+    }
+    if (meshRef.current) {
+      if (!trackMouse) {
+        meshRef.current.rotation.y += delta * 0.025;
+        meshRef.current.rotation.x += delta * 0.025;
+      }
+      if (loading) {
+        uniformsRef.current.u_frequency.value =
+          30 + Math.sin(performance.now() / 20000) + 1;
       }
     }
   });
+
+  useEffect(() => {
+    if (!trackMouse) {
+      return;
+    }
+    const mousemoveHandler = (e: MouseEvent) => {
+      if (!meshRef.current) {
+        return;
+      }
+      const posX = e.clientX / window.innerWidth - 0.5;
+      const posY = e.clientY / window.innerHeight - 0.5;
+      meshRef.current.rotation.y = -posX * 1.2;
+      meshRef.current.rotation.x = -posY * 1.2;
+    };
+
+    document.body.addEventListener('mousemove', mousemoveHandler, {
+      passive: true,
+    });
+
+    return () => {
+      document.body.removeEventListener('mousemove', mousemoveHandler);
+    };
+  }, [trackMouse]);
 
   return (
     <mesh
