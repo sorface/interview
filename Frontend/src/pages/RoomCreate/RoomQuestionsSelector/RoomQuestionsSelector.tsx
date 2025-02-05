@@ -76,13 +76,13 @@ export const RoomQuestionsSelector: FunctionComponent<
   const [subCategory, setSubCategory] = useState('');
   const [selectedQuestions, setSelectedQuestions] =
     useState<RoomQuestionListItem[]>(preSelected);
-  const debounced = useDebounce(inputQuestionValue);
+  const questionValueDebounced = useDebounce(inputQuestionValue);
 
   const totalLoading =
     rootCategoriesLoading || subCategoriesLoading || questionsLoading;
   const totalError =
     rootCategoriesError || subCategoriesError || questionsError;
-  const triggerResetAccumData = `${debounced}${rootCategory}${subCategory}`;
+  const triggerResetAccumData = `${questionValueDebounced}${rootCategory}${subCategory}`;
 
   useEffect(() => {
     fetchRootCategories({
@@ -114,10 +114,10 @@ export const RoomQuestionsSelector: FunctionComponent<
       PageNumber: pageNumber,
       PageSize: pageSize,
       tags: [],
-      value: debounced,
+      value: questionValueDebounced,
       categoryId: subCategory,
     });
-  }, [pageNumber, subCategory, fetchQuestions, debounced]);
+  }, [pageNumber, subCategory, fetchQuestions, questionValueDebounced]);
 
   const handleRootCategoryChange: ChangeEventHandler<HTMLSelectElement> = (
     e,
