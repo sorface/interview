@@ -141,6 +141,7 @@ export enum AiAssistantScriptName {
   PleaseAnswer = 'please-answer',
   GoodAnswer = 'good-answer',
   NeedTrain = 'need-train',
+  Login = 'login',
 }
 
 interface HrAvatarProps {
@@ -187,6 +188,9 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
       ),
       [AiAssistantScriptName.NeedTrain]: new Audio(
         `/audios/${lang}/${AiAssistantScriptName.NeedTrain}.mp3`,
+      ),
+      [AiAssistantScriptName.Login]: new Audio(
+        `/audios/${lang}/${AiAssistantScriptName.Login}.mp3`,
       ),
     };
     return result;
@@ -245,6 +249,10 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
       [AiAssistantScriptName.NeedTrain]:
         analyser.context.createMediaElementSource(
           audios[AiAssistantScriptName.NeedTrain],
+        ),
+      [AiAssistantScriptName.Login]:
+        analyser.context.createMediaElementSource(
+          audios[AiAssistantScriptName.Login],
         ),
     };
     return result;

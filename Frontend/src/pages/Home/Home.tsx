@@ -40,7 +40,7 @@ export const Home: FunctionComponent = () => {
       aiAssistantClicked &&
       aiAssistantScript === AiAssistantScriptName.Idle
     ) {
-      setAiAssistantScript(AiAssistantScriptName.Welcome);
+      setAiAssistantScript(AiAssistantScriptName.Login);
     }
   }, [aiAssistantScript, aiAssistantClicked]);
 
