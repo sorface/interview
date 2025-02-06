@@ -10,10 +10,16 @@ import { useParticipantTypeLocalization } from '../../../../hooks/useParticipant
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../../localization';
 
+interface DetailedEvaluation {
+  recommendation?: string;
+  expected?: string;
+}
+
 interface ReviewUserOpinionProps {
   user: {
     id: User['id'];
-    evaluation?: Partial<Omit<RoomQuestionEvaluation, 'id'>>;
+    evaluation?: Partial<Omit<RoomQuestionEvaluation, 'id'>> &
+      DetailedEvaluation;
   };
   allUsers: Map<User['id'], AnalyticsUserReview>;
 }
@@ -69,6 +75,18 @@ export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
         {user.evaluation?.review ??
           localizationCaptions[LocalizationKey.RoomReviewWaiting]}
       </Typography>
+      {user.evaluation?.recommendation && (
+        <>
+          <Gap sizeRem={1} />
+          <Typography size="m">{user.evaluation.recommendation}</Typography>
+        </>
+      )}
+      {user.evaluation?.expected && (
+        <>
+          <Gap sizeRem={1} />
+          <Typography size="m">{user.evaluation.expected}</Typography>
+        </>
+      )}
     </div>
   );
 };
