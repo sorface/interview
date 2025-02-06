@@ -239,6 +239,7 @@ export const enum LocalizationKey {
   RateMeCommand,
   LetsBeginDescription,
   LetsBeginCommand,
+  HomeDescription,
 }
 
 export const LocalizationCaptions: Record<
@@ -518,6 +519,8 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.LetsBeginDescription]:
       'To start an interview, say "{LetsStartCommand}".',
     [LocalizationKey.LetsBeginCommand]: "let's begin",
+    [LocalizationKey.HomeDescription]:
+      'AI interviews, video calls, question database.',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -795,5 +798,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.LetsBeginDescription]:
       'Для начала собеседования скажите "{LetsStartCommand}".',
     [LocalizationKey.LetsBeginCommand]: 'давай начнём',
+    [LocalizationKey.HomeDescription]:
+      'Собеседования с AI, видеозвонки, база вопросов.',
   },
 };
