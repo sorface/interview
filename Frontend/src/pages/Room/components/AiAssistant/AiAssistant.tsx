@@ -144,14 +144,23 @@ export enum AiAssistantScriptName {
   Login = 'login',
 }
 
-interface HrAvatarProps {
+export enum AiAssistantLoadingVariant {
+  Normal = 10,
+  Wide = 30,
+}
+
+interface AiAssistantProps {
   loading?: boolean;
+  loadingVariant?: AiAssistantLoadingVariant;
   trackMouse?: boolean;
   currentScript: AiAssistantScriptName;
 }
 
-const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
+const AiAssistantComponent: FunctionComponent<
+  GroupProps & AiAssistantProps
+> = ({
   loading,
+  loadingVariant = AiAssistantLoadingVariant.Normal,
   trackMouse,
   currentScript,
 }) => {
@@ -301,7 +310,7 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
       }
       if (loading) {
         uniformsRef.current.u_frequency.value =
-          30 + Math.sin(performance.now() / 20000) + 1;
+          loadingVariant + Math.sin(performance.now() / 20000) + 1;
       }
     }
   });

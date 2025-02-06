@@ -16,6 +16,7 @@ import { LangSwitch } from '../../components/LangSwitch/LangSwitch';
 import { VITE_NAME } from '../../config';
 import {
   AiAssistant,
+  AiAssistantLoadingVariant,
   AiAssistantScriptName,
 } from '../Room/components/AiAssistant/AiAssistant';
 import { Canvas } from '@react-three/fiber';
@@ -64,7 +65,12 @@ export const Home: FunctionComponent = () => {
             <EffectComposer>
               <FXAA />
             </EffectComposer>
-            <AiAssistant currentScript={aiAssistantScript} loading trackMouse />
+            <AiAssistant
+              currentScript={aiAssistantScript}
+              loading
+              loadingVariant={AiAssistantLoadingVariant.Wide}
+              trackMouse
+            />
           </Canvas>
         </div>
         <Typography size="xxl" bold>
