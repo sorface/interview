@@ -25,3 +25,4 @@ export const VITE_FEEDBACK_IFRAME_URL = getFromEnvOrDefault(
   'VITE_FEEDBACK_IFRAME_URL',
   '',
 );
+export const VITE_AI_API = getFromEnv('VITE_AI_API');

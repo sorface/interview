@@ -16,9 +16,14 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
+      '/ai-assistant/examinee': {
+        target: 'http://localhost:3033',
+        changeOrigin: true,
+        secure: true,
+        ws: true,
+      },
       '/api': {
-        target:
-          process.env['VITE_PROXY_TARGET'] || 'http://localhost:5043/',
+        target: process.env['VITE_PROXY_TARGET'] || 'http://localhost:5043/',
         changeOrigin: true,
         secure: true,
         ws: true,

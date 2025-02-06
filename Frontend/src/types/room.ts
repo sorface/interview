@@ -101,7 +101,7 @@ export interface RoomQuestion {
 
 export interface RoomQuestionEvaluation {
   id: string;
-  mark?: number;
+  mark?: number | null;
   review?: string;
 }
 
