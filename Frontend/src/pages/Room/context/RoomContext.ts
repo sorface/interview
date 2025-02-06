@@ -25,11 +25,13 @@ export interface RoomContextType {
   recognitionEnabled: boolean;
   sendWsMessage: SendMessage;
   setCodeEditorEnabled: (enabled: boolean) => void;
-  setAiAssistantCurrentScript: (aiAssistantScript: AiAssistantScriptName) => void;
+  setAiAssistantCurrentScript: (
+    aiAssistantScript: AiAssistantScriptName,
+  ) => void;
   setRecognitionEnabled: (enabled: boolean) => void;
 }
 
-const noop = () => { };
+const noop = () => {};
 
 const defaultValue: RoomContextType = {
   room: null,

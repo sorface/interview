@@ -14,6 +14,7 @@ export interface DropdownProps {
   toggleClassName?: string;
   toggleIcon?: boolean;
   contentClassName?: string;
+  contentStyle?: React.CSSProperties | undefined;
   useButton?: boolean;
   buttonVariant?: ButtonProps['variant'];
   children: ReactNode;
@@ -24,6 +25,7 @@ export const Dropdown: FunctionComponent<DropdownProps> = ({
   toggleClassName,
   toggleIcon,
   contentClassName,
+  contentStyle,
   useButton,
   buttonVariant,
   children,
@@ -84,6 +86,7 @@ export const Dropdown: FunctionComponent<DropdownProps> = ({
       {open && (
         <div
           className={`${contentClassName} absolute overflow-auto max-h-20 z-50 translate-y-0.25 shadow`}
+          style={contentStyle}
         >
           {children}
         </div>
