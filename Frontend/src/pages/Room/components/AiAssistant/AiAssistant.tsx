@@ -250,10 +250,9 @@ const AiAssistantComponent: FunctionComponent<GroupProps & HrAvatarProps> = ({
         analyser.context.createMediaElementSource(
           audios[AiAssistantScriptName.NeedTrain],
         ),
-      [AiAssistantScriptName.Login]:
-        analyser.context.createMediaElementSource(
-          audios[AiAssistantScriptName.Login],
-        ),
+      [AiAssistantScriptName.Login]: analyser.context.createMediaElementSource(
+        audios[AiAssistantScriptName.Login],
+      ),
     };
     return result;
   }, [analyser, audios]);
