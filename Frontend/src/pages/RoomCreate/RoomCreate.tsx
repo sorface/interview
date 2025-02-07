@@ -103,7 +103,13 @@ const formatDuration = (durationSec: number) => {
   return `${padTime(hours)}:${padTime(minutes)}`;
 };
 
-const getNextHourDate = () => {
+const getAiRoomStartDate = () => {
+  const currDate = new Date();
+  currDate.setMinutes(currDate.getMinutes() + 15);
+  return currDate;
+};
+
+const getAiRoomEndDate = () => {
   const currDate = new Date();
   currDate.setHours(currDate.getHours() + 1);
   return currDate;
@@ -181,8 +187,8 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     name: '',
     categoryId: '',
     date: formatDate(new Date()),
-    startTime: aiRoom ? formatTime(new Date()) : '',
-    endTime: aiRoom ? formatTime(getNextHourDate()) : '',
+    startTime: aiRoom ? formatTime(getAiRoomStartDate()) : '',
+    endTime: aiRoom ? formatTime(getAiRoomEndDate()) : '',
   });
   const parsedRoomDate = parseRoomDate(roomFields);
   const [selectedQuestions, setSelectedQuestions] = useState<
@@ -552,7 +558,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
                 <select
                   id="rootCategory"
                   className="w-full"
-                  value={roomFields.categoryId}
+                  defaultValue={roomFields.categoryId}
                   onChange={handleChangeCategoryField}
                 >
                   <option value="">

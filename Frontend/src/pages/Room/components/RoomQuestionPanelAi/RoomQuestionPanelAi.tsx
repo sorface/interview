@@ -16,9 +16,6 @@ import {
 import { useApiMethod } from '../../../../hooks/useApiMethod';
 import {
   ChangeActiveQuestionBody,
-  copilotApiDeclaration,
-  CopilotEvaluateAnswerBody,
-  CopilotEvaluateAnswerResponse,
   GetRoomQuestionEvaluationParams,
   MergeRoomQuestionEvaluationBody,
   roomQuestionApiDeclaration,
@@ -28,19 +25,22 @@ import {
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { Gap } from '../../../../components/Gap/Gap';
-import {
-  RoomQuestionEvaluationValue,
-} from '../RoomQuestionEvaluation/RoomQuestionEvaluation';
+import { RoomQuestionEvaluationValue } from '../RoomQuestionEvaluation/RoomQuestionEvaluation';
 import { Loader } from '../../../../components/Loader/Loader';
 import { Typography } from '../../../../components/Typography/Typography';
 import { Icon } from '../Icon/Icon';
 import { IconNames } from '../../../../constants';
 import { Button } from '../../../../components/Button/Button';
 import { RoomContext } from '../../context/RoomContext';
-import { useVoiceRecognitionAccum, VoiceRecognitionCommand } from '../../hooks/useVoiceRecognitionAccum';
+import {
+  useVoiceRecognitionAccum,
+  VoiceRecognitionCommand,
+} from '../../hooks/useVoiceRecognitionAccum';
 import { AiAssistant, AiAssistantScriptName } from '../AiAssistant/AiAssistant';
 import { ReviewUserOpinion } from '../../../RoomAnaytics/components/ReviewUserOpinion/ReviewUserOpinion';
 import { AnalyticsUserReview } from '../../../../types/analytics';
+import { useAiAnswerSource } from '../../hooks/useAiAnswerSource';
+import { AuthContext } from '../../../../context/AuthContext';
 
 const notFoundCode = 404;
 const aiAssistantGoodRate = 6;
@@ -64,85 +64,70 @@ interface Question {
 
 const questions: Question[] = [
   {
-    id: '55ec12b1-239b-451e-9464-6d3845f4f133',
+    id: '0193cfe7-4053-75d1-95f8-8b73b837de24',
     value: 'Что из себя представляет контекст выполнения?',
     tags: ['контекст', 'this', 'зис'],
-    nextQuestions: { '8c732b6a-7b4f-48b8-8533-30b83220facb': 1.0 },
+    nextQuestions: { '0193cfe9-4bce-76ce-9682-9ccc93d49a57': 1.0 },
   },
   {
-    id: '8c732b6a-7b4f-48b8-8533-30b83220facb',
+    id: '0193cfe9-4bce-76ce-9682-9ccc93d49a57',
     value: 'Как переопределить контекст у функции?',
     tags: ['контекст', 'функция'],
     nextQuestions: {},
   },
   {
-    id: 'a4fb513e-16dd-4cba-b504-d98fd98abe27',
+    id: '0193d011-2df2-75cd-936e-69695355a604',
     value: 'Что такое «Лексическое окружение»?',
     tags: ['лексическое', 'замыкание', 'замыкания'],
-    nextQuestions: { '6915a9a3-6c36-491c-9588-19592843544d': 1.0 },
+    nextQuestions: { '0193cfdb-28a7-7c7d-8319-0664d689991c': 1.0 },
   },
   {
-    id: '6915a9a3-6c36-491c-9588-19592843544d',
+    id: '0193cfdb-28a7-7c7d-8319-0664d689991c',
     value: 'Что такое «Замыкание»?',
     tags: ['лексическое', 'замыкание', 'замыкания'],
-    nextQuestions: { '55ec12b1-239b-451e-9464-6d3845f4f133': 1.0 },
+    nextQuestions: { '0193cfe7-4053-75d1-95f8-8b73b837de24': 1.0 },
   },
   {
-    id: 'e0c1c923-d6a2-41b1-a6b6-b5e82e8e4de8',
+    id: '0193ee7d-4e7d-7e57-b337-2d567a563722',
     value: 'Какие есть типы в JS?',
     tags: ['типы', 'типизированный'],
-    nextQuestions: { '36a63b67-0e6a-4130-83be-0fb1e7f64642': 1.0, 'd0d0cd70-5bb6-4a84-9e46-734af5b47697': 0.6 },
+    nextQuestions: {
+      '0193ee81-0be8-73ec-ad29-a4bf4616bb00': 1.0,
+      '0193ee8a-2bca-7339-a55f-3665d29f03aa': 0.6,
+    },
   },
   {
-    id: '36a63b67-0e6a-4130-83be-0fb1e7f64642',
+    id: '0193ee81-0be8-73ec-ad29-a4bf4616bb00',
     value: 'В чём различие null и undefined?',
     tags: ['нал', 'now', 'null', 'undefine'],
-    nextQuestions: { 'd0d0cd70-5bb6-4a84-9e46-734af5b47697': 1.0 },
+    nextQuestions: { '0193ee8a-2bca-7339-a55f-3665d29f03aa': 1.0 },
   },
   {
-    id: 'd0d0cd70-5bb6-4a84-9e46-734af5b47697',
+    id: '0193ee8a-2bca-7339-a55f-3665d29f03aa',
     value: 'Что такое объект в JS?',
-    tags: ['объект', 'объекты', 'объектов', 'object',],
-    nextQuestions: { '7231b74e-60e4-4aec-bc0b-afc4ff4f2659': 1.0 },
+    tags: ['объект', 'объекты', 'объектов', 'object'],
+    nextQuestions: { '0193ee8c-775a-7130-9991-8530e0e1f3b3': 1.0 },
   },
   {
-    id: '7231b74e-60e4-4aec-bc0b-afc4ff4f2659',
+    id: '0193ee8c-775a-7130-9991-8530e0e1f3b3',
     value: 'Какого типа могут быть ключи у объекта?',
     tags: ['объект', 'object', 'ключи', 'ключ'],
-    nextQuestions: { 'a4fb513e-16dd-4cba-b504-d98fd98abe27': 1.0 },
+    nextQuestions: { '0193d011-2df2-75cd-936e-69695355a604': 1.0 },
   },
   {
-    id: 'd3a87acd-57ba-4337-8ff6-31d64e20bca9',
-    value: 'Что такое JS?',
-    tags: ['JS', 'javascript', 'gs', 'javascript'],
-    nextQuestions: { 'e0c1c923-d6a2-41b1-a6b6-b5e82e8e4de8': 1.0 },
-  },
-  {
-    id: '1a325851-f68f-4be6-8cfe-6ecd9c3c5486',
-    value: 'Что такое TypeScript?',
-    tags: ['typescript', 'ts', 'типизация'],
-    nextQuestions: { '3b0eab35-32f6-4505-a705-830c64fc7477': 1.0 },
-  },
-  {
-    id: '3b0eab35-32f6-4505-a705-830c64fc7477',
-    value: 'Как задать тип объекту?',
-    tags: ['интерфейс', 'тип'],
-    nextQuestions: {},
-  },
-  {
-    id: '464f511e-1d76-4d09-9ad2-69b8a22e9882',
+    id: '0194df5d-a8fe-760d-a28e-c7c56fc51dfe',
     value: 'Как в JS происходит управление памятью?',
     tags: ['памятью', 'память', 'стек', 'куча', 'хип', 'heap', 'stack'],
-    nextQuestions: { 'bff01b27-0a9b-4b14-a88b-59dd2e3ac108': 1.0 },
+    nextQuestions: { '0193ee7e-ce18-79ef-b7e2-a93edab25b94': 1.0 },
   },
   {
-    id: 'bff01b27-0a9b-4b14-a88b-59dd2e3ac108',
+    id: '0193ee7e-ce18-79ef-b7e2-a93edab25b94',
     value: 'Что такое сборщик мусора?',
     tags: ['сборщик', 'мусора', 'гц', 'сборка', 'гербович коллектор'],
-    nextQuestions: { '3733a026-e0f0-4fd5-9e50-4c4f2a21ace9': 1.0 },
+    nextQuestions: { '0193ee7f-b26b-70e3-a7c8-5add6a256ed3': 1.0 },
   },
   {
-    id: '3733a026-e0f0-4fd5-9e50-4c4f2a21ace9',
+    id: '0193ee7f-b26b-70e3-a7c8-5add6a256ed3',
     value: 'Какие есть алгоритмы сборки мусора?',
     tags: ['сборщик', 'гц', 'сборка', 'гербович коллектор'],
     nextQuestions: {},
@@ -150,13 +135,26 @@ const questions: Question[] = [
 ];
 
 const findQuestionById = (id: string) =>
-  questions.find(question => question.id === id);
+  questions.find((question) => question.id === id);
 
 const normalizeWords = (words: string[]) =>
-  words.map(word => word.trim().toLowerCase());
+  words.map((word) => word.trim().toLowerCase());
 
 const findQuestionsWithTag = (tag: string) =>
-  questions.filter(question => question.tags.indexOf(tag) !== -1);
+  questions.filter((question) => question.tags.indexOf(tag) !== -1);
+
+const getRandomQuestion = () =>
+  questions[Math.floor(Math.random() * questions.length)];
+
+const getRandomQuestionWithNextQuestions = () => {
+  for (let i = 30; i--; ) {
+    const randomQuestion = getRandomQuestion();
+    if (Object.keys(randomQuestion.nextQuestions).length !== 0) {
+      return randomQuestion;
+    }
+  }
+  return getRandomQuestion();
+};
 
 export interface RoomQuestionPanelAiProps {
   roomQuestionsLoading: boolean;
@@ -164,11 +162,10 @@ export interface RoomQuestionPanelAiProps {
   initialQuestion?: RoomQuestion;
 }
 
-export const RoomQuestionPanelAi: FunctionComponent<RoomQuestionPanelAiProps> = ({
-  roomQuestionsLoading,
-  roomQuestions,
-  initialQuestion,
-}) => {
+export const RoomQuestionPanelAi: FunctionComponent<
+  RoomQuestionPanelAiProps
+> = ({ roomQuestionsLoading, roomQuestions, initialQuestion }) => {
+  const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
   const {
     room,
@@ -189,7 +186,9 @@ export const RoomQuestionPanelAi: FunctionComponent<RoomQuestionPanelAiProps> = 
     useState<RoomQuestionEvaluationValue | null>(null);
   const [copilotAnswerOpen, setCopilotAnswerOpen] = useState(false);
   const startedByVoiceRef = useRef(false);
-  const [nextQuestionsMap, setNextQuestionsMap] = useState<Record<string, number>>({});
+  const [nextQuestionsMap, setNextQuestionsMap] = useState<
+    Record<string, number>
+  >({});
   const nextQuestions = Object.entries(nextQuestionsMap)
     .sort(([, factor1], [, factor2]) => {
       if (factor1 < factor2) {
@@ -252,17 +251,6 @@ export const RoomQuestionPanelAi: FunctionComponent<RoomQuestionPanelAiProps> = 
     },
   } = apiMergeRoomQuestionEvaluationState;
 
-  const {
-    apiMethodState: apiEvaluateAnswerState,
-    fetchData: fetchEvaluateAnswer,
-  } = useApiMethod<CopilotEvaluateAnswerResponse, CopilotEvaluateAnswerBody>(
-    copilotApiDeclaration.evaluateAnswer,
-  );
-  const {
-    process: { loading: evaluateAnswerLoading, error: evaluateAnswerError },
-    data: evaluateAnswerData,
-  } = apiEvaluateAnswerState;
-
   const getRoomQuestionEvaluationError =
     responseCodeRoomQuestionEvaluation !== notFoundCode
       ? errorRoomQuestionEvaluation
@@ -270,34 +258,62 @@ export const RoomQuestionPanelAi: FunctionComponent<RoomQuestionPanelAiProps> = 
   const totalErrorRoomQuestionEvaluation =
     errorMergeRoomQuestionEvaluation || getRoomQuestionEvaluationError;
 
+  const { aiAnswerCompleted, aiAnswerLoading, lastValidAiAnswer } =
+    useAiAnswerSource({
+      enabled: copilotAnswerOpen,
+      answer: recognitionAccum,
+      conversationId: `${room?.id}${initialQuestion?.id}${auth?.id}`,
+      question: initialQuestion?.value || '',
+      questionId: initialQuestion?.id || '',
+      theme: room?.category?.name || '',
+      userId: auth?.id || '',
+    });
+
   const closedQuestions = roomQuestions.filter(
     (roomQuestion) => roomQuestion.state === 'Closed',
   );
   const openQuestions = roomQuestions.filter(
     (roomQuestion) => roomQuestion.state === 'Open',
   );
-  const readyToReview = closedQuestions.length > 4 || openQuestions.length === 0;
+  const readyToReview =
+    closedQuestions.length > 4 || openQuestions.length === 0;
   const nextQuestionButtonLoading =
-    (!mergedRoomQuestionEvaluation || loadingMergeRoomQuestionEvaluation) ||
-    (!evaluateAnswerData || evaluateAnswerLoading);
-  const letsStartDescription = localizationCaptions[LocalizationKey.LetsBeginDescription]
-    .replace('{LetsStartCommand}', localizationCaptions[LocalizationKey.LetsBeginCommand]);
-  const rateMeDescription = localizationCaptions[LocalizationKey.RateMeDescription]
-    .replace('{RateMeCommand}', localizationCaptions[LocalizationKey.RateMeCommand]);
+    !mergedRoomQuestionEvaluation ||
+    loadingMergeRoomQuestionEvaluation ||
+    !aiAnswerCompleted;
+  const letsStartDescription = localizationCaptions[
+    LocalizationKey.LetsBeginDescription
+  ].replace(
+    '{LetsStartCommand}',
+    localizationCaptions[LocalizationKey.LetsBeginCommand],
+  );
+  const rateMeDescription = localizationCaptions[
+    LocalizationKey.RateMeDescription
+  ].replace(
+    '{RateMeCommand}',
+    localizationCaptions[LocalizationKey.RateMeCommand],
+  );
 
   useEffect(() => {
     setRecognitionEnabled(!copilotAnswerOpen);
   }, [copilotAnswerOpen, setRecognitionEnabled]);
 
   useEffect(() => {
-    if (!initialQuestion) {
+    if (initialQuestion) {
+      const currQuestion = findQuestionById(initialQuestion.id);
+      if (!currQuestion) {
+        return;
+      }
+      if (Object.keys(currQuestion.nextQuestions).length === 0) {
+        const randWithNextQuestions = getRandomQuestionWithNextQuestions();
+        setNextQuestionsMap(randWithNextQuestions.nextQuestions || {});
+        return;
+      }
+      setNextQuestionsMap(currQuestion?.nextQuestions || {});
       return;
     }
-    const currQ = findQuestionById(initialQuestion.id);
-    if (!currQ) {
-      console.warn('no next questions');
-    }
-    setNextQuestionsMap(currQ?.nextQuestions || {});
+    const randomQuestion = getRandomQuestionWithNextQuestions();
+    setNextQuestionsMap(randomQuestion?.nextQuestions || {});
   }, [initialQuestion]);
 
   const addNextQuestionContext = useCallback((message: string) => {
@@ -308,13 +324,12 @@ export const RoomQuestionPanelAi: FunctionComponent<RoomQuestionPanelAiProps> = 
     }
     setNextQuestionsMap((oldNextQuestionsMap) => {
       const clone = { ...oldNextQuestionsMap };
-      questionsWithTags.forEach(questionWithTags => {
-
+      questionsWithTags.forEach((questionWithTags) => {
         if (!clone[questionWithTags.id]) {
           clone[questionWithTags.id] = 0.0;
         }
         clone[questionWithTags.id] += 0.3;
-      })
+      });
       return clone;
     });
   }, []);
@@ -355,40 +370,22 @@ export const RoomQuestionPanelAi: FunctionComponent<RoomQuestionPanelAiProps> = 
     setCopilotAnswerOpen(false);
   }, []);
 
-  const handleRateMe = useCallback(() => {
-    const question = initialQuestion?.value;
-    if (!question) {
-      return;
-    }
-    fetchEvaluateAnswer({
-      question,
-      transcript: recognitionAccum,
-    });
-  }, [initialQuestion?.value, recognitionAccum, fetchEvaluateAnswer]);
-
-  useEffect(() => {
-    if (!evaluateAnswerData) {
-      return;
-    }
-    handleCopilotAnswerOpen();
-  }, [evaluateAnswerData, handleCopilotAnswerOpen]);
-
   useEffect(() => {
     if (recognitionCommand !== VoiceRecognitionCommand.RateMe) {
       return;
     }
-    handleRateMe();
-  }, [recognitionCommand, handleRateMe]);
+    handleCopilotAnswerOpen();
+  }, [recognitionCommand, handleCopilotAnswerOpen]);
 
   useEffect(() => {
-    if (!evaluateAnswerData) {
+    if (!aiAnswerCompleted || !lastValidAiAnswer) {
       return;
     }
     setRoomQuestionEvaluation({
-      mark: evaluateAnswerData.mark,
-      review: evaluateAnswerData.review,
+      mark: Math.round(lastValidAiAnswer?.score),
+      review: lastValidAiAnswer?.reason,
     });
-  }, [evaluateAnswerData]);
+  }, [aiAnswerCompleted, lastValidAiAnswer]);
 
   useEffect(() => {
     if (!room) {
@@ -407,15 +404,15 @@ export const RoomQuestionPanelAi: FunctionComponent<RoomQuestionPanelAiProps> = 
   }, [initialQuestion?.id, setAiAssistantCurrentScript]);
 
   useEffect(() => {
-    if (!evaluateAnswerData) {
+    if (!aiAnswerCompleted) {
       return;
     }
-    if (evaluateAnswerData.mark >= aiAssistantGoodRate) {
+    if (lastValidAiAnswer?.score >= aiAssistantGoodRate) {
       setAiAssistantCurrentScript(AiAssistantScriptName.GoodAnswer);
     } else {
       setAiAssistantCurrentScript(AiAssistantScriptName.NeedTrain);
     }
-  }, [evaluateAnswerData, setAiAssistantCurrentScript])
+  }, [aiAnswerCompleted, lastValidAiAnswer, setAiAssistantCurrentScript]);
 
   useEffect(() => {
     if (readOnly || !room || !initialQuestion) {
@@ -484,7 +481,13 @@ export const RoomQuestionPanelAi: FunctionComponent<RoomQuestionPanelAiProps> = 
       roomId: room.id,
       questionId: nextQId,
     });
-  }, [room, nextQuestions, handleCopilotAnswerClose, resetVoiceRecognitionAccum, sendRoomActiveQuestion]);
+  }, [
+    room,
+    nextQuestions,
+    handleCopilotAnswerClose,
+    resetVoiceRecognitionAccum,
+    sendRoomActiveQuestion,
+  ]);
 
   useEffect(() => {
     if (
@@ -509,66 +512,72 @@ export const RoomQuestionPanelAi: FunctionComponent<RoomQuestionPanelAiProps> = 
     fetchRoomStartReview(room.id);
   }, [room?.id, fetchRoomStartReview]);
 
-  const firstLineCaption = initialQuestion ?
-    initialQuestion.value :
-    localizationCaptions[LocalizationKey.WaitingInterviewStart];
-  const secondLineCaption = initialQuestion ?
-    rateMeDescription :
-    letsStartDescription;
+  const firstLineCaption = initialQuestion
+    ? initialQuestion.value
+    : localizationCaptions[LocalizationKey.WaitingInterviewStart];
+  const secondLineCaption = initialQuestion
+    ? rateMeDescription
+    : letsStartDescription;
   const loadingTotal =
     loadingRoomStartReview ||
     roomQuestionsLoading ||
     loadingRoomActiveQuestion ||
-    evaluateAnswerLoading;
+    aiAnswerLoading;
 
   return (
     <>
-      <div className='flex flex-col z-50'>
-        <Typography size='xxxl' bold>{firstLineCaption}</Typography>
+      <div className="flex flex-col z-50">
+        <Typography size="xxxl" bold>
+          {firstLineCaption}
+        </Typography>
         <Gap sizeRem={0.5} />
-        <Typography size='m'>{secondLineCaption}</Typography>
+        <Typography size="m">{secondLineCaption}</Typography>
         {errorRoomActiveQuestion && (
           <>
             <Gap sizeRem={1} />
-            <Typography size='m' error>
-              {
-                localizationCaptions[
-                LocalizationKey.ErrorSendingActiveQuestion
-                ]
-              }
+            <Typography size="m" error>
+              {localizationCaptions[LocalizationKey.ErrorSendingActiveQuestion]}
             </Typography>
           </>
         )}
       </div>
 
-      {copilotAnswerOpen && !evaluateAnswerLoading && evaluateAnswerData && (
-        <div className='absolute w-full h-full flex items-center justify-center'>
-          <div className='flex flex-col px-1.5 z-10'>
-            {evaluateAnswerLoading && <Loader />}
-            {(!evaluateAnswerLoading && evaluateAnswerData) && (
-              <ReviewUserOpinion
-                user={{
-                  id: aiExpertId,
-                  evaluation: {
-                    mark: evaluateAnswerData.mark,
-                    review: evaluateAnswerData.review,
-                  },
-                }}
-                allUsers={allUsersWithAiExpert}
-              />
-            )}
+      {copilotAnswerOpen && (
+        <div className="absolute w-full h-full flex items-center justify-center">
+          <div className="flex flex-col px-1.5 z-10">
+            <ReviewUserOpinion
+              user={{
+                id: aiExpertId,
+                evaluation: {
+                  mark: parseFloat(lastValidAiAnswer?.score) || null,
+                  review: lastValidAiAnswer?.reason,
+                  expected: lastValidAiAnswer?.expected,
+                  recommendation: lastValidAiAnswer?.recommendation,
+                },
+              }}
+              allUsers={allUsersWithAiExpert}
+            />
             <div>
               <Gap sizeRem={1.75} />
-              {totalErrorRoomQuestionEvaluation && <Typography size='m' error>{totalErrorRoomQuestionEvaluation}</Typography>}
-              {evaluateAnswerError && <Typography size='m' error>{evaluateAnswerError}</Typography>}
-              {errorRoomStartReview && <Typography size='m' error>{errorRoomStartReview}</Typography>}
-              <div className='flex justify-center w-full'>
+              {totalErrorRoomQuestionEvaluation && (
+                <Typography size="m" error>
+                  {totalErrorRoomQuestionEvaluation}
+                </Typography>
+              )}
+              {errorRoomStartReview && (
+                <Typography size="m" error>
+                  {errorRoomStartReview}
+                </Typography>
+              )}
+              <div className="flex justify-center w-full">
                 <Button
                   className="flex items-center"
                   variant="active"
-                  onClick={readyToReview ? handleStartReviewRoom : handleNextQuestion}
+                  disabled={nextQuestionButtonLoading}
+                  onClick={
+                    readyToReview ? handleStartReviewRoom : handleNextQuestion
+                  }
                 >
-
                   {nextQuestionButtonLoading ? (
                     <Loader />
                   ) : (
@@ -576,16 +585,18 @@ export const RoomQuestionPanelAi: FunctionComponent<RoomQuestionPanelAiProps> = 
                       <span>
                         {
                           localizationCaptions[
-                          readyToReview
-                            ? LocalizationKey.StartReviewRoom
-                            : LocalizationKey.NextRoomQuestion
+                            readyToReview
+                              ? LocalizationKey.StartReviewRoom
+                              : LocalizationKey.NextRoomQuestion
                           ]
                         }
                       </span>
                       <Gap sizeRem={0.5} horizontal />
                       <Icon
                         name={
-                          readyToReview ? IconNames.Stop : IconNames.ChevronForward
+                          readyToReview
+                            ? IconNames.Stop
+                            : IconNames.ChevronForward
                         }
                       />
                     </>
@@ -597,7 +608,10 @@ export const RoomQuestionPanelAi: FunctionComponent<RoomQuestionPanelAiProps> = 
         </div>
       )}
 
-      <div className='absolute w-full h-full z-0' style={{ opacity: copilotAnswerOpen ? 0.05 : 1.0 }}>
+      <div
+        className="absolute w-full h-full z-0"
+        style={{ opacity: copilotAnswerOpen ? 0.05 : 1.0 }}
+      >
         <Canvas shadows camera={{ position: [0, 0.5, 6.5], fov: 38 }}>
           <EffectComposer>
             <FXAA />
