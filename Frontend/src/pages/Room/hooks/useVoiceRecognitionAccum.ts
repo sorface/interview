@@ -30,7 +30,7 @@ type VoiceRecognitionAccumAction =
 const checkIsCommandTranscript = (transcript: string, command: string[]) => {
   const words = encodeRussianSymbols(transcript.toLowerCase().replaceAll('.', '')).split(' ');
   const firstWordIndex = words.indexOf(encodeRussianSymbols(command[0]));
-
+  
   if (firstWordIndex === -1) {
     return false;
   }
