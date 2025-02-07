@@ -1,6 +1,8 @@
 import React, { FunctionComponent, ReactNode } from 'react';
 import { UserAvatar } from '../../../../components/UserAvatar/UserAvatar';
 import { ParticipantReactions } from './ParticipantReactions';
+import { ParticipantPinButton } from './ParticipantPinButton';
+import { usePin } from './hoks/usePin';
 
 interface VideochatParticipantWithVideoProps {
   order?: number;
@@ -8,17 +10,21 @@ interface VideochatParticipantWithVideoProps {
   avatar?: string;
   nickname?: string;
   reaction?: string | null;
+  pinable?: boolean;
 }
 
 export const VideochatParticipantWithVideo: FunctionComponent<
   VideochatParticipantWithVideoProps
-> = ({ order, children, avatar, nickname, reaction }) => {
-  const orderSafe = order || 2;
+> = ({ order, children, avatar, nickname, reaction, pinable }) => {
+  const { handlePin, pin, orderSafe } = usePin(order);
+
   return (
     <div
       className={`videochat-participant ${orderSafe === 1 ? 'videochat-participant-big' : 'videochat-participant'}`}
       style={{ order: orderSafe }}
     >
+      {pinable && <ParticipantPinButton handlePin={handlePin} pin={pin} />}
+
       {!!reaction && (
         <div className="videochat-caption videochat-overlay videochat-participant-reactions">
           <ParticipantReactions reaction={reaction} />

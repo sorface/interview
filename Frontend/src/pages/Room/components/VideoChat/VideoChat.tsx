@@ -489,6 +489,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             .filter((peer) => !peer.screenShare)
             .map((peer) => (
               <VideochatParticipant
+                pinable
                 key={peer.peerID}
                 viewer={peer.participantType === 'Viewer'}
                 order={
