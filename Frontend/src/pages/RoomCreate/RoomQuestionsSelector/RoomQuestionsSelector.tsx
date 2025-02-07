@@ -26,6 +26,7 @@ import { Button } from '../../../components/Button/Button';
 import { RoomCreateField } from '../RoomCreateField/RoomCreateField';
 import { Typography } from '../../../components/Typography/Typography';
 import { Checkbox } from '../../../components/Checkbox/Checkbox';
+import { useDebounce } from '../../../utils/debounce';
 
 interface RoomQuestionsSelectorProps {
   preSelected: RoomQuestionListItem[];
@@ -40,7 +41,6 @@ export const RoomQuestionsSelector: FunctionComponent<
   RoomQuestionsSelectorProps
 > = ({ preSelected, onCancel, onSave }) => {
   const localizationCaptions = useLocalizationCaptions();
-
   const {
     apiMethodState: rootCategoriesState,
     fetchData: fetchRootCategories,
@@ -61,7 +61,7 @@ export const RoomQuestionsSelector: FunctionComponent<
     data: subCategories,
   } = subCategoriesState;
 
-  const { apiMethodState: questionsState, fetchData: fetchQuestios } =
+  const { apiMethodState: questionsState, fetchData: fetchQuestions } =
     useApiMethod<Question[], GetQuestionsParams>(
       questionsApiDeclaration.getPage,
     );
@@ -72,15 +72,17 @@ export const RoomQuestionsSelector: FunctionComponent<
 
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const [rootCategory, setRootCategory] = useState('');
+  const [inputQuestionValue, setInputQuestionValue] = useState('');
   const [subCategory, setSubCategory] = useState('');
   const [selectedQuestions, setSelectedQuestions] =
     useState<RoomQuestionListItem[]>(preSelected);
+  const questionValueDebounced = useDebounce(inputQuestionValue);
 
   const totalLoading =
     rootCategoriesLoading || subCategoriesLoading || questionsLoading;
   const totalError =
     rootCategoriesError || subCategoriesError || questionsError;
-  const triggerResetAccumData = `${rootCategory}${subCategory}`;
+  const triggerResetAccumData = `${questionValueDebounced}${rootCategory}${subCategory}`;
 
   useEffect(() => {
     fetchRootCategories({
@@ -108,20 +110,25 @@ export const RoomQuestionsSelector: FunctionComponent<
     if (!subCategory) {
       return;
     }
-    fetchQuestios({
+    fetchQuestions({
       PageNumber: pageNumber,
       PageSize: pageSize,
       tags: [],
-      value: '',
+      value: questionValueDebounced,
       categoryId: subCategory,
     });
-  }, [pageNumber, subCategory, fetchQuestios]);
+  }, [pageNumber, subCategory, fetchQuestions, questionValueDebounced]);
 
   const handleRootCategoryChange: ChangeEventHandler<HTMLSelectElement> = (
     e,
   ) => {
     setRootCategory(e.target.value);
     setSubCategory('');
+  };
+  const handleQuestionsInputChange: ChangeEventHandler<HTMLInputElement> = (
+    e,
+  ) => {
+    setInputQuestionValue(e.target.value);
   };
 
   const handleSubCategoryChange: ChangeEventHandler<HTMLSelectElement> = (
@@ -253,6 +260,23 @@ export const RoomQuestionsSelector: FunctionComponent<
               </select>
             </RoomCreateField.Content>
           </RoomCreateField.Wrapper>
+          <Gap sizeRem={1} horizontal />
+          <RoomCreateField.Wrapper>
+            <RoomCreateField.Label>
+              <Typography size="m" bold>
+                {localizationCaptions[LocalizationKey.SearchByName]}
+              </Typography>
+            </RoomCreateField.Label>
+
+            <RoomCreateField.Content>
+              <input
+                type="text"
+                value={inputQuestionValue}
+                onChange={handleQuestionsInputChange}
+              />
+            </RoomCreateField.Content>
+          </RoomCreateField.Wrapper>
+
           <RoomCreateField.Wrapper className="ml-auto">
             <RoomCreateField.Label>
               <Gap sizeRem={1.25} />
