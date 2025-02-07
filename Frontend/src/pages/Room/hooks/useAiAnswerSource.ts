@@ -39,6 +39,7 @@ export const useAiAnswerSource = ({
 
     const fetchAiEvaluate = async () => {
       const response = await fetch(`${VITE_AI_API}/ai-assistant/examinee`, {
+        credentials: 'include',
         headers: {
           'content-type': 'application/json',
         },
