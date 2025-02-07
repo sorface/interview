@@ -474,6 +474,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             avatar={auth?.avatar}
             nickname={`${auth?.nickname} (${localizationCaptions[LocalizationKey.You]})`}
             reaction={activeReactions[auth?.id || '']}
+            pinable
           >
             <video
               ref={userVideo}
