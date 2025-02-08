@@ -28,7 +28,7 @@ type VoiceRecognitionAccumAction =
     };
 
 const checkIsCommandTranscript = (transcript: string, command: string[]) => {
-  const words = transcript.toLowerCase().replaceAll('.', '').split(' ');
+  const words = transcript.toLowerCase().replaceAll('.', '').replaceAll('ё', 'е').split(' ');
   const firstWordIndex = words.indexOf(command[0]);
   if (firstWordIndex === -1) {
     return false;
