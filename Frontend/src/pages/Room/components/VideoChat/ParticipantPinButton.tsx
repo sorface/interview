@@ -1,7 +1,4 @@
-import { Button } from '../../../../components/Button/Button';
 import { IconNames } from '../../../../constants';
-import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
-import { LocalizationKey } from '../../../../localization';
 import { Icon } from '../Icon/Icon';
 
 interface ParticipantPinButtonProps {
@@ -13,12 +10,10 @@ export const ParticipantPinButton = ({
   pin,
   handlePin,
 }: ParticipantPinButtonProps) => {
-  const localizationCaptions = useLocalizationCaptions();
-
   return (
-    <Button onClick={handlePin}>
-      {localizationCaptions[LocalizationKey.Pin]}
-      {pin && <Icon name={IconNames.Like} />}
-    </Button>
+    <div onClick={handlePin}>
+      {pin && <Icon name={IconNames.ChevronDown} />}
+      {!pin && <Icon name={IconNames.Like} />}
+    </div>
   );
 };

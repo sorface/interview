@@ -23,8 +23,6 @@ export const VideochatParticipantWithVideo: FunctionComponent<
       className={`videochat-participant ${orderSafe === 1 ? 'videochat-participant-big' : 'videochat-participant'}`}
       style={{ order: orderSafe }}
     >
-      {pinable && <ParticipantPinButton handlePin={handlePin} pin={pin} />}
-
       {!!reaction && (
         <div className="videochat-caption videochat-overlay videochat-participant-reactions">
           <ParticipantReactions reaction={reaction} />
@@ -33,6 +31,7 @@ export const VideochatParticipantWithVideo: FunctionComponent<
       <div className="videochat-caption videochat-overlay videochat-participant-name">
         {avatar && <UserAvatar src={avatar} nickname={nickname || ''} />}
         {nickname}
+        {pinable && <ParticipantPinButton handlePin={handlePin} pin={pin} />}
       </div>
       <div className="h-full">{children}</div>
     </div>

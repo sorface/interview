@@ -22,11 +22,10 @@ export const VideochatParticipantWithoutVideo: FunctionComponent<
       className="videochat-participant-viewer-wrapper"
       style={{ order: orderSafe }}
     >
-      {pinable && <ParticipantPinButton handlePin={handlePin} pin={pin} />}
-
       <div className="videochat-participant-viewer">
         {avatar && <UserAvatar src={avatar} nickname={nickname || ''} />}
         <div>{nickname}</div>
+        {pinable && <ParticipantPinButton handlePin={handlePin} pin={pin} />}
         <ParticipantReactions reaction={reaction} />
       </div>
     </div>
