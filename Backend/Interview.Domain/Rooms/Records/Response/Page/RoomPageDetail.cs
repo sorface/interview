@@ -20,4 +20,6 @@ public class RoomPageDetail
     public RoomTimerDetail? Timer { get; set; }
 
     public DateTime? ScheduledStartTime { get; init; }
+
+    public required EVRoomType Type { get; init; }
 }

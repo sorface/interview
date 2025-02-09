@@ -127,6 +127,7 @@ public sealed class RoomService(
                 Tags = e.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
                 Timer = e.Timer == null ? null : new { Duration = e.Timer.Duration, ActualStartTime = e.Timer.ActualStartTime, },
                 ScheduledStartTime = e.ScheduleStartTime,
+                Type = e.Type,
             })
             .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
 
@@ -140,6 +141,7 @@ public sealed class RoomService(
             Tags = e.Tags,
             Timer = e.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)e.Timer.Duration.TotalSeconds, StartTime = e.Timer.ActualStartTime, },
             ScheduledStartTime = e.ScheduledStartTime,
+            Type = e.Type.EnumValue,
         });
     }
 
@@ -408,11 +410,22 @@ public sealed class RoomService(
                             })
                         .ToList(),
                     Status = room.Status.EnumValue,
-                    Tags = room.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
+                    Tags = room.Tags.Select(t => new TagItem
+                        {
+                            Id = t.Id,
+                            Value = t.Value,
+                            HexValue = t.HexColor,
+                        })
+                        .ToList(),
                     Timer = room.Timer == null
                         ? null
-                        : new RoomTimerDetail { DurationSec = (long)room.Timer.Duration.TotalSeconds, StartTime = room.Timer.ActualStartTime, },
+                        : new RoomTimerDetail
+                        {
+                            DurationSec = (long)room.Timer.Duration.TotalSeconds,
+                            StartTime = room.Timer.ActualStartTime,
+                        },
                     ScheduledStartTime = room.ScheduleStartTime,
+                    Type = room.Type.EnumValue,
                 };
             },
             cancellationToken);
