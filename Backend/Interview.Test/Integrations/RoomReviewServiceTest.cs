@@ -189,12 +189,15 @@ public class RoomReviewServiceTest
 
         var service = new RoomReviewService(
             iRoomReviewRepository,
-            iRoomRepository,
-            iRoomQuestionEvaluationRepository,
             iRoomMembershipChecker,
             memoryDatabase,
             iRoomParticipantRepository,
-            new RoomStatusUpdater(memoryDatabase, new RoomQuestionRepository(memoryDatabase))
+            new RoomReviewCompleter(
+                memoryDatabase,
+                iRoomParticipantRepository,
+                iRoomQuestionEvaluationRepository,
+                iRoomRepository,
+                new RoomStatusUpdater(memoryDatabase, new RoomQuestionRepository(memoryDatabase)))
         );
 
         var roomCompleteResponse = await service.CompleteAsync(new RoomReviewCompletionRequest { RoomId = room.Id }, user2.Id, ct);
@@ -292,12 +295,15 @@ public class RoomReviewServiceTest
 
         var service = new RoomReviewService(
             new RoomReviewRepository(db),
-            new RoomRepository(db),
-            new RoomQuestionEvaluationRepository(db),
             new RoomMembershipChecker(userAccessor, new RoomParticipantRepository(db)),
             db,
             new RoomParticipantRepository(db),
-            new RoomStatusUpdater(db, new RoomQuestionRepository(db)));
+            new RoomReviewCompleter(
+                db,
+                new RoomParticipantRepository(db),
+                new RoomQuestionEvaluationRepository(db),
+                new RoomRepository(db),
+                new RoomStatusUpdater(db, new RoomQuestionRepository(db))));
 
         return (service, user.Id, room.Id);
     }
