@@ -31,7 +31,7 @@ public class RoomController(IRoomService roomService) : ControllerBase
     [Authorize]
     [HttpGet]
     [Produces(MediaTypeNames.Application.Json)]
-    [ProducesResponseType(typeof(RoomReviewDetail), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RoomPageDetail), StatusCodes.Status200OK)]
     public Task<IPagedList<RoomPageDetail>> GetPage(
         [FromQuery] PageRequest request,
         [FromQuery] RoomPageDetailRequestFilter? filter)
