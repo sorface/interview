@@ -394,6 +394,11 @@ export const roomReviewApiDeclaration = {
     baseUrl: '/room-reviews/complete',
     body,
   }),
+  completeAi: (body: CompleteRoomReviewsBody): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: '/room-reviews/complete/ai',
+    body,
+  }),
 };
 
 export interface ApplyRoomInviteBody {

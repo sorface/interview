@@ -9,18 +9,18 @@ import React, {
 import { Canvas } from '@react-three/fiber';
 import { EffectComposer, FXAA } from '@react-three/postprocessing';
 import {
-  Room,
   RoomQuestion,
   RoomQuestionEvaluation as RoomQuestionEvaluationType,
 } from '../../../../types/room';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
 import {
   ChangeActiveQuestionBody,
+  CompleteRoomReviewsBody,
   GetRoomQuestionEvaluationParams,
   MergeRoomQuestionEvaluationBody,
   roomQuestionApiDeclaration,
   roomQuestionEvaluationApiDeclaration,
-  roomsApiDeclaration,
+  roomReviewApiDeclaration,
 } from '../../../../apiDeclarations';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
@@ -218,7 +218,9 @@ export const RoomQuestionPanelAi: FunctionComponent<
   const {
     apiMethodState: apiRoomStartReviewMethodState,
     fetchData: fetchRoomStartReview,
-  } = useApiMethod<unknown, Room['id']>(roomsApiDeclaration.startReview);
+  } = useApiMethod<unknown, CompleteRoomReviewsBody>(
+    roomReviewApiDeclaration.completeAi,
+  );
   const {
     process: { loading: loadingRoomStartReview, error: errorRoomStartReview },
   } = apiRoomStartReviewMethodState;
@@ -276,7 +278,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
     (roomQuestion) => roomQuestion.state === 'Open',
   );
   const readyToReview =
-    closedQuestions.length > 4 || openQuestions.length === 0;
+    closedQuestions.length > 1 || openQuestions.length === 0;
   const nextQuestionButtonLoading =
     !mergedRoomQuestionEvaluation ||
     loadingMergeRoomQuestionEvaluation ||
@@ -509,7 +511,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
     if (!room?.id) {
       throw new Error('Room id not found');
     }
-    fetchRoomStartReview(room.id);
+    fetchRoomStartReview({ roomId: room.id });
   }, [room?.id, fetchRoomStartReview]);
 
   const firstLineCaption = initialQuestion
