@@ -50,7 +50,6 @@ public sealed class RoomService(
         IQueryable<Room> queryable = db.Rooms
             .Include(e => e.Participants)
             .ThenInclude(e => e.User)
-            .Include(e => e.Questions)
             .Include(e => e.Configuration)
             .Include(e => e.Tags)
             .Include(e => e.Timer)
@@ -104,16 +103,6 @@ public sealed class RoomService(
             {
                 Id = e.Id,
                 Name = e.Name,
-                Questions = e.Questions.OrderBy(rq => rq.Order)
-                    .Select(question => new RoomQuestionDetail
-                    {
-                        Id = question.Question!.Id,
-                        Value = question.Question.Value,
-                        Order = question.Order,
-                        Answers = null,
-                        CodeEditor = null,
-                    })
-                    .ToList(),
                 Participants = e.Participants.Select(participant =>
                         new RoomUserDetail
                         {
@@ -135,7 +124,6 @@ public sealed class RoomService(
         {
             Id = e.Id,
             Name = e.Name,
-            Questions = e.Questions,
             Participants = e.Participants,
             Status = e.RoomStatus,
             Tags = e.Tags,
@@ -390,16 +378,6 @@ public sealed class RoomService(
                 {
                     Id = room.Id,
                     Name = room.Name,
-                    Questions = room.Questions.OrderBy(rq => rq.Order)
-                        .Select(question => new RoomQuestionDetail
-                        {
-                            Id = question.Question!.Id,
-                            Value = question.Question.Value,
-                            Order = question.Order,
-                            Answers = null,
-                            CodeEditor = null,
-                        })
-                        .ToList(),
                     Participants = room.Participants.Select(participant =>
                             new RoomUserDetail
                             {
@@ -411,11 +389,11 @@ public sealed class RoomService(
                         .ToList(),
                     Status = room.Status.EnumValue,
                     Tags = room.Tags.Select(t => new TagItem
-                        {
-                            Id = t.Id,
-                            Value = t.Value,
-                            HexValue = t.HexColor,
-                        })
+                    {
+                        Id = t.Id,
+                        Value = t.Value,
+                        HexValue = t.HexColor,
+                    })
                         .ToList(),
                     Timer = room.Timer == null
                         ? null
