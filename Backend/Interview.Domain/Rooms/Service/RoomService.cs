@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Storage;
@@ -13,11 +12,9 @@ using Interview.Domain.Rooms.Records.Response.RoomStates;
 using Interview.Domain.Rooms.RoomInvites;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomParticipants.Service;
-using Interview.Domain.Rooms.RoomQuestionEvaluations;
 using Interview.Domain.Rooms.RoomQuestionReactions.Mappers;
 using Interview.Domain.Rooms.RoomQuestionReactions.Specifications;
 using Interview.Domain.Rooms.RoomQuestions;
-using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Rooms.RoomTimers;
 using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
@@ -32,7 +29,6 @@ using Entity = Interview.Domain.Repository.Entity;
 namespace Interview.Domain.Rooms.Service;
 
 public sealed class RoomService(
-    IRoomQuestionRepository roomQuestionRepository,
     IRoomEventDispatcher roomEventDispatcher,
     IHotEventStorage hotEventStorage,
     IRoomInviteService roomInviteService,
@@ -41,7 +37,8 @@ public sealed class RoomService(
     AppDbContext db,
     ILogger<RoomService> logger,
     ISystemClock clock,
-    RoomAnalyticService roomAnalyticService)
+    RoomAnalyticService roomAnalyticService,
+    RoomStatusUpdater roomStatusUpdater)
     : IRoomServiceWithoutPermissionCheck
 {
     public async Task<IPagedList<RoomPageDetail>> FindPageAsync(
@@ -627,15 +624,9 @@ public sealed class RoomService(
     /// <param name="roomId">Room id.</param>
     /// <param name="cancellationToken">Token.</param>
     /// <returns>Result.</returns>
-    public Task CloseAsync(Guid roomId, CancellationToken cancellationToken = default)
-    {
-        return UpdateRoomStatusAsync(roomId, SERoomStatus.Close, cancellationToken);
-    }
+    public Task CloseAsync(Guid roomId, CancellationToken cancellationToken = default) => roomStatusUpdater.CloseWithoutReviewAsync(roomId, cancellationToken: cancellationToken);
 
-    public Task StartReviewAsync(Guid roomId, CancellationToken cancellationToken)
-    {
-        return UpdateRoomStatusAsync(roomId, SERoomStatus.Review, cancellationToken);
-    }
+    public Task StartReviewAsync(Guid roomId, CancellationToken cancellationToken) => roomStatusUpdater.StartReviewAsync(roomId, cancellationToken: cancellationToken);
 
     public async Task<ActualRoomStateResponse> GetActualStateAsync(Guid roomId, CancellationToken cancellationToken = default)
     {
@@ -949,47 +940,6 @@ public sealed class RoomService(
         }
 
         return new RoomTimer { Duration = TimeSpan.FromSeconds(durationSec.Value), };
-    }
-
-    private async Task UpdateRoomStatusAsync(Guid roomId, SERoomStatus status, CancellationToken cancellationToken)
-    {
-        var currentRoom = await db.Rooms.FirstOrDefaultAsync(e => e.Id == roomId, cancellationToken);
-        if (currentRoom is null)
-        {
-            throw NotFoundException.Create<Room>(roomId);
-        }
-
-        if (currentRoom.Status == status)
-        {
-            throw new UserException($"Room already in '{status}' status");
-        }
-
-        await db.RunTransactionAsync(async _ =>
-            {
-                currentRoom.Status = status;
-
-                await roomQuestionRepository.CloseActiveQuestionAsync(roomId, cancellationToken);
-                if (status == SERoomStatus.Close)
-                {
-                    await db.RoomQuestionEvaluation
-                        .Include(e => e.RoomQuestion)
-                        .Where(e => e.RoomQuestion!.RoomId == roomId && e.State == SERoomQuestionEvaluationState.Draft)
-                        .ExecuteUpdateAsync(
-                            calls => calls.SetProperty(e => e.State, SERoomQuestionEvaluationState.Rejected),
-                            cancellationToken);
-
-                    await db.RoomReview
-                        .Include(e => e.Participant)
-                        .Where(e => e.Participant!.RoomId == roomId && e.State == SERoomReviewState.Open)
-                        .ExecuteUpdateAsync(
-                            calls => calls.SetProperty(e => e.State, SERoomReviewState.Rejected),
-                            cancellationToken);
-                }
-
-                await db.SaveChangesAsync(cancellationToken);
-                return DBNull.Value;
-            },
-            cancellationToken);
     }
 
     private void EnsureAvailableRoomEdit(Room room)

@@ -186,7 +186,6 @@ public class RoomInviteIntegration
         CurrentUserAccessor userAccessor)
     {
         return new RoomService(
-            new RoomQuestionRepository(appDbContext),
             new EmptyRoomEventDispatcher(),
             new EmptyHotEventStorage(),
             new RoomInviteService(appDbContext, roomParticipantService, NullLogger<RoomInviteService>.Instance),
@@ -195,7 +194,8 @@ public class RoomInviteIntegration
             appDbContext,
             NullLogger<RoomService>.Instance,
             new TestSystemClock(),
-            new RoomAnalyticService(appDbContext)
+            new RoomAnalyticService(appDbContext),
+            new RoomStatusUpdater(appDbContext, new RoomQuestionRepository(appDbContext))
         );
     }
 }

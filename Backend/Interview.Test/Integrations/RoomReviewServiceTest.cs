@@ -10,9 +10,11 @@ using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Rooms.RoomReviews.Records;
 using Interview.Domain.Rooms.RoomReviews.Services;
 using Interview.Domain.Rooms.RoomReviews.Services.UserRoomReview;
+using Interview.Domain.Rooms.Service;
 using Interview.Domain.Users;
 using Interview.Infrastructure.RoomParticipants;
 using Interview.Infrastructure.RoomQuestionEvaluations;
+using Interview.Infrastructure.RoomQuestions;
 using Interview.Infrastructure.RoomReviews;
 using Interview.Infrastructure.Rooms;
 using Microsoft.EntityFrameworkCore;
@@ -191,7 +193,8 @@ public class RoomReviewServiceTest
             iRoomQuestionEvaluationRepository,
             iRoomMembershipChecker,
             memoryDatabase,
-            iRoomParticipantRepository
+            iRoomParticipantRepository,
+            new RoomStatusUpdater(memoryDatabase, new RoomQuestionRepository(memoryDatabase))
         );
 
         var roomCompleteResponse = await service.CompleteAsync(new RoomReviewCompletionRequest { RoomId = room.Id }, user2.Id, ct);
@@ -293,7 +296,8 @@ public class RoomReviewServiceTest
             new RoomQuestionEvaluationRepository(db),
             new RoomMembershipChecker(userAccessor, new RoomParticipantRepository(db)),
             db,
-            new RoomParticipantRepository(db));
+            new RoomParticipantRepository(db),
+            new RoomStatusUpdater(db, new RoomQuestionRepository(db)));
 
         return (service, user.Id, room.Id);
     }

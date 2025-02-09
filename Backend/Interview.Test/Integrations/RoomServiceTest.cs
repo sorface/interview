@@ -1096,7 +1096,6 @@ public class RoomServiceTest
             new PermissionRepository(appDbContext));
 
         return new RoomService(
-            new RoomQuestionRepository(appDbContext),
             new EmptyRoomEventDispatcher(),
             new EmptyHotEventStorage(),
             new RoomInviteService(appDbContext, roomParticipantService, NullLogger<RoomInviteService>.Instance),
@@ -1105,6 +1104,7 @@ public class RoomServiceTest
             appDbContext,
             new NullLogger<RoomService>(),
             time,
-            new RoomAnalyticService(appDbContext));
+            new RoomAnalyticService(appDbContext),
+            new RoomStatusUpdater(appDbContext, new RoomQuestionRepository(appDbContext)));
     }
 }

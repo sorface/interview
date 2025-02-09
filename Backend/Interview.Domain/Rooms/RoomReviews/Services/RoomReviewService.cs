@@ -6,6 +6,7 @@ using Interview.Domain.Rooms.RoomReviews.Mappers;
 using Interview.Domain.Rooms.RoomReviews.Records;
 using Interview.Domain.Rooms.RoomReviews.Response.Page;
 using Interview.Domain.Rooms.RoomReviews.Services.UserRoomReview;
+using Interview.Domain.Rooms.Service;
 using Microsoft.EntityFrameworkCore;
 using NSpecifications;
 using X.PagedList;
@@ -18,7 +19,8 @@ public class RoomReviewService(
     IRoomQuestionEvaluationRepository roomQuestionEvaluationRepository,
     IRoomMembershipChecker membershipChecker,
     AppDbContext db,
-    IRoomParticipantRepository roomParticipantRepository)
+    IRoomParticipantRepository roomParticipantRepository,
+    RoomStatusUpdater roomStatusUpdater)
     : IRoomReviewService
 {
     public async Task<UserRoomReviewResponse?> GetUserRoomReviewAsync(UserRoomReviewRequest request, CancellationToken cancellationToken)
@@ -123,14 +125,25 @@ public class RoomReviewService(
 
                 var resultReview = roomParticipant.Review;
 
-                if (resultReview is null)
+                if (roomParticipant.Room.Type == SERoomType.AI)
                 {
-                    throw new NotFoundException("The final review of the user in the room was not found");
+                    if (resultReview is null)
+                    {
+                        resultReview = new RoomReview(roomParticipant, SERoomReviewState.Open);
+                        await db.RoomReview.AddAsync(resultReview, cancellationToken);
+                    }
                 }
-
-                if (resultReview.Review.Length < 1)
+                else
                 {
-                    throw new UserException("The final review of the user in the room is not filled");
+                    if (resultReview is null)
+                    {
+                        throw new NotFoundException("The final review of the user in the room was not found");
+                    }
+
+                    if (resultReview.Review.Length < 1)
+                    {
+                        throw new UserException("The final review of the user in the room is not filled");
+                    }
                 }
 
                 resultReview.State = SERoomReviewState.Closed;
@@ -141,11 +154,8 @@ public class RoomReviewService(
 
                 if (roomReadyClose)
                 {
+                    await roomStatusUpdater.CloseAsync(request.RoomId, false, cancellationToken);
                     roomCompleteResponse.AutoClosed = true;
-
-                    var room = roomParticipant.Room;
-                    room.Status = SERoomStatus.Close;
-                    await roomRepository.UpdateAsync(room, ct);
                 }
 
                 await db.SaveChangesAsync(ct);
