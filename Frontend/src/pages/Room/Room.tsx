@@ -99,6 +99,7 @@ export const Room: FunctionComponent = () => {
   } = apiApplyRoomInviteState;
 
   const [roomInReview, setRoomInReview] = useState(false);
+  const [roomClose, setRoomClose] = useState(false);
   const [reactionsVisible, setReactionsVisible] = useState(false);
   const [currentQuestionId, setCurrentQuestionId] =
     useState<RoomQuestion['id']>();
@@ -409,6 +410,10 @@ export const Room: FunctionComponent = () => {
         case 'ChangeRoomStatus': {
           const newStatus: RoomType['status'] = 'New';
           const reviewStatus: RoomType['status'] = 'Review';
+          const closeStatus: RoomType['status'] = 'Close';
+          if (parsedData?.Value === closeStatus) {
+            setRoomClose(true);
+          }
           if (parsedData?.Value === reviewStatus) {
             setRoomInReview(true);
           }
@@ -527,6 +532,12 @@ export const Room: FunctionComponent = () => {
     }
     fetchRoomCompleteAi({ roomId: room.id });
   };
+
+  if (roomClose && id) {
+    return (
+      <Navigate to={generatePath(pathnames.roomAnalytics, { id })} replace />
+    );
+  }
 
   if (roomInReview && id) {
     return (
