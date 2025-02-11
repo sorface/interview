@@ -1,4 +1,4 @@
-const getFromEnv = (varName: string) => {
+const getFromEnv = (varName: string): string => {
   const value = import.meta.env && import.meta.env[varName];
   if (!value) {
     throw new Error(`import.meta.env.${varName} are not defined`);
@@ -26,3 +26,4 @@ export const VITE_FEEDBACK_IFRAME_URL = getFromEnvOrDefault(
   '',
 );
 export const VITE_AI_API = getFromEnv('VITE_AI_API');
+export const VITE_AI_ACCESS = getFromEnvOrDefault('VITE_AI_ACCESS', '');
