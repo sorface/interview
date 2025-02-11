@@ -41,19 +41,12 @@ import { ReviewUserOpinion } from '../../../RoomAnaytics/components/ReviewUserOp
 import { AnalyticsUserReview } from '../../../../types/analytics';
 import { useAiAnswerSource } from '../../hooks/useAiAnswerSource';
 import { AuthContext } from '../../../../context/AuthContext';
+import { useThemedAiAvatar } from '../../../../hooks/useThemedAiAvatar';
 
 const notFoundCode = 404;
 const aiAssistantGoodRate = 6;
 
 const aiExpertId = 'aiExpertId';
-const allUsersWithAiExpert = new Map<string, AnalyticsUserReview>();
-allUsersWithAiExpert.set(aiExpertId, {
-  comment: '',
-  nickname: 'AI Expert',
-  participantType: 'Expert',
-  userId: aiExpertId,
-  avatar: '/aiLogo192.png',
-});
 
 interface Question {
   id: string;
@@ -271,6 +264,16 @@ export const RoomQuestionPanelAi: FunctionComponent<
       userId: auth?.id || '',
     });
 
+  const themedAiAvatar = useThemedAiAvatar();
+  const allUsersWithAiExpert = new Map<string, AnalyticsUserReview>();
+  allUsersWithAiExpert.set(aiExpertId, {
+    comment: '',
+    nickname: 'AI Expert',
+    participantType: 'Expert',
+    userId: aiExpertId,
+    avatar: themedAiAvatar,
+  });
+
   const closedQuestions = roomQuestions.filter(
     (roomQuestion) => roomQuestion.state === 'Closed',
   );
@@ -278,7 +281,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
     (roomQuestion) => roomQuestion.state === 'Open',
   );
   const readyToReview =
-    closedQuestions.length > 1 || openQuestions.length === 0;
+    closedQuestions.length > 4 || openQuestions.length === 0;
   const nextQuestionButtonLoading =
     !mergedRoomQuestionEvaluation ||
     loadingMergeRoomQuestionEvaluation ||

@@ -32,6 +32,10 @@ export interface Room {
   };
 }
 
+export type RoomWtithType = Room & {
+  type: 'AI' | 'Standard';
+};
+
 export interface RoomCalendarItem {
   minScheduledStartTime: string;
   statuses: RoomStatus[];
