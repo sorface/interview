@@ -43,6 +43,7 @@ import { QuestionItem } from '../../components/QuestionItem/QuestionItem';
 import { SwitcherButton } from '../../components/SwitcherButton/SwitcherButton';
 import { DragNDropList } from '../../components/DragNDropList/DragNDropList';
 import { RoomQuestionsSelector } from './RoomQuestionsSelector/RoomQuestionsSelector';
+import { sortRoomQuestion } from '../../utils/sortRoomQestions';
 
 const nameFieldName = 'roomName';
 const dateFieldName = 'roomDate';
@@ -240,6 +241,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         ? parsedScheduledStartTime.endTime || ''
         : '',
     }));
+    setSelectedQuestions(room.questions.sort(sortRoomQuestion));
   }, [room]);
 
   useEffect(() => {

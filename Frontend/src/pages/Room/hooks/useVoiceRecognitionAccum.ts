@@ -28,12 +28,22 @@ type VoiceRecognitionAccumAction =
     };
 
 const checkIsCommandTranscript = (transcript: string, command: string[]) => {
-  const words = transcript.toLowerCase().replaceAll('.', '').split(' ');
-  const firstWordIndex = words.indexOf(command[0]);
+  const words = encodeRussianSymbols(
+    transcript.toLowerCase().replaceAll('.', ''),
+  ).split(' ');
+  const firstWordIndex = words.indexOf(encodeRussianSymbols(command[0]));
+
   if (firstWordIndex === -1) {
     return false;
   }
-  return words[firstWordIndex + 1] === command[1];
+
+  return words[firstWordIndex + 1] === encodeRussianSymbols(command[1]);
+};
+
+const encodeRussianSymbols = (value: string) => {
+  if (!value) return '';
+
+  return value.replaceAll('ё', 'е');
 };
 
 const apiMethodReducer = (
