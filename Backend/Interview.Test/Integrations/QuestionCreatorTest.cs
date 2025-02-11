@@ -104,7 +104,7 @@ public class QuestionCreatorTest
     public async Task CreateShouldFailIfRoomIsNotAvailable()
     {
         await using var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
-        var room = new Room("Test Room", SERoomAccessType.Public);
+        var room = new Room("Test Room", SERoomAccessType.Public, SERoomType.Standard);
         appDbContext.Rooms.Add(room);
         var category = new Category { Name = "Test" };
         appDbContext.Categories.Add(category);

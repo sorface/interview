@@ -38,14 +38,14 @@ public class RoomAnalyticServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var room1 = new Room(DefaultRoomName, SERoomAccessType.Public);
+        var room1 = new Room(DefaultRoomName, SERoomAccessType.Public, SERoomType.Standard);
 
         appDbContext.Rooms.Add(room1);
 
         var dummyUser = new User("dummy", "dummy");
         appDbContext.Users.Add(dummyUser);
         appDbContext.SaveChanges();
-        var dummyRoom = new Room("test room", SERoomAccessType.Public)
+        var dummyRoom = new Room("test room", SERoomAccessType.Public, SERoomType.Standard)
         {
             Questions =
             [
@@ -76,7 +76,7 @@ public class RoomAnalyticServiceTest
         dummyRoom.Participants.Add(new RoomParticipant(dummyUser, dummyRoom, SERoomParticipantType.Expert));
 
         appDbContext.Rooms.Add(dummyRoom);
-        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", SERoomAccessType.Public));
+        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", SERoomAccessType.Public, SERoomType.Standard));
 
         var questions = new Question[]
         {
@@ -334,14 +334,14 @@ public class RoomAnalyticServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var room1 = new Room(DefaultRoomName, SERoomAccessType.Public);
+        var room1 = new Room(DefaultRoomName, SERoomAccessType.Public, SERoomType.Standard);
 
         appDbContext.Rooms.Add(room1);
 
         var dummyUser = new User("dummy", "dummy");
         appDbContext.Users.Add(dummyUser);
         appDbContext.SaveChanges();
-        var dummyRoom = new Room("test room", SERoomAccessType.Public)
+        var dummyRoom = new Room("test room", SERoomAccessType.Public, SERoomType.Standard)
         {
             Questions =
             [
@@ -372,7 +372,7 @@ public class RoomAnalyticServiceTest
         dummyRoom.Participants.Add(new RoomParticipant(dummyUser, dummyRoom, SERoomParticipantType.Expert));
 
         appDbContext.Rooms.Add(dummyRoom);
-        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", SERoomAccessType.Public));
+        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", SERoomAccessType.Public, SERoomType.Standard));
 
         var questions = new Question[]
         {

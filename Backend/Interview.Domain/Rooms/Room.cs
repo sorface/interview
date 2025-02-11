@@ -12,10 +12,10 @@ using Interview.Domain.Tags;
 
 namespace Interview.Domain.Rooms;
 
-public class Room(string name, SERoomAccessType accessType) : Entity
+public class Room(string name, SERoomAccessType accessType, SERoomType type) : Entity
 {
     private Room()
-        : this(string.Empty, SERoomAccessType.Public)
+        : this(string.Empty, SERoomAccessType.Public, SERoomType.Standard)
     {
     }
 
@@ -46,4 +46,6 @@ public class Room(string name, SERoomAccessType accessType) : Entity
     public Guid? CategoryId { get; set; }
 
     public Category? Category { get; set; }
+
+    public SERoomType Type { get; set; } = type;
 }

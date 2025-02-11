@@ -425,6 +425,14 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasColumnType("character(1)")
                         .HasDefaultValue('N');
 
+                    b.Property<char>("Type")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(1)
+                        .IsUnicode(false)
+                        .HasColumnType("character(1)")
+                        .HasDefaultValue('S')
+                        .HasComment("Available values: A: AI, S: Standard");
+
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("timestamp without time zone");
 
@@ -1578,13 +1586,15 @@ namespace Interview.Migrations.Postgres.Migrations
 
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>
                 {
-                    b.HasOne("Interview.Domain.Categories.Category", null)
+                    b.HasOne("Interview.Domain.Categories.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId");
 
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
+
+                    b.Navigation("Category");
 
                     b.Navigation("CreatedBy");
                 });

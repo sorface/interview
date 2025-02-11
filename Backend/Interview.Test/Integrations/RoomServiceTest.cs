@@ -39,7 +39,7 @@ public class RoomServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var savedRoom = new Room(DefaultRoomName, SERoomAccessType.Public);
+        var savedRoom = new Room(DefaultRoomName, SERoomAccessType.Public, SERoomType.Standard);
 
         appDbContext.Rooms.Add(savedRoom);
 
@@ -71,7 +71,7 @@ public class RoomServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var savedRoom = new Room(DefaultRoomName, SERoomAccessType.Public);
+        var savedRoom = new Room(DefaultRoomName, SERoomAccessType.Public, SERoomType.Standard);
 
         appDbContext.Rooms.Add(savedRoom);
 
@@ -127,7 +127,7 @@ public class RoomServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var savedRoom = new Room(DefaultRoomName, SERoomAccessType.Public);
+        var savedRoom = new Room(DefaultRoomName, SERoomAccessType.Public, SERoomType.Standard);
         appDbContext.Rooms.Add(savedRoom);
 
         var question = new Question("question_value#1");
@@ -158,7 +158,7 @@ public class RoomServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var savedRoom = new Room(DefaultRoomName, SERoomAccessType.Public);
+        var savedRoom = new Room(DefaultRoomName, SERoomAccessType.Public, SERoomType.Standard);
 
         appDbContext.Rooms.Add(savedRoom);
         var questions = new[] { new Question("V1"), new Question("V2"), new Question("V3") };
@@ -214,10 +214,10 @@ public class RoomServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var room1 = new Room(DefaultRoomName, SERoomAccessType.Public);
+        var room1 = new Room(DefaultRoomName, SERoomAccessType.Public, SERoomType.Standard);
 
         appDbContext.Rooms.Add(room1);
-        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", SERoomAccessType.Public));
+        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", SERoomAccessType.Public, SERoomType.Standard));
 
         var questions = new Question[]
         {
@@ -403,7 +403,7 @@ public class RoomServiceTest
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
         var generatedRooms = Enumerable.Range(0, 5)
-            .Select(i => new Room(DefaultRoomName + i, SERoomAccessType.Public)).ToList();
+            .Select(i => new Room(DefaultRoomName + i, SERoomAccessType.Public, SERoomType.Standard)).ToList();
         appDbContext.Rooms.AddRange(generatedRooms);
         var roomInvites = generatedRooms.SelectMany(GenerateInvites).ToList();
         appDbContext.RoomInvites.AddRange(roomInvites);
@@ -438,17 +438,17 @@ public class RoomServiceTest
         var firstScheduled = new DateTime(2024, 9, 27, 0, 0, 0, 0, DateTimeKind.Utc);
         var secondScheduled = new DateTime(2024, 9, 27, 23, 49, 0, 0, DateTimeKind.Utc);
 
-        var room1 = new Room(DefaultRoomName + Random.Shared.Next(10), SERoomAccessType.Public)
+        var room1 = new Room(DefaultRoomName + Random.Shared.Next(10), SERoomAccessType.Public, SERoomType.Standard)
         {
             ScheduleStartTime = firstScheduled,
             Status = SERoomStatus.Active
         };
-        var room2 = new Room(DefaultRoomName + Random.Shared.Next(10), SERoomAccessType.Public)
+        var room2 = new Room(DefaultRoomName + Random.Shared.Next(10), SERoomAccessType.Public, SERoomType.Standard)
         {
             ScheduleStartTime = secondScheduled,
             Status = SERoomStatus.Review
         };
-        var room3 = new Room(DefaultRoomName + Random.Shared.Next(10), SERoomAccessType.Public)
+        var room3 = new Room(DefaultRoomName + Random.Shared.Next(10), SERoomAccessType.Public, SERoomType.Standard)
         {
             ScheduleStartTime = DateTime.UtcNow,
             Status = SERoomStatus.Close
@@ -505,7 +505,7 @@ public class RoomServiceTest
         var question = new Question("question_test");
         var question1 = new Question("question_test_1");
 
-        var room = new Room("test", SERoomAccessType.Private);
+        var room = new Room("test", SERoomAccessType.Private, SERoomType.Standard);
 
         memoryDatabase.Users.AddRange(user1, user2);
         memoryDatabase.Rooms.Add(room);
@@ -543,7 +543,7 @@ public class RoomServiceTest
         var question = new Question("question_test");
         var question1 = new Question("question_test_1");
 
-        var room = new Room("test", SERoomAccessType.Private);
+        var room = new Room("test", SERoomAccessType.Private, SERoomType.Standard);
 
         memoryDatabase.Users.AddRange(user1, user2);
         memoryDatabase.SaveChanges();
@@ -608,7 +608,7 @@ public class RoomServiceTest
         var question = new Question("question_test");
         var question1 = new Question("question_test_1");
 
-        var room = new Room("test", SERoomAccessType.Private);
+        var room = new Room("test", SERoomAccessType.Private, SERoomType.Standard);
 
         memoryDatabase.Users.AddRange(user1, user2);
         memoryDatabase.SaveChanges();
@@ -666,7 +666,7 @@ public class RoomServiceTest
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
         var generatedRooms = Enumerable.Range(0, 5)
-            .Select(i => new Room(DefaultRoomName + i, SERoomAccessType.Public)).ToList();
+            .Select(i => new Room(DefaultRoomName + i, SERoomAccessType.Public, SERoomType.Standard)).ToList();
         appDbContext.Rooms.AddRange(generatedRooms);
         var roomInvites = generatedRooms.SelectMany(GenerateInvites).ToList();
         appDbContext.RoomInvites.AddRange(roomInvites);
@@ -713,7 +713,7 @@ public class RoomServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var room = new Room("test", SERoomAccessType.Public);
+        var room = new Room("test", SERoomAccessType.Public, SERoomType.Standard);
         appDbContext.Rooms.Add(room);
 
         var question = new Question("question_value#1");
@@ -747,7 +747,7 @@ public class RoomServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var room = new Room("test", SERoomAccessType.Public) { Timer = new RoomTimer { Duration = TimeSpan.FromSeconds(durationSec), } };
+        var room = new Room("test", SERoomAccessType.Public, SERoomType.Standard) { Timer = new RoomTimer { Duration = TimeSpan.FromSeconds(durationSec), } };
         appDbContext.Rooms.Add(room);
 
         var question = new Question("question_value#1");
@@ -783,7 +783,7 @@ public class RoomServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var room = new Room("test", SERoomAccessType.Public) { Timer = new RoomTimer { Duration = TimeSpan.FromSeconds(initialDurationSec), } };
+        var room = new Room("test", SERoomAccessType.Public, SERoomType.Standard) { Timer = new RoomTimer { Duration = TimeSpan.FromSeconds(initialDurationSec), } };
         appDbContext.Rooms.Add(room);
 
         var question = new Question("question_value#1");
@@ -1014,7 +1014,7 @@ public class RoomServiceTest
         var question2 = new Question("test 2");
         var question3 = new Question("test 3");
         appDbContext.Questions.AddRange(question1, question2, question3);
-        var initialRoom = new Room("My room", SERoomAccessType.Public)
+        var initialRoom = new Room("My room", SERoomAccessType.Public, SERoomType.Standard)
         {
             Questions =
             [
@@ -1096,7 +1096,6 @@ public class RoomServiceTest
             new PermissionRepository(appDbContext));
 
         return new RoomService(
-            new RoomQuestionRepository(appDbContext),
             new EmptyRoomEventDispatcher(),
             new EmptyHotEventStorage(),
             new RoomInviteService(appDbContext, roomParticipantService, NullLogger<RoomInviteService>.Instance),
@@ -1105,6 +1104,7 @@ public class RoomServiceTest
             appDbContext,
             new NullLogger<RoomService>(),
             time,
-            new RoomAnalyticService(appDbContext));
+            new RoomAnalyticService(appDbContext),
+            new RoomStatusUpdater(appDbContext, new RoomQuestionRepository(appDbContext)));
     }
 }

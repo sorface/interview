@@ -16,12 +16,14 @@ import useWebSocket from 'react-use-websocket';
 import toast from 'react-hot-toast';
 import {
   ApplyRoomInviteBody,
+  CompleteRoomReviewsBody,
   GenerateRoomInviteBody,
   GetRoomParticipantParams,
   GetRoomQuestionsBody,
   RoomIdParam,
   roomInviteApiDeclaration,
   roomQuestionApiDeclaration,
+  roomReviewApiDeclaration,
   roomsApiDeclaration,
 } from '../../apiDeclarations';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
@@ -97,6 +99,7 @@ export const Room: FunctionComponent = () => {
   } = apiApplyRoomInviteState;
 
   const [roomInReview, setRoomInReview] = useState(false);
+  const [roomClose, setRoomClose] = useState(false);
   const [reactionsVisible, setReactionsVisible] = useState(false);
   const [currentQuestionId, setCurrentQuestionId] =
     useState<RoomQuestion['id']>();
@@ -226,6 +229,16 @@ export const Room: FunctionComponent = () => {
     process: { loading: loadingRoomState, error: errorRoomState },
     data: roomState,
   } = apiRoomStateState;
+
+  const {
+    apiMethodState: apiRoomCompleteAiMethodState,
+    fetchData: fetchRoomCompleteAi,
+  } = useApiMethod<unknown, CompleteRoomReviewsBody>(
+    roomReviewApiDeclaration.completeAi,
+  );
+  const {
+    process: { loading: loadingCompleteAi, error: errorCompleteAi },
+  } = apiRoomCompleteAiMethodState;
 
   const {
     apiMethodState: apiRoomStartReviewMethodState,
@@ -397,6 +410,10 @@ export const Room: FunctionComponent = () => {
         case 'ChangeRoomStatus': {
           const newStatus: RoomType['status'] = 'New';
           const reviewStatus: RoomType['status'] = 'Review';
+          const closeStatus: RoomType['status'] = 'Close';
+          if (parsedData?.Value === closeStatus) {
+            setRoomClose(true);
+          }
           if (parsedData?.Value === reviewStatus) {
             setRoomInReview(true);
           }
@@ -507,6 +524,20 @@ export const Room: FunctionComponent = () => {
     }
     fetchRoomStartReview(room.id);
   };
+
+  const handleStartReviewRoomAi = () => {
+    if (!room?.id) {
+      console.warn('Room id not found');
+      return;
+    }
+    fetchRoomCompleteAi({ roomId: room.id });
+  };
+
+  if (roomClose && id) {
+    return (
+      <Navigate to={generatePath(pathnames.roomAnalytics, { id })} replace />
+    );
+  }
 
   if (roomInReview && id) {
     return (
@@ -713,8 +744,8 @@ export const Room: FunctionComponent = () => {
                             messagesChatEnabled={messagesChatEnabled}
                             recognitionNotSupported={recognitionNotSupported}
                             currentUserExpert={currentUserExpert}
-                            loadingRoomStartReview={loadingRoomStartReview}
-                            errorRoomStartReview={errorRoomStartReview}
+                            loadingRoomStartReview={loadingCompleteAi}
+                            errorRoomStartReview={errorCompleteAi}
                             // ScreenShare
                             // screenStream={screenStream}
                             roomQuestionsLoading={roomQuestionsLoading}
@@ -722,7 +753,7 @@ export const Room: FunctionComponent = () => {
                               roomQuestions?.sort(sortRoomQuestion) || []
                             }
                             initialQuestion={currentQuestion}
-                            handleStartReviewRoom={handleStartReviewRoom}
+                            handleStartReviewRoom={handleStartReviewRoomAi}
                             handleSettingsOpen={handleSettingsOpen}
                             handleLeaveRoom={handleLeaveRoom}
                           />

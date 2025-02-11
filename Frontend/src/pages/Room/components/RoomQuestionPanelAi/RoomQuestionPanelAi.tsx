@@ -9,18 +9,18 @@ import React, {
 import { Canvas } from '@react-three/fiber';
 import { EffectComposer, FXAA } from '@react-three/postprocessing';
 import {
-  Room,
   RoomQuestion,
   RoomQuestionEvaluation as RoomQuestionEvaluationType,
 } from '../../../../types/room';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
 import {
   ChangeActiveQuestionBody,
+  CompleteRoomReviewsBody,
   GetRoomQuestionEvaluationParams,
   MergeRoomQuestionEvaluationBody,
   roomQuestionApiDeclaration,
   roomQuestionEvaluationApiDeclaration,
-  roomsApiDeclaration,
+  roomReviewApiDeclaration,
 } from '../../../../apiDeclarations';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
@@ -41,19 +41,12 @@ import { ReviewUserOpinion } from '../../../RoomAnaytics/components/ReviewUserOp
 import { AnalyticsUserReview } from '../../../../types/analytics';
 import { useAiAnswerSource } from '../../hooks/useAiAnswerSource';
 import { AuthContext } from '../../../../context/AuthContext';
+import { useThemedAiAvatar } from '../../../../hooks/useThemedAiAvatar';
 
 const notFoundCode = 404;
 const aiAssistantGoodRate = 6;
 
 const aiExpertId = 'aiExpertId';
-const allUsersWithAiExpert = new Map<string, AnalyticsUserReview>();
-allUsersWithAiExpert.set(aiExpertId, {
-  comment: '',
-  nickname: 'AI Expert',
-  participantType: 'Expert',
-  userId: aiExpertId,
-  avatar: '/aiLogo192.png',
-});
 
 interface Question {
   id: string;
@@ -218,7 +211,9 @@ export const RoomQuestionPanelAi: FunctionComponent<
   const {
     apiMethodState: apiRoomStartReviewMethodState,
     fetchData: fetchRoomStartReview,
-  } = useApiMethod<unknown, Room['id']>(roomsApiDeclaration.startReview);
+  } = useApiMethod<unknown, CompleteRoomReviewsBody>(
+    roomReviewApiDeclaration.completeAi,
+  );
   const {
     process: { loading: loadingRoomStartReview, error: errorRoomStartReview },
   } = apiRoomStartReviewMethodState;
@@ -268,6 +263,16 @@ export const RoomQuestionPanelAi: FunctionComponent<
       theme: room?.category?.name || '',
       userId: auth?.id || '',
     });
+
+  const themedAiAvatar = useThemedAiAvatar();
+  const allUsersWithAiExpert = new Map<string, AnalyticsUserReview>();
+  allUsersWithAiExpert.set(aiExpertId, {
+    comment: '',
+    nickname: 'AI Expert',
+    participantType: 'Expert',
+    userId: aiExpertId,
+    avatar: themedAiAvatar,
+  });
 
   const closedQuestions = roomQuestions.filter(
     (roomQuestion) => roomQuestion.state === 'Closed',
@@ -509,7 +514,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
     if (!room?.id) {
       throw new Error('Room id not found');
     }
-    fetchRoomStartReview(room.id);
+    fetchRoomStartReview({ roomId: room.id });
   }, [room?.id, fetchRoomStartReview]);
 
   const firstLineCaption = initialQuestion

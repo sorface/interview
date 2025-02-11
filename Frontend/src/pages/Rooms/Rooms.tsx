@@ -15,7 +15,13 @@ import {
 import { IconNames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
-import { Room, RoomCalendarItem, RoomStatus } from '../../types/room';
+import {
+  Room,
+  RoomCalendarItem,
+  RoomParticipant,
+  RoomStatus,
+  RoomWtithType,
+} from '../../types/room';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
@@ -34,8 +40,21 @@ import { Loader } from '../../components/Loader/Loader';
 import { Typography } from '../../components/Typography/Typography';
 import { ContextMenu } from '../../components/ContextMenu/ContextMenu';
 import { checkAiAccess } from '../../utils/checkAiAccess';
+import { useThemedAiAvatar } from '../../hooks/useThemedAiAvatar';
 
 import './Rooms.css';
+
+const aiParticipant: RoomParticipant = {
+  id: 'fakeId',
+  nickname: 'AI Expert',
+  userType: 'Expert',
+  roles: ['User'],
+  roomId: 'roomId',
+  twitchIdentity: 'twitchIdentity',
+  type: 'Expert',
+  userId: 'userId',
+  avatar: '',
+};
 
 const pageSize = 30;
 const initialPageNumber = 1;
@@ -83,10 +102,12 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
   const auth = useContext(AuthContext);
   const userHasAiAccess = checkAiAccess(auth);
   const localizationCaptions = useLocalizationCaptions();
+  const themedAiAvatar = useThemedAiAvatar();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
-  const { apiMethodState, fetchData } = useApiMethod<Room[], GetRoomPageParams>(
-    roomsApiDeclaration.getPage,
-  );
+  const { apiMethodState, fetchData } = useApiMethod<
+    RoomWtithType[],
+    GetRoomPageParams
+  >(roomsApiDeclaration.getPage);
   const {
     process: { loading, error },
     data: rooms,
@@ -249,7 +270,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
     setSelectedDay(day);
   };
 
-  const createRoomItem = (room: Room) => {
+  const createRoomItem = (room: RoomWtithType) => {
     const roomStatusCaption: Record<Room['status'], string> = {
       New: localizationCaptions[LocalizationKey.RoomStatusNew],
       Active: localizationCaptions[LocalizationKey.RoomStatusActive],
@@ -305,7 +326,19 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
                 </>
               )}
               <Gap sizeRem={1.75} />
-              <RoomParticipants participants={room.participants} />
+              <RoomParticipants
+                participants={[
+                  ...room.participants,
+                  ...(room.type === 'AI'
+                    ? [
+                        {
+                          ...aiParticipant,
+                          avatar: themedAiAvatar,
+                        },
+                      ]
+                    : []),
+                ]}
+              />
             </div>
           </Link>
         </li>

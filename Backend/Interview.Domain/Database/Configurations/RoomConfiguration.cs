@@ -35,5 +35,14 @@ public class RoomConfiguration : EntityTypeConfigurationBase<Room>
         builder.HasOne<Category>(e => e.Category)
             .WithMany()
             .HasForeignKey(e => e.CategoryId);
+
+        var roomTypes = SERoomType.List.OrderBy(e => e.Value).Select(e => e.Value + ": " + e.Name);
+        builder.Property(e => e.Type)
+            .HasConversion(e => e.Value, e => SERoomType.FromValue(e))
+            .IsRequired()
+            .IsUnicode(false)
+            .HasMaxLength(1)
+            .HasDefaultValue(SERoomType.Standard)
+            .HasComment("Available values: " + string.Join(", ", roomTypes));
     }
 }
