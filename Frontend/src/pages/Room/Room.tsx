@@ -617,9 +617,9 @@ export const Room: FunctionComponent = () => {
                               className="no-underline"
                             >
                               <div className="room-page-header-wrapper flex items-center">
-                                <div className="w-2.375 pr-1">
+                                <div className="w-[2.375rem] mr-[1rem]">
                                   <img
-                                    className="w-2.375 h-2.375 rounded-0.375"
+                                    className="w-[2.375rem] h-[2.375rem] rounded-[0.375rem]"
                                     src="/logo192.png"
                                     alt="site logo"
                                   />

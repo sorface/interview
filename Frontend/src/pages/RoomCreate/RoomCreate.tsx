@@ -415,7 +415,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
   ) => (
     <Fragment>
       <div className="flex w-full">
-        <div className="flex flex-col w-1.75 text-right text-grey2">
+        <div className="flex flex-col w-[1.75rem] text-right text-grey2">
           <Gap sizeRem={1} />
           <Typography size="xxl" bold>
             {index + 1}
@@ -480,7 +480,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
                   value={roomFields.date}
                   type="date"
                   required
-                  className="mr-0.5"
+                  className="mr-[0.5rem]"
                   onChange={handleChangeField('date')}
                 />
                 <input
@@ -489,10 +489,10 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
                   value={roomFields.startTime}
                   type="time"
                   required
-                  className="mr-0.5"
+                  className="mr-[0.5rem]"
                   onChange={handleChangeField('startTime')}
                 />
-                <span className="mr-0.5">
+                <span className="mr-[0.5rem]">
                   <Typography size="s">-</Typography>
                 </span>
                 <input
@@ -540,7 +540,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         )}
 
         {aiRoom && (
-          <RoomCreateField.Wrapper className="w-full max-w-15.75">
+          <RoomCreateField.Wrapper className="w-full max-w-[15.75rem]">
             <RoomCreateField.Label>
               <label htmlFor="rootCategory">
                 <Typography size="m" bold>

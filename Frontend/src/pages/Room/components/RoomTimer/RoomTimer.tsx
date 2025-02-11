@@ -43,10 +43,10 @@ export const RoomTimer: FunctionComponent<RoomTimerProps> = ({
   }, [startTime, durationSec]);
 
   return (
-    <div className="flex items-center justify-center px-1 py-0.625 bg-wrap rounded-2">
+    <div className="flex items-center justify-center px-[1rem] py-[0.625rem] bg-wrap rounded-[2rem]">
       <Icon name={IconNames.Time} />
       <Gap sizeRem={0.25} horizontal />
-      <div className="w-4 text-left">
+      <div className="w-[4rem] text-left">
         {formatTime(remainingTimeMs <= 0 ? 0 : remainingTimeMs)}
       </div>
     </div>

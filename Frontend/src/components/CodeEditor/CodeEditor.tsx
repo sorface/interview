@@ -115,7 +115,7 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
 
   return (
     <div
-      className={`code-editor flex flex-col rounded-1.125 overflow-hidden ${className}`}
+      className={`code-editor flex flex-col rounded-[1.125rem] overflow-hidden ${className}`}
       ref={codeEditorComponentRef}
     >
       <div className="code-editor-tools">

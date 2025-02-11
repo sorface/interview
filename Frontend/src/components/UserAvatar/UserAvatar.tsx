@@ -12,17 +12,17 @@ interface UserAvatarProps {
 const getSizeClassName = (size: UserAvatarProps['size']) => {
   switch (size) {
     case 'xl':
-      return 'w-6.875 h-6.875';
+      return 'w-[6.875rem] h-[6.875rem]';
     case 'l':
-      return 'w-4 h-4';
+      return 'w-[4rem] h-[4rem]';
     case 'm':
-      return 'w-2.5 h-2.5';
+      return 'w-[2.5rem] h-[2.5rem]';
     case 's':
-      return 'w-2.25 h-2.25';
+      return 'w-[2.25rem] h-[2.25rem]';
     case 'xs':
-      return 'w-1.375 h-1.375 items-center';
+      return 'w-[1.375rem] h-[1.375rem] items-center';
     case 'xxs':
-      return 'w-1 h-1 items-end';
+      return 'w-[1rem] h-[1rem] items-end';
     default:
       return '';
   }

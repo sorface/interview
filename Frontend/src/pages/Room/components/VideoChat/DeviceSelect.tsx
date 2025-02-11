@@ -51,7 +51,7 @@ export const DeviceSelect: FunctionComponent<DeviceSelectProps> = ({
   return (
     <>
       {icon && (
-        <div className="pr-0.25">
+        <div className="pr-[0.25rem]">
           <Icon name={icon} />
         </div>
       )}

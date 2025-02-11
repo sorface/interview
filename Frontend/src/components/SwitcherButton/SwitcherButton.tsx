@@ -1,5 +1,6 @@
 import React, { FunctionComponent, ReactNode } from 'react';
 import { Button } from '../Button/Button';
+import { Typography } from '../Typography/Typography';
 
 import './SwitcherButton.css';
 
@@ -38,7 +39,7 @@ export const SwitcherButton: FunctionComponent<SwitcherButtonProps> = ({
             onClick?.(index as ActiveIndex);
           }}
         >
-          {item.content}
+          <Typography size="m">{item.content}</Typography>
         </Button>
       ))}
     </div>

@@ -28,7 +28,7 @@ export const RoomsHistory: FunctionComponent<RoomsHistoryProps> = ({
   const localizationCaptions = useLocalizationCaptions();
 
   return (
-    <div className="text-left overflow-auto flex flex-col h-full px-1.125 bg-wrap rounded-1.125">
+    <div className="text-left overflow-auto flex flex-col h-full px-[1.125rem] bg-wrap rounded-[1.125rem]">
       <Gap sizeRem={1.5} />
       <div className="sticky top-0 bg-wrap w-full z-1">
         <Typography size="m" bold>
