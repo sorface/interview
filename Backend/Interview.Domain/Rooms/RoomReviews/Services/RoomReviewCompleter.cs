@@ -3,6 +3,7 @@ using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomQuestionEvaluations;
 using Interview.Domain.Rooms.RoomReviews.Records;
 using Interview.Domain.Rooms.Service;
+using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Domain.Rooms.RoomReviews.Services;
 
@@ -15,15 +16,15 @@ public class RoomReviewCompleter(
 {
     public Task<RoomCompleteResponse> CompleteAsync(RoomReviewCompletionRequest request, Guid userId, CancellationToken cancellationToken = default)
     {
-        return CompleteAICoreAsync(false, request, userId, cancellationToken);
+        return CompleteAsync(false, request, userId, cancellationToken);
     }
 
     public Task<RoomCompleteResponse> CompleteAIAsync(RoomReviewCompletionRequest request, Guid userId, CancellationToken cancellationToken = default)
     {
-        return CompleteAICoreAsync(true, request, userId, cancellationToken);
+        return CompleteAsync(true, request, userId, cancellationToken);
     }
 
-    private Task<RoomCompleteResponse> CompleteAICoreAsync(
+    private Task<RoomCompleteResponse> CompleteAsync(
         bool checkAi,
         RoomReviewCompletionRequest request,
         Guid userId,
@@ -31,16 +32,31 @@ public class RoomReviewCompleter(
     {
         return db.RunTransactionAsync<RoomCompleteResponse>(async ct =>
             {
+                var isAIRoom = false;
+                if (checkAi)
+                {
+                    var roomType = await db.Rooms.AsNoTracking()
+                        .Where(e => e.Id == request.RoomId)
+                        .Select(e => e.Type)
+                        .FirstOrDefaultAsync(cancellationToken) ?? throw NotFoundException.Create<Room>(request.RoomId);
+
+                    isAIRoom = checkAi && roomType == SERoomType.AI;
+
+                    if (isAIRoom)
+                    {
+                        // At first start review
+                        await roomStatusUpdater.StartReviewAsync(request.RoomId, false, cancellationToken);
+                    }
+                }
+
                 var roomCompleteResponse = new RoomCompleteResponse { AutoClosed = false, };
 
                 var roomParticipant = await FindParticipantWithValidateAsync(request.RoomId, userId, ct);
 
                 var resultReview = roomParticipant.Review;
 
-                if (checkAi && roomParticipant.Room.Type == SERoomType.AI)
+                if (isAIRoom)
                 {
-                    await roomStatusUpdater.StartReviewAsync(request.RoomId, false, cancellationToken);
-
                     if (resultReview is null)
                     {
                         resultReview = new RoomReview(roomParticipant, SERoomReviewState.Open);
