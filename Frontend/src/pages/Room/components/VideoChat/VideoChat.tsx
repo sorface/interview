@@ -53,6 +53,7 @@ interface VideoChatProps {
   handleStartReviewRoom: () => void;
   handleSettingsOpen: () => void;
   handleLeaveRoom: () => void;
+  pinUser?: () => void;
 }
 
 const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string) => {
@@ -123,6 +124,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     peerToStream,
     allUsers,
     sendWsMessage,
+    pinUser,
   } = useContext(RoomContext);
   const {
     userVideoStream,
@@ -267,6 +269,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       }),
     );
   };
+  const handleUserPin = (id: string) => pinUser(id);
 
   const handleMicSwitch = () => {
     setMicEnabled(!micEnabled);
@@ -469,6 +472,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             </div>
           </VideochatParticipant> */}
           <VideochatParticipant
+            handleUserPin={() => handleUserPin(auth?.id || '')}
             order={viewerMode ? viewerOrder - 1 : videoOrder[auth?.id || '']}
             viewer={viewerMode}
             avatar={auth?.avatar}
@@ -491,8 +495,9 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             .map((peer) => (
               <VideochatParticipant
                 pinable
-                key={peer.peerID}
+                handleUserPin={() => handleUserPin('fsafas')}
                 viewer={peer.participantType === 'Viewer'}
+                key={peer.peerID}
                 order={
                   peer.participantType === 'Viewer'
                     ? viewerOrder

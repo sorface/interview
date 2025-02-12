@@ -10,12 +10,13 @@ interface VideochatParticipantWithoutVideoProps {
   nickname?: string;
   reaction?: string | null;
   pinable?: boolean;
+  handleUserPin?: () => void;
 }
 
 export const VideochatParticipantWithoutVideo: FunctionComponent<
   VideochatParticipantWithoutVideoProps
-> = ({ order, avatar, nickname, reaction, pinable }) => {
-  const { handlePin, pin, orderSafe } = usePin(order);
+> = ({ order, avatar, nickname, reaction, pinable, handleUserPin }) => {
+  const orderSafe = order || 2;
 
   return (
     <div
@@ -25,7 +26,9 @@ export const VideochatParticipantWithoutVideo: FunctionComponent<
       <div className="videochat-participant-viewer">
         {avatar && <UserAvatar src={avatar} nickname={nickname || ''} />}
         <div>{nickname}</div>
-        {pinable && <ParticipantPinButton handlePin={handlePin} pin={pin} />}
+        {pinable && handleUserPin && (
+          <ParticipantPinButton handlePin={handleUserPin} pin={orderSafe < 1} />
+        )}
         <ParticipantReactions reaction={reaction} />
       </div>
     </div>

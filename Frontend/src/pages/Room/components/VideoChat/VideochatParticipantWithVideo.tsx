@@ -11,12 +11,21 @@ interface VideochatParticipantWithVideoProps {
   nickname?: string;
   reaction?: string | null;
   pinable?: boolean;
+  handleUserPin?: () => void;
 }
 
 export const VideochatParticipantWithVideo: FunctionComponent<
   VideochatParticipantWithVideoProps
-> = ({ order, children, avatar, nickname, reaction, pinable }) => {
-  const { handlePin, pin, orderSafe } = usePin(order);
+> = ({
+  order,
+  children,
+  avatar,
+  nickname,
+  reaction,
+  pinable,
+  handleUserPin,
+}) => {
+  const orderSafe = order || 2;
 
   return (
     <div
@@ -31,7 +40,9 @@ export const VideochatParticipantWithVideo: FunctionComponent<
       <div className="videochat-caption videochat-overlay videochat-participant-name">
         {avatar && <UserAvatar src={avatar} nickname={nickname || ''} />}
         {nickname}
-        {pinable && <ParticipantPinButton handlePin={handlePin} pin={pin} />}
+        {pinable && handleUserPin && (
+          <ParticipantPinButton handlePin={handleUserPin} pin={orderSafe < 1} />
+        )}
       </div>
       <div className="h-full">{children}</div>
     </div>

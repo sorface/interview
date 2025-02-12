@@ -1,7 +1,6 @@
 import { LocalizationLang } from './context/LocalizationContext';
 
 export const enum LocalizationKey {
-  Pin,
   LoginRequired,
   WelcomeMessage,
   HighlightsRoomsPageName,
@@ -248,7 +247,6 @@ export const LocalizationCaptions: Record<
   Record<LocalizationKey, string>
 > = {
   [LocalizationLang.en]: {
-    [LocalizationKey.Pin]: 'Pin',
     [LocalizationKey.LoginRequired]:
       'To view this page you need to log in to your account',
     [LocalizationKey.WelcomeMessage]: 'Welcome',
@@ -525,7 +523,6 @@ export const LocalizationCaptions: Record<
       'AI interviews, video calls, question database.',
   },
   [LocalizationLang.ru]: {
-    [LocalizationKey.Pin]: 'Закрепить',
     [LocalizationKey.LoginRequired]:
       'Для просмотра данной страницы необходимо войти в аккаунт',
     [LocalizationKey.WelcomeMessage]: 'Добро пожаловать',
