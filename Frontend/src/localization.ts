@@ -93,6 +93,7 @@ export const enum LocalizationKey {
   CloseRoomWithoutReview,
   StartRoom,
   StartReviewRoom,
+  StartReviewRoomAi,
   CloseRoomModalTitle,
   StartReviewRoomModalTitle,
   CloseRoomLoading,
@@ -348,6 +349,7 @@ export const LocalizationCaptions: Record<
       'Close meeting without waiting for evaluations',
     [LocalizationKey.StartRoom]: 'Start interview',
     [LocalizationKey.StartReviewRoom]: 'Start meeting review.',
+    [LocalizationKey.StartReviewRoomAi]: 'Finish interview',
     [LocalizationKey.CloseRoomModalTitle]:
       'Do you really want to close meeting?',
     [LocalizationKey.StartReviewRoomModalTitle]:
@@ -622,6 +624,7 @@ export const LocalizationCaptions: Record<
       'Закрыть встречу не дожидаясь оценок',
     [LocalizationKey.StartRoom]: 'Начать собеседование',
     [LocalizationKey.StartReviewRoom]: 'Начать разбор встречи',
+    [LocalizationKey.StartReviewRoomAi]: 'Закончить собеседование',
     [LocalizationKey.CloseRoomModalTitle]:
       'Действительно хотите закрыть встречу?',
     [LocalizationKey.StartReviewRoomModalTitle]:

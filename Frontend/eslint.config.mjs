@@ -13,4 +13,5 @@ export default [
   {
     ignores: ['src/setupProxy.js', 'build', 'node_modules', 'coverage'],
   },
+  { settings: { react: { version: 'detect' } } },
 ];
