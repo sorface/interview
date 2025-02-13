@@ -3,6 +3,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -139,12 +140,16 @@ const findQuestionsWithTag = (tag: string) =>
 const getRandomQuestion = () =>
   questions[Math.floor(Math.random() * questions.length)];
 
-const getRandomQuestionWithNextQuestions = () => {
+const getRandomQuestionWithExclude = (excludedQuestions: RoomQuestion[]) => {
   for (let i = 30; i--; ) {
     const randomQuestion = getRandomQuestion();
-    if (Object.keys(randomQuestion.nextQuestions).length !== 0) {
-      return randomQuestion;
+    const inExcludedQuestions = excludedQuestions.find(
+      (eq) => eq.id === randomQuestion.id,
+    );
+    if (inExcludedQuestions) {
+      continue;
     }
+    return randomQuestion;
   }
   return getRandomQuestion();
 };
@@ -182,18 +187,6 @@ export const RoomQuestionPanelAi: FunctionComponent<
   const [nextQuestionsMap, setNextQuestionsMap] = useState<
     Record<string, number>
   >({});
-  const nextQuestions = Object.entries(nextQuestionsMap)
-    .sort(([, factor1], [, factor2]) => {
-      if (factor1 < factor2) {
-        return 1;
-      }
-      if (factor1 > factor2) {
-        return -1;
-      }
-      return 0;
-    })
-    .map(([questionId]) => findQuestionById(questionId))
-    .filter(Boolean);
 
   const {
     apiMethodState: apiSendActiveQuestionState,
@@ -274,12 +267,32 @@ export const RoomQuestionPanelAi: FunctionComponent<
     avatar: themedAiAvatar,
   });
 
-  const closedQuestions = roomQuestions.filter(
-    (roomQuestion) => roomQuestion.state === 'Closed',
+  const closedQuestions = useMemo(
+    () =>
+      roomQuestions.filter((roomQuestion) => roomQuestion.state === 'Closed'),
+    [roomQuestions],
   );
   const openQuestions = roomQuestions.filter(
     (roomQuestion) => roomQuestion.state === 'Open',
   );
+  const nextQuestions = Object.entries(nextQuestionsMap)
+    .sort(([, factor1], [, factor2]) => {
+      if (factor1 < factor2) {
+        return 1;
+      }
+      if (factor1 > factor2) {
+        return -1;
+      }
+      return 0;
+    })
+    .filter(
+      ([questionId]) =>
+        questionId !== initialQuestion?.id &&
+        !closedQuestions.find((cq) => cq.id === questionId),
+    )
+    .map(([questionId]) => findQuestionById(questionId))
+    .filter(Boolean);
+
   const readyToReview =
     closedQuestions.length > 4 || openQuestions.length === 0;
   const nextQuestionButtonLoading =
@@ -304,21 +317,15 @@ export const RoomQuestionPanelAi: FunctionComponent<
   }, [copilotAnswerOpen, setRecognitionEnabled]);
 
   useEffect(() => {
-    if (initialQuestion) {
-      const currQuestion = findQuestionById(initialQuestion.id);
-      if (!currQuestion) {
-        return;
-      }
-      if (Object.keys(currQuestion.nextQuestions).length === 0) {
-        const randWithNextQuestions = getRandomQuestionWithNextQuestions();
-        setNextQuestionsMap(randWithNextQuestions.nextQuestions || {});
-        return;
-      }
-      setNextQuestionsMap(currQuestion?.nextQuestions || {});
+    if (!initialQuestion) {
       return;
     }
-    const randomQuestion = getRandomQuestionWithNextQuestions();
-    setNextQuestionsMap(randomQuestion?.nextQuestions || {});
+    const currQuestion = findQuestionById(initialQuestion.id);
+    if (!currQuestion) {
+      return;
+    }
+    setNextQuestionsMap(currQuestion?.nextQuestions || {});
+    return;
   }, [initialQuestion]);
 
   const addNextQuestionContext = useCallback((message: string) => {
@@ -475,7 +482,12 @@ export const RoomQuestionPanelAi: FunctionComponent<
     if (!room) {
       throw new Error('handleNextQuestion Room not found.');
     }
-    const nextQId = nextQuestions[0]?.id;
+    const nextQId =
+      nextQuestions[0]?.id ||
+      getRandomQuestionWithExclude([
+        ...closedQuestions,
+        ...(initialQuestion ? [initialQuestion] : []),
+      ]).id;
     if (!nextQId) {
       console.warn('handleNextQuestion empty nextQuestion');
       return;
@@ -489,6 +501,8 @@ export const RoomQuestionPanelAi: FunctionComponent<
   }, [
     room,
     nextQuestions,
+    closedQuestions,
+    initialQuestion,
     handleCopilotAnswerClose,
     resetVoiceRecognitionAccum,
     sendRoomActiveQuestion,
@@ -591,7 +605,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                         {
                           localizationCaptions[
                             readyToReview
-                              ? LocalizationKey.StartReviewRoom
+                              ? LocalizationKey.StartReviewRoomAi
                               : LocalizationKey.NextRoomQuestion
                           ]
                         }
