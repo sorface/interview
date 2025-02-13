@@ -13,6 +13,7 @@ import { ParsedWsMessage } from '../../../utils/parseWsMessage';
 import { checkIsAudioStream } from '../utils/checkIsAudioStream';
 import { useLocalizationCaptions } from '../../../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../../../localization';
+import { viewerPinOrder } from '../VideoChat';
 
 interface UseVideoChatProps {
   viewerMode: boolean;
@@ -101,7 +102,7 @@ export const useVideoChat = ({
         } else {
           setVideoOrder((prevVideoOrder) => ({
             ...prevVideoOrder,
-            [userId]: -666,
+            [userId]: viewerPinOrder,
           }));
           return userId;
         }

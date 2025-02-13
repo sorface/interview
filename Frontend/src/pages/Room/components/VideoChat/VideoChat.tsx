@@ -37,6 +37,7 @@ import './VideoChat.css';
 
 const transcriptsMaxLength = 100;
 const viewerOrder = 666;
+export const viewerPinOrder = -666;
 
 interface VideoChatProps {
   messagesChatEnabled: boolean;
@@ -495,7 +496,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             .map((peer) => (
               <VideochatParticipant
                 pinable
-                handleUserPin={() => handleUserPin('fsafas')}
+                handleUserPin={() => handleUserPin(peer.targetUserId)}
                 viewer={peer.participantType === 'Viewer'}
                 key={peer.peerID}
                 order={

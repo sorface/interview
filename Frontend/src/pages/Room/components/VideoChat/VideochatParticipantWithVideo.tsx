@@ -2,7 +2,7 @@ import React, { FunctionComponent, ReactNode } from 'react';
 import { UserAvatar } from '../../../../components/UserAvatar/UserAvatar';
 import { ParticipantReactions } from './ParticipantReactions';
 import { ParticipantPinButton } from './ParticipantPinButton';
-import { usePin } from './hoks/usePin';
+import { viewerPinOrder } from './VideoChat';
 
 interface VideochatParticipantWithVideoProps {
   order?: number;
@@ -41,7 +41,10 @@ export const VideochatParticipantWithVideo: FunctionComponent<
         {avatar && <UserAvatar src={avatar} nickname={nickname || ''} />}
         {nickname}
         {pinable && handleUserPin && (
-          <ParticipantPinButton handlePin={handleUserPin} pin={orderSafe < 1} />
+          <ParticipantPinButton
+            handlePin={handleUserPin}
+            pin={orderSafe === viewerPinOrder}
+          />
         )}
       </div>
       <div className="h-full">{children}</div>
