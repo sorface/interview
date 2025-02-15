@@ -244,8 +244,8 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
   };
 
   return (
-    <div className="videochat-field !w-21 text-left flex flex-col">
-      <div className="flex-1 flex flex-col py-1.5 px-1.25 bg-wrap rounded-1.125">
+    <div className="videochat-field !w-[21rem] text-left flex flex-col">
+      <div className="flex-1 flex flex-col py-[1.5rem] px-[1.25rem] bg-wrap rounded-[1.125rem]">
         {!initialQuestion && (
           <>
             <Typography size="xxl" bold>
@@ -310,7 +310,7 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
       {!readOnly && initialQuestion && (
         <>
           <Gap sizeRem={0.375} />
-          <div className="py-1.5 px-1.25 bg-wrap rounded-1.125">
+          <div className="py-[1.5rem] px-[1.25rem] bg-wrap rounded-[1.125rem]">
             {!loadingRoomQuestionEvaluation && roomQuestionEvaluation ? (
               <RoomQuestionEvaluation
                 value={roomQuestionEvaluation}
@@ -320,7 +320,7 @@ export const RoomQuestionPanel: FunctionComponent<RoomQuestionPanelProps> = ({
               <Loader />
             )}
             <Gap sizeRem={1} />
-            <div className="text-left h-1.125">
+            <div className="text-left h-[1.125rem]">
               {mergedRoomQuestionEvaluation && (
                 <Typography size="s">
                   <Icon name={IconNames.CheckmarkDone} />

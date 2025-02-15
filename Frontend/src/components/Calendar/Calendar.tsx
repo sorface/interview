@@ -57,7 +57,7 @@ export const Calendar: FunctionComponent<CalendarProps> = ({
   const days = getWeekDays(lang);
 
   const daysThemedClassName = useThemeClassName({
-    [Theme.Dark]: 'border-grey-3',
+    [Theme.Dark]: 'border-grey3',
     [Theme.Light]: 'border-grey-active',
   });
   const startMonthShift =
@@ -83,27 +83,27 @@ export const Calendar: FunctionComponent<CalendarProps> = ({
   );
 
   return (
-    <div className="w-fit h-fit p-0.25 select-none bg-wrap rounded-1.125">
-      <div className="capitalize flex justify-between px-0.5 py-0.375 h-2 items-center">
-        <div className="cursor-pointer opacity-0.5" onClick={onMonthBackClick}>
+    <div className="w-fit h-fit p-[0.25rem] select-none bg-wrap rounded-[1.125rem] box-content">
+      <div className="capitalize flex justify-between h-fit px-[0.5rem] py-[0.375rem] box-content items-center">
+        <div className="cursor-pointer opacity-50" onClick={onMonthBackClick}>
           <Icon name={IconNames.ChevronBack} size="s" />
         </div>
         <Typography size="l" bold>
           {getMonthName(monthStartDate, lang)}
         </Typography>
         <div
-          className="cursor-pointer opacity-0.5"
+          className="cursor-pointer opacity-50"
           onClick={onMonthForwardClick}
         >
           <Icon name={IconNames.ChevronForward} size="s" />
         </div>
       </div>
       <div
-        className={`flex items-center h-1.375 border-b-1 border-b-solid ${daysThemedClassName}`}
+        className={`flex items-center h-[1.375rem] border-b-[1px] border-b-solid ${daysThemedClassName}`}
       >
         {days.map((day, dayIndex) => (
           <Fragment key={day}>
-            <div className="capitalize w-1.875">
+            <div className="capitalize w-[1.875rem]">
               <Typography size="xs">{day}</Typography>
             </div>
             {dayIndex !== days.length - 1 && <Gap sizeRem={0.625} horizontal />}
@@ -113,7 +113,7 @@ export const Calendar: FunctionComponent<CalendarProps> = ({
       <Gap sizeRem={0.25} />
       {daysChunks.map((daysChunk, index) => (
         <Fragment key={`daysChunk${index}`}>
-          <div className={`flex ${loading ? 'opacity-0.5' : ''}`}>
+          <div className={`flex ${loading ? 'opacity-50' : ''}`}>
             {daysChunk.map((day, dayIndex) => (
               <Fragment key={day ? day.valueOf() : `null-day${dayIndex}`}>
                 <CalendarDay

@@ -206,7 +206,7 @@ export const RoomQuestionsSelector: FunctionComponent<
     <div>
       <div className="flex justify-between">
         <div className="flex w-full">
-          <RoomCreateField.Wrapper className="w-full max-w-15.75">
+          <RoomCreateField.Wrapper className="w-full max-w-[15.75rem]">
             <RoomCreateField.Label>
               <label htmlFor="rootCategory">
                 <Typography size="m" bold>
@@ -233,7 +233,7 @@ export const RoomQuestionsSelector: FunctionComponent<
             </RoomCreateField.Content>
           </RoomCreateField.Wrapper>
           <Gap sizeRem={1} horizontal />
-          <RoomCreateField.Wrapper className="w-full max-w-15.75">
+          <RoomCreateField.Wrapper className="w-full max-w-[15.75rem]">
             <RoomCreateField.Label>
               <label htmlFor="subCategory">
                 <Typography size="m" bold>
@@ -314,7 +314,7 @@ export const RoomQuestionsSelector: FunctionComponent<
       ) : (
         <div className="flex flex-col items-center">
           <Gap sizeRem={5.375} />
-          <div className="w-38.375 text-center">
+          <div className="w-[38.375rem] text-center">
             <Typography size="xl" secondary>
               {localizationCaptions[LocalizationKey.SelectCategorySubcategory]}
             </Typography>

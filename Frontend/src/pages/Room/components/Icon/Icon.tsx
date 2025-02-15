@@ -17,13 +17,13 @@ export interface IconProps {
 const getSizeClassName = (size: IconProps['size']) => {
   switch (size) {
     case 's':
-      return 'w-1.125 h-1.125';
+      return 'w-[1.125rem] h-[1.125rem]';
     case 'm':
-      return 'w-1.25 h-1.25';
+      return 'w-[1.25rem] h-[1.25rem]';
     case 'l':
-      return 'w-1.375 h-1.375';
+      return 'w-[1.375rem] h-[1.375rem]';
     case 'xxl':
-      return 'w-4 h-4';
+      return 'w-[4rem] h-[4rem]';
     default:
       return '';
   }

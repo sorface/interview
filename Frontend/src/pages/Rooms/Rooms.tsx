@@ -349,7 +349,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
   const renderCreateRoomButton = () => (
     <Button
       variant="active"
-      className="h-2.5"
+      className="h-[2.5rem]"
       aria-hidden={userHasAiAccess}
       onClick={userHasAiAccess ? undefined : handleOpenCreateModalClassic}
     >
@@ -417,7 +417,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
               <>
                 <Gap sizeRem={2.25} />
                 <Button
-                  className="h-2.5 text-grey3"
+                  className="h-[2.5rem] text-grey3"
                   onClick={handleOpenCreateModalClassic}
                 >
                   <Icon name={IconNames.Add} />
@@ -429,7 +429,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
           {mode === RoomsPageMode.Home && (
             <div className="flex overflow-auto">
               <Gap sizeRem={1} horizontal />
-              <div className="flex flex-col overflow-auto w-17.375">
+              <div className="flex flex-col overflow-auto w-[17.375rem]">
                 {!!errorRoomsCalendar && (
                   <Typography size="m" error>
                     <div className="text-left flex items-center">
@@ -466,7 +466,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
                   </Typography>
                 )}
                 {!roomsHistory || loadingRoomsHistory ? (
-                  <div className="flex justify-center items-center w-full h-full bg-wrap rounded-1.125">
+                  <div className="flex justify-center items-center w-full h-full bg-wrap rounded-[1.125rem]">
                     <Loader />
                   </div>
                 ) : (

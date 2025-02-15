@@ -51,7 +51,8 @@ const checkIsCommentValid = (evaluation: RoomQuestionEvaluationValue) => {
 export const RoomQuestionEvaluation: FunctionComponent<
   RoomQuestionEvaluationPorps
 > = ({ readOnly, value, validateComment, onChange }) => {
-  const commonButtonClassName = 'w-1.75 h-1.75 min-h-unset p-0.375';
+  const commonButtonClassName =
+    'w-[1.75rem] h-[1.75rem] !min-w-[1.75rem] !min-h-[1.75rem] !p-0';
   const themeClassName = useThemeClassName(themeClassNames);
   const localizationCaptions = useLocalizationCaptions();
   const noValidComment = validateComment ? !checkIsCommentValid(value) : false;
@@ -115,7 +116,7 @@ export const RoomQuestionEvaluation: FunctionComponent<
           <Fragment key={`markGroup${markGroupIndex}`}>
             <div>
               <div
-                className={`rounded-l-2 rounded-r-2 overflow-hidden whitespace-nowrap ${themeClassName['nonActive']}`}
+                className={`rounded-l-[2rem] rounded-r-[2rem] overflow-hidden whitespace-nowrap ${themeClassName['nonActive']}`}
               >
                 {markGroup.marks.map((markVal) => (
                   <Button
@@ -141,7 +142,7 @@ export const RoomQuestionEvaluation: FunctionComponent<
       <Gap sizeRem={1} />
       <div className="flex">
         <Textarea
-          className={`flex-1 h-6.25 ${noValidComment ? textareaNoValidClassName : ''}`}
+          className={`flex-1 h-[6.25rem] ${noValidComment ? textareaNoValidClassName : ''}`}
           maxLength={roomReviewMaxLength}
           readOnly={readOnly}
           value={value.review || ''}

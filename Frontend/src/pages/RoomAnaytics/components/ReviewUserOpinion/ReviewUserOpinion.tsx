@@ -46,7 +46,7 @@ export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
             <Typography size="m" bold>
               {currentUser?.nickname}
             </Typography>
-            <span className="opacity-0.5">
+            <span className="opacity-50">
               <Typography size="m" bold>
                 {currentUser &&
                   localizeParticipantType(currentUser.participantType)}

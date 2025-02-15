@@ -131,7 +131,7 @@ export const Questions: FunctionComponent = () => {
   };
 
   const createQuestionItem = (question: Question) => (
-    <li key={question.id} className="pb-0.25">
+    <li key={question.id} className="pb-[0.25rem]">
       <QuestionItem
         question={question}
         primary
@@ -168,7 +168,7 @@ export const Questions: FunctionComponent = () => {
       >
         <Button
           variant="active"
-          className="h-2.5"
+          className="h-[2.5rem]"
           onClick={handleOpenCreateModal}
         >
           <Icon name={IconNames.Add} />
@@ -195,10 +195,10 @@ export const Questions: FunctionComponent = () => {
             ) : (
               <>
                 <Typography size="m">{rootCategoryData?.name}</Typography>
-                <span className="flex opacity-0.65">
+                <span className="flex opacity-65">
                   <Icon name={IconNames.ChevronForward} />
                 </span>
-                <span className="opacity-0.5">
+                <span className="opacity-50">
                   <Typography size="m">{subCategoryData?.name}</Typography>
                 </span>
               </>
@@ -220,7 +220,7 @@ export const Questions: FunctionComponent = () => {
           <>
             <Gap sizeRem={2.25} />
             <Button
-              className="h-2.5 text-grey3"
+              className="h-[2.5rem] text-grey3"
               onClick={handleOpenCreateModal}
             >
               <Icon name={IconNames.Add} />

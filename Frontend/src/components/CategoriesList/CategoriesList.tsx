@@ -65,7 +65,7 @@ export const CategoriesList: FunctionComponent<CategoriesListProps> = ({
   };
 
   return (
-    <div className="categories-list overflow-x-hidden overflow-y-auto min-h-4">
+    <div className="categories-list overflow-x-hidden overflow-y-auto min-h-[4rem]">
       {loading && (
         <div className="categories-list-item h-fit">
           <Loader />

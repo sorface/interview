@@ -30,7 +30,7 @@ export const Button: FunctionComponent<ButtonProps> = ({
     <button
       disabled={disabled}
       {...rest}
-      className={`${variant || ''} ${rest.className || ''}`}
+      className={`px-4 py-0.5 text-[0.875rem] ${variant || ''} ${rest.className || ''}`}
     >
       {children}
     </button>

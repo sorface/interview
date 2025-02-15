@@ -447,12 +447,12 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           </ContextMenu>
         </RoomToolsPanel.ButtonsGroupWrapper>
       </RoomToolsPanel.Wrapper>
-      <div className="videochat-field relative videochat-field-main bg-wrap rounded-1.125">
+      <div className="videochat-field relative videochat-field-main bg-wrap rounded-[1.125rem]">
         <RoomCodeEditor visible={codeEditorEnabled} />
         {!codeEditorEnabled && renderMain()}
       </div>
 
-      <div className="relative videochat-field bg-wrap rounded-1.125">
+      <div className="relative videochat-field bg-wrap rounded-[1.125rem]">
         <div
           className={`videochat ${messagesChatEnabled ? 'invisible h-full' : 'visible'}`}
         >

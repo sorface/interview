@@ -11,7 +11,14 @@ export default [
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
   {
-    ignores: ['src/setupProxy.js', 'build', 'node_modules', 'coverage'],
+    ignores: [
+      'src/setupProxy.js',
+      'build',
+      'node_modules',
+      'coverage',
+      'postcss.config.js',
+      'tailwind.config.js',
+    ],
   },
   { settings: { react: { version: 'detect' } } },
 ];

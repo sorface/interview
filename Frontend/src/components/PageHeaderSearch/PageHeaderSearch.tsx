@@ -27,7 +27,7 @@ export const PageHeaderSearch: FunctionComponent<PageHeaderSearchProps> = ({
   };
 
   return (
-    <div className="flex items-stretch justify-end h-2.5">
+    <div className="flex items-stretch justify-end h-[2.5rem]">
       <input
         type="text"
         placeholder={localizationCaptions[LocalizationKey.SearchByName]}
@@ -41,7 +41,7 @@ export const PageHeaderSearch: FunctionComponent<PageHeaderSearchProps> = ({
       <Gap sizeRem={0.25} horizontal />
       <Button
         variant="invertedAlternative"
-        className="min-w-unset w-2.5 h-2.5 p-0"
+        className="min-w-0 w-[2.5rem] h-[2.5rem] !px-0 !py-0"
         onClick={handleOpenSwitch}
       >
         <Icon size="s" name={IconNames.Search} />

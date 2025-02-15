@@ -148,7 +148,7 @@ export const Categories: FunctionComponent = () => {
         onSearchChange={setSearchValueInput}
       >
         <Link to={pathnames.categoriesCreate}>
-          <Button variant="active" className="h-2.5">
+          <Button variant="active" className="h-[2.5rem]">
             <Icon name={IconNames.Add} />
             {localizationCaptions[LocalizationKey.CreateCategory]}
           </Button>
@@ -162,7 +162,7 @@ export const Categories: FunctionComponent = () => {
             checked={showOnlyWithoutParent}
             onChange={handleOnlyWithoutParentChange}
           />
-          <label htmlFor="showOnlyWithoutParent" className="mr-1">
+          <label htmlFor="showOnlyWithoutParent" className="mr-[1rem]">
             {localizationCaptions[LocalizationKey.RootCategories]}
           </label>
           <label htmlFor="parentID">
