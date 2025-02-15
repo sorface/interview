@@ -12,10 +12,10 @@ export const HomeAction: FunctionComponent = () => {
     <a
       href={`${VITE_BACKEND_URL}/login/sorface?redirectUri=${encodeURIComponent(window.location.href)}`}
     >
-      <Button variant='invertedActive'>
+      <Button variant="invertedActive">
         {useLocalizationCaptions()[LocalizationKey.Login]}
         <Gap horizontal sizeRem={0.15} />
-        <Icon name={IconNames.ChevronForward} />
+        <Icon name={IconNames.LogIn} />
       </Button>
     </a>
   );
