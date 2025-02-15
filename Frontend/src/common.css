@@ -515,6 +515,9 @@
 .whitespace-nowrap {
   white-space: nowrap;
 }
+.whitespace-break-spaces {
+  white-space: break-spaces;
+}
 .text-ellipsis {
   text-overflow: ellipsis;
 }

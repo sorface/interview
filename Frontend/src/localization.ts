@@ -522,7 +522,7 @@ export const LocalizationCaptions: Record<
       'To start an interview, say "{LetsStartCommand}".',
     [LocalizationKey.LetsBeginCommand]: "let's begin",
     [LocalizationKey.HomeDescription]:
-      'AI interviews, video calls, question database.',
+      'AI interviews, video calls,\nquestion database.',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -802,6 +802,6 @@ export const LocalizationCaptions: Record<
       'Для начала собеседования скажите "{LetsStartCommand}".',
     [LocalizationKey.LetsBeginCommand]: 'давай начнём',
     [LocalizationKey.HomeDescription]:
-      'Собеседования с AI, видеозвонки, база вопросов.',
+      'Собеседования с AI, видеозвонки,\nбаза вопросов.',
   },
 };

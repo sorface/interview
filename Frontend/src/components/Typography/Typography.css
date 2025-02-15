@@ -32,6 +32,14 @@
   font-size: 0.625rem;
 }
 
+.typography-landing-l {
+  font-size: 2.8125rem;
+}
+
+.typography-landing-m {
+  font-size: 1.875rem;;
+}
+
 .typography-bold {
   font-weight: 600;
 }
