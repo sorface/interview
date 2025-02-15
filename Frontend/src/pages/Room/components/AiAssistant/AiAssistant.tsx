@@ -208,8 +208,8 @@ const AiAssistantComponent: FunctionComponent<
   useEffect(() => {
     const color =
       themeInUi === Theme.Dark
-        ? [0.7255, 0.1333, 0.1098]
-        : [0.8784, 0.2784, 0.2275];
+        ? [6 / 255, 102 / 255, 226 / 255]
+        : [6 / 255, 102 / 255, 225 / 255];
     uniformsRef.current.u_red.value = color[0];
     uniformsRef.current.u_green.value = color[1];
     uniformsRef.current.u_blue.value = color[2];

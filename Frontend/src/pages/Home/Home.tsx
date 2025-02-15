@@ -20,7 +20,6 @@ import {
   AiAssistantScriptName,
 } from '../Room/components/AiAssistant/AiAssistant';
 import { Canvas } from '@react-three/fiber';
-import { EffectComposer, FXAA } from '@react-three/postprocessing';
 
 export const Home: FunctionComponent = () => {
   const auth = useContext(AuthContext);
@@ -57,14 +56,11 @@ export const Home: FunctionComponent = () => {
     <>
       <div className="flex flex-1 flex-col justify-center items-center">
         <div
-          style={{ width: 450, height: 450 }}
+          style={{ width: 291, height: 291 }}
           className="cursor-pointer"
           onClick={handleAiAssistantClick}
         >
-          <Canvas shadows camera={{ position: [0, 0.05, 2.8], fov: 38 }}>
-            <EffectComposer>
-              <FXAA />
-            </EffectComposer>
+          <Canvas shadows camera={{ position: [0, 0.05, 2.2], fov: 38 }}>
             <AiAssistant
               currentScript={aiAssistantScript}
               loading
@@ -73,14 +69,16 @@ export const Home: FunctionComponent = () => {
             />
           </Canvas>
         </div>
-        <Typography size="xxl" bold>
+        <Typography size="xxxl" bold>
           {VITE_NAME}
         </Typography>
-        <Gap sizeRem={0.25} />
-        <Typography size="m">
-          {localizationCaptions[LocalizationKey.HomeDescription]}
-        </Typography>
-        <Gap sizeRem={1.25} />
+        <Gap sizeRem={0.625} />
+        <div className="whitespace-break-spaces">
+          <Typography size="l">
+            {localizationCaptions[LocalizationKey.HomeDescription]}
+          </Typography>
+        </div>
+        <Gap sizeRem={1.05} />
         <HomeAction />
       </div>
       <div className="flex justify-center">

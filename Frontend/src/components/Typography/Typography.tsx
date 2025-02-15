@@ -5,7 +5,16 @@ import { Theme } from '../../context/ThemeContext';
 import './Typography.css';
 
 export interface TypographyProps {
-  size: 'xxxl' | 'xxl' | 'xl' | 'l' | 'm' | 's' | 'xs';
+  size:
+    | 'xxxl'
+    | 'xxl'
+    | 'xl'
+    | 'l'
+    | 'm'
+    | 's'
+    | 'xs'
+    | 'landing-l'
+    | 'landing-m';
   bold?: boolean;
   error?: boolean;
   secondary?: boolean;

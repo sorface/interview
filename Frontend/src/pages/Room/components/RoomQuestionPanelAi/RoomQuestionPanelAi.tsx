@@ -8,7 +8,6 @@ import React, {
   useState,
 } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { EffectComposer, FXAA } from '@react-three/postprocessing';
 import {
   RoomQuestion,
   RoomQuestionEvaluation as RoomQuestionEvaluationType,
@@ -632,9 +631,6 @@ export const RoomQuestionPanelAi: FunctionComponent<
         style={{ opacity: copilotAnswerOpen ? 0.05 : 1.0 }}
       >
         <Canvas shadows camera={{ position: [0, 0.5, 6.5], fov: 38 }}>
-          <EffectComposer>
-            <FXAA />
-          </EffectComposer>
           <AiAssistant
             loading={loadingTotal}
             currentScript={aiAssistantScript}
