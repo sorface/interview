@@ -250,7 +250,7 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
           <Typography size="m">
             {localizationCaptions[LocalizationKey.CategoryParent]}:
           </Typography>
-          <div className="overflow-auto h-25">
+          <div className="overflow-auto h-[25rem]">
             <ItemsGrid
               currentData={parentCategories}
               loading={parentCategoriesLoading}

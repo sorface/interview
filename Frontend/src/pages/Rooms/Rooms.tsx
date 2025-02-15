@@ -316,7 +316,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
   const renderCreateRoomButton = () => (
     <Button
       variant="active"
-      className="h-2.5"
+      className="h-[2.5rem]"
       aria-hidden={userHasAiAccess}
       onClick={userHasAiAccess ? undefined : handleOpenCreateModalClassic}
     >

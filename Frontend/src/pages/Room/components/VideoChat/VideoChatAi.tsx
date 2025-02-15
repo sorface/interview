@@ -259,7 +259,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
         />
         <video
           ref={userVideoMainContent}
-          className="w-12.5 h-10 absolute videochat-video object-cover z-1"
+          className="w-[12.5rem] h-[10rem] absolute videochat-video object-cover z-1"
           style={{
             right: '5.5rem',
             bottom: '1.5rem',
@@ -361,14 +361,14 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
       <div className="w-full flex justify-center">
         <div
           style={{ maxWidth: '840px' }}
-          className="w-full flex flex-col videochat-field relative videochat-field-main rounded-1.125"
+          className="w-full flex flex-col videochat-field relative videochat-field-main rounded-[1.125rem]"
         >
           <RoomCodeEditor visible={codeEditorEnabled} />
           {!codeEditorEnabled && renderMain()}
         </div>
       </div>
 
-      <div className="relative videochat-field bg-wrap rounded-1.125">
+      <div className="relative videochat-field bg-wrap rounded-[1.125rem]">
         <div
           className={`videochat ${messagesChatEnabled ? 'invisible h-full' : 'visible'}`}
         >
