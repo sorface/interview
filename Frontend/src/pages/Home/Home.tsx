@@ -73,10 +73,10 @@ export const Home: FunctionComponent = () => {
           {VITE_NAME}
         </Typography>
         <Gap sizeRem={0.625} />
-        <div className='whitespace-break-spaces'>
-        <Typography size="l">
-          {localizationCaptions[LocalizationKey.HomeDescription]}
-        </Typography>
+        <div className="whitespace-break-spaces">
+          <Typography size="l">
+            {localizationCaptions[LocalizationKey.HomeDescription]}
+          </Typography>
         </div>
         <Gap sizeRem={1.05} />
         <HomeAction />
