@@ -320,6 +320,88 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.ToTable("QuestionAnswers");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionSubjectTree", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid?>("ParentQuestionSubjectTreeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<char>("Type")
+                        .HasColumnType("character(1)")
+                        .HasComment("Available values: [Empty: E, Question: Q]");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ParentQuestionSubjectTreeId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("QuestionSubjectTree");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionTree", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("ParentQuestionTreeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RootQuestionSubjectTreeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ParentQuestionTreeId");
+
+                    b.HasIndex("RootQuestionSubjectTreeId");
+
+                    b.ToTable("QuestionTree");
+                });
+
             modelBuilder.Entity("Interview.Domain.Reactions.Reaction", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1558,6 +1640,52 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionSubjectTree", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Questions.QuestionSubjectTree", "ParentQuestionSubjectTree")
+                        .WithMany()
+                        .HasForeignKey("ParentQuestionSubjectTreeId");
+
+                    b.HasOne("Interview.Domain.Questions.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ParentQuestionSubjectTree");
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionTree", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Questions.QuestionTree", "ParentQuestionTree")
+                        .WithMany()
+                        .HasForeignKey("ParentQuestionTreeId");
+
+                    b.HasOne("Interview.Domain.Questions.QuestionSubjectTree", "RootQuestionSubjectTree")
+                        .WithMany()
+                        .HasForeignKey("RootQuestionSubjectTreeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ParentQuestionTree");
+
+                    b.Navigation("RootQuestionSubjectTree");
                 });
 
             modelBuilder.Entity("Interview.Domain.Reactions.Reaction", b =>
