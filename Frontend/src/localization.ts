@@ -241,6 +241,8 @@ export const enum LocalizationKey {
   LetsBeginDescription,
   LetsBeginCommand,
   HomeDescription,
+  Recommendation,
+  ExampleOfCorrectAnswer,
 }
 
 export const LocalizationCaptions: Record<
@@ -523,6 +525,8 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.LetsBeginCommand]: "let's begin",
     [LocalizationKey.HomeDescription]:
       'AI interviews, video calls,\nquestion database.',
+    [LocalizationKey.Recommendation]: 'Recommendation',
+    [LocalizationKey.ExampleOfCorrectAnswer]: 'Example of correct answer',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -803,5 +807,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.LetsBeginCommand]: 'давай начнём',
     [LocalizationKey.HomeDescription]:
       'Собеседования с AI, видеозвонки,\nбаза вопросов.',
+    [LocalizationKey.Recommendation]: 'Рекомендация',
+    [LocalizationKey.ExampleOfCorrectAnswer]: 'Пример правильного ответа',
   },
 };
