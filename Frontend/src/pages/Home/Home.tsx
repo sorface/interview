@@ -13,7 +13,7 @@ import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Gap } from '../../components/Gap/Gap';
 import { Typography } from '../../components/Typography/Typography';
 import { LangSwitch } from '../../components/LangSwitch/LangSwitch';
-import { VITE_NAME } from '../../config';
+import { VITE_APP_NAME } from '../../config';
 import {
   AiAssistant,
   AiAssistantLoadingVariant,
@@ -70,7 +70,7 @@ export const Home: FunctionComponent = () => {
           </Canvas>
         </div>
         <Typography size="xxxl" bold>
-          {VITE_NAME}
+          {VITE_APP_NAME}
         </Typography>
         <Gap sizeRem={0.625} />
         <div className="whitespace-break-spaces">
