@@ -4,7 +4,7 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { Navigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import { pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { HomeAction } from './components/HomeContent/HomeAction';
@@ -81,7 +81,16 @@ export const Home: FunctionComponent = () => {
         <Gap sizeRem={1.05} />
         <HomeAction />
       </div>
-      <div className="flex justify-center">
+      <div className="flex flex-col items-center">
+        <div className="whitespace-break-spaces">
+          <Typography size="s">
+            {localizationCaptions[LocalizationKey.TermsOfUsageAcceptance]}
+            <Link to={pathnames.terms}>
+              {localizationCaptions[LocalizationKey.TermsOfUsage]}
+            </Link>
+          </Typography>
+        </div>
+        <Gap sizeRem={0.5} />
         <LangSwitch elementType="switcherButton" />
       </div>
     </>
