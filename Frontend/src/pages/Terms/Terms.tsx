@@ -1,6 +1,6 @@
 import React, { FunctionComponent, Fragment, useContext } from 'react';
 import terms from './terms.json';
-import { pathnames } from '../../constants';
+import { IconNames, pathnames } from '../../constants';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
@@ -8,6 +8,10 @@ import { Typography } from '../../components/Typography/Typography';
 import { Gap } from '../../components/Gap/Gap';
 import { LocalizationContext } from '../../context/LocalizationContext';
 import { VITE_APP_NAME } from '../../config';
+import { Icon } from '../Room/components/Icon/Icon';
+import { Button } from '../../components/Button/Button';
+import { Link } from 'react-router-dom';
+import { LangSwitch } from '../../components/LangSwitch/LangSwitch';
 
 interface Term {
   title: string;
@@ -57,6 +61,16 @@ export const Terms: FunctionComponent = () => {
   return (
     <>
       <PageHeader title={VITE_APP_NAME} />
+      <div className="flex">
+        <Link to={pathnames.home}>
+          <Button>
+            <Icon name={IconNames.ChevronBack} />
+          </Button>
+        </Link>
+        <Gap sizeRem={0.25} horizontal />
+        <LangSwitch elementType="switcherButton" />
+      </div>
+      <Gap sizeRem={0.75} />
       <div className="text-left flex flex-col overflow-auto">
         <Typography size="xxl" bold>
           {localizationCaptions[LocalizationKey.TermsOfUsage]}
