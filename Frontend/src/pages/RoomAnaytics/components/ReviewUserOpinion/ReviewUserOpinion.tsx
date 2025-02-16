@@ -76,16 +76,22 @@ export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
           localizationCaptions[LocalizationKey.RoomReviewWaiting]}
       </Typography>
       {user.evaluation?.recommendation && (
-        <>
+        <div className="flex flex-col">
           <Gap sizeRem={1} />
+          <Typography size="m" bold>
+            {localizationCaptions[LocalizationKey.Recommendation]}
+          </Typography>
           <Typography size="m">{user.evaluation.recommendation}</Typography>
-        </>
+        </div>
       )}
       {user.evaluation?.expected && (
-        <>
+        <div className="flex flex-col">
           <Gap sizeRem={1} />
+          <Typography size="m" bold>
+            {localizationCaptions[LocalizationKey.ExampleOfCorrectAnswer]}
+          </Typography>
           <Typography size="m">{user.evaluation.expected}</Typography>
-        </>
+        </div>
       )}
     </div>
   );
