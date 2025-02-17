@@ -37,6 +37,7 @@ import './VideoChat.css';
 
 const transcriptsMaxLength = 100;
 const viewerOrder = 666;
+export const viewerPinOrder = -666;
 
 interface VideoChatProps {
   messagesChatEnabled: boolean;
@@ -53,6 +54,7 @@ interface VideoChatProps {
   handleStartReviewRoom: () => void;
   handleSettingsOpen: () => void;
   handleLeaveRoom: () => void;
+  pinUser?: () => void;
 }
 
 const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string) => {
@@ -123,6 +125,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     peerToStream,
     allUsers,
     sendWsMessage,
+    pinUser,
   } = useContext(RoomContext);
   const {
     userVideoStream,
@@ -267,6 +270,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       }),
     );
   };
+  const handleUserPin = (id: string) => pinUser(id);
 
   const handleMicSwitch = () => {
     setMicEnabled(!micEnabled);
@@ -469,11 +473,13 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             </div>
           </VideochatParticipant> */}
           <VideochatParticipant
+            handleUserPin={() => handleUserPin(auth?.id || '')}
             order={viewerMode ? viewerOrder - 1 : videoOrder[auth?.id || '']}
             viewer={viewerMode}
             avatar={auth?.avatar}
             nickname={`${auth?.nickname} (${localizationCaptions[LocalizationKey.You]})`}
             reaction={activeReactions[auth?.id || '']}
+            pinable
           >
             <video
               ref={userVideo}
@@ -489,8 +495,10 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             .filter((peer) => !peer.screenShare)
             .map((peer) => (
               <VideochatParticipant
-                key={peer.peerID}
+                pinable
+                handleUserPin={() => handleUserPin(peer.targetUserId)}
                 viewer={peer.participantType === 'Viewer'}
+                key={peer.peerID}
                 order={
                   peer.participantType === 'Viewer'
                     ? viewerOrder

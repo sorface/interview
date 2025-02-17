@@ -9,6 +9,8 @@ interface VideochatParticipantProps {
   avatar?: string;
   nickname?: string;
   reaction?: string | null;
+  pinable?: boolean;
+  handleUserPin?: () => void;
 }
 
 export const VideochatParticipant: FunctionComponent<
