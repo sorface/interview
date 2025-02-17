@@ -761,6 +761,9 @@
 .opacity-0\.65 {
   opacity: 0.65;
 }
+.hover\:opacity-100:hover {
+  opacity: 100%;
+}
 .backdrop-blur {
   backdrop-filter: blur(6px);
 }

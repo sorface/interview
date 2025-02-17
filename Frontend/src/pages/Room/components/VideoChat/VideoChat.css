@@ -114,11 +114,18 @@
   right: 0.5rem;
 }
 
-.videochat-participant-reactions {
+.videochat-participant-pin {
   display: flex;
   align-items: center;
   bottom: 2.95rem;
   right: 0.5rem;
+}
+
+.videochat-participant-reactions {
+  display: flex;
+  align-items: center;
+  bottom: 2.95rem;
+  right: 3.5rem;
 }
 
 .videochat .user-avatar {

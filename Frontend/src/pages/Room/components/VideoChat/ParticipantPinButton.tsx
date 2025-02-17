@@ -11,9 +11,8 @@ export const ParticipantPinButton = ({
   handlePin,
 }: ParticipantPinButtonProps) => {
   return (
-    <div onClick={handlePin}>
-      {pin && <Icon name={IconNames.ChevronDown} />}
-      {!pin && <Icon name={IconNames.Like} />}
-    </div>
+    <span className="cursor-pointer participant-reaction" onClick={handlePin}>
+      <Icon secondary={!pin} name={IconNames.Pin} />
+    </span>
   );
 };

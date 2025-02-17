@@ -26,6 +26,7 @@ export const VideochatParticipantWithVideo: FunctionComponent<
   handleUserPin,
 }) => {
   const orderSafe = order || 2;
+  const pin = orderSafe === viewerPinOrder;
 
   return (
     <div
@@ -37,15 +38,16 @@ export const VideochatParticipantWithVideo: FunctionComponent<
           <ParticipantReactions reaction={reaction} />
         </div>
       )}
+      <div
+        className={`videochat-caption videochat-overlay videochat-participant-pin ${pin ? '' : 'opacity-0'} hover:opacity-100`}
+      >
+        {pinable && handleUserPin && (
+          <ParticipantPinButton handlePin={handleUserPin} pin={pin} />
+        )}
+      </div>
       <div className="videochat-caption videochat-overlay videochat-participant-name">
         {avatar && <UserAvatar src={avatar} nickname={nickname || ''} />}
         {nickname}
-        {pinable && handleUserPin && (
-          <ParticipantPinButton
-            handlePin={handleUserPin}
-            pin={orderSafe === viewerPinOrder}
-          />
-        )}
       </div>
       <div className="h-full">{children}</div>
     </div>
