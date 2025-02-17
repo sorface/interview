@@ -3,6 +3,7 @@ using Interview.Domain.Categories.Page;
 using Interview.Domain.Database;
 using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
+using Interview.Domain.Questions.QuestionTreePage;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Domain.Rooms.RoomParticipants;
@@ -48,6 +49,42 @@ public class QuestionService(
 
         return await questionNonArchiveRepository.GetPageDetailedAsync(
             spec, QuestionItem.Mapper, request.Page.PageNumber, request.Page.PageSize, cancellationToken);
+    }
+
+    public Task<IPagedList<QuestionTreePageResponse>> FindQuestionTreePageAsync(QuestionTreePageRequest request, CancellationToken cancellationToken)
+    {
+        var spec = BuildSpecification(request);
+        return db.QuestionTree.AsNoTracking()
+            .Where(spec)
+            .OrderBy(e => e.CreateDate)
+            .Select(e => new QuestionTreePageResponse { Id = e.Id, Name = e.Name, ParentQuestionTreeId = e.ParentQuestionTreeId, })
+            .ToPagedListAsync(request.Page, cancellationToken);
+
+        static ASpec<QuestionTree> BuildSpecification(QuestionTreePageRequest request)
+        {
+            var res = Spec<QuestionTree>.Any;
+            if (request.Filter is null)
+            {
+                return res;
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Filter.Name))
+            {
+                var name = request.Filter.Name.Trim();
+                res &= new Spec<QuestionTree>(e => e.Name.ToLower().Contains(name));
+            }
+
+            if (request.Filter.ParentQuestionTreeId is not null)
+            {
+                res &= new Spec<QuestionTree>(e => e.ParentQuestionTreeId == request.Filter.ParentQuestionTreeId);
+            }
+            else if (request.Filter.ParentlessOnly.GetValueOrDefault())
+            {
+                res &= new Spec<QuestionTree>(e => e.ParentQuestionTreeId == null);
+            }
+
+            return res;
+        }
     }
 
     public Task<IPagedList<QuestionItem>> FindPageArchiveAsync(

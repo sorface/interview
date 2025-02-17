@@ -1,3 +1,4 @@
+using Interview.Domain.Questions.QuestionTreePage;
 using Interview.Domain.Questions.Records.FindPage;
 using X.PagedList;
 
@@ -6,6 +7,8 @@ namespace Interview.Domain.Questions.Services;
 public interface IQuestionService : IService
 {
     public Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken);
+
+    Task<IPagedList<QuestionTreePageResponse>> FindQuestionTreePageAsync(QuestionTreePageRequest request, CancellationToken cancellationToken);
 
     Task<IPagedList<QuestionItem>> FindPageArchiveAsync(
         int pageNumber, int pageSize, CancellationToken cancellationToken);

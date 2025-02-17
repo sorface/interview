@@ -419,6 +419,12 @@ public class SEPermission(Guid id, string name, string description, EVPermission
         "Getting a schedule of meetings",
         EVPermission.GetRoomCalendar);
 
+    public static readonly SEPermission QuestionTreeFindPage = new(
+        Guid.Parse("2E1670EC-F9D2-4CB8-BB57-F6239B16F24F"),
+        "QuestionTreeFindPage",
+        "Getting the questions tree page",
+        EVPermission.QuestionTreeFindPage);
+
     public Guid Id { get; } = id;
 
     public string Description { get; } = description;

@@ -199,5 +199,8 @@ public enum EVPermission
 
     [Description("Getting a schedule of meetings")]
     GetRoomCalendar,
+
+    [Description("Getting the questions tree page")]
+    QuestionTreeFindPage,
 #pragma warning restore SA1602
 }

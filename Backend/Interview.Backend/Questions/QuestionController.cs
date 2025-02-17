@@ -1,5 +1,7 @@
+using Interview.Backend.Common;
 using Interview.Backend.Responses;
 using Interview.Domain;
+using Interview.Domain.Questions.QuestionTreePage;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Questions.Services;
 using Interview.Domain.ServiceResults.Success;
@@ -21,10 +23,10 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
     [Authorize]
     [HttpGet]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(IPagedList<QuestionItem>), StatusCodes.Status200OK)]
-    public Task<IPagedList<QuestionItem>> GetPage([FromQuery] FindPageRequest request)
+    [ProducesResponseType(typeof(PagedListResponse<QuestionItem>), StatusCodes.Status200OK)]
+    public Task<PagedListResponse<QuestionItem>> GetPage([FromQuery] FindPageRequest request)
     {
-        return questionService.FindPageAsync(request, HttpContext.RequestAborted);
+        return questionService.FindPageAsync(request, HttpContext.RequestAborted).ToPagedListResponseAsync();
     }
 
     /// <summary>
@@ -35,10 +37,10 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
     [Authorize]
     [HttpGet("archived")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(QuestionItem), StatusCodes.Status200OK)]
-    public Task<IPagedList<QuestionItem>> Unarchive([FromQuery] PageRequest pageRequest)
+    [ProducesResponseType(typeof(PagedListResponse<QuestionItem>), StatusCodes.Status200OK)]
+    public Task<PagedListResponse<QuestionItem>> Unarchive([FromQuery] PageRequest pageRequest)
     {
-        return questionService.FindPageArchiveAsync(pageRequest.PageNumber, pageRequest.PageSize, HttpContext.RequestAborted);
+        return questionService.FindPageArchiveAsync(pageRequest.PageNumber, pageRequest.PageSize, HttpContext.RequestAborted).ToPagedListResponseAsync();
     }
 
     /// <summary>
@@ -132,5 +134,19 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
     public Task<QuestionItem> DeletePermanently(Guid id)
     {
         return questionService.DeletePermanentlyAsync(id, HttpContext.RequestAborted);
+    }
+
+    /// <summary>
+    /// Getting a Question tree page.
+    /// </summary>
+    /// <param name="request">Search request.</param>
+    /// <returns>A page of question trees with metadata about the pages.</returns>
+    [Authorize]
+    [HttpGet("tree")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(PagedListResponse<QuestionTreePageRequest>), StatusCodes.Status200OK)]
+    public Task<PagedListResponse<QuestionTreePageResponse>> FindQuestionTreePageAsync([FromQuery] QuestionTreePageRequest request)
+    {
+        return questionService.FindQuestionTreePageAsync(request, HttpContext.RequestAborted).ToPagedListResponseAsync();
     }
 }
