@@ -3,6 +3,7 @@ using Interview.Domain.Categories.Page;
 using Interview.Domain.Database;
 using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
+using Interview.Domain.Questions.QuestionTreeById;
 using Interview.Domain.Questions.QuestionTreePage;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Rooms.RoomConfigurations;
@@ -85,6 +86,55 @@ public class QuestionService(
 
             return res;
         }
+    }
+
+    public async Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid questionTreeId, CancellationToken cancellationToken)
+    {
+        var questionTree = await db.QuestionTree.AsNoTracking()
+            .Select(e => new { Id = e.Id, Name = e.Name, RootQuestionSubjectTreeId = e.RootQuestionSubjectTreeId, })
+            .FirstOrDefaultAsync(e => e.Id == questionTreeId, cancellationToken);
+        if (questionTree is null)
+        {
+            throw NotFoundException.Create<QuestionTree>(questionTreeId);
+        }
+
+        var child = await GetAllQuestionSubjectTreeChildrenAsync(questionTree.RootQuestionSubjectTreeId, cancellationToken);
+        child.Add(questionTree.RootQuestionSubjectTreeId);
+
+        var tree = await db.QuestionSubjectTree.AsNoTracking()
+            .Where(e => child.Contains(e.Id))
+            .Select(e => new
+            {
+                Id = e.Id,
+                QuestionId = e.QuestionId,
+                Type = e.Type,
+                ParentQuestionSubjectTreeId = e.ParentQuestionSubjectTreeId,
+            })
+            .ToListAsync(cancellationToken);
+
+        var questions = tree.Select(e => e.QuestionId).ToHashSet();
+        var questionDetails = await db.Questions
+            .Include(e => e.Tags)
+            .AsNoTracking()
+            .Where(e => questions.Contains(e.Id))
+            .Select(e => new QuestionTreeByIdResponseQuestionDetail
+            {
+                Id = e.Id,
+                Tags = e.Tags.Select(t => t.Value).ToHashSet(),
+            })
+            .ToListAsync(cancellationToken);
+        return new QuestionTreeByIdResponse
+        {
+            QuestionDetail = questionDetails,
+            Tree = tree.ConvertAll(e => new QuestionTreeByIdResponseTree
+            {
+                Id = e.Id,
+                QuestionId = e.QuestionId,
+                Type = e.Type.EnumValue,
+                ParentQuestionSubjectTreeId = e.ParentQuestionSubjectTreeId,
+            }),
+            Name = questionTree.Name,
+        };
     }
 
     public Task<IPagedList<QuestionItem>> FindPageArchiveAsync(
@@ -393,5 +443,35 @@ public class QuestionService(
                     Lang = entity.CodeEditor.Lang,
                 },
         };
+    }
+
+    private async Task<HashSet<Guid>> GetAllQuestionSubjectTreeChildrenAsync(Guid questionSubjectTreeId, CancellationToken cancellationToken)
+    {
+        var childrenList = await db.QuestionSubjectTree
+            .AsNoTracking()
+            .Where(e => e.ParentQuestionSubjectTreeId == questionSubjectTreeId)
+            .Select(e => e.Id)
+            .ToListAsync(cancellationToken);
+        var children = childrenList.ToHashSet();
+        var actualParent = children;
+        while (actualParent.Count > 0)
+        {
+            var parent = actualParent;
+            var childrenNLevel = await db.QuestionSubjectTree
+                .AsNoTracking()
+                .Where(e => e.ParentQuestionSubjectTreeId != null && parent.Contains(e.ParentQuestionSubjectTreeId.Value))
+                .Select(e => e.Id)
+                .ToListAsync(cancellationToken);
+            actualParent = [];
+            foreach (var id in childrenNLevel)
+            {
+                if (children.Add(id))
+                {
+                    actualParent.Add(id);
+                }
+            }
+        }
+
+        return children;
     }
 }

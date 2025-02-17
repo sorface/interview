@@ -1,4 +1,5 @@
 using Interview.Domain.Permissions;
+using Interview.Domain.Questions.QuestionTreeById;
 using Interview.Domain.Questions.QuestionTreePage;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Questions.Services;
@@ -18,6 +19,12 @@ public class QuestionServicePermissionAccessor(IQuestionService questionService,
     {
         await securityService.EnsurePermissionAsync(SEPermission.QuestionTreeFindPage, cancellationToken);
         return await questionService.FindQuestionTreePageAsync(request, cancellationToken);
+    }
+
+    public async Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid questionTreeId, CancellationToken cancellationToken)
+    {
+        await securityService.EnsurePermissionAsync(SEPermission.GetQuestionTreeByIdAsync, cancellationToken);
+        return await questionService.GetQuestionTreeByIdAsync(questionTreeId, cancellationToken);
     }
 
     public async Task<IPagedList<QuestionItem>> FindPageArchiveAsync(

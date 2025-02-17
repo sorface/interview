@@ -425,6 +425,12 @@ public class SEPermission(Guid id, string name, string description, EVPermission
         "Getting the questions tree page",
         EVPermission.QuestionTreeFindPage);
 
+    public static readonly SEPermission GetQuestionTreeByIdAsync = new(
+        Guid.Parse("8F12692D-8E94-4409-AAEF-84F2CEAACD5D"),
+        "GetQuestionTreeByIdAsync",
+        "Getting the question tree by id",
+        EVPermission.GetQuestionTreeByIdAsync);
+
     public Guid Id { get; } = id;
 
     public string Description { get; } = description;

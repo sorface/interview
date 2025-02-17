@@ -1,4 +1,4 @@
-﻿namespace Interview.Domain.Questions.QuestionTreePage;
+namespace Interview.Domain.Questions.QuestionTreePage;
 
 public class QuestionTreePageResponse
 {

@@ -1,6 +1,7 @@
 using Interview.Backend.Common;
 using Interview.Backend.Responses;
 using Interview.Domain;
+using Interview.Domain.Questions.QuestionTreeById;
 using Interview.Domain.Questions.QuestionTreePage;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Questions.Services;
@@ -148,5 +149,20 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
     public Task<PagedListResponse<QuestionTreePageResponse>> FindQuestionTreePageAsync([FromQuery] QuestionTreePageRequest request)
     {
         return questionService.FindQuestionTreePageAsync(request, HttpContext.RequestAborted).ToPagedListResponseAsync();
+    }
+
+    /// <summary>
+    /// Getting a Question tree by id.
+    /// </summary>
+    /// <param name="id">Question tree id.</param>
+    /// <returns>A question tree detail.</returns>
+    [Authorize]
+    [HttpGet("tree/{id:guid}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(QuestionTreeByIdResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(NotFoundException), StatusCodes.Status404NotFound)]
+    public Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid id)
+    {
+        return questionService.GetQuestionTreeByIdAsync(id, HttpContext.RequestAborted);
     }
 }

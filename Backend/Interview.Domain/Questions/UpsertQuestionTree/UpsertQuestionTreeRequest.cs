@@ -1,4 +1,4 @@
-﻿namespace Interview.Domain.Questions.UpsertQuestionTree;
+namespace Interview.Domain.Questions.UpsertQuestionTree;
 
 public class UpsertQuestionTreeRequest
 {

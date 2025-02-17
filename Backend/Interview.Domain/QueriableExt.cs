@@ -1,4 +1,4 @@
-﻿using X.PagedList;
+using X.PagedList;
 
 namespace Interview.Domain;
 

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Interview.Migrations.Sqlite.Migrations
 {
     /// <inheritdoc />
-    public partial class permission_add_QuestionTreeFindPage : Migration
+    public partial class permission_add_GetQuestionTreeByIdAsync : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -14,7 +14,7 @@ namespace Interview.Migrations.Sqlite.Migrations
             migrationBuilder.InsertData(
                 table: "Permissions",
                 columns: new[] { "Id", "CreateDate", "CreatedById", "Type", "UpdateDate" },
-                values: new object[] { new Guid("2e1670ec-f9d2-4cb8-bb57-f6239b16f24f"), new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "QuestionTreeFindPage", new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { new Guid("8f12692d-8e94-4409-aaef-84f2ceaacd5d"), new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "GetQuestionTreeByIdAsync", new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified) });
         }
 
         /// <inheritdoc />
@@ -23,7 +23,7 @@ namespace Interview.Migrations.Sqlite.Migrations
             migrationBuilder.DeleteData(
                 table: "Permissions",
                 keyColumn: "Id",
-                keyValue: new Guid("2e1670ec-f9d2-4cb8-bb57-f6239b16f24f"));
+                keyValue: new Guid("8f12692d-8e94-4409-aaef-84f2ceaacd5d"));
         }
     }
 }
