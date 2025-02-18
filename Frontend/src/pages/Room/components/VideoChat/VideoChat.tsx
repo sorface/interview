@@ -479,7 +479,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             avatar={auth?.avatar}
             nickname={`${auth?.nickname} (${localizationCaptions[LocalizationKey.You]})`}
             reaction={activeReactions[auth?.id || '']}
-            pinable
+            pinable={!viewerMode}
           >
             <video
               ref={userVideo}
@@ -495,7 +495,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             .filter((peer) => !peer.screenShare)
             .map((peer) => (
               <VideochatParticipant
-                pinable
+                pinable={peer.participantType !== 'Viewer'}
                 handleUserPin={() => handleUserPin(peer.targetUserId)}
                 viewer={peer.participantType === 'Viewer'}
                 key={peer.peerID}
