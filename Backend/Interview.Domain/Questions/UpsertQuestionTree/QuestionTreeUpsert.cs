@@ -56,29 +56,57 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
 
     private async Task UpdateAsync(QuestionTree tree, UpsertQuestionTreeRequest request, CancellationToken cancellationToken)
     {
-        var allNodeIds = await db.QuestionSubjectTree.GetAllChildrenAsync(tree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, cancellationToken);
-        var allNodes = await db.QuestionSubjectTree.AsNoTracking()
-            .Where(e => allNodeIds.Contains(e.Id))
-            .ToListAsync(cancellationToken);
-
+        var dbNodeIds = await db.QuestionSubjectTree.GetAllChildrenAsync(tree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, cancellationToken);
         var actualNodeIds = request.Tree.Select(e => e.Id).ToHashSet();
 
-        var nodesForDelete = allNodeIds.Except(actualNodeIds).ToList();
+        var addNodeIds = actualNodeIds.Except(dbNodeIds).ToHashSet();
+        if (addNodeIds.Count > 0)
+        {
+            var addNodes = request.Tree
+                .Where(e => addNodeIds.Contains(e.Id))
+                .Select(e => new QuestionSubjectTree
+                {
+                    Id = e.Id,
+                    ParentQuestionSubjectTreeId = e.ParentQuestionSubjectTreeId,
+                    QuestionId = e.QuestionId,
+                    Type = SEQuestionSubjectTreeType.FromEnumValue(e.Type),
+                    Order = e.Order,
+                });
+            await db.QuestionSubjectTree.AddRangeAsync(addNodes, cancellationToken);
+        }
+
+        var dbNodes = await db.QuestionSubjectTree.AsNoTracking()
+            .Where(e => actualNodeIds.Contains(e.Id))
+            .ToListAsync(cancellationToken);
+        if (dbNodes.Count > 0)
+        {
+            foreach (var item in dbNodes.Join(
+                         request.Tree,
+                         e => e.Id,
+                         e => e.Id,
+                         (subjectTree, treeRequest) => (Db: subjectTree, Request: treeRequest)))
+            {
+                if (item.Db.QuestionId != item.Request.QuestionId)
+                {
+                    item.Db.QuestionId = item.Request.QuestionId;
+                }
+
+                if (item.Db.ParentQuestionSubjectTreeId != item.Request.ParentQuestionSubjectTreeId)
+                {
+                    item.Db.ParentQuestionSubjectTreeId = item.Request.ParentQuestionSubjectTreeId;
+                }
+            }
+        }
+
+        tree.RootQuestionSubjectTreeId = request.Tree.Single(e => e.ParentQuestionSubjectTreeId is null).Id;
+
+        var nodesForDelete = dbNodeIds.Except(actualNodeIds).ToList();
 
         // Удалить неактуальные ноды, в конце, так как тут может быть родительский нод
         if (nodesForDelete.Count > 0)
         {
             await db.QuestionSubjectTree.Where(e => nodesForDelete.Contains(e.Id)).ExecuteDeleteAsync(cancellationToken);
         }
-
-        // Проверяем были ли изменения в дереве
-        // Получаем все ноды старого дерева
-        // Составляем список, который нужно удалить
-        // Составляем список на добавление
-        // Добавляем новые ноды
-        // Обновляем существующие ноды
-        // Удаляем неактуальные ноды
-        throw new NotImplementedException();
     }
 
     private async Task CreateAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken)
