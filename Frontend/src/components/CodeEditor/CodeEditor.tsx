@@ -14,6 +14,7 @@ import Editor, {
 } from '@monaco-editor/react';
 import { CodeEditorLang } from '../../types/question';
 import { Theme, ThemeContext } from '../../context/ThemeContext';
+import { RunCodeButton } from '../../pages/Room/components/RunCodeButton/RunCodeButton';
 
 import './CodeEditor.css';
 
@@ -135,6 +136,7 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
         >
           {renderOptions(fontSizeOptions)}
         </select>
+        <RunCodeButton stringifyFunction={value} />
       </div>
       <div className="flex-1">
         <Editor
