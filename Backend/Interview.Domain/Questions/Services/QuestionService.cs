@@ -103,38 +103,31 @@ public class QuestionService(
         child.Add(questionTree.RootQuestionSubjectTreeId);
 
         var tree = await db.QuestionSubjectTree.AsNoTracking()
+            .Include(e => e.Question)
             .Where(e => child.Contains(e.Id))
             .Select(e => new
             {
                 Id = e.Id,
                 QuestionId = e.QuestionId,
+                QuestionValue = e.Question!.Value,
                 Type = e.Type,
                 ParentQuestionSubjectTreeId = e.ParentQuestionSubjectTreeId,
             })
             .ToListAsync(cancellationToken);
-
-        var questions = tree.Select(e => e.QuestionId).ToHashSet();
-        var questionDetails = await db.Questions
-            .Include(e => e.Tags)
-            .AsNoTracking()
-            .Where(e => questions.Contains(e.Id))
-            .Select(e => new QuestionTreeByIdResponseQuestionDetail
-            {
-                Id = e.Id,
-                Tags = e.Tags.Select(t => t.Value).ToHashSet(),
-            })
-            .ToListAsync(cancellationToken);
         return new QuestionTreeByIdResponse
         {
-            QuestionDetail = questionDetails,
+            Name = questionTree.Name,
             Tree = tree.ConvertAll(e => new QuestionTreeByIdResponseTree
             {
                 Id = e.Id,
-                QuestionId = e.QuestionId,
+                Question = new QuestionTreeByIdResponseQuestionDetail
+                {
+                    Id = e.QuestionId,
+                    Value = e.QuestionValue,
+                },
                 Type = e.Type.EnumValue,
                 ParentQuestionSubjectTreeId = e.ParentQuestionSubjectTreeId,
             }),
-            Name = questionTree.Name,
         };
     }
 
