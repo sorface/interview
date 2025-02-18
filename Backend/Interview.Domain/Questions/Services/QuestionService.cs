@@ -57,7 +57,8 @@ public class QuestionService(
         var spec = BuildSpecification(request);
         return db.QuestionTree.AsNoTracking()
             .Where(spec)
-            .OrderBy(e => e.CreateDate)
+            .OrderBy(e => e.Order)
+            .ThenBy(e => e.CreateDate)
             .Select(e => new QuestionTreePageResponse { Id = e.Id, Name = e.Name, ParentQuestionTreeId = e.ParentQuestionTreeId, })
             .ToPagedListAsync(request.Page, cancellationToken);
 
