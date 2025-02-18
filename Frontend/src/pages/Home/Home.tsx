@@ -4,7 +4,7 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { Navigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import { pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { HomeAction } from './components/HomeContent/HomeAction';
@@ -13,7 +13,7 @@ import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Gap } from '../../components/Gap/Gap';
 import { Typography } from '../../components/Typography/Typography';
 import { LangSwitch } from '../../components/LangSwitch/LangSwitch';
-import { VITE_NAME } from '../../config';
+import { VITE_APP_NAME } from '../../config';
 import {
   AiAssistant,
   AiAssistantLoadingVariant,
@@ -70,7 +70,7 @@ export const Home: FunctionComponent = () => {
           </Canvas>
         </div>
         <Typography size="xxxl" bold>
-          {VITE_NAME}
+          {VITE_APP_NAME}
         </Typography>
         <Gap sizeRem={0.625} />
         <div className="whitespace-break-spaces">
@@ -81,7 +81,16 @@ export const Home: FunctionComponent = () => {
         <Gap sizeRem={1.05} />
         <HomeAction />
       </div>
-      <div className="flex justify-center">
+      <div className="flex flex-col items-center">
+        <div className="whitespace-break-spaces">
+          <Typography size="s">
+            {localizationCaptions[LocalizationKey.TermsOfUsageAcceptance]}
+            <Link to={pathnames.terms}>
+              {localizationCaptions[LocalizationKey.TermsOfUsage]}
+            </Link>
+          </Typography>
+        </div>
+        <Gap sizeRem={0.5} />
         <LangSwitch elementType="switcherButton" />
       </div>
     </>
