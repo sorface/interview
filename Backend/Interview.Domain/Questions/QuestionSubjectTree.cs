@@ -43,4 +43,17 @@ public sealed class SEQuestionSubjectTreeType : SmartEnum<SEQuestionSubjectTreeT
     }
 
     public EVQuestionSubjectTreeType EnumValue { get; }
+
+    public static SEQuestionSubjectTreeType FromEnumValue(EVQuestionSubjectTreeType enumValue)
+    {
+        foreach (var seQuestionSubjectTreeType in List)
+        {
+            if (seQuestionSubjectTreeType.EnumValue == enumValue)
+            {
+                return seQuestionSubjectTreeType;
+            }
+        }
+
+        throw new Exception($"Not found item by value '{enumValue}'");
+    }
 }

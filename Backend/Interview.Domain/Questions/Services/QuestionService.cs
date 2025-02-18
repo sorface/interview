@@ -441,33 +441,8 @@ public class QuestionService(
         };
     }
 
-    private async Task<HashSet<Guid>> GetAllQuestionSubjectTreeChildrenAsync(Guid questionSubjectTreeId, CancellationToken cancellationToken)
+    private Task<HashSet<Guid>> GetAllQuestionSubjectTreeChildrenAsync(Guid questionSubjectTreeId, CancellationToken cancellationToken)
     {
-        var childrenList = await db.QuestionSubjectTree
-            .AsNoTracking()
-            .Where(e => e.ParentQuestionSubjectTreeId == questionSubjectTreeId)
-            .Select(e => e.Id)
-            .ToListAsync(cancellationToken);
-        var children = childrenList.ToHashSet();
-        var actualParent = children;
-        while (actualParent.Count > 0)
-        {
-            var parent = actualParent;
-            var childrenNLevel = await db.QuestionSubjectTree
-                .AsNoTracking()
-                .Where(e => e.ParentQuestionSubjectTreeId != null && parent.Contains(e.ParentQuestionSubjectTreeId.Value))
-                .Select(e => e.Id)
-                .ToListAsync(cancellationToken);
-            actualParent = [];
-            foreach (var id in childrenNLevel)
-            {
-                if (children.Add(id))
-                {
-                    actualParent.Add(id);
-                }
-            }
-        }
-
-        return children;
+        return db.QuestionSubjectTree.GetAllChildrenAsync(questionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, cancellationToken);
     }
 }
