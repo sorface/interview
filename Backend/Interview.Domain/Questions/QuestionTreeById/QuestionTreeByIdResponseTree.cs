@@ -8,5 +8,7 @@ public class QuestionTreeByIdResponseTree
 
     public required Guid? ParentQuestionSubjectTreeId { get; set; }
 
+    public required int Order { get; set; }
+
     public required QuestionTreeByIdResponseQuestionDetail Question { get; set; }
 }

@@ -112,6 +112,7 @@ public class QuestionService(
                 QuestionValue = e.Question!.Value,
                 Type = e.Type,
                 ParentQuestionSubjectTreeId = e.ParentQuestionSubjectTreeId,
+                Order = e.Order,
             })
             .ToListAsync(cancellationToken);
         return new QuestionTreeByIdResponse
@@ -127,6 +128,7 @@ public class QuestionService(
                 },
                 Type = e.Type.EnumValue,
                 ParentQuestionSubjectTreeId = e.ParentQuestionSubjectTreeId,
+                Order = e.Order,
             }),
         };
     }

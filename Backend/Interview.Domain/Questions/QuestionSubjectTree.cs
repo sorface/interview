@@ -14,6 +14,8 @@ public class QuestionSubjectTree : ArchiveEntity
     public Guid? ParentQuestionSubjectTreeId { get; set; }
 
     public QuestionSubjectTree? ParentQuestionSubjectTree { get; set; }
+
+    public int Order { get; set; }
 }
 
 public enum EVQuestionSubjectTreeType : byte

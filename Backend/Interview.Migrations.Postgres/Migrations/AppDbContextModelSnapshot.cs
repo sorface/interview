@@ -335,6 +335,9 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Property<bool>("IsArchived")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
                     b.Property<Guid?>("ParentQuestionSubjectTreeId")
                         .HasColumnType("uuid");
 
