@@ -1,12 +1,13 @@
 using System.Linq.Expressions;
 using Interview.Domain.Database;
+using Interview.Domain.ServiceResults.Success;
 using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Domain.Questions.UpsertQuestionTree;
 
 public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
 {
-    public async Task UpsertQuestionTreeAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken = default)
+    public async Task<ServiceResult<Guid>> UpsertQuestionTreeAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(request.Name))
         {
@@ -31,7 +32,7 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
         }
 
         var tree = await db.QuestionTree.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
-        await db.RunTransactionAsync(async ct =>
+        return await db.RunTransactionAsync(async ct =>
         {
             // Shift tree order
             await db.QuestionTree
@@ -39,9 +40,11 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
                 .Where(e => e.Order >= request.Order)
                 .ExecuteUpdateAsync(e => e.SetProperty(p => p.Order, p => p.Order + 1), cancellationToken);
 
+            var create = false;
             if (tree is null)
             {
-                await CreateAsync(request, cancellationToken);
+                create = true;
+                tree = await CreateAsync(request, cancellationToken);
             }
             else
             {
@@ -49,14 +52,14 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
             }
 
             await db.SaveChangesAsync(ct);
-            return DBNull.Value;
+            return create ? ServiceResult.Created(tree.Id) : ServiceResult.Ok(tree.Id);
         },
             cancellationToken);
     }
 
     private async Task UpdateAsync(QuestionTree tree, UpsertQuestionTreeRequest request, CancellationToken cancellationToken)
     {
-        var dbNodeIds = await db.QuestionSubjectTree.GetAllChildrenAsync(tree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, cancellationToken);
+        var dbNodeIds = await db.QuestionSubjectTree.GetAllChildrenAsync(tree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
         var actualNodeIds = request.Tree.Select(e => e.Id).ToHashSet();
 
         var addNodeIds = actualNodeIds.Except(dbNodeIds).ToHashSet();
@@ -75,7 +78,9 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
             await db.QuestionSubjectTree.AddRangeAsync(addNodes, cancellationToken);
         }
 
-        var dbNodes = await db.QuestionSubjectTree.AsNoTracking()
+        await db.SaveChangesAsync(cancellationToken);
+
+        var dbNodes = await db.QuestionSubjectTree
             .Where(e => actualNodeIds.Contains(e.Id))
             .ToListAsync(cancellationToken);
         if (dbNodes.Count > 0)
@@ -95,10 +100,17 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
                 {
                     item.Db.ParentQuestionSubjectTreeId = item.Request.ParentQuestionSubjectTreeId;
                 }
+
+                if (item.Db.Type.EnumValue != item.Request.Type)
+                {
+                    item.Db.Type = SEQuestionSubjectTreeType.FromEnumValue(item.Request.Type);
+                }
             }
         }
 
         tree.RootQuestionSubjectTreeId = request.Tree.Single(e => e.ParentQuestionSubjectTreeId is null).Id;
+
+        await db.SaveChangesAsync(cancellationToken);
 
         var nodesForDelete = dbNodeIds.Except(actualNodeIds).ToList();
 
@@ -109,7 +121,7 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
         }
     }
 
-    private async Task CreateAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken)
+    private async Task<QuestionTree> CreateAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken)
     {
         var subjectTrees = request.Tree.Select(e => new QuestionSubjectTree
         {
@@ -123,12 +135,14 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
 
         var tree = new QuestionTree
         {
+            Id = request.Id,
             Name = request.Name,
             ParentQuestionTreeId = request.ParentQuestionTreeId,
             Order = request.Order,
             RootQuestionSubjectTreeId = subjectTrees.Single(e => e.ParentQuestionSubjectTreeId is null).Id,
         };
         await db.QuestionTree.AddAsync(tree, cancellationToken);
+        return tree;
     }
 
     private Expression<Func<QuestionTree, bool>> BuildSpecByParent(Guid? parentQuestionTreeId)

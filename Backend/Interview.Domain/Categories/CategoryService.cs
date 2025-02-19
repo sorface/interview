@@ -161,7 +161,7 @@ public class CategoryService(AppDbContext db, ArchiveService<Category> archiveSe
 
     private Task<HashSet<Guid>> GetAllChildrenAsync(Guid categoryId, CancellationToken cancellationToken)
     {
-        return db.Categories.GetAllChildrenAsync(categoryId, e => e.ParentId, cancellationToken);
+        return db.Categories.GetAllChildrenAsync(categoryId, e => e.ParentId, false, cancellationToken);
     }
 
     private Task<ServiceError?> EnsureValidAsync(CategoryEditRequest request, CancellationToken cancellationToken)

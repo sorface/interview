@@ -6,6 +6,124 @@ namespace Interview.Test.Units;
 
 public class UpsertQuestionTreeRequestTest
 {
+    public static IEnumerable<object[]> ValidTreeData
+    {
+        get
+        {
+            var parentNodeId = Guid.NewGuid();
+            yield return new object[]
+            {
+                new List<UpsertQuestionSubjectTreeRequest>
+                {
+                    new()
+                    {
+                        Id = parentNodeId,
+                        ParentQuestionSubjectTreeId = null,
+                        QuestionId = Guid.NewGuid(),
+                        Type = EVQuestionSubjectTreeType.Question,
+                        Order = 1
+                    },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        ParentQuestionSubjectTreeId = parentNodeId,
+                        QuestionId = Guid.NewGuid(),
+                        Type = EVQuestionSubjectTreeType.Question,
+                        Order = 2
+                    }
+                }
+            };
+
+            var node2lvl = Guid.NewGuid();
+            yield return new object[]
+            {
+                new List<UpsertQuestionSubjectTreeRequest>
+                {
+                    new()
+                    {
+                        Id = parentNodeId,
+                        ParentQuestionSubjectTreeId = null,
+                        QuestionId = Guid.NewGuid(),
+                        Type = EVQuestionSubjectTreeType.Question,
+                        Order = 1
+                    },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        ParentQuestionSubjectTreeId = parentNodeId,
+                        QuestionId = Guid.NewGuid(),
+                        Type = EVQuestionSubjectTreeType.Question,
+                        Order = 1
+                    },
+                    new()
+                    {
+                        Id = node2lvl,
+                        ParentQuestionSubjectTreeId = parentNodeId,
+                        QuestionId = Guid.NewGuid(),
+                        Type = EVQuestionSubjectTreeType.Question,
+                        Order = 2
+                    },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        ParentQuestionSubjectTreeId = node2lvl,
+                        QuestionId = Guid.NewGuid(),
+                        Type = EVQuestionSubjectTreeType.Question,
+                        Order = 1
+                    },
+                }
+            };
+
+            var node3lvl = Guid.NewGuid();
+            yield return new object[]
+            {
+                new List<UpsertQuestionSubjectTreeRequest>
+                {
+                    new()
+                    {
+                        Id = parentNodeId,
+                        ParentQuestionSubjectTreeId = null,
+                        QuestionId = Guid.NewGuid(),
+                        Type = EVQuestionSubjectTreeType.Question,
+                        Order = 1
+                    },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        ParentQuestionSubjectTreeId = parentNodeId,
+                        QuestionId = Guid.NewGuid(),
+                        Type = EVQuestionSubjectTreeType.Question,
+                        Order = 1
+                    },
+                    new()
+                    {
+                        Id = node2lvl,
+                        ParentQuestionSubjectTreeId = parentNodeId,
+                        QuestionId = Guid.NewGuid(),
+                        Type = EVQuestionSubjectTreeType.Question,
+                        Order = 2
+                    },
+                    new()
+                    {
+                        Id = node3lvl,
+                        ParentQuestionSubjectTreeId = node2lvl,
+                        QuestionId = Guid.NewGuid(),
+                        Type = EVQuestionSubjectTreeType.Question,
+                        Order = 1
+                    },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        ParentQuestionSubjectTreeId = node3lvl,
+                        QuestionId = Guid.NewGuid(),
+                        Type = EVQuestionSubjectTreeType.Question,
+                        Order = 1
+                    },
+                }
+            };
+        }
+    }
+
     [Fact]
     public void IsValidTree_WhenTreeHasNoNodes_ShouldReturnFalse()
     {
@@ -115,18 +233,14 @@ public class UpsertQuestionTreeRequestTest
         errorMessage.Should().Be("Tree has cycle");
     }
 
-    [Fact]
-    public void IsValidTree_WhenTreeIsValid_ShouldReturnTrue()
+    [Theory]
+    [MemberData(nameof(ValidTreeData))]
+    public void IsValidTree_WhenTreeIsValid_ShouldReturnTrue(List<UpsertQuestionSubjectTreeRequest> tree)
     {
         // Arrange
-        var parentNodeId = Guid.NewGuid();
         var request = new UpsertQuestionTreeRequest
         {
-            Tree = new List<UpsertQuestionSubjectTreeRequest>
-            {
-                new() { Id = parentNodeId, ParentQuestionSubjectTreeId = null, QuestionId = Guid.NewGuid(), Type = EVQuestionSubjectTreeType.Question, Order = 1 },
-                new() { Id = Guid.NewGuid(), ParentQuestionSubjectTreeId = parentNodeId, QuestionId = Guid.NewGuid(), Type = EVQuestionSubjectTreeType.Question, Order = 2 }
-            },
+            Tree = tree,
             Name = "t"
         };
 

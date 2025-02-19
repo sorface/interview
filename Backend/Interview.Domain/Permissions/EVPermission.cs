@@ -204,6 +204,9 @@ public enum EVPermission
     QuestionTreeFindPage,
 
     [Description("Getting the question tree by id")]
-    GetQuestionTreeByIdAsync,
+    GetQuestionTreeById,
+
+    [Description("Upsert question tree")]
+    UpsertQuestionTree,
 #pragma warning restore SA1602
 }

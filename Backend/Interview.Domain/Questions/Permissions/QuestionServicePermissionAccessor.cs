@@ -3,6 +3,8 @@ using Interview.Domain.Questions.QuestionTreeById;
 using Interview.Domain.Questions.QuestionTreePage;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Questions.Services;
+using Interview.Domain.Questions.UpsertQuestionTree;
+using Interview.Domain.ServiceResults.Success;
 using X.PagedList;
 
 namespace Interview.Domain.Questions.Permissions;
@@ -23,8 +25,14 @@ public class QuestionServicePermissionAccessor(IQuestionService questionService,
 
     public async Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid questionTreeId, CancellationToken cancellationToken)
     {
-        await securityService.EnsurePermissionAsync(SEPermission.GetQuestionTreeByIdAsync, cancellationToken);
+        await securityService.EnsurePermissionAsync(SEPermission.GetQuestionTreeById, cancellationToken);
         return await questionService.GetQuestionTreeByIdAsync(questionTreeId, cancellationToken);
+    }
+
+    public async Task<ServiceResult<Guid>> UpsertQuestionTreeAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken = default)
+    {
+        await securityService.EnsurePermissionAsync(SEPermission.UpsertQuestionTree, cancellationToken);
+        return await questionService.UpsertQuestionTreeAsync(request, cancellationToken);
     }
 
     public async Task<IPagedList<QuestionItem>> FindPageArchiveAsync(

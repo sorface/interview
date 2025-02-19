@@ -1,6 +1,8 @@
 using Interview.Domain.Questions.QuestionTreeById;
 using Interview.Domain.Questions.QuestionTreePage;
 using Interview.Domain.Questions.Records.FindPage;
+using Interview.Domain.Questions.UpsertQuestionTree;
+using Interview.Domain.ServiceResults.Success;
 using X.PagedList;
 
 namespace Interview.Domain.Questions.Services;
@@ -10,6 +12,8 @@ public interface IQuestionService : IService
     public Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken);
 
     Task<IPagedList<QuestionTreePageResponse>> FindQuestionTreePageAsync(QuestionTreePageRequest request, CancellationToken cancellationToken);
+
+    Task<ServiceResult<Guid>> UpsertQuestionTreeAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken = default);
 
     Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid questionTreeId, CancellationToken cancellationToken);
 

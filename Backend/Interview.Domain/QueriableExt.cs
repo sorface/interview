@@ -18,74 +18,60 @@ public static class QueryableExt
         this DbSet<TEntity> dbSet,
         Guid parentId,
         Expression<Func<TEntity, Guid?>> parentIdSelector,
+        bool includeParent = false,
         CancellationToken cancellationToken = default)
         where TEntity : Entity
     {
-        // Анализируем выражение parentIdSelector, чтобы получить доступ к свойству ParentId
-        if (parentIdSelector.Body is not MemberExpression memberExpression ||
-            memberExpression.Member is not PropertyInfo parentIdProperty)
+        // Проверяем, что передано корректное выражение
+        if (parentIdSelector.Body is not MemberExpression { Member: PropertyInfo parentIdProperty })
         {
             throw new ArgumentException("The parentIdSelector must be a simple property access expression.", nameof(parentIdSelector));
         }
 
-        // Создаем параметр для выражения
-        var parameter = Expression.Parameter(typeof(TEntity), "e");
+        var result = new HashSet<Guid>();
+        if (includeParent)
+        {
+            result.Add(parentId);
+        }
 
-        // Выражение для Id
+        var queue = new Queue<Guid>();
+        queue.Enqueue(parentId);
+
+        // Параметр для выражения
+        var parameter = Expression.Parameter(typeof(TEntity), "e");
+        var parentIdExpression = Expression.Property(parameter, parentIdProperty.Name);
         var idExpression = Expression.Property(parameter, nameof(Entity.Id));
 
-        // Выражение для ParentId
-        var parentIdExpression = Expression.Property(parameter, parentIdProperty.Name);
+        var containsMethod = typeof(List<Guid?>).GetMethod(nameof(List<Guid?>.Contains), new[] { typeof(Guid?) }) ?? throw new InvalidOperationException("Not found contains method");
 
-        // Выражение для начального условия: ParentId == parentId
-        var initialCondition = Expression.Equal(parentIdExpression, Expression.Constant(parentId, typeof(Guid?)));
-        var initialWhere = Expression.Lambda<Func<TEntity, bool>>(initialCondition, parameter);
-
-        // Получаем начальный список дочерних элементов
-        var childrenList = await dbSet
-            .AsNoTracking()
-            .Where(initialWhere)
-            .Select(Expression.Lambda<Func<TEntity, Guid>>(idExpression, parameter))
-            .ToListAsync(cancellationToken);
-
-        var children = childrenList.ToHashSet();
-        var actualParent = children;
-
-        // Рекурсивно получаем все дочерние элементы
-        while (actualParent.Count > 0)
+        while (queue.Count > 0)
         {
-            var parent = actualParent;
-            var parentIds = parent.Select(id => (Guid?)id).ToList();
+            var currentParents = queue.ToList();
+            queue.Clear();
 
-            // Выражение для условия: ParentId != null && parent.Contains(ParentId.Value)
-            var parentIdNotNull = Expression.NotEqual(parentIdExpression, Expression.Constant(null, typeof(Guid?)));
-            var parentIdInList = Expression.Call(
-                typeof(Enumerable),
-                "Contains",
-                new[] { typeof(Guid?) },
-                Expression.Constant(parentIds),
-                parentIdExpression);
+            // Создаём динамическое условие WHERE e.ParentId IN (currentParents)
+            var parentIdListExpression = Expression.Constant(currentParents.Cast<Guid?>().ToList());
 
-            var combinedCondition = Expression.AndAlso(parentIdNotNull, parentIdInList);
-            var whereExpression = Expression.Lambda<Func<TEntity, bool>>(combinedCondition, parameter);
+            var condition = Expression.Call(parentIdListExpression, containsMethod, parentIdExpression);
+            var lambda = Expression.Lambda<Func<TEntity, bool>>(condition, parameter);
 
-            // Получаем дочерние элементы следующего уровня
-            var childrenNLevel = await dbSet
+            // Выполняем запрос к БД
+            var children = await dbSet
                 .AsNoTracking()
-                .Where(whereExpression)
+                .Where(lambda)
                 .Select(Expression.Lambda<Func<TEntity, Guid>>(idExpression, parameter))
                 .ToListAsync(cancellationToken);
 
-            actualParent = new HashSet<Guid>();
-            foreach (var id in childrenNLevel)
+            foreach (var childId in children)
             {
-                if (children.Add(id))
+                // Добавляем в результат только новые узлы
+                if (result.Add(childId))
                 {
-                    actualParent.Add(id);
+                    queue.Enqueue(childId);
                 }
             }
         }
 
-        return children;
+        return result;
     }
 }

@@ -425,11 +425,17 @@ public class SEPermission(Guid id, string name, string description, EVPermission
         "Getting the questions tree page",
         EVPermission.QuestionTreeFindPage);
 
-    public static readonly SEPermission GetQuestionTreeByIdAsync = new(
+    public static readonly SEPermission GetQuestionTreeById = new(
         Guid.Parse("8F12692D-8E94-4409-AAEF-84F2CEAACD5D"),
-        "GetQuestionTreeByIdAsync",
+        "GetQuestionTreeById",
         "Getting the question tree by id",
-        EVPermission.GetQuestionTreeByIdAsync);
+        EVPermission.GetQuestionTreeById);
+
+    public static readonly SEPermission UpsertQuestionTree = new(
+        Guid.Parse("03B8BDCA-DDA6-4063-915B-31BF0A2DBA74"),
+        "UpsertQuestionTree",
+        "Upsert question tree",
+        EVPermission.UpsertQuestionTree);
 
     public Guid Id { get; } = id;
 

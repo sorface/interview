@@ -1004,7 +1004,7 @@ namespace Interview.Migrations.Sqlite.Migrations
                         {
                             Id = new Guid("8f12692d-8e94-4409-aaef-84f2ceaacd5d"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Type = "GetQuestionTreeByIdAsync",
+                            Type = "GetQuestionTreeById",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -1320,6 +1320,13 @@ namespace Interview.Migrations.Sqlite.Migrations
                             Id = new Guid("9f020c9e-e0b4-4e6d-9fb3-38ba44cfa3f9"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "TranscriptionGet",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("03b8bdca-dda6-4063-915b-31bf0a2dba74"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "UpsertQuestionTree",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new

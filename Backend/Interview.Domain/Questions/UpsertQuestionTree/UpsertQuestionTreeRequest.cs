@@ -48,28 +48,37 @@ public class UpsertQuestionTreeRequest
         // Проверка на циклические ссылки и однонаправленность
         foreach (var node in Tree)
         {
-            if (node.ParentQuestionSubjectTreeId.HasValue)
+            if (!node.ParentQuestionSubjectTreeId.HasValue)
             {
-                if (!nodeDict.TryGetValue(node.ParentQuestionSubjectTreeId.Value, out var value))
+                continue;
+            }
+
+            if (!nodeDict.TryGetValue(node.ParentQuestionSubjectTreeId.Value, out var value))
+            {
+                // Если ParentId ссылается на несуществующий узел, это ошибка
+                errorMessage = $"Unknown parent node id {node.ParentQuestionSubjectTreeId.Value}";
+                return false;
+            }
+
+            var current = node;
+            while (current.ParentQuestionSubjectTreeId.HasValue)
+            {
+                if (current.ParentQuestionSubjectTreeId == node.Id)
                 {
-                    // Если ParentId ссылается на несуществующий узел, это ошибка
-                    errorMessage = $"Unknown parent node id {node.ParentQuestionSubjectTreeId.Value}";
+                    // Найдена циклическая ссылка
+                    errorMessage = "Tree has cycle";
                     return false;
                 }
 
-                // Проверка на циклические ссылки
-                var current = node;
-                while (current.ParentQuestionSubjectTreeId.HasValue)
+                // Обновляем current на родительский узел
+                if (!nodeDict.TryGetValue(current.ParentQuestionSubjectTreeId.Value, out var parent))
                 {
-                    if (current.ParentQuestionSubjectTreeId == node.Id)
-                    {
-                        // Найдена циклическая ссылка
-                        errorMessage = "Tree has cycle";
-                        return false;
-                    }
-
-                    current = value;
+                    // Если ParentId ссылается на несуществующий узел, это ошибка
+                    errorMessage = $"Unknown parent node id {current.ParentQuestionSubjectTreeId.Value}";
+                    return false;
                 }
+
+                current = parent;
             }
         }
 

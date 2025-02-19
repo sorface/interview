@@ -56,7 +56,7 @@ public sealed class RoleName : SmartEnum<RoleName>
             SEPermission.QuestionUnarchive,
             SEPermission.GetRoomCalendar,
             SEPermission.QuestionTreeFindPage,
-            SEPermission.GetQuestionTreeByIdAsync,
+            SEPermission.GetQuestionTreeById,
         });
 
     public static readonly RoleName Admin = new(

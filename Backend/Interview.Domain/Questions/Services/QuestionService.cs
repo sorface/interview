@@ -6,8 +6,10 @@ using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Questions.QuestionTreeById;
 using Interview.Domain.Questions.QuestionTreePage;
 using Interview.Domain.Questions.Records.FindPage;
+using Interview.Domain.Questions.UpsertQuestionTree;
 using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.ServiceResults.Success;
 using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
 using Interview.Domain.Users;
@@ -24,6 +26,7 @@ public class QuestionService(
     ITagRepository tagRepository,
     IRoomMembershipChecker roomMembershipChecker,
     ICurrentUserAccessor currentUserAccessor,
+    QuestionTreeUpsert questionTreeUpsert,
     AppDbContext db)
     : IQuestionService
 {
@@ -64,7 +67,7 @@ public class QuestionService(
 
         static ASpec<QuestionTree> BuildSpecification(QuestionTreePageRequest request)
         {
-            var res = Spec<QuestionTree>.Any;
+            ASpec<QuestionTree>? res = new Spec<QuestionTree>(e => e.IsArchived == false);
             if (request.Filter is null)
             {
                 return res;
@@ -89,22 +92,23 @@ public class QuestionService(
         }
     }
 
+    public Task<ServiceResult<Guid>> UpsertQuestionTreeAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken = default)
+        => questionTreeUpsert.UpsertQuestionTreeAsync(request, cancellationToken);
+
     public async Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid questionTreeId, CancellationToken cancellationToken)
     {
         var questionTree = await db.QuestionTree.AsNoTracking()
-            .Select(e => new { Id = e.Id, Name = e.Name, RootQuestionSubjectTreeId = e.RootQuestionSubjectTreeId, })
-            .FirstOrDefaultAsync(e => e.Id == questionTreeId, cancellationToken);
+            .Select(e => new { e.Id, e.Name, e.RootQuestionSubjectTreeId, e.IsArchived })
+            .FirstOrDefaultAsync(e => e.Id == questionTreeId && e.IsArchived == false, cancellationToken);
         if (questionTree is null)
         {
             throw NotFoundException.Create<QuestionTree>(questionTreeId);
         }
 
-        var child = await GetAllQuestionSubjectTreeChildrenAsync(questionTree.RootQuestionSubjectTreeId, cancellationToken);
-        child.Add(questionTree.RootQuestionSubjectTreeId);
-
+        var nodes = await db.QuestionSubjectTree.GetAllChildrenAsync(questionTree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
         var tree = await db.QuestionSubjectTree.AsNoTracking()
             .Include(e => e.Question)
-            .Where(e => child.Contains(e.Id))
+            .Where(e => nodes.Contains(e.Id))
             .Select(e => new
             {
                 Id = e.Id,
@@ -439,10 +443,5 @@ public class QuestionService(
                     Lang = entity.CodeEditor.Lang,
                 },
         };
-    }
-
-    private Task<HashSet<Guid>> GetAllQuestionSubjectTreeChildrenAsync(Guid questionSubjectTreeId, CancellationToken cancellationToken)
-    {
-        return db.QuestionSubjectTree.GetAllChildrenAsync(questionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, cancellationToken);
     }
 }

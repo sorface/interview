@@ -5,6 +5,7 @@ using Interview.Domain.Questions.QuestionTreeById;
 using Interview.Domain.Questions.QuestionTreePage;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Questions.Services;
+using Interview.Domain.Questions.UpsertQuestionTree;
 using Interview.Domain.ServiceResults.Success;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -164,5 +165,21 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
     public Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid id)
     {
         return questionService.GetQuestionTreeByIdAsync(id, HttpContext.RequestAborted);
+    }
+
+    /// <summary>
+    /// Upsert question tree.
+    /// </summary>
+    /// <param name="request">Upsert question tree request.</param>
+    /// <returns>Question tree id.</returns>
+    [Authorize]
+    [HttpPost("tree")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(ActionResult<Guid>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ActionResult<Guid>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(NotFoundException), StatusCodes.Status404NotFound)]
+    public Task<ActionResult<Guid>> UpsertQuestionTreeAsync([FromBody] UpsertQuestionTreeRequest request)
+    {
+        return questionService.UpsertQuestionTreeAsync(request, HttpContext.RequestAborted).ToActionResultAsync();
     }
 }
