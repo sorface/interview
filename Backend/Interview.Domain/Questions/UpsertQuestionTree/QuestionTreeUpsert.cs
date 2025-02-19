@@ -31,6 +31,8 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
             throw new UserException("Duplicate question tree by name");
         }
 
+        await EnsureAvailableQuestionsAsync(request.Tree.Select(e => e.QuestionId), cancellationToken);
+
         var tree = await db.QuestionTree.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
         return await db.RunTransactionAsync(async ct =>
         {
@@ -55,6 +57,21 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
             return create ? ServiceResult.Created(tree.Id) : ServiceResult.Ok(tree.Id);
         },
             cancellationToken);
+    }
+
+    private async Task EnsureAvailableQuestionsAsync(IEnumerable<Guid> select, CancellationToken cancellationToken)
+    {
+        var requiredQuestions = select.ToHashSet().ToList();
+        var dbQuestions = await db.Questions
+            .Where(e => requiredQuestions.Contains(e.Id))
+            .Select(e => e.Id)
+            .ToListAsync(cancellationToken);
+
+        var unknownQuestions = requiredQuestions.Except(dbQuestions).ToList();
+        if (requiredQuestions.Count > 0)
+        {
+            throw NotFoundException.Create<Question>(unknownQuestions);
+        }
     }
 
     private async Task UpdateAsync(QuestionTree tree, UpsertQuestionTreeRequest request, CancellationToken cancellationToken)
