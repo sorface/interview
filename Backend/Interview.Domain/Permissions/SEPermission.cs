@@ -425,11 +425,23 @@ public class SEPermission(Guid id, string name, string description, EVPermission
         "Getting the questions tree page",
         EVPermission.QuestionTreeFindPage);
 
+    public static readonly SEPermission QuestionTreeFindArchivedPage = new(
+        Guid.Parse("BADFC74C-4F2F-4B53-9B46-763B28676009"),
+        "QuestionTreeFindArchivedPage",
+        "Getting the archived questions tree page",
+        EVPermission.QuestionTreeFindArchivedPage);
+
     public static readonly SEPermission GetQuestionTreeById = new(
         Guid.Parse("8F12692D-8E94-4409-AAEF-84F2CEAACD5D"),
         "GetQuestionTreeById",
         "Getting the question tree by id",
         EVPermission.GetQuestionTreeById);
+
+    public static readonly SEPermission GetArchiveQuestionTreeById = new(
+        Guid.Parse("1119039F-8127-43DC-AC11-247FC4D221D3"),
+        "GetArchiveQuestionTreeById",
+        "Getting archive the question tree by id",
+        EVPermission.GetArchiveQuestionTreeById);
 
     public static readonly SEPermission UpsertQuestionTree = new(
         Guid.Parse("03B8BDCA-DDA6-4063-915B-31BF0A2DBA74"),

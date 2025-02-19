@@ -15,7 +15,7 @@ public interface IQuestionService : IService
 
     Task<ServiceResult<Guid>> UpsertQuestionTreeAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken = default);
 
-    Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid questionTreeId, CancellationToken cancellationToken);
+    Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid questionTreeId, bool archive, CancellationToken cancellationToken);
 
     Task<IPagedList<QuestionItem>> FindPageArchiveAsync(
         int pageNumber, int pageSize, CancellationToken cancellationToken);

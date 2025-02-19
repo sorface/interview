@@ -203,8 +203,14 @@ public enum EVPermission
     [Description("Getting the questions tree page")]
     QuestionTreeFindPage,
 
+    [Description("Getting the archived questions tree page")]
+    QuestionTreeFindArchivedPage,
+
     [Description("Getting the question tree by id")]
     GetQuestionTreeById,
+
+    [Description("Getting archive the question tree by id")]
+    GetArchiveQuestionTreeById,
 
     [Description("Upsert question tree")]
     UpsertQuestionTree,

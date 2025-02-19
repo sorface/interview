@@ -156,15 +156,16 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
     /// Getting a Question tree by id.
     /// </summary>
     /// <param name="id">Question tree id.</param>
+    /// <param name="archive">Archive.</param>
     /// <returns>A question tree detail.</returns>
     [Authorize]
     [HttpGet("tree/{id:guid}")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(QuestionTreeByIdResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundException), StatusCodes.Status404NotFound)]
-    public Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid id)
+    public Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid id, [FromQuery] bool archive)
     {
-        return questionService.GetQuestionTreeByIdAsync(id, HttpContext.RequestAborted);
+        return questionService.GetQuestionTreeByIdAsync(id, archive, HttpContext.RequestAborted);
     }
 
     /// <summary>

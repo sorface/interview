@@ -67,7 +67,8 @@ public class QuestionService(
 
         static ASpec<QuestionTree> BuildSpecification(QuestionTreePageRequest request)
         {
-            ASpec<QuestionTree>? res = new Spec<QuestionTree>(e => e.IsArchived == false);
+            var archived = request.Filter?.Archived == true;
+            ASpec<QuestionTree>? res = new Spec<QuestionTree>(e => e.IsArchived == archived);
             if (request.Filter is null)
             {
                 return res;
@@ -95,11 +96,11 @@ public class QuestionService(
     public Task<ServiceResult<Guid>> UpsertQuestionTreeAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken = default)
         => questionTreeUpsert.UpsertQuestionTreeAsync(request, cancellationToken);
 
-    public async Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid questionTreeId, CancellationToken cancellationToken)
+    public async Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid questionTreeId, bool archive, CancellationToken cancellationToken)
     {
         var questionTree = await db.QuestionTree.AsNoTracking()
             .Select(e => new { e.Id, e.Name, e.RootQuestionSubjectTreeId, e.IsArchived })
-            .FirstOrDefaultAsync(e => e.Id == questionTreeId && e.IsArchived == false, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == questionTreeId && e.IsArchived == archive, cancellationToken);
         if (questionTree is null)
         {
             throw NotFoundException.Create<QuestionTree>(questionTreeId);

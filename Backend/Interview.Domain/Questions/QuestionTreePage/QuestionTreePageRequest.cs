@@ -12,4 +12,6 @@ public class QuestionTreePageRequestFilter
     public Guid? ParentQuestionTreeId { get; set; }
 
     public bool? ParentlessOnly { get; set; }
+
+    public bool Archived { get; set; }
 }

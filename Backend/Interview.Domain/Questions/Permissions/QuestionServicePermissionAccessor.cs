@@ -19,14 +19,18 @@ public class QuestionServicePermissionAccessor(IQuestionService questionService,
 
     public async Task<IPagedList<QuestionTreePageResponse>> FindQuestionTreePageAsync(QuestionTreePageRequest request, CancellationToken cancellationToken)
     {
-        await securityService.EnsurePermissionAsync(SEPermission.QuestionTreeFindPage, cancellationToken);
+        var permission = request.Filter?.Archived == true
+            ? SEPermission.QuestionTreeFindArchivedPage
+            : SEPermission.QuestionTreeFindPage;
+        await securityService.EnsurePermissionAsync(permission, cancellationToken);
         return await questionService.FindQuestionTreePageAsync(request, cancellationToken);
     }
 
-    public async Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid questionTreeId, CancellationToken cancellationToken)
+    public async Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid questionTreeId, bool archive, CancellationToken cancellationToken)
     {
-        await securityService.EnsurePermissionAsync(SEPermission.GetQuestionTreeById, cancellationToken);
-        return await questionService.GetQuestionTreeByIdAsync(questionTreeId, cancellationToken);
+        var permission = archive ? SEPermission.GetArchiveQuestionTreeById : SEPermission.GetQuestionTreeById;
+        await securityService.EnsurePermissionAsync(permission, cancellationToken);
+        return await questionService.GetQuestionTreeByIdAsync(questionTreeId, archive, cancellationToken);
     }
 
     public async Task<ServiceResult<Guid>> UpsertQuestionTreeAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken = default)
