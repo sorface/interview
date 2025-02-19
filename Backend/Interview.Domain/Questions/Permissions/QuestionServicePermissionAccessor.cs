@@ -36,6 +36,7 @@ public class QuestionServicePermissionAccessor(IQuestionService questionService,
     public async Task<ServiceResult<Guid>> UpsertQuestionTreeAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken = default)
     {
         await securityService.EnsurePermissionAsync(SEPermission.UpsertQuestionTree, cancellationToken);
+        await entityAccessControl.EnsureEditPermissionAsync<QuestionTree>(request.Id, true, cancellationToken);
         return await questionService.UpsertQuestionTreeAsync(request, cancellationToken);
     }
 
@@ -57,7 +58,7 @@ public class QuestionServicePermissionAccessor(IQuestionService questionService,
         Guid id, QuestionEditRequest request, CancellationToken cancellationToken = default)
     {
         await securityService.EnsurePermissionAsync(SEPermission.QuestionUpdate, cancellationToken);
-        await entityAccessControl.EnsureEditPermissionAsync<Question>(id, cancellationToken);
+        await entityAccessControl.EnsureEditPermissionAsync<Question>(id, false, cancellationToken);
         return await questionService.UpdateAsync(id, request, cancellationToken);
     }
 
@@ -72,6 +73,7 @@ public class QuestionServicePermissionAccessor(IQuestionService questionService,
         Guid id, CancellationToken cancellationToken = default)
     {
         await securityService.EnsurePermissionAsync(SEPermission.QuestionDeletePermanently, cancellationToken);
+        await entityAccessControl.EnsureEditPermissionAsync<Question>(id, false, cancellationToken);
         return await questionService.DeletePermanentlyAsync(id, cancellationToken);
     }
 
