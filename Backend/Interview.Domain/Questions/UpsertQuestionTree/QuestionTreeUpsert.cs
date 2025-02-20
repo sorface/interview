@@ -127,6 +127,8 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
             }
         }
 
+        tree.Order = request.Order;
+        tree.Name = request.Name;
         tree.RootQuestionSubjectTreeId = request.Tree.Single(e => e.ParentQuestionSubjectTreeId is null).Id;
 
         await db.SaveChangesAsync(cancellationToken);
