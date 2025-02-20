@@ -71,12 +71,41 @@ public class RoomServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var savedRoom = new Room(DefaultRoomName, SERoomAccessType.Public, SERoomType.Standard);
+        var question = new Question("question_value#1");
+        var question2 = new Question("question_value#2");
+        appDbContext.Questions.AddRange(question, question2);
+
+        var questionTree = new QuestionTree
+        {
+            Name = "root",
+            RootQuestionSubjectTreeId = default,
+            RootQuestionSubjectTree = new QuestionSubjectTree
+            {
+                Id = Guid.NewGuid(),
+                QuestionId = question.Id,
+                Type = SEQuestionSubjectTreeType.Question
+            }
+        };
+
+        var questionTree2 = new QuestionTree
+        {
+            Name = "Dummy t",
+            RootQuestionSubjectTreeId = default,
+            RootQuestionSubjectTree = new QuestionSubjectTree
+            {
+                QuestionId = null,
+                Question = new Question("question_value#3"),
+                Type = SEQuestionSubjectTreeType.Question,
+            }
+        };
+        appDbContext.QuestionTree.AddRange(questionTree, questionTree2);
+
+        var savedRoom = new Room(DefaultRoomName, SERoomAccessType.Public, SERoomType.Standard)
+        {
+            QuestionTreeId = questionTree.Id,
+        };
 
         appDbContext.Rooms.Add(savedRoom);
-
-        var question = new Question("question_value#1");
-        appDbContext.Questions.AddRange(question);
 
         appDbContext.RoomQuestions.AddRange(new RoomQuestion
         {
@@ -88,25 +117,6 @@ public class RoomServiceTest
             Order = 0
         });
 
-        var questionSubjectTree = new QuestionSubjectTree { Id = Guid.NewGuid(), QuestionId = question.Id, Type = SEQuestionSubjectTreeType.Question };
-        appDbContext.QuestionSubjectTree.Add(questionSubjectTree);
-
-        var questionTree = new QuestionTree
-        {
-            Name = "root",
-            RootQuestionSubjectTreeId = questionSubjectTree.Id
-        };
-        appDbContext.QuestionTree.AddRange(questionTree);
-
-        var categoryQuestion = new Question("question_value#2")
-        {
-            Category = new Category
-            {
-                Name = "test category"
-            }
-        };
-        appDbContext.Questions.AddRange(categoryQuestion);
-
         await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
 
@@ -116,8 +126,8 @@ public class RoomServiceTest
         var roomPatchUpdateRequest = new RoomUpdateRequest
         {
             Name = "New_Value_Name_Room",
-            Questions = [new() { Id = question.Id, Order = 0 }],
-            QuestionTreeId = questionTree.Id,
+            Questions = [new() { Id = question2.Id, Order = 0 }],
+            QuestionTreeId = questionTree2.Id,
         };
 
         _ = await roomService.UpdateAsync(savedRoom.Id, roomPatchUpdateRequest);
@@ -126,9 +136,9 @@ public class RoomServiceTest
 
         foundedRoom.Should().NotBeNull();
         foundedRoom!.Name.Should().BeEquivalentTo(roomPatchUpdateRequest.Name);
+        foundedRoom.QuestionTreeId.Should().Be(questionTree2.Id);
         foundedRoom.Questions.Count.Should().Be(1);
-        foundedRoom.Questions[0].QuestionId.Should().Be(question.Id);
-        foundedRoom.QuestionTreeId.Should().Be(questionTree.Id);
+        foundedRoom.Questions[0].QuestionId.Should().Be(questionTree2.RootQuestionSubjectTree!.QuestionId!.Value);
     }
 
     [Fact(DisplayName = "Patch update room with request name not null and add category")]
@@ -852,7 +862,49 @@ public class RoomServiceTest
         dbRoom.Name.Should().Be("My room");
         dbRoom.AccessType!.Should().Be(SERoomAccessType.Public);
         dbRoom.Questions.Should().HaveCount(1);
-        dbRoom.Questions[0].Order.Should().Be(10);
+        dbRoom.Questions[0].Order.Should().Be(roomCreateRequest.Questions[0].Order);
+        dbRoom.Questions[0].QuestionId.Should().Be(roomCreateRequest.Questions[0].Id);
+    }
+
+    [Fact]
+    public async Task Create_Room_With_QuestionTree()
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+        var user = new User("test", "test");
+        appDbContext.Users.Add(user);
+        var tree = new QuestionTree
+        {
+            Name = "dummy",
+            RootQuestionSubjectTreeId = default,
+            RootQuestionSubjectTree = new QuestionSubjectTree { QuestionId = null, Question = new Question("test"), Type = SEQuestionSubjectTreeType.Question },
+        };
+
+        appDbContext.QuestionTree.Add(tree);
+        appDbContext.SaveChanges();
+        appDbContext.ChangeTracker.Clear();
+
+        var roomService = CreateRoomService(appDbContext, user);
+        var roomCreateRequest = new RoomCreateRequest
+        {
+            Questions = [],
+            Experts = [],
+            Examinees = [],
+            Tags = [],
+            Name = "My room",
+            AccessType = SERoomAccessType.Public,
+            ScheduleStartTime = new DateTime(2024, 1, 1, 0, 0, 0),
+            QuestionTreeId = tree.Id,
+        };
+
+        var createdRoom = await roomService.CreateAsync(roomCreateRequest, CancellationToken.None);
+
+        var dbRoom = await appDbContext.Rooms.Include(e => e.Questions).FirstAsync(e => e.Id == createdRoom.Id);
+
+        dbRoom.Name.Should().Be("My room");
+        dbRoom.AccessType!.Should().Be(SERoomAccessType.Public);
+        dbRoom.Questions.Should().HaveCount(1);
+        dbRoom.Questions[0].QuestionId.Should().Be(tree.RootQuestionSubjectTree!.QuestionId!.Value);
     }
 
     [Fact]

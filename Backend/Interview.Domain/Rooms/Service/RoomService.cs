@@ -4,6 +4,7 @@ using Interview.Domain.Events.Storage;
 using Interview.Domain.Questions;
 using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Questions.QuestionTreeById;
+using Interview.Domain.Questions.QuestionTreePage;
 using Interview.Domain.Reactions;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Request.Transcription;
@@ -324,6 +325,31 @@ public sealed class RoomService(
             QuestionTreeId = request.QuestionTreeId,
         };
 
+        if (request.QuestionTreeId is not null)
+        {
+            var questionTree = await db.QuestionTree
+                .Select(e => new { Id = e.Id, Name = e.Name, RootQuestionSubjectTreeId = e.RootQuestionSubjectTreeId, })
+                .FirstAsync(cancellationToken);
+            var allSubjectTreeIds = await db.QuestionSubjectTree.GetAllChildrenAsync(questionTree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
+            var questionsFromTree = await db.QuestionSubjectTree.AsNoTracking()
+                .Where(e => allSubjectTreeIds.Contains(e.Id) && e.QuestionId != null)
+                .Select(e => new
+                {
+                    Id = e.QuestionId!.Value,
+                    e.Order,
+                })
+                .ToListAsync(cancellationToken);
+
+            foreach (var question in questionsFromTree)
+            {
+                request.Questions.Add(new RoomQuestionRequest
+                {
+                    Id = question.Id,
+                    Order = question.Order,
+                });
+            }
+        }
+
         var requiredQuestions = request.Questions.Select(e => e.Id).ToHashSet();
         if (requiredQuestions.Count == 0)
         {
@@ -421,10 +447,49 @@ public sealed class RoomService(
             throw NotFoundException.Create<User>(roomId);
         }
 
+        if (foundRoom.QuestionTreeId is not null && request.QuestionTreeId is null)
+        {
+            throw new UserException("Question tree id should not be null");
+        }
+
+        if (foundRoom.QuestionTreeId is null && request.QuestionTreeId is not null)
+        {
+            throw new UserException("Question tree id should be null");
+        }
+
         EnsureAvailableRoomEdit(foundRoom);
         EnsureValidScheduleStartTime(request.ScheduleStartTime, foundRoom.ScheduleStartTime);
 
         var tags = await Tag.EnsureValidTagsAsync(db.Tag, request.Tags, cancellationToken);
+
+        if (request.QuestionTreeId != null && request.QuestionTreeId != (foundRoom.QuestionTreeId ?? Guid.Empty))
+        {
+            // When a user sets up a category, you must remove all questions from the room.
+            request.Questions.Clear();
+
+            var questionTree = await db.QuestionTree
+                .Select(e => new { Id = e.Id, Name = e.Name, RootQuestionSubjectTreeId = e.RootQuestionSubjectTreeId, })
+                .FirstAsync(cancellationToken);
+            var allSubjectTreeIds = await db.QuestionSubjectTree.GetAllChildrenAsync(questionTree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
+            var questions = await db.QuestionSubjectTree.AsNoTracking()
+                .Where(e => allSubjectTreeIds.Contains(e.Id) && e.QuestionId != null)
+                .Select(e => new
+                {
+                    Id = e.QuestionId!.Value,
+                    e.Order,
+                })
+                .ToListAsync(cancellationToken);
+
+            foreach (var question in questions)
+            {
+                request.Questions.Add(new RoomQuestionRequest
+                {
+                    Id = question.Id,
+                    Order = question.Order,
+                });
+            }
+        }
+
         var requiredQuestions = request.Questions.Select(e => e.Id).ToHashSet();
 
         if (requiredQuestions.Count == 0)
