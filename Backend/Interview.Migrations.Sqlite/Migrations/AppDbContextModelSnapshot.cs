@@ -336,7 +336,7 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Property<Guid?>("ParentQuestionSubjectTreeId")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("QuestionId")
+                    b.Property<Guid?>("QuestionId")
                         .HasColumnType("TEXT");
 
                     b.Property<char>("Type")
@@ -1701,9 +1701,7 @@ namespace Interview.Migrations.Sqlite.Migrations
 
                     b.HasOne("Interview.Domain.Questions.Question", "Question")
                         .WithMany()
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("QuestionId");
 
                     b.Navigation("CreatedBy");
 

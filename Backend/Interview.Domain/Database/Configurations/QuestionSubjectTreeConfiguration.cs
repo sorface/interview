@@ -8,7 +8,7 @@ public class QuestionSubjectTreeConfiguration : EntityTypeConfigurationBase<Ques
 {
     protected override void ConfigureCore(EntityTypeBuilder<QuestionSubjectTree> builder)
     {
-        builder.Property(e => e.QuestionId).IsRequired();
+        builder.Property(e => e.QuestionId);
         builder.HasOne(e => e.Question)
             .WithMany()
             .HasForeignKey(e => e.QuestionId);

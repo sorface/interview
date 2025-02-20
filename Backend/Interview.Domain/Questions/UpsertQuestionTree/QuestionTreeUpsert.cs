@@ -31,7 +31,10 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
             throw new UserException("Duplicate question tree by name");
         }
 
-        await EnsureAvailableQuestionsAsync(request.Tree.Select(e => e.QuestionId), cancellationToken);
+        var questionIds = request.Tree
+            .Where(e => e.QuestionId is not null)
+            .Select(e => e.QuestionId!.Value);
+        await EnsureAvailableQuestionsAsync(questionIds, cancellationToken);
 
         var tree = await db.QuestionTree.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
         return await db.RunTransactionAsync(async ct =>

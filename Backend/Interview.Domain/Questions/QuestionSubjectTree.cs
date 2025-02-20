@@ -5,7 +5,7 @@ namespace Interview.Domain.Questions;
 
 public class QuestionSubjectTree : ArchiveEntity
 {
-    public required Guid QuestionId { get; set; }
+    public required Guid? QuestionId { get; set; }
 
     public Question? Question { get; set; }
 

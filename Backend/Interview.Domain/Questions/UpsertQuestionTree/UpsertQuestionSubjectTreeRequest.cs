@@ -6,7 +6,7 @@ public class UpsertQuestionSubjectTreeRequest
 
     public Guid? ParentQuestionSubjectTreeId { get; set; }
 
-    public required Guid QuestionId { get; set; }
+    public required Guid? QuestionId { get; set; }
 
     public required EVQuestionSubjectTreeType Type { get; set; }
 

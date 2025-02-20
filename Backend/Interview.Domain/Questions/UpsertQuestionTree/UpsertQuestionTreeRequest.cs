@@ -34,7 +34,18 @@ public class UpsertQuestionTreeRequest
             return false;
         }
 
-        // TODO: Если тип элемента Question, то вопрос обязательный, иначе его нельзя передавать
+        if (Tree.Any(e => e is { Type: EVQuestionSubjectTreeType.Empty, QuestionId: not null }))
+        {
+            errorMessage = "Tree has empty node with question";
+            return false;
+        }
+
+        if (Tree.Any(e => e is { Type: EVQuestionSubjectTreeType.Question, QuestionId: null }))
+        {
+            errorMessage = "Tree has question node without question";
+            return false;
+        }
+
         var nodeDict = new Dictionary<Guid, UpsertQuestionSubjectTreeRequest>();
         foreach (var node in Tree)
         {

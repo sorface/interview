@@ -28,7 +28,9 @@ public class QuestionTreeByIdResponse
                 Type = e.Type,
                 ParentQuestionSubjectTreeId = e.ParentQuestionSubjectTreeId,
                 Order = e.Order,
-                Question = new QuestionTreeByIdResponseQuestionDetail { Id = e.Question!.Id, Value = e.Question!.Value, },
+                Question = e.Question == null
+                    ? null
+                    : new QuestionTreeByIdResponseQuestionDetail { Id = e.Question!.Id, Value = e.Question!.Value, },
             })
             .ToListAsync(cancellationToken);
         Tree.AddRange(subjectTrees.Select(e => new QuestionTreeByIdResponseTree

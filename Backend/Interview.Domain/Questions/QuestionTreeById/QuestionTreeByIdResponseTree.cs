@@ -10,5 +10,5 @@ public class QuestionTreeByIdResponseTree
 
     public required int Order { get; set; }
 
-    public required QuestionTreeByIdResponseQuestionDetail Question { get; set; }
+    public required QuestionTreeByIdResponseQuestionDetail? Question { get; set; }
 }

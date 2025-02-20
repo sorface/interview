@@ -143,6 +143,58 @@ public class UpsertQuestionTreeRequestTest
     }
 
     [Fact]
+    public void IsValidTree_WhenTreeHasEmptyNode_With_Question_ShouldReturnFalse()
+    {
+        // Arrange
+        var request = new UpsertQuestionTreeRequest
+        {
+            Tree = new List<UpsertQuestionSubjectTreeRequest>
+            {
+                new UpsertQuestionSubjectTreeRequest
+                {
+                    QuestionId = Guid.NewGuid(),
+                    Type = EVQuestionSubjectTreeType.Empty,
+                    Order = 0
+                }
+            },
+            Name = "t"
+        };
+
+        // Act
+        var result = request.IsValidTree(out var errorMessage);
+
+        // Assert
+        result.Should().BeFalse();
+        errorMessage.Should().Be("Tree has empty node with question");
+    }
+
+    [Fact]
+    public void IsValidTree_WhenTreeHasQuestionNode_Without_Question_ShouldReturnFalse()
+    {
+        // Arrange
+        var request = new UpsertQuestionTreeRequest
+        {
+            Tree = new List<UpsertQuestionSubjectTreeRequest>
+            {
+                new UpsertQuestionSubjectTreeRequest
+                {
+                    QuestionId = null,
+                    Type = EVQuestionSubjectTreeType.Question,
+                    Order = 0
+                }
+            },
+            Name = "t"
+        };
+
+        // Act
+        var result = request.IsValidTree(out var errorMessage);
+
+        // Assert
+        result.Should().BeFalse();
+        errorMessage.Should().Be("Tree has question node without question");
+    }
+
+    [Fact]
     public void IsValidTree_WhenTreeHasNoParentNode_ShouldReturnFalse()
     {
         // Arrange

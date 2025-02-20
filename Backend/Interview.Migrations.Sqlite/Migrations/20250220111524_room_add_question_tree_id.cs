@@ -11,6 +11,8 @@ namespace Interview.Migrations.Sqlite.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("PRAGMA foreign_keys = OFF;", suppressTransaction: true);
+
             migrationBuilder.AddColumn<Guid>(
                 name: "QuestionTreeId",
                 table: "Rooms",
