@@ -46,14 +46,13 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
             if (tree is null)
             {
                 create = true;
-                tree = await CreateAsync(request, cancellationToken);
+                tree = await CreateAsync(request, ct);
             }
             else
             {
-                await UpdateAsync(tree, request, cancellationToken);
+                await UpdateAsync(tree, request, ct);
             }
 
-            await db.SaveChangesAsync(ct);
             return create ? ServiceResult.Created(tree.Id) : ServiceResult.Ok(tree.Id);
         },
             cancellationToken);
@@ -135,6 +134,7 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
         if (nodesForDelete.Count > 0)
         {
             await db.QuestionSubjectTree.Where(e => nodesForDelete.Contains(e.Id)).ExecuteDeleteAsync(cancellationToken);
+            await db.SaveChangesAsync(cancellationToken);
         }
     }
 
@@ -159,6 +159,7 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
             RootQuestionSubjectTreeId = subjectTrees.Single(e => e.ParentQuestionSubjectTreeId is null).Id,
         };
         await db.QuestionTree.AddAsync(tree, cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
         return tree;
     }
 
