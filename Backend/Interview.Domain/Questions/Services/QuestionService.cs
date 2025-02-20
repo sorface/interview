@@ -352,43 +352,28 @@ public class QuestionService(
     public async Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid questionTreeId, bool archive, CancellationToken cancellationToken)
     {
         var questionTree = await db.QuestionTree.AsNoTracking()
-            .Select(e => new { e.Id, e.Name, e.RootQuestionSubjectTreeId, e.IsArchived })
+            .Select(e => new
+            {
+                e.Id,
+                e.Name,
+                e.RootQuestionSubjectTreeId,
+                e.IsArchived,
+            })
             .FirstOrDefaultAsync(e => e.Id == questionTreeId && e.IsArchived == archive, cancellationToken);
         if (questionTree is null)
         {
             throw NotFoundException.Create<QuestionTree>(questionTreeId);
         }
 
-        var nodes = await db.QuestionSubjectTree.GetAllChildrenAsync(questionTree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
-        var tree = await db.QuestionSubjectTree.AsNoTracking()
-            .Include(e => e.Question)
-            .Where(e => nodes.Contains(e.Id))
-            .Select(e => new
-            {
-                Id = e.Id,
-                QuestionId = e.QuestionId,
-                QuestionValue = e.Question!.Value,
-                Type = e.Type,
-                ParentQuestionSubjectTreeId = e.ParentQuestionSubjectTreeId,
-                Order = e.Order,
-            })
-            .ToListAsync(cancellationToken);
-        return new QuestionTreeByIdResponse
+        var response = new QuestionTreeByIdResponse
         {
+            Id = questionTree.Id,
+            RootQuestionSUbjectTreeId = questionTree.RootQuestionSubjectTreeId,
             Name = questionTree.Name,
-            Tree = tree.ConvertAll(e => new QuestionTreeByIdResponseTree
-            {
-                Id = e.Id,
-                Question = new QuestionTreeByIdResponseQuestionDetail
-                {
-                    Id = e.QuestionId,
-                    Value = e.QuestionValue,
-                },
-                Type = e.Type.EnumValue,
-                ParentQuestionSubjectTreeId = e.ParentQuestionSubjectTreeId,
-                Order = e.Order,
-            }),
+            Tree = new List<QuestionTreeByIdResponseTree>(),
         };
+        await response.FillTreeAsync(db, cancellationToken);
+        return response;
     }
 
     public Task ArchiveQuestionTreeAsync(Guid id, CancellationToken cancellationToken = default)

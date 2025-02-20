@@ -3,6 +3,7 @@ using System;
 using Interview.Domain.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Interview.Migrations.Sqlite.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250220111409_room_remove_category_id")]
+    partial class room_remove_category_id
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
@@ -494,9 +497,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasMaxLength(70)
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("QuestionTreeId")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime>("ScheduleStartTime")
                         .HasColumnType("TEXT");
 
@@ -519,8 +519,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
-
-                    b.HasIndex("QuestionTreeId");
 
                     b.ToTable("Rooms");
                 });
@@ -1765,13 +1763,7 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
-                    b.HasOne("Interview.Domain.Questions.QuestionTree", "QuestionTree")
-                        .WithMany()
-                        .HasForeignKey("QuestionTreeId");
-
                     b.Navigation("CreatedBy");
-
-                    b.Navigation("QuestionTree");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.RoomConfigurations.RoomConfiguration", b =>
