@@ -368,7 +368,7 @@ public class QuestionService(
         var response = new QuestionTreeByIdResponse
         {
             Id = questionTree.Id,
-            RootQuestionSUbjectTreeId = questionTree.RootQuestionSubjectTreeId,
+            RootQuestionSubjectTreeId = questionTree.RootQuestionSubjectTreeId,
             Name = questionTree.Name,
             Tree = new List<QuestionTreeByIdResponseTree>(),
         };

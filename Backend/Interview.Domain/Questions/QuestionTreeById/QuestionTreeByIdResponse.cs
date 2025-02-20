@@ -9,14 +9,14 @@ public class QuestionTreeByIdResponse
 
     public required string Name { get; set; }
 
-    public required Guid RootQuestionSUbjectTreeId { get; set; }
+    public required Guid RootQuestionSubjectTreeId { get; set; }
 
     public required List<QuestionTreeByIdResponseTree> Tree { get; set; }
 
     public async Task FillTreeAsync(AppDbContext db, CancellationToken cancellationToken)
     {
         Tree.Clear();
-        var subjectTreesIds = await db.QuestionSubjectTree.GetAllChildrenAsync(RootQuestionSUbjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
+        var subjectTreesIds = await db.QuestionSubjectTree.GetAllChildrenAsync(RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
         Tree.Capacity = subjectTreesIds.Count;
 
         var subjectTrees = await db.QuestionSubjectTree.AsNoTracking()

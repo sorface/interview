@@ -255,7 +255,7 @@ public sealed class RoomService(
                     {
                         Id = e.QuestionTree.Id,
                         Name = e.QuestionTree.Name,
-                        RootQuestionSUbjectTreeId = e.QuestionTree.RootQuestionSubjectTreeId,
+                        RootQuestionSubjectTreeId = e.QuestionTree.RootQuestionSubjectTreeId,
                         Tree = new List<QuestionTreeByIdResponseTree>(),
                     }
                     : null,
@@ -618,7 +618,7 @@ public sealed class RoomService(
                     {
                         Id = room.QuestionTree.Id,
                         Name = room.QuestionTree.Name,
-                        RootQuestionSUbjectTreeId = room.QuestionTree.RootQuestionSubjectTreeId,
+                        RootQuestionSubjectTreeId = room.QuestionTree.RootQuestionSubjectTreeId,
                         Tree = new List<QuestionTreeByIdResponseTree>(),
                     }
                     : null,

@@ -34,6 +34,7 @@ public class UpsertQuestionTreeRequest
             return false;
         }
 
+        // TODO: Если тип элемента Question, то вопрос обязательный, иначе его нельзя передавать
         var nodeDict = new Dictionary<Guid, UpsertQuestionSubjectTreeRequest>();
         foreach (var node in Tree)
         {
