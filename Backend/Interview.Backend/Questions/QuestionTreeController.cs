@@ -39,7 +39,7 @@ public class QuestionTreeController(IQuestionService questionService) : Controll
     [HttpGet("{id:guid}")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(QuestionTreeByIdResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(NotFoundException), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid id, [FromQuery] bool archive)
     {
         return questionService.GetQuestionTreeByIdAsync(id, archive, HttpContext.RequestAborted);
@@ -55,7 +55,7 @@ public class QuestionTreeController(IQuestionService questionService) : Controll
     [Produces("application/json")]
     [ProducesResponseType(typeof(ActionResult<Guid>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ActionResult<Guid>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(NotFoundException), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
     public Task<ActionResult<Guid>> UpsertQuestionTreeAsync([FromBody] UpsertQuestionTreeRequest request)
     {
         return questionService.UpsertQuestionTreeAsync(request, HttpContext.RequestAborted).ToActionResultAsync();

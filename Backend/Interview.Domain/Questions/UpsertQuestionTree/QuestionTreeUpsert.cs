@@ -67,7 +67,7 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
             .ToListAsync(cancellationToken);
 
         var unknownQuestions = requiredQuestions.Except(dbQuestions).ToList();
-        if (requiredQuestions.Count > 0)
+        if (unknownQuestions.Count > 0)
         {
             throw NotFoundException.Create<Question>(unknownQuestions);
         }
