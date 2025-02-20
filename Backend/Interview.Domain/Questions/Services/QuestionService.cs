@@ -23,6 +23,8 @@ public class QuestionService(
     IQuestionRepository questionRepository,
     IQuestionNonArchiveRepository questionNonArchiveRepository,
     ArchiveService<Question> archiveService,
+    ArchiveService<QuestionTree> archiveQuestionTreeService,
+    ArchiveService<QuestionSubjectTree> archiveQuestionSubjectTreeService,
     ITagRepository tagRepository,
     IRoomMembershipChecker roomMembershipChecker,
     ICurrentUserAccessor currentUserAccessor,
@@ -53,89 +55,6 @@ public class QuestionService(
 
         return await questionNonArchiveRepository.GetPageDetailedAsync(
             spec, QuestionItem.Mapper, request.Page.PageNumber, request.Page.PageSize, cancellationToken);
-    }
-
-    public Task<IPagedList<QuestionTreePageResponse>> FindQuestionTreePageAsync(QuestionTreePageRequest request, CancellationToken cancellationToken)
-    {
-        var spec = BuildSpecification(request);
-        return db.QuestionTree.AsNoTracking()
-            .Where(spec)
-            .OrderBy(e => e.Order)
-            .ThenBy(e => e.CreateDate)
-            .Select(e => new QuestionTreePageResponse { Id = e.Id, Name = e.Name, ParentQuestionTreeId = e.ParentQuestionTreeId, })
-            .ToPagedListAsync(request.Page, cancellationToken);
-
-        static ASpec<QuestionTree> BuildSpecification(QuestionTreePageRequest request)
-        {
-            var archived = request.Filter?.Archived == true;
-            ASpec<QuestionTree>? res = new Spec<QuestionTree>(e => e.IsArchived == archived);
-            if (request.Filter is null)
-            {
-                return res;
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.Filter.Name))
-            {
-                var name = request.Filter.Name.Trim();
-                res &= new Spec<QuestionTree>(e => e.Name.ToLower().Contains(name));
-            }
-
-            if (request.Filter.ParentQuestionTreeId is not null)
-            {
-                res &= new Spec<QuestionTree>(e => e.ParentQuestionTreeId == request.Filter.ParentQuestionTreeId);
-            }
-            else if (request.Filter.ParentlessOnly.GetValueOrDefault())
-            {
-                res &= new Spec<QuestionTree>(e => e.ParentQuestionTreeId == null);
-            }
-
-            return res;
-        }
-    }
-
-    public Task<ServiceResult<Guid>> UpsertQuestionTreeAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken = default)
-        => questionTreeUpsert.UpsertQuestionTreeAsync(request, cancellationToken);
-
-    public async Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid questionTreeId, bool archive, CancellationToken cancellationToken)
-    {
-        var questionTree = await db.QuestionTree.AsNoTracking()
-            .Select(e => new { e.Id, e.Name, e.RootQuestionSubjectTreeId, e.IsArchived })
-            .FirstOrDefaultAsync(e => e.Id == questionTreeId && e.IsArchived == archive, cancellationToken);
-        if (questionTree is null)
-        {
-            throw NotFoundException.Create<QuestionTree>(questionTreeId);
-        }
-
-        var nodes = await db.QuestionSubjectTree.GetAllChildrenAsync(questionTree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
-        var tree = await db.QuestionSubjectTree.AsNoTracking()
-            .Include(e => e.Question)
-            .Where(e => nodes.Contains(e.Id))
-            .Select(e => new
-            {
-                Id = e.Id,
-                QuestionId = e.QuestionId,
-                QuestionValue = e.Question!.Value,
-                Type = e.Type,
-                ParentQuestionSubjectTreeId = e.ParentQuestionSubjectTreeId,
-                Order = e.Order,
-            })
-            .ToListAsync(cancellationToken);
-        return new QuestionTreeByIdResponse
-        {
-            Name = questionTree.Name,
-            Tree = tree.ConvertAll(e => new QuestionTreeByIdResponseTree
-            {
-                Id = e.Id,
-                Question = new QuestionTreeByIdResponseQuestionDetail
-                {
-                    Id = e.QuestionId,
-                    Value = e.QuestionValue,
-                },
-                Type = e.Type.EnumValue,
-                ParentQuestionSubjectTreeId = e.ParentQuestionSubjectTreeId,
-                Order = e.Order,
-            }),
-        };
     }
 
     public Task<IPagedList<QuestionItem>> FindPageArchiveAsync(
@@ -387,6 +306,123 @@ public class QuestionService(
             CodeEditor = null,
             Category = null,
         };
+    }
+
+    public Task<IPagedList<QuestionTreePageResponse>> FindQuestionTreePageAsync(QuestionTreePageRequest request, CancellationToken cancellationToken)
+    {
+        var spec = BuildSpecification(request);
+        return db.QuestionTree.AsNoTracking()
+            .Where(spec)
+            .OrderBy(e => e.Order)
+            .ThenBy(e => e.CreateDate)
+            .Select(e => new QuestionTreePageResponse { Id = e.Id, Name = e.Name, ParentQuestionTreeId = e.ParentQuestionTreeId, })
+            .ToPagedListAsync(request.Page, cancellationToken);
+
+        static ASpec<QuestionTree> BuildSpecification(QuestionTreePageRequest request)
+        {
+            var archived = request.Filter?.Archived == true;
+            ASpec<QuestionTree>? res = new Spec<QuestionTree>(e => e.IsArchived == archived);
+            if (request.Filter is null)
+            {
+                return res;
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Filter.Name))
+            {
+                var name = request.Filter.Name.Trim();
+                res &= new Spec<QuestionTree>(e => e.Name.ToLower().Contains(name));
+            }
+
+            if (request.Filter.ParentQuestionTreeId is not null)
+            {
+                res &= new Spec<QuestionTree>(e => e.ParentQuestionTreeId == request.Filter.ParentQuestionTreeId);
+            }
+            else if (request.Filter.ParentlessOnly.GetValueOrDefault())
+            {
+                res &= new Spec<QuestionTree>(e => e.ParentQuestionTreeId == null);
+            }
+
+            return res;
+        }
+    }
+
+    public Task<ServiceResult<Guid>> UpsertQuestionTreeAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken = default)
+        => questionTreeUpsert.UpsertQuestionTreeAsync(request, cancellationToken);
+
+    public async Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid questionTreeId, bool archive, CancellationToken cancellationToken)
+    {
+        var questionTree = await db.QuestionTree.AsNoTracking()
+            .Select(e => new { e.Id, e.Name, e.RootQuestionSubjectTreeId, e.IsArchived })
+            .FirstOrDefaultAsync(e => e.Id == questionTreeId && e.IsArchived == archive, cancellationToken);
+        if (questionTree is null)
+        {
+            throw NotFoundException.Create<QuestionTree>(questionTreeId);
+        }
+
+        var nodes = await db.QuestionSubjectTree.GetAllChildrenAsync(questionTree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
+        var tree = await db.QuestionSubjectTree.AsNoTracking()
+            .Include(e => e.Question)
+            .Where(e => nodes.Contains(e.Id))
+            .Select(e => new
+            {
+                Id = e.Id,
+                QuestionId = e.QuestionId,
+                QuestionValue = e.Question!.Value,
+                Type = e.Type,
+                ParentQuestionSubjectTreeId = e.ParentQuestionSubjectTreeId,
+                Order = e.Order,
+            })
+            .ToListAsync(cancellationToken);
+        return new QuestionTreeByIdResponse
+        {
+            Name = questionTree.Name,
+            Tree = tree.ConvertAll(e => new QuestionTreeByIdResponseTree
+            {
+                Id = e.Id,
+                Question = new QuestionTreeByIdResponseQuestionDetail
+                {
+                    Id = e.QuestionId,
+                    Value = e.QuestionValue,
+                },
+                Type = e.Type.EnumValue,
+                ParentQuestionSubjectTreeId = e.ParentQuestionSubjectTreeId,
+                Order = e.Order,
+            }),
+        };
+    }
+
+    public Task ArchiveQuestionTreeAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return db.RunTransactionAsync(async ct =>
+        {
+            var archiveQuestion = await archiveQuestionTreeService.ArchiveAsync(id, false, ct);
+            var nodes = await db.QuestionSubjectTree.GetAllChildrenAsync(archiveQuestion.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
+            foreach (var subjectTreeId in nodes)
+            {
+                await archiveQuestionSubjectTreeService.ArchiveAsync(subjectTreeId, false, ct);
+            }
+
+            await db.SaveChangesAsync(ct);
+            return DBNull.Value;
+        },
+            cancellationToken);
+    }
+
+    public Task UnarchiveQuestionTreeAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return db.RunTransactionAsync(async ct =>
+            {
+                var archiveQuestion = await archiveQuestionTreeService.UnarchiveAsync(id, false, ct);
+                var nodes = await db.QuestionSubjectTree.GetAllChildrenAsync(archiveQuestion.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
+                foreach (var subjectTreeId in nodes)
+                {
+                    await archiveQuestionSubjectTreeService.UnarchiveAsync(subjectTreeId, false, ct);
+                }
+
+                await db.SaveChangesAsync(ct);
+                return DBNull.Value;
+            },
+            cancellationToken);
     }
 
     private static string EnsureValidQuestionValue(string value)

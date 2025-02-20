@@ -449,6 +449,18 @@ public class SEPermission(Guid id, string name, string description, EVPermission
         "Upsert question tree",
         EVPermission.UpsertQuestionTree);
 
+    public static readonly SEPermission QuestionTreeArchive = new(
+        Guid.Parse("E6B59BAE-2F2C-40F3-8587-49A3E703AC44"),
+        "QuestionTreeArchive",
+        "Archiving a question tree",
+        EVPermission.QuestionTreeArchive);
+
+    public static readonly SEPermission QuestionTreeUnarchive = new(
+        Guid.Parse("1EE1E860-A1DC-4DEF-A191-1CBAC8956A90"),
+        "QuestionTreeUnarchive",
+        "Unarchiving the question tree",
+        EVPermission.QuestionTreeUnarchive);
+
     public Guid Id { get; } = id;
 
     public string Description { get; } = description;

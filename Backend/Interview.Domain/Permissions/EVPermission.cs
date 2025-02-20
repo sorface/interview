@@ -214,5 +214,11 @@ public enum EVPermission
 
     [Description("Upsert question tree")]
     UpsertQuestionTree,
+
+    [Description("Archiving a question tree")]
+    QuestionTreeArchive,
+
+    [Description("Unarchiving the question tree")]
+    QuestionTreeUnarchive,
 #pragma warning restore SA1602
 }

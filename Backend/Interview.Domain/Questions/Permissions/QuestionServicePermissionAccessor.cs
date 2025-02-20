@@ -33,6 +33,18 @@ public class QuestionServicePermissionAccessor(IQuestionService questionService,
         return await questionService.GetQuestionTreeByIdAsync(questionTreeId, archive, cancellationToken);
     }
 
+    public async Task ArchiveQuestionTreeAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        await securityService.EnsurePermissionAsync(SEPermission.QuestionTreeArchive, cancellationToken);
+        await questionService.ArchiveQuestionTreeAsync(id, cancellationToken);
+    }
+
+    public async Task UnarchiveQuestionTreeAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        await securityService.EnsurePermissionAsync(SEPermission.QuestionTreeUnarchive, cancellationToken);
+        await questionService.UnarchiveQuestionTreeAsync(id, cancellationToken);
+    }
+
     public async Task<ServiceResult<Guid>> UpsertQuestionTreeAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken = default)
     {
         await securityService.EnsurePermissionAsync(SEPermission.UpsertQuestionTree, cancellationToken);

@@ -11,12 +11,6 @@ public interface IQuestionService : IService
 {
     public Task<IPagedList<QuestionItem>> FindPageAsync(FindPageRequest request, CancellationToken cancellationToken);
 
-    Task<IPagedList<QuestionTreePageResponse>> FindQuestionTreePageAsync(QuestionTreePageRequest request, CancellationToken cancellationToken);
-
-    Task<ServiceResult<Guid>> UpsertQuestionTreeAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken = default);
-
-    Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid questionTreeId, bool archive, CancellationToken cancellationToken);
-
     Task<IPagedList<QuestionItem>> FindPageArchiveAsync(
         int pageNumber, int pageSize, CancellationToken cancellationToken);
 
@@ -33,4 +27,14 @@ public interface IQuestionService : IService
     Task<QuestionItem> ArchiveAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task<QuestionItem> UnarchiveAsync(Guid id, CancellationToken cancellationToken = default);
+
+    Task<IPagedList<QuestionTreePageResponse>> FindQuestionTreePageAsync(QuestionTreePageRequest request, CancellationToken cancellationToken);
+
+    Task<ServiceResult<Guid>> UpsertQuestionTreeAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken = default);
+
+    Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid questionTreeId, bool archive, CancellationToken cancellationToken);
+
+    Task ArchiveQuestionTreeAsync(Guid id, CancellationToken cancellationToken = default);
+
+    Task UnarchiveQuestionTreeAsync(Guid id, CancellationToken cancellationToken = default);
 }

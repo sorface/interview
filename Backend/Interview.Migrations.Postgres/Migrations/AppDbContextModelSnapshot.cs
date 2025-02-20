@@ -1084,6 +1084,13 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
+                            Id = new Guid("e6b59bae-2f2c-40f3-8587-49a3e703ac44"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "QuestionTreeArchive",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
                             Id = new Guid("badfc74c-4f2f-4b53-9b46-763b28676009"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "QuestionTreeFindArchivedPage",
@@ -1094,6 +1101,13 @@ namespace Interview.Migrations.Postgres.Migrations
                             Id = new Guid("2e1670ec-f9d2-4cb8-bb57-f6239b16f24f"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "QuestionTreeFindPage",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("1ee1e860-a1dc-4def-a191-1cbac8956a90"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "QuestionTreeUnarchive",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
