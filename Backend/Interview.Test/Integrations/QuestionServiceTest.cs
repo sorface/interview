@@ -611,6 +611,8 @@ public class QuestionServiceTest
             questionRepository,
             questionArchiveRepository,
             archiveService,
+            new ArchiveService<QuestionTree>(appDbContext),
+            new ArchiveService<QuestionSubjectTree>(appDbContext),
             tagRepository,
             aRoomMembershipChecker,
             currentUser,

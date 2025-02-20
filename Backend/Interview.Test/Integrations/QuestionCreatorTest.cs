@@ -141,6 +141,8 @@ public class QuestionCreatorTest
             questionRepository,
             new QuestionNonArchiveRepository(appDbContext),
             new ArchiveService<Question>(appDbContext),
+            new ArchiveService<QuestionTree>(appDbContext),
+            new ArchiveService<QuestionSubjectTree>(appDbContext),
             tagRepository,
             roomMembershipChecker,
             currentUser,
