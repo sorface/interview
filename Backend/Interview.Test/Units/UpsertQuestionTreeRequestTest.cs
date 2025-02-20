@@ -146,6 +146,42 @@ public class UpsertQuestionTreeRequestTest
     public void IsValidTree_WhenTreeHasEmptyNode_With_Question_ShouldReturnFalse()
     {
         // Arrange
+        var subjectTreeId = Guid.NewGuid();
+        var request = new UpsertQuestionTreeRequest
+        {
+            Tree = new List<UpsertQuestionSubjectTreeRequest>
+            {
+                new UpsertQuestionSubjectTreeRequest
+                {
+                    Id = subjectTreeId,
+                    QuestionId = Guid.NewGuid(),
+                    Type = EVQuestionSubjectTreeType.Empty,
+                    Order = 0
+                },
+                new UpsertQuestionSubjectTreeRequest
+                {
+                    Id = Guid.NewGuid(),
+                    QuestionId = Guid.NewGuid(),
+                    ParentQuestionSubjectTreeId = subjectTreeId,
+                    Type = EVQuestionSubjectTreeType.Question,
+                    Order = 0
+                }
+            },
+            Name = "t"
+        };
+
+        // Act
+        var result = request.IsValidTree(out var errorMessage);
+
+        // Assert
+        result.Should().BeFalse();
+        errorMessage.Should().Be("Tree has empty node with question");
+    }
+
+    [Fact]
+    public void IsValidTree_WhenTreeHasNoQuestionNode_ShouldReturnFalse()
+    {
+        // Arrange
         var request = new UpsertQuestionTreeRequest
         {
             Tree = new List<UpsertQuestionSubjectTreeRequest>
@@ -165,7 +201,7 @@ public class UpsertQuestionTreeRequestTest
 
         // Assert
         result.Should().BeFalse();
-        errorMessage.Should().Be("Tree has empty node with question");
+        errorMessage.Should().Be("Tree has no question");
     }
 
     [Fact]

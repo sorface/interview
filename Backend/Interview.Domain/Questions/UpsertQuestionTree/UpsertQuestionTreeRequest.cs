@@ -34,6 +34,12 @@ public class UpsertQuestionTreeRequest
             return false;
         }
 
+        if (Tree.All(e => e.Type != EVQuestionSubjectTreeType.Question))
+        {
+            errorMessage = "Tree has no question";
+            return false;
+        }
+
         if (Tree.Any(e => e is { Type: EVQuestionSubjectTreeType.Empty, QuestionId: not null }))
         {
             errorMessage = "Tree has empty node with question";
