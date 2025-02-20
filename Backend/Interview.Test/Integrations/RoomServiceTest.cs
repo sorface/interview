@@ -107,7 +107,7 @@ public class RoomServiceTest
 
         appDbContext.Rooms.Add(savedRoom);
 
-        appDbContext.RoomQuestions.AddRange(new RoomQuestion
+        appDbContext.RoomQuestions.Add(new RoomQuestion
         {
             RoomId = savedRoom.Id,
             QuestionId = question.Id,
@@ -117,7 +117,7 @@ public class RoomServiceTest
             Order = 0
         });
 
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
         appDbContext.ChangeTracker.Clear();
 
         var roomRepository = new RoomRepository(appDbContext);

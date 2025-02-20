@@ -329,7 +329,7 @@ public sealed class RoomService(
         {
             var questionTree = await db.QuestionTree
                 .Select(e => new { Id = e.Id, Name = e.Name, RootQuestionSubjectTreeId = e.RootQuestionSubjectTreeId, })
-                .FirstAsync(cancellationToken);
+                .FirstAsync(e => e.Id == request.QuestionTreeId, cancellationToken);
             var allSubjectTreeIds = await db.QuestionSubjectTree.GetAllChildrenAsync(questionTree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
             var questionsFromTree = await db.QuestionSubjectTree.AsNoTracking()
                 .Where(e => allSubjectTreeIds.Contains(e.Id) && e.QuestionId != null)
@@ -469,7 +469,7 @@ public sealed class RoomService(
 
             var questionTree = await db.QuestionTree
                 .Select(e => new { Id = e.Id, Name = e.Name, RootQuestionSubjectTreeId = e.RootQuestionSubjectTreeId, })
-                .FirstAsync(cancellationToken);
+                .FirstAsync(e => e.Id == request.QuestionTreeId, cancellationToken);
             var allSubjectTreeIds = await db.QuestionSubjectTree.GetAllChildrenAsync(questionTree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
             var questions = await db.QuestionSubjectTree.AsNoTracking()
                 .Where(e => allSubjectTreeIds.Contains(e.Id) && e.QuestionId != null)
