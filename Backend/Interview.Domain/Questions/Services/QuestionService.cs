@@ -380,8 +380,8 @@ public class QuestionService(
     {
         return db.RunTransactionAsync(async ct =>
         {
-            var archiveQuestion = await archiveQuestionTreeService.ArchiveAsync(id, false, ct);
-            var nodes = await db.QuestionSubjectTree.GetAllChildrenAsync(archiveQuestion.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
+            var tree = await archiveQuestionTreeService.ArchiveAsync(id, false, ct);
+            var nodes = await db.QuestionSubjectTree.GetAllChildrenAsync(tree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
             foreach (var subjectTreeId in nodes)
             {
                 await archiveQuestionSubjectTreeService.ArchiveAsync(subjectTreeId, false, ct);
@@ -397,8 +397,9 @@ public class QuestionService(
     {
         return db.RunTransactionAsync(async ct =>
             {
-                var archiveQuestion = await archiveQuestionTreeService.UnarchiveAsync(id, false, ct);
-                var nodes = await db.QuestionSubjectTree.GetAllChildrenAsync(archiveQuestion.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
+                var tree = await archiveQuestionTreeService.UnarchiveAsync(id, false, ct);
+                await QuestionTreeUpsert.EnsureNonDuplicateByNameAsync(db, tree.Id, tree.Name, tree.ParentQuestionTreeId, cancellationToken);
+                var nodes = await db.QuestionSubjectTree.GetAllChildrenAsync(tree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
                 foreach (var subjectTreeId in nodes)
                 {
                     await archiveQuestionSubjectTreeService.UnarchiveAsync(subjectTreeId, false, ct);

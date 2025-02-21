@@ -7,6 +7,19 @@ namespace Interview.Domain.Questions.UpsertQuestionTree;
 
 public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
 {
+    public static async Task EnsureNonDuplicateByNameAsync(AppDbContext db, Guid id, string name, Guid? parentQuestionTreeId, CancellationToken cancellationToken)
+    {
+        var hasDuplicates = await db.QuestionTree
+            .AsNoTracking()
+            .Where(e => e.Name == name && e.Id != id && !e.IsArchived)
+            .Where(BuildSpecByParent(parentQuestionTreeId))
+            .AnyAsync(cancellationToken);
+        if (hasDuplicates)
+        {
+            throw new UserException("Duplicate question tree by name");
+        }
+    }
+
     public async Task<ServiceResult<Guid>> UpsertQuestionTreeAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(request.Name))
@@ -21,15 +34,7 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
             throw new UserException(errorMessage);
         }
 
-        var hasDuplicates = await db.QuestionTree
-            .AsNoTracking()
-            .Where(e => e.Id != request.Id && e.Name == request.Name)
-            .Where(BuildSpecByParent(request.ParentQuestionTreeId))
-            .AnyAsync(cancellationToken);
-        if (hasDuplicates)
-        {
-            throw new UserException("Duplicate question tree by name");
-        }
+        await EnsureNonDuplicateByNameAsync(db, request.Id, request.Name, request.ParentQuestionTreeId, cancellationToken);
 
         var questionIds = request.Tree
             .Where(e => e.QuestionId is not null)
@@ -59,6 +64,13 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
             return create ? ServiceResult.Created(tree.Id) : ServiceResult.Ok(tree.Id);
         },
             cancellationToken);
+    }
+
+    private static Expression<Func<QuestionTree, bool>> BuildSpecByParent(Guid? parentQuestionTreeId)
+    {
+        return parentQuestionTreeId is null
+            ? e => e.ParentQuestionTreeId == null
+            : e => e.ParentQuestionTreeId == parentQuestionTreeId;
     }
 
     private async Task EnsureAvailableQuestionsAsync(IEnumerable<Guid> select, CancellationToken cancellationToken)
@@ -156,12 +168,5 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
         await db.QuestionTree.AddAsync(tree, cancellationToken);
         await db.SaveChangesAsync(cancellationToken);
         return tree;
-    }
-
-    private Expression<Func<QuestionTree, bool>> BuildSpecByParent(Guid? parentQuestionTreeId)
-    {
-        return parentQuestionTreeId is null
-            ? e => e.ParentQuestionTreeId == null
-            : e => e.ParentQuestionTreeId == parentQuestionTreeId;
     }
 }
