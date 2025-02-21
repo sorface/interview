@@ -19,13 +19,8 @@ import {
   TreeController,
   useTreeController,
 } from '../../components/TreeEditor/hooks/useTreeController';
-import { Tree } from 'versatile-tree';
 import { BasicTreeNodeComponent } from '../../components/TreeEditor/BasicTreeNodeComponent';
 import { TreeViewer } from '../../components/TreeViewer/TreeViewer';
-import {
-  TreeNodeType as TreeNodeTypeType,
-  TreeNode as TreeNodeType,
-} from '../../types/tree';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import {
   CreateQuestionTreeBody,
@@ -40,72 +35,8 @@ import { Typography } from '../../components/Typography/Typography';
 import toast from 'react-hot-toast';
 import { IconNames, pathnames } from '../../constants';
 import { Icon } from '../Room/components/Icon/Icon';
-
-const findChildrenNodesInTreeFromBackend = (
-  node: TreeNodeType,
-  treeFromBackend: TreeNodeType[],
-): TreeNodeType[] => {
-  const children = treeFromBackend
-    .sort((tNode1, tNode2) => tNode1.order - tNode2.order)
-    .filter((tNode) => tNode.parentQuestionSubjectTreeId === node.id)
-    .map((tNode) => ({
-      ...tNode,
-      children: findChildrenNodesInTreeFromBackend(tNode, treeFromBackend),
-    }));
-  return children;
-};
-
-const parseTreeFromBackend = (treeFromBackend: GetQuestionsTreeResponse) => {
-  const rootNode = treeFromBackend.tree.find(
-    (node) => node.id === treeFromBackend.rootQuestionSubjectTreeId,
-  );
-  if (!rootNode) {
-    console.warn('no rootNode in parseTreeFromBackend');
-    return [];
-  }
-  return findChildrenNodesInTreeFromBackend(rootNode, treeFromBackend.tree);
-};
-
-const appendToTreeForBackend = (tree: Tree, treeForBackend: TreeNodeType[]) => {
-  const data = tree.getData();
-  tree.getChildren().forEach((treeChild, index) => {
-    const dataChild = treeChild.getData();
-    treeForBackend.push({
-      id: dataChild.id,
-      parentQuestionSubjectTreeId: data.id,
-      question: dataChild.question,
-      type: TreeNodeTypeType.Question,
-      order: index,
-    });
-    appendToTreeForBackend(treeChild, treeForBackend);
-  });
-};
-
-const getTreeForBackend = (
-  tree: Tree,
-  rootNodeFakeId: string,
-  rootNodeName?: string,
-): TreeNodeType[] => {
-  const result: TreeNodeType[] = [];
-  appendToTreeForBackend(tree, result);
-  result.push({
-    id: rootNodeFakeId,
-    parentQuestionSubjectTreeId: null,
-    question: {
-      id: null,
-      value: rootNodeName || '',
-    },
-    type: TreeNodeTypeType.Empty,
-    order: 0,
-  });
-  return result.map((node) => ({
-    ...node,
-    parentQuestionSubjectTreeId:
-      node.id === rootNodeFakeId
-        ? node.parentQuestionSubjectTreeId
-        : node.parentQuestionSubjectTreeId || rootNodeFakeId,
-  }));
-};
+import { getTreeForBackend } from '../../utils/getTreeForBackend';
+import { parseTreeFromBackend } from '../../utils/parseTreeFromBackend';
 
 interface QuestionTreeCreateProps {
   edit: boolean;
