@@ -208,11 +208,10 @@ export const enum LocalizationKey {
   AnswerDetails,
   QuestionAnswerDetails,
   EmptyRoomNameError,
-  EmptyRoomCategoryError,
+  EmptyRoomQuestionTreeError,
   RoomEmptyStartTimeError,
   RoomStartTimeMustBeGreaterError,
   RoomEmptyQuestionsListError,
-  RoomEmptyCategoryError,
   InterviewHistoryTitle,
   RoomReviewSave,
   RoomReviewAlreadyGiven,
@@ -244,6 +243,7 @@ export const enum LocalizationKey {
   HomeDescription,
   QuestionTreesPageName,
   CreateQuestionTree,
+  QuestionTree,
   QuestionTreeName,
   QuestionTreeNodeDelete,
   QuestionTreeNodeNewItemBelow,
@@ -492,16 +492,14 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.AnswerDetails]: 'Answer details',
     [LocalizationKey.QuestionAnswerDetails]: 'Question answer details',
     [LocalizationKey.EmptyRoomNameError]: 'Please provide the meeting name',
-    [LocalizationKey.EmptyRoomCategoryError]:
-      'Please provide the meeting category',
+    [LocalizationKey.EmptyRoomQuestionTreeError]:
+      'Please provide the question tree',
     [LocalizationKey.RoomEmptyStartTimeError]:
       'Please enter meeting start time',
     [LocalizationKey.RoomStartTimeMustBeGreaterError]:
       'Meeting start time must be greater than the current time',
     [LocalizationKey.RoomEmptyQuestionsListError]:
       'Please add questions to the list of questions',
-    [LocalizationKey.RoomEmptyCategoryError]:
-      'Please select a meeting category',
     [LocalizationKey.InterviewHistoryTitle]: 'Interview history',
     [LocalizationKey.RoomReviewAlreadyGiven]:
       'You have already given feedback on the interview. Waiting for evaluation from other participants.',
@@ -542,6 +540,7 @@ export const LocalizationCaptions: Record<
       'AI interviews, video calls,\nquestion database.',
     [LocalizationKey.QuestionTreesPageName]: 'Question trees',
     [LocalizationKey.CreateQuestionTree]: 'Create question trees',
+    [LocalizationKey.QuestionTree]: 'Question tree',
     [LocalizationKey.QuestionTreeName]: 'Question tree name',
     [LocalizationKey.QuestionTreeNodeDelete]: 'Delete',
     [LocalizationKey.QuestionTreeNodeNewItemBelow]: 'New item below',
@@ -787,16 +786,14 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.AnswerDetails]: 'Детали ответа',
     [LocalizationKey.QuestionAnswerDetails]: 'Детали ответа на вопрос',
     [LocalizationKey.EmptyRoomNameError]: 'Пожалуйста, укажите имя встречи',
-    [LocalizationKey.EmptyRoomCategoryError]:
-      'Пожалуйста, укажите категорию встречи',
+    [LocalizationKey.EmptyRoomQuestionTreeError]:
+      'Пожалуйста, укажите дерево вопросов',
     [LocalizationKey.RoomEmptyStartTimeError]:
       'Пожалуйста, укажите время начала встречи',
     [LocalizationKey.RoomStartTimeMustBeGreaterError]:
       'Время начала встречи должно быть больше текущего времени',
     [LocalizationKey.RoomEmptyQuestionsListError]:
       'Пожалуйста, добавьте вопросы в список вопросов',
-    [LocalizationKey.RoomEmptyCategoryError]:
-      'Пожалуйста, выберите категорию встречи',
     [LocalizationKey.InterviewHistoryTitle]: 'История собеседований',
     [LocalizationKey.RoomReviewAlreadyGiven]:
       'Вы уже дали отзыв о собеседовании. Ожидание оценки от остальных участников.',
@@ -840,6 +837,7 @@ export const LocalizationCaptions: Record<
       'Собеседования с AI, видеозвонки,\nбаза вопросов.',
     [LocalizationKey.QuestionTreesPageName]: 'Деревья вопросов',
     [LocalizationKey.CreateQuestionTree]: 'Создать дерево вопросов',
+    [LocalizationKey.QuestionTree]: 'Дерево вопросов',
     [LocalizationKey.QuestionTreeName]: 'Имя дерева вопросов',
     [LocalizationKey.QuestionTreeNodeDelete]: 'Удалить',
     [LocalizationKey.QuestionTreeNodeNewItemBelow]: 'Новый элемент рядом',

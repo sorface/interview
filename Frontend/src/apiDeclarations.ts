@@ -28,7 +28,7 @@ export interface PaginationUrlParams {
 export interface CreateRoomBody {
   name: string;
   questions?: Array<{ id: Question['id']; order: number }> | null;
-  categoryId?: Category['id'] | null;
+  questionTreeId?: string | null;
   experts: Array<User['id']>;
   examinees: Array<User['id']>;
   tags: Array<Tag['id']>;
@@ -504,7 +504,6 @@ export interface CreateQuestionTreeBody {
   order: number;
   parentQuestionTreeId: string | null;
   tree: Array<{
-    // id: string;
     parentQuestionSubjectTreeId: string | null | undefined;
     questionId: string | null;
     type: TreeNodeType;
