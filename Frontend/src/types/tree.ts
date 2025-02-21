@@ -5,7 +5,7 @@ export const enum TreeNodeType {
 
 export interface TreeNode {
   id: string;
-  question: {
+  question?: {
     id: string | null;
     value: string;
   } | null;

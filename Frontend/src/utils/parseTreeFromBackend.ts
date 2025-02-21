@@ -1,4 +1,4 @@
-import { GetQuestionsTreeResponse } from '../apiDeclarations';
+import { QuestionsTree } from '../types/questionsTree';
 import { TreeNode } from '../types/tree';
 
 const findChildrenNodesInTreeFromBackend = (
@@ -15,9 +15,7 @@ const findChildrenNodesInTreeFromBackend = (
   return children;
 };
 
-export const parseTreeFromBackend = (
-  treeFromBackend: GetQuestionsTreeResponse,
-) => {
+export const parseTreeFromBackend = (treeFromBackend: QuestionsTree) => {
   const rootNode = treeFromBackend.tree.find(
     (node) => node.id === treeFromBackend.rootQuestionSubjectTreeId,
   );

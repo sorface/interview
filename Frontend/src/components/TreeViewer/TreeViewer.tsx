@@ -89,15 +89,12 @@ interface TreeViewerProps {
 }
 
 export const TreeViewer: FunctionComponent<TreeViewerProps> = ({ tree }) => {
-  console.log('tree: ', tree);
   const reactFlowColorMode: ColorMode = useThemeClassName({
     [Theme.Dark]: 'dark',
     [Theme.Light]: 'light',
   });
   const [nodes, setNodes] = useNodesState<Node>([]);
-  console.log('nodes: ', nodes);
   const [edges, setEdges] = useEdgesState<Edge>([]);
-  console.log('edges: ', JSON.stringify(edges));
 
   useEffect(() => {
     const nodes = getNodes(tree);

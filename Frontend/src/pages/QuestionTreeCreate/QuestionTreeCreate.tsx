@@ -24,7 +24,6 @@ import { TreeViewer } from '../../components/TreeViewer/TreeViewer';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import {
   CreateQuestionTreeBody,
-  GetQuestionsTreeResponse,
   questionTreeApiDeclaration,
 } from '../../apiDeclarations';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -37,6 +36,7 @@ import { IconNames, pathnames } from '../../constants';
 import { Icon } from '../Room/components/Icon/Icon';
 import { getTreeForBackend } from '../../utils/getTreeForBackend';
 import { parseTreeFromBackend } from '../../utils/parseTreeFromBackend';
+import { QuestionsTree } from '../../types/questionsTree';
 
 interface QuestionTreeCreateProps {
   edit: boolean;
@@ -60,7 +60,7 @@ export const QuestionTreeCreate: FunctionComponent<QuestionTreeCreateProps> = ({
   );
 
   const { apiMethodState: getState, fetchData: fetchGet } = useApiMethod<
-    GetQuestionsTreeResponse,
+    QuestionsTree,
     string
   >(questionTreeApiDeclaration.get);
   const {

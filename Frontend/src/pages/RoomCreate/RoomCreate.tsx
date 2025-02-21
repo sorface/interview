@@ -10,7 +10,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   CreateRoomBody,
   GetPageQuestionsTreeResponse,
-  GetQuestionsTreeResponse,
   GetQuestionsTreesParams,
   questionTreeApiDeclaration,
   RoomEditBody,
@@ -46,6 +45,7 @@ import { DragNDropList } from '../../components/DragNDropList/DragNDropList';
 import { RoomQuestionsSelector } from './RoomQuestionsSelector/RoomQuestionsSelector';
 import { sortRoomQuestion } from '../../utils/sortRoomQestions';
 import { TreeViewer } from '../../components/TreeViewer/TreeViewer';
+import { QuestionsTree } from '../../types/questionsTree';
 
 const nameFieldName = 'roomName';
 const dateFieldName = 'roomDate';
@@ -185,9 +185,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
   } = questionTreesState;
 
   const { apiMethodState: questionTreeGetState, fetchData: fetchQuestionTree } =
-    useApiMethod<GetQuestionsTreeResponse, string>(
-      questionTreeApiDeclaration.get,
-    );
+    useApiMethod<QuestionsTree, string>(questionTreeApiDeclaration.get);
   const {
     process: { loading: questionTreeLoading, error: questionTreeError },
     data: questionTree,

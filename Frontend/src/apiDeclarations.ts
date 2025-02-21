@@ -515,22 +515,6 @@ export interface GetPageQuestionsTreeResponse {
   data: Array<TreeMeta>;
 }
 
-export interface GetQuestionsTreeResponse {
-  id: string;
-  name: string;
-  rootQuestionSubjectTreeId: string;
-  tree: Array<{
-    id: string;
-    order: number;
-    parentQuestionSubjectTreeId: string;
-    type: TreeNodeType;
-    question: {
-      id: string;
-      value: string;
-    };
-  }>;
-}
-
 export const questionTreeApiDeclaration = {
   getPage: (params: GetCategoriesParams): ApiContractGet => ({
     method: 'GET',
