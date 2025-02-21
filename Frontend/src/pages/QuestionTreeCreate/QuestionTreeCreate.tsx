@@ -41,8 +41,6 @@ import toast from 'react-hot-toast';
 import { IconNames, pathnames } from '../../constants';
 import { Icon } from '../Room/components/Icon/Icon';
 
-const rootNodeFakeId = crypto.randomUUID();
-
 const findChildrenNodesInTreeFromBackend = (
   node: TreeNodeType,
   treeFromBackend: TreeNodeType[],
@@ -85,6 +83,7 @@ const appendToTreeForBackend = (tree: Tree, treeForBackend: TreeNodeType[]) => {
 
 const getTreeForBackend = (
   tree: Tree,
+  rootNodeFakeId: string,
   rootNodeName?: string,
 ): TreeNodeType[] => {
   const result: TreeNodeType[] = [];
@@ -116,6 +115,7 @@ export const QuestionTreeCreate: FunctionComponent<QuestionTreeCreateProps> = ({
   edit,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
+  const [rootNodeFakeId] = useState(crypto.randomUUID());
   const [name, setName] = useState('');
   const { id } = useParams();
   const navigate = useNavigate();
@@ -213,7 +213,7 @@ export const QuestionTreeCreate: FunctionComponent<QuestionTreeCreateProps> = ({
   };
 
   const handleCreate = () => {
-    const treeForBackend = getTreeForBackend(tree);
+    const treeForBackend = getTreeForBackend(tree, rootNodeFakeId);
     const treeId = edit ? getedTree?.id : crypto.randomUUID();
     if (!treeId) {
       throw new Error('empty treeId in handleCreate');
@@ -287,6 +287,7 @@ export const QuestionTreeCreate: FunctionComponent<QuestionTreeCreateProps> = ({
             <TreeViewer
               tree={getTreeForBackend(
                 tree,
+                rootNodeFakeId,
                 localizationCaptions[LocalizationKey.QuestionTreeRootNode],
               )}
             />
