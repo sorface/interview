@@ -18,6 +18,7 @@ import {
 } from './types/room';
 import { User, UserType } from './types/user';
 import { Category } from './types/category';
+import { TreeMeta, TreeNodeType } from './types/tree';
 
 export interface PaginationUrlParams {
   PageSize: number;
@@ -489,6 +490,70 @@ export const categoriesApiDeclaration = {
   archive: (id: Category['id']): ApiContractPost => ({
     method: 'POST',
     baseUrl: `/category/archive/${id}`,
+    body: undefined,
+  }),
+};
+
+export interface GetQuestionsTreesParams extends PaginationUrlParams {
+  name: string;
+}
+
+export interface CreateQuestionTreeBody {
+  id: string;
+  name: string;
+  order: number;
+  parentQuestionTreeId: string | null;
+  tree: Array<{
+    // id: string;
+    parentQuestionSubjectTreeId: string | null | undefined;
+    questionId: string | null;
+    type: TreeNodeType;
+    order: number;
+  }>;
+}
+
+export interface GetPageQuestionsTreeResponse {
+  data: Array<TreeMeta>;
+}
+
+export interface GetQuestionsTreeResponse {
+  id: string;
+  name: string;
+  rootQuestionSubjectTreeId: string;
+  tree: Array<{
+    id: string;
+    order: number;
+    parentQuestionSubjectTreeId: string;
+    type: TreeNodeType;
+    question: {
+      id: string;
+      value: string;
+    };
+  }>;
+}
+
+export const questionTreeApiDeclaration = {
+  getPage: (params: GetCategoriesParams): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: '/questions/tree',
+    urlParams: {
+      'Page.PageSize': params.PageSize,
+      'Page.PageNumber': params.PageNumber,
+      Name: params.name,
+    },
+  }),
+  get: (id: string): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: `/questions/tree/${id}`,
+  }),
+  upsert: (category: CreateQuestionTreeBody): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: '/questions/tree',
+    body: category,
+  }),
+  archive: (id: string): ApiContractPatch => ({
+    method: 'PATCH',
+    baseUrl: `/questions/tree/${id}/archive`,
     body: undefined,
   }),
 };

@@ -154,6 +154,18 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
           onClick: handleItemClick,
         }
       : null,
+    admin
+      ? {
+          path: pathnames.questionTrees,
+          caption: (
+            <LocalizationCaption
+              captionKey={LocalizationKey.QuestionTreesPageName}
+            />
+          ),
+          icon: IconNames.Expand,
+          onClick: handleItemClick,
+        }
+      : null,
   ];
 
   const createMenuItem = (item: MenuItem) => {

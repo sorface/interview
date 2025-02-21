@@ -20,6 +20,9 @@ export const pathnames = {
   categoriesCreate: '/categories/create',
   categoriesEdit: '/categories/edit/:id',
   logoutError: '/logoutError',
+  questionTrees: '/questionTrees',
+  questionTreeCreate: '/questionTrees/create',
+  questionTreeEdit: '/questionTrees/:id',
 };
 
 export const enum IconNames {
@@ -69,6 +72,8 @@ export const enum IconNames {
   Search = 'search',
   Hourglass = 'hourglass',
   LogIn = 'log-in-outline',
+  Expand = 'expand-outline',
+  Collapse = 'chevron-collapse-outline',
 }
 
 export const reactionIcon: Record<string, IconNames> = {

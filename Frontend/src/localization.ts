@@ -48,6 +48,7 @@ export const enum LocalizationKey {
   CloselWithoutSave,
   Stay,
   Error,
+  Loading,
   NotSelected,
   QuestionCreatedSuccessfully,
   QuestionUpdatedSuccessfully,
@@ -241,6 +242,21 @@ export const enum LocalizationKey {
   LetsBeginDescription,
   LetsBeginCommand,
   HomeDescription,
+  QuestionTreesPageName,
+  CreateQuestionTree,
+  QuestionTreeName,
+  QuestionTreeNodeDelete,
+  QuestionTreeNodeNewItemBelow,
+  QuestionTreeNodeNewItemInside,
+  QuestionTreeNodeMoveUp,
+  QuestionTreeNodeMoveDown,
+  QuestionTreeNodeMoveLeft,
+  QuestionTreeNodeMoveRight,
+  QuestionTreeCreatedSuccessfully,
+  QuestionTreeUpdatedSuccessfully,
+  QuestionTreeExpandAll,
+  QuestionTreeCollapseAll,
+  QuestionTreeRootNode,
 }
 
 export const LocalizationCaptions: Record<
@@ -297,6 +313,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.CloselWithoutSave]: 'Exit without saving',
     [LocalizationKey.Stay]: 'Stay',
     [LocalizationKey.Error]: 'Error',
+    [LocalizationKey.Loading]: 'Loading',
     [LocalizationKey.NotSelected]: 'Not selected',
     [LocalizationKey.QuestionCreatedSuccessfully]:
       'Question created successfully',
@@ -523,6 +540,23 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.LetsBeginCommand]: "let's begin",
     [LocalizationKey.HomeDescription]:
       'AI interviews, video calls,\nquestion database.',
+    [LocalizationKey.QuestionTreesPageName]: 'Question trees',
+    [LocalizationKey.CreateQuestionTree]: 'Create question trees',
+    [LocalizationKey.QuestionTreeName]: 'Question tree name',
+    [LocalizationKey.QuestionTreeNodeDelete]: 'Delete',
+    [LocalizationKey.QuestionTreeNodeNewItemBelow]: 'New item below',
+    [LocalizationKey.QuestionTreeNodeNewItemInside]: 'New item inside',
+    [LocalizationKey.QuestionTreeNodeMoveUp]: 'Move up',
+    [LocalizationKey.QuestionTreeNodeMoveDown]: 'Move down',
+    [LocalizationKey.QuestionTreeNodeMoveLeft]: 'Move out',
+    [LocalizationKey.QuestionTreeNodeMoveRight]: 'Move in',
+    [LocalizationKey.QuestionTreeCreatedSuccessfully]:
+      'Question tree created successfully',
+    [LocalizationKey.QuestionTreeUpdatedSuccessfully]:
+      'Question tree updated successfully',
+    [LocalizationKey.QuestionTreeExpandAll]: 'Expand all',
+    [LocalizationKey.QuestionTreeCollapseAll]: 'Collapse all',
+    [LocalizationKey.QuestionTreeRootNode]: 'Beginning',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -574,6 +608,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.CloselWithoutSave]: 'Выйти без сохранения',
     [LocalizationKey.Stay]: 'Остаться',
     [LocalizationKey.Error]: 'Ошибка',
+    [LocalizationKey.Loading]: 'Загрузка',
     [LocalizationKey.NotSelected]: 'Не выбрано',
     [LocalizationKey.QuestionCreatedSuccessfully]: 'Вопрос успешно создан',
     [LocalizationKey.QuestionUpdatedSuccessfully]: 'Вопрос успешно обновлён',
@@ -803,5 +838,22 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.LetsBeginCommand]: 'давай начнём',
     [LocalizationKey.HomeDescription]:
       'Собеседования с AI, видеозвонки,\nбаза вопросов.',
+    [LocalizationKey.QuestionTreesPageName]: 'Деревья вопросов',
+    [LocalizationKey.CreateQuestionTree]: 'Создать дерево вопросов',
+    [LocalizationKey.QuestionTreeName]: 'Имя дерева вопросов',
+    [LocalizationKey.QuestionTreeNodeDelete]: 'Удалить',
+    [LocalizationKey.QuestionTreeNodeNewItemBelow]: 'Новый элемент рядом',
+    [LocalizationKey.QuestionTreeNodeNewItemInside]: 'Новый элемент внутри',
+    [LocalizationKey.QuestionTreeNodeMoveUp]: 'Переместить вверх',
+    [LocalizationKey.QuestionTreeNodeMoveDown]: 'Переместить вниз',
+    [LocalizationKey.QuestionTreeNodeMoveLeft]: 'Переместить наружу',
+    [LocalizationKey.QuestionTreeNodeMoveRight]: 'Переместить внутрь',
+    [LocalizationKey.QuestionTreeCreatedSuccessfully]:
+      'Дерево вопросов создано успешно',
+    [LocalizationKey.QuestionTreeUpdatedSuccessfully]:
+      'Дерево вопросов успешно обновлено',
+    [LocalizationKey.QuestionTreeExpandAll]: 'Развернуть все',
+    [LocalizationKey.QuestionTreeCollapseAll]: 'Свернуть все',
+    [LocalizationKey.QuestionTreeRootNode]: 'Начало',
   },
 };
