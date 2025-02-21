@@ -88,12 +88,25 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
         }
     }
 
+    private async Task EnsureNotExistQuestionSubjectTreesAsync(ICollection<Guid> ids, CancellationToken cancellationToken)
+    {
+        var dbItems = await db.QuestionSubjectTree.AsNoTracking()
+            .Where(e => ids.Contains(e.Id))
+            .Select(e => e.Id)
+            .ToListAsync(cancellationToken);
+        if (dbItems.Count > 0)
+        {
+            throw new UserException($"Question subject tree with id [{string.Join(", ", dbItems)}] already exists");
+        }
+    }
+
     private async Task UpdateAsync(QuestionTree tree, UpsertQuestionTreeRequest request, CancellationToken cancellationToken)
     {
         var dbNodeIds = await db.QuestionSubjectTree.GetAllChildrenAsync(tree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
         var actualNodeIds = request.Tree.Select(e => e.Id).ToHashSet();
 
         var addNodeIds = actualNodeIds.Except(dbNodeIds).ToHashSet();
+        await EnsureNotExistQuestionSubjectTreesAsync(addNodeIds, cancellationToken);
         if (addNodeIds.Count > 0)
         {
             var addNodes = request.Tree
@@ -147,6 +160,7 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
 
     private async Task<QuestionTree> CreateAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken)
     {
+        await EnsureNotExistQuestionSubjectTreesAsync(request.Tree.Select(e => e.Id).ToList(), cancellationToken);
         var subjectTrees = request.Tree.Select(e => new QuestionSubjectTree
         {
             Id = e.Id,
