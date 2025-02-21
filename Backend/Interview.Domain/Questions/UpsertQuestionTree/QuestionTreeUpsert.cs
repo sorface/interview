@@ -110,20 +110,10 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
                          e => e.Id,
                          (subjectTree, treeRequest) => (Db: subjectTree, Request: treeRequest)))
             {
-                if (item.Db.QuestionId != item.Request.QuestionId)
-                {
-                    item.Db.QuestionId = item.Request.QuestionId;
-                }
-
-                if (item.Db.ParentQuestionSubjectTreeId != item.Request.ParentQuestionSubjectTreeId)
-                {
-                    item.Db.ParentQuestionSubjectTreeId = item.Request.ParentQuestionSubjectTreeId;
-                }
-
-                if (item.Db.Type.EnumValue != item.Request.Type)
-                {
-                    item.Db.Type = SEQuestionSubjectTreeType.FromEnumValue(item.Request.Type);
-                }
+                item.Db.QuestionId = item.Request.QuestionId;
+                item.Db.ParentQuestionSubjectTreeId = item.Request.ParentQuestionSubjectTreeId;
+                item.Db.Type = SEQuestionSubjectTreeType.FromEnumValue(item.Request.Type);
+                item.Db.Order = item.Request.Order;
             }
         }
 
