@@ -55,11 +55,14 @@ const aiExpertId = 'aiExpertId';
 const findNodeById = (nodes: QuestionsTreeNode[], id: string) =>
   nodes.find((node) => node.id === id);
 
+const findNodeByQuestionId = (nodes: QuestionsTreeNode[], id: string) =>
+  nodes.find((node) => node.question?.id === id);
+
 const findNextNodes = (
   nodes: QuestionsTreeNode[],
   currentQuestionId: string,
 ): QuestionsTree['tree'] => {
-  const currentNode = findNodeById(nodes, currentQuestionId);
+  const currentNode = findNodeByQuestionId(nodes, currentQuestionId);
   if (!currentNode) {
     console.warn('no currentNode in getQuestions');
     return [];
@@ -77,7 +80,7 @@ const getRandomQuestionWithExclude = (
   nodes: QuestionsTreeNode[],
   excludedQuestions: RoomQuestion[],
 ) => {
-  for (let i = 30; i--; ) {
+  for (let i = 777; i--; ) {
     const randomNode = getRandomNode(nodes);
     if (!randomNode.question) {
       continue;
@@ -93,23 +96,137 @@ const getRandomQuestionWithExclude = (
   return getRandomNode(nodes).question;
 };
 
-const getNextQuestion = (
+const findRandomNextNode = (
   nodes: QuestionsTreeNode[],
   excludedQuestions: RoomQuestion[],
-  currentQuestionId?: string,
+  currentQuestionId: string,
 ) => {
-  if (!currentQuestionId) {
-    return getRandomQuestionWithExclude(nodes, excludedQuestions);
-  }
   const nextNodes = findNextNodes(nodes, currentQuestionId);
   const nextNodesFiltered = nextNodes.filter(
     (node) =>
       !excludedQuestions.find((excluded) => node.question?.id === excluded.id),
   );
   if (nextNodesFiltered.length === 0) {
-    return getRandomQuestionWithExclude(nodes, excludedQuestions);
+    return null;
   }
   return getRandomNode(nextNodesFiltered).question;
+};
+
+const visitNodesFromRoot = (
+  nodes: QuestionsTreeNode[],
+  currentNode: QuestionsTreeNode,
+  excludedQuestions: RoomQuestion[],
+) => {
+  const childNodes = nodes.filter(
+    (node) => node.parentQuestionSubjectTreeId === currentNode.id,
+  );
+  if (childNodes.length === 0) {
+    return null;
+  }
+  const nextNodesFiltered = childNodes.filter(
+    (node) =>
+      !excludedQuestions.find((excluded) => node.question?.id === excluded.id),
+  );
+  if (nextNodesFiltered.length !== 0) {
+    return getRandomNode(nextNodesFiltered);
+  }
+  const randomChild = getRandomNode(childNodes);
+  return visitNodesFromRoot(nodes, randomChild, excludedQuestions);
+};
+
+const tryGetRandomNodeFromRoot = (
+  tree: QuestionsTree,
+  excludedQuestions: RoomQuestion[],
+) => {
+  const nodes = tree.tree;
+  const rootNode = findNodeById(nodes, tree.rootQuestionSubjectTreeId);
+  if (!rootNode) {
+    console.warn('no rootNode in tryGetRandomNodeFromRoot');
+    return null;
+  }
+  for (let i = 777; i--; ) {
+    const nodeFromRoot = visitNodesFromRoot(nodes, rootNode, excludedQuestions);
+    if (nodeFromRoot) {
+      return nodeFromRoot;
+    }
+  }
+  return null;
+};
+
+const findParentNextNode = (
+  nodes: QuestionsTreeNode[],
+  currentNodeId: string,
+  excludedQuestions: RoomQuestion[],
+) => {
+  const parentNodeId = findNodeById(
+    nodes,
+    currentNodeId,
+  )?.parentQuestionSubjectTreeId;
+  if (!parentNodeId) {
+    console.warn('no parentNodeId in findParentNextNode');
+    return null;
+  }
+  const parentNode = findNodeById(nodes, parentNodeId);
+  if (!parentNode) {
+    console.warn('no parentNode in findParentNextNode');
+    return null;
+  }
+  if (!parentNode.question) {
+    return null;
+  }
+  const randomNextNode = findRandomNextNode(
+    nodes,
+    excludedQuestions,
+    parentNode.question.id,
+  );
+  if (randomNextNode) {
+    return randomNextNode;
+  }
+  return findParentNextNode(nodes, parentNode.id, excludedQuestions);
+};
+
+const getNextQuestion = (
+  tree: QuestionsTree,
+  excludedQuestions: RoomQuestion[],
+  currentQuestionId?: string,
+) => {
+  const nodes = tree.tree;
+  if (!currentQuestionId) {
+    const randomQuestionFromRoot = tryGetRandomNodeFromRoot(
+      tree,
+      excludedQuestions,
+    )?.question;
+    return (
+      randomQuestionFromRoot ||
+      getRandomQuestionWithExclude(nodes, excludedQuestions)
+    );
+  }
+  const randomNextNode = findRandomNextNode(
+    nodes,
+    excludedQuestions,
+    currentQuestionId,
+  );
+  if (randomNextNode) {
+    return randomNextNode;
+  }
+  const currentNode = findNodeByQuestionId(nodes, currentQuestionId);
+  if (!currentNode) {
+    console.warn('no currentNode in getNextQuestion');
+    return getRandomQuestionWithExclude(nodes, excludedQuestions);
+  }
+  const parentNextNode = findParentNextNode(
+    nodes,
+    currentNode.id,
+    excludedQuestions,
+  );
+  if (parentNextNode) {
+    return parentNextNode;
+  }
+  const randomNodeFromRoot = tryGetRandomNodeFromRoot(tree, excludedQuestions);
+  if (randomNodeFromRoot) {
+    return randomNodeFromRoot.question;
+  }
+  return getRandomQuestionWithExclude(nodes, excludedQuestions);
 };
 
 export interface RoomQuestionPanelAiProps {
@@ -222,8 +339,6 @@ export const RoomQuestionPanelAi: FunctionComponent<
     avatar: themedAiAvatar,
   });
 
-  const questionTreeNodesSafe: QuestionsTreeNode[] =
-    room?.questionTree?.tree || [];
   const closedQuestions = useMemo(
     () =>
       roomQuestions.filter((roomQuestion) => roomQuestion.state === 'Closed'),
@@ -378,8 +493,11 @@ export const RoomQuestionPanelAi: FunctionComponent<
     if (!room) {
       throw new Error('handleNextQuestion Room not found.');
     }
+    if (!room.questionTree) {
+      throw new Error('handleNextQuestion questionTree not found.');
+    }
     const nextQuestion = getNextQuestion(
-      questionTreeNodesSafe,
+      room.questionTree,
       [...closedQuestions, ...(initialQuestion ? [initialQuestion] : [])],
       initialQuestion?.id,
     );
@@ -397,7 +515,6 @@ export const RoomQuestionPanelAi: FunctionComponent<
     room,
     closedQuestions,
     initialQuestion,
-    questionTreeNodesSafe,
     handleCopilotAnswerClose,
     resetVoiceRecognitionAccum,
     sendRoomActiveQuestion,
