@@ -97,8 +97,9 @@ export const TreeViewer: FunctionComponent<TreeViewerProps> = ({ tree }) => {
   const [edges, setEdges] = useEdgesState<Edge>([]);
 
   useEffect(() => {
-    const nodes = getNodes(tree);
-    const edges = getEdges(tree);
+    const treeSorted = tree.sort((node1, node2) => node1.order - node2.order);
+    const nodes = getNodes(treeSorted);
+    const edges = getEdges(treeSorted);
     const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
       nodes,
       edges,
@@ -117,9 +118,6 @@ export const TreeViewer: FunctionComponent<TreeViewerProps> = ({ tree }) => {
       colorMode={reactFlowColorMode}
       nodes={nodes}
       edges={edges}
-      // onNodesChange={onNodesChange}
-      // onEdgesChange={onEdgesChange}
-      // onConnect={onConnect}
     />
   );
 };
