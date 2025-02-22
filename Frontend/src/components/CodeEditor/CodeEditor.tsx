@@ -1,7 +1,7 @@
 import React, {
   ChangeEventHandler,
+  Fragment,
   FunctionComponent,
-  ReactNode,
   useContext,
   useEffect,
   useRef,
@@ -15,20 +15,26 @@ import Editor, {
 } from '@monaco-editor/react';
 import { CodeEditorLang } from '../../types/question';
 import { Theme, ThemeContext } from '../../context/ThemeContext';
-import {
-  Res,
-  RunCodeButton,
-} from '../../pages/Room/components/RunCodeButton/RunCodeButton';
-
-import './CodeEditor.css';
 import { Modal } from '../Modal/Modal';
 import { Gap } from '../Gap/Gap';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
+import { Typography } from '../Typography/Typography';
+import { Button } from '../Button/Button';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
+import { IconNames } from '../../constants';
+import {
+  executeCodeWithExpect,
+  ExpectResults,
+} from '../../utils/executeCodeWithExpect';
+
+import './CodeEditor.css';
 
 export const defaultCodeEditorFontSize = 13;
 
 const fontSizeOptions = [10, 12, 13, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48];
+
+const languagesForExecute: CodeEditorLang[] = [CodeEditorLang.Javascript];
 
 const renderOptions = (options: Array<number | string>) =>
   options.map((option) => (
@@ -67,14 +73,13 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   const localizationCaptions = useLocalizationCaptions();
   const { themeInUi } = useContext(ThemeContext);
   const [fontSize, setFontSize] = useState(defaultCodeEditorFontSize);
-  const [expectResults, setExpectResults] = useState<Res>({});
+  const [expectResults, setExpectResults] = useState<ExpectResults>([]);
+  const expectResultsPassed = expectResults.every(
+    (expectResult) => expectResult.passed,
+  );
   const [modalExpectResults, setModalExpectResults] = useState(false);
   const codeEditorComponentRef = useRef<HTMLDivElement | null>(null);
 
-  const handleExpectResults = (arr: Res) => {
-    setExpectResults(arr);
-    setModalExpectResults(true);
-  };
   const handleModalExpectClose = () => setModalExpectResults(false);
 
   const handleFontSizeChange: ChangeEventHandler<HTMLSelectElement> = (
@@ -102,6 +107,12 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
       },
     };
     monaco.editor.defineTheme('my-dark', theme);
+  };
+
+  const handleExecuteCode = () => {
+    const executeCodeResult = executeCodeWithExpect(value);
+    setExpectResults(executeCodeResult);
+    setModalExpectResults(true);
   };
 
   useEffect(() => {
@@ -135,29 +146,6 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
       className={`code-editor flex flex-col rounded-1.125 overflow-hidden ${className}`}
       ref={codeEditorComponentRef}
     >
-      <Modal
-        contentLabel="Modal with expect results"
-        onClose={handleModalExpectClose}
-        open={modalExpectResults}
-      >
-        {localizationCaptions[LocalizationKey.CodeEditorResults]}
-        <br />
-
-        {Object.entries(expectResults)?.map(([key, expectCall]) => {
-          const firstValue = JSON.stringify(
-            expectCall?.arguments?.[0]?.[0],
-          ) as ReactNode;
-          const secondValue = JSON.stringify(
-            expectCall?.arguments?.[0]?.[1],
-          ) as ReactNode;
-          const expectResult = JSON.stringify(expectCall.result);
-
-          const resultValue = `expect(${firstValue},${secondValue}) : ${expectResult}`;
-
-          return <div key={key}>{resultValue}</div>;
-        })}
-        <Gap sizeRem={1} />
-      </Modal>
       <div className="code-editor-tools">
         <select
           className="code-editor-tools-select"
@@ -175,10 +163,17 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
         >
           {renderOptions(fontSizeOptions)}
         </select>
-        <RunCodeButton
-          handleExpectResults={handleExpectResults}
-          codeEditorText={value}
-        />
+        {languagesForExecute.includes(language) && (
+          <Button
+            className="min-h-[1.91rem]"
+            onClick={handleExecuteCode}
+            disabled={!value?.length}
+          >
+            {localizationCaptions[LocalizationKey.Run]}
+            <Gap sizeRem={0.25} horizontal />
+            <Icon inheritFontSize name={IconNames.PaperPlane} />
+          </Button>
+        )}
       </div>
       <div className="flex-1">
         <Editor
@@ -201,6 +196,59 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
           beforeMount={handleBeforeMount}
         />
       </div>
+
+      <Modal
+        contentLabel={
+          localizationCaptions[LocalizationKey.ExpectsExecuteResults]
+        }
+        onClose={handleModalExpectClose}
+        open={modalExpectResults}
+      >
+        <div className="grid grid-cols-2">
+          <Typography size="l">
+            {localizationCaptions[LocalizationKey.ExpectsExecuteOutput]}
+          </Typography>
+          <Typography size="l">
+            {localizationCaptions[LocalizationKey.ExpectsExecuteOutputExpected]}
+          </Typography>
+          {expectResults
+            .sort(
+              (expectResult1, expectResult2) =>
+                +expectResult1.passed - +expectResult2.passed,
+            )
+            .map((expectResult) => (
+              <Fragment key={expectResult.id}>
+                <Typography
+                  error={!expectResult.passed}
+                  secondary={expectResult.passed}
+                  size="m"
+                >
+                  {JSON.stringify(expectResult.arguments[0])}
+                </Typography>
+                <Typography
+                  error={!expectResult.passed}
+                  secondary={expectResult.passed}
+                  size="m"
+                >
+                  {JSON.stringify(expectResult.arguments[1])}
+                </Typography>
+              </Fragment>
+            ))}
+        </div>
+        <Gap sizeRem={1.5} />
+        <div>
+          <Typography size="m" error={!expectResultsPassed}>
+            {
+              localizationCaptions[
+                expectResultsPassed
+                  ? LocalizationKey.ExpectsExecuteResultsPassed
+                  : LocalizationKey.ExpectsExecuteResultsNotPassed
+              ]
+            }
+          </Typography>
+        </div>
+        <Gap sizeRem={1.5} />
+      </Modal>
     </div>
   );
 };

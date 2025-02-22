@@ -244,7 +244,11 @@ export const enum LocalizationKey {
   Recommendation,
   ExampleOfCorrectAnswer,
   Run,
-  CodeEditorResults,
+  ExpectsExecuteResults,
+  ExpectsExecuteOutput,
+  ExpectsExecuteOutputExpected,
+  ExpectsExecuteResultsPassed,
+  ExpectsExecuteResultsNotPassed,
 }
 
 export const LocalizationCaptions: Record<
@@ -252,7 +256,6 @@ export const LocalizationCaptions: Record<
   Record<LocalizationKey, string>
 > = {
   [LocalizationLang.en]: {
-    [LocalizationKey.CodeEditorResults]: 'Result of all expects execute',
     [LocalizationKey.LoginRequired]:
       'To view this page you need to log in to your account',
     [LocalizationKey.WelcomeMessage]: 'Welcome',
@@ -531,9 +534,15 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.Recommendation]: 'Recommendation',
     [LocalizationKey.ExampleOfCorrectAnswer]: 'Example of correct answer',
     [LocalizationKey.Run]: 'Run',
+    [LocalizationKey.ExpectsExecuteResults]: 'Result of all expects execute',
+    [LocalizationKey.ExpectsExecuteOutput]: 'Output',
+    [LocalizationKey.ExpectsExecuteOutputExpected]: 'Expected output',
+    [LocalizationKey.ExpectsExecuteResultsPassed]:
+      'All checks passed successfully',
+    [LocalizationKey.ExpectsExecuteResultsNotPassed]:
+      'Not all tests were passed successfully',
   },
   [LocalizationLang.ru]: {
-    [LocalizationKey.CodeEditorResults]: 'Результат выполнения функций expect',
     [LocalizationKey.LoginRequired]:
       'Для просмотра данной страницы необходимо войти в аккаунт',
     [LocalizationKey.WelcomeMessage]: 'Добро пожаловать',
@@ -815,5 +824,13 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.Recommendation]: 'Рекомендация',
     [LocalizationKey.ExampleOfCorrectAnswer]: 'Пример правильного ответа',
     [LocalizationKey.Run]: 'Запустить',
+    [LocalizationKey.ExpectsExecuteResults]:
+      'Результат выполнения функций expect',
+    [LocalizationKey.ExpectsExecuteOutput]: 'Результат',
+    [LocalizationKey.ExpectsExecuteOutputExpected]: 'Ожидаемый результат',
+    [LocalizationKey.ExpectsExecuteResultsPassed]:
+      'Все проверки пройдены успешно',
+    [LocalizationKey.ExpectsExecuteResultsNotPassed]:
+      'Не все проверки пройдены успешно',
   },
 };
