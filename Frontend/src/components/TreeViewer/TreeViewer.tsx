@@ -15,6 +15,8 @@ import { TreeNode } from '../../types/tree';
 
 import '@xyflow/react/dist/style.css';
 import './TreeViewer.css';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { LocalizationKey } from '../../localization';
 
 const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
@@ -61,11 +63,11 @@ const getLayoutedElements = (
 
 const defaultPosition = { x: 0, y: 0 };
 
-const getNodes = (tree: TreeNode[]): Node[] => {
+const getNodes = (tree: TreeNode[], defaultLabel: string): Node[] => {
   return tree.map((node) => ({
     id: node.id,
     position: defaultPosition,
-    data: { label: node.question?.value },
+    data: { label: node.question?.value || defaultLabel },
   }));
 };
 
@@ -89,6 +91,7 @@ interface TreeViewerProps {
 }
 
 export const TreeViewer: FunctionComponent<TreeViewerProps> = ({ tree }) => {
+  const localizationCaptions = useLocalizationCaptions();
   const reactFlowColorMode: ColorMode = useThemeClassName({
     [Theme.Dark]: 'dark',
     [Theme.Light]: 'light',
@@ -98,7 +101,10 @@ export const TreeViewer: FunctionComponent<TreeViewerProps> = ({ tree }) => {
 
   useEffect(() => {
     const treeSorted = tree.sort((node1, node2) => node1.order - node2.order);
-    const nodes = getNodes(treeSorted);
+    const nodes = getNodes(
+      treeSorted,
+      localizationCaptions[LocalizationKey.QuestionTreeRootNode],
+    );
     const edges = getEdges(treeSorted);
     const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
       nodes,
@@ -107,7 +113,7 @@ export const TreeViewer: FunctionComponent<TreeViewerProps> = ({ tree }) => {
     );
     setNodes(layoutedNodes);
     setEdges(layoutedEdges);
-  }, [tree]);
+  }, [tree, localizationCaptions]);
 
   return (
     <ReactFlow
