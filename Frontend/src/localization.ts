@@ -244,6 +244,7 @@ export const enum LocalizationKey {
   Recommendation,
   ExampleOfCorrectAnswer,
   Run,
+  CodeEditorResults,
 }
 
 export const LocalizationCaptions: Record<
@@ -251,6 +252,7 @@ export const LocalizationCaptions: Record<
   Record<LocalizationKey, string>
 > = {
   [LocalizationLang.en]: {
+    [LocalizationKey.CodeEditorResults]: 'Result of all expects execute',
     [LocalizationKey.LoginRequired]:
       'To view this page you need to log in to your account',
     [LocalizationKey.WelcomeMessage]: 'Welcome',
@@ -531,6 +533,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.Run]: 'Run',
   },
   [LocalizationLang.ru]: {
+    [LocalizationKey.CodeEditorResults]: 'Результат выполнения функций expect',
     [LocalizationKey.LoginRequired]:
       'Для просмотра данной страницы необходимо войти в аккаунт',
     [LocalizationKey.WelcomeMessage]: 'Добро пожаловать',

@@ -1,6 +1,7 @@
 import React, {
   ChangeEventHandler,
   FunctionComponent,
+  ReactNode,
   useContext,
   useEffect,
   useRef,
@@ -14,9 +15,16 @@ import Editor, {
 } from '@monaco-editor/react';
 import { CodeEditorLang } from '../../types/question';
 import { Theme, ThemeContext } from '../../context/ThemeContext';
-import { RunCodeButton } from '../../pages/Room/components/RunCodeButton/RunCodeButton';
+import {
+  Res,
+  RunCodeButton,
+} from '../../pages/Room/components/RunCodeButton/RunCodeButton';
 
 import './CodeEditor.css';
+import { Modal } from '../Modal/Modal';
+import { Gap } from '../Gap/Gap';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { LocalizationKey } from '../../localization';
 
 export const defaultCodeEditorFontSize = 13;
 
@@ -56,10 +64,18 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   onLanguageChange,
   onFontSizeChange,
 }) => {
+  const localizationCaptions = useLocalizationCaptions();
   const { themeInUi } = useContext(ThemeContext);
   const [fontSize, setFontSize] = useState(defaultCodeEditorFontSize);
-
+  const [expectResults, setExpectResults] = useState<Res>({});
+  const [modalExpectResults, setModalExpectResults] = useState(false);
   const codeEditorComponentRef = useRef<HTMLDivElement | null>(null);
+
+  const handleExpectResults = (arr: Res) => {
+    setExpectResults(arr);
+    setModalExpectResults(true);
+  };
+  const handleModalExpectClose = () => setModalExpectResults(false);
 
   const handleFontSizeChange: ChangeEventHandler<HTMLSelectElement> = (
     event,
@@ -119,6 +135,29 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
       className={`code-editor flex flex-col rounded-1.125 overflow-hidden ${className}`}
       ref={codeEditorComponentRef}
     >
+      <Modal
+        contentLabel="Modal with expect results"
+        onClose={handleModalExpectClose}
+        open={modalExpectResults}
+      >
+        {localizationCaptions[LocalizationKey.CodeEditorResults]}
+        <br />
+
+        {Object.entries(expectResults)?.map(([key, expectCall]) => {
+          const firstValue = JSON.stringify(
+            expectCall?.arguments?.[0]?.[0],
+          ) as ReactNode;
+          const secondValue = JSON.stringify(
+            expectCall?.arguments?.[0]?.[1],
+          ) as ReactNode;
+          const expectResult = JSON.stringify(expectCall.result);
+
+          const resultValue = `expect(${firstValue},${secondValue}) : ${expectResult}`;
+
+          return <div key={key}>{resultValue}</div>;
+        })}
+        <Gap sizeRem={1} />
+      </Modal>
       <div className="code-editor-tools">
         <select
           className="code-editor-tools-select"
@@ -136,7 +175,10 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
         >
           {renderOptions(fontSizeOptions)}
         </select>
-        <RunCodeButton stringifyFunction={value} />
+        <RunCodeButton
+          handleExpectResults={handleExpectResults}
+          codeEditorText={value}
+        />
       </div>
       <div className="flex-1">
         <Editor
