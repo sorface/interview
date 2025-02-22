@@ -20,21 +20,19 @@ export type ExpectResults = Array<{
   passed: boolean;
 }>;
 
-export const executeCodeWithExpect = (code: string | undefined) => {
+export const executeCodeWithExpect = (
+  code: string | undefined,
+): ExpectResults => {
   const executeCodeWithExpect = new Function(
     expectCode + code + expectCallsReturnCode,
   ) as () => Array<Arg[]>;
 
-  const res: ExpectResults = [];
-
-  executeCodeWithExpect().forEach(([result, expect]) => {
+  return executeCodeWithExpect().map(([result, expect]) => {
     const passed = deepEqual(result, expect);
-    res.push({
+    return {
       id: Math.random(),
       arguments: [result, expect],
       passed,
-    });
+    };
   });
-
-  return res;
 };
