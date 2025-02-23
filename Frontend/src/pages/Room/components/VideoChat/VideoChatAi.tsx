@@ -12,7 +12,6 @@ import { VideochatParticipant } from './VideochatParticipant';
 import { MessagesChat } from './MessagesChat';
 import { limitLength } from './utils/limitLength';
 import { randomId } from '../../../../utils/randomId';
-import { RoomCodeEditor } from '../RoomCodeEditor/RoomCodeEditor';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
 import { RoomIdParam, roomsApiDeclaration } from '../../../../apiDeclarations';
 import { EventsSearch } from '../../../../types/event';
@@ -253,6 +252,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
       <>
         <Gap sizeRem={1.5 * 2.5} />
         <RoomQuestionPanelAi
+          questionWithCode={codeEditorEnabled}
           roomQuestionsLoading={roomQuestionsLoading}
           roomQuestions={roomQuestions?.sort(sortRoomQuestion) || []}
           initialQuestion={initialQuestion}
@@ -363,8 +363,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
           style={{ maxWidth: '840px' }}
           className="w-full flex flex-col videochat-field relative videochat-field-main rounded-1.125"
         >
-          <RoomCodeEditor visible={codeEditorEnabled} />
-          {!codeEditorEnabled && renderMain()}
+          {renderMain()}
         </div>
       </div>
 

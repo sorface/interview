@@ -259,12 +259,20 @@ export const enum LocalizationKey {
   QuestionTreeRootNode,
   Recommendation,
   ExampleOfCorrectAnswer,
+  CodeReadability,
+  CodePerformance,
+  BestPractice,
+  Vulnerabilities,
+  CodeComments,
+  RefactoringProposal,
+  ReferenceCode,
   Run,
   ExpectsExecuteResults,
   ExpectsExecuteOutput,
   ExpectsExecuteOutputExpected,
   ExpectsExecuteResultsPassed,
   ExpectsExecuteResultsNotPassed,
+  ExecutionResultsSubmit,
 }
 
 export const LocalizationCaptions: Record<
@@ -566,6 +574,14 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.QuestionTreeRootNode]: 'Beginning',
     [LocalizationKey.Recommendation]: 'Recommendation',
     [LocalizationKey.ExampleOfCorrectAnswer]: 'Example of correct answer',
+    [LocalizationKey.CodeReadability]: 'Code readability',
+    [LocalizationKey.CodePerformance]: 'Performance optimization',
+    [LocalizationKey.BestPractice]:
+      'Compliance with best programming practices',
+    [LocalizationKey.Vulnerabilities]: 'Possible errors or vulnerabilities',
+    [LocalizationKey.CodeComments]: 'Comments on complex sections of code',
+    [LocalizationKey.RefactoringProposal]: 'Suggestions for improvement',
+    [LocalizationKey.ReferenceCode]: 'Reference code',
     [LocalizationKey.Run]: 'Run',
     [LocalizationKey.ExpectsExecuteResults]: 'Result of all expects execute',
     [LocalizationKey.ExpectsExecuteOutput]: 'Output',
@@ -574,6 +590,7 @@ export const LocalizationCaptions: Record<
       'All checks passed successfully',
     [LocalizationKey.ExpectsExecuteResultsNotPassed]:
       'Not all tests were passed successfully',
+    [LocalizationKey.ExecutionResultsSubmit]: 'Send code for review',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -873,6 +890,14 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.QuestionTreeRootNode]: 'Начало',
     [LocalizationKey.Recommendation]: 'Рекомендация',
     [LocalizationKey.ExampleOfCorrectAnswer]: 'Пример правильного ответа',
+    [LocalizationKey.CodeReadability]: 'Читаемость кода',
+    [LocalizationKey.CodePerformance]: 'Оптимизация производительности',
+    [LocalizationKey.BestPractice]:
+      'Соответствие лучшим практикам программирования',
+    [LocalizationKey.Vulnerabilities]: 'Возможные ошибки или уязвимости',
+    [LocalizationKey.CodeComments]: 'Комментарии к сложным участкам кода',
+    [LocalizationKey.RefactoringProposal]: 'Предложения по улучшению',
+    [LocalizationKey.ReferenceCode]: 'Эталонный код',
     [LocalizationKey.Run]: 'Запустить',
     [LocalizationKey.ExpectsExecuteResults]:
       'Результат выполнения функций expect',
@@ -882,5 +907,6 @@ export const LocalizationCaptions: Record<
       'Все проверки пройдены успешно',
     [LocalizationKey.ExpectsExecuteResultsNotPassed]:
       'Не все проверки пройдены успешно',
+    [LocalizationKey.ExecutionResultsSubmit]: 'Отправить код на проверку',
   },
 };
