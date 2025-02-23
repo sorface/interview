@@ -116,7 +116,7 @@ const visitNodesFromRoot = (
   nodes: QuestionsTreeNode[],
   currentNode: QuestionsTreeNode,
   excludedQuestions: RoomQuestion[],
-) => {
+): QuestionsTreeNode | null => {
   const childNodes = nodes.filter(
     (node) => node.parentQuestionSubjectTreeId === currentNode.id,
   );
@@ -157,7 +157,7 @@ const findParentNextNode = (
   nodes: QuestionsTreeNode[],
   currentNodeId: string,
   excludedQuestions: RoomQuestion[],
-) => {
+): QuestionsTreeNode['question'] | null => {
   const parentNodeId = findNodeById(
     nodes,
     currentNodeId,
