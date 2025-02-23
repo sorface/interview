@@ -150,6 +150,7 @@ export enum AiAssistantLoadingVariant {
 }
 
 interface AiAssistantProps {
+  visible?: boolean;
   loading?: boolean;
   loadingVariant?: AiAssistantLoadingVariant;
   trackMouse?: boolean;
@@ -159,6 +160,7 @@ interface AiAssistantProps {
 const AiAssistantComponent: FunctionComponent<
   GroupProps & AiAssistantProps
 > = ({
+  visible = true,
   loading,
   loadingVariant = AiAssistantLoadingVariant.Normal,
   trackMouse,
@@ -337,6 +339,10 @@ const AiAssistantComponent: FunctionComponent<
       document.body.removeEventListener('mousemove', mousemoveHandler);
     };
   }, [trackMouse]);
+
+  if (!visible) {
+    return <></>;
+  }
 
   return (
     <mesh

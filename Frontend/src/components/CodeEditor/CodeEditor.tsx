@@ -27,6 +27,7 @@ import {
   executeCodeWithExpect,
   ExpectResults,
 } from '../../utils/executeCodeWithExpect';
+import { ModalFooter } from '../ModalFooter/ModalFooter';
 
 import './CodeEditor.css';
 
@@ -55,6 +56,10 @@ interface CodeEditorProps {
   onChange?: OnChange | undefined;
   onLanguageChange?: (language: CodeEditorLang) => void;
   onFontSizeChange?: (size: number) => void;
+  onExecutionResultsSubmit?: (
+    code: string | undefined,
+    language: CodeEditorLang,
+  ) => void;
 }
 
 export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
@@ -69,6 +74,7 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   onChange,
   onLanguageChange,
   onFontSizeChange,
+  onExecutionResultsSubmit,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
   const { themeInUi } = useContext(ThemeContext);
@@ -113,6 +119,14 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
     const executeCodeResult = executeCodeWithExpect(value);
     setExpectResults(executeCodeResult);
     setModalExpectResults(true);
+  };
+
+  const handleExecutionResultsSubmit = () => {
+    if (!onExecutionResultsSubmit) {
+      return;
+    }
+    setModalExpectResults(false);
+    onExecutionResultsSubmit(value, language);
   };
 
   useEffect(() => {
@@ -248,6 +262,13 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
           </Typography>
         </div>
         <Gap sizeRem={1.5} />
+        {onExecutionResultsSubmit && expectResultsPassed && (
+          <ModalFooter>
+            <Button variant="active" onClick={handleExecutionResultsSubmit}>
+              {localizationCaptions[LocalizationKey.ExecutionResultsSubmit]}
+            </Button>
+          </ModalFooter>
+        )}
       </Modal>
     </div>
   );

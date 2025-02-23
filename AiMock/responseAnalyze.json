@@ -1,0 +1,10 @@
+{
+  "codeReadability": "codeReadability",
+  "performance": "performance",
+  "bestPractice": "bestPractice",
+  "vulnerabilities": "vulnerabilities",
+  "comments": "comments",
+  "refactoringProposal": "refactoringProposal",
+  "referenceCode": "referenceCode",
+  "score": 10.0
+}

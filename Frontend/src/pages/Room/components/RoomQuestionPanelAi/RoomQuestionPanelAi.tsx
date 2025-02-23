@@ -37,15 +37,21 @@ import {
   VoiceRecognitionCommand,
 } from '../../hooks/useVoiceRecognitionAccum';
 import { AiAssistant, AiAssistantScriptName } from '../AiAssistant/AiAssistant';
-import { ReviewUserOpinion } from '../../../RoomAnaytics/components/ReviewUserOpinion/ReviewUserOpinion';
+import {
+  OtherComment,
+  ReviewUserOpinion,
+} from '../../../RoomAnaytics/components/ReviewUserOpinion/ReviewUserOpinion';
 import { AnalyticsUserReview } from '../../../../types/analytics';
-import { useAiAnswerSource } from '../../hooks/useAiAnswerSource';
+import { AiEndpoint, useAiAnswerSource } from '../../hooks/useAiAnswerSource';
 import { AuthContext } from '../../../../context/AuthContext';
 import { useThemedAiAvatar } from '../../../../hooks/useThemedAiAvatar';
 import {
   QuestionsTree,
   QuestionsTreeNode,
 } from '../../../../types/questionsTree';
+import { RoomCodeEditor } from '../RoomCodeEditor/RoomCodeEditor';
+import { CodeEditorLang } from '../../../../types/question';
+import { AnyObject } from '../../../../types/anyObject';
 
 const notFoundCode = 404;
 const aiAssistantGoodRate = 6;
@@ -229,7 +235,41 @@ const getNextQuestion = (
   return getRandomQuestionWithExclude(nodes, excludedQuestions);
 };
 
+const getCustomCommets = (
+  lastValidAiAnswer: AnyObject | null,
+): OtherComment[] => {
+  if (!lastValidAiAnswer) {
+    return [];
+  }
+
+  const localizations = {
+    recommendation: LocalizationKey.Recommendation,
+    expected: LocalizationKey.ExampleOfCorrectAnswer,
+    performance: LocalizationKey.CodePerformance,
+    bestPractice: LocalizationKey.BestPractice,
+    vulnerabilities: LocalizationKey.Vulnerabilities,
+    comments: LocalizationKey.CodeComments,
+    refactoringProposal: LocalizationKey.RefactoringProposal,
+    referenceCode: LocalizationKey.ReferenceCode,
+  };
+
+  const comments = Object.entries(localizations)
+    .map(([key, value]) => {
+      const comment = lastValidAiAnswer[key];
+      if (!comment) {
+        return undefined;
+      }
+      return {
+        title: value,
+        value: comment,
+      };
+    })
+    .filter((comment) => !!comment);
+  return comments;
+};
+
 export interface RoomQuestionPanelAiProps {
+  questionWithCode: boolean;
   roomQuestionsLoading: boolean;
   roomQuestions: RoomQuestion[];
   initialQuestion?: RoomQuestion;
@@ -237,7 +277,12 @@ export interface RoomQuestionPanelAiProps {
 
 export const RoomQuestionPanelAi: FunctionComponent<
   RoomQuestionPanelAiProps
-> = ({ roomQuestionsLoading, roomQuestions, initialQuestion }) => {
+> = ({
+  questionWithCode,
+  roomQuestionsLoading,
+  roomQuestions,
+  initialQuestion,
+}) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
   const {
@@ -257,6 +302,10 @@ export const RoomQuestionPanelAi: FunctionComponent<
   const readOnly = roomParticipant?.userType !== 'Expert';
   const [roomQuestionEvaluation, setRoomQuestionEvaluation] =
     useState<RoomQuestionEvaluationValue | null>(null);
+  const [questionCode, setQuestionCode] = useState<string | undefined>('');
+  const [questionLanguage, setQuestionLanguage] = useState<CodeEditorLang>(
+    CodeEditorLang.Javascript,
+  );
   const [copilotAnswerOpen, setCopilotAnswerOpen] = useState(false);
   const startedByVoiceRef = useRef(false);
 
@@ -327,6 +376,10 @@ export const RoomQuestionPanelAi: FunctionComponent<
       questionId: initialQuestion?.id || '',
       theme: room?.questionTree?.name || '',
       userId: auth?.id || '',
+      taskDescription: initialQuestion?.value || '',
+      code: questionCode || '',
+      language: questionLanguage,
+      endpoint: questionWithCode ? AiEndpoint.analyze : AiEndpoint.examinee,
     });
 
   const themedAiAvatar = useThemedAiAvatar();
@@ -393,11 +446,14 @@ export const RoomQuestionPanelAi: FunctionComponent<
   }, []);
 
   useEffect(() => {
+    if (questionWithCode) {
+      return;
+    }
     if (recognitionCommand !== VoiceRecognitionCommand.RateMe) {
       return;
     }
     handleCopilotAnswerOpen();
-  }, [recognitionCommand, handleCopilotAnswerOpen]);
+  }, [questionWithCode, recognitionCommand, handleCopilotAnswerOpen]);
 
   useEffect(() => {
     if (!aiAnswerCompleted || !lastValidAiAnswer) {
@@ -542,6 +598,16 @@ export const RoomQuestionPanelAi: FunctionComponent<
     fetchRoomStartReview({ roomId: room.id });
   }, [room?.id, fetchRoomStartReview]);
 
+  const handleExecutionResultsSubmit = (
+    code: string | undefined,
+    language: CodeEditorLang,
+  ) => {
+    setQuestionCode(code);
+    setQuestionLanguage(language);
+    handleCopilotAnswerOpen();
+  };
+
+  const statusPanelVisible = questionWithCode ? copilotAnswerOpen : true;
   const firstLineCaption = initialQuestion
     ? initialQuestion.value
     : localizationCaptions[LocalizationKey.WaitingInterviewStart];
@@ -556,21 +622,36 @@ export const RoomQuestionPanelAi: FunctionComponent<
 
   return (
     <>
-      <div className="flex flex-col z-50">
-        <Typography size="xxxl" bold>
-          {firstLineCaption}
-        </Typography>
-        <Gap sizeRem={0.5} />
-        <Typography size="m">{secondLineCaption}</Typography>
-        {errorRoomActiveQuestion && (
-          <>
-            <Gap sizeRem={1} />
-            <Typography size="m" error>
-              {localizationCaptions[LocalizationKey.ErrorSendingActiveQuestion]}
-            </Typography>
-          </>
-        )}
+      <div className="absolute w-full h-full z-1">
+        <RoomCodeEditor
+          // TODO: Fix this hardcode ( https://github.com/sorface/interview/issues/650 )
+          language={CodeEditorLang.Javascript}
+          visible={!copilotAnswerOpen && questionWithCode}
+          onExecutionResultsSubmit={handleExecutionResultsSubmit}
+        />
       </div>
+
+      {statusPanelVisible && (
+        <div className="flex flex-col z-50">
+          <Typography size="xxxl" bold>
+            {firstLineCaption}
+          </Typography>
+          <Gap sizeRem={0.5} />
+          <Typography size="m">{secondLineCaption}</Typography>
+          {errorRoomActiveQuestion && (
+            <>
+              <Gap sizeRem={1} />
+              <Typography size="m" error>
+                {
+                  localizationCaptions[
+                    LocalizationKey.ErrorSendingActiveQuestion
+                  ]
+                }
+              </Typography>
+            </>
+          )}
+        </div>
+      )}
 
       {copilotAnswerOpen && (
         <div className="absolute w-full h-full flex items-center justify-center">
@@ -580,10 +661,11 @@ export const RoomQuestionPanelAi: FunctionComponent<
                 id: aiExpertId,
                 evaluation: {
                   mark: parseFloat(lastValidAiAnswer?.score) || null,
-                  review: lastValidAiAnswer?.reason,
-                  expected: lastValidAiAnswer?.expected,
-                  recommendation: lastValidAiAnswer?.recommendation,
+                  review:
+                    lastValidAiAnswer?.reason ||
+                    lastValidAiAnswer?.codeReadability,
                 },
+                otherComments: getCustomCommets(lastValidAiAnswer),
               }}
               allUsers={allUsersWithAiExpert}
             />
@@ -644,6 +726,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
       >
         <Canvas shadows camera={{ position: [0, 0.5, 6.5], fov: 38 }}>
           <AiAssistant
+            visible={!questionWithCode || copilotAnswerOpen}
             loading={loadingTotal}
             currentScript={aiAssistantScript}
           />

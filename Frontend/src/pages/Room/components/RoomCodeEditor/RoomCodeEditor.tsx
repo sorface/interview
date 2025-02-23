@@ -44,10 +44,17 @@ const remoteSelectionColor = 'var(--active)';
 
 interface RoomCodeEditorProps {
   visible: boolean;
+  language?: CodeEditorLang;
+  onExecutionResultsSubmit?: (
+    code: string | undefined,
+    language: CodeEditorLang,
+  ) => void;
 }
 
 export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   visible,
+  language,
+  onExecutionResultsSubmit,
 }) => {
   const auth = useContext(AuthContext);
   const {
@@ -280,7 +287,7 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
 
   return (
     <CodeEditor
-      language={codeEditorLanguage || defaultLanguage}
+      language={language || codeEditorLanguage || defaultLanguage}
       languages={Object.values(CodeEditorLang)}
       readOnly={viewerMode}
       value={value || ''}
@@ -288,6 +295,7 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
       onChange={handleChange}
       onLanguageChange={handleLanguageChange}
       onFontSizeChange={handleFontSizeChange}
+      onExecutionResultsSubmit={onExecutionResultsSubmit}
     />
   );
 };

@@ -10,16 +10,16 @@ import { useParticipantTypeLocalization } from '../../../../hooks/useParticipant
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../../localization';
 
-interface DetailedEvaluation {
-  recommendation?: string;
-  expected?: string;
+export interface OtherComment {
+  title: LocalizationKey;
+  value: string;
 }
 
 interface ReviewUserOpinionProps {
   user: {
     id: User['id'];
-    evaluation?: Partial<Omit<RoomQuestionEvaluation, 'id'>> &
-      DetailedEvaluation;
+    evaluation?: Partial<Omit<RoomQuestionEvaluation, 'id'>>;
+    otherComments?: OtherComment[];
   };
   allUsers: Map<User['id'], AnalyticsUserReview>;
 }
@@ -75,24 +75,15 @@ export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
         {user.evaluation?.review ??
           localizationCaptions[LocalizationKey.RoomReviewWaiting]}
       </Typography>
-      {user.evaluation?.recommendation && (
-        <div className="flex flex-col">
+      {user.otherComments?.map((comment) => (
+        <div key={`${comment.title}${comment.value}`} className="flex flex-col">
           <Gap sizeRem={1} />
           <Typography size="m" bold>
-            {localizationCaptions[LocalizationKey.Recommendation]}
+            {localizationCaptions[comment.title]}
           </Typography>
-          <Typography size="m">{user.evaluation.recommendation}</Typography>
+          <Typography size="m">{comment.value}</Typography>
         </div>
-      )}
-      {user.evaluation?.expected && (
-        <div className="flex flex-col">
-          <Gap sizeRem={1} />
-          <Typography size="m" bold>
-            {localizationCaptions[LocalizationKey.ExampleOfCorrectAnswer]}
-          </Typography>
-          <Typography size="m">{user.evaluation.expected}</Typography>
-        </div>
-      )}
+      ))}
     </div>
   );
 };
