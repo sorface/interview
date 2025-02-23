@@ -257,6 +257,14 @@ export const enum LocalizationKey {
   QuestionTreeExpandAll,
   QuestionTreeCollapseAll,
   QuestionTreeRootNode,
+  Recommendation,
+  ExampleOfCorrectAnswer,
+  Run,
+  ExpectsExecuteResults,
+  ExpectsExecuteOutput,
+  ExpectsExecuteOutputExpected,
+  ExpectsExecuteResultsPassed,
+  ExpectsExecuteResultsNotPassed,
 }
 
 export const LocalizationCaptions: Record<
@@ -556,6 +564,16 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.QuestionTreeExpandAll]: 'Expand all',
     [LocalizationKey.QuestionTreeCollapseAll]: 'Collapse all',
     [LocalizationKey.QuestionTreeRootNode]: 'Beginning',
+    [LocalizationKey.Recommendation]: 'Recommendation',
+    [LocalizationKey.ExampleOfCorrectAnswer]: 'Example of correct answer',
+    [LocalizationKey.Run]: 'Run',
+    [LocalizationKey.ExpectsExecuteResults]: 'Result of all expects execute',
+    [LocalizationKey.ExpectsExecuteOutput]: 'Output',
+    [LocalizationKey.ExpectsExecuteOutputExpected]: 'Expected output',
+    [LocalizationKey.ExpectsExecuteResultsPassed]:
+      'All checks passed successfully',
+    [LocalizationKey.ExpectsExecuteResultsNotPassed]:
+      'Not all tests were passed successfully',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -853,5 +871,16 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.QuestionTreeExpandAll]: 'Развернуть все',
     [LocalizationKey.QuestionTreeCollapseAll]: 'Свернуть все',
     [LocalizationKey.QuestionTreeRootNode]: 'Начало',
+    [LocalizationKey.Recommendation]: 'Рекомендация',
+    [LocalizationKey.ExampleOfCorrectAnswer]: 'Пример правильного ответа',
+    [LocalizationKey.Run]: 'Запустить',
+    [LocalizationKey.ExpectsExecuteResults]:
+      'Результат выполнения функций expect',
+    [LocalizationKey.ExpectsExecuteOutput]: 'Результат',
+    [LocalizationKey.ExpectsExecuteOutputExpected]: 'Ожидаемый результат',
+    [LocalizationKey.ExpectsExecuteResultsPassed]:
+      'Все проверки пройдены успешно',
+    [LocalizationKey.ExpectsExecuteResultsNotPassed]:
+      'Не все проверки пройдены успешно',
   },
 };

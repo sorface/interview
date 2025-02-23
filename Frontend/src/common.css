@@ -1,6 +1,9 @@
 .grid {
   display: grid;
 }
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
 .grid-cols-3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -535,6 +538,9 @@
 }
 .min-h-4 {
   min-height: 4rem;
+}
+.min-h-\[1\.91rem\] {
+  min-height: 1.91rem;
 }
 .w-fit {
   width: fit-content;
