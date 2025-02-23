@@ -348,8 +348,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
     (roomQuestion) => roomQuestion.state === 'Open',
   );
 
-  const readyToReview =
-    closedQuestions.length > 4 || openQuestions.length === 0;
+  const readyToReview = openQuestions.length === 0;
   const nextQuestionButtonLoading =
     !mergedRoomQuestionEvaluation ||
     loadingMergeRoomQuestionEvaluation ||
