@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@convergencelabs/monaco-collab-ext": "^0.4.0",
+    "@dagrejs/dagre": "^1.1.4",
     "@mediapipe/camera_utils": "^0.3.1675466862",
     "@mediapipe/selfie_segmentation": "^0.1.1675465747",
     "@monaco-editor/react": "^4.6.0",
@@ -21,6 +22,7 @@
     "@types/simple-peer": "^9.11.5",
     "@types/three": "^0.163.0",
     "@vitejs/plugin-react-swc": "^3.7.2",
+    "@xyflow/react": "^12.4.3",
     "http-proxy-middleware": "^2.0.6",
     "linkify-react": "^4.1.3",
     "monaco-editor": "^0.52.2",
@@ -34,6 +36,7 @@
     "simple-peer": "^9.11.1",
     "three": "^0.163.0",
     "typescript": "^4.9.5",
+    "versatile-tree": "^1.3.12",
     "vite": "^6.0.3",
     "vite-plugin-svgr": "^4.3.0",
     "vite-tsconfig-paths": "^5.1.4",

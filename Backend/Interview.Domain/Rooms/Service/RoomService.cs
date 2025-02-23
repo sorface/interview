@@ -1,7 +1,10 @@
 using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Storage;
+using Interview.Domain.Questions;
 using Interview.Domain.Questions.QuestionAnswers;
+using Interview.Domain.Questions.QuestionTreeById;
+using Interview.Domain.Questions.QuestionTreePage;
 using Interview.Domain.Reactions;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Request.Transcription;
@@ -192,7 +195,7 @@ public sealed class RoomService(
             .Include(e => e.Participants)
             .Include(e => e.Configuration)
             .Include(e => e.Timer)
-            .Include(e => e.Category)
+            .Include(e => e.QuestionTree)
             .Include(e => e.Questions).ThenInclude(e => e.Question).ThenInclude(e => e!.Answers)
             .Include(e => e.Questions).ThenInclude(e => e.Question).ThenInclude(e => e!.CodeEditor)
             .Select(e => new
@@ -248,11 +251,22 @@ public sealed class RoomService(
                             Lang = q.Question.CodeEditor.Lang,
                         },
                 }).ToList(),
-                Category = e.Category != null
-                    ? new RoomCategoryResponse { Id = e.Category.Id, Name = e.Category.Name }
+                QuestionTree = e.QuestionTree != null
+                    ? new QuestionTreeByIdResponse
+                    {
+                        Id = e.QuestionTree.Id,
+                        Name = e.QuestionTree.Name,
+                        RootQuestionSubjectTreeId = e.QuestionTree.RootQuestionSubjectTreeId,
+                        Tree = new List<QuestionTreeByIdResponseTree>(),
+                    }
                     : null,
             })
             .FirstOrDefaultAsync(room => room.Id == id, cancellationToken: cancellationToken) ?? throw NotFoundException.Create<Room>(id);
+
+        if (res.QuestionTree is not null)
+        {
+            await res.QuestionTree.FillTreeAsync(db, cancellationToken);
+        }
 
         return new RoomDetail
         {
@@ -272,7 +286,7 @@ public sealed class RoomService(
                 },
             ScheduledStartTime = res.ScheduledStartTime,
             Questions = res.Questions,
-            Category = res.Category,
+            QuestionTree = res.QuestionTree,
         };
     }
 
@@ -302,35 +316,36 @@ public sealed class RoomService(
         var experts = await FindByIdsOrErrorAsync(db.Users, requestExperts, "experts", cancellationToken);
         var examinees = await FindByIdsOrErrorAsync(db.Users, request.Examinees, "examinees", cancellationToken);
         var tags = await Tag.EnsureValidTagsAsync(db.Tag, request.Tags, cancellationToken);
-        var type = request.CategoryId is not null ? SERoomType.AI : SERoomType.Standard;
+        var type = request.QuestionTreeId is not null ? SERoomType.AI : SERoomType.Standard;
         var room = new Room(name, request.AccessType, type)
         {
             Tags = tags,
             ScheduleStartTime = request.ScheduleStartTime,
             Timer = CreateRoomTimer(request.DurationSec),
-            CategoryId = request.CategoryId,
+            QuestionTreeId = request.QuestionTreeId,
         };
 
-        if (request.CategoryId is not null)
+        if (request.QuestionTreeId is not null)
         {
-            var requiredQuestionIds = request.Questions.Select(e => e.Id).ToList();
-            var allCategories = await db.GetWithChildCategoriesAsync(request.CategoryId.Value, cancellationToken);
-            var questionsFromCategories = await db.Questions
-                .Where(e => e.CategoryId != null && allCategories.Contains(e.CategoryId.Value) && !requiredQuestionIds.Contains(e.Id))
-                .Select(e => e.Id)
+            var questionTree = await db.QuestionTree
+                .Select(e => new { Id = e.Id, Name = e.Name, RootQuestionSubjectTreeId = e.RootQuestionSubjectTreeId, })
+                .FirstAsync(e => e.Id == request.QuestionTreeId, cancellationToken);
+            var allSubjectTreeIds = await db.QuestionSubjectTree.GetAllChildrenAsync(questionTree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
+            var questionsFromTree = await db.QuestionSubjectTree.AsNoTracking()
+                .Where(e => allSubjectTreeIds.Contains(e.Id) && e.QuestionId != null)
+                .Select(e => new
+                {
+                    Id = e.QuestionId!.Value,
+                    e.Order,
+                })
                 .ToListAsync(cancellationToken);
 
-            var startOrder = request.Questions.Count > 0
-                ? request.Questions.Select(e => e.Order).Max() + 1
-
-                // first question should start from 0
-                : -1;
-            foreach (var questionsFromCategoryId in questionsFromCategories)
+            foreach (var question in questionsFromTree)
             {
                 request.Questions.Add(new RoomQuestionRequest
                 {
-                    Id = questionsFromCategoryId,
-                    Order = ++startOrder,
+                    Id = question.Id,
+                    Order = question.Order,
                 });
             }
         }
@@ -432,29 +447,45 @@ public sealed class RoomService(
             throw NotFoundException.Create<User>(roomId);
         }
 
+        if (foundRoom.QuestionTreeId is not null && request.QuestionTreeId is null)
+        {
+            throw new UserException("Question tree id should not be null");
+        }
+
+        if (foundRoom.QuestionTreeId is null && request.QuestionTreeId is not null)
+        {
+            throw new UserException("Question tree id should be null");
+        }
+
         EnsureAvailableRoomEdit(foundRoom);
         EnsureValidScheduleStartTime(request.ScheduleStartTime, foundRoom.ScheduleStartTime);
 
         var tags = await Tag.EnsureValidTagsAsync(db.Tag, request.Tags, cancellationToken);
 
-        if (request.CategoryId != null && request.CategoryId != (foundRoom.CategoryId ?? Guid.Empty))
+        if (request.QuestionTreeId != null && request.QuestionTreeId != (foundRoom.QuestionTreeId ?? Guid.Empty))
         {
             // When a user sets up a category, you must remove all questions from the room.
             request.Questions.Clear();
 
-            var allCategories = await db.GetWithChildCategoriesAsync(request.CategoryId.Value, cancellationToken);
-            var questionsFromCategories = await db.Questions
-                .Where(e => e.CategoryId != null && allCategories.Contains(e.CategoryId.Value))
-                .Select(e => e.Id)
+            var questionTree = await db.QuestionTree
+                .Select(e => new { Id = e.Id, Name = e.Name, RootQuestionSubjectTreeId = e.RootQuestionSubjectTreeId, })
+                .FirstAsync(e => e.Id == request.QuestionTreeId, cancellationToken);
+            var allSubjectTreeIds = await db.QuestionSubjectTree.GetAllChildrenAsync(questionTree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
+            var questions = await db.QuestionSubjectTree.AsNoTracking()
+                .Where(e => allSubjectTreeIds.Contains(e.Id) && e.QuestionId != null)
+                .Select(e => new
+                {
+                    Id = e.QuestionId!.Value,
+                    e.Order,
+                })
                 .ToListAsync(cancellationToken);
 
-            var startOrder = 0;
-            foreach (var questionsFromCategoryId in questionsFromCategories)
+            foreach (var question in questions)
             {
                 request.Questions.Add(new RoomQuestionRequest
                 {
-                    Id = questionsFromCategoryId,
-                    Order = startOrder++,
+                    Id = question.Id,
+                    Order = question.Order,
                 });
             }
         }
@@ -517,7 +548,7 @@ public sealed class RoomService(
 
         foundRoom.ScheduleStartTime = request.ScheduleStartTime;
         foundRoom.Name = name;
-        foundRoom.CategoryId = request.CategoryId;
+        foundRoom.QuestionTreeId = request.QuestionTreeId;
         foundRoom.Tags.Clear();
         foundRoom.Tags.AddRange(tags);
         db.Update(foundRoom);
@@ -625,14 +656,48 @@ public sealed class RoomService(
             .Include(e => e.Questions)
             .Include(e => e.Configuration)
             .Include(e => e.RoomStates)
-            .Include(e => e.Category)
+            .Include(e => e.QuestionTree)
             .Where(e => e.Id == roomId)
-            .Select(ActualRoomStateResponse.Mapper.Expression)
+            .Select(room => new ActualRoomStateResponse
+            {
+                Id = room.Id,
+                Name = room.Name,
+                ActiveQuestion = room.Questions.Select(q => new RoomStateQuestion
+                {
+                    Id = q.Id,
+                    Value = q.Question!.Value,
+                    State = q.State!,
+                }).FirstOrDefault(q => q.State == RoomQuestionState.Active),
+                CodeEditor = new CodeEditorStateResponse
+                {
+                    Content = room.Configuration == null ? null : room.Configuration.CodeEditorContent,
+                    Enabled = room.Configuration != null && room.Configuration.CodeEditorEnabled,
+                },
+                States = room.RoomStates.Select(e => new RoomStateResponse
+                {
+                    Payload = e.Payload,
+                    Type = e.Type,
+                }).ToList(),
+                QuestionTree = room.QuestionTree != null
+                    ? new QuestionTreeByIdResponse
+                    {
+                        Id = room.QuestionTree.Id,
+                        Name = room.QuestionTree.Name,
+                        RootQuestionSubjectTreeId = room.QuestionTree.RootQuestionSubjectTreeId,
+                        Tree = new List<QuestionTreeByIdResponseTree>(),
+                    }
+                    : null,
+            })
             .FirstOrDefaultAsync(cancellationToken);
 
         if (roomState == null)
         {
             throw NotFoundException.Create<Room>(roomId);
+        }
+
+        if (roomState.QuestionTree is not null)
+        {
+            await roomState.QuestionTree.FillTreeAsync(db, cancellationToken);
         }
 
         var spec = new RoomReactionsSpecification(roomId);

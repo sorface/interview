@@ -199,5 +199,26 @@ public enum EVPermission
 
     [Description("Getting a schedule of meetings")]
     GetRoomCalendar,
+
+    [Description("Getting the questions tree page")]
+    QuestionTreeFindPage,
+
+    [Description("Getting the archived questions tree page")]
+    QuestionTreeFindArchivedPage,
+
+    [Description("Getting the question tree by id")]
+    GetQuestionTreeById,
+
+    [Description("Getting archive the question tree by id")]
+    GetArchiveQuestionTreeById,
+
+    [Description("Upsert question tree")]
+    UpsertQuestionTree,
+
+    [Description("Archiving a question tree")]
+    QuestionTreeArchive,
+
+    [Description("Unarchiving the question tree")]
+    QuestionTreeUnarchive,
 #pragma warning restore SA1602
 }

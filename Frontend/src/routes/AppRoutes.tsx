@@ -20,6 +20,8 @@ import { RoomReview } from '../pages/RoomReview/RoomReview';
 import { RoomAnaytics } from '../pages/RoomAnaytics/RoomAnaytics';
 import { LogoutError } from '../pages/LogoutError/LogoutError';
 import { QuestionsArchive } from '../pages/QuestionsArchive/QuestionsArchive';
+import { QuestionTrees } from '../pages/QuestionTrees/QuestionTrees';
+import { QuestionTreeCreate } from '../pages/QuestionTreeCreate/QuestionTreeCreate';
 
 interface AppRoutesProps {
   user: User | null;
@@ -145,6 +147,30 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <Categories />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.questionTrees}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <QuestionTrees />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.questionTreeCreate}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <QuestionTreeCreate edit={false} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.questionTreeEdit}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <QuestionTreeCreate edit={true} />
                 </ProtectedRoute>
               }
             />

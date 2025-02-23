@@ -464,6 +464,9 @@
 .ml-auto {
   margin-left: auto;
 }
+.ml-1 {
+  margin-left: 1rem;
+}
 .mr-0\.25 {
   margin-right: 0.25rem;
 }

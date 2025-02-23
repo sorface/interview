@@ -320,6 +320,91 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.ToTable("QuestionAnswers");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionSubjectTree", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("ParentQuestionSubjectTreeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("QuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<char>("Type")
+                        .HasColumnType("character(1)")
+                        .HasComment("Available values: [Empty: E, Question: Q]");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ParentQuestionSubjectTreeId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("QuestionSubjectTree");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionTree", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("ParentQuestionTreeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RootQuestionSubjectTreeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ParentQuestionTreeId");
+
+                    b.HasIndex("RootQuestionSubjectTreeId");
+
+                    b.ToTable("QuestionTree");
+                });
+
             modelBuilder.Entity("Interview.Domain.Reactions.Reaction", b =>
                 {
                     b.Property<Guid>("Id")
@@ -403,9 +488,6 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasColumnType("integer")
                         .HasDefaultValue(0);
 
-                    b.Property<Guid?>("CategoryId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
 
@@ -416,6 +498,9 @@ namespace Interview.Migrations.Postgres.Migrations
                         .IsRequired()
                         .HasMaxLength(70)
                         .HasColumnType("character varying(70)");
+
+                    b.Property<Guid?>("QuestionTreeId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("ScheduleStartTime")
                         .HasColumnType("timestamp without time zone");
@@ -438,9 +523,9 @@ namespace Interview.Migrations.Postgres.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
-
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("QuestionTreeId");
 
                     b.ToTable("Rooms");
                 });
@@ -915,9 +1000,23 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
+                            Id = new Guid("1119039f-8127-43dc-ac11-247fc4d221d3"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "GetArchiveQuestionTreeById",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
                             Id = new Guid("bc98d0b8-b4a3-4b66-b8c1-db1fca0647e0"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "GetCategoryById",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("8f12692d-8e94-4409-aaef-84f2ceaacd5d"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "GetQuestionTreeById",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -981,6 +1080,34 @@ namespace Interview.Migrations.Postgres.Migrations
                             Id = new Guid("6f652e58-1229-4a3c-b8cb-328bf817ad54"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "QuestionFindPageArchive",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("e6b59bae-2f2c-40f3-8587-49a3e703ac44"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "QuestionTreeArchive",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("badfc74c-4f2f-4b53-9b46-763b28676009"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "QuestionTreeFindArchivedPage",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("2e1670ec-f9d2-4cb8-bb57-f6239b16f24f"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "QuestionTreeFindPage",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("1ee1e860-a1dc-4def-a191-1cbac8956a90"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "QuestionTreeUnarchive",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -1226,6 +1353,13 @@ namespace Interview.Migrations.Postgres.Migrations
                             Id = new Guid("9f020c9e-e0b4-4e6d-9fb3-38ba44cfa3f9"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "TranscriptionGet",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("03b8bdca-dda6-4063-915b-31bf0a2dba74"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "UpsertQuestionTree",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -1560,6 +1694,50 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Navigation("Question");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionSubjectTree", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Questions.QuestionSubjectTree", "ParentQuestionSubjectTree")
+                        .WithMany()
+                        .HasForeignKey("ParentQuestionSubjectTreeId");
+
+                    b.HasOne("Interview.Domain.Questions.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ParentQuestionSubjectTree");
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionTree", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Questions.QuestionTree", "ParentQuestionTree")
+                        .WithMany()
+                        .HasForeignKey("ParentQuestionTreeId");
+
+                    b.HasOne("Interview.Domain.Questions.QuestionSubjectTree", "RootQuestionSubjectTree")
+                        .WithMany()
+                        .HasForeignKey("RootQuestionSubjectTreeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ParentQuestionTree");
+
+                    b.Navigation("RootQuestionSubjectTree");
+                });
+
             modelBuilder.Entity("Interview.Domain.Reactions.Reaction", b =>
                 {
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
@@ -1586,17 +1764,17 @@ namespace Interview.Migrations.Postgres.Migrations
 
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>
                 {
-                    b.HasOne("Interview.Domain.Categories.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId");
-
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
-                    b.Navigation("Category");
+                    b.HasOne("Interview.Domain.Questions.QuestionTree", "QuestionTree")
+                        .WithMany()
+                        .HasForeignKey("QuestionTreeId");
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("QuestionTree");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.RoomConfigurations.RoomConfiguration", b =>

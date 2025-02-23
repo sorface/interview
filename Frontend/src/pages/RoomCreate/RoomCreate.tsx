@@ -8,9 +8,10 @@ import React, {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  categoriesApiDeclaration,
   CreateRoomBody,
-  GetCategoriesParams,
+  GetPageQuestionsTreeResponse,
+  GetQuestionsTreesParams,
+  questionTreeApiDeclaration,
   RoomEditBody,
   RoomIdParam,
   roomInviteApiDeclaration,
@@ -37,13 +38,14 @@ import { RoomCreateField } from './RoomCreateField/RoomCreateField';
 import { ModalWithProgressWarning } from '../../components/ModalWithProgressWarning/ModalWithProgressWarning';
 import { Button } from '../../components/Button/Button';
 import { padTime } from '../../utils/padTime';
-import { Category } from '../../types/category';
 import { Question } from '../../types/question';
 import { QuestionItem } from '../../components/QuestionItem/QuestionItem';
 import { SwitcherButton } from '../../components/SwitcherButton/SwitcherButton';
 import { DragNDropList } from '../../components/DragNDropList/DragNDropList';
 import { RoomQuestionsSelector } from './RoomQuestionsSelector/RoomQuestionsSelector';
 import { sortRoomQuestion } from '../../utils/sortRoomQestions';
+import { TreeViewer } from '../../components/TreeViewer/TreeViewer';
+import { QuestionsTree } from '../../types/questionsTree';
 
 const nameFieldName = 'roomName';
 const dateFieldName = 'roomDate';
@@ -123,7 +125,7 @@ enum CreationStep {
 
 type RoomFields = {
   name: string;
-  categoryId: string;
+  questionTreeId: string;
   date: string;
   startTime: string;
   endTime: string;
@@ -173,20 +175,25 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     data: roomInvitesData,
   } = apiRoomInvitesState;
 
+  const { apiMethodState: questionTreesState, fetchData: fetchQuestionTrees } =
+    useApiMethod<GetPageQuestionsTreeResponse, GetQuestionsTreesParams>(
+      questionTreeApiDeclaration.getPage,
+    );
   const {
-    apiMethodState: rootCategoriesState,
-    fetchData: fetchRootCategories,
-  } = useApiMethod<Category[], GetCategoriesParams>(
-    categoriesApiDeclaration.getPage,
-  );
+    process: { loading: questionTreesLoading, error: questionTreesError },
+    data: questionTrees,
+  } = questionTreesState;
+
+  const { apiMethodState: questionTreeGetState, fetchData: fetchQuestionTree } =
+    useApiMethod<QuestionsTree, string>(questionTreeApiDeclaration.get);
   const {
-    process: { loading: rootCategoriesLoading, error: rootCategoriesError },
-    data: rootCategories,
-  } = rootCategoriesState;
+    process: { loading: questionTreeLoading, error: questionTreeError },
+    data: questionTree,
+  } = questionTreeGetState;
 
   const [roomFields, setRoomFields] = useState<RoomFields>({
     name: '',
-    categoryId: '',
+    questionTreeId: '',
     date: formatDate(new Date()),
     startTime: aiRoom ? formatTime(getAiRoomStartDate()) : '',
     endTime: aiRoom ? formatTime(getAiRoomEndDate()) : '',
@@ -199,6 +206,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     CreationStep.Step1,
   );
   const [questionsView, setQuestionsView] = useState(false);
+  const [displayTreeViewer, setDisplayTreeViewer] = useState(false);
   const [uiError, setUiError] = useState('');
   const modalTitle = editRoomId
     ? localizationCaptions[LocalizationKey.EditRoom]
@@ -208,13 +216,12 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
   const totalError = error || errorRoom || errorRoomEdit || uiError;
 
   useEffect(() => {
-    fetchRootCategories({
+    fetchQuestionTrees({
       name: '',
       PageNumber: 1,
       PageSize: 30,
-      showOnlyWithoutParent: true,
     });
-  }, [fetchRootCategories]);
+  }, [fetchQuestionTrees]);
 
   useEffect(() => {
     if (!editRoomId) {
@@ -260,9 +267,27 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     });
   }, [createdRoom, editedRoom, fetchRoomInvites]);
 
+  useEffect(() => {
+    if (!roomFields.questionTreeId) {
+      return;
+    }
+    fetchQuestionTree(roomFields.questionTreeId);
+  }, [roomFields.questionTreeId]);
+
+  useEffect(() => {
+    if (questionTreeLoading) {
+      setDisplayTreeViewer(false);
+      return;
+    }
+    if (questionTree) {
+      setDisplayTreeViewer(true);
+      return;
+    }
+  }, [questionTreeLoading, questionTree]);
+
   const getUiError = () => {
-    if (aiRoom && !roomFields.categoryId) {
-      return localizationCaptions[LocalizationKey.EmptyRoomCategoryError];
+    if (aiRoom && !roomFields.questionTreeId) {
+      return localizationCaptions[LocalizationKey.EmptyRoomQuestionTreeError];
     }
     if (!aiRoom && selectedQuestions.length === 0) {
       return localizationCaptions[LocalizationKey.RoomEmptyQuestionsListError];
@@ -310,7 +335,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         name: roomFields.name,
         ...(aiRoom
           ? {
-              categoryId: roomFields.categoryId,
+              questionTreeId: roomFields.questionTreeId,
             }
           : {
               questions: selectedQuestions.map((question, index) => ({
@@ -326,7 +351,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         name: roomFields.name,
         ...(aiRoom
           ? {
-              categoryId: roomFields.categoryId,
+              questionTreeId: roomFields.questionTreeId,
             }
           : {
               questions: selectedQuestions.map((question, index) => ({
@@ -353,13 +378,13 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
       });
     };
 
-  const handleChangeCategoryField = (
+  const handleChangeQuestionTreeField = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const [id, name] = e.target.value.split('|');
     setRoomFields({
       ...roomFields,
-      categoryId: id,
+      questionTreeId: id,
       name: name,
     });
   };
@@ -540,41 +565,57 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         )}
 
         {aiRoom && (
-          <RoomCreateField.Wrapper className="w-full max-w-15.75">
-            <RoomCreateField.Label>
-              <label htmlFor="rootCategory">
+          <RoomCreateField.Wrapper className="w-full">
+            <div className="">
+              <label htmlFor="questionTree">
                 <Typography size="m" bold>
-                  {localizationCaptions[LocalizationKey.Category]}
+                  {localizationCaptions[LocalizationKey.QuestionTree]}
                 </Typography>
               </label>
-            </RoomCreateField.Label>
+              <Gap sizeRem={0.5} />
+            </div>
             <RoomCreateField.Content>
-              {rootCategoriesError && (
+              {questionTreesError && (
                 <Typography error size="m">
-                  {rootCategoriesError}
+                  {questionTreesError}
                 </Typography>
               )}
-              {rootCategoriesLoading ? (
+              {questionTreesLoading ? (
                 <Loader />
               ) : (
-                <select
-                  id="rootCategory"
-                  className="w-full"
-                  defaultValue={roomFields.categoryId}
-                  onChange={handleChangeCategoryField}
-                >
-                  <option value="">
-                    {localizationCaptions[LocalizationKey.NotSelected]}
-                  </option>
-                  {rootCategories?.map((rootCategory) => (
-                    <option
-                      key={rootCategory.id}
-                      value={`${rootCategory.id}|${rootCategory.name}`}
-                    >
-                      {rootCategory.name}
+                <div>
+                  <select
+                    id="questionTree"
+                    className="w-full"
+                    defaultValue={roomFields.questionTreeId}
+                    onChange={handleChangeQuestionTreeField}
+                  >
+                    <option value="">
+                      {localizationCaptions[LocalizationKey.NotSelected]}
                     </option>
-                  ))}
-                </select>
+                    {questionTrees?.data.map((questionTree) => (
+                      <option
+                        key={questionTree.id}
+                        value={`${questionTree.id}|${questionTree.name}`}
+                      >
+                        {questionTree.name}
+                      </option>
+                    ))}
+                  </select>
+                  {questionTreeError && (
+                    <Typography error size="m">
+                      {questionTreeError}
+                    </Typography>
+                  )}
+                  {displayTreeViewer && questionTree && (
+                    <>
+                      <Gap sizeRem={0.75} />
+                      <div style={{ width: '100%', height: '500px' }}>
+                        <TreeViewer tree={questionTree.tree} />
+                      </div>
+                    </>
+                  )}
+                </div>
               )}
             </RoomCreateField.Content>
           </RoomCreateField.Wrapper>

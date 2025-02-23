@@ -79,6 +79,10 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
 
     public DbSet<RoomReview> RoomReview { get; private set; } = null!;
 
+    public DbSet<QuestionTree> QuestionTree { get; private set; } = null!;
+
+    public DbSet<QuestionSubjectTree> QuestionSubjectTree { get; private set; } = null!;
+
     public async Task<HashSet<Guid>> GetWithChildCategoriesAsync(Guid categoryId, CancellationToken cancellationToken)
     {
         var res = new HashSet<Guid> { categoryId };

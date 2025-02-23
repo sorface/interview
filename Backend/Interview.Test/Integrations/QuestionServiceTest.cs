@@ -8,6 +8,7 @@ using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Questions.Services;
+using Interview.Domain.Questions.UpsertQuestionTree;
 using Interview.Domain.Reactions;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomConfigurations;
@@ -610,9 +611,12 @@ public class QuestionServiceTest
             questionRepository,
             questionArchiveRepository,
             archiveService,
+            new ArchiveService<QuestionTree>(appDbContext),
+            new ArchiveService<QuestionSubjectTree>(appDbContext),
             tagRepository,
             aRoomMembershipChecker,
             currentUser,
+            new QuestionTreeUpsert(appDbContext),
             appDbContext);
     }
 }

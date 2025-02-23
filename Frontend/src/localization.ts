@@ -48,6 +48,7 @@ export const enum LocalizationKey {
   CloselWithoutSave,
   Stay,
   Error,
+  Loading,
   NotSelected,
   QuestionCreatedSuccessfully,
   QuestionUpdatedSuccessfully,
@@ -207,11 +208,10 @@ export const enum LocalizationKey {
   AnswerDetails,
   QuestionAnswerDetails,
   EmptyRoomNameError,
-  EmptyRoomCategoryError,
+  EmptyRoomQuestionTreeError,
   RoomEmptyStartTimeError,
   RoomStartTimeMustBeGreaterError,
   RoomEmptyQuestionsListError,
-  RoomEmptyCategoryError,
   InterviewHistoryTitle,
   RoomReviewSave,
   RoomReviewAlreadyGiven,
@@ -241,6 +241,22 @@ export const enum LocalizationKey {
   LetsBeginDescription,
   LetsBeginCommand,
   HomeDescription,
+  QuestionTreesPageName,
+  CreateQuestionTree,
+  QuestionTree,
+  QuestionTreeName,
+  QuestionTreeNodeDelete,
+  QuestionTreeNodeNewItemBelow,
+  QuestionTreeNodeNewItemInside,
+  QuestionTreeNodeMoveUp,
+  QuestionTreeNodeMoveDown,
+  QuestionTreeNodeMoveLeft,
+  QuestionTreeNodeMoveRight,
+  QuestionTreeCreatedSuccessfully,
+  QuestionTreeUpdatedSuccessfully,
+  QuestionTreeExpandAll,
+  QuestionTreeCollapseAll,
+  QuestionTreeRootNode,
   Recommendation,
   ExampleOfCorrectAnswer,
   Run,
@@ -305,6 +321,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.CloselWithoutSave]: 'Exit without saving',
     [LocalizationKey.Stay]: 'Stay',
     [LocalizationKey.Error]: 'Error',
+    [LocalizationKey.Loading]: 'Loading',
     [LocalizationKey.NotSelected]: 'Not selected',
     [LocalizationKey.QuestionCreatedSuccessfully]:
       'Question created successfully',
@@ -483,16 +500,14 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.AnswerDetails]: 'Answer details',
     [LocalizationKey.QuestionAnswerDetails]: 'Question answer details',
     [LocalizationKey.EmptyRoomNameError]: 'Please provide the meeting name',
-    [LocalizationKey.EmptyRoomCategoryError]:
-      'Please provide the meeting category',
+    [LocalizationKey.EmptyRoomQuestionTreeError]:
+      'Please provide the question tree',
     [LocalizationKey.RoomEmptyStartTimeError]:
       'Please enter meeting start time',
     [LocalizationKey.RoomStartTimeMustBeGreaterError]:
       'Meeting start time must be greater than the current time',
     [LocalizationKey.RoomEmptyQuestionsListError]:
       'Please add questions to the list of questions',
-    [LocalizationKey.RoomEmptyCategoryError]:
-      'Please select a meeting category',
     [LocalizationKey.InterviewHistoryTitle]: 'Interview history',
     [LocalizationKey.RoomReviewAlreadyGiven]:
       'You have already given feedback on the interview. Waiting for evaluation from other participants.',
@@ -531,6 +546,24 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.LetsBeginCommand]: "let's begin",
     [LocalizationKey.HomeDescription]:
       'AI interviews, video calls,\nquestion database.',
+    [LocalizationKey.QuestionTreesPageName]: 'Question trees',
+    [LocalizationKey.CreateQuestionTree]: 'Create question trees',
+    [LocalizationKey.QuestionTree]: 'Question tree',
+    [LocalizationKey.QuestionTreeName]: 'Question tree name',
+    [LocalizationKey.QuestionTreeNodeDelete]: 'Delete',
+    [LocalizationKey.QuestionTreeNodeNewItemBelow]: 'New item below',
+    [LocalizationKey.QuestionTreeNodeNewItemInside]: 'New item inside',
+    [LocalizationKey.QuestionTreeNodeMoveUp]: 'Move up',
+    [LocalizationKey.QuestionTreeNodeMoveDown]: 'Move down',
+    [LocalizationKey.QuestionTreeNodeMoveLeft]: 'Move out',
+    [LocalizationKey.QuestionTreeNodeMoveRight]: 'Move in',
+    [LocalizationKey.QuestionTreeCreatedSuccessfully]:
+      'Question tree created successfully',
+    [LocalizationKey.QuestionTreeUpdatedSuccessfully]:
+      'Question tree updated successfully',
+    [LocalizationKey.QuestionTreeExpandAll]: 'Expand all',
+    [LocalizationKey.QuestionTreeCollapseAll]: 'Collapse all',
+    [LocalizationKey.QuestionTreeRootNode]: 'Beginning',
     [LocalizationKey.Recommendation]: 'Recommendation',
     [LocalizationKey.ExampleOfCorrectAnswer]: 'Example of correct answer',
     [LocalizationKey.Run]: 'Run',
@@ -592,6 +625,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.CloselWithoutSave]: 'Выйти без сохранения',
     [LocalizationKey.Stay]: 'Остаться',
     [LocalizationKey.Error]: 'Ошибка',
+    [LocalizationKey.Loading]: 'Загрузка',
     [LocalizationKey.NotSelected]: 'Не выбрано',
     [LocalizationKey.QuestionCreatedSuccessfully]: 'Вопрос успешно создан',
     [LocalizationKey.QuestionUpdatedSuccessfully]: 'Вопрос успешно обновлён',
@@ -770,16 +804,14 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.AnswerDetails]: 'Детали ответа',
     [LocalizationKey.QuestionAnswerDetails]: 'Детали ответа на вопрос',
     [LocalizationKey.EmptyRoomNameError]: 'Пожалуйста, укажите имя встречи',
-    [LocalizationKey.EmptyRoomCategoryError]:
-      'Пожалуйста, укажите категорию встречи',
+    [LocalizationKey.EmptyRoomQuestionTreeError]:
+      'Пожалуйста, укажите дерево вопросов',
     [LocalizationKey.RoomEmptyStartTimeError]:
       'Пожалуйста, укажите время начала встречи',
     [LocalizationKey.RoomStartTimeMustBeGreaterError]:
       'Время начала встречи должно быть больше текущего времени',
     [LocalizationKey.RoomEmptyQuestionsListError]:
       'Пожалуйста, добавьте вопросы в список вопросов',
-    [LocalizationKey.RoomEmptyCategoryError]:
-      'Пожалуйста, выберите категорию встречи',
     [LocalizationKey.InterviewHistoryTitle]: 'История собеседований',
     [LocalizationKey.RoomReviewAlreadyGiven]:
       'Вы уже дали отзыв о собеседовании. Ожидание оценки от остальных участников.',
@@ -821,6 +853,24 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.LetsBeginCommand]: 'давай начнём',
     [LocalizationKey.HomeDescription]:
       'Собеседования с AI, видеозвонки,\nбаза вопросов.',
+    [LocalizationKey.QuestionTreesPageName]: 'Деревья вопросов',
+    [LocalizationKey.CreateQuestionTree]: 'Создать дерево вопросов',
+    [LocalizationKey.QuestionTree]: 'Дерево вопросов',
+    [LocalizationKey.QuestionTreeName]: 'Имя дерева вопросов',
+    [LocalizationKey.QuestionTreeNodeDelete]: 'Удалить',
+    [LocalizationKey.QuestionTreeNodeNewItemBelow]: 'Новый элемент рядом',
+    [LocalizationKey.QuestionTreeNodeNewItemInside]: 'Новый элемент внутри',
+    [LocalizationKey.QuestionTreeNodeMoveUp]: 'Переместить вверх',
+    [LocalizationKey.QuestionTreeNodeMoveDown]: 'Переместить вниз',
+    [LocalizationKey.QuestionTreeNodeMoveLeft]: 'Переместить наружу',
+    [LocalizationKey.QuestionTreeNodeMoveRight]: 'Переместить внутрь',
+    [LocalizationKey.QuestionTreeCreatedSuccessfully]:
+      'Дерево вопросов создано успешно',
+    [LocalizationKey.QuestionTreeUpdatedSuccessfully]:
+      'Дерево вопросов успешно обновлено',
+    [LocalizationKey.QuestionTreeExpandAll]: 'Развернуть все',
+    [LocalizationKey.QuestionTreeCollapseAll]: 'Свернуть все',
+    [LocalizationKey.QuestionTreeRootNode]: 'Начало',
     [LocalizationKey.Recommendation]: 'Рекомендация',
     [LocalizationKey.ExampleOfCorrectAnswer]: 'Пример правильного ответа',
     [LocalizationKey.Run]: 'Запустить',
