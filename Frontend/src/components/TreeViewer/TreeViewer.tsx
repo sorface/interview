@@ -11,12 +11,12 @@ import {
 import dagre from '@dagrejs/dagre';
 import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme } from '../../context/ThemeContext';
-import { TreeNode } from '../../types/tree';
+import { TreeNode, TreeNodeType } from '../../types/tree';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { LocalizationKey } from '../../localization';
 
 import '@xyflow/react/dist/style.css';
 import './TreeViewer.css';
-import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
-import { LocalizationKey } from '../../localization';
 
 const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
@@ -63,12 +63,18 @@ const getLayoutedElements = (
 
 const defaultPosition = { x: 0, y: 0 };
 
-const getNodes = (tree: TreeNode[], defaultLabel: string): Node[] => {
-  return tree.map((node) => ({
-    id: node.id,
-    position: defaultPosition,
-    data: { label: node.question?.value || defaultLabel },
-  }));
+const getNodes = (tree: TreeNode[], emptyNodeLabel: string): Node[] => {
+  return tree.map((node) => {
+    const label =
+      node.type === TreeNodeType.Empty
+        ? emptyNodeLabel
+        : node.question?.value || '';
+    return {
+      id: node.id,
+      position: defaultPosition,
+      data: { label },
+    };
+  });
 };
 
 const getEdges = (tree: TreeNode[]): Edge[] => {
