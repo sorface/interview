@@ -253,18 +253,17 @@ const getCustomCommets = (
     referenceCode: LocalizationKey.ReferenceCode,
   };
 
-  const comments = Object.entries(localizations)
-    .map(([key, value]) => {
-      const comment = lastValidAiAnswer[key];
-      if (!comment) {
-        return undefined;
-      }
-      return {
-        title: value,
-        value: comment,
-      };
-    })
-    .filter((comment) => !!comment);
+  const comments: OtherComment[] = [];
+  Object.entries(localizations).forEach(([key, value]) => {
+    const comment = lastValidAiAnswer[key];
+    if (!comment) {
+      return;
+    }
+    comments.push({
+      title: value,
+      value: comment,
+    });
+  });
   return comments;
 };
 
