@@ -24,8 +24,8 @@ import { Button } from '../Button/Button';
 import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';
 import {
+  ExecuteCodeResult,
   executeCodeWithExpect,
-  ExpectResults,
 } from '../../utils/executeCodeWithExpect';
 import { ModalFooter } from '../ModalFooter/ModalFooter';
 
@@ -79,8 +79,10 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   const localizationCaptions = useLocalizationCaptions();
   const { themeInUi } = useContext(ThemeContext);
   const [fontSize, setFontSize] = useState(defaultCodeEditorFontSize);
-  const [expectResults, setExpectResults] = useState<ExpectResults>([]);
-  const expectResultsPassed = expectResults.every(
+  const [expectResult, setExpectResult] = useState<ExecuteCodeResult>({
+    results: [],
+  });
+  const expectResultsPassed = expectResult.results.every(
     (expectResult) => expectResult.passed,
   );
   const [modalExpectResults, setModalExpectResults] = useState(false);
@@ -117,7 +119,7 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
 
   const handleExecuteCode = () => {
     const executeCodeResult = executeCodeWithExpect(value);
-    setExpectResults(executeCodeResult);
+    setExpectResult(executeCodeResult);
     setModalExpectResults(true);
   };
 
@@ -218,57 +220,74 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
         onClose={handleModalExpectClose}
         open={modalExpectResults}
       >
-        <div className="grid grid-cols-2">
-          <Typography size="l">
-            {localizationCaptions[LocalizationKey.ExpectsExecuteOutput]}
-          </Typography>
-          <Typography size="l">
-            {localizationCaptions[LocalizationKey.ExpectsExecuteOutputExpected]}
-          </Typography>
-          {expectResults
-            .sort(
-              (expectResult1, expectResult2) =>
-                +expectResult1.passed - +expectResult2.passed,
-            )
-            .map((expectResult) => (
-              <Fragment key={expectResult.id}>
-                <Typography
-                  error={!expectResult.passed}
-                  secondary={expectResult.passed}
-                  size="m"
-                >
-                  {JSON.stringify(expectResult.arguments[0])}
-                </Typography>
-                <Typography
-                  error={!expectResult.passed}
-                  secondary={expectResult.passed}
-                  size="m"
-                >
-                  {JSON.stringify(expectResult.arguments[1])}
-                </Typography>
-              </Fragment>
-            ))}
-        </div>
-        <Gap sizeRem={1.5} />
-        <div>
-          <Typography size="m" error={!expectResultsPassed}>
-            {
-              localizationCaptions[
-                expectResultsPassed
-                  ? LocalizationKey.ExpectsExecuteResultsPassed
-                  : LocalizationKey.ExpectsExecuteResultsNotPassed
-              ]
-            }
-          </Typography>
-        </div>
-        <Gap sizeRem={1.5} />
-        {onExecutionResultsSubmit && expectResultsPassed && (
-          <ModalFooter>
-            <Button variant="active" onClick={handleExecutionResultsSubmit}>
-              {localizationCaptions[LocalizationKey.ExecutionResultsSubmit]}
-            </Button>
-          </ModalFooter>
+        {!expectResult.error && (
+          <div className="grid grid-cols-2">
+            <Typography size="l">
+              {localizationCaptions[LocalizationKey.ExpectsExecuteOutput]}
+            </Typography>
+            <Typography size="l">
+              {
+                localizationCaptions[
+                  LocalizationKey.ExpectsExecuteOutputExpected
+                ]
+              }
+            </Typography>
+            {expectResult.results
+              .sort(
+                (expectResult1, expectResult2) =>
+                  +expectResult1.passed - +expectResult2.passed,
+              )
+              .map((expectResult) => (
+                <Fragment key={expectResult.id}>
+                  <Typography
+                    error={!expectResult.passed}
+                    secondary={expectResult.passed}
+                    size="m"
+                  >
+                    {JSON.stringify(expectResult.arguments[0])}
+                  </Typography>
+                  <Typography
+                    error={!expectResult.passed}
+                    secondary={expectResult.passed}
+                    size="m"
+                  >
+                    {JSON.stringify(expectResult.arguments[1])}
+                  </Typography>
+                </Fragment>
+              ))}
+          </div>
         )}
+        {!!expectResult.error && (
+          <Typography size="m" error>
+            {expectResult.error}
+          </Typography>
+        )}
+        {!expectResult.error && (
+          <>
+            <Gap sizeRem={1.5} />
+            <div>
+              <Typography size="m" error={!expectResultsPassed}>
+                {
+                  localizationCaptions[
+                    expectResultsPassed
+                      ? LocalizationKey.ExpectsExecuteResultsPassed
+                      : LocalizationKey.ExpectsExecuteResultsNotPassed
+                  ]
+                }
+              </Typography>
+            </div>
+          </>
+        )}
+        <Gap sizeRem={1.5} />
+        {onExecutionResultsSubmit &&
+          expectResultsPassed &&
+          !expectResult.error && (
+            <ModalFooter>
+              <Button variant="active" onClick={handleExecutionResultsSubmit}>
+                {localizationCaptions[LocalizationKey.ExecutionResultsSubmit]}
+              </Button>
+            </ModalFooter>
+          )}
       </Modal>
     </div>
   );

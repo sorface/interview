@@ -14,6 +14,11 @@ const expectCallsReturnCode = `
 
 type Arg = number | string | AnyObject;
 
+export interface ExecuteCodeResult {
+  results: ExpectResults;
+  error?: string;
+}
+
 export type ExpectResults = Array<{
   id: number;
   arguments: [Arg, Arg];
@@ -22,17 +27,28 @@ export type ExpectResults = Array<{
 
 export const executeCodeWithExpect = (
   code: string | undefined,
-): ExpectResults => {
-  const executeCodeWithExpect = new Function(
-    expectCode + code + expectCallsReturnCode,
-  ) as () => Array<Arg[]>;
+): ExecuteCodeResult => {
+  try {
+    const executeCodeWithExpect = new Function(
+      expectCode + code + expectCallsReturnCode,
+    ) as () => Array<Arg[]>;
 
-  return executeCodeWithExpect().map(([result, expect]) => {
-    const passed = deepEqual(result, expect);
+    const executeResult = executeCodeWithExpect();
+
     return {
-      id: Math.random(),
-      arguments: [result, expect],
-      passed,
+      results: executeResult.map(([result, expect]) => {
+        const passed = deepEqual(result, expect);
+        return {
+          id: Math.random(),
+          arguments: [result, expect],
+          passed,
+        };
+      }),
     };
-  });
+  } catch (error) {
+    return {
+      results: [],
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
 };
