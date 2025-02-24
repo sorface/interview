@@ -39,7 +39,6 @@ import { getRoomLink } from '../../utils/getRoomLink';
 import { Loader } from '../../components/Loader/Loader';
 import { Typography } from '../../components/Typography/Typography';
 import { ContextMenu } from '../../components/ContextMenu/ContextMenu';
-import { checkAiAccess } from '../../utils/checkAiAccess';
 import { useThemedAiAvatar } from '../../hooks/useThemedAiAvatar';
 
 import './Rooms.css';
@@ -100,7 +99,6 @@ interface RoomsProps {
 
 export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
   const auth = useContext(AuthContext);
-  const userHasAiAccess = checkAiAccess(auth);
   const localizationCaptions = useLocalizationCaptions();
   const themedAiAvatar = useThemedAiAvatar();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
@@ -347,12 +345,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
   };
 
   const renderCreateRoomButton = () => (
-    <Button
-      variant="active"
-      className="h-2.5"
-      aria-hidden={userHasAiAccess}
-      onClick={userHasAiAccess ? undefined : handleOpenCreateModalClassic}
-    >
+    <Button variant="active" className="h-2.5" aria-hidden>
       <Icon name={IconNames.Add} />
       {localizationCaptions[LocalizationKey.CreateRoom]}
     </Button>
@@ -365,27 +358,23 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
         searchValue={searchValueInput}
         onSearchChange={setSearchValueInput}
       >
-        {userHasAiAccess ? (
-          <ContextMenu
-            translateRem={{ x: -3.75, y: 0.25 }}
-            toggleContent={renderCreateRoomButton()}
-          >
-            {[
-              <ContextMenu.Item
-                key="CreateClassicRoom"
-                title={localizationCaptions[LocalizationKey.CreateRoomClassic]}
-                onClick={handleOpenCreateModalClassic}
-              />,
-              <ContextMenu.Item
-                key="CreateAiRoom"
-                title={localizationCaptions[LocalizationKey.CreateRoomAi]}
-                onClick={handleOpenCreateModalAi}
-              />,
-            ]}
-          </ContextMenu>
-        ) : (
-          renderCreateRoomButton()
-        )}
+        <ContextMenu
+          translateRem={{ x: -3.75, y: 0.25 }}
+          toggleContent={renderCreateRoomButton()}
+        >
+          {[
+            <ContextMenu.Item
+              key="CreateClassicRoom"
+              title={localizationCaptions[LocalizationKey.CreateRoomClassic]}
+              onClick={handleOpenCreateModalClassic}
+            />,
+            <ContextMenu.Item
+              key="CreateAiRoom"
+              title={localizationCaptions[LocalizationKey.CreateRoomAi]}
+              onClick={handleOpenCreateModalAi}
+            />,
+          ]}
+        </ContextMenu>
       </PageHeader>
       <div className="rooms-page flex-1 overflow-auto">
         {createEditModalOpened && (
