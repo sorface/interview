@@ -81,7 +81,11 @@ export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
           <Typography size="m" bold>
             {localizationCaptions[comment.title]}
           </Typography>
-          <Typography size="m">{comment.value}</Typography>
+          <Typography size="m">
+            {Array.isArray(comment.value)
+              ? JSON.stringify(comment.value)
+              : comment.value}
+          </Typography>
         </div>
       ))}
     </div>
