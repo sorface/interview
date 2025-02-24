@@ -4,7 +4,7 @@
   "bestPractice": "bestPractice",
   "vulnerabilities": "vulnerabilities",
   "comments": "comments",
-  "refactoringProposal": "refactoringProposal",
+  "refactoringProposal": [{"issue" : "Участок кода требующий улучшения", "solution": "Предложения по улучшению" }],
   "referenceCode": "referenceCode",
   "score": 10.0
 }
