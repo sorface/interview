@@ -3,6 +3,7 @@ using Interview.Domain;
 using Interview.Domain.Database;
 using Interview.Domain.Questions;
 using Interview.Domain.Questions.UpsertQuestionTree;
+using Interview.Domain.ServiceResults.Success;
 using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Test.Integrations;
@@ -84,6 +85,8 @@ public class QuestionTreeUpsertTests
             }
         };
         var result = await service.UpsertQuestionTreeAsync(request);
+        dbContext.ChangeTracker.Clear();
+
         result.Should().NotBeNull();
         result.Value.Should().Be(request.Id);
 
@@ -140,6 +143,8 @@ public class QuestionTreeUpsertTests
             }
         };
         var result = await service.UpsertQuestionTreeAsync(request);
+        dbContext.ChangeTracker.Clear();
+
         result.Should().NotBeNull();
         result.Value.Should().Be(existingTree.Id);
 
@@ -153,6 +158,308 @@ public class QuestionTreeUpsertTests
         dbTree.RootQuestionSubjectTreeId.Should().Be(request.Tree.Where(e => e.ParentQuestionSubjectTreeId is null).Select(e => e.Id).Single());
         dbTree.RootQuestionSubjectTree.Should().NotBeNull();
         dbTree.RootQuestionSubjectTree!.QuestionId.Should().Be(questionId2);
+    }
+
+    [Fact]
+    public async Task UpsertQuestionTreeAsync_CreateNewTree_ReturnsCreatedResult()
+    {
+        // Arrange
+        using var dbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
+        var service = new QuestionTreeUpsert(dbContext);
+        var questionId = Guid.NewGuid();
+        GenerateQuestion(dbContext, questionId);
+
+        var request = new UpsertQuestionTreeRequest
+        {
+            Id = Guid.NewGuid(),
+            Name = "New Tree",
+            Order = 1,
+            ParentQuestionTreeId = null,
+            Tree = new List<UpsertQuestionSubjectTreeRequest>
+            {
+                new UpsertQuestionSubjectTreeRequest
+                {
+                    Id = Guid.NewGuid(),
+                    ParentQuestionSubjectTreeId = null,
+                    QuestionId = questionId,
+                    Type = EVQuestionSubjectTreeType.Question,
+                    Order = 1
+                }
+            }
+        };
+
+        // Act
+        var result = await service.UpsertQuestionTreeAsync(request);
+        dbContext.ChangeTracker.Clear();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.IsType<CreateServiceResult<Guid>>(result);
+        Assert.Equal(request.Id, result.Value);
+    }
+
+    [Fact]
+    public async Task UpsertQuestionTreeAsync_UpdateExistingTree_ReturnsOkResult()
+    {
+        // Arrange
+        using var dbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
+        var questionId = Guid.NewGuid();
+        GenerateQuestion(dbContext, questionId);
+
+        var subjectTree = new QuestionSubjectTree
+        {
+            QuestionId = questionId,
+            Type = SEQuestionSubjectTreeType.Empty,
+        };
+        await dbContext.QuestionSubjectTree.AddAsync(subjectTree);
+        await dbContext.SaveChangesAsync();
+
+        var existingTree = new QuestionTree
+        {
+            Id = Guid.NewGuid(),
+            Name = "Existing Tree",
+            Order = 1,
+            ParentQuestionTreeId = null,
+            RootQuestionSubjectTreeId = subjectTree.Id
+        };
+
+        dbContext.QuestionTree.Add(existingTree);
+        await dbContext.SaveChangesAsync();
+
+        var service = new QuestionTreeUpsert(dbContext);
+
+        var request = new UpsertQuestionTreeRequest
+        {
+            Id = existingTree.Id,
+            Name = "Updated Tree",
+            Order = 2,
+            ParentQuestionTreeId = null,
+            Tree = new List<UpsertQuestionSubjectTreeRequest>
+            {
+                new UpsertQuestionSubjectTreeRequest
+                {
+                    Id = Guid.NewGuid(),
+                    ParentQuestionSubjectTreeId = null,
+                    QuestionId = questionId,
+                    Type = EVQuestionSubjectTreeType.Question,
+                    Order = 55
+                }
+            }
+        };
+
+        // Act
+        var result = await service.UpsertQuestionTreeAsync(request);
+        dbContext.ChangeTracker.Clear();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.IsType<OkServiceResult<Guid>>(result);
+        Assert.Equal(existingTree.Id, result.Value);
+
+        var updatedTree = await dbContext.QuestionTree.FindAsync(existingTree.Id);
+        Assert.NotNull(updatedTree);
+        Assert.Equal("Updated Tree", updatedTree.Name);
+        Assert.Equal(2, updatedTree.Order);
+
+        var child = await GetSubjectTree(dbContext, existingTree);
+        child.Should().HaveCount(1);
+        ShouldBeSame(child[0], request.Tree[0]);
+    }
+
+    [Fact]
+    public async Task UpsertQuestionTreeAsync_NonExistentQuestion_ThrowsNotFoundException()
+    {
+        // Arrange
+        using var dbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
+
+        var service = new QuestionTreeUpsert(dbContext);
+
+        var request = new UpsertQuestionTreeRequest
+        {
+            Id = Guid.NewGuid(),
+            Name = "New Tree",
+            Order = 1,
+            ParentQuestionTreeId = null,
+            Tree = new List<UpsertQuestionSubjectTreeRequest>
+            {
+                new UpsertQuestionSubjectTreeRequest
+                {
+                    Id = Guid.NewGuid(),
+                    ParentQuestionSubjectTreeId = null,
+                    QuestionId = Guid.NewGuid(),
+                    Type = EVQuestionSubjectTreeType.Question,
+                    Order = 1
+                }
+            }
+        };
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotFoundException>(() => service.UpsertQuestionTreeAsync(request));
+    }
+
+    [Fact]
+    public async Task UpdateAsync_AddNewNodes_UpdatesTreeSuccessfully()
+    {
+        // Arrange
+        using var dbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
+        var questionId = Guid.NewGuid();
+        GenerateQuestion(dbContext, questionId);
+        var questionId2 = Guid.NewGuid();
+        GenerateQuestion(dbContext, questionId2);
+
+        var subjectTree = new QuestionSubjectTree
+        {
+            QuestionId = questionId,
+            Type = SEQuestionSubjectTreeType.Empty,
+        };
+        await dbContext.QuestionSubjectTree.AddAsync(subjectTree);
+        await dbContext.SaveChangesAsync();
+
+        var existingTree = new QuestionTree
+        {
+            Id = Guid.NewGuid(),
+            Name = "Existing Tree",
+            Order = 1,
+            ParentQuestionTreeId = null,
+            RootQuestionSubjectTreeId = subjectTree.Id
+        };
+
+        dbContext.QuestionTree.Add(existingTree);
+        await dbContext.SaveChangesAsync();
+
+        var service = new QuestionTreeUpsert(dbContext);
+
+        var rootId = Guid.NewGuid();
+        var request = new UpsertQuestionTreeRequest
+        {
+            Id = existingTree.Id,
+            Name = "Updated Tree",
+            Order = 2,
+            ParentQuestionTreeId = null,
+            Tree = new List<UpsertQuestionSubjectTreeRequest>
+            {
+                new UpsertQuestionSubjectTreeRequest
+                {
+                    Id = rootId,
+                    ParentQuestionSubjectTreeId = null,
+                    QuestionId = questionId,
+                    Type = EVQuestionSubjectTreeType.Question,
+                    Order = 1
+                },
+                new UpsertQuestionSubjectTreeRequest
+                {
+                    Id = Guid.NewGuid(),
+                    ParentQuestionSubjectTreeId = rootId,
+                    QuestionId = questionId2,
+                    Type = EVQuestionSubjectTreeType.Question,
+                    Order = 2
+                }
+            }
+        };
+
+        // Act
+        await service.UpsertQuestionTreeAsync(request);
+        dbContext.ChangeTracker.Clear();
+
+        // Assert
+        var updatedTree = await dbContext.QuestionTree
+            .Include(qt => qt.RootQuestionSubjectTree)
+            .FirstOrDefaultAsync(qt => qt.Id == existingTree.Id);
+
+        Assert.NotNull(updatedTree);
+
+        var children = await GetSubjectTree(dbContext, updatedTree);
+
+        children.Should().HaveCount(2);
+
+        var subjectTrees = await GetSubjectTree(dbContext, updatedTree);
+
+        var treeChild1 = request.Tree.ElementAt(0);
+        ShouldBeSame(subjectTrees.First(e => e.Id == treeChild1.Id), treeChild1);
+        var treeChild2 = request.Tree.ElementAt(1);
+        ShouldBeSame(subjectTrees.First(e => e.Id == treeChild2.Id), treeChild2);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_RemoveOutdatedNodes_UpdatesTreeSuccessfully()
+    {
+        // Arrange
+        using var dbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
+        var questionId = Guid.NewGuid();
+        GenerateQuestion(dbContext, questionId);
+
+        var outdatedNode = new QuestionSubjectTree
+        {
+            Id = Guid.NewGuid(),
+            ParentQuestionSubjectTreeId = null,
+            QuestionId = questionId,
+            Type = SEQuestionSubjectTreeType.Question,
+            Order = 100
+        };
+        await dbContext.QuestionSubjectTree.AddAsync(outdatedNode);
+        await dbContext.SaveChangesAsync();
+
+        var existingTree = new QuestionTree
+        {
+            Id = Guid.NewGuid(),
+            Name = "Existing Tree",
+            Order = 1,
+            ParentQuestionTreeId = null,
+            RootQuestionSubjectTreeId = outdatedNode.Id
+        };
+
+        dbContext.QuestionTree.Add(existingTree);
+        await dbContext.SaveChangesAsync();
+
+        var service = new QuestionTreeUpsert(dbContext);
+
+        var request = new UpsertQuestionTreeRequest
+        {
+            Id = existingTree.Id,
+            Name = "Updated Tree",
+            Order = 2,
+            ParentQuestionTreeId = null,
+            Tree = new List<UpsertQuestionSubjectTreeRequest>
+            {
+                new UpsertQuestionSubjectTreeRequest
+                {
+                    Id = Guid.NewGuid(),
+                    ParentQuestionSubjectTreeId = null,
+                    QuestionId = questionId,
+                    Type = EVQuestionSubjectTreeType.Question,
+                    Order = 22
+                }
+            }
+        };
+
+        // Act
+        await service.UpsertQuestionTreeAsync(request);
+        dbContext.ChangeTracker.Clear();
+
+        // Assert
+        var deletedNode = await dbContext.QuestionSubjectTree.FindAsync(outdatedNode.Id);
+        Assert.Null(deletedNode);
+
+        var tree = await dbContext.QuestionTree.FindAsync(existingTree.Id);
+        var child = await GetSubjectTree(dbContext, tree!);
+        child.Should().HaveCount(1);
+        ShouldBeSame(child[0], request.Tree.ElementAt(0));
+    }
+
+    private async Task<List<QuestionSubjectTree>> GetSubjectTree(AppDbContext dbContext, QuestionTree questionTree)
+    {
+        var children = await dbContext.QuestionSubjectTree.GetAllChildrenAsync(questionTree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, CancellationToken.None);
+        return await dbContext.QuestionSubjectTree
+            .Where(e => children.Contains(e.Id))
+            .ToListAsync();
+    }
+
+    private void ShouldBeSame(QuestionSubjectTree actual, UpsertQuestionSubjectTreeRequest expected)
+    {
+        actual.Order.Should().Be(expected.Order);
+        actual.ParentQuestionSubjectTreeId.Should().Be(expected.ParentQuestionSubjectTreeId);
+        actual.QuestionId.Should().Be(expected.QuestionId);
+        actual.Id.Should().Be(expected.Id);
     }
 
     private void GenerateQuestion(AppDbContext db, Guid id)
