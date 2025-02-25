@@ -288,6 +288,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
         roomParticipant.type === 'Expert' && roomParticipant.id === auth?.id,
     );
     const canEditInStatus = room.status === 'New' || room.status === 'Active';
+    const aiRoom = room.type === 'AI';
 
     return (
       <div key={room.id} className="room-item-wrapper">
@@ -300,7 +301,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
                 </Tag>
                 <Gap sizeRem={1.5} />
                 <div className="room-action-links">
-                  {expertInRoom && canEditInStatus && (
+                  {!aiRoom && expertInRoom && canEditInStatus && (
                     <>
                       <div
                         className="room-edit-participants-link rotate-90"
