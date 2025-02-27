@@ -406,13 +406,36 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
             ) && (
               <>
                 <Gap sizeRem={2.25} />
-                <Button
-                  className="h-2.5 text-grey3"
-                  onClick={handleOpenCreateModalClassic}
-                >
-                  <Icon name={IconNames.Add} />
-                  {localizationCaptions[LocalizationKey.CreateRoom]}
-                </Button>
+                <div className="flex justify-center">
+                  <ContextMenu
+                    translateRem={{ x: 0, y: 0 }}
+                    toggleContent={
+                      <Button className="h-2.5 text-grey3" aria-hidden>
+                        <Icon name={IconNames.Add} />
+                        {localizationCaptions[LocalizationKey.CreateRoom]}
+                      </Button>
+                    }
+                  >
+                    {[
+                      <ContextMenu.Item
+                        key="CreateClassicRoom"
+                        title={
+                          localizationCaptions[
+                            LocalizationKey.CreateRoomClassic
+                          ]
+                        }
+                        onClick={handleOpenCreateModalClassic}
+                      />,
+                      <ContextMenu.Item
+                        key="CreateAiRoom"
+                        title={
+                          localizationCaptions[LocalizationKey.CreateRoomAi]
+                        }
+                        onClick={handleOpenCreateModalAi}
+                      />,
+                    ]}
+                  </ContextMenu>
+                </div>
               </>
             )}
           </div>
