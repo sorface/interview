@@ -465,7 +465,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
   ]);
 
   useEffect(() => {
-    if (!lastWsMessageParsed) {
+    if (!lastWsMessageParsed || !readOnly) {
       return;
     }
     if (
@@ -490,7 +490,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
       setWsLastValidAiAnswer(lastWsMessageParsed.Value.AdditionalData);
       setCopilotAnswerOpen(true);
     }
-  }, [lastWsMessageParsed, auth?.id]);
+  }, [readOnly, lastWsMessageParsed, auth?.id]);
 
   useEffect(() => {
     if (!initialQuestion?.id) {
