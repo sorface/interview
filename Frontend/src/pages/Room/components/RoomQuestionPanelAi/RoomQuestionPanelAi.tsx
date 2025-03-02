@@ -29,7 +29,7 @@ import { RoomQuestionEvaluationValue } from '../RoomQuestionEvaluation/RoomQuest
 import { Loader } from '../../../../components/Loader/Loader';
 import { Typography } from '../../../../components/Typography/Typography';
 import { Icon } from '../Icon/Icon';
-import { aiExpertNickname, IconNames } from '../../../../constants';
+import { aiExpertNickname, EventName, IconNames } from '../../../../constants';
 import { Button } from '../../../../components/Button/Button';
 import { RoomContext } from '../../context/RoomContext';
 import {
@@ -293,6 +293,8 @@ export const RoomQuestionPanelAi: FunctionComponent<
     roomParticipant,
     lastVoiceRecognition,
     aiAssistantScript,
+    lastWsMessageParsed,
+    sendWsMessage,
     setAiAssistantCurrentScript,
     setRecognitionEnabled,
   } = useContext(RoomContext);
@@ -373,7 +375,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
 
   const { aiAnswerCompleted, aiAnswerLoading, lastValidAiAnswer } =
     useAiAnswerSource({
-      enabled: copilotAnswerOpen,
+      enabled: copilotAnswerOpen && !readOnly,
       answer: recognitionAccum,
       conversationId: `${room?.id}${initialQuestion?.id}${auth?.id}`,
       question: initialQuestion?.value || '',
@@ -385,6 +387,9 @@ export const RoomQuestionPanelAi: FunctionComponent<
       language: questionLanguage,
       endpoint: questionWithCode ? AiEndpoint.analyze : AiEndpoint.examinee,
     });
+  const [wsLastValidAiAnswer, setWsLastValidAiAnswer] =
+    useState<AnyObject | null>(null);
+  const totalLastValidAiAnswer = lastValidAiAnswer || wsLastValidAiAnswer;
 
   const themedAiAvatar = useThemedAiAvatar();
   const allUsersWithAiExpert = new Map<string, AnalyticsUserReview>();
@@ -424,18 +429,21 @@ export const RoomQuestionPanelAi: FunctionComponent<
   );
 
   useEffect(() => {
+    if (readOnly) {
+      return;
+    }
     setRecognitionEnabled(!copilotAnswerOpen);
-  }, [copilotAnswerOpen, setRecognitionEnabled]);
+  }, [readOnly, copilotAnswerOpen, setRecognitionEnabled]);
 
   useEffect(() => {
-    if (!lastVoiceRecognition) {
+    if (!lastVoiceRecognition || readOnly) {
       return;
     }
     addVoiceRecognitionAccumTranscript(lastVoiceRecognition);
-  }, [lastVoiceRecognition, addVoiceRecognitionAccumTranscript]);
+  }, [lastVoiceRecognition, readOnly, addVoiceRecognitionAccumTranscript]);
 
   useEffect(() => {
-    if (!lastVoiceRecognition) {
+    if (!lastVoiceRecognition || readOnly) {
       return;
     }
     setChatMessages((oldChatMessages) => [
@@ -450,10 +458,39 @@ export const RoomQuestionPanelAi: FunctionComponent<
     ]);
   }, [
     lastVoiceRecognition,
+    readOnly,
     auth?.id,
     auth?.nickname,
     addVoiceRecognitionAccumTranscript,
   ]);
+
+  useEffect(() => {
+    if (!lastWsMessageParsed) {
+      return;
+    }
+    if (
+      lastWsMessageParsed.Type === 'VoiceRecognition' &&
+      lastWsMessageParsed.Value.Message &&
+      lastWsMessageParsed.CreatedById !== auth?.id
+    ) {
+      setChatMessages((oldChatMessages) => [
+        ...oldChatMessages,
+        {
+          id: lastWsMessageParsed.Id,
+          fromAi: false,
+          userId: lastWsMessageParsed.CreatedById,
+          userNickname: lastWsMessageParsed.Value.Nickname,
+          value: lastWsMessageParsed.Value.Message,
+        },
+      ]);
+      return;
+    }
+    if (lastWsMessageParsed.Type === 'ValidAiAnswer') {
+      console.log(lastWsMessageParsed.Value.AdditionalData);
+      setWsLastValidAiAnswer(lastWsMessageParsed.Value.AdditionalData);
+      setCopilotAnswerOpen(true);
+    }
+  }, [lastWsMessageParsed, auth?.id]);
 
   useEffect(() => {
     if (!initialQuestion?.id) {
@@ -461,6 +498,14 @@ export const RoomQuestionPanelAi: FunctionComponent<
     }
     resetVoiceRecognitionAccum();
   }, [initialQuestion?.id, resetVoiceRecognitionAccum]);
+
+  useEffect(() => {
+    if (!initialQuestion?.id || !readOnly) {
+      return;
+    }
+    setWsLastValidAiAnswer(null);
+    setCopilotAnswerOpen(false);
+  }, [initialQuestion?.id, readOnly]);
 
   useEffect(() => {
     const firstLineCaption = initialQuestion
@@ -507,6 +552,9 @@ export const RoomQuestionPanelAi: FunctionComponent<
   }, [questionWithCode, recognitionCommand, handleCopilotAnswerOpen]);
 
   useEffect(() => {
+    if (readOnly) {
+      return;
+    }
     if (!aiAnswerCompleted || !lastValidAiAnswer) {
       return;
     }
@@ -514,7 +562,13 @@ export const RoomQuestionPanelAi: FunctionComponent<
       mark: Math.round(lastValidAiAnswer?.score),
       review: lastValidAiAnswer?.reason,
     });
-  }, [aiAnswerCompleted, lastValidAiAnswer]);
+    sendWsMessage(
+      JSON.stringify({
+        Type: EventName.ValidAiAnswer,
+        Value: JSON.stringify(lastValidAiAnswer),
+      }),
+    );
+  }, [readOnly, aiAnswerCompleted, lastValidAiAnswer]);
 
   useEffect(() => {
     if (!room) {
@@ -682,7 +736,9 @@ export const RoomQuestionPanelAi: FunctionComponent<
             <AiAssistant
               visible={!questionWithCode || copilotAnswerOpen}
               loading={loadingTotal}
-              currentScript={aiAssistantScript}
+              currentScript={
+                readOnly ? AiAssistantScriptName.Idle : aiAssistantScript
+              }
             />
           </Canvas>
           {errorRoomActiveQuestion && (
@@ -731,13 +787,15 @@ export const RoomQuestionPanelAi: FunctionComponent<
                               id: aiExpertId,
                               evaluation: {
                                 mark:
-                                  parseFloat(lastValidAiAnswer?.score) || null,
+                                  parseFloat(totalLastValidAiAnswer?.score) ||
+                                  null,
                                 review:
-                                  lastValidAiAnswer?.reason ||
-                                  lastValidAiAnswer?.codeReadability,
+                                  totalLastValidAiAnswer?.reason ||
+                                  totalLastValidAiAnswer?.codeReadability,
                               },
-                              otherComments:
-                                getCustomCommets(lastValidAiAnswer),
+                              otherComments: getCustomCommets(
+                                totalLastValidAiAnswer,
+                              ),
                             }}
                             allUsers={allUsersWithAiExpert}
                           />

@@ -46,6 +46,7 @@ import { RoomQuestionsSelector } from './RoomQuestionsSelector/RoomQuestionsSele
 import { sortRoomQuestion } from '../../utils/sortRoomQestions';
 import { TreeViewer } from '../../components/TreeViewer/TreeViewer';
 import { QuestionsTree } from '../../types/questionsTree';
+import { mapInvitesForAiRoom } from '../../utils/mapInvitesForAiRoom';
 
 const nameFieldName = 'roomName';
 const dateFieldName = 'roomDate';
@@ -255,12 +256,8 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     if (!createdRoom && !editedRoom) {
       return;
     }
-    if (aiRoom) {
-      onClose();
-      return;
-    }
     setCreationStep(CreationStep.Step2);
-  }, [aiRoom, createdRoom, editedRoom, localizationCaptions, navigate]);
+  }, [createdRoom, editedRoom, localizationCaptions, navigate]);
 
   useEffect(() => {
     if (!createdRoom && !editedRoom) {
@@ -639,7 +636,11 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
       <>
         <RoomInvitations
           roomId={createdRoom?.id || editedRoom?.id || ''}
-          roomInvitesData={roomInvitesData}
+          roomInvitesData={
+            !aiRoom
+              ? roomInvitesData
+              : mapInvitesForAiRoom(roomInvitesData || [])
+          }
           roomInvitesError={roomInvitesError}
           roomInvitesLoading={roomInvitesLoading}
         />
