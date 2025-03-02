@@ -29,7 +29,7 @@ import { RoomQuestionEvaluationValue } from '../RoomQuestionEvaluation/RoomQuest
 import { Loader } from '../../../../components/Loader/Loader';
 import { Typography } from '../../../../components/Typography/Typography';
 import { Icon } from '../Icon/Icon';
-import { IconNames } from '../../../../constants';
+import { aiExpertNickname, IconNames } from '../../../../constants';
 import { Button } from '../../../../components/Button/Button';
 import { RoomContext } from '../../context/RoomContext';
 import {
@@ -52,6 +52,10 @@ import {
 import { RoomCodeEditor } from '../RoomCodeEditor/RoomCodeEditor';
 import { CodeEditorLang } from '../../../../types/question';
 import { AnyObject } from '../../../../types/anyObject';
+import {
+  MessagesChatAi,
+  MessagesChatAiMessage,
+} from '../MessagesChatAi/MessagesChatAi';
 
 const notFoundCode = 404;
 const aiAssistantGoodRate = 6;
@@ -307,6 +311,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
   );
   const [copilotAnswerOpen, setCopilotAnswerOpen] = useState(false);
   const startedByVoiceRef = useRef(false);
+  const [chatMessages, setChatMessages] = useState<MessagesChatAiMessage[]>([]);
 
   const {
     apiMethodState: apiSendActiveQuestionState,
@@ -385,7 +390,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
   const allUsersWithAiExpert = new Map<string, AnalyticsUserReview>();
   allUsersWithAiExpert.set(aiExpertId, {
     comment: '',
-    nickname: 'AI Expert',
+    nickname: aiExpertNickname,
     participantType: 'Expert',
     userId: aiExpertId,
     avatar: themedAiAvatar,
@@ -430,11 +435,58 @@ export const RoomQuestionPanelAi: FunctionComponent<
   }, [lastVoiceRecognition, addVoiceRecognitionAccumTranscript]);
 
   useEffect(() => {
+    if (!lastVoiceRecognition) {
+      return;
+    }
+    setChatMessages((oldChatMessages) => [
+      ...oldChatMessages,
+      {
+        id: crypto.randomUUID(),
+        fromAi: false,
+        userId: auth?.id || '',
+        userNickname: auth?.nickname || '',
+        value: lastVoiceRecognition,
+      },
+    ]);
+  }, [
+    lastVoiceRecognition,
+    auth?.id,
+    auth?.nickname,
+    addVoiceRecognitionAccumTranscript,
+  ]);
+
+  useEffect(() => {
     if (!initialQuestion?.id) {
       return;
     }
     resetVoiceRecognitionAccum();
   }, [initialQuestion?.id, resetVoiceRecognitionAccum]);
+
+  useEffect(() => {
+    const firstLineCaption = initialQuestion
+      ? initialQuestion.value
+      : localizationCaptions[LocalizationKey.WaitingInterviewStart];
+    const secondLineCaption = initialQuestion
+      ? rateMeDescription
+      : letsStartDescription;
+
+    setChatMessages([
+      {
+        id: crypto.randomUUID(),
+        userId: aiExpertId,
+        userNickname: aiExpertNickname,
+        fromAi: true,
+        value: firstLineCaption,
+      },
+      {
+        id: crypto.randomUUID(),
+        userId: aiExpertId,
+        userNickname: aiExpertNickname,
+        fromAi: true,
+        value: secondLineCaption,
+      },
+    ]);
+  }, [initialQuestion]);
 
   const handleCopilotAnswerOpen = useCallback(() => {
     setCopilotAnswerOpen(true);
@@ -607,12 +659,6 @@ export const RoomQuestionPanelAi: FunctionComponent<
   };
 
   const statusPanelVisible = questionWithCode ? copilotAnswerOpen : true;
-  const firstLineCaption = initialQuestion
-    ? initialQuestion.value
-    : localizationCaptions[LocalizationKey.WaitingInterviewStart];
-  const secondLineCaption = initialQuestion
-    ? rateMeDescription
-    : letsStartDescription;
   const loadingTotal =
     loadingRoomStartReview ||
     roomQuestionsLoading ||
@@ -621,22 +667,24 @@ export const RoomQuestionPanelAi: FunctionComponent<
 
   return (
     <>
-      <div className="absolute w-full h-full z-1">
-        <RoomCodeEditor
-          // TODO: Fix this hardcode ( https://github.com/sorface/interview/issues/650 )
-          language={CodeEditorLang.Javascript}
-          visible={!copilotAnswerOpen && questionWithCode}
-          onExecutionResultsSubmit={handleExecutionResultsSubmit}
+      {statusPanelVisible && <Gap sizeRem={4} />}
+      {!statusPanelVisible && <Gap sizeRem={0.75} />}
+      <div className="w-full flex items-center justify-center">
+        <div
+          className={`z-0`}
+          style={{
+            width: statusPanelVisible ? '162px' : 0,
+            height: statusPanelVisible ? '162px' : 0,
+          }}
         />
-      </div>
-
-      {statusPanelVisible && (
-        <div className="flex flex-col z-50">
-          <Typography size="xxxl" bold>
-            {firstLineCaption}
-          </Typography>
-          <Gap sizeRem={0.5} />
-          <Typography size="m">{secondLineCaption}</Typography>
+        <div className="absolute" style={{ width: '200px', height: '200px' }}>
+          <Canvas shadows camera={{ position: [0, 0.12, 1.5], fov: 38 }}>
+            <AiAssistant
+              visible={!questionWithCode || copilotAnswerOpen}
+              loading={loadingTotal}
+              currentScript={aiAssistantScript}
+            />
+          </Canvas>
           {errorRoomActiveQuestion && (
             <>
               <Gap sizeRem={1} />
@@ -650,87 +698,108 @@ export const RoomQuestionPanelAi: FunctionComponent<
             </>
           )}
         </div>
-      )}
-
-      {copilotAnswerOpen && (
-        <div className="absolute w-full h-full flex items-center justify-center">
-          <div className="flex flex-col px-1.5 z-10">
-            <ReviewUserOpinion
-              user={{
-                id: aiExpertId,
-                evaluation: {
-                  mark: parseFloat(lastValidAiAnswer?.score) || null,
-                  review:
-                    lastValidAiAnswer?.reason ||
-                    lastValidAiAnswer?.codeReadability,
-                },
-                otherComments: getCustomCommets(lastValidAiAnswer),
-              }}
-              allUsers={allUsersWithAiExpert}
-            />
-            <div>
-              <Gap sizeRem={1.75} />
-              {totalErrorRoomQuestionEvaluation && (
-                <Typography size="m" error>
-                  {totalErrorRoomQuestionEvaluation}
-                </Typography>
-              )}
-              {errorRoomStartReview && (
-                <Typography size="m" error>
-                  {errorRoomStartReview}
-                </Typography>
-              )}
-              <div className="flex justify-center w-full">
-                <Button
-                  className="flex items-center"
-                  variant="active"
-                  disabled={nextQuestionButtonLoading}
-                  onClick={
-                    readyToReview ? handleStartReviewRoom : handleNextQuestion
-                  }
-                >
-                  {nextQuestionButtonLoading ? (
-                    <Loader />
-                  ) : (
-                    <>
-                      <span>
-                        {
-                          localizationCaptions[
-                            readyToReview
-                              ? LocalizationKey.StartReviewRoomAi
-                              : LocalizationKey.NextRoomQuestion
-                          ]
-                        }
-                      </span>
-                      <Gap sizeRem={0.5} horizontal />
-                      <Icon
-                        name={
-                          readyToReview
-                            ? IconNames.Stop
-                            : IconNames.ChevronForward
-                        }
-                      />
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div
-        className="absolute w-full h-full z-0"
-        style={{ opacity: copilotAnswerOpen ? 0.05 : 1.0 }}
-      >
-        <Canvas shadows camera={{ position: [0, 0.5, 6.5], fov: 38 }}>
-          <AiAssistant
-            visible={!questionWithCode || copilotAnswerOpen}
-            loading={loadingTotal}
-            currentScript={aiAssistantScript}
-          />
-        </Canvas>
       </div>
+
+      {statusPanelVisible && <Gap sizeRem={1.5} />}
+
+      <div className={statusPanelVisible ? `invisible` : `w-full h-full z-1`}>
+        <RoomCodeEditor
+          // TODO: Fix this hardcode ( https://github.com/sorface/interview/issues/650 )
+          language={CodeEditorLang.Javascript}
+          visible={!copilotAnswerOpen && questionWithCode}
+          onExecutionResultsSubmit={handleExecutionResultsSubmit}
+        />
+      </div>
+
+      {statusPanelVisible && (
+        <>
+          <MessagesChatAi
+            messages={
+              copilotAnswerOpen
+                ? [
+                    ...chatMessages,
+                    {
+                      id: crypto.randomUUID(),
+                      userId: aiExpertId,
+                      userNickname: aiExpertNickname,
+                      value: '',
+                      fromAi: true,
+                      children: (
+                        <div>
+                          <ReviewUserOpinion
+                            user={{
+                              id: aiExpertId,
+                              evaluation: {
+                                mark:
+                                  parseFloat(lastValidAiAnswer?.score) || null,
+                                review:
+                                  lastValidAiAnswer?.reason ||
+                                  lastValidAiAnswer?.codeReadability,
+                              },
+                              otherComments:
+                                getCustomCommets(lastValidAiAnswer),
+                            }}
+                            allUsers={allUsersWithAiExpert}
+                          />
+                          <div>
+                            <Gap sizeRem={1.75} />
+                            {totalErrorRoomQuestionEvaluation && (
+                              <Typography size="m" error>
+                                {totalErrorRoomQuestionEvaluation}
+                              </Typography>
+                            )}
+                            {errorRoomStartReview && (
+                              <Typography size="m" error>
+                                {errorRoomStartReview}
+                              </Typography>
+                            )}
+                            <div className="flex justify-center w-full">
+                              <Button
+                                className="flex items-center"
+                                variant="active"
+                                disabled={nextQuestionButtonLoading}
+                                onClick={
+                                  readyToReview
+                                    ? handleStartReviewRoom
+                                    : handleNextQuestion
+                                }
+                              >
+                                {nextQuestionButtonLoading ? (
+                                  <Loader />
+                                ) : (
+                                  <>
+                                    <span>
+                                      {
+                                        localizationCaptions[
+                                          readyToReview
+                                            ? LocalizationKey.StartReviewRoomAi
+                                            : LocalizationKey.NextRoomQuestion
+                                        ]
+                                      }
+                                    </span>
+                                    <Gap sizeRem={0.5} horizontal />
+                                    <Icon
+                                      name={
+                                        readyToReview
+                                          ? IconNames.Stop
+                                          : IconNames.ChevronForward
+                                      }
+                                    />
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ),
+                    },
+                  ]
+                : chatMessages
+            }
+          />
+        </>
+      )}
+      <Gap sizeRem={1} />
     </>
   );
 };
