@@ -55,19 +55,27 @@ export const Home: FunctionComponent = () => {
   return (
     <>
       <div className="flex flex-1 flex-col justify-center items-center">
-        <div
-          style={{ width: 291, height: 291 }}
-          className="cursor-pointer"
-          onClick={handleAiAssistantClick}
-        >
-          <Canvas shadows camera={{ position: [0, 0.05, 2.2], fov: 38 }}>
-            <AiAssistant
-              currentScript={aiAssistantScript}
-              loading
-              loadingVariant={AiAssistantLoadingVariant.Wide}
-              trackMouse
-            />
-          </Canvas>
+        <div className="w-full flex items-center justify-center">
+          <div
+            style={{
+              width: '291px',
+              height: '291px',
+            }}
+          />
+          <div
+            className="absolute cursor-pointer"
+            style={{ width: '256px', height: '256px' }}
+            onClick={handleAiAssistantClick}
+          >
+            <Canvas shadows camera={{ position: [0, 0.12, 1.5], fov: 38 }}>
+              <AiAssistant
+                currentScript={aiAssistantScript}
+                loading
+                loadingVariant={AiAssistantLoadingVariant.Wide}
+                trackMouse
+              />
+            </Canvas>
+          </div>
         </div>
         <Typography size="xxxl" bold>
           {VITE_APP_NAME}
