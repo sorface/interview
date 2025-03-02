@@ -721,8 +721,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
 
   return (
     <>
-      {statusPanelVisible && <Gap sizeRem={4} />}
-      {!statusPanelVisible && <Gap sizeRem={0.75} />}
+      <Gap sizeRem={0.75} />
       <div className="w-full flex items-center justify-center">
         <div
           className={`z-0`}

@@ -32,24 +32,22 @@ export const ChatMessageAi: FunctionComponent<ChatMessageAiProps> = ({
 
   return (
     <div className={`flex flex-col ${fromAi ? '' : 'items-end'}`}>
-      <div>
-        {!removePaggingTop && <Gap sizeRem={stackWithPrevious ? 0.25 : 1} />}
-        {!stackWithPrevious && (
-          <>
-            <div className="flex items-center">
-              <Typography size="xl">{nickname}</Typography>
-            </div>
-            <Gap sizeRem={0.375} />
-          </>
-        )}
-        <div className={`flex ${children ? '' : 'w-fit'}`}>
-          <div
-            className={`${fromAi ? messageClassName : currentUserMessageClassName} overflow-auto flex-1 text-left flex flex-col px-0.5 rounded-0.5`}
-          >
-            <Gap sizeRem={0.5} />
-            {children || <Typography size="xxl">{message}</Typography>}
-            <Gap sizeRem={0.5} />
+      {!removePaggingTop && <Gap sizeRem={stackWithPrevious ? 0.25 : 1} />}
+      {!stackWithPrevious && (
+        <>
+          <div className="flex items-center">
+            <Typography size="xl">{nickname}</Typography>
           </div>
+          <Gap sizeRem={0.375} />
+        </>
+      )}
+      <div className={`flex ${children ? '' : 'w-fit'}`}>
+        <div
+          className={`${fromAi ? messageClassName : currentUserMessageClassName} overflow-auto flex-1 text-left flex flex-col px-0.5 rounded-0.5`}
+        >
+          <Gap sizeRem={0.5} />
+          {children || <Typography size="xxl">{message}</Typography>}
+          <Gap sizeRem={0.5} />
         </div>
       </div>
     </div>
