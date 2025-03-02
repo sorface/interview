@@ -42,7 +42,7 @@ export interface RoomCalendarItem {
 export type RoomQuestionListItem = Question & DragNDropListItem;
 
 export interface RoomParticipant extends User {
-  userType: UserType;
+  type: UserType;
 }
 
 export type RoomStateType = 'CodeEditor';
