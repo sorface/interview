@@ -257,7 +257,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
       return;
     }
     setCreationStep(CreationStep.Step2);
-  }, [aiRoom, createdRoom, editedRoom, localizationCaptions, navigate]);
+  }, [createdRoom, editedRoom, localizationCaptions, navigate]);
 
   useEffect(() => {
     if (!createdRoom && !editedRoom) {
