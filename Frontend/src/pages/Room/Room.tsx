@@ -69,6 +69,7 @@ import { useVideoChat } from './components/VideoChat/hoks/useVideoChat';
 import { useUserStreams } from './hooks/useUserStreams';
 import { useRoomSounds } from './hooks/useRoomSounds';
 import { AiAssistantScriptName } from './components/AiAssistant/AiAssistant';
+import { mapInvitesForAiRoom } from '../../utils/mapInvitesForAiRoom';
 
 import './Room.css';
 
@@ -604,7 +605,11 @@ export const Room: FunctionComponent = () => {
               <Invitations
                 open={invitationsOpen}
                 roomId={id || ''}
-                roomInvitesData={roomInvitesData}
+                roomInvitesData={
+                  !aiRoom
+                    ? roomInvitesData
+                    : mapInvitesForAiRoom(roomInvitesData || [])
+                }
                 roomInvitesError={
                   roomInvitesError ||
                   generateRoomInviteError ||
@@ -753,6 +758,7 @@ export const Room: FunctionComponent = () => {
                               roomQuestions?.sort(sortRoomQuestion) || []
                             }
                             initialQuestion={currentQuestion}
+                            handleInvitationsOpen={handleInvitationsOpen}
                             handleStartReviewRoom={handleStartReviewRoomAi}
                             handleSettingsOpen={handleSettingsOpen}
                             handleLeaveRoom={handleLeaveRoom}

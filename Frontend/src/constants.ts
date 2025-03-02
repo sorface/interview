@@ -87,6 +87,7 @@ export const enum EventName {
   CodeEditor = 'CodeEditor',
   CodeEditorLanguage = 'CodeEditorLanguage',
   CodeEditorCursor = 'CodeEditorCursor',
+  ValidAiAnswer = 'ValidAiAnswer',
 }
 
 export enum HttpResponseCode {

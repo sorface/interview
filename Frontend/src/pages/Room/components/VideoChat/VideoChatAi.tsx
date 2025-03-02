@@ -48,6 +48,7 @@ interface VideoChatAiProps {
   roomQuestionsLoading: boolean;
   roomQuestions: RoomQuestion[];
   initialQuestion?: RoomQuestion;
+  handleInvitationsOpen: () => void;
   handleStartReviewRoom: () => void;
   handleSettingsOpen: () => void;
   handleLeaveRoom: () => void;
@@ -92,6 +93,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
   roomQuestionsLoading,
   roomQuestions,
   initialQuestion,
+  handleInvitationsOpen,
   handleLeaveRoom,
   handleSettingsOpen,
   handleStartReviewRoom,
@@ -290,14 +292,20 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                   </div>
                 )}
                 {currentUserExpert && (
-                  <ContextMenu.Item
-                    title={
-                      localizationCaptions[
-                        LocalizationKey.CompleteAndEvaluateCandidate
-                      ]
-                    }
-                    onClick={handleStartReviewRoom}
-                  />
+                  <>
+                    <ContextMenu.Item
+                      title={
+                        localizationCaptions[
+                          LocalizationKey.CompleteAndEvaluateCandidate
+                        ]
+                      }
+                      onClick={handleStartReviewRoom}
+                    />
+                    <ContextMenu.Item
+                      title={localizationCaptions[LocalizationKey.Invitations]}
+                      onClick={handleInvitationsOpen}
+                    />
+                  </>
                 )}
                 <ContextMenu.Item
                   title={localizationCaptions[LocalizationKey.Exit]}
@@ -350,7 +358,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
 
   return (
     <>
-      <div className="w-full flex justify-center">
+      <div className="flex-1 flex justify-center">
         <div
           style={{ maxWidth: '840px' }}
           className="w-full flex flex-col relative rounded-1.125"
