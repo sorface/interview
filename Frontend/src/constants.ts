@@ -1,5 +1,6 @@
 export const inviteParamName = 'invite';
 export const roomReviewMaxLength = 500;
+export const aiExpertNickname = 'AI Expert';
 
 export const pathnames = {
   home: '/:redirect?',

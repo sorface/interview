@@ -12,7 +12,7 @@ import {
   GetRoomPageParams,
   roomsApiDeclaration,
 } from '../../apiDeclarations';
-import { IconNames } from '../../constants';
+import { aiExpertNickname, IconNames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import {
@@ -45,7 +45,7 @@ import './Rooms.css';
 
 const aiParticipant: RoomParticipant = {
   id: 'fakeId',
-  nickname: 'AI Expert',
+  nickname: aiExpertNickname,
   userType: 'Expert',
   roles: ['User'],
   roomId: 'roomId',

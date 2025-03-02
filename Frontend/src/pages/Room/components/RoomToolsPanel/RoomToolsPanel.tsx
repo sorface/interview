@@ -49,6 +49,7 @@ const ButtonsGroupWrapper: FunctionComponent<ButtonsGroupWrapperProps> = ({
 interface SwitchButtonProps {
   enabled: boolean;
   danger?: boolean;
+  alternative?: boolean;
   iconEnabledName: IconNames;
   iconDisabledName: IconNames;
   loading?: boolean;
@@ -62,6 +63,7 @@ interface SwitchButtonProps {
 const SwitchButton: FunctionComponent<SwitchButtonProps> = ({
   enabled,
   danger,
+  alternative,
   iconDisabledName,
   iconEnabledName,
   loading,
@@ -73,7 +75,13 @@ const SwitchButton: FunctionComponent<SwitchButtonProps> = ({
 
   return (
     <Button
-      variant={danger ? 'toolsPanelDanger' : 'toolsPanel'}
+      variant={
+        danger
+          ? 'toolsPanelDanger'
+          : alternative
+            ? 'toolsPanelAlternative'
+            : 'toolsPanel'
+      }
       disabled={htmlDisabled}
       className="w-2.5 h-2.5 z-1"
       onClick={onClick}
@@ -81,7 +89,7 @@ const SwitchButton: FunctionComponent<SwitchButtonProps> = ({
       {loading ? (
         <Loader />
       ) : (
-        <div className="absolute z-1">
+        <div className="absolute z-1 flex">
           <Icon name={iconName} />
         </div>
       )}
