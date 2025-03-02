@@ -237,7 +237,7 @@ export const enum LocalizationKey {
   WebcamBackgroundBlur,
   Feedback,
   RateMeDescription,
-  RateMeCommand,
+  RateMeCommands,
   LetsBeginDescription,
   LetsBeginCommand,
   HomeDescription,
@@ -548,7 +548,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.Feedback]: 'Feedback',
     [LocalizationKey.RateMeDescription]:
       'At the end of your answer, say "{RateMeCommand}" and assistant will rate you.',
-    [LocalizationKey.RateMeCommand]: 'rate me',
+    [LocalizationKey.RateMeCommands]: 'rate me',
     [LocalizationKey.LetsBeginDescription]:
       'To start an interview, say "{LetsStartCommand}".',
     [LocalizationKey.LetsBeginCommand]: "let's begin",
@@ -864,7 +864,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.Feedback]: 'Обратная связь',
     [LocalizationKey.RateMeDescription]:
       'В конце ответа скажите "{RateMeCommand}" и ассистент оценит вас.',
-    [LocalizationKey.RateMeCommand]: 'оцени меня',
+    [LocalizationKey.RateMeCommands]: 'оцени меня|цени меня',
     [LocalizationKey.LetsBeginDescription]:
       'Для начала собеседования скажите "{LetsStartCommand}".',
     [LocalizationKey.LetsBeginCommand]: 'давай начнём',

@@ -420,7 +420,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
     LocalizationKey.RateMeDescription
   ].replace(
     '{RateMeCommand}',
-    localizationCaptions[LocalizationKey.RateMeCommand],
+    localizationCaptions[LocalizationKey.RateMeCommands].split('|')[0],
   );
 
   useEffect(() => {
