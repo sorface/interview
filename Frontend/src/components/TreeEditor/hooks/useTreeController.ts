@@ -19,6 +19,7 @@ export const useTreeController = (
       titlePropertyName: opts.titlePropertyName,
       createNewData: opts.createNewData,
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [opts.idPropertyName, opts.titlePropertyName], // Don't add createNewData as it changes on every render
   );
   const expansions = useTreeExpansions(tree, options);

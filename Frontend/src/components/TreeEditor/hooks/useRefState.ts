@@ -9,8 +9,11 @@ export function useRefState<T>(initial: T): [T, (value: T) => void] {
       ref.current = value;
       setRenderId(uuid());
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [renderId],
   );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const value: T = React.useMemo(() => ref.current, [renderId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   return React.useMemo(() => [value, setValue], [renderId]);
 }
