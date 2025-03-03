@@ -562,13 +562,19 @@ export const RoomQuestionPanelAi: FunctionComponent<
       mark: Math.round(lastValidAiAnswer?.score),
       review: lastValidAiAnswer?.reason,
     });
+  }, [readOnly, aiAnswerCompleted, lastValidAiAnswer]);
+
+  useEffect(() => {
+    if (readOnly || !lastValidAiAnswer) {
+      return;
+    }
     sendWsMessage(
       JSON.stringify({
         Type: EventName.ValidAiAnswer,
         Value: JSON.stringify(lastValidAiAnswer),
       }),
     );
-  }, [readOnly, aiAnswerCompleted, lastValidAiAnswer]);
+  }, [readOnly, lastValidAiAnswer]);
 
   useEffect(() => {
     if (!room) {
