@@ -39,7 +39,7 @@ export const BasicTreeNodeTitleComponent = ({
       return;
     }
     fetchQuestion(questionId);
-  }, [questionId]);
+  }, [questionId, fetchQuestion]);
 
   const handleQuestionsSelectorOpen = () => {
     setQuestionsSelectorOpen(true);

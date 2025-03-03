@@ -273,7 +273,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
       return;
     }
     fetchQuestionTree(roomFields.questionTreeId);
-  }, [roomFields.questionTreeId]);
+  }, [roomFields.questionTreeId, fetchQuestionTree]);
 
   useEffect(() => {
     if (questionTreeLoading) {

@@ -531,7 +531,12 @@ export const RoomQuestionPanelAi: FunctionComponent<
         value: secondLineCaption,
       },
     ]);
-  }, [initialQuestion]);
+  }, [
+    initialQuestion,
+    letsStartDescription,
+    localizationCaptions,
+    rateMeDescription,
+  ]);
 
   const handleCopilotAnswerOpen = useCallback(() => {
     setCopilotAnswerOpen(true);
@@ -574,7 +579,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
         Value: JSON.stringify(lastValidAiAnswer),
       }),
     );
-  }, [readOnly, lastValidAiAnswer]);
+  }, [readOnly, lastValidAiAnswer, sendWsMessage]);
 
   useEffect(() => {
     if (!room) {

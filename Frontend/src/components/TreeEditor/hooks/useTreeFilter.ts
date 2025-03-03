@@ -87,6 +87,7 @@ export const useTreeFilter = (
       });
       setFilteredAncestorNodeMap(newFilteredAncestorIdMap);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [renderId]);
 
   return React.useMemo(

@@ -119,7 +119,7 @@ export const TreeViewer: FunctionComponent<TreeViewerProps> = ({ tree }) => {
     );
     setNodes(layoutedNodes);
     setEdges(layoutedEdges);
-  }, [tree, localizationCaptions]);
+  }, [tree, localizationCaptions, setNodes, setEdges]);
 
   return (
     <ReactFlow

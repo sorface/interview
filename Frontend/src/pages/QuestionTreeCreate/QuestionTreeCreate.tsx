@@ -90,7 +90,7 @@ export const QuestionTreeCreate: FunctionComponent<QuestionTreeCreateProps> = ({
       children: parsed,
     });
     setDisplayTreeViewer(true);
-  }, [getedTree]);
+  }, [getedTree, setTreeData]);
 
   useEffect(() => {
     if (!upsertedTree) {
