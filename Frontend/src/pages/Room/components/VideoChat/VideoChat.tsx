@@ -86,9 +86,9 @@ const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string) => {
     .reverse();
 };
 
-const findUserByOrder = (videoOrder: Record<string, number>) => {
+const findUserByPinnedOrder = (videoOrder: Record<string, number>) => {
   const lounderUser = Object.entries(videoOrder).find(
-    ([, order]) => order === 1,
+    ([, order]) => order === viewerPinOrder,
   );
   if (lounderUser) {
     return lounderUser[0];
@@ -294,8 +294,9 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   };
 
   const renderMain = () => {
-    const userOrder1 = findUserByOrder(videoOrder);
-    if (!userOrder1 || userOrder1 === auth?.id) {
+    const pinnedOrderUserId = findUserByPinnedOrder(videoOrder);
+
+    if (!pinnedOrderUserId || pinnedOrderUserId === auth?.id) {
       return (
         <>
           <video
@@ -320,7 +321,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       );
     }
     const userOrder1Peer = peers.find(
-      (peer) => peer.targetUserId === userOrder1,
+      (peer) => peer.targetUserId === pinnedOrderUserId,
     );
     if (!userOrder1Peer) {
       return <></>;
