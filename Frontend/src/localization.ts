@@ -48,6 +48,7 @@ export const enum LocalizationKey {
   CloselWithoutSave,
   Stay,
   Error,
+  Loading,
   NotSelected,
   QuestionCreatedSuccessfully,
   QuestionUpdatedSuccessfully,
@@ -93,6 +94,7 @@ export const enum LocalizationKey {
   CloseRoomWithoutReview,
   StartRoom,
   StartReviewRoom,
+  StartReviewRoomAi,
   CloseRoomModalTitle,
   StartReviewRoomModalTitle,
   CloseRoomLoading,
@@ -206,11 +208,10 @@ export const enum LocalizationKey {
   AnswerDetails,
   QuestionAnswerDetails,
   EmptyRoomNameError,
-  EmptyRoomCategoryError,
+  EmptyRoomQuestionTreeError,
   RoomEmptyStartTimeError,
   RoomStartTimeMustBeGreaterError,
   RoomEmptyQuestionsListError,
-  RoomEmptyCategoryError,
   InterviewHistoryTitle,
   RoomReviewSave,
   RoomReviewAlreadyGiven,
@@ -236,10 +237,42 @@ export const enum LocalizationKey {
   WebcamBackgroundBlur,
   Feedback,
   RateMeDescription,
-  RateMeCommand,
+  RateMeCommands,
   LetsBeginDescription,
   LetsBeginCommand,
   HomeDescription,
+  QuestionTreesPageName,
+  CreateQuestionTree,
+  QuestionTree,
+  QuestionTreeName,
+  QuestionTreeNodeDelete,
+  QuestionTreeNodeNewItemBelow,
+  QuestionTreeNodeNewItemInside,
+  QuestionTreeNodeMoveUp,
+  QuestionTreeNodeMoveDown,
+  QuestionTreeNodeMoveLeft,
+  QuestionTreeNodeMoveRight,
+  QuestionTreeCreatedSuccessfully,
+  QuestionTreeUpdatedSuccessfully,
+  QuestionTreeExpandAll,
+  QuestionTreeCollapseAll,
+  QuestionTreeRootNode,
+  Recommendation,
+  ExampleOfCorrectAnswer,
+  CodeReadability,
+  CodePerformance,
+  BestPractice,
+  Vulnerabilities,
+  CodeComments,
+  RefactoringProposal,
+  ReferenceCode,
+  Run,
+  ExpectsExecuteResults,
+  ExpectsExecuteOutput,
+  ExpectsExecuteOutputExpected,
+  ExpectsExecuteResultsPassed,
+  ExpectsExecuteResultsNotPassed,
+  ExecutionResultsSubmit,
 }
 
 export const LocalizationCaptions: Record<
@@ -296,6 +329,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.CloselWithoutSave]: 'Exit without saving',
     [LocalizationKey.Stay]: 'Stay',
     [LocalizationKey.Error]: 'Error',
+    [LocalizationKey.Loading]: 'Loading',
     [LocalizationKey.NotSelected]: 'Not selected',
     [LocalizationKey.QuestionCreatedSuccessfully]:
       'Question created successfully',
@@ -348,6 +382,7 @@ export const LocalizationCaptions: Record<
       'Close meeting without waiting for evaluations',
     [LocalizationKey.StartRoom]: 'Start interview',
     [LocalizationKey.StartReviewRoom]: 'Start meeting review.',
+    [LocalizationKey.StartReviewRoomAi]: 'Finish interview',
     [LocalizationKey.CloseRoomModalTitle]:
       'Do you really want to close meeting?',
     [LocalizationKey.StartReviewRoomModalTitle]:
@@ -473,16 +508,14 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.AnswerDetails]: 'Answer details',
     [LocalizationKey.QuestionAnswerDetails]: 'Question answer details',
     [LocalizationKey.EmptyRoomNameError]: 'Please provide the meeting name',
-    [LocalizationKey.EmptyRoomCategoryError]:
-      'Please provide the meeting category',
+    [LocalizationKey.EmptyRoomQuestionTreeError]:
+      'Please provide the question tree',
     [LocalizationKey.RoomEmptyStartTimeError]:
       'Please enter meeting start time',
     [LocalizationKey.RoomStartTimeMustBeGreaterError]:
       'Meeting start time must be greater than the current time',
     [LocalizationKey.RoomEmptyQuestionsListError]:
       'Please add questions to the list of questions',
-    [LocalizationKey.RoomEmptyCategoryError]:
-      'Please select a meeting category',
     [LocalizationKey.InterviewHistoryTitle]: 'Interview history',
     [LocalizationKey.RoomReviewAlreadyGiven]:
       'You have already given feedback on the interview. Waiting for evaluation from other participants.',
@@ -515,12 +548,49 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.Feedback]: 'Feedback',
     [LocalizationKey.RateMeDescription]:
       'At the end of your answer, say "{RateMeCommand}" and assistant will rate you.',
-    [LocalizationKey.RateMeCommand]: 'rate me',
+    [LocalizationKey.RateMeCommands]: 'rate me',
     [LocalizationKey.LetsBeginDescription]:
       'To start an interview, say "{LetsStartCommand}".',
     [LocalizationKey.LetsBeginCommand]: "let's begin",
     [LocalizationKey.HomeDescription]:
-      'AI interviews, video calls, question database.',
+      'AI interviews, video calls,\nquestion database.',
+    [LocalizationKey.QuestionTreesPageName]: 'Question trees',
+    [LocalizationKey.CreateQuestionTree]: 'Create question trees',
+    [LocalizationKey.QuestionTree]: 'Question tree',
+    [LocalizationKey.QuestionTreeName]: 'Question tree name',
+    [LocalizationKey.QuestionTreeNodeDelete]: 'Delete',
+    [LocalizationKey.QuestionTreeNodeNewItemBelow]: 'New item below',
+    [LocalizationKey.QuestionTreeNodeNewItemInside]: 'New item inside',
+    [LocalizationKey.QuestionTreeNodeMoveUp]: 'Move up',
+    [LocalizationKey.QuestionTreeNodeMoveDown]: 'Move down',
+    [LocalizationKey.QuestionTreeNodeMoveLeft]: 'Move out',
+    [LocalizationKey.QuestionTreeNodeMoveRight]: 'Move in',
+    [LocalizationKey.QuestionTreeCreatedSuccessfully]:
+      'Question tree created successfully',
+    [LocalizationKey.QuestionTreeUpdatedSuccessfully]:
+      'Question tree updated successfully',
+    [LocalizationKey.QuestionTreeExpandAll]: 'Expand all',
+    [LocalizationKey.QuestionTreeCollapseAll]: 'Collapse all',
+    [LocalizationKey.QuestionTreeRootNode]: 'Beginning',
+    [LocalizationKey.Recommendation]: 'Recommendation',
+    [LocalizationKey.ExampleOfCorrectAnswer]: 'Example of correct answer',
+    [LocalizationKey.CodeReadability]: 'Code readability',
+    [LocalizationKey.CodePerformance]: 'Performance optimization',
+    [LocalizationKey.BestPractice]:
+      'Compliance with best programming practices',
+    [LocalizationKey.Vulnerabilities]: 'Possible errors or vulnerabilities',
+    [LocalizationKey.CodeComments]: 'Comments on complex sections of code',
+    [LocalizationKey.RefactoringProposal]: 'Suggestions for improvement',
+    [LocalizationKey.ReferenceCode]: 'Reference code',
+    [LocalizationKey.Run]: 'Run',
+    [LocalizationKey.ExpectsExecuteResults]: 'Result of all expects execute',
+    [LocalizationKey.ExpectsExecuteOutput]: 'Output',
+    [LocalizationKey.ExpectsExecuteOutputExpected]: 'Expected output',
+    [LocalizationKey.ExpectsExecuteResultsPassed]:
+      'All checks passed successfully',
+    [LocalizationKey.ExpectsExecuteResultsNotPassed]:
+      'Not all tests were passed successfully',
+    [LocalizationKey.ExecutionResultsSubmit]: 'Send code for review',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -572,6 +642,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.CloselWithoutSave]: 'Выйти без сохранения',
     [LocalizationKey.Stay]: 'Остаться',
     [LocalizationKey.Error]: 'Ошибка',
+    [LocalizationKey.Loading]: 'Загрузка',
     [LocalizationKey.NotSelected]: 'Не выбрано',
     [LocalizationKey.QuestionCreatedSuccessfully]: 'Вопрос успешно создан',
     [LocalizationKey.QuestionUpdatedSuccessfully]: 'Вопрос успешно обновлён',
@@ -622,6 +693,7 @@ export const LocalizationCaptions: Record<
       'Закрыть встречу не дожидаясь оценок',
     [LocalizationKey.StartRoom]: 'Начать собеседование',
     [LocalizationKey.StartReviewRoom]: 'Начать разбор встречи',
+    [LocalizationKey.StartReviewRoomAi]: 'Закончить собеседование',
     [LocalizationKey.CloseRoomModalTitle]:
       'Действительно хотите закрыть встречу?',
     [LocalizationKey.StartReviewRoomModalTitle]:
@@ -749,16 +821,14 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.AnswerDetails]: 'Детали ответа',
     [LocalizationKey.QuestionAnswerDetails]: 'Детали ответа на вопрос',
     [LocalizationKey.EmptyRoomNameError]: 'Пожалуйста, укажите имя встречи',
-    [LocalizationKey.EmptyRoomCategoryError]:
-      'Пожалуйста, укажите категорию встречи',
+    [LocalizationKey.EmptyRoomQuestionTreeError]:
+      'Пожалуйста, укажите дерево вопросов',
     [LocalizationKey.RoomEmptyStartTimeError]:
       'Пожалуйста, укажите время начала встречи',
     [LocalizationKey.RoomStartTimeMustBeGreaterError]:
       'Время начала встречи должно быть больше текущего времени',
     [LocalizationKey.RoomEmptyQuestionsListError]:
       'Пожалуйста, добавьте вопросы в список вопросов',
-    [LocalizationKey.RoomEmptyCategoryError]:
-      'Пожалуйста, выберите категорию встречи',
     [LocalizationKey.InterviewHistoryTitle]: 'История собеседований',
     [LocalizationKey.RoomReviewAlreadyGiven]:
       'Вы уже дали отзыв о собеседовании. Ожидание оценки от остальных участников.',
@@ -794,11 +864,49 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.Feedback]: 'Обратная связь',
     [LocalizationKey.RateMeDescription]:
       'В конце ответа скажите "{RateMeCommand}" и ассистент оценит вас.',
-    [LocalizationKey.RateMeCommand]: 'оцени меня',
+    [LocalizationKey.RateMeCommands]: 'оцени меня|цени меня',
     [LocalizationKey.LetsBeginDescription]:
       'Для начала собеседования скажите "{LetsStartCommand}".',
     [LocalizationKey.LetsBeginCommand]: 'давай начнём',
     [LocalizationKey.HomeDescription]:
-      'Собеседования с AI, видеозвонки, база вопросов.',
+      'Собеседования с AI, видеозвонки,\nбаза вопросов.',
+    [LocalizationKey.QuestionTreesPageName]: 'Деревья вопросов',
+    [LocalizationKey.CreateQuestionTree]: 'Создать дерево вопросов',
+    [LocalizationKey.QuestionTree]: 'Дерево вопросов',
+    [LocalizationKey.QuestionTreeName]: 'Имя дерева вопросов',
+    [LocalizationKey.QuestionTreeNodeDelete]: 'Удалить',
+    [LocalizationKey.QuestionTreeNodeNewItemBelow]: 'Новый элемент рядом',
+    [LocalizationKey.QuestionTreeNodeNewItemInside]: 'Новый элемент внутри',
+    [LocalizationKey.QuestionTreeNodeMoveUp]: 'Переместить вверх',
+    [LocalizationKey.QuestionTreeNodeMoveDown]: 'Переместить вниз',
+    [LocalizationKey.QuestionTreeNodeMoveLeft]: 'Переместить наружу',
+    [LocalizationKey.QuestionTreeNodeMoveRight]: 'Переместить внутрь',
+    [LocalizationKey.QuestionTreeCreatedSuccessfully]:
+      'Дерево вопросов создано успешно',
+    [LocalizationKey.QuestionTreeUpdatedSuccessfully]:
+      'Дерево вопросов успешно обновлено',
+    [LocalizationKey.QuestionTreeExpandAll]: 'Развернуть все',
+    [LocalizationKey.QuestionTreeCollapseAll]: 'Свернуть все',
+    [LocalizationKey.QuestionTreeRootNode]: 'Начало',
+    [LocalizationKey.Recommendation]: 'Рекомендация',
+    [LocalizationKey.ExampleOfCorrectAnswer]: 'Пример правильного ответа',
+    [LocalizationKey.CodeReadability]: 'Читаемость кода',
+    [LocalizationKey.CodePerformance]: 'Оптимизация производительности',
+    [LocalizationKey.BestPractice]:
+      'Соответствие лучшим практикам программирования',
+    [LocalizationKey.Vulnerabilities]: 'Возможные ошибки или уязвимости',
+    [LocalizationKey.CodeComments]: 'Комментарии к сложным участкам кода',
+    [LocalizationKey.RefactoringProposal]: 'Предложения по улучшению',
+    [LocalizationKey.ReferenceCode]: 'Эталонный код',
+    [LocalizationKey.Run]: 'Запустить',
+    [LocalizationKey.ExpectsExecuteResults]:
+      'Результат выполнения функций expect',
+    [LocalizationKey.ExpectsExecuteOutput]: 'Результат',
+    [LocalizationKey.ExpectsExecuteOutputExpected]: 'Ожидаемый результат',
+    [LocalizationKey.ExpectsExecuteResultsPassed]:
+      'Все проверки пройдены успешно',
+    [LocalizationKey.ExpectsExecuteResultsNotPassed]:
+      'Не все проверки пройдены успешно',
+    [LocalizationKey.ExecutionResultsSubmit]: 'Отправить код на проверку',
   },
 };

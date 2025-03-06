@@ -12,5 +12,5 @@ public class RoomUpdateRequest
 
     public long? DurationSec { get; set; }
 
-    public Guid? CategoryId { get; set; }
+    public Guid? QuestionTreeId { get; set; }
 }

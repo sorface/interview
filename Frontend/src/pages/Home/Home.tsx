@@ -4,7 +4,7 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { Navigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import { pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { HomeAction } from './components/HomeContent/HomeAction';
@@ -13,14 +13,13 @@ import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Gap } from '../../components/Gap/Gap';
 import { Typography } from '../../components/Typography/Typography';
 import { LangSwitch } from '../../components/LangSwitch/LangSwitch';
-import { VITE_NAME } from '../../config';
+import { VITE_APP_NAME } from '../../config';
 import {
   AiAssistant,
   AiAssistantLoadingVariant,
   AiAssistantScriptName,
 } from '../Room/components/AiAssistant/AiAssistant';
 import { Canvas } from '@react-three/fiber';
-import { EffectComposer, FXAA } from '@react-three/postprocessing';
 
 export const Home: FunctionComponent = () => {
   const auth = useContext(AuthContext);
@@ -56,34 +55,50 @@ export const Home: FunctionComponent = () => {
   return (
     <>
       <div className="flex flex-1 flex-col justify-center items-center">
-        <div
-          style={{ width: 450, height: 450 }}
-          className="cursor-pointer"
-          onClick={handleAiAssistantClick}
-        >
-          <Canvas shadows camera={{ position: [0, 0.05, 2.8], fov: 38 }}>
-            <EffectComposer>
-              <FXAA />
-            </EffectComposer>
-            <AiAssistant
-              currentScript={aiAssistantScript}
-              loading
-              loadingVariant={AiAssistantLoadingVariant.Wide}
-              trackMouse
-            />
-          </Canvas>
+        <div className="w-full flex items-center justify-center">
+          <div
+            style={{
+              width: '291px',
+              height: '291px',
+            }}
+          />
+          <div
+            className="absolute cursor-pointer"
+            style={{ width: '256px', height: '256px' }}
+            onClick={handleAiAssistantClick}
+          >
+            <Canvas shadows camera={{ position: [0, 0.12, 1.5], fov: 38 }}>
+              <AiAssistant
+                currentScript={aiAssistantScript}
+                loading
+                loadingVariant={AiAssistantLoadingVariant.Wide}
+                trackMouse
+              />
+            </Canvas>
+          </div>
         </div>
-        <Typography size="xxl" bold>
-          {VITE_NAME}
+        <Typography size="xxxl" bold>
+          {VITE_APP_NAME}
         </Typography>
-        <Gap sizeRem={0.25} />
-        <Typography size="m">
-          {localizationCaptions[LocalizationKey.HomeDescription]}
-        </Typography>
-        <Gap sizeRem={1.25} />
+        <Gap sizeRem={0.625} />
+        <div className="whitespace-break-spaces">
+          <Typography size="l">
+            {localizationCaptions[LocalizationKey.HomeDescription]}
+          </Typography>
+        </div>
+        <Gap sizeRem={1.05} />
         <HomeAction />
       </div>
-      <div className="flex justify-center">
+      <div className="flex flex-col items-center">
+        <div className="whitespace-break-spaces">
+          <Typography size="s">
+            {localizationCaptions[LocalizationKey.TermsOfUsageAcceptance]}
+            <Link to={pathnames.terms}>
+              {localizationCaptions[LocalizationKey.TermsOfUsage]}
+            </Link>
+          </Typography>
+        </div>
+        <Gap sizeRem={0.5} />
         <LangSwitch elementType="switcherButton" />
       </div>
     </>

@@ -15,19 +15,19 @@
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="./manifest.json" />
-    %VITE_INJECT_HTML%
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap"
       rel="stylesheet"
     />
-    <title>Interview Platform</title>
+    <title>%VITE_APP_NAME%</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <script type="module" src="/src/index.tsx"></script>
+    %VITE_INJECT_HTML%
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.

@@ -45,4 +45,11 @@ public class RoomReviewServicePermissionAccessor(IRoomReviewService roomReviewSe
         await securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomReviewCompletion, cancellationToken);
         return await roomReviewService.CompleteAsync(request, userId, cancellationToken);
     }
+
+    public async Task<RoomCompleteResponse> CompleteAIAsync(RoomReviewCompletionRequest request, Guid userId, CancellationToken cancellationToken = default)
+    {
+        await securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomStartReview, cancellationToken);
+        await securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomReviewCompletion, cancellationToken);
+        return await roomReviewService.CompleteAIAsync(request, userId, cancellationToken);
+    }
 }

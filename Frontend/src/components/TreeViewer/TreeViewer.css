@@ -1,0 +1,12 @@
+.react-flow__pane,
+.react-flow__pane * {
+  transition: none !important;
+}
+
+.dark .react-flow__renderer {
+  background: var(--page-bg);
+}
+
+.dark .react-flow__node {
+  background: var(--wrap-bg);
+}

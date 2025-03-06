@@ -1,7 +1,11 @@
+using Interview.Backend.Common;
 using Interview.Backend.Responses;
 using Interview.Domain;
+using Interview.Domain.Questions.QuestionTreeById;
+using Interview.Domain.Questions.QuestionTreePage;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Questions.Services;
+using Interview.Domain.Questions.UpsertQuestionTree;
 using Interview.Domain.ServiceResults.Success;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +26,7 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
     [HttpGet]
     [Produces("application/json")]
     [ProducesResponseType(typeof(IPagedList<QuestionItem>), StatusCodes.Status200OK)]
-    public Task<IPagedList<QuestionItem>> GetPage([FromQuery] FindPageRequest request)
+    public Task<IPagedList<QuestionItem>> FindPageAsync([FromQuery] FindPageRequest request)
     {
         return questionService.FindPageAsync(request, HttpContext.RequestAborted);
     }
@@ -35,8 +39,8 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
     [Authorize]
     [HttpGet("archived")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(QuestionItem), StatusCodes.Status200OK)]
-    public Task<IPagedList<QuestionItem>> Unarchive([FromQuery] PageRequest pageRequest)
+    [ProducesResponseType(typeof(IPagedList<QuestionItem>), StatusCodes.Status200OK)]
+    public Task<IPagedList<QuestionItem>> FindPageArchiveAsync([FromQuery] PageRequest pageRequest)
     {
         return questionService.FindPageArchiveAsync(pageRequest.PageNumber, pageRequest.PageSize, HttpContext.RequestAborted);
     }
@@ -51,7 +55,7 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
     [Produces("application/json")]
     [ProducesResponseType(typeof(QuestionItem), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
-    public Task<QuestionItem> GetById(Guid id)
+    public Task<QuestionItem> FindByIdAsync(Guid id)
     {
         return questionService.FindByIdAsync(id, HttpContext.RequestAborted);
     }
@@ -66,7 +70,7 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
     [Produces("application/json")]
     [ProducesResponseType(typeof(QuestionItem), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<QuestionItem>> Create(QuestionCreateRequest request)
+    public async Task<ActionResult<QuestionItem>> CreateAsync(QuestionCreateRequest request)
     {
         var question = await questionService.CreateAsync(request, null, HttpContext.RequestAborted);
 
@@ -84,7 +88,7 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
     [Produces("application/json")]
     [ProducesResponseType(typeof(QuestionItem), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
-    public Task<QuestionItem> Update(Guid id, QuestionEditRequest request)
+    public Task<QuestionItem> UpdateAsync(Guid id, QuestionEditRequest request)
     {
         return questionService.UpdateAsync(id, request, HttpContext.RequestAborted);
     }
@@ -114,7 +118,7 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
     [Produces("application/json")]
     [ProducesResponseType(typeof(QuestionItem), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
-    public Task<QuestionItem> Unarchive(Guid id)
+    public Task<QuestionItem> UnarchiveAsync(Guid id)
     {
         return questionService.UnarchiveAsync(id, HttpContext.RequestAborted);
     }
@@ -129,7 +133,7 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
     [Produces("application/json")]
     [ProducesResponseType(typeof(QuestionItem), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
-    public Task<QuestionItem> DeletePermanently(Guid id)
+    public Task<QuestionItem> DeletePermanentlyAsync(Guid id)
     {
         return questionService.DeletePermanentlyAsync(id, HttpContext.RequestAborted);
     }

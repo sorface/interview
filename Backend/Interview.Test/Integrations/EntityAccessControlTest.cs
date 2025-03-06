@@ -39,7 +39,7 @@ public class EntityAccessControlTest : IDisposable
         _currentUserAccessorMock.Setup(x => x.IsAdmin()).Returns(true);
 
         // Act
-        Func<Task> act = async () => await _entityAccessControl.EnsureEditPermissionAsync<Tag>(entityId, CancellationToken.None);
+        Func<Task> act = async () => await _entityAccessControl.EnsureEditPermissionAsync<Tag>(entityId, false, CancellationToken.None);
 
         // Assert
         await act.Should().NotThrowAsync();
@@ -61,7 +61,7 @@ public class EntityAccessControlTest : IDisposable
         _appDbContext.ChangeTracker.Clear();
 
         // Act
-        Func<Task> act = async () => await _entityAccessControl.EnsureEditPermissionAsync<Tag>(entityId, CancellationToken.None);
+        Func<Task> act = async () => await _entityAccessControl.EnsureEditPermissionAsync<Tag>(entityId, false, CancellationToken.None);
 
         // Assert
         await act.Should().NotThrowAsync();
@@ -85,9 +85,47 @@ public class EntityAccessControlTest : IDisposable
         _appDbContext.ChangeTracker.Clear();
 
         // Act
-        Func<Task> act = async () => await _entityAccessControl.EnsureEditPermissionAsync<Tag>(entityId, CancellationToken.None);
+        Func<Task> act = async () => await _entityAccessControl.EnsureEditPermissionAsync<Tag>(entityId, false, CancellationToken.None);
 
         // Assert
         await act.Should().ThrowAsync<AccessDeniedException>().WithMessage("You do not have permission to modify the entity.");
+    }
+
+    [Fact]
+    public async Task EnsureEditPermissionAsync_NonAdminUserWithoutPermission_ShouldThrowException_For_Non_Exists_Entity()
+    {
+        // Arrange
+        var currentUserId = Guid.NewGuid();
+        var otherUserId = Guid.NewGuid();
+        TestAppDbContextFactory.AddUser(_appDbContext, currentUserId, "Usr_" + currentUserId);
+        TestAppDbContextFactory.AddUser(_appDbContext, otherUserId, "Usr_" + currentUserId);
+
+        _currentUserAccessorMock.Setup(x => x.IsAdmin()).Returns(false);
+        _currentUserAccessorMock.Setup(x => x.UserId).Returns(currentUserId);
+
+        // Act
+        Func<Task> act = async () => await _entityAccessControl.EnsureEditPermissionAsync<Tag>(Guid.NewGuid(), false, CancellationToken.None);
+
+        // Assert
+        await act.Should().ThrowAsync<AccessDeniedException>().WithMessage("You do not have permission to modify the entity.");
+    }
+
+    [Fact]
+    public async Task EnsureEditPermissionAsync_NonAdminUserWithoutPermission_ShouldNotThrowException_For_Non_Exists_Entity()
+    {
+        // Arrange
+        var currentUserId = Guid.NewGuid();
+        var otherUserId = Guid.NewGuid();
+        TestAppDbContextFactory.AddUser(_appDbContext, currentUserId, "Usr_" + currentUserId);
+        TestAppDbContextFactory.AddUser(_appDbContext, otherUserId, "Usr_" + currentUserId);
+
+        _currentUserAccessorMock.Setup(x => x.IsAdmin()).Returns(false);
+        _currentUserAccessorMock.Setup(x => x.UserId).Returns(currentUserId);
+
+        // Act
+        Func<Task> act = async () => await _entityAccessControl.EnsureEditPermissionAsync<Tag>(Guid.NewGuid(), true, CancellationToken.None);
+
+        // Assert
+        await act.Should().NotThrowAsync();
     }
 }

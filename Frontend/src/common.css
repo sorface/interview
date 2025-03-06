@@ -1,6 +1,9 @@
 .grid {
   display: grid;
 }
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
 .grid-cols-3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -461,6 +464,9 @@
 .ml-auto {
   margin-left: auto;
 }
+.ml-1 {
+  margin-left: 1rem;
+}
 .mr-0\.25 {
   margin-right: 0.25rem;
 }
@@ -515,6 +521,9 @@
 .whitespace-nowrap {
   white-space: nowrap;
 }
+.whitespace-break-spaces {
+  white-space: break-spaces;
+}
 .text-ellipsis {
   text-overflow: ellipsis;
 }
@@ -529,6 +538,9 @@
 }
 .min-h-4 {
   min-height: 4rem;
+}
+.min-h-\[1\.91rem\] {
+  min-height: 1.91rem;
 }
 .w-fit {
   width: fit-content;

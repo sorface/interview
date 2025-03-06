@@ -28,6 +28,7 @@ const ContextMenuComponent: FunctionComponent<ContextMenuProps> = ({
       useButton={useButton}
       buttonVariant={buttonVariant}
       contentClassName="w-13.75 rounded-0.75"
+      toggleClassName="flex"
       contentStyle={{
         transform: `translate(${translateRem.x}rem, ${translateRem.y}rem)`,
       }}

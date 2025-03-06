@@ -12,10 +12,16 @@ import {
   GetRoomPageParams,
   roomsApiDeclaration,
 } from '../../apiDeclarations';
-import { IconNames } from '../../constants';
+import { aiExpertNickname, IconNames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
-import { Room, RoomCalendarItem, RoomStatus } from '../../types/room';
+import {
+  Room,
+  RoomCalendarItem,
+  RoomParticipant,
+  RoomStatus,
+  RoomWtithType,
+} from '../../types/room';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
@@ -33,9 +39,21 @@ import { getRoomLink } from '../../utils/getRoomLink';
 import { Loader } from '../../components/Loader/Loader';
 import { Typography } from '../../components/Typography/Typography';
 import { ContextMenu } from '../../components/ContextMenu/ContextMenu';
-import { checkAiAccess } from '../../utils/checkAiAccess';
+import { useThemedAiAvatar } from '../../hooks/useThemedAiAvatar';
 
 import './Rooms.css';
+
+const aiParticipant: RoomParticipant = {
+  id: 'fakeId',
+  nickname: aiExpertNickname,
+  userType: 'Expert',
+  roles: ['User'],
+  roomId: 'roomId',
+  twitchIdentity: 'twitchIdentity',
+  type: 'Expert',
+  userId: 'userId',
+  avatar: '',
+};
 
 const pageSize = 30;
 const initialPageNumber = 1;
@@ -81,12 +99,13 @@ interface RoomsProps {
 
 export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
   const auth = useContext(AuthContext);
-  const userHasAiAccess = checkAiAccess(auth);
   const localizationCaptions = useLocalizationCaptions();
+  const themedAiAvatar = useThemedAiAvatar();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
-  const { apiMethodState, fetchData } = useApiMethod<Room[], GetRoomPageParams>(
-    roomsApiDeclaration.getPage,
-  );
+  const { apiMethodState, fetchData } = useApiMethod<
+    RoomWtithType[],
+    GetRoomPageParams
+  >(roomsApiDeclaration.getPage);
   const {
     process: { loading, error },
     data: rooms,
@@ -249,7 +268,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
     setSelectedDay(day);
   };
 
-  const createRoomItem = (room: Room) => {
+  const createRoomItem = (room: RoomWtithType) => {
     const roomStatusCaption: Record<Room['status'], string> = {
       New: localizationCaptions[LocalizationKey.RoomStatusNew],
       Active: localizationCaptions[LocalizationKey.RoomStatusActive],
@@ -269,6 +288,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
         roomParticipant.type === 'Expert' && roomParticipant.id === auth?.id,
     );
     const canEditInStatus = room.status === 'New' || room.status === 'Active';
+    const aiRoom = room.type === 'AI';
 
     return (
       <div key={room.id} className="room-item-wrapper">
@@ -281,7 +301,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
                 </Tag>
                 <Gap sizeRem={1.5} />
                 <div className="room-action-links">
-                  {expertInRoom && canEditInStatus && (
+                  {!aiRoom && expertInRoom && canEditInStatus && (
                     <>
                       <div
                         className="room-edit-participants-link rotate-90"
@@ -305,7 +325,19 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
                 </>
               )}
               <Gap sizeRem={1.75} />
-              <RoomParticipants participants={room.participants} />
+              <RoomParticipants
+                participants={[
+                  ...room.participants,
+                  ...(room.type === 'AI'
+                    ? [
+                        {
+                          ...aiParticipant,
+                          avatar: themedAiAvatar,
+                        },
+                      ]
+                    : []),
+                ]}
+              />
             </div>
           </Link>
         </li>
@@ -314,12 +346,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
   };
 
   const renderCreateRoomButton = () => (
-    <Button
-      variant="active"
-      className="h-2.5"
-      aria-hidden={userHasAiAccess}
-      onClick={userHasAiAccess ? undefined : handleOpenCreateModalClassic}
-    >
+    <Button variant="active" className="h-2.5" aria-hidden>
       <Icon name={IconNames.Add} />
       {localizationCaptions[LocalizationKey.CreateRoom]}
     </Button>
@@ -332,27 +359,23 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
         searchValue={searchValueInput}
         onSearchChange={setSearchValueInput}
       >
-        {userHasAiAccess ? (
-          <ContextMenu
-            translateRem={{ x: -3.75, y: 0.25 }}
-            toggleContent={renderCreateRoomButton()}
-          >
-            {[
-              <ContextMenu.Item
-                key="CreateClassicRoom"
-                title={localizationCaptions[LocalizationKey.CreateRoomClassic]}
-                onClick={handleOpenCreateModalClassic}
-              />,
-              <ContextMenu.Item
-                key="CreateAiRoom"
-                title={localizationCaptions[LocalizationKey.CreateRoomAi]}
-                onClick={handleOpenCreateModalAi}
-              />,
-            ]}
-          </ContextMenu>
-        ) : (
-          renderCreateRoomButton()
-        )}
+        <ContextMenu
+          translateRem={{ x: -3.75, y: 0.25 }}
+          toggleContent={renderCreateRoomButton()}
+        >
+          {[
+            <ContextMenu.Item
+              key="CreateClassicRoom"
+              title={localizationCaptions[LocalizationKey.CreateRoomClassic]}
+              onClick={handleOpenCreateModalClassic}
+            />,
+            <ContextMenu.Item
+              key="CreateAiRoom"
+              title={localizationCaptions[LocalizationKey.CreateRoomAi]}
+              onClick={handleOpenCreateModalAi}
+            />,
+          ]}
+        </ContextMenu>
       </PageHeader>
       <div className="rooms-page flex-1 overflow-auto">
         {createEditModalOpened && (
@@ -383,13 +406,36 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
             ) && (
               <>
                 <Gap sizeRem={2.25} />
-                <Button
-                  className="h-2.5 text-grey3"
-                  onClick={handleOpenCreateModalClassic}
-                >
-                  <Icon name={IconNames.Add} />
-                  {localizationCaptions[LocalizationKey.CreateRoom]}
-                </Button>
+                <div className="flex justify-center">
+                  <ContextMenu
+                    translateRem={{ x: 0, y: 0 }}
+                    toggleContent={
+                      <Button className="h-2.5 text-grey3" aria-hidden>
+                        <Icon name={IconNames.Add} />
+                        {localizationCaptions[LocalizationKey.CreateRoom]}
+                      </Button>
+                    }
+                  >
+                    {[
+                      <ContextMenu.Item
+                        key="CreateClassicRoom"
+                        title={
+                          localizationCaptions[
+                            LocalizationKey.CreateRoomClassic
+                          ]
+                        }
+                        onClick={handleOpenCreateModalClassic}
+                      />,
+                      <ContextMenu.Item
+                        key="CreateAiRoom"
+                        title={
+                          localizationCaptions[LocalizationKey.CreateRoomAi]
+                        }
+                        onClick={handleOpenCreateModalAi}
+                      />,
+                    ]}
+                  </ContextMenu>
+                </div>
               </>
             )}
           </div>

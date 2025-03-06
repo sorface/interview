@@ -1,3 +1,5 @@
+using Interview.Domain.Questions.QuestionTreeById;
+
 namespace Interview.Domain.Rooms.Records.Response.Detail;
 
 public class RoomDetail
@@ -22,5 +24,5 @@ public class RoomDetail
 
     public required List<RoomQuestionDetail>? Questions { get; set; }
 
-    public required RoomCategoryResponse? Category { get; set; }
+    public required QuestionTreeByIdResponse? QuestionTree { get; set; }
 }

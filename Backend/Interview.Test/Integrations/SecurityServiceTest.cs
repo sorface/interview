@@ -85,7 +85,7 @@ public class SecurityServiceTest
     {
         var faker = new Faker();
         var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
-        room = new Room(faker.Random.Word(), SERoomAccessType.Public);
+        room = new Room(faker.Random.Word(), SERoomAccessType.Public, SERoomType.Standard);
         appDbContext.Rooms.Add(room);
         user = new User(faker.Random.Word(), string.Empty);
         appDbContext.Users.Add(user);
