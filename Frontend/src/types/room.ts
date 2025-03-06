@@ -1,6 +1,5 @@
 import { DragNDropListItem } from '../components/DragNDropList/DragNDropList';
 import { CodeEditorLang, Question, QuestionAnswer } from './question';
-import { QuestionsTree } from './questionsTree';
 import { Tag } from './tag';
 import { User, UserType } from './user';
 
@@ -23,16 +22,15 @@ export interface Room {
   status: RoomStatus;
   questions: RoomQuestionListItem[];
   scheduledStartTime: string;
-  questionTree?: QuestionsTree;
+  category?: {
+    id: string;
+    name: string;
+  };
   timer?: {
     durationSec: number;
     startTime?: string;
   };
 }
-
-export type RoomWtithType = Room & {
-  type: 'AI' | 'Standard';
-};
 
 export interface RoomCalendarItem {
   minScheduledStartTime: string;

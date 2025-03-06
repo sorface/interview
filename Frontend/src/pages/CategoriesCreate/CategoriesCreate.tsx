@@ -1,7 +1,6 @@
 import React, {
   ChangeEvent,
   FormEvent,
-  Fragment,
   FunctionComponent,
   useCallback,
   useEffect,
@@ -25,15 +24,9 @@ import { useApiMethod } from '../../hooks/useApiMethod';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Category } from '../../types/category';
-import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
-import { Gap } from '../../components/Gap/Gap';
-import { Checkbox } from '../../components/Checkbox/Checkbox';
-import { Typography } from '../../components/Typography/Typography';
 
 import './CategoriesCreate.css';
 
-const pageSize = 30;
-const initialPageNumber = 1;
 const nameFieldName = 'categoryName';
 const orderFieldName = 'categoryOrder';
 
@@ -84,10 +77,11 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
   const [categoryName, setCategoryName] = useState('');
   const [categoryParent, setCategoryParent] = useState('');
   const [categoryOrder, setCategoryOrder] = useState(0);
-  const [pageNumber, setPageNumber] = useState(initialPageNumber);
 
-  const totalLoading = loading || updatingLoading || categoryLoading;
-  const totalError = error || categoryError || updatingError;
+  const totalLoading =
+    loading || updatingLoading || categoryLoading || parentCategoriesLoading;
+  const totalError =
+    error || categoryError || updatingError || parentCategoriesError;
 
   useEffect(() => {
     if (!edit) {
@@ -131,18 +125,18 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
   useEffect(() => {
     fetchParentCategories({
       name: '',
-      PageNumber: pageNumber,
-      PageSize: pageSize,
+      PageNumber: 1,
+      PageSize: 30,
       parentId: null,
     });
-  }, [pageNumber, fetchParentCategories]);
-
-  const handleNextPage = () => {
-    setPageNumber(pageNumber + 1);
-  };
+  }, [fetchParentCategories]);
 
   const handleCategoryNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setCategoryName(event.target.value);
+  };
+
+  const handleCategoryParentChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setCategoryParent(e.target.value);
   };
 
   const handleCategoryOrderChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -204,23 +198,6 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
     return <></>;
   };
 
-  const createQuestionItem = (category: Category) => (
-    <Fragment key={category.id}>
-      <div className="flex items-center">
-        <div>
-          <Gap sizeRem={1.25} />
-          <Checkbox
-            id={category.id}
-            checked={categoryParent === category.id}
-            onChange={() => setCategoryParent(category.id)}
-            label={category.name}
-          />
-        </div>
-      </div>
-      <Gap sizeRem={0.25} />
-    </Fragment>
-  );
-
   return (
     <MainContentWrapper className="categories-create">
       <HeaderWithLink
@@ -247,20 +224,25 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
           />
         </Field>
         <Field>
-          <Typography size="m">
-            {localizationCaptions[LocalizationKey.CategoryParent]}:
-          </Typography>
-          <div className="overflow-auto h-25">
-            <ItemsGrid
-              currentData={parentCategories}
-              loading={parentCategoriesLoading}
-              error={parentCategoriesError}
-              triggerResetAccumData=""
-              renderItem={createQuestionItem}
-              nextPageAvailable={parentCategories?.length === pageSize}
-              handleNextPage={handleNextPage}
-            />
+          <div>
+            <label htmlFor="parentID">
+              {localizationCaptions[LocalizationKey.CategoryParent]}:
+            </label>
           </div>
+          <select
+            id="parentID"
+            value={categoryParent}
+            onChange={handleCategoryParentChange}
+          >
+            <option value="null">
+              {localizationCaptions[LocalizationKey.NotSelected]}
+            </option>
+            {parentCategories?.map((parentCategory) => (
+              <option key={parentCategory.id} value={parentCategory.id}>
+                {parentCategory.name}
+              </option>
+            ))}
+          </select>
         </Field>
         <Field>
           <div>

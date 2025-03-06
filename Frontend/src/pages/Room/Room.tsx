@@ -16,14 +16,12 @@ import useWebSocket from 'react-use-websocket';
 import toast from 'react-hot-toast';
 import {
   ApplyRoomInviteBody,
-  CompleteRoomReviewsBody,
   GenerateRoomInviteBody,
   GetRoomParticipantParams,
   GetRoomQuestionsBody,
   RoomIdParam,
   roomInviteApiDeclaration,
   roomQuestionApiDeclaration,
-  roomReviewApiDeclaration,
   roomsApiDeclaration,
 } from '../../apiDeclarations';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
@@ -69,7 +67,6 @@ import { useVideoChat } from './components/VideoChat/hoks/useVideoChat';
 import { useUserStreams } from './hooks/useUserStreams';
 import { useRoomSounds } from './hooks/useRoomSounds';
 import { AiAssistantScriptName } from './components/AiAssistant/AiAssistant';
-import { mapInvitesForAiRoom } from '../../utils/mapInvitesForAiRoom';
 
 import './Room.css';
 
@@ -100,7 +97,6 @@ export const Room: FunctionComponent = () => {
   } = apiApplyRoomInviteState;
 
   const [roomInReview, setRoomInReview] = useState(false);
-  const [roomClose, setRoomClose] = useState(false);
   const [reactionsVisible, setReactionsVisible] = useState(false);
   const [currentQuestionId, setCurrentQuestionId] =
     useState<RoomQuestion['id']>();
@@ -232,16 +228,6 @@ export const Room: FunctionComponent = () => {
   } = apiRoomStateState;
 
   const {
-    apiMethodState: apiRoomCompleteAiMethodState,
-    fetchData: fetchRoomCompleteAi,
-  } = useApiMethod<unknown, CompleteRoomReviewsBody>(
-    roomReviewApiDeclaration.completeAi,
-  );
-  const {
-    process: { loading: loadingCompleteAi, error: errorCompleteAi },
-  } = apiRoomCompleteAiMethodState;
-
-  const {
     apiMethodState: apiRoomStartReviewMethodState,
     fetchData: fetchRoomStartReview,
   } = useApiMethod<unknown, RoomType['id']>(roomsApiDeclaration.startReview);
@@ -259,11 +245,11 @@ export const Room: FunctionComponent = () => {
   const currentUserExpert = roomParticipant?.userType === 'Expert';
   const currentUserExaminee = roomParticipant?.userType === 'Examinee';
   const viewerMode = !(currentUserExpert || currentUserExaminee);
-  const aiRoom = !!room?.questionTree;
+  const aiRoom = !!room?.category;
 
   const userStreams = useUserStreams();
   const { playJoinRoomSound, playChatMessageSound } = useRoomSounds();
-  const { peers, videoOrder, peerToStream, allUsers } = useVideoChat({
+  const { peers, videoOrder, peerToStream, allUsers, pinUser } = useVideoChat({
     viewerMode,
     lastWsMessageParsed,
     userAudioStream: userStreams.userAudioStream,
@@ -411,10 +397,6 @@ export const Room: FunctionComponent = () => {
         case 'ChangeRoomStatus': {
           const newStatus: RoomType['status'] = 'New';
           const reviewStatus: RoomType['status'] = 'Review';
-          const closeStatus: RoomType['status'] = 'Close';
-          if (parsedData?.Value === closeStatus) {
-            setRoomClose(true);
-          }
           if (parsedData?.Value === reviewStatus) {
             setRoomInReview(true);
           }
@@ -526,20 +508,6 @@ export const Room: FunctionComponent = () => {
     fetchRoomStartReview(room.id);
   };
 
-  const handleStartReviewRoomAi = () => {
-    if (!room?.id) {
-      console.warn('Room id not found');
-      return;
-    }
-    fetchRoomCompleteAi({ roomId: room.id });
-  };
-
-  if (roomClose && id) {
-    return (
-      <Navigate to={generatePath(pathnames.roomAnalytics, { id })} replace />
-    );
-  }
-
   if (roomInReview && id) {
     return (
       <Navigate to={getCloseRedirectLink(id, currentUserExpert)} replace />
@@ -571,6 +539,7 @@ export const Room: FunctionComponent = () => {
         codeEditorEnabled,
         codeEditorLanguage,
         peers,
+        pinUser: pinUser(),
         videoOrder,
         peerToStream,
         allUsers,
@@ -605,11 +574,7 @@ export const Room: FunctionComponent = () => {
               <Invitations
                 open={invitationsOpen}
                 roomId={id || ''}
-                roomInvitesData={
-                  !aiRoom
-                    ? roomInvitesData
-                    : mapInvitesForAiRoom(roomInvitesData || [])
-                }
+                roomInvitesData={roomInvitesData}
                 roomInvitesError={
                   roomInvitesError ||
                   generateRoomInviteError ||
@@ -749,8 +714,8 @@ export const Room: FunctionComponent = () => {
                             messagesChatEnabled={messagesChatEnabled}
                             recognitionNotSupported={recognitionNotSupported}
                             currentUserExpert={currentUserExpert}
-                            loadingRoomStartReview={loadingCompleteAi}
-                            errorRoomStartReview={errorCompleteAi}
+                            loadingRoomStartReview={loadingRoomStartReview}
+                            errorRoomStartReview={errorRoomStartReview}
                             // ScreenShare
                             // screenStream={screenStream}
                             roomQuestionsLoading={roomQuestionsLoading}
@@ -758,8 +723,7 @@ export const Room: FunctionComponent = () => {
                               roomQuestions?.sort(sortRoomQuestion) || []
                             }
                             initialQuestion={currentQuestion}
-                            handleInvitationsOpen={handleInvitationsOpen}
-                            handleStartReviewRoom={handleStartReviewRoomAi}
+                            handleStartReviewRoom={handleStartReviewRoom}
                             handleSettingsOpen={handleSettingsOpen}
                             handleLeaveRoom={handleLeaveRoom}
                           />

@@ -7,6 +7,6 @@ namespace Interview.Domain.Permissions;
 /// </summary>
 public interface IEntityAccessControl
 {
-    Task EnsureEditPermissionAsync<T>(Guid entityId, bool skipNotExistEntity = false, CancellationToken cancellationToken = default)
+    Task EnsureEditPermissionAsync<T>(Guid entityId, CancellationToken cancellationToken)
         where T : Entity;
 }

@@ -9,7 +9,7 @@ namespace Interview.Test
         public Faker<Room> Room()
         {
             return new Faker<Room>()
-                .CustomInstantiator(e => new Room(string.Empty, SERoomAccessType.Public, SERoomType.Standard))
+                .CustomInstantiator(e => new Room(string.Empty, SERoomAccessType.Public))
                 .RuleFor(e => e.Name, f => f.Random.Word())
                 .RuleFor(e => e.Id, f => Guid.NewGuid());
         }

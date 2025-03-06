@@ -12,6 +12,7 @@ import { VideochatParticipant } from './VideochatParticipant';
 import { MessagesChat } from './MessagesChat';
 import { limitLength } from './utils/limitLength';
 import { randomId } from '../../../../utils/randomId';
+import { RoomCodeEditor } from '../RoomCodeEditor/RoomCodeEditor';
 import { useApiMethod } from '../../../../hooks/useApiMethod';
 import { RoomIdParam, roomsApiDeclaration } from '../../../../apiDeclarations';
 import { EventsSearch } from '../../../../types/event';
@@ -30,7 +31,6 @@ import { RoomContext } from '../../context/RoomContext';
 import { RoomQuestionPanelAi } from '../RoomQuestionPanelAi/RoomQuestionPanelAi';
 import { RoomQuestion } from '../../../../types/room';
 import { sortRoomQuestion } from '../../../../utils/sortRoomQestions';
-import { Theme, ThemeContext } from '../../../../context/ThemeContext';
 
 import './VideoChatAi.css';
 
@@ -48,7 +48,6 @@ interface VideoChatAiProps {
   roomQuestionsLoading: boolean;
   roomQuestions: RoomQuestion[];
   initialQuestion?: RoomQuestion;
-  handleInvitationsOpen: () => void;
   handleStartReviewRoom: () => void;
   handleSettingsOpen: () => void;
   handleLeaveRoom: () => void;
@@ -85,6 +84,7 @@ const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string) => {
 
 export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
   messagesChatEnabled,
+  recognitionNotSupported,
   currentUserExpert,
   errorRoomStartReview,
   loadingRoomStartReview,
@@ -93,14 +93,12 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
   roomQuestionsLoading,
   roomQuestions,
   initialQuestion,
-  handleInvitationsOpen,
   handleLeaveRoom,
   handleSettingsOpen,
   handleStartReviewRoom,
 }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
-  const { themeInUi } = useContext(ThemeContext);
   const {
     viewerMode,
     roomState,
@@ -110,6 +108,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
     videoOrder,
     peerToStream,
     allUsers,
+    recognitionEnabled,
     sendWsMessage,
     setRecognitionEnabled,
   } = useContext(RoomContext);
@@ -245,134 +244,131 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
     setCameraEnabled(!cameraEnabled);
   };
 
+  const handleVoiceRecognitionSwitch = () => {
+    setRecognitionEnabled(!recognitionEnabled);
+  };
+
   const renderMain = () => {
     return (
       <>
+        <Gap sizeRem={1.5 * 2.5} />
         <RoomQuestionPanelAi
-          questionWithCode={codeEditorEnabled}
           roomQuestionsLoading={roomQuestionsLoading}
           roomQuestions={roomQuestions?.sort(sortRoomQuestion) || []}
           initialQuestion={initialQuestion}
         />
-        <div className="flex items-center justify-center">
-          <div className="flex flex-col">
-            <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
+        <video
+          ref={userVideoMainContent}
+          className="w-12.5 h-10 absolute videochat-video object-cover z-1"
+          style={{
+            right: '5.5rem',
+            bottom: '1.5rem',
+          }}
+          muted
+          autoPlay
+          playsInline
+        >
+          Video not supported
+        </video>
+        <RoomToolsPanel.Wrapper rightPos="1.5rem" bottomPos="1.5rem">
+          {!viewerMode && (
+            <RoomToolsPanel.ButtonsGroupWrapper>
+              <RoomToolsPanel.SwitchButton
+                enabled={micEnabled}
+                iconEnabledName={IconNames.MicOn}
+                iconDisabledName={IconNames.MicOff}
+                onClick={handleMicSwitch}
+              />
+              <Gap sizeRem={0.125} />
+              <RoomToolsPanel.SwitchButton
+                enabled={cameraEnabled}
+                iconEnabledName={IconNames.VideocamOn}
+                iconDisabledName={IconNames.VideocamOff}
+                onClick={handleCameraSwitch}
+              />
+              {!recognitionNotSupported && (
+                <>
+                  <Gap sizeRem={0.125} />
+                  <RoomToolsPanel.SwitchButton
+                    enabled={recognitionEnabled}
+                    htmlDisabled={!micEnabled}
+                    iconEnabledName={IconNames.RecognitionOn}
+                    iconDisabledName={IconNames.RecognitionOff}
+                    onClick={handleVoiceRecognitionSwitch}
+                  />
+                </>
+              )}
+            </RoomToolsPanel.ButtonsGroupWrapper>
+          )}
+          {!viewerMode && (
+            <RoomToolsPanel.ButtonsGroupWrapper>
+              <Gap sizeRem={0.125} />
               <RoomToolsPanel.SwitchButton
                 enabled={true}
-                alternative={themeInUi === Theme.Light}
                 iconEnabledName={IconNames.Settings}
                 iconDisabledName={IconNames.Settings}
                 onClick={handleSettingsOpen}
               />
             </RoomToolsPanel.ButtonsGroupWrapper>
-            <Gap sizeRem={0.5} />
-            <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
-              <ContextMenu
-                toggleContent={
-                  <RoomToolsPanel.SwitchButton
-                    enabled={true}
-                    alternative={themeInUi === Theme.Light}
-                    iconEnabledName={IconNames.Call}
-                    iconDisabledName={IconNames.Call}
-                    onClick={currentUserExpert ? () => {} : handleLeaveRoom}
-                    danger
-                  />
-                }
-                translateRem={{ x: -14.25, y: -6.75 }}
-              >
-                {loadingRoomStartReview && <Loader />}
-                {errorRoomStartReview && (
-                  <div className="flex items-center justify-center">
-                    <Typography size="m" error>
-                      <Icon name={IconNames.Information} />
-                    </Typography>
-                    <Typography size="m" error>
-                      {errorRoomStartReview}
-                    </Typography>
-                  </div>
-                )}
-                {currentUserExpert && (
-                  <>
-                    <ContextMenu.Item
-                      title={
-                        localizationCaptions[
-                          LocalizationKey.CompleteAndEvaluateCandidate
-                        ]
-                      }
-                      onClick={handleStartReviewRoom}
-                    />
-                    <ContextMenu.Item
-                      title={localizationCaptions[LocalizationKey.Invitations]}
-                      onClick={handleInvitationsOpen}
-                    />
-                  </>
-                )}
-                <ContextMenu.Item
-                  title={localizationCaptions[LocalizationKey.Exit]}
-                  onClick={handleLeaveRoom}
+          )}
+          <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
+            <ContextMenu
+              toggleContent={
+                <RoomToolsPanel.SwitchButton
+                  enabled={true}
+                  iconEnabledName={IconNames.Call}
+                  iconDisabledName={IconNames.Call}
+                  onClick={currentUserExpert ? () => {} : handleLeaveRoom}
+                  danger
                 />
-              </ContextMenu>
-            </RoomToolsPanel.ButtonsGroupWrapper>
-          </div>
-          <Gap sizeRem={0.625} horizontal />
-          <video
-            ref={userVideoMainContent}
-            className="w-12.5 h-10 videochat-video object-cover z-1"
-            style={{
-              right: '5.5rem',
-              bottom: '1.5rem',
-            }}
-            muted
-            autoPlay
-            playsInline
-          >
-            Video not supported
-          </video>
-          <Gap sizeRem={0.625} horizontal />
-          <div className="flex flex-col">
-            <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
-              <RoomToolsPanel.SwitchButton
-                enabled={micEnabled}
-                alternative={themeInUi === Theme.Light}
-                iconEnabledName={IconNames.MicOn}
-                iconDisabledName={IconNames.MicOff}
-                onClick={handleMicSwitch}
+              }
+              translateRem={{ x: -14.25, y: -6.75 }}
+            >
+              {loadingRoomStartReview && <Loader />}
+              {errorRoomStartReview && (
+                <div className="flex items-center justify-center">
+                  <Typography size="m" error>
+                    <Icon name={IconNames.Information} />
+                  </Typography>
+                  <Typography size="m" error>
+                    {errorRoomStartReview}
+                  </Typography>
+                </div>
+              )}
+              {currentUserExpert && (
+                <ContextMenu.Item
+                  title={
+                    localizationCaptions[
+                      LocalizationKey.CompleteAndEvaluateCandidate
+                    ]
+                  }
+                  onClick={handleStartReviewRoom}
+                />
+              )}
+              <ContextMenu.Item
+                title={localizationCaptions[LocalizationKey.Exit]}
+                onClick={handleLeaveRoom}
               />
-            </RoomToolsPanel.ButtonsGroupWrapper>
-            <Gap sizeRem={0.5} />
-            <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
-              <RoomToolsPanel.SwitchButton
-                enabled={cameraEnabled}
-                alternative={themeInUi === Theme.Light}
-                iconEnabledName={IconNames.VideocamOn}
-                iconDisabledName={IconNames.VideocamOff}
-                onClick={handleCameraSwitch}
-              />
-            </RoomToolsPanel.ButtonsGroupWrapper>
-          </div>
-        </div>
-        <Gap sizeRem={0.25} />
+            </ContextMenu>
+          </RoomToolsPanel.ButtonsGroupWrapper>
+        </RoomToolsPanel.Wrapper>
       </>
     );
   };
 
   return (
     <>
-      <div className="flex-1 flex justify-center">
+      <div className="w-full flex justify-center">
         <div
           style={{ maxWidth: '840px' }}
-          className="w-full flex flex-col relative rounded-1.125"
+          className="w-full flex flex-col videochat-field relative videochat-field-main rounded-1.125"
         >
-          {renderMain()}
+          <RoomCodeEditor visible={codeEditorEnabled} />
+          {!codeEditorEnabled && renderMain()}
         </div>
       </div>
 
-      <div
-        className="absolute videochat-field overflow-auto right-1"
-        style={{
-          height: 'calc(100% - 0.75rem)',
-        }}
-      >
+      <div className="relative videochat-field bg-wrap rounded-1.125">
         <div
           className={`videochat ${messagesChatEnabled ? 'invisible h-full' : 'visible'}`}
         >

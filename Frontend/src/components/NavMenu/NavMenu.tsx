@@ -16,7 +16,7 @@ import { LocalizationCaption } from '../LocalizationCaption/LocalizationCaption'
 import { CategoriesList } from '../CategoriesList/CategoriesList';
 import { Category } from '../../types/category';
 import { Typography } from '../Typography/Typography';
-import { VITE_APP_NAME, VITE_BUILD_HASH } from '../../config';
+import { VITE_NAME, VITE_BUILD_HASH } from '../../config';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 import './NavMenu.css';
@@ -154,18 +154,6 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
           onClick: handleItemClick,
         }
       : null,
-    admin
-      ? {
-          path: pathnames.questionTrees,
-          caption: (
-            <LocalizationCaption
-              captionKey={LocalizationKey.QuestionTreesPageName}
-            />
-          ),
-          icon: IconNames.Expand,
-          onClick: handleItemClick,
-        }
-      : null,
   ];
 
   const createMenuItem = (item: MenuItem) => {
@@ -216,7 +204,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
               className="nav-menu-item-caption move-transition"
               style={{ width: collapsed ? '0rem' : 'var(--caption-width)' }}
             >
-              {VITE_APP_NAME}
+              {VITE_NAME}
             </h1>
           </NavLink>
           <div className="flex flex-col overflow-x-hidden overflow-y-auto">

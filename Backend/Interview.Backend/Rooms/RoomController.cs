@@ -31,7 +31,7 @@ public class RoomController(IRoomService roomService) : ControllerBase
     [Authorize]
     [HttpGet]
     [Produces(MediaTypeNames.Application.Json)]
-    [ProducesResponseType(typeof(RoomPageDetail), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RoomReviewDetail), StatusCodes.Status200OK)]
     public Task<IPagedList<RoomPageDetail>> GetPage(
         [FromQuery] PageRequest request,
         [FromQuery] RoomPageDetailRequestFilter? filter)
@@ -138,7 +138,7 @@ public class RoomController(IRoomService roomService) : ControllerBase
             Tags = request.Tags,
             DurationSec = request.Duration,
             ScheduleStartTime = request.ScheduleStartTime,
-            QuestionTreeId = request.QuestionTreeId,
+            CategoryId = request.CategoryId,
         };
 
         var room = await roomService.CreateAsync(domainRequest, HttpContext.RequestAborted);

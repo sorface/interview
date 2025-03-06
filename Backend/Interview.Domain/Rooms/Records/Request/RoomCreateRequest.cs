@@ -18,5 +18,5 @@ public sealed class RoomCreateRequest
 
     public DateTime ScheduleStartTime { get; set; }
 
-    public Guid? QuestionTreeId { get; set; }
+    public Guid? CategoryId { get; set; }
 }

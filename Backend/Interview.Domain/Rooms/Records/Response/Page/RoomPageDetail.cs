@@ -9,6 +9,8 @@ public class RoomPageDetail
 
     public string? Name { get; set; }
 
+    public List<RoomQuestionDetail>? Questions { get; set; }
+
     public List<RoomUserDetail>? Participants { get; set; }
 
     public List<TagItem>? Tags { get; set; }
@@ -18,6 +20,4 @@ public class RoomPageDetail
     public RoomTimerDetail? Timer { get; set; }
 
     public DateTime? ScheduledStartTime { get; init; }
-
-    public required EVRoomType Type { get; init; }
 }

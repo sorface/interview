@@ -395,7 +395,7 @@ public class AnswerDetailServiceTest
     {
         var user = new User("test user", "ID");
         db.Users.Add(user);
-        var room = new Room("MY ROOM", SERoomAccessType.Private, SERoomType.Standard);
+        var room = new Room("MY ROOM", SERoomAccessType.Private);
         db.Rooms.Add(room);
         if (addQueuedRoomEvent)
         {

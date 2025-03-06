@@ -1,7 +1,6 @@
 using Interview.Domain.Database;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.RoomQuestionEvaluations;
-using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Domain.Rooms.RoomReviews;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,10 +39,9 @@ public sealed class RoomAnalyticService(AppDbContext db) : ISelfScopeService
             .Include(e => e.Questions).ThenInclude(e => e.Question)
             .Include(e => e.Participants)
             .Where(e => e.Id == roomId)
-            .Select(e => new ServiceAnalytic
+            .Select(e => new Analytics
             {
-                Questions = e.Questions
-                    .OrderBy(rq => rq.Order)
+                Questions = e.Questions.OrderBy(rq => rq.Order)
                     .Select(q => new Analytics.AnalyticsQuestion
                     {
                         Id = q.Question!.Id,
@@ -56,21 +54,11 @@ public sealed class RoomAnalyticService(AppDbContext db) : ISelfScopeService
                 AverageMark = null,
                 UserReview = new List<Analytics.AnalyticsUserAverageMark>(),
                 Completed = false,
-                IsAiRoom = e.Type == SERoomType.AI,
-                OpenedQuestions = e.Questions
-                    .Where(e => e.State == RoomQuestionState.Open)
-                    .Select(e => e.Question!.Id).ToList(),
             })
             .FirstOrDefaultAsync(ct);
         if (res is null)
         {
             return null;
-        }
-
-        // https://github.com/sorface/interview/issues/620
-        if (res is { IsAiRoom: true, Questions.Count: > 0 })
-        {
-            res.Questions.RemoveAll(e => res.OpenedQuestions.Contains(e.Id));
         }
 
         var userReview = await db.RoomParticipants.AsNoTracking()
@@ -85,9 +73,9 @@ public sealed class RoomAnalyticService(AppDbContext db) : ISelfScopeService
                 AverageMarks = e.Review == null || e.Review.State != SERoomReviewState.Closed
                     ? null
                     : e.User.RoomQuestionEvaluations
-                        .Where(rqe => rqe.RoomQuestion!.RoomId == roomId && rqe.Mark != null && rqe.Mark > 0)
-                        .Select(rqe => rqe.Mark ?? 0)
-                        .ToList(),
+                    .Where(rqe => rqe.RoomQuestion!.RoomId == roomId && rqe.Mark != null && rqe.Mark > 0)
+                    .Select(rqe => rqe.Mark ?? 0)
+                    .ToList(),
                 Comment = e.Review == null || e.Review.State != SERoomReviewState.Closed
                     ? null
                     : e.Review!.Review,
@@ -140,12 +128,5 @@ public sealed class RoomAnalyticService(AppDbContext db) : ISelfScopeService
                     .FirstOrDefault(),
             })
             .ToListAsync(ct);
-    }
-
-    private sealed class ServiceAnalytic : Analytics
-    {
-        public required bool IsAiRoom { get; set; }
-
-        public required List<Guid> OpenedQuestions { get; set; }
     }
 }

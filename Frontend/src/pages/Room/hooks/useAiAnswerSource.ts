@@ -3,20 +3,11 @@ import { tryCompleteJson } from '../utils/tryCompleteJson';
 import { AnyObject } from '../../../types/anyObject';
 import { VITE_AI_API } from '../../../config';
 
-export const enum AiEndpoint {
-  examinee = 'examinee',
-  analyze = 'analyze',
-}
-
 interface UseAiAnswerSourceParams {
   enabled: boolean;
-  endpoint: AiEndpoint;
   theme: string;
   question: string;
   answer: string;
-  taskDescription: string;
-  code: string;
-  language: string;
   conversationId: string;
   questionId: string;
   userId: string;
@@ -24,13 +15,9 @@ interface UseAiAnswerSourceParams {
 
 export const useAiAnswerSource = ({
   enabled,
-  endpoint,
   theme,
   question,
   answer,
-  taskDescription,
-  code,
-  language,
   conversationId,
   questionId,
   userId,
@@ -51,27 +38,17 @@ export const useAiAnswerSource = ({
     setLoading(true);
 
     const fetchAiEvaluate = async () => {
-      const response = await fetch(`${VITE_AI_API}/ai-assistant/${endpoint}`, {
-        credentials: 'include',
+      const response = await fetch(`${VITE_AI_API}/ai-assistant/examinee`, {
         headers: {
-          accept: 'text/event-stream',
           'content-type': 'application/json',
         },
         body: JSON.stringify({
+          theme,
+          question,
+          answer,
           conversationId,
           questionId,
           userId,
-          ...(endpoint === AiEndpoint.examinee
-            ? {
-                theme,
-                question,
-                answer,
-              }
-            : {
-                taskDescription,
-                code,
-                language,
-              }),
         }),
         method: 'POST',
         signal: abortController.signal,
@@ -105,19 +82,7 @@ export const useAiAnswerSource = ({
     return () => {
       abortController.abort();
     };
-  }, [
-    enabled,
-    theme,
-    question,
-    answer,
-    conversationId,
-    questionId,
-    userId,
-    endpoint,
-    taskDescription,
-    code,
-    language,
-  ]);
+  }, [enabled, theme, question, answer, conversationId, questionId, userId]);
 
   return {
     lastValidAiAnswer,

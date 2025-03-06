@@ -88,22 +88,6 @@ export type ParsedWsMessage =
           };
         };
       };
-    }
-  | {
-      Type: 'VoiceRecognition';
-      CreatedById: string;
-      Id: string;
-      Value: {
-        Message: string;
-        Nickname: string;
-      };
-    }
-  | {
-      Type: 'ValidAiAnswer';
-      Value: {
-        UserId: string;
-        AdditionalData: AnyObject;
-      };
     };
 
 const parseWsPayload = (parsedData: AnyObject) => {

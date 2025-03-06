@@ -27,26 +27,13 @@ type VoiceRecognitionAccumAction =
       payload: { value: string; command: VoiceRecognitionCommand };
     };
 
-const normalizeRussianSymbols = (value: string) => value.replaceAll('ё', 'е');
-
-const checkIsCommandTranscript = (transcript: string, commands: string[]) => {
-  for (const command of commands) {
-    const commandWords = command.split(' ');
-    const words = normalizeRussianSymbols(
-      transcript.toLowerCase().replaceAll('.', ''),
-    ).split(' ');
-    const firstWordIndex = words.indexOf(
-      normalizeRussianSymbols(commandWords[0]),
-    );
-
-    if (
-      firstWordIndex !== -1 &&
-      words[firstWordIndex + 1] === normalizeRussianSymbols(commandWords[1])
-    ) {
-      return true;
-    }
+const checkIsCommandTranscript = (transcript: string, command: string[]) => {
+  const words = transcript.toLowerCase().split(' ');
+  const firstWordIndex = words.indexOf(command[0]);
+  if (firstWordIndex === -1) {
+    return false;
   }
-  return false;
+  return words[firstWordIndex + 1] === command[1];
 };
 
 const apiMethodReducer = (
@@ -82,9 +69,9 @@ export const useVoiceRecognitionAccum = () => {
   const addVoiceRecognitionAccumTranscript = useCallback(
     (transcript: string) => {
       const rateMeCommandLocalized =
-        localizationCaptions[LocalizationKey.RateMeCommands].split('|');
+        localizationCaptions[LocalizationKey.RateMeCommand].split(' ');
       const letsStartCommandLocalized =
-        localizationCaptions[LocalizationKey.LetsBeginCommand].split('|');
+        localizationCaptions[LocalizationKey.LetsBeginCommand].split(' ');
       dispatch({
         name: 'addTranscript',
         payload: {

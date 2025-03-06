@@ -6,7 +6,6 @@ using Interview.Domain.Rooms.RoomReviews.Mappers;
 using Interview.Domain.Rooms.RoomReviews.Records;
 using Interview.Domain.Rooms.RoomReviews.Response.Page;
 using Interview.Domain.Rooms.RoomReviews.Services.UserRoomReview;
-using Interview.Domain.Rooms.Service;
 using Microsoft.EntityFrameworkCore;
 using NSpecifications;
 using X.PagedList;
@@ -15,10 +14,11 @@ namespace Interview.Domain.Rooms.RoomReviews.Services;
 
 public class RoomReviewService(
     IRoomReviewRepository roomReviewRepository,
+    IRoomRepository roomRepository,
+    IRoomQuestionEvaluationRepository roomQuestionEvaluationRepository,
     IRoomMembershipChecker membershipChecker,
     AppDbContext db,
-    IRoomParticipantRepository roomParticipantRepository,
-    RoomReviewCompleter roomReviewCompleter)
+    IRoomParticipantRepository roomParticipantRepository)
     : IRoomReviewService
 {
     public async Task<UserRoomReviewResponse?> GetUserRoomReviewAsync(UserRoomReviewRequest request, CancellationToken cancellationToken)
@@ -115,12 +115,44 @@ public class RoomReviewService(
 
     public Task<RoomCompleteResponse> CompleteAsync(RoomReviewCompletionRequest request, Guid userId, CancellationToken cancellationToken = default)
     {
-        return roomReviewCompleter.CompleteAsync(request, userId, cancellationToken);
-    }
+        return db.RunTransactionAsync<RoomCompleteResponse>(async ct =>
+            {
+                var roomCompleteResponse = new RoomCompleteResponse { AutoClosed = false, };
 
-    public Task<RoomCompleteResponse> CompleteAIAsync(RoomReviewCompletionRequest request, Guid userId, CancellationToken cancellationToken = default)
-    {
-        return roomReviewCompleter.CompleteAIAsync(request, userId, cancellationToken);
+                var roomParticipant = await FindParticipantWithValidateAsync(request.RoomId, userId, ct);
+
+                var resultReview = roomParticipant.Review;
+
+                if (resultReview is null)
+                {
+                    throw new NotFoundException("The final review of the user in the room was not found");
+                }
+
+                if (resultReview.Review.Length < 1)
+                {
+                    throw new UserException("The final review of the user in the room is not filled");
+                }
+
+                resultReview.State = SERoomReviewState.Closed;
+
+                await roomQuestionEvaluationRepository.SubmitAsync(request.RoomId, userId, ct);
+
+                var roomReadyClose = await roomRepository.IsReadyToCloseAsync(request.RoomId, ct);
+
+                if (roomReadyClose)
+                {
+                    roomCompleteResponse.AutoClosed = true;
+
+                    var room = roomParticipant.Room;
+                    room.Status = SERoomStatus.Close;
+                    await roomRepository.UpdateAsync(room, ct);
+                }
+
+                await db.SaveChangesAsync(ct);
+
+                return roomCompleteResponse;
+            },
+            cancellationToken);
     }
 
     public async Task<RoomReviewDetail> UpdateAsync(Guid id, RoomReviewUpdateRequest request, CancellationToken cancellationToken = default)

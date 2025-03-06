@@ -10,16 +10,16 @@ import { useParticipantTypeLocalization } from '../../../../hooks/useParticipant
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../../localization';
 
-export interface OtherComment {
-  title: LocalizationKey;
-  value: string;
+interface DetailedEvaluation {
+  recommendation?: string;
+  expected?: string;
 }
 
 interface ReviewUserOpinionProps {
   user: {
     id: User['id'];
-    evaluation?: Partial<Omit<RoomQuestionEvaluation, 'id'>>;
-    otherComments?: OtherComment[];
+    evaluation?: Partial<Omit<RoomQuestionEvaluation, 'id'>> &
+      DetailedEvaluation;
   };
   allUsers: Map<User['id'], AnalyticsUserReview>;
 }
@@ -75,19 +75,18 @@ export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
         {user.evaluation?.review ??
           localizationCaptions[LocalizationKey.RoomReviewWaiting]}
       </Typography>
-      {user.otherComments?.map((comment) => (
-        <div key={`${comment.title}${comment.value}`} className="flex flex-col">
+      {user.evaluation?.recommendation && (
+        <>
           <Gap sizeRem={1} />
-          <Typography size="m" bold>
-            {localizationCaptions[comment.title]}
-          </Typography>
-          <Typography size="m">
-            {Array.isArray(comment.value)
-              ? JSON.stringify(comment.value)
-              : comment.value}
-          </Typography>
-        </div>
-      ))}
+          <Typography size="m">{user.evaluation.recommendation}</Typography>
+        </>
+      )}
+      {user.evaluation?.expected && (
+        <>
+          <Gap sizeRem={1} />
+          <Typography size="m">{user.evaluation.expected}</Typography>
+        </>
+      )}
     </div>
   );
 };

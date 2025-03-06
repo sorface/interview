@@ -31,18 +31,9 @@ public class RoomConfiguration : EntityTypeConfigurationBase<Room>
             .HasConversion(e => e.Value, e => SERoomAccessType.FromValue(e))
             .IsRequired()
             .HasDefaultValue(SERoomAccessType.Public);
-        builder.Property(e => e.QuestionTreeId);
-        builder.HasOne(e => e.QuestionTree)
+        builder.Property(e => e.CategoryId);
+        builder.HasOne<Category>(e => e.Category)
             .WithMany()
-            .HasForeignKey(e => e.QuestionTreeId);
-
-        var roomTypes = SERoomType.List.OrderBy(e => e.Value).Select(e => e.Value + ": " + e.Name);
-        builder.Property(e => e.Type)
-            .HasConversion(e => e.Value, e => SERoomType.FromValue(e))
-            .IsRequired()
-            .IsUnicode(false)
-            .HasMaxLength(1)
-            .HasDefaultValue(SERoomType.Standard)
-            .HasComment("Available values: " + string.Join(", ", roomTypes));
+            .HasForeignKey(e => e.CategoryId);
     }
 }

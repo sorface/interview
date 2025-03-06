@@ -150,7 +150,6 @@ export enum AiAssistantLoadingVariant {
 }
 
 interface AiAssistantProps {
-  visible?: boolean;
   loading?: boolean;
   loadingVariant?: AiAssistantLoadingVariant;
   trackMouse?: boolean;
@@ -160,7 +159,6 @@ interface AiAssistantProps {
 const AiAssistantComponent: FunctionComponent<
   GroupProps & AiAssistantProps
 > = ({
-  visible = true,
   loading,
   loadingVariant = AiAssistantLoadingVariant.Normal,
   trackMouse,
@@ -210,8 +208,8 @@ const AiAssistantComponent: FunctionComponent<
   useEffect(() => {
     const color =
       themeInUi === Theme.Dark
-        ? [6 / 255, 102 / 255, 226 / 255]
-        : [6 / 255, 102 / 255, 225 / 255];
+        ? [0.7255, 0.1333, 0.1098]
+        : [0.8784, 0.2784, 0.2275];
     uniformsRef.current.u_red.value = color[0];
     uniformsRef.current.u_green.value = color[1];
     uniformsRef.current.u_blue.value = color[2];
@@ -340,10 +338,6 @@ const AiAssistantComponent: FunctionComponent<
     };
   }, [trackMouse]);
 
-  if (!visible) {
-    return <></>;
-  }
-
   return (
     <mesh
       ref={meshRef}
@@ -351,7 +345,7 @@ const AiAssistantComponent: FunctionComponent<
       position={[0, -0.5, -6]}
     >
       {/* eslint-disable-next-line react/no-unknown-property */}
-      <icosahedronGeometry args={[2, 8]} />
+      <icosahedronGeometry args={[2, 16]} />
       <shaderMaterial
         // eslint-disable-next-line react/no-unknown-property
         wireframe

@@ -10,11 +10,9 @@ using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Rooms.RoomReviews.Records;
 using Interview.Domain.Rooms.RoomReviews.Services;
 using Interview.Domain.Rooms.RoomReviews.Services.UserRoomReview;
-using Interview.Domain.Rooms.Service;
 using Interview.Domain.Users;
 using Interview.Infrastructure.RoomParticipants;
 using Interview.Infrastructure.RoomQuestionEvaluations;
-using Interview.Infrastructure.RoomQuestions;
 using Interview.Infrastructure.RoomReviews;
 using Interview.Infrastructure.Rooms;
 using Microsoft.EntityFrameworkCore;
@@ -84,7 +82,7 @@ public class RoomReviewServiceTest
         var (service, userId, roomId) = CreateService(memoryDatabase, true, SERoomStatus.Review);
 
         var user = new User(Guid.NewGuid(), "test_nickname", Guid.NewGuid().ToString());
-        var room = new Room("TEST", SERoomAccessType.Private, SERoomType.Standard);
+        var room = new Room("TEST", SERoomAccessType.Private);
 
         var roomParticipant = new RoomParticipant(user, room, SERoomParticipantType.Expert);
 
@@ -132,7 +130,7 @@ public class RoomReviewServiceTest
         var question = new Question("question_test");
         var question1 = new Question("question_test_1");
 
-        var room = new Room("test", SERoomAccessType.Private, SERoomType.Standard) { Status = SERoomStatus.Review, };
+        var room = new Room("test", SERoomAccessType.Private) { Status = SERoomStatus.Review, };
 
         await memoryDatabase.Users.AddRangeAsync(user1, user2);
         await memoryDatabase.Rooms.AddAsync(room, ct);
@@ -189,15 +187,11 @@ public class RoomReviewServiceTest
 
         var service = new RoomReviewService(
             iRoomReviewRepository,
+            iRoomRepository,
+            iRoomQuestionEvaluationRepository,
             iRoomMembershipChecker,
             memoryDatabase,
-            iRoomParticipantRepository,
-            new RoomReviewCompleter(
-                memoryDatabase,
-                iRoomParticipantRepository,
-                iRoomQuestionEvaluationRepository,
-                iRoomRepository,
-                new RoomStatusUpdater(memoryDatabase, new RoomQuestionRepository(memoryDatabase)))
+            iRoomParticipantRepository
         );
 
         var roomCompleteResponse = await service.CompleteAsync(new RoomReviewCompletionRequest { RoomId = room.Id }, user2.Id, ct);
@@ -277,7 +271,7 @@ public class RoomReviewServiceTest
     {
         var user = new User("test user", "ID");
         db.Users.Add(user);
-        var room = new Room("MY ROOM", SERoomAccessType.Private, SERoomType.Standard) { Status = roomStatus == null ? SERoomStatus.Active : roomStatus };
+        var room = new Room("MY ROOM", SERoomAccessType.Private) { Status = roomStatus == null ? SERoomStatus.Active : roomStatus };
         db.Rooms.Add(room);
         db.SaveChanges();
 
@@ -295,15 +289,11 @@ public class RoomReviewServiceTest
 
         var service = new RoomReviewService(
             new RoomReviewRepository(db),
+            new RoomRepository(db),
+            new RoomQuestionEvaluationRepository(db),
             new RoomMembershipChecker(userAccessor, new RoomParticipantRepository(db)),
             db,
-            new RoomParticipantRepository(db),
-            new RoomReviewCompleter(
-                db,
-                new RoomParticipantRepository(db),
-                new RoomQuestionEvaluationRepository(db),
-                new RoomRepository(db),
-                new RoomStatusUpdater(db, new RoomQuestionRepository(db))));
+            new RoomParticipantRepository(db));
 
         return (service, user.Id, room.Id);
     }

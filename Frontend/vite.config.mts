@@ -16,7 +16,7 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/ai-assistant': {
+      '/ai-assistant/examinee': {
         target: 'http://localhost:3033',
         changeOrigin: true,
         secure: true,

@@ -11,7 +11,6 @@ type Variant =
   | 'invertedActive'
   | 'text'
   | 'toolsPanel'
-  | 'toolsPanelAlternative'
   | 'toolsPanelDanger';
 
 export interface ButtonProps
