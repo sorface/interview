@@ -13,6 +13,7 @@ interface RoomDateAndTimeProps {
   timer?: Room['timer'];
   mini?: boolean;
   secondary?: boolean;
+  col?: boolean;
 }
 
 const formatScheduledStartTime = (scheduledStartTime: string, lang: string) => {
@@ -43,6 +44,7 @@ export const RoomDateAndTime: FunctionComponent<RoomDateAndTimeProps> = ({
   timer,
   mini,
   secondary,
+  col,
 }) => {
   const { lang } = useContext(LocalizationContext);
   const themeSecondaryClassName = useThemeClassName({
@@ -53,7 +55,7 @@ export const RoomDateAndTime: FunctionComponent<RoomDateAndTimeProps> = ({
 
   return (
     <div
-      className={`flex  ${!mini ? 'justify-between' : ''} ${secondaryClassName} items-baseline`}
+      className={`flex  ${!mini ? 'justify-between' : ''} ${col ? 'flex-col' : ''} ${secondaryClassName} items-baseline`}
     >
       <div className="flex items-baseline">
         <Typography size={typographySize}>

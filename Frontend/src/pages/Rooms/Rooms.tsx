@@ -93,6 +93,11 @@ export enum RoomsPageMode {
   Closed,
 }
 
+enum RoomsView {
+  Grid,
+  List,
+}
+
 interface RoomsProps {
   mode: RoomsPageMode;
 }
@@ -101,6 +106,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
   const themedAiAvatar = useThemedAiAvatar();
+  const [view, setView] = useState<RoomsView>(RoomsView.List);
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const { apiMethodState, fetchData } = useApiMethod<
     RoomWtithType[],
@@ -290,6 +296,62 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
     const canEditInStatus = room.status === 'New' || room.status === 'Active';
     const aiRoom = room.type === 'AI';
 
+    if (view === RoomsView.List) {
+      return (
+        <div key={room.id} className="room-item-wrapper">
+          <li>
+            <Link to={roomLink}>
+              <div className="room-item">
+                <div className="room-name">{room.name}</div>
+                {room.scheduledStartTime && (
+                  <>
+                    {/* <Gap sizeRem={0.75} /> */}
+                    <RoomDateAndTime
+                      typographySize="s"
+                      scheduledStartTime={room.scheduledStartTime}
+                      timer={room.timer}
+                      col
+                      mini
+                    />
+                  </>
+                )}
+                <div className="room-status-wrapper">
+                  <Tag state={tagStates[room.status]}>
+                    {roomStatusCaption[room.status]}
+                  </Tag>
+                </div>
+                <RoomParticipants
+                  participants={[
+                    ...room.participants,
+                    ...(room.type === 'AI'
+                      ? [
+                          {
+                            ...aiParticipant,
+                            avatar: themedAiAvatar,
+                          },
+                        ]
+                      : []),
+                  ]}
+                />
+                <div className="room-action-links">
+                  {!aiRoom && expertInRoom && canEditInStatus && (
+                    <>
+                      <div
+                        className="room-edit-participants-link rotate-90"
+                        onClick={handleOpenEditModal(room.id)}
+                      >
+                        <Icon size="s" secondary name={IconNames.Options} />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </Link>
+          </li>
+        </div>
+      );
+    }
+
     return (
       <div key={room.id} className="room-item-wrapper">
         <li>
@@ -359,6 +421,8 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
         searchValue={searchValueInput}
         onSearchChange={setSearchValueInput}
       >
+        <Button onClick={() => setView(RoomsView.Grid)}>GRID</Button>
+        <Button onClick={() => setView(RoomsView.List)}>LIST</Button>
         <ContextMenu
           translateRem={{ x: -3.75, y: 0.25 }}
           toggleContent={renderCreateRoomButton()}
@@ -387,7 +451,9 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
           />
         )}
         <div className="flex overflow-auto h-full">
-          <div className="flex-1 overflow-auto h-full">
+          <div
+            className={`flex-1 overflow-auto h-full ${view === RoomsView.Grid ? 'grid-view' : 'list-view'}`}
+          >
             <ItemsGrid
               currentData={rooms}
               loading={loading}
