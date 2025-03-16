@@ -44,6 +44,7 @@ import {
   SwitcherButton,
   SwitcherButtonContent,
 } from '../../components/SwitcherButton/SwitcherButton';
+import { RoomsView, useSavedRoomsView } from '../../hooks/useSavedRoomsView';
 
 import './Rooms.css';
 
@@ -97,11 +98,6 @@ export enum RoomsPageMode {
   Closed,
 }
 
-enum RoomsView {
-  Grid,
-  List,
-}
-
 interface RoomsProps {
   mode: RoomsPageMode;
 }
@@ -110,7 +106,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
   const themedAiAvatar = useThemedAiAvatar();
-  const [view, setView] = useState<RoomsView>(RoomsView.List);
+  const { view, setView } = useSavedRoomsView();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const { apiMethodState, fetchData } = useApiMethod<
     RoomWtithType[],
@@ -308,16 +304,13 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
               <div className="room-item">
                 <div className="room-name">{room.name}</div>
                 {room.scheduledStartTime && (
-                  <>
-                    {/* <Gap sizeRem={0.75} /> */}
-                    <RoomDateAndTime
-                      typographySize="s"
-                      scheduledStartTime={room.scheduledStartTime}
-                      timer={room.timer}
-                      col
-                      mini
-                    />
-                  </>
+                  <RoomDateAndTime
+                    typographySize="s"
+                    scheduledStartTime={room.scheduledStartTime}
+                    timer={room.timer}
+                    col
+                    mini
+                  />
                 )}
                 <div className="room-status-wrapper">
                   <Tag state={tagStates[room.status]}>
