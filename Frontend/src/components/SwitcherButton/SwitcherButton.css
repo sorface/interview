@@ -4,6 +4,10 @@
   width: 5.25rem;
 }
 
+.switcher-button.mini button {
+  border: unset !important;
+}
+
 .switcher-button button {
   position: relative;
 }
