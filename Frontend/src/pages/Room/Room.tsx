@@ -717,7 +717,8 @@ export const Room: FunctionComponent = () => {
                               },
                             ]}
                             activeIndex={messagesChatEnabled ? 0 : 1}
-                            variant="alternative"
+                            activeVariant="invertedActive"
+                            nonActiveVariant="invertedAlternative"
                             onClick={handleSwitchMessagesChat}
                           />
                         </div>

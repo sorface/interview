@@ -8,6 +8,7 @@ import { ButtonProps } from '../Button/Button';
 export interface ContextMenuProps {
   translateRem: { x: number; y: number };
   toggleContent?: DropdownProps['toggleContent'];
+  contentClassName?: string;
   useButton?: DropdownProps['useButton'];
   buttonVariant?: ButtonProps['variant'];
   children: ReactNode;
@@ -16,6 +17,7 @@ export interface ContextMenuProps {
 const ContextMenuComponent: FunctionComponent<ContextMenuProps> = ({
   translateRem,
   toggleContent,
+  contentClassName,
   useButton,
   buttonVariant,
   children,
@@ -27,7 +29,7 @@ const ContextMenuComponent: FunctionComponent<ContextMenuProps> = ({
       toggleContent={toggleContent || defaultToggleContent}
       useButton={useButton}
       buttonVariant={buttonVariant}
-      contentClassName="w-13.75 rounded-0.75"
+      contentClassName={contentClassName ?? 'w-13.75 rounded-0.75'}
       toggleClassName="flex"
       contentStyle={{
         transform: `translate(${translateRem.x}rem, ${translateRem.y}rem)`,

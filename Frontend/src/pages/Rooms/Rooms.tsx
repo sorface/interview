@@ -40,6 +40,10 @@ import { Loader } from '../../components/Loader/Loader';
 import { Typography } from '../../components/Typography/Typography';
 import { ContextMenu } from '../../components/ContextMenu/ContextMenu';
 import { useThemedAiAvatar } from '../../hooks/useThemedAiAvatar';
+import {
+  SwitcherButton,
+  SwitcherButtonContent,
+} from '../../components/SwitcherButton/SwitcherButton';
 
 import './Rooms.css';
 
@@ -414,15 +418,45 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
     </Button>
   );
 
+  const headerActionSwitcherItems: [
+    SwitcherButtonContent,
+    SwitcherButtonContent,
+  ] = [
+    {
+      id: RoomsView.Grid,
+      content: <Icon name={IconNames.Grid} />,
+    },
+    {
+      id: RoomsView.List,
+      content: <Icon name={IconNames.Menu} />,
+    },
+  ];
+
+  const headerActionItems = (
+    <div className="flex">
+      <SwitcherButton
+        items={headerActionSwitcherItems}
+        activeIndex={view === RoomsView.Grid ? 0 : 1}
+        activeVariant="active2"
+        nonActiveVariant="invertedAlternative"
+        mini
+        onClick={(activeIndex) =>
+          setView(activeIndex === 0 ? RoomsView.Grid : RoomsView.List)
+        }
+      />
+      <Gap sizeRem={2} horizontal />
+    </div>
+  );
+
   return (
     <>
       <PageHeader
         title={getPageTitle()}
+        notifications
         searchValue={searchValueInput}
+        actionItem={headerActionItems}
         onSearchChange={setSearchValueInput}
       >
-        <Button onClick={() => setView(RoomsView.Grid)}>GRID</Button>
-        <Button onClick={() => setView(RoomsView.List)}>LIST</Button>
         <ContextMenu
           translateRem={{ x: -3.75, y: 0.25 }}
           toggleContent={renderCreateRoomButton()}

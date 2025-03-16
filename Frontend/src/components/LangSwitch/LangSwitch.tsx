@@ -66,7 +66,8 @@ export const LangSwitch = ({
       <SwitcherButton
         items={items}
         activeIndex={items.findIndex((i) => i.id === lang) as 0 | 1}
-        variant="alternative"
+        activeVariant="invertedActive"
+        nonActiveVariant="invertedAlternative"
         onClick={(activeIndex) =>
           setLang(items[activeIndex].id as LocalizationLang)
         }

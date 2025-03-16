@@ -33,12 +33,11 @@ export const PageHeaderSearch: FunctionComponent<PageHeaderSearchProps> = ({
         placeholder={localizationCaptions[LocalizationKey.SearchByName]}
         value={searchValue}
         style={{
-          opacity: open ? '1' : '0',
-          transition: 'opacity 0.1s ease-in-out',
+          display: open ? 'block' : 'none',
         }}
         onChange={handleSearchChange}
       />
-      <Gap sizeRem={0.25} horizontal />
+      {open && <Gap sizeRem={0.25} horizontal />}
       <Button
         variant="invertedAlternative"
         className="min-w-unset w-2.5 h-2.5 p-0"
