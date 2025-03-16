@@ -38,13 +38,14 @@
 
 .rooms-page .list-view .items-grid .room-item {
   display: grid;
+  align-items: center;
   gap: 4.5rem;
   grid-template-columns: 1fr 5.375rem 7.125rem min-content 1rem;
   padding: 1rem;
   font-size: 0.875rem;
 }
 
-.room-item .room-status-wrapper {
+.grid-view .room-item .room-status-wrapper {
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
