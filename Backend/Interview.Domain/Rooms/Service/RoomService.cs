@@ -48,6 +48,7 @@ public sealed class RoomService(
         RoomPageDetailRequestFilter filter,
         int pageNumber,
         int pageSize,
+        EVSortOrder dateSort,
         CancellationToken cancellationToken = default)
     {
         IQueryable<Room> queryable = db.Rooms
@@ -60,7 +61,7 @@ public sealed class RoomService(
                 e.Status == SERoomStatus.Review ? 2 :
                 e.Status == SERoomStatus.New ? 3 :
                 4)
-            .ThenBy(e => e.ScheduleStartTime);
+            .ThenBy(e => e.ScheduleStartTime, dateSort);
         var filterName = filter.Name?.Trim().ToLower();
         if (!string.IsNullOrWhiteSpace(filterName))
         {
