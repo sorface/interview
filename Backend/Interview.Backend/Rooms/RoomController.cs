@@ -27,6 +27,7 @@ public class RoomController(IRoomService roomService) : ControllerBase
     /// </summary>
     /// <param name="request">Request.</param>
     /// <param name="filter">Search filter.</param>
+    /// <param name="dateSort">Date sorting.</param>
     /// <returns>Page.</returns>
     [Authorize]
     [HttpGet]
@@ -34,12 +35,14 @@ public class RoomController(IRoomService roomService) : ControllerBase
     [ProducesResponseType(typeof(RoomPageDetail), StatusCodes.Status200OK)]
     public Task<IPagedList<RoomPageDetail>> GetPage(
         [FromQuery] PageRequest request,
-        [FromQuery] RoomPageDetailRequestFilter? filter)
+        [FromQuery] RoomPageDetailRequestFilter? filter,
+        [FromQuery] EVSortOrder dateSort = EVSortOrder.Asc)
     {
         return roomService.FindPageAsync(
             filter ?? new RoomPageDetailRequestFilter(),
             request.PageNumber,
             request.PageSize,
+            dateSort,
             HttpContext.RequestAborted);
     }
 

@@ -49,6 +49,7 @@ export interface GetRoomPageParams extends PaginationUrlParams {
   Statuses: RoomStatus[];
   StartValue?: string;
   EndValue?: string;
+  dateSort?: 'Asc' | 'Desc';
 }
 
 export interface GetRoomCalendarParams {
