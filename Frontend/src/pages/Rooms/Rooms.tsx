@@ -212,6 +212,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
       Name: '',
       Participants: [auth?.id || ''],
       Statuses: ['Close'],
+      dateSort: 'Desc',
     });
   }, [mode, auth?.id, fetchRoomsHistory]);
 
