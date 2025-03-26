@@ -1,120 +1,62 @@
-using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Responses;
-using Interview.Backend.Users;
 using Interview.Domain.Users.Service;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Interview.Backend.Auth;
 
 public static class ServiceCollectionExt
 {
-    private static readonly Dictionary<Type, string[]> DISABLEDCONTROLLER = new()
+    public static void AddAppAuth(this IServiceCollection self, OpenIdConnectOptions openIdConnectOptions)
     {
-        [typeof(AuthController)] = [nameof(AuthController.SignIn), nameof(AuthController.SignOutImpl)],
-        [typeof(UserController)] = [nameof(UserController.GetMyself)],
-    };
+        self.AddAuthentication()
+            .AddJwtBearer(options =>
+            {
+                options.MetadataAddress = $@"{openIdConnectOptions.Issuer}{openIdConnectOptions.MetadataPath}";
+                options.RequireHttpsMetadata = openIdConnectOptions.RequireHttpsMetadata;
+                options.MapInboundClaims = false;
+                options.SaveToken = false;
 
-    public static void AddAppAuth(this IServiceCollection self, AuthorizationService authorizationService)
-    {
-        self.AddSingleton<SemaphoreLockProvider<string>>();
-        self.AddAuthentication(options =>
-            {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            })
-            .AddCookie(options =>
-            {
-                options.Events.OnValidatePrincipal = (CookieValidatePrincipalContext context) =>
+                options.Events = new JwtBearerEvents
                 {
-                    var descriptor = context.HttpContext.GetEndpoint()?.Metadata.OfType<ControllerActionDescriptor>().FirstOrDefault();
-
-                    if (descriptor != null && DISABLEDCONTROLLER.TryGetValue(descriptor.ControllerTypeInfo, out var exception) &&
-                        exception.Contains(descriptor.MethodInfo.Name))
+                    OnForbidden = context =>
                     {
+                        context.Response.StatusCode = 403;
+                        context.Response.WriteAsJsonAsync(new MessageResponse { Message = "Unauthorized", });
                         return Task.CompletedTask;
-                    }
-
-                    var sorfacePrincipalValidator = context.HttpContext.RequestServices.GetRequiredService<SorfacePrincipalValidator>();
-                    return sorfacePrincipalValidator.ValidateAsync(context);
-                };
-
-                options.SessionStore = self.BuildServiceProvider().GetRequiredService<ITicketStore>();
-                options.Cookie.HttpOnly = true;
-                options.Cookie.Name = authorizationService.CookieName;
-                options.Cookie.Domain = authorizationService.CookieDomain;
-
-                options.Events.OnRedirectToAccessDenied = (RedirectContext<CookieAuthenticationOptions> context) =>
-                {
-                    context.Response.StatusCode = 403;
-                    context.Response.WriteAsJsonAsync(new MessageResponse { Message = "Forbidden", });
-                    return Task.CompletedTask;
-                };
-                options.Events.OnRedirectToLogin = (RedirectContext<CookieAuthenticationOptions> context) =>
-                {
-                    context.Response.StatusCode = 401;
-                    context.Response.WriteAsJsonAsync(new MessageResponse { Message = "Unauthorized", });
-                    return Task.CompletedTask;
-                };
-            })
-            .AddSorface(authorizationService.Id, options =>
-            {
-                options.ClientId = authorizationService.ClientId;
-                options.ClientSecret = authorizationService.ClientSecret;
-
-                options.ClaimsIssuer = authorizationService.Issuer;
-
-                options.CallbackPath = authorizationService.CallbackPath;
-                options.AuthorizationEndpoint = authorizationService.AuthorizationEndPoint;
-                options.TokenEndpoint = authorizationService.TokenEndpoint;
-                options.UserInformationEndpoint = authorizationService.UserInformationEndpoint;
-
-                options.SaveTokens = true;
-
-                options.Scope.Add("scope.read");
-
-                if (authorizationService.CorrelationCookie is not null)
-                {
-                    var cookieBuilder = new CookieBuilder();
-
-                    if (authorizationService.CorrelationCookie?.Name is not null && authorizationService.CorrelationCookie?.Name.Length > 0)
+                    },
+                    OnAuthenticationFailed = context =>
                     {
-                        cookieBuilder.Name = authorizationService.CorrelationCookie.Name;
-                    }
-
-                    if (authorizationService.CorrelationCookie?.Domain is not null && authorizationService.CorrelationCookie?.Domain.Length > 0)
+                        context.Response.StatusCode = 401;
+                        context.Response.WriteAsJsonAsync(new MessageResponse { Message = "Unauthorized", });
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = async context =>
                     {
-                        cookieBuilder.Domain = authorizationService.CorrelationCookie.Domain;
-                    }
+                        var user = context.Principal?.ToUser();
 
-                    options.CorrelationCookie = cookieBuilder;
-                }
+                        if (user is null)
+                        {
+                            return;
+                        }
 
-                options.Events.OnTicketReceived += async context =>
-                {
-                    var user = context.Principal?.ToUser();
-                    if (user is null)
-                    {
-                        return;
-                    }
+                        var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
 
-                    var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
-                    var upsertUser = await userService.UpsertByExternalIdAsync(user);
+                        var upsertUser = await userService.UpsertByExternalIdAsync(user);
 
-                    context.Principal!.EnrichRolesWithId(upsertUser);
+                        context.Principal!.EnrichRolesWithId(upsertUser);
+                    },
                 };
+
+                options.TokenValidationParameters = new TokenValidationParameters { ValidateAudience = false, };
             });
 
         self.AddAuthorization(options =>
         {
-            options.AddPolicy(SecurePolicy.Manager, policyBuilder =>
-            {
-                policyBuilder.RequireRole(RoleNameConstants.Admin);
-            });
-            options.AddPolicy(SecurePolicy.User, policyBuilder =>
-            {
-                policyBuilder.RequireAuthenticatedUser();
-            });
+            options.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+                .RequireAuthenticatedUser()
+                .Build();
         });
     }
 }

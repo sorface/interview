@@ -50,9 +50,6 @@ public class MiddlewareConfigurator(WebApplication app)
         app.UseAuthentication();
         app.UseAuthorization();
 
-        var cookieExpTimeConfig = app.Configuration.GetSection("AccessTokenExpiredTime");
-        app.UseAccessTokenExpiredTimeCookie("ate_t", new CookieOptions { Domain = cookieExpTimeConfig.GetValue<string>("Domain"), Secure = true, });
-
         app.Use((context, func) =>
         {
             var upsertUser = context.User.ToUser();

@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Interview.Backend.Auth.Sorface;
 
 namespace Interview.Backend.Auth;
 
@@ -16,43 +15,60 @@ public static class ClaimsPrincipalExt
         self.AddIdentity(claimIdentity);
     }
 
-    public static User? ToUser(this ClaimsPrincipal self)
+    private static User? ToUserLegacy(this ClaimsPrincipal self)
     {
-        var profileId = self.Claims.FirstOrDefault(e => e.Type == SorfaceClaimTypes.Claims.Profile.Id);
-        var nickname = self.Claims.FirstOrDefault(e => e.Type == SorfaceClaimTypes.Claims.Profile.Username);
+        var profileId = self.Claims.FirstOrDefault(e => e.Type == "principal-id");
+        var nickname = self.Claims.FirstOrDefault(e => e.Type == "sub");
 
-        if (profileId == null || nickname == null)
+        if (profileId is null || nickname is null)
         {
             return null;
         }
 
         var id = self.Claims.FirstOrDefault(e => e.Type == UserClaimConstants.UserId);
 
-        var profileImage = self.Claims.FirstOrDefault(e => e.Type == SorfaceClaimTypes.Claims.Profile.Avatar);
+        var user = new User(Guid.Parse(profileId.Value), nickname.Value, profileId.Value);
 
-        var user = new User(nickname.Value, profileId.Value);
-
-        if (id != null && Guid.TryParse(id.Value, out var typedId))
+        if (id is not null && Guid.TryParse(id.Value, out var typedId))
         {
             user.Id = typedId;
         }
 
-        user.Avatar = profileImage?.Value;
+        var authoritiesClaim = self.Claims.Where(e => e.Type == "roles").Select(it => it.Value);
 
-        var authoritiesClaim = self.Claims.FirstOrDefault(e => e.Type == SorfaceClaimTypes.Claims.Profile.Authorities);
-
-        if (authoritiesClaim is null)
-        {
-            return user;
-        }
-
-        var values = authoritiesClaim.Value;
-
-        var strings = values.Split(',');
-
-        foreach (var authority in strings)
+        foreach (var authority in authoritiesClaim)
         {
             var roleName = RoleName.FromName(authority, true);
+            user.Roles.Add(new Role(roleName));
+        }
+
+        return user;
+    }
+
+    public static User? ToUser(this ClaimsPrincipal self)
+    {
+        var profileId = self.Claims.FirstOrDefault(e => e.Type == JwtClaimsConstants.ProfileId);
+        var nickname = self.Claims.FirstOrDefault(e => e.Type == JwtClaimsConstants.Username);
+
+        if (profileId is null || nickname is null)
+        {
+            return null;
+        }
+
+        var id = self.Claims.FirstOrDefault(e => e.Type == UserClaimConstants.UserId);
+
+        var user = new User(nickname.Value, profileId.Value);
+
+        if (id is not null && Guid.TryParse(id.Value, out var typedId))
+        {
+            user.Id = typedId;
+        }
+
+        var authoritiesClaim = self.Claims.Where(e => e.Type == JwtClaimsConstants.Authorities).Select(it => it.Value);
+
+        foreach (var authority in authoritiesClaim)
+        {
+            var roleName = RoleName.FromName(authority.Replace("ROLE_", string.Empty), true);
             user.Roles.Add(new Role(roleName));
         }
 

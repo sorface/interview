@@ -1,8 +1,10 @@
+using Interview.Domain.Database;
 using Interview.Domain.Permissions;
 using Interview.Domain.Repository;
 using Interview.Domain.Users.Permissions;
 using Interview.Domain.Users.Records;
 using Interview.Domain.Users.Roles;
+using Microsoft.Extensions.Caching.Memory;
 using NSpecifications;
 using X.PagedList;
 
@@ -12,7 +14,9 @@ public sealed class UserService(
     IUserRepository userRepository,
     IRoleRepository roleRepository,
     IPermissionRepository permissionRepository,
-    ISecurityService securityService)
+    ISecurityService securityService,
+    AppDbContext databaseContext,
+    IMemoryCache memoryCache)
     : IUserService
 {
     public Task<IPagedList<UserDetail>> FindPageAsync(
@@ -82,46 +86,56 @@ public sealed class UserService(
         });
     }
 
-    public async Task<User> UpsertByExternalIdAsync(User user, CancellationToken cancellationToken = default)
+    public async Task<User?> UpsertByExternalIdAsync(User user, CancellationToken cancellationToken = default)
     {
-        var existingUser = await userRepository.FindByExternalIdAsync(user.ExternalId, cancellationToken);
+        var cachedUser = new { user.Nickname, user.Avatar, user.ExternalId, Roles = user.Roles.Select(role => role.Name.Name).ToList() };
 
-        var roles = user.Roles.DefaultIfEmpty(new Role(RoleName.User));
-
-        var userRoles = await GetUserRolesAsync(roles, cancellationToken);
-
-        if (userRoles is null || !userRoles.Any())
+        return await memoryCache.GetOrCreateAsync<User>(cachedUser, entry =>
         {
-            throw new NotFoundException(ExceptionMessage.UserRoleNotFound());
-        }
+            entry.SlidingExpiration = TimeSpan.FromMinutes(3);
 
-        if (existingUser != null)
-        {
-            existingUser.Nickname = user.Nickname;
-            existingUser.Avatar = user.Avatar;
+            return databaseContext.RunTransactionAsync(async token =>
+            {
+                var existingUser = await userRepository.FindByExternalIdAsync(user.ExternalId, token);
 
-            existingUser.Roles.Clear();
-            existingUser.Roles.AddRange(userRoles);
+                var roles = user.Roles.DefaultIfEmpty(new Role(RoleName.User));
 
-            var permissions = await GetDefaultUserPermission(existingUser, cancellationToken);
-            existingUser.Permissions.AddRange(permissions);
+                var userRoles = await GetUserRolesAsync(roles, token);
 
-            await userRepository.UpdateAsync(existingUser, cancellationToken);
+                if (userRoles is null || !userRoles.Any())
+                {
+                    throw new NotFoundException(ExceptionMessage.UserRoleNotFound());
+                }
 
-            return existingUser;
-        }
+                if (existingUser != null)
+                {
+                    existingUser.Nickname = user.Nickname;
+                    existingUser.Avatar = user.Avatar;
 
-        var insertUser = new User(user.Nickname, user.ExternalId) { Avatar = user.Avatar };
+                    existingUser.Roles.Clear();
+                    existingUser.Roles.AddRange(userRoles);
 
-        insertUser.Roles.Clear();
-        insertUser.Roles.AddRange(userRoles);
+                    var permissions = await GetDefaultUserPermission(existingUser, token);
+                    existingUser.Permissions.AddRange(permissions);
 
-        var defaultUserPermissions = await GetDefaultUserPermission(insertUser, cancellationToken);
-        insertUser.Permissions.AddRange(defaultUserPermissions);
+                    await userRepository.UpdateAsync(existingUser, token);
 
-        await userRepository.CreateAsync(insertUser, cancellationToken);
+                    return existingUser;
+                }
 
-        return insertUser;
+                var insertUser = new User(user.Nickname, user.ExternalId) { Avatar = user.Avatar };
+
+                insertUser.Roles.Clear();
+                insertUser.Roles.AddRange(userRoles);
+
+                var defaultUserPermissions = await GetDefaultUserPermission(insertUser, token);
+                insertUser.Permissions.AddRange(defaultUserPermissions);
+
+                await userRepository.CreateAsync(insertUser, token);
+
+                return insertUser;
+            }, cancellationToken);
+        });
     }
 
     public Task<IPagedList<UserDetail>> FindByRoleAsync(
