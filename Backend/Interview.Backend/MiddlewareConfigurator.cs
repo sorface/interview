@@ -25,14 +25,15 @@ public class MiddlewareConfigurator(WebApplication app)
 
         app.UseWebSockets();
 
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseWebSocketsAuthorization(new WebSocketAuthorizationOptions
-            {
-                CookieName = WebSocketAuthorizationOptions.DefaultCookieName,
-                WebSocketQueryName = "Authorization",
-            });
-        }
+        // TODO: only for development
+        // if (app.Environment.IsDevelopment())
+        // {
+        //     app.UseWebSocketsAuthorization(new WebSocketAuthorizationOptions
+        //     {
+        //         CookieName = WebSocketAuthorizationOptions.DefaultCookieName,
+        //         WebSocketQueryName = "Authorization",
+        //     });
+        // }
 
         app.UseCors("All");
 

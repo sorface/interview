@@ -1,10 +1,15 @@
 using FluentAssertions;
+using Interview.Backend.Auth;
+using Interview.Domain.Database;
 using Interview.Domain.Permissions;
 using Interview.Domain.Users;
 using Interview.Domain.Users.Permissions;
 using Interview.Domain.Users.Records;
 using Interview.Domain.Users.Roles;
 using Interview.Domain.Users.Service;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Internal;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NSpecifications;
 
@@ -12,10 +17,16 @@ namespace Interview.Test.Units.Users;
 
 public class UserServiceTest
 {
+    private readonly ISystemClock _systemClock = new TestSystemClock
+    {
+        UtcNow = new DateTimeOffset(1971, 10, 20, 0, 0, 0, TimeSpan.Zero)
+    };
+    
     private readonly Mock<IUserRepository> _mockUserRepository;
     private readonly Mock<IRoleRepository> _mockRoleRepository;
     private readonly Mock<IPermissionRepository> _mockPermissionRepository;
     private readonly Mock<ISecurityService> _mockSecurityService;
+    private readonly SemaphoreLockProvider<string> _mockSemaphoreLockProvider;
 
     private readonly UserService _userService;
 
@@ -25,9 +36,13 @@ public class UserServiceTest
         _mockRoleRepository = new Mock<IRoleRepository>();
         _mockPermissionRepository = new Mock<IPermissionRepository>();
         _mockSecurityService = new Mock<ISecurityService>();
-
+        _mockSemaphoreLockProvider = new SemaphoreLockProvider<string>(NullLogger<SemaphoreLockProvider<string>>.Instance);
+        var databaseContext = new TestAppDbContextFactory().Create(_systemClock);
+        
         _userService = new UserService(_mockUserRepository.Object, _mockRoleRepository.Object,
-            _mockPermissionRepository.Object, _mockSecurityService.Object);
+            _mockPermissionRepository.Object, _mockSecurityService.Object, databaseContext, new MemoryCache(new MemoryCacheOptions()), 
+            _mockSemaphoreLockProvider
+            );
     }
 
     [Fact]
