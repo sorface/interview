@@ -34,7 +34,6 @@ public class MiddlewareConfigurator(WebApplication app)
         //         WebSocketQueryName = "Authorization",
         //     });
         // }
-
         app.UseCors("All");
 
         app.UseRateLimiter();

@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Interview.Backend.Auth;
-using Interview.Domain.Database;
 using Interview.Domain.Permissions;
 using Interview.Domain.Users;
 using Interview.Domain.Users.Permissions;

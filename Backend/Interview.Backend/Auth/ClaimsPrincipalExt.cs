@@ -15,36 +15,6 @@ public static class ClaimsPrincipalExt
         self.AddIdentity(claimIdentity);
     }
 
-    private static User? ToUserLegacy(this ClaimsPrincipal self)
-    {
-        var profileId = self.Claims.FirstOrDefault(e => e.Type == "principal-id");
-        var nickname = self.Claims.FirstOrDefault(e => e.Type == "sub");
-
-        if (profileId is null || nickname is null)
-        {
-            return null;
-        }
-
-        var id = self.Claims.FirstOrDefault(e => e.Type == UserClaimConstants.UserId);
-
-        var user = new User(Guid.Parse(profileId.Value), nickname.Value, profileId.Value);
-
-        if (id is not null && Guid.TryParse(id.Value, out var typedId))
-        {
-            user.Id = typedId;
-        }
-
-        var authoritiesClaim = self.Claims.Where(e => e.Type == "roles").Select(it => it.Value);
-
-        foreach (var authority in authoritiesClaim)
-        {
-            var roleName = RoleName.FromName(authority, true);
-            user.Roles.Add(new Role(roleName));
-        }
-
-        return user;
-    }
-
     public static User? ToUser(this ClaimsPrincipal self)
     {
         var profileId = self.Claims.FirstOrDefault(e => e.Type == JwtClaimsConstants.ProfileId);

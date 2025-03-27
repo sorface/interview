@@ -101,7 +101,7 @@ public sealed class UserService(
             using (externalIdLock)
             {
                 await externalIdLock.WaitAsync(cancellationToken);
-                
+
                 entry.SlidingExpiration = TimeSpan.FromMinutes(3);
 
                 return await databaseContext.RunTransactionAsync(async token =>
