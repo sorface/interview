@@ -19,7 +19,6 @@ namespace Interview.Backend.Auth
         /// until it can enter the LockProvider
         /// </summary>
         /// <param name="id">the unique ID to perform the lock</param>
-        /// <param name="cancellationToken">cancellationToken for aborted process</param>
         /// <returns>A <see cref="Task"/>representing the asynchronous operation</returns>
         public ILockWaiter CreateWaiter(T id)
         {

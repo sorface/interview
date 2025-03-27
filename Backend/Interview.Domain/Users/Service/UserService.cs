@@ -105,46 +105,47 @@ public sealed class UserService(
                 entry.SlidingExpiration = TimeSpan.FromMinutes(3);
 
                 return await databaseContext.RunTransactionAsync(async token =>
-                {
-                    var existingUser = await userRepository.FindByExternalIdAsync(user.ExternalId, token);
-
-                    var roles = user.Roles.DefaultIfEmpty(new Role(RoleName.User));
-
-                    var userRoles = await GetUserRolesAsync(roles, token);
-
-                    if (userRoles is null || !userRoles.Any())
                     {
-                        throw new NotFoundException(ExceptionMessage.UserRoleNotFound());
-                    }
+                        var existingUser = await userRepository.FindByExternalIdAsync(user.ExternalId, token);
 
-                    if (existingUser != null)
-                    {
-                        existingUser.Nickname = user.Nickname;
-                        existingUser.Avatar = user.Avatar;
+                        var roles = user.Roles.DefaultIfEmpty(new Role(RoleName.User));
 
-                        existingUser.Roles.Clear();
-                        existingUser.Roles.AddRange(userRoles);
+                        var userRoles = await GetUserRolesAsync(roles, token);
 
-                        var permissions = await GetDefaultUserPermission(existingUser, token);
-                        existingUser.Permissions.AddRange(permissions);
+                        if (userRoles is null || !userRoles.Any())
+                        {
+                            throw new NotFoundException(ExceptionMessage.UserRoleNotFound());
+                        }
 
-                        await userRepository.UpdateAsync(existingUser, token);
+                        if (existingUser != null)
+                        {
+                            existingUser.Nickname = user.Nickname;
+                            existingUser.Avatar = user.Avatar;
 
-                        return existingUser;
-                    }
+                            existingUser.Roles.Clear();
+                            existingUser.Roles.AddRange(userRoles);
 
-                    var insertUser = new User(user.Nickname, user.ExternalId) { Avatar = user.Avatar };
+                            var permissions = await GetDefaultUserPermission(existingUser, token);
+                            existingUser.Permissions.AddRange(permissions);
 
-                    insertUser.Roles.Clear();
-                    insertUser.Roles.AddRange(userRoles);
+                            await userRepository.UpdateAsync(existingUser, token);
 
-                    var defaultUserPermissions = await GetDefaultUserPermission(insertUser, token);
-                    insertUser.Permissions.AddRange(defaultUserPermissions);
+                            return existingUser;
+                        }
 
-                    await userRepository.CreateAsync(insertUser, token);
+                        var insertUser = new User(user.Nickname, user.ExternalId) { Avatar = user.Avatar };
 
-                    return insertUser;
-                }, cancellationToken);
+                        insertUser.Roles.Clear();
+                        insertUser.Roles.AddRange(userRoles);
+
+                        var defaultUserPermissions = await GetDefaultUserPermission(insertUser, token);
+                        insertUser.Permissions.AddRange(defaultUserPermissions);
+
+                        await userRepository.CreateAsync(insertUser, token);
+
+                        return insertUser;
+                    },
+                    cancellationToken);
             }
         });
     }
