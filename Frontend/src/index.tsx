@@ -2,9 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';
 import reportWebVitals from './reportWebVitals';
+import { loader } from '@monaco-editor/react';
 import '@convergencelabs/monaco-collab-ext/css/monaco-collab-ext.css';
 import './index.css';
 import './common.css';
+
+loader.config({ paths: { vs: '/vs' } });
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
