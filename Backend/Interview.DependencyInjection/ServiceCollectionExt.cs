@@ -1,3 +1,4 @@
+using Interview.Backend.Auth;
 using Interview.Domain;
 using Interview.Domain.Certificates;
 using Interview.Domain.Database;
@@ -40,6 +41,7 @@ public static class ServiceCollectionExt
         var serializer = new JsonEventSerializer();
         self.AddSingleton<IEventSerializer>(serializer);
         self.AddSingleton<IEventDeserializer>(serializer);
+        self.AddSingleton<SemaphoreLockProvider<string>>();
 
         self.AddScoped(typeof(ArchiveService<>));
 

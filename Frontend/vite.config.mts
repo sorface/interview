@@ -17,13 +17,19 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/ai-assistant': {
-        target: 'http://localhost:3033',
+        target: 'http://localhost:9000',
         changeOrigin: true,
         secure: true,
         ws: true,
       },
-      '/api': {
-        target: process.env['VITE_PROXY_TARGET'] || 'http://localhost:5043/',
+      '/interview/api': {
+        target: process.env['VITE_PROXY_TARGET'] || 'http://localhost:9000',
+        changeOrigin: true,
+        secure: true,
+        ws: true,
+      },
+      '/socket/interview/room': {
+        target: process.env['VITE_PROXY_TARGET'] || 'http://localhost:9000',
         changeOrigin: true,
         secure: true,
         ws: true,

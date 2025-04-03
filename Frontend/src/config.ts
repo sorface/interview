@@ -23,3 +23,6 @@ export const VITE_FEEDBACK_IFRAME_URL = getFromEnvOrDefault(
   '',
 );
 export const VITE_AI_API = getFromEnv('VITE_AI_API');
+export const VITE_GATEWAY_URL = getFromEnv('VITE_GATEWAY_URL');
+export const VITE_GATEWAY_LOGOUT_URL = VITE_GATEWAY_URL + getFromEnv('VITE_PATH_GATEWAY_LOGOUT_URL');
+export const VITE_GATEWAY_POST_LOGOUT_URL = getFromEnv('VITE_GATEWAY_POST_LOGOUT_URL');

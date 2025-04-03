@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer } from 'react';
-import { VITE_BACKEND_URL } from '../config';
+import {VITE_BACKEND_URL, VITE_GATEWAY_URL} from '../config';
 
 interface LogoutState {
   process: {
@@ -81,18 +81,25 @@ export const useLogout = () => {
   const logout = useCallback(async () => {
     dispatch({ name: 'startLoad' });
     try {
-      const response = await fetch(`${VITE_BACKEND_URL}/logout`, {
+      const response = await fetch(`${VITE_GATEWAY_URL}/passport/logout`, {
         method: 'POST',
         credentials: 'include',
       });
+
+      if (response.redirected && response.headers.get('location') != null) {
+        window.location.href = response.headers.get('location')!!
+      }
+
       if (!response.ok) {
         throw new Error('logout error');
       }
+
       dispatch({
         name: 'setCode',
         payload: response.status,
       });
     } catch (err: unknown) {
+      window.location.reload()
       dispatch({
         name: 'setError',
         payload: err instanceof Error ? err.message : 'Failed to logout',
