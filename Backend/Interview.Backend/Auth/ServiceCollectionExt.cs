@@ -1,4 +1,6 @@
+using System.Net;
 using Interview.Backend.Responses;
+using Interview.Domain;
 using Interview.Domain.Users.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -20,18 +22,8 @@ public static class ServiceCollectionExt
 
                 options.Events = new JwtBearerEvents
                 {
-                    OnForbidden = context =>
-                    {
-                        context.Response.StatusCode = 403;
-                        context.Response.WriteAsJsonAsync(new MessageResponse { Message = "Unauthorized", });
-                        return Task.CompletedTask;
-                    },
-                    OnAuthenticationFailed = context =>
-                    {
-                        context.Response.StatusCode = 401;
-                        context.Response.WriteAsJsonAsync(new MessageResponse { Message = "Unauthorized", });
-                        return Task.CompletedTask;
-                    },
+                    OnForbidden = _ => throw new AccessDeniedException("Forbidden"),
+                    OnAuthenticationFailed = _ => throw new UnauthorizedAccessException(),
                     OnTokenValidated = async context =>
                     {
                         var user = context.Principal?.ToUser();
@@ -43,7 +35,7 @@ public static class ServiceCollectionExt
 
                         var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
 
-                        var upsertUser = await userService.UpsertByExternalIdAsync(user);
+                        var upsertUser = await userService.UpsertByExternalIdAsync(user)!;
 
                         context.Principal!.EnrichRolesWithId(upsertUser);
                     },

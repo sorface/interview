@@ -8,10 +8,12 @@ import {Gap} from '../Gap/Gap';
 import {Icon} from '../../pages/Room/components/Icon/Icon';
 import {IconNames, pathnames} from '../../constants';
 import {Button} from '../Button/Button';
+import {useLogout} from "../../hooks/useLogout";
 import {VITE_GATEWAY_LOGOUT_URL, VITE_GATEWAY_POST_LOGOUT_URL} from "../../config";
 
 export const PageHeaderUserAvatar: FunctionComponent = () => {
     const auth = useContext(AuthContext);
+    const { logout } = useLogout();
 
     return (
         <>
