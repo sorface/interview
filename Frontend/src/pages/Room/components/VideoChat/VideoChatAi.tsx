@@ -18,7 +18,6 @@ import { EventsSearch } from '../../../../types/event';
 import { useReactionsStatus } from '../../hooks/useReactionsStatus';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
-import { RoomToolsPanel } from '../RoomToolsPanel/RoomToolsPanel';
 import { UserStreamsContext } from '../../context/UserStreamsContext';
 import { IconNames } from '../../../../constants';
 import { Gap } from '../../../../components/Gap/Gap';
@@ -31,6 +30,7 @@ import { RoomQuestionPanelAi } from '../RoomQuestionPanelAi/RoomQuestionPanelAi'
 import { RoomQuestion } from '../../../../types/room';
 import { sortRoomQuestion } from '../../../../utils/sortRoomQestions';
 import { Theme, ThemeContext } from '../../../../context/ThemeContext';
+import { Button } from '../../../../components/Button/Button';
 
 import './VideoChatAi.css';
 
@@ -245,117 +245,6 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
     setCameraEnabled(!cameraEnabled);
   };
 
-  const renderMain = () => {
-    return (
-      <>
-        <RoomQuestionPanelAi
-          questionWithCode={codeEditorEnabled}
-          roomQuestionsLoading={roomQuestionsLoading}
-          roomQuestions={roomQuestions?.sort(sortRoomQuestion) || []}
-          initialQuestion={initialQuestion}
-        />
-        <div className="flex items-center justify-center">
-          <div className="flex flex-col">
-            <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
-              <RoomToolsPanel.SwitchButton
-                enabled={true}
-                alternative={themeInUi === Theme.Light}
-                iconEnabledName={IconNames.Settings}
-                iconDisabledName={IconNames.Settings}
-                onClick={handleSettingsOpen}
-              />
-            </RoomToolsPanel.ButtonsGroupWrapper>
-            <Gap sizeRem={0.5} />
-            <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
-              <ContextMenu
-                toggleContent={
-                  <RoomToolsPanel.SwitchButton
-                    enabled={true}
-                    alternative={themeInUi === Theme.Light}
-                    iconEnabledName={IconNames.Call}
-                    iconDisabledName={IconNames.Call}
-                    onClick={currentUserExpert ? () => {} : handleLeaveRoom}
-                    danger
-                  />
-                }
-                translateRem={{ x: -14.25, y: -6.75 }}
-              >
-                {loadingRoomStartReview && <Loader />}
-                {errorRoomStartReview && (
-                  <div className="flex items-center justify-center">
-                    <Typography size="m" error>
-                      <Icon name={IconNames.Information} />
-                    </Typography>
-                    <Typography size="m" error>
-                      {errorRoomStartReview}
-                    </Typography>
-                  </div>
-                )}
-                {currentUserExpert && (
-                  <>
-                    <ContextMenu.Item
-                      title={
-                        localizationCaptions[
-                          LocalizationKey.CompleteAndEvaluateCandidate
-                        ]
-                      }
-                      onClick={handleStartReviewRoom}
-                    />
-                    <ContextMenu.Item
-                      title={localizationCaptions[LocalizationKey.Invitations]}
-                      onClick={handleInvitationsOpen}
-                    />
-                  </>
-                )}
-                <ContextMenu.Item
-                  title={localizationCaptions[LocalizationKey.Exit]}
-                  onClick={handleLeaveRoom}
-                />
-              </ContextMenu>
-            </RoomToolsPanel.ButtonsGroupWrapper>
-          </div>
-          <Gap sizeRem={0.625} horizontal />
-          <video
-            ref={userVideoMainContent}
-            className="w-12.5 h-10 videochat-video object-cover z-1"
-            style={{
-              right: '5.5rem',
-              bottom: '1.5rem',
-            }}
-            muted
-            autoPlay
-            playsInline
-          >
-            Video not supported
-          </video>
-          <Gap sizeRem={0.625} horizontal />
-          <div className="flex flex-col">
-            <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
-              <RoomToolsPanel.SwitchButton
-                enabled={micEnabled}
-                alternative={themeInUi === Theme.Light}
-                iconEnabledName={IconNames.MicOn}
-                iconDisabledName={IconNames.MicOff}
-                onClick={handleMicSwitch}
-              />
-            </RoomToolsPanel.ButtonsGroupWrapper>
-            <Gap sizeRem={0.5} />
-            <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
-              <RoomToolsPanel.SwitchButton
-                enabled={cameraEnabled}
-                alternative={themeInUi === Theme.Light}
-                iconEnabledName={IconNames.VideocamOn}
-                iconDisabledName={IconNames.VideocamOff}
-                onClick={handleCameraSwitch}
-              />
-            </RoomToolsPanel.ButtonsGroupWrapper>
-          </div>
-        </div>
-        <Gap sizeRem={0.25} />
-      </>
-    );
-  };
-
   return (
     <>
       <div className="flex-1 flex justify-center">
@@ -363,7 +252,103 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
           style={{ maxWidth: '840px' }}
           className="w-full flex flex-col relative rounded-1.125"
         >
-          {renderMain()}
+          <RoomQuestionPanelAi
+            questionWithCode={codeEditorEnabled}
+            roomQuestionsLoading={roomQuestionsLoading}
+            roomQuestions={roomQuestions?.sort(sortRoomQuestion) || []}
+            initialQuestion={initialQuestion}
+          >
+            <div className="flex flex-col items-center justify-center">
+              <video
+                ref={userVideoMainContent}
+                className="w-14.5 h-14.5 rounded-full videochat-video object-cover z-1"
+                style={{
+                  right: '5.5rem',
+                  bottom: '1.5rem',
+                }}
+                muted
+                autoPlay
+                playsInline
+              >
+                Video not supported
+              </video>
+              <div className="flex absolute" style={{ bottom: '-1.25rem' }}>
+                <Button
+                  variant="invertedAlternative"
+                  className="min-w-unset w-2.5 h-2.5 p-0 z-1"
+                  onClick={handleMicSwitch}
+                >
+                  <Icon size="s" name={micEnabled ? IconNames.MicOn : IconNames.MicOff} />
+                </Button>
+                <Gap sizeRem={0.5} horizontal />
+                <Button
+                  variant="invertedAlternative"
+                  className="min-w-unset w-2.5 h-2.5 p-0 z-1"
+                  onClick={handleCameraSwitch}
+                >
+                  <Icon size="s" name={cameraEnabled ? IconNames.VideocamOn : IconNames.VideocamOff} />
+                </Button>
+              </div>
+            </div>
+          </RoomQuestionPanelAi>
+          <Gap sizeRem={3.375} />
+          <div className="flex">
+            <ContextMenu
+              toggleContent={
+                <Button
+                  variant="invertedAlternative"
+                  className="min-w-unset w-2.5 h-2.5 p-0"
+                  onClick={currentUserExpert ? () => { } : handleLeaveRoom}
+                >
+                  <Icon size="s" name={IconNames.Call} />
+                </Button>
+              }
+              translateRem={{ x: -14.25, y: -6.75 }}
+            >
+              {loadingRoomStartReview && <Loader />}
+              {errorRoomStartReview && (
+                <div className="flex items-center justify-center">
+                  <Typography size="m" error>
+                    <Icon name={IconNames.Information} />
+                  </Typography>
+                  <Typography size="m" error>
+                    {errorRoomStartReview}
+                  </Typography>
+                </div>
+              )}
+              {currentUserExpert && (
+                <ContextMenu.Item
+                  title={
+                    localizationCaptions[
+                    LocalizationKey.CompleteAndEvaluateCandidate
+                    ]
+                  }
+                  onClick={handleStartReviewRoom}
+                />
+              )}
+              <ContextMenu.Item
+                title={localizationCaptions[LocalizationKey.Exit]}
+                onClick={handleLeaveRoom}
+              />
+            </ContextMenu>
+            <Gap sizeRem={0.5} horizontal />
+            <Button
+              variant="invertedAlternative"
+              className="min-w-unset w-2.5 h-2.5 p-0"
+              onClick={handleSettingsOpen}
+            >
+              <Icon size="s" name={IconNames.Settings} />
+            </Button>
+            <Gap sizeRem={0.5} horizontal />
+            <Button
+              variant="invertedAlternative"
+              className="min-w-unset w-2.5 h-2.5 p-0"
+              onClick={handleInvitationsOpen}
+            >
+              <Icon size="s" name={IconNames.PersonAdd} />
+            </Button>
+          </div>
+          <Gap sizeRem={1.875} />
         </div>
       </div>
 

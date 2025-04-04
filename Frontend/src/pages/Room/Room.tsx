@@ -641,95 +641,36 @@ export const Room: FunctionComponent = () => {
               >
                 <div className="room-page">
                   <div className="room-page-main">
-                    {aiRoom && <Gap sizeRem={0.75} />}
-                    {!aiRoom && (
-                      <div className="room-page-header justify-between">
-                        <div>
-                          <span
-                            className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
+                    <div className="room-page-header justify-between">
+                      <div>
+                        <span
+                          className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
+                        >
+                          <Link
+                            to={pathnames.highlightRooms}
+                            className="no-underline"
                           >
-                            <Link
-                              to={pathnames.highlightRooms}
-                              className="no-underline"
-                            >
-                              <div className="room-page-header-wrapper flex items-center">
-                                <div className="w-2.375 pr-1">
-                                  <img
-                                    className="w-2.375 h-2.375 rounded-0.375"
-                                    src="/logo192.png"
-                                    alt="site logo"
-                                  />
-                                </div>
-                                <h3>{room?.name}</h3>
+                            <div className="room-page-header-wrapper flex items-center">
+                              <div className="w-2.375 pr-1">
+                                <img
+                                  className="w-2.375 h-2.375 rounded-0.375"
+                                  src="/logo192.png"
+                                  alt="site logo"
+                                />
                               </div>
-                            </Link>
-                          </span>
-                        </div>
-                        <div className="flex">
-                          {!!roomTimer?.startTime && (
-                            <>
-                              <RoomTimer
-                                durationSec={roomTimer.durationSec}
-                                startTime={roomTimer.startTime}
-                              />
-                              <Gap sizeRem={0.5} horizontal />
-                            </>
-                          )}
-                          <SwitcherButton
-                            items={[
-                              {
-                                id: 0,
-                                content: (
-                                  <div className="flex items-center">
-                                    <div>
-                                      {
-                                        localizationCaptions[
-                                          LocalizationKey.Chat
-                                        ]
-                                      }
-                                    </div>
-                                    {!!unreadChatMessages && (
-                                      <>
-                                        <Gap sizeRem={0.5} horizontal />
-                                        <UnreadChatMessagesCounter
-                                          value={unreadChatMessages}
-                                        />
-                                      </>
-                                    )}
-                                  </div>
-                                ),
-                              },
-                              {
-                                id: 1,
-                                content: (
-                                  <div className="flex items-center">
-                                    <div>
-                                      {
-                                        localizationCaptions[
-                                          LocalizationKey.RoomParticipants
-                                        ]
-                                      }
-                                    </div>
-                                    <Gap sizeRem={0.5} horizontal />
-                                    <div>{peers.length + 1}</div>
-                                  </div>
-                                ),
-                              },
-                            ]}
-                            activeIndex={messagesChatEnabled ? 0 : 1}
-                            variant="alternative"
-                            onClick={handleSwitchMessagesChat}
-                          />
-                        </div>
+                              <h3>{room?.name}</h3>
+                            </div>
+                          </Link>
+                        </span>
                       </div>
-                    )}
+                    </div>
                     <div className="room-page-main-content">
                       <div className="room-columns">
                         {errorRoomState && (
                           <div>
                             {
                               localizationCaptions[
-                                LocalizationKey.ErrorLoadingRoomState
+                              LocalizationKey.ErrorLoadingRoomState
                               ]
                             }
                             ...

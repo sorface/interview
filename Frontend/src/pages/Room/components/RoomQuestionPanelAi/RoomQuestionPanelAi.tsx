@@ -1,5 +1,6 @@
 import React, {
   FunctionComponent,
+  ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -90,7 +91,7 @@ const getRandomQuestionWithExclude = (
   nodes: QuestionsTreeNode[],
   excludedQuestions: RoomQuestion[],
 ) => {
-  for (let i = 777; i--; ) {
+  for (let i = 777; i--;) {
     const randomNode = getRandomNode(nodes);
     if (!randomNode.question) {
       continue;
@@ -154,7 +155,7 @@ const tryGetRandomNodeFromRoot = (
     console.warn('no rootNode in tryGetRandomNodeFromRoot');
     return null;
   }
-  for (let i = 777; i--; ) {
+  for (let i = 777; i--;) {
     const nodeFromRoot = visitNodesFromRoot(nodes, rootNode, excludedQuestions);
     if (nodeFromRoot) {
       return nodeFromRoot;
@@ -276,6 +277,7 @@ export interface RoomQuestionPanelAiProps {
   roomQuestionsLoading: boolean;
   roomQuestions: RoomQuestion[];
   initialQuestion?: RoomQuestion;
+  children: ReactNode;
 }
 
 export const RoomQuestionPanelAi: FunctionComponent<
@@ -285,229 +287,150 @@ export const RoomQuestionPanelAi: FunctionComponent<
   roomQuestionsLoading,
   roomQuestions,
   initialQuestion,
+  children,
 }) => {
-  const auth = useContext(AuthContext);
-  const localizationCaptions = useLocalizationCaptions();
-  const {
-    room,
-    roomParticipant,
-    lastVoiceRecognition,
-    aiAssistantScript,
-    lastWsMessageParsed,
-    sendWsMessage,
-    setAiAssistantCurrentScript,
-    setRecognitionEnabled,
-  } = useContext(RoomContext);
-  const {
-    recognitionAccum,
-    recognitionCommand,
-    resetVoiceRecognitionAccum,
-    addVoiceRecognitionAccumTranscript,
-  } = useVoiceRecognitionAccum();
-  const readOnly = roomParticipant?.userType !== 'Expert';
-  const [roomQuestionEvaluation, setRoomQuestionEvaluation] =
-    useState<RoomQuestionEvaluationValue | null>(null);
-  const [questionCode, setQuestionCode] = useState<string | undefined>('');
-  const [questionLanguage, setQuestionLanguage] = useState<CodeEditorLang>(
-    CodeEditorLang.Javascript,
-  );
-  const [copilotAnswerOpen, setCopilotAnswerOpen] = useState(false);
-  const startedByVoiceRef = useRef(false);
-  const [chatMessages, setChatMessages] = useState<MessagesChatAiMessage[]>([]);
+    const auth = useContext(AuthContext);
+    const localizationCaptions = useLocalizationCaptions();
+    const {
+      room,
+      roomParticipant,
+      lastVoiceRecognition,
+      aiAssistantScript,
+      lastWsMessageParsed,
+      sendWsMessage,
+      setAiAssistantCurrentScript,
+      setRecognitionEnabled,
+    } = useContext(RoomContext);
+    const {
+      recognitionAccum,
+      recognitionCommand,
+      resetVoiceRecognitionAccum,
+      addVoiceRecognitionAccumTranscript,
+    } = useVoiceRecognitionAccum();
+    const readOnly = roomParticipant?.userType !== 'Expert';
+    const [roomQuestionEvaluation, setRoomQuestionEvaluation] =
+      useState<RoomQuestionEvaluationValue | null>(null);
+    const [questionCode, setQuestionCode] = useState<string | undefined>('');
+    const [questionLanguage, setQuestionLanguage] = useState<CodeEditorLang>(
+      CodeEditorLang.Javascript,
+    );
+    const [copilotAnswerOpen, setCopilotAnswerOpen] = useState(false);
+    const startedByVoiceRef = useRef(false);
+    // const [chatMessages, setChatMessages] = useState<MessagesChatAiMessage[]>([]);
 
-  const {
-    apiMethodState: apiSendActiveQuestionState,
-    fetchData: sendRoomActiveQuestion,
-  } = useApiMethod<unknown, ChangeActiveQuestionBody>(
-    roomQuestionApiDeclaration.changeActiveQuestion,
-  );
-  const {
-    process: {
-      loading: loadingRoomActiveQuestion,
-      error: errorRoomActiveQuestion,
-    },
-  } = apiSendActiveQuestionState;
-
-  const {
-    apiMethodState: apiRoomStartReviewMethodState,
-    fetchData: fetchRoomStartReview,
-  } = useApiMethod<unknown, CompleteRoomReviewsBody>(
-    roomReviewApiDeclaration.completeAi,
-  );
-  const {
-    process: { loading: loadingRoomStartReview, error: errorRoomStartReview },
-  } = apiRoomStartReviewMethodState;
-
-  const {
-    apiMethodState: apiRoomQuestionEvaluationState,
-    fetchData: getRoomQuestionEvaluation,
-  } = useApiMethod<RoomQuestionEvaluationType, GetRoomQuestionEvaluationParams>(
-    roomQuestionEvaluationApiDeclaration.get,
-  );
-  const {
-    data: loadedRoomQuestionEvaluation,
-    process: {
-      error: errorRoomQuestionEvaluation,
-      code: responseCodeRoomQuestionEvaluation,
-    },
-  } = apiRoomQuestionEvaluationState;
-
-  const {
-    apiMethodState: apiMergeRoomQuestionEvaluationState,
-    fetchData: mergeRoomQuestionEvaluation,
-  } = useApiMethod<RoomQuestionEvaluationType, MergeRoomQuestionEvaluationBody>(
-    roomQuestionEvaluationApiDeclaration.merge,
-  );
-  const {
-    data: mergedRoomQuestionEvaluation,
-    process: {
-      loading: loadingMergeRoomQuestionEvaluation,
-      error: errorMergeRoomQuestionEvaluation,
-    },
-  } = apiMergeRoomQuestionEvaluationState;
-
-  const getRoomQuestionEvaluationError =
-    responseCodeRoomQuestionEvaluation !== notFoundCode
-      ? errorRoomQuestionEvaluation
-      : null;
-  const totalErrorRoomQuestionEvaluation =
-    errorMergeRoomQuestionEvaluation || getRoomQuestionEvaluationError;
-
-  const { aiAnswerCompleted, aiAnswerLoading, lastValidAiAnswer } =
-    useAiAnswerSource({
-      enabled: copilotAnswerOpen && !readOnly,
-      answer: recognitionAccum,
-      conversationId: `${room?.id}${initialQuestion?.id}${auth?.id}`,
-      question: initialQuestion?.value || '',
-      questionId: initialQuestion?.id || '',
-      theme: room?.questionTree?.name || '',
-      userId: auth?.id || '',
-      taskDescription: initialQuestion?.value || '',
-      code: questionCode || '',
-      language: questionLanguage,
-      endpoint: questionWithCode ? AiEndpoint.analyze : AiEndpoint.examinee,
-    });
-  const [wsLastValidAiAnswer, setWsLastValidAiAnswer] =
-    useState<AnyObject | null>(null);
-  const totalLastValidAiAnswer = lastValidAiAnswer || wsLastValidAiAnswer;
-
-  const themedAiAvatar = useThemedAiAvatar();
-  const allUsersWithAiExpert = new Map<string, AnalyticsUserReview>();
-  allUsersWithAiExpert.set(aiExpertId, {
-    comment: '',
-    nickname: aiExpertNickname,
-    participantType: 'Expert',
-    userId: aiExpertId,
-    avatar: themedAiAvatar,
-  });
-
-  const closedQuestions = useMemo(
-    () =>
-      roomQuestions.filter((roomQuestion) => roomQuestion.state === 'Closed'),
-    [roomQuestions],
-  );
-  const openQuestions = roomQuestions.filter(
-    (roomQuestion) => roomQuestion.state === 'Open',
-  );
-
-  const readyToReview = openQuestions.length === 0;
-  const nextQuestionButtonLoading =
-    !mergedRoomQuestionEvaluation ||
-    loadingMergeRoomQuestionEvaluation ||
-    !aiAnswerCompleted;
-  const letsStartDescription = localizationCaptions[
-    LocalizationKey.LetsBeginDescription
-  ].replace(
-    '{LetsStartCommand}',
-    localizationCaptions[LocalizationKey.LetsBeginCommand],
-  );
-  const rateMeDescription = localizationCaptions[
-    LocalizationKey.RateMeDescription
-  ].replace(
-    '{RateMeCommand}',
-    localizationCaptions[LocalizationKey.RateMeCommands].split('|')[0],
-  );
-
-  useEffect(() => {
-    if (readOnly) {
-      return;
-    }
-    setRecognitionEnabled(!copilotAnswerOpen);
-  }, [readOnly, copilotAnswerOpen, setRecognitionEnabled]);
-
-  useEffect(() => {
-    if (!lastVoiceRecognition || readOnly) {
-      return;
-    }
-    addVoiceRecognitionAccumTranscript(lastVoiceRecognition);
-  }, [lastVoiceRecognition, readOnly, addVoiceRecognitionAccumTranscript]);
-
-  useEffect(() => {
-    if (!lastVoiceRecognition || readOnly) {
-      return;
-    }
-    setChatMessages((oldChatMessages) => [
-      ...oldChatMessages,
-      {
-        id: crypto.randomUUID(),
-        fromAi: false,
-        userId: auth?.id || '',
-        userNickname: auth?.nickname || '',
-        value: lastVoiceRecognition,
+    const {
+      apiMethodState: apiSendActiveQuestionState,
+      fetchData: sendRoomActiveQuestion,
+    } = useApiMethod<unknown, ChangeActiveQuestionBody>(
+      roomQuestionApiDeclaration.changeActiveQuestion,
+    );
+    const {
+      process: {
+        loading: loadingRoomActiveQuestion,
+        error: errorRoomActiveQuestion,
       },
-    ]);
-  }, [
-    lastVoiceRecognition,
-    readOnly,
-    auth?.id,
-    auth?.nickname,
-    addVoiceRecognitionAccumTranscript,
-  ]);
+    } = apiSendActiveQuestionState;
 
-  useEffect(() => {
-    if (!lastWsMessageParsed || !readOnly) {
-      return;
-    }
-    if (
-      lastWsMessageParsed.Type === 'VoiceRecognition' &&
-      lastWsMessageParsed.Value.Message &&
-      lastWsMessageParsed.CreatedById !== auth?.id
-    ) {
-      setChatMessages((oldChatMessages) => [
-        ...oldChatMessages,
-        {
-          id: lastWsMessageParsed.Id,
-          fromAi: false,
-          userId: lastWsMessageParsed.CreatedById,
-          userNickname: lastWsMessageParsed.Value.Nickname,
-          value: lastWsMessageParsed.Value.Message,
-        },
-      ]);
-      return;
-    }
-    if (lastWsMessageParsed.Type === 'ValidAiAnswer') {
-      console.log(lastWsMessageParsed.Value.AdditionalData);
-      setWsLastValidAiAnswer(lastWsMessageParsed.Value.AdditionalData);
-      setCopilotAnswerOpen(true);
-    }
-  }, [readOnly, lastWsMessageParsed, auth?.id]);
+    const {
+      apiMethodState: apiRoomStartReviewMethodState,
+      fetchData: fetchRoomStartReview,
+    } = useApiMethod<unknown, CompleteRoomReviewsBody>(
+      roomReviewApiDeclaration.completeAi,
+    );
+    const {
+      process: { loading: loadingRoomStartReview, error: errorRoomStartReview },
+    } = apiRoomStartReviewMethodState;
 
-  useEffect(() => {
-    if (!initialQuestion?.id) {
-      return;
-    }
-    resetVoiceRecognitionAccum();
-  }, [initialQuestion?.id, resetVoiceRecognitionAccum]);
+    const {
+      apiMethodState: apiRoomQuestionEvaluationState,
+      fetchData: getRoomQuestionEvaluation,
+    } = useApiMethod<RoomQuestionEvaluationType, GetRoomQuestionEvaluationParams>(
+      roomQuestionEvaluationApiDeclaration.get,
+    );
+    const {
+      data: loadedRoomQuestionEvaluation,
+      process: {
+        error: errorRoomQuestionEvaluation,
+        code: responseCodeRoomQuestionEvaluation,
+      },
+    } = apiRoomQuestionEvaluationState;
 
-  useEffect(() => {
-    if (!initialQuestion?.id || !readOnly) {
-      return;
-    }
-    setWsLastValidAiAnswer(null);
-    setCopilotAnswerOpen(false);
-  }, [initialQuestion?.id, readOnly]);
+    const {
+      apiMethodState: apiMergeRoomQuestionEvaluationState,
+      fetchData: mergeRoomQuestionEvaluation,
+    } = useApiMethod<RoomQuestionEvaluationType, MergeRoomQuestionEvaluationBody>(
+      roomQuestionEvaluationApiDeclaration.merge,
+    );
+    const {
+      data: mergedRoomQuestionEvaluation,
+      process: {
+        loading: loadingMergeRoomQuestionEvaluation,
+        error: errorMergeRoomQuestionEvaluation,
+      },
+    } = apiMergeRoomQuestionEvaluationState;
 
-  useEffect(() => {
+    const getRoomQuestionEvaluationError =
+      responseCodeRoomQuestionEvaluation !== notFoundCode
+        ? errorRoomQuestionEvaluation
+        : null;
+    const totalErrorRoomQuestionEvaluation =
+      errorMergeRoomQuestionEvaluation || getRoomQuestionEvaluationError;
+
+    const { aiAnswerCompleted, aiAnswerLoading, lastValidAiAnswer } =
+      useAiAnswerSource({
+        enabled: copilotAnswerOpen && !readOnly,
+        answer: recognitionAccum,
+        conversationId: `${room?.id}${initialQuestion?.id}${auth?.id}`,
+        question: initialQuestion?.value || '',
+        questionId: initialQuestion?.id || '',
+        theme: room?.questionTree?.name || '',
+        userId: auth?.id || '',
+        taskDescription: initialQuestion?.value || '',
+        code: questionCode || '',
+        language: questionLanguage,
+        endpoint: questionWithCode ? AiEndpoint.analyze : AiEndpoint.examinee,
+      });
+    const [wsLastValidAiAnswer, setWsLastValidAiAnswer] =
+      useState<AnyObject | null>(null);
+    const totalLastValidAiAnswer = lastValidAiAnswer || wsLastValidAiAnswer;
+
+    const themedAiAvatar = useThemedAiAvatar();
+    const allUsersWithAiExpert = new Map<string, AnalyticsUserReview>();
+    allUsersWithAiExpert.set(aiExpertId, {
+      comment: '',
+      nickname: aiExpertNickname,
+      participantType: 'Expert',
+      userId: aiExpertId,
+      avatar: themedAiAvatar,
+    });
+
+    const closedQuestions = useMemo(
+      () =>
+        roomQuestions.filter((roomQuestion) => roomQuestion.state === 'Closed'),
+      [roomQuestions],
+    );
+    const openQuestions = roomQuestions.filter(
+      (roomQuestion) => roomQuestion.state === 'Open',
+    );
+
+    const readyToReview = openQuestions.length === 0;
+    const nextQuestionButtonLoading =
+      !mergedRoomQuestionEvaluation ||
+      loadingMergeRoomQuestionEvaluation ||
+      !aiAnswerCompleted;
+    const letsStartDescription = localizationCaptions[
+      LocalizationKey.LetsBeginDescription
+    ].replace(
+      '{LetsStartCommand}',
+      localizationCaptions[LocalizationKey.LetsBeginCommand],
+    );
+    const rateMeDescription = localizationCaptions[
+      LocalizationKey.RateMeDescription
+    ].replace(
+      '{RateMeCommand}',
+      localizationCaptions[LocalizationKey.RateMeCommands].split('|')[0],
+    );
+
     const firstLineCaption = initialQuestion
       ? initialQuestion.value
       : localizationCaptions[LocalizationKey.WaitingInterviewStart];
@@ -515,359 +438,323 @@ export const RoomQuestionPanelAi: FunctionComponent<
       ? rateMeDescription
       : letsStartDescription;
 
-    setChatMessages([
-      {
-        id: crypto.randomUUID(),
-        userId: aiExpertId,
-        userNickname: aiExpertNickname,
-        fromAi: true,
-        value: firstLineCaption,
-      },
-      {
-        id: crypto.randomUUID(),
-        userId: aiExpertId,
-        userNickname: aiExpertNickname,
-        fromAi: true,
-        value: secondLineCaption,
-      },
+    useEffect(() => {
+      if (readOnly) {
+        return;
+      }
+      setRecognitionEnabled(!copilotAnswerOpen);
+    }, [readOnly, copilotAnswerOpen, setRecognitionEnabled]);
+
+    useEffect(() => {
+      if (!lastVoiceRecognition || readOnly) {
+        return;
+      }
+      addVoiceRecognitionAccumTranscript(lastVoiceRecognition);
+    }, [lastVoiceRecognition, readOnly, addVoiceRecognitionAccumTranscript]);
+
+    useEffect(() => {
+      if (!lastWsMessageParsed || !readOnly) {
+        return;
+      }
+      if (lastWsMessageParsed.Type === 'ValidAiAnswer') {
+        setWsLastValidAiAnswer(lastWsMessageParsed.Value.AdditionalData);
+        setCopilotAnswerOpen(true);
+      }
+    }, [readOnly, lastWsMessageParsed, auth?.id]);
+
+    useEffect(() => {
+      if (!initialQuestion?.id) {
+        return;
+      }
+      resetVoiceRecognitionAccum();
+    }, [initialQuestion?.id, resetVoiceRecognitionAccum]);
+
+    useEffect(() => {
+      if (!initialQuestion?.id || !readOnly) {
+        return;
+      }
+      setWsLastValidAiAnswer(null);
+      setCopilotAnswerOpen(false);
+    }, [initialQuestion?.id, readOnly]);
+
+    const handleCopilotAnswerOpen = useCallback(() => {
+      setCopilotAnswerOpen(true);
+    }, []);
+
+    const handleCopilotAnswerClose = useCallback(() => {
+      setCopilotAnswerOpen(false);
+    }, []);
+
+    useEffect(() => {
+      if (questionWithCode) {
+        return;
+      }
+      if (recognitionCommand !== VoiceRecognitionCommand.RateMe) {
+        return;
+      }
+      handleCopilotAnswerOpen();
+    }, [questionWithCode, recognitionCommand, handleCopilotAnswerOpen]);
+
+    useEffect(() => {
+      if (readOnly) {
+        return;
+      }
+      if (!aiAnswerCompleted || !lastValidAiAnswer) {
+        return;
+      }
+      setRoomQuestionEvaluation({
+        mark: Math.round(lastValidAiAnswer?.score),
+        review: lastValidAiAnswer?.reason,
+      });
+    }, [readOnly, aiAnswerCompleted, lastValidAiAnswer]);
+
+    useEffect(() => {
+      if (readOnly || !lastValidAiAnswer) {
+        return;
+      }
+      sendWsMessage(
+        JSON.stringify({
+          Type: EventName.ValidAiAnswer,
+          Value: JSON.stringify(lastValidAiAnswer),
+        }),
+      );
+    }, [readOnly, lastValidAiAnswer, sendWsMessage]);
+
+    useEffect(() => {
+      if (!room) {
+        return;
+      }
+      if (room.status === 'New') {
+        setAiAssistantCurrentScript(AiAssistantScriptName.Welcome);
+      }
+    }, [room, setAiAssistantCurrentScript]);
+
+    useEffect(() => {
+      if (!initialQuestion?.id) {
+        return;
+      }
+      setAiAssistantCurrentScript(AiAssistantScriptName.PleaseAnswer);
+    }, [initialQuestion?.id, setAiAssistantCurrentScript]);
+
+    useEffect(() => {
+      if (!aiAnswerCompleted) {
+        return;
+      }
+      if (lastValidAiAnswer?.score >= aiAssistantGoodRate) {
+        setAiAssistantCurrentScript(AiAssistantScriptName.GoodAnswer);
+      } else {
+        setAiAssistantCurrentScript(AiAssistantScriptName.NeedTrain);
+      }
+    }, [aiAnswerCompleted, lastValidAiAnswer, setAiAssistantCurrentScript]);
+
+    useEffect(() => {
+      if (readOnly || !room || !initialQuestion) {
+        return;
+      }
+      getRoomQuestionEvaluation({
+        questionId: initialQuestion.id,
+        roomId: room.id,
+      });
+    }, [readOnly, room, initialQuestion, getRoomQuestionEvaluation]);
+
+    useEffect(() => {
+      if (!roomQuestionEvaluation) {
+        return;
+      }
+      const activeQuestion = roomQuestions?.find(
+        (question) => question.state === 'Active',
+      );
+      const roomId = room?.id;
+      if (!activeQuestion || !roomId) {
+        return;
+      }
+      mergeRoomQuestionEvaluation({
+        ...roomQuestionEvaluation,
+        questionId: activeQuestion.id,
+        roomId: roomId,
+        review: roomQuestionEvaluation.review || '',
+        mark: roomQuestionEvaluation.mark || null,
+      });
+    }, [
+      roomQuestionEvaluation,
+      room?.id,
+      roomQuestions,
+      mergeRoomQuestionEvaluation,
     ]);
-  }, [
-    initialQuestion,
-    letsStartDescription,
-    localizationCaptions,
-    rateMeDescription,
-  ]);
 
-  const handleCopilotAnswerOpen = useCallback(() => {
-    setCopilotAnswerOpen(true);
-  }, []);
+    useEffect(() => {
+      if (!loadedRoomQuestionEvaluation) {
+        return;
+      }
+      setRoomQuestionEvaluation(loadedRoomQuestionEvaluation);
+    }, [loadedRoomQuestionEvaluation]);
 
-  const handleCopilotAnswerClose = useCallback(() => {
-    setCopilotAnswerOpen(false);
-  }, []);
+    useEffect(() => {
+      if (responseCodeRoomQuestionEvaluation !== notFoundCode) {
+        return;
+      }
+      setRoomQuestionEvaluation({
+        mark: null,
+        review: '',
+      });
+    }, [responseCodeRoomQuestionEvaluation]);
 
-  useEffect(() => {
-    if (questionWithCode) {
-      return;
-    }
-    if (recognitionCommand !== VoiceRecognitionCommand.RateMe) {
-      return;
-    }
-    handleCopilotAnswerOpen();
-  }, [questionWithCode, recognitionCommand, handleCopilotAnswerOpen]);
+    const handleNextQuestion = useCallback(() => {
+      if (!room) {
+        throw new Error('handleNextQuestion Room not found.');
+      }
+      if (!room.questionTree) {
+        throw new Error('handleNextQuestion questionTree not found.');
+      }
+      const nextQuestion = getNextQuestion(
+        room.questionTree,
+        [...closedQuestions, ...(initialQuestion ? [initialQuestion] : [])],
+        initialQuestion?.id,
+      );
+      if (!nextQuestion) {
+        console.warn('handleNextQuestion empty nextQuestion');
+        return;
+      }
+      handleCopilotAnswerClose();
+      resetVoiceRecognitionAccum();
+      sendRoomActiveQuestion({
+        roomId: room.id,
+        questionId: nextQuestion.id,
+      });
+    }, [
+      room,
+      closedQuestions,
+      initialQuestion,
+      handleCopilotAnswerClose,
+      resetVoiceRecognitionAccum,
+      sendRoomActiveQuestion,
+    ]);
 
-  useEffect(() => {
-    if (readOnly) {
-      return;
-    }
-    if (!aiAnswerCompleted || !lastValidAiAnswer) {
-      return;
-    }
-    setRoomQuestionEvaluation({
-      mark: Math.round(lastValidAiAnswer?.score),
-      review: lastValidAiAnswer?.reason,
-    });
-  }, [readOnly, aiAnswerCompleted, lastValidAiAnswer]);
+    useEffect(() => {
+      if (
+        startedByVoiceRef.current ||
+        recognitionCommand !== VoiceRecognitionCommand.LetsStart ||
+        initialQuestion ||
+        !room
+      ) {
+        return;
+      }
+      if (room.status !== 'New') {
+        return;
+      }
+      startedByVoiceRef.current = true;
+      handleNextQuestion();
+    }, [recognitionCommand, initialQuestion, room, handleNextQuestion]);
 
-  useEffect(() => {
-    if (readOnly || !lastValidAiAnswer) {
-      return;
-    }
-    sendWsMessage(
-      JSON.stringify({
-        Type: EventName.ValidAiAnswer,
-        Value: JSON.stringify(lastValidAiAnswer),
-      }),
-    );
-  }, [readOnly, lastValidAiAnswer, sendWsMessage]);
+    const handleStartReviewRoom = useCallback(() => {
+      if (!room?.id) {
+        throw new Error('Room id not found');
+      }
+      fetchRoomStartReview({ roomId: room.id });
+    }, [room?.id, fetchRoomStartReview]);
 
-  useEffect(() => {
-    if (!room) {
-      return;
-    }
-    if (room.status === 'New') {
-      setAiAssistantCurrentScript(AiAssistantScriptName.Welcome);
-    }
-  }, [room, setAiAssistantCurrentScript]);
+    const handleExecutionResultsSubmit = (
+      code: string | undefined,
+      language: CodeEditorLang,
+    ) => {
+      setQuestionCode(code);
+      setQuestionLanguage(language);
+      handleCopilotAnswerOpen();
+    };
 
-  useEffect(() => {
-    if (!initialQuestion?.id) {
-      return;
-    }
-    setAiAssistantCurrentScript(AiAssistantScriptName.PleaseAnswer);
-  }, [initialQuestion?.id, setAiAssistantCurrentScript]);
+    const statusPanelVisible = questionWithCode ? copilotAnswerOpen : true;
+    const loadingTotal =
+      loadingRoomStartReview ||
+      roomQuestionsLoading ||
+      loadingRoomActiveQuestion ||
+      aiAnswerLoading;
 
-  useEffect(() => {
-    if (!aiAnswerCompleted) {
-      return;
-    }
-    if (lastValidAiAnswer?.score >= aiAssistantGoodRate) {
-      setAiAssistantCurrentScript(AiAssistantScriptName.GoodAnswer);
-    } else {
-      setAiAssistantCurrentScript(AiAssistantScriptName.NeedTrain);
-    }
-  }, [aiAnswerCompleted, lastValidAiAnswer, setAiAssistantCurrentScript]);
+    return (
+      <>
+        <Gap sizeRem={4.375} />
 
-  useEffect(() => {
-    if (readOnly || !room || !initialQuestion) {
-      return;
-    }
-    getRoomQuestionEvaluation({
-      questionId: initialQuestion.id,
-      roomId: room.id,
-    });
-  }, [readOnly, room, initialQuestion, getRoomQuestionEvaluation]);
-
-  useEffect(() => {
-    if (!roomQuestionEvaluation) {
-      return;
-    }
-    const activeQuestion = roomQuestions?.find(
-      (question) => question.state === 'Active',
-    );
-    const roomId = room?.id;
-    if (!activeQuestion || !roomId) {
-      return;
-    }
-    mergeRoomQuestionEvaluation({
-      ...roomQuestionEvaluation,
-      questionId: activeQuestion.id,
-      roomId: roomId,
-      review: roomQuestionEvaluation.review || '',
-      mark: roomQuestionEvaluation.mark || null,
-    });
-  }, [
-    roomQuestionEvaluation,
-    room?.id,
-    roomQuestions,
-    mergeRoomQuestionEvaluation,
-  ]);
-
-  useEffect(() => {
-    if (!loadedRoomQuestionEvaluation) {
-      return;
-    }
-    setRoomQuestionEvaluation(loadedRoomQuestionEvaluation);
-  }, [loadedRoomQuestionEvaluation]);
-
-  useEffect(() => {
-    if (responseCodeRoomQuestionEvaluation !== notFoundCode) {
-      return;
-    }
-    setRoomQuestionEvaluation({
-      mark: null,
-      review: '',
-    });
-  }, [responseCodeRoomQuestionEvaluation]);
-
-  const handleNextQuestion = useCallback(() => {
-    if (!room) {
-      throw new Error('handleNextQuestion Room not found.');
-    }
-    if (!room.questionTree) {
-      throw new Error('handleNextQuestion questionTree not found.');
-    }
-    const nextQuestion = getNextQuestion(
-      room.questionTree,
-      [...closedQuestions, ...(initialQuestion ? [initialQuestion] : [])],
-      initialQuestion?.id,
-    );
-    if (!nextQuestion) {
-      console.warn('handleNextQuestion empty nextQuestion');
-      return;
-    }
-    handleCopilotAnswerClose();
-    resetVoiceRecognitionAccum();
-    sendRoomActiveQuestion({
-      roomId: room.id,
-      questionId: nextQuestion.id,
-    });
-  }, [
-    room,
-    closedQuestions,
-    initialQuestion,
-    handleCopilotAnswerClose,
-    resetVoiceRecognitionAccum,
-    sendRoomActiveQuestion,
-  ]);
-
-  useEffect(() => {
-    if (
-      startedByVoiceRef.current ||
-      recognitionCommand !== VoiceRecognitionCommand.LetsStart ||
-      initialQuestion ||
-      !room
-    ) {
-      return;
-    }
-    if (room.status !== 'New') {
-      return;
-    }
-    startedByVoiceRef.current = true;
-    handleNextQuestion();
-  }, [recognitionCommand, initialQuestion, room, handleNextQuestion]);
-
-  const handleStartReviewRoom = useCallback(() => {
-    if (!room?.id) {
-      throw new Error('Room id not found');
-    }
-    fetchRoomStartReview({ roomId: room.id });
-  }, [room?.id, fetchRoomStartReview]);
-
-  const handleExecutionResultsSubmit = (
-    code: string | undefined,
-    language: CodeEditorLang,
-  ) => {
-    setQuestionCode(code);
-    setQuestionLanguage(language);
-    handleCopilotAnswerOpen();
-  };
-
-  const statusPanelVisible = questionWithCode ? copilotAnswerOpen : true;
-  const loadingTotal =
-    loadingRoomStartReview ||
-    roomQuestionsLoading ||
-    loadingRoomActiveQuestion ||
-    aiAnswerLoading;
-
-  return (
-    <>
-      <Gap sizeRem={0.75} />
-      <div className="w-full flex items-center justify-center">
-        <div
-          className={`z-0`}
-          style={{
-            width: statusPanelVisible ? '162px' : 0,
-            height: statusPanelVisible ? '162px' : 0,
-          }}
-        />
-        <div className="absolute" style={{ width: '200px', height: '200px' }}>
-          <Canvas shadows camera={{ position: [0, 0.12, 1.5], fov: 38 }}>
-            <AiAssistant
-              visible={!questionWithCode || copilotAnswerOpen}
-              loading={loadingTotal}
-              currentScript={
-                readOnly ? AiAssistantScriptName.Idle : aiAssistantScript
+        {errorRoomActiveQuestion && (
+          <>
+            <Gap sizeRem={1} />
+            <Typography size="m" error>
+              {
+                localizationCaptions[
+                LocalizationKey.ErrorSendingActiveQuestion
+                ]
               }
+            </Typography>
+          </>
+        )}
+
+        <div className={statusPanelVisible ? `invisible` : `w-full h-full z-1`}>
+          {!statusPanelVisible && (
+            <div className="flex items-center justify-center">
+            <div
+              className={`z-0`}
+              style={{
+                width: statusPanelVisible ? '72px' : 0,
+                height: statusPanelVisible ? '72px' : 0,
+              }}
             />
-          </Canvas>
-          {errorRoomActiveQuestion && (
-            <>
-              <Gap sizeRem={1} />
-              <Typography size="m" error>
-                {
-                  localizationCaptions[
-                    LocalizationKey.ErrorSendingActiveQuestion
-                  ]
-                }
-              </Typography>
-            </>
+            <div className="absolute z-1" style={{ width: '72px', height: '72px', right: '1.875rem', top: '5.25rem' }}>
+              <Canvas shadows camera={{ position: [0, 0.12, 1.5], fov: 38 }}>
+                <AiAssistant
+                  // visible={!questionWithCode || copilotAnswerOpen}
+                  loading={loadingTotal}
+                  currentScript={
+                    readOnly ? AiAssistantScriptName.Idle : aiAssistantScript
+                  }
+                />
+              </Canvas>
+            </div>
+          </div>
           )}
-        </div>
-      </div>
-
-      {statusPanelVisible && <Gap sizeRem={1.5} />}
-
-      <div className={statusPanelVisible ? `invisible` : `w-full h-full z-1`}>
-        <RoomCodeEditor
-          // TODO: Fix this hardcode ( https://github.com/sorface/interview/issues/650 )
-          language={CodeEditorLang.Javascript}
-          visible={!copilotAnswerOpen && questionWithCode}
-          onExecutionResultsSubmit={handleExecutionResultsSubmit}
-        />
-      </div>
-
-      {statusPanelVisible && (
-        <>
-          <MessagesChatAi
-            messages={
-              copilotAnswerOpen
-                ? [
-                    ...chatMessages,
-                    {
-                      id: crypto.randomUUID(),
-                      userId: aiExpertId,
-                      userNickname: aiExpertNickname,
-                      value: '',
-                      fromAi: true,
-                      children: (
-                        <div>
-                          <ReviewUserOpinion
-                            user={{
-                              id: aiExpertId,
-                              evaluation: {
-                                mark:
-                                  parseFloat(totalLastValidAiAnswer?.score) ||
-                                  null,
-                                review:
-                                  totalLastValidAiAnswer?.reason ||
-                                  totalLastValidAiAnswer?.codeReadability,
-                              },
-                              otherComments: getCustomCommets(
-                                totalLastValidAiAnswer,
-                              ),
-                            }}
-                            allUsers={allUsersWithAiExpert}
-                          />
-                          <div>
-                            <Gap sizeRem={1.75} />
-                            {totalErrorRoomQuestionEvaluation && (
-                              <Typography size="m" error>
-                                {totalErrorRoomQuestionEvaluation}
-                              </Typography>
-                            )}
-                            {errorRoomStartReview && (
-                              <Typography size="m" error>
-                                {errorRoomStartReview}
-                              </Typography>
-                            )}
-                            <div className="flex justify-center w-full">
-                              <Button
-                                className="flex items-center"
-                                variant="active"
-                                disabled={nextQuestionButtonLoading}
-                                onClick={
-                                  readyToReview
-                                    ? handleStartReviewRoom
-                                    : handleNextQuestion
-                                }
-                              >
-                                {nextQuestionButtonLoading ? (
-                                  <Loader />
-                                ) : (
-                                  <>
-                                    <span>
-                                      {
-                                        localizationCaptions[
-                                          readyToReview
-                                            ? LocalizationKey.StartReviewRoomAi
-                                            : LocalizationKey.NextRoomQuestion
-                                        ]
-                                      }
-                                    </span>
-                                    <Gap sizeRem={0.5} horizontal />
-                                    <Icon
-                                      name={
-                                        readyToReview
-                                          ? IconNames.Stop
-                                          : IconNames.ChevronForward
-                                      }
-                                    />
-                                  </>
-                                )}
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      ),
-                    },
-                  ]
-                : chatMessages
-            }
+          <RoomCodeEditor
+            // TODO: Fix this hardcode ( https://github.com/sorface/interview/issues/650 )
+            language={CodeEditorLang.Javascript}
+            visible={!copilotAnswerOpen && questionWithCode}
+            onExecutionResultsSubmit={handleExecutionResultsSubmit}
           />
-        </>
-      )}
-      <Gap sizeRem={1} />
-    </>
-  );
-};
+        </div>
+        {statusPanelVisible && (
+          <>
+            <div className='bg-wrap flex-1 rounded-2.5 px-8 flex flex-col'>
+              <Gap sizeRem={4.75} />
+              <div className='flex'>
+                <div className="flex items-center justify-center">
+                  <div
+                    className={`z-0`}
+                    style={{
+                      width: statusPanelVisible ? '72px' : 0,
+                      height: statusPanelVisible ? '72px' : 0,
+                    }}
+                  />
+                  <div className="absolute" style={{ width: '72px', height: '72px' }}>
+                    <Canvas shadows camera={{ position: [0, 0.12, 1.5], fov: 38 }}>
+                      <AiAssistant
+                        visible={!questionWithCode || copilotAnswerOpen}
+                        loading={loadingTotal}
+                        currentScript={
+                          readOnly ? AiAssistantScriptName.Idle : aiAssistantScript
+                        }
+                      />
+                    </Canvas>
+                  </div>
+                </div>
+                <Gap sizeRem={1.375} horizontal />
+                <div className='flex flex-col text-left justify-center'>
+                  <Typography size='xl'>{firstLineCaption}</Typography>
+                  <Typography size='m'>{secondLineCaption}</Typography>
+                </div>
+              </div>
+
+            </div>
+          </>
+        )}
+        <div className='absolute' style={{ bottom: '3rem', right: '-7.25rem' }}>
+          {children}
+        </div>
+        <Gap sizeRem={1} />
+      </>
+    );
+  };
