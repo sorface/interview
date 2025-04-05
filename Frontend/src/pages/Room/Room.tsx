@@ -583,7 +583,7 @@ export const Room: FunctionComponent = () => {
       }}
     >
       <UserStreamsContext.Provider value={userStreams}>
-        <MainContentWrapper withMargin className="room-wrapper">
+        <MainContentWrapper withMargin={!aiRoom} className="room-wrapper">
           <EnterVideoChatModal
             open={welcomeScreen}
             loading={
@@ -651,7 +651,7 @@ export const Room: FunctionComponent = () => {
                             className="no-underline"
                           >
                             <div className="room-page-header-wrapper flex items-center">
-                              <div className="w-2.375 pr-1">
+                              <div className={`w-2.375 pr-1 ${aiRoom ? 'px-1' : ''}`}>
                                 <img
                                   className="w-2.375 h-2.375 rounded-0.375"
                                   src="/logo192.png"

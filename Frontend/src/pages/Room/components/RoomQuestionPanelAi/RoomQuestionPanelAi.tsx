@@ -685,74 +685,97 @@ export const RoomQuestionPanelAi: FunctionComponent<
             </Typography>
           </>
         )}
-
-        <div className={statusPanelVisible ? `invisible` : `w-full h-full z-1`}>
-          {!statusPanelVisible && (
-            <div className="flex items-center justify-center">
-            <div
-              className={`z-0`}
-              style={{
-                width: statusPanelVisible ? '72px' : 0,
-                height: statusPanelVisible ? '72px' : 0,
-              }}
-            />
-            <div className="absolute z-1" style={{ width: '72px', height: '72px', right: '1.875rem', top: '5.25rem' }}>
-              <Canvas shadows camera={{ position: [0, 0.12, 1.5], fov: 38 }}>
-                <AiAssistant
-                  // visible={!questionWithCode || copilotAnswerOpen}
-                  loading={loadingTotal}
-                  currentScript={
-                    readOnly ? AiAssistantScriptName.Idle : aiAssistantScript
-                  }
-                />
-              </Canvas>
-            </div>
-          </div>
-          )}
-          <RoomCodeEditor
-            // TODO: Fix this hardcode ( https://github.com/sorface/interview/issues/650 )
-            language={CodeEditorLang.Javascript}
-            visible={!copilotAnswerOpen && questionWithCode}
-            onExecutionResultsSubmit={handleExecutionResultsSubmit}
-          />
-        </div>
-        {statusPanelVisible && (
-          <>
-            <div className='bg-wrap flex-1 rounded-2.5 px-8 flex flex-col'>
-              <Gap sizeRem={4.75} />
-              <div className='flex'>
-                <div className="flex items-center justify-center">
-                  <div
-                    className={`z-0`}
-                    style={{
-                      width: statusPanelVisible ? '72px' : 0,
-                      height: statusPanelVisible ? '72px' : 0,
-                    }}
-                  />
-                  <div className="absolute" style={{ width: '72px', height: '72px' }}>
-                    <Canvas shadows camera={{ position: [0, 0.12, 1.5], fov: 38 }}>
-                      <AiAssistant
-                        visible={!questionWithCode || copilotAnswerOpen}
-                        loading={loadingTotal}
-                        currentScript={
-                          readOnly ? AiAssistantScriptName.Idle : aiAssistantScript
-                        }
-                      />
-                    </Canvas>
+        <div className='flex flex-1'>
+          <div
+            className='bg-wrap flex-0 rounded-2.5 px-8 flex flex-col'
+            style={{
+              borderTopLeftRadius: 0,
+              borderBottomLeftRadius: 0,
+              background: 'linear-gradient(270deg, rgba(67, 184, 241, 0.07) 0%, rgba(245, 246, 248, 0.07) 92.16%)',
+            }}
+          ></div>
+          <Gap sizeRem={1.75} horizontal />
+          <div className='relative bg-wrap flex-1 rounded-2.5 flex flex-col' style={{ width: '840px' }}>
+            {statusPanelVisible && (
+              <>
+                <Gap sizeRem={4.75} />
+                <div className='flex px-8'>
+                  <div className="flex items-center justify-center">
+                    <div
+                      className={`z-0`}
+                      style={{
+                        width: '72px',
+                        height: '72px',
+                      }}
+                    />
+                    <div className="absolute" style={{ width: '72px', height: '72px' }}>
+                      <Canvas shadows camera={{ position: [0, 0.12, 1.5], fov: 38 }}>
+                        <AiAssistant
+                          loading={loadingTotal}
+                          currentScript={
+                            readOnly ? AiAssistantScriptName.Idle : aiAssistantScript
+                          }
+                        />
+                      </Canvas>
+                    </div>
+                  </div>
+                  <Gap sizeRem={1.375} horizontal />
+                  <div className='flex flex-col text-left justify-center'>
+                    <Typography size='xl'>{firstLineCaption}</Typography>
+                    <Typography size='m'>{secondLineCaption}</Typography>
                   </div>
                 </div>
-                <Gap sizeRem={1.375} horizontal />
-                <div className='flex flex-col text-left justify-center'>
-                  <Typography size='xl'>{firstLineCaption}</Typography>
-                  <Typography size='m'>{secondLineCaption}</Typography>
+              </>
+            )}
+            {!statusPanelVisible && (
+              <div className='flex-1'>
+                <RoomCodeEditor
+                  // TODO: Fix this hardcode ( https://github.com/sorface/interview/issues/650 )
+                  language={CodeEditorLang.Javascript}
+                  visible={!copilotAnswerOpen && questionWithCode}
+                  onExecutionResultsSubmit={handleExecutionResultsSubmit}
+                />
+              </div>
+            )}
+
+            {children}
+            {!statusPanelVisible && (
+              <div
+                className="absolute flex items-center justify-center z-60"
+                style={{
+                  bottom: '97px',
+                  right: '44px',
+                }}
+              >
+                <div
+                  className={`z-0`}
+                  style={{
+                    width: '72px',
+                    height: '72px',
+                  }}
+                />
+                <div className="absolute" style={{ width: '72px', height: '72px' }}>
+                  <Canvas shadows camera={{ position: [0, 0.12, 1.5], fov: 38 }}>
+                    <AiAssistant
+                      loading={loadingTotal}
+                      currentScript={
+                        readOnly ? AiAssistantScriptName.Idle : aiAssistantScript
+                      }
+                    />
+                  </Canvas>
                 </div>
               </div>
-
-            </div>
-          </>
-        )}
-        <div className='absolute' style={{ bottom: '3rem', right: '-7.25rem' }}>
-          {children}
+            )}
+          </div>
+          <Gap sizeRem={1.75} horizontal />
+          <div
+            className='bg-wrap flex-0 rounded-2.5 px-8 flex flex-col'
+            style={{
+              borderTopRightRadius: 0,
+              borderBottomRightRadius: 0,
+              background: 'linear-gradient(89.03deg, #EFF0FF -2.02%, #F5F6F8 96.31%)',
+            }}
+          ></div>
         </div>
         <Gap sizeRem={1} />
       </>

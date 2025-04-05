@@ -249,7 +249,6 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
     <>
       <div className="flex-1 flex justify-center">
         <div
-          style={{ maxWidth: '840px' }}
           className="w-full flex flex-col relative rounded-1.125"
         >
           <RoomQuestionPanelAi
@@ -258,41 +257,58 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
             roomQuestions={roomQuestions?.sort(sortRoomQuestion) || []}
             initialQuestion={initialQuestion}
           >
-            <div className="flex flex-col items-center justify-center">
-              <video
-                ref={userVideoMainContent}
-                className="w-14.5 h-14.5 rounded-full videochat-video object-cover z-1"
-                style={{
-                  right: '5.5rem',
-                  bottom: '1.5rem',
-                }}
-                muted
-                autoPlay
-                playsInline
-              >
-                Video not supported
-              </video>
-              <div className="flex absolute" style={{ bottom: '-1.25rem' }}>
-                <Button
-                  variant="invertedAlternative"
-                  className="min-w-unset w-2.5 h-2.5 p-0 z-1"
-                  onClick={handleMicSwitch}
+            <div
+              className="absolute flex flex-col items-end justify-center"
+              style={{
+                right: '-106px',
+                bottom: '-53px',
+              }}
+            >
+              <div className='z-50'>
+                <video
+                  ref={userVideoMainContent}
+                  className="rounded-full videochat-video object-cover z-1"
+                  style={{ width: '213px', height: '213px' }}
+                  muted
+                  autoPlay
+                  playsInline
                 >
-                  <Icon size="s" name={micEnabled ? IconNames.MicOn : IconNames.MicOff} />
-                </Button>
-                <Gap sizeRem={0.5} horizontal />
-                <Button
-                  variant="invertedAlternative"
-                  className="min-w-unset w-2.5 h-2.5 p-0 z-1"
-                  onClick={handleCameraSwitch}
-                >
-                  <Icon size="s" name={cameraEnabled ? IconNames.VideocamOn : IconNames.VideocamOff} />
-                </Button>
+                  Video not supported
+                </video>
+                <div className="absolute w-14.5 flex justify-center" style={{ bottom: '-1.25rem' }}>
+                  <Button
+                    variant="invertedAlternative"
+                    className="min-w-unset w-2.5 h-2.5 p-0 z-1"
+                    onClick={handleMicSwitch}
+                  >
+                    <Icon size="s" name={micEnabled ? IconNames.MicOn : IconNames.MicOff} />
+                  </Button>
+                  <Gap sizeRem={0.5} horizontal />
+                  <Button
+                    variant="invertedAlternative"
+                    className="min-w-unset w-2.5 h-2.5 p-0 z-1"
+                    onClick={handleCameraSwitch}
+                  >
+                    <Icon size="s" name={cameraEnabled ? IconNames.VideocamOn : IconNames.VideocamOff} />
+                  </Button>
+                </div>
               </div>
+              <div style={{
+                position: 'absolute',
+                width: '931px',
+                height: '547px',
+                top: '50px',
+                left: '-170px',
+                background: 'rgba(128, 112, 196, 0.23)',
+                filter: 'blur(79.1px)',
+                transform: 'rotate(40.92deg)',
+                pointerEvents: 'none',
+              }}></div>
             </div>
           </RoomQuestionPanelAi>
           <Gap sizeRem={3.375} />
           <div className="flex">
+            <Gap sizeRem={3.375} horizontal />
             <ContextMenu
               toggleContent={
                 <Button
