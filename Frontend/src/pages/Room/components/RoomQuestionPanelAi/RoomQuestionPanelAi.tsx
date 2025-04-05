@@ -702,32 +702,70 @@ export const RoomQuestionPanelAi: FunctionComponent<
           <div className='relative bg-wrap flex-1 rounded-2.5 flex flex-col' style={{ width: '840px' }}>
             {statusPanelVisible && (
               <>
-                <Gap sizeRem={4.75} />
-                <div className='flex px-8'>
-                  <div className="flex items-center justify-center">
-                    <div
-                      className={`z-0`}
-                      style={{
-                        width: '72px',
-                        height: '72px',
-                      }}
-                    />
-                    <div className="absolute" style={{ width: '72px', height: '72px' }}>
-                      <Canvas shadows camera={{ position: [0, 0.12, 1.5], fov: 38 }}>
-                        <AiAssistant
-                          loading={loadingTotal}
-                          currentScript={
-                            readOnly ? AiAssistantScriptName.Idle : aiAssistantScript
-                          }
-                        />
-                      </Canvas>
+                <Gap sizeRem={copilotAnswerOpen ? 1.75 : 4.75} />
+                <div className='flex flex-col px-8'>
+                  <div className='flex'>
+                    <div className="flex items-center justify-center">
+                      <div
+                        className={`z-0`}
+                        style={{
+                          width: '72px',
+                          height: '72px',
+                        }}
+                      />
+                      <div className="absolute" style={{ width: '72px', height: '72px' }}>
+                        <Canvas shadows camera={{ position: [0, 0.12, 1.5], fov: 38 }}>
+                          <AiAssistant
+                            loading={loadingTotal}
+                            currentScript={
+                              readOnly ? AiAssistantScriptName.Idle : aiAssistantScript
+                            }
+                          />
+                        </Canvas>
+                      </div>
+                    </div>
+                    <Gap sizeRem={1.375} horizontal />
+                    <div className='flex flex-col text-left justify-center'>
+                      <Typography size='xl'>{firstLineCaption}</Typography>
+                      <Typography size='m'>{secondLineCaption}</Typography>
                     </div>
                   </div>
-                  <Gap sizeRem={1.375} horizontal />
-                  <div className='flex flex-col text-left justify-center'>
-                    <Typography size='xl'>{firstLineCaption}</Typography>
-                    <Typography size='m'>{secondLineCaption}</Typography>
-                  </div>
+                  {copilotAnswerOpen && (
+                    <>
+                      <Gap sizeRem={2} />
+                      <div className='flex'>
+                        <div
+                          className='flex-1 flex flex-col text-left px-1.875 h-full rounded-1.5'
+                          style={{ background: 'linear-gradient(180.08deg, #F6F9FF 3.79%, #FFFFFF 105.65%)' }}
+                        >
+                          <Gap sizeRem={1.375} />
+                          <div className='flex justify-between'>
+                            <div className='flex flex-col'>
+                              <Typography size='xxxl' bold>{totalLastValidAiAnswer?.score} {localizationCaptions[LocalizationKey.From10]}</Typography>
+                              <Typography size='m' secondary>{localizationCaptions[LocalizationKey.AnswerEvaluation]}</Typography>
+                            </div>
+                            <div className='flex flex-col'>
+                              <Typography size='xxxl'><Icon inheritFontSize name={IconNames.Happy} /></Typography>
+                              <Typography size='m' secondary>{localizationCaptions[LocalizationKey.EmotionalAssessment]}</Typography>
+                            </div>
+                          </div>
+                          <Gap sizeRem={1.875} />
+                          <Typography size='m'>{totalLastValidAiAnswer?.reason || totalLastValidAiAnswer?.codeReadability}</Typography>
+                          <Gap sizeRem={1.375} />
+                        </div>
+                        <Gap sizeRem={0.625} horizontal />
+                        <div
+                          className='flex-1 flex flex-col text-left px-1.875 h-full rounded-1.5'
+                          style={{ background: 'linear-gradient(359.67deg, #FFFFFF 0.27%, #FDF8FF 97.33%)' }}
+                        >
+                          <Gap sizeRem={2} />
+                          <Typography size='m' bold>{localizationCaptions[LocalizationKey.ExampleOfCorrectAnswer]}</Typography>
+                          <Gap sizeRem={1.375} />
+                          <Typography size='m'>{totalLastValidAiAnswer?.expected}</Typography>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </>
             )}

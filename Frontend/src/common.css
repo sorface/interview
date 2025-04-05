@@ -307,6 +307,9 @@
 .rounded-1\.125 {
   border-radius: 1.125rem;
 }
+.rounded-1\.5 {
+  border-radius: 1.5rem;
+}
 .rounded-2 {
   border-radius: 2rem;
 }
@@ -416,6 +419,10 @@
 .px-1\.25 {
   padding-left: 1.25rem;
   padding-right: 1.25rem;
+}
+.px-1\.875 {
+  padding-left: 1.875rem;
+  padding-right: 1.875rem;
 }
 .px-1\.5 {
   padding-left: 1.5rem;
