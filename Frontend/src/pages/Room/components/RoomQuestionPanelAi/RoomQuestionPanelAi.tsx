@@ -686,14 +686,18 @@ export const RoomQuestionPanelAi: FunctionComponent<
           </>
         )}
         <div className='flex flex-1'>
-          <div
-            className='bg-wrap flex-0 rounded-2.5 px-8 flex flex-col'
-            style={{
-              borderTopLeftRadius: 0,
-              borderBottomLeftRadius: 0,
-              background: 'linear-gradient(270deg, rgba(67, 184, 241, 0.07) 0%, rgba(245, 246, 248, 0.07) 92.16%)',
-            }}
-          ></div>
+          <div className='flex flex-col'>
+            <Gap sizeRem={2.5} />
+            <div
+              className='bg-wrap rounded-2.5 px-8 flex-1 flex flex-col'
+              style={{
+                borderTopLeftRadius: 0,
+                borderBottomLeftRadius: 0,
+                background: 'linear-gradient(270deg, rgba(67, 184, 241, 0.07) 0%, rgba(245, 246, 248, 0.07) 92.16%)',
+              }}
+            ></div>
+            <Gap sizeRem={2.75} />
+          </div>
           <Gap sizeRem={1.75} horizontal />
           <div className='relative bg-wrap flex-1 rounded-2.5 flex flex-col' style={{ width: '840px' }}>
             {statusPanelVisible && (
@@ -768,14 +772,18 @@ export const RoomQuestionPanelAi: FunctionComponent<
             )}
           </div>
           <Gap sizeRem={1.75} horizontal />
-          <div
-            className='bg-wrap flex-0 rounded-2.5 px-8 flex flex-col'
-            style={{
-              borderTopRightRadius: 0,
-              borderBottomRightRadius: 0,
-              background: 'linear-gradient(89.03deg, #EFF0FF -2.02%, #F5F6F8 96.31%)',
-            }}
-          ></div>
+          <div className='flex flex-col'>
+            <Gap sizeRem={2.5} />
+            <div
+              className='bg-wrap rounded-2.5 px-8 flex-1 flex flex-col'
+              style={{
+                borderTopRightRadius: 0,
+                borderBottomRightRadius: 0,
+                background: 'linear-gradient(89.03deg, #EFF0FF -2.02%, #F5F6F8 96.31%)',
+              }}
+            ></div>
+            <Gap sizeRem={2.75} />
+          </div>
         </div>
         <Gap sizeRem={1} />
       </>

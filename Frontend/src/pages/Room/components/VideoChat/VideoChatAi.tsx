@@ -275,7 +275,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                 >
                   Video not supported
                 </video>
-                <div className="absolute w-14.5 flex justify-center" style={{ bottom: '-1.25rem' }}>
+                <div className="absolute flex justify-center" style={{ width: '213px', bottom: '-0.75rem' }}>
                   <Button
                     variant="invertedAlternative"
                     className="min-w-unset w-2.5 h-2.5 p-0 z-1"
