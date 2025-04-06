@@ -702,18 +702,18 @@ export const RoomQuestionPanelAi: FunctionComponent<
           <div className='relative bg-wrap flex-1 rounded-2.5 flex flex-col' style={{ width: '840px' }}>
             {statusPanelVisible && (
               <>
-                <Gap sizeRem={copilotAnswerOpen ? 1.75 : 4.75} />
-                <div className='flex flex-col px-8'>
+                <Gap sizeRem={copilotAnswerOpen ? 1.6875 : 7.6875} />
+                <div className='flex flex-col px-4.75'>
                   <div className='flex'>
                     <div className="flex items-center justify-center">
                       <div
                         className={`z-0`}
                         style={{
-                          width: '72px',
-                          height: '72px',
+                          width: '86px',
+                          height: '86px',
                         }}
                       />
-                      <div className="absolute" style={{ width: '72px', height: '72px' }}>
+                      <div className="absolute" style={{ width: '84px', height: '84px' }}>
                         <Canvas shadows camera={{ position: [0, 0.12, 1.5], fov: 38 }}>
                           <AiAssistant
                             loading={loadingTotal}
@@ -724,12 +724,20 @@ export const RoomQuestionPanelAi: FunctionComponent<
                         </Canvas>
                       </div>
                     </div>
-                    <Gap sizeRem={1.375} horizontal />
+                    <Gap sizeRem={2.1875} horizontal />
                     <div className='flex flex-col text-left justify-center'>
                       <Typography size='xl'>{firstLineCaption}</Typography>
-                      <Typography size='m'>{secondLineCaption}</Typography>
                     </div>
                   </div>
+                  {!copilotAnswerOpen && (
+                    <div className='text-left'>
+                      <Gap sizeRem={3.625} />
+                      <div className='flex'>
+                        <Gap sizeRem={7.5} horizontal />
+                        <Typography size='xs' secondary>{secondLineCaption}</Typography>
+                      </div>
+                    </div>
+                  )}
                   {copilotAnswerOpen && (
                     <>
                       <Button
@@ -803,11 +811,11 @@ export const RoomQuestionPanelAi: FunctionComponent<
                 <div
                   className={`z-0`}
                   style={{
-                    width: '72px',
-                    height: '72px',
+                    width: '86px',
+                    height: '86px',
                   }}
                 />
-                <div className="absolute" style={{ width: '72px', height: '72px' }}>
+                <div className="absolute" style={{ width: '84px', height: '84px' }}>
                   <Canvas shadows camera={{ position: [0, 0.12, 1.5], fov: 38 }}>
                     <AiAssistant
                       loading={loadingTotal}
