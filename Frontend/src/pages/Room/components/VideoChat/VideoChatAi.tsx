@@ -31,6 +31,8 @@ import { RoomQuestion } from '../../../../types/room';
 import { sortRoomQuestion } from '../../../../utils/sortRoomQestions';
 import { Theme, ThemeContext } from '../../../../context/ThemeContext';
 import { Button } from '../../../../components/Button/Button';
+import { ThemeSwitchMini } from '../../../../components/ThemeSwitchMini/ThemeSwitchMini';
+import { LangSwitch } from '../../../../components/LangSwitch/LangSwitch';
 
 import './VideoChatAi.css';
 
@@ -309,60 +311,9 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
           <Gap sizeRem={3.375} />
           <div className="flex">
             <Gap sizeRem={3.375} horizontal />
-            <ContextMenu
-              toggleContent={
-                <Button
-                  variant="invertedAlternative"
-                  className="min-w-unset w-2.5 h-2.5 p-0"
-                  onClick={currentUserExpert ? () => { } : handleLeaveRoom}
-                >
-                  <Icon size="s" name={IconNames.Call} />
-                </Button>
-              }
-              translateRem={{ x: -14.25, y: -6.75 }}
-            >
-              {loadingRoomStartReview && <Loader />}
-              {errorRoomStartReview && (
-                <div className="flex items-center justify-center">
-                  <Typography size="m" error>
-                    <Icon name={IconNames.Information} />
-                  </Typography>
-                  <Typography size="m" error>
-                    {errorRoomStartReview}
-                  </Typography>
-                </div>
-              )}
-              {currentUserExpert && (
-                <ContextMenu.Item
-                  title={
-                    localizationCaptions[
-                    LocalizationKey.CompleteAndEvaluateCandidate
-                    ]
-                  }
-                  onClick={handleStartReviewRoom}
-                />
-              )}
-              <ContextMenu.Item
-                title={localizationCaptions[LocalizationKey.Exit]}
-                onClick={handleLeaveRoom}
-              />
-            </ContextMenu>
+            <LangSwitch elementType='button' />
             <Gap sizeRem={0.5} horizontal />
-            <Button
-              variant="invertedAlternative"
-              className="min-w-unset w-2.5 h-2.5 p-0"
-              onClick={handleSettingsOpen}
-            >
-              <Icon size="s" name={IconNames.Settings} />
-            </Button>
-            <Gap sizeRem={0.5} horizontal />
-            <Button
-              variant="invertedAlternative"
-              className="min-w-unset w-2.5 h-2.5 p-0"
-              onClick={handleInvitationsOpen}
-            >
-              <Icon size="s" name={IconNames.PersonAdd} />
-            </Button>
+            <ThemeSwitchMini variant='button' />
           </div>
           <Gap sizeRem={1.875} />
         </div>
