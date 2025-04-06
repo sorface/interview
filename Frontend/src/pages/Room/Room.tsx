@@ -714,7 +714,12 @@ export const Room: FunctionComponent = () => {
                         <div className="flex">
                           <div className="flex items-center bg-wrap px-1 h-2.5 rounded-6.25">
                             <Typography size="m" error>
-                              <Icon inheritFontSize name={IconNames.Chat} />
+                              <div className="flex">
+                                <Icon
+                                  inheritFontSize
+                                  name={IconNames.RadioButtonOn}
+                                />
+                              </div>
                             </Typography>
                             <Gap sizeRem={0.25} horizontal />
                             <Typography size="m">
@@ -725,7 +730,7 @@ export const Room: FunctionComponent = () => {
                               }
                             </Typography>
                           </div>
-                          <Gap sizeRem={10} horizontal />
+                          <Gap sizeRem={10.375} horizontal />
                         </div>
                       )}
                     </div>
