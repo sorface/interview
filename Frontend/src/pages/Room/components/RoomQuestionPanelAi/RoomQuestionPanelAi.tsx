@@ -50,9 +50,12 @@ import { RoomCodeEditor } from '../RoomCodeEditor/RoomCodeEditor';
 import { CodeEditorLang } from '../../../../types/question';
 import { AnyObject } from '../../../../types/anyObject';
 import { Theme, ThemeContext } from '../../../../context/ThemeContext';
+import { RoomTimerAi } from '../RoomTimerAi/RoomTimerAi';
 
 const notFoundCode = 404;
 const aiAssistantGoodRate = 6;
+const questionAnswerTimer = 5 * 60;
+const questionWithCodeAnswerTimer = 30 * 60;
 
 const aiExpertId = 'aiExpertId';
 
@@ -278,7 +281,9 @@ export const RoomQuestionPanelAi: FunctionComponent<
   );
   const [copilotAnswerOpen, setCopilotAnswerOpen] = useState(false);
   const startedByVoiceRef = useRef(false);
-  // const [chatMessages, setChatMessages] = useState<MessagesChatAiMessage[]>([]);
+  const [questionTimerStartDate, setQuestionTimerStartDate] = useState<
+    string | null
+  >(null);
 
   const {
     apiMethodState: apiSendActiveQuestionState,
@@ -428,6 +433,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
     if (!initialQuestion?.id) {
       return;
     }
+    setQuestionTimerStartDate(new Date().toISOString());
     resetVoiceRecognitionAccum();
   }, [initialQuestion?.id, resetVoiceRecognitionAccum]);
 
@@ -664,6 +670,21 @@ export const RoomQuestionPanelAi: FunctionComponent<
           className="relative bg-wrap flex-1 rounded-2.5 flex flex-col"
           style={{ width: '840px' }}
         >
+          {!copilotAnswerOpen && questionTimerStartDate && (
+            <div
+              className="absolute"
+              style={{ top: '1.125rem', right: '1.625rem' }}
+            >
+              <RoomTimerAi
+                startTime={questionTimerStartDate}
+                durationSec={
+                  questionWithCode
+                    ? questionWithCodeAnswerTimer
+                    : questionAnswerTimer
+                }
+              />
+            </div>
+          )}
           {totalErrorRoomQuestionEvaluation && (
             <Typography size="m" error>
               {totalErrorRoomQuestionEvaluation}

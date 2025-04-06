@@ -148,6 +148,9 @@
 .bg-blue-dark {
   background-color: var(--blue-dark);
 }
+.bg-blue-ai-room-timer {
+  background-color: var(--blue-ai-room-timer);
+}
 .bg-dark {
   background-color: var(--dark);
 }
@@ -315,6 +318,9 @@
 }
 .rounded-2\.5 {
   border-radius: 2.5rem;
+}
+.rounded-6\.25 {
+  border-radius: 6.25rem;
 }
 .rounded-t-0\.75 {
   border-top-left-radius: 0.75rem !important;
@@ -592,6 +598,9 @@
 }
 .w-2\.25 {
   width: 2.25rem;
+}
+.w-2\.3125 {
+  width: 2.3125rem;
 }
 .w-2\.375 {
   width: 2.375rem;
