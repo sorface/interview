@@ -79,7 +79,7 @@ export const LangSwitch = ({
     return (
       <Button
         variant="invertedAlternative"
-        className="min-w-unset w-2.5 h-2.5 p-0"
+        className="min-w-unset w-2.375 h-2.375 p-0"
         onClick={() =>
           setLang(
             lang === LocalizationLang.ru
@@ -88,7 +88,7 @@ export const LangSwitch = ({
           )
         }
       >
-        <Typography size="m" semibold>
+        <Typography size="s" semibold>
           {lang === LocalizationLang.ru ? 'RU' : 'EN'}
         </Typography>
       </Button>

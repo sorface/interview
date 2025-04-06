@@ -26,7 +26,12 @@ import {
 } from '../../apiDeclarations';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { VITE_WS_URL } from '../../config';
-import { EventName, inviteParamName, pathnames } from '../../constants';
+import {
+  EventName,
+  IconNames,
+  inviteParamName,
+  pathnames,
+} from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import {
@@ -68,6 +73,8 @@ import { useUserStreams } from './hooks/useUserStreams';
 import { useRoomSounds } from './hooks/useRoomSounds';
 import { AiAssistantScriptName } from './components/AiAssistant/AiAssistant';
 import { mapInvitesForAiRoom } from '../../utils/mapInvitesForAiRoom';
+import { Typography } from '../../components/Typography/Typography';
+import { Icon } from './components/Icon/Icon';
 
 import './Room.css';
 
@@ -701,6 +708,24 @@ export const Room: FunctionComponent = () => {
                             variant="alternative"
                             onClick={handleSwitchMessagesChat}
                           />
+                        </div>
+                      )}
+                      {aiRoom && (
+                        <div className="flex">
+                          <div className="flex items-center bg-wrap px-1 h-2.5 rounded-6.25">
+                            <Typography size="m" error>
+                              <Icon inheritFontSize name={IconNames.Chat} />
+                            </Typography>
+                            <Gap sizeRem={0.25} horizontal />
+                            <Typography size="m">
+                              {
+                                localizationCaptions[
+                                  LocalizationKey.MeetingBeingRecorded
+                                ]
+                              }
+                            </Typography>
+                          </div>
+                          <Gap sizeRem={10} horizontal />
                         </div>
                       )}
                     </div>

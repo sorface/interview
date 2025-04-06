@@ -312,12 +312,12 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
             </div>
           </RoomQuestionPanelAi>
           <Gap sizeRem={1.5} />
-          <div className="flex">
+          <div className="flex h-2.375">
             <Gap sizeRem={3.375} horizontal />
             <LangSwitch elementType="button" />
             <Gap sizeRem={0.5} horizontal />
             <ThemeSwitchMini variant="button" />
-            <Gap sizeRem={0.5} horizontal />
+            <Gap sizeRem={1.75} horizontal />
             <QuestionsProgress value={questionsProgress} />
           </div>
           <Gap sizeRem={1.875} />
