@@ -48,7 +48,7 @@
     "serve": "vite preview",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
-    "prettier": "prettier . --write",
+    "prettier": "prettier src --write",
     "test": "vitest",
     "test:coverage": "vitest --coverage"
   },
