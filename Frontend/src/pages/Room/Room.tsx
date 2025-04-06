@@ -16,14 +16,12 @@ import useWebSocket from 'react-use-websocket';
 import toast from 'react-hot-toast';
 import {
   ApplyRoomInviteBody,
-  CompleteRoomReviewsBody,
   GenerateRoomInviteBody,
   GetRoomParticipantParams,
   GetRoomQuestionsBody,
   RoomIdParam,
   roomInviteApiDeclaration,
   roomQuestionApiDeclaration,
-  roomReviewApiDeclaration,
   roomsApiDeclaration,
 } from '../../apiDeclarations';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
@@ -230,16 +228,6 @@ export const Room: FunctionComponent = () => {
     process: { loading: loadingRoomState, error: errorRoomState },
     data: roomState,
   } = apiRoomStateState;
-
-  const {
-    apiMethodState: apiRoomCompleteAiMethodState,
-    fetchData: fetchRoomCompleteAi,
-  } = useApiMethod<unknown, CompleteRoomReviewsBody>(
-    roomReviewApiDeclaration.completeAi,
-  );
-  const {
-    process: { loading: loadingCompleteAi, error: errorCompleteAi },
-  } = apiRoomCompleteAiMethodState;
 
   const {
     apiMethodState: apiRoomStartReviewMethodState,
@@ -526,14 +514,6 @@ export const Room: FunctionComponent = () => {
     fetchRoomStartReview(room.id);
   };
 
-  const handleStartReviewRoomAi = () => {
-    if (!room?.id) {
-      console.warn('Room id not found');
-      return;
-    }
-    fetchRoomCompleteAi({ roomId: room.id });
-  };
-
   if (roomClose && id) {
     return (
       <Navigate to={generatePath(pathnames.roomAnalytics, { id })} replace />
@@ -746,10 +726,6 @@ export const Room: FunctionComponent = () => {
                         {aiRoom ? (
                           <VideoChatAi
                             messagesChatEnabled={messagesChatEnabled}
-                            recognitionNotSupported={recognitionNotSupported}
-                            currentUserExpert={currentUserExpert}
-                            loadingRoomStartReview={loadingCompleteAi}
-                            errorRoomStartReview={errorCompleteAi}
                             // ScreenShare
                             // screenStream={screenStream}
                             roomQuestionsLoading={roomQuestionsLoading}
@@ -757,10 +733,6 @@ export const Room: FunctionComponent = () => {
                               roomQuestions?.sort(sortRoomQuestion) || []
                             }
                             initialQuestion={currentQuestion}
-                            handleInvitationsOpen={handleInvitationsOpen}
-                            handleStartReviewRoom={handleStartReviewRoomAi}
-                            handleSettingsOpen={handleSettingsOpen}
-                            handleLeaveRoom={handleLeaveRoom}
                           />
                         ) : (
                           <VideoChat

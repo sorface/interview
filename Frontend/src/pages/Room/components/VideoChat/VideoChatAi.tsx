@@ -21,9 +21,6 @@ import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptio
 import { UserStreamsContext } from '../../context/UserStreamsContext';
 import { IconNames } from '../../../../constants';
 import { Gap } from '../../../../components/Gap/Gap';
-import { ContextMenu } from '../../../../components/ContextMenu/ContextMenu';
-import { Loader } from '../../../../components/Loader/Loader';
-import { Typography } from '../../../../components/Typography/Typography';
 import { Icon } from '../Icon/Icon';
 import { RoomContext } from '../../context/RoomContext';
 import { RoomQuestionPanelAi } from '../RoomQuestionPanelAi/RoomQuestionPanelAi';
@@ -42,19 +39,11 @@ const viewerOrder = 666;
 
 interface VideoChatAiProps {
   messagesChatEnabled: boolean;
-  recognitionNotSupported: boolean;
-  currentUserExpert: boolean;
-  loadingRoomStartReview: boolean;
-  errorRoomStartReview: string | null;
   // ScreenShare
   // screenStream: MediaStream | null;
   roomQuestionsLoading: boolean;
   roomQuestions: RoomQuestion[];
   initialQuestion?: RoomQuestion;
-  handleInvitationsOpen: () => void;
-  handleStartReviewRoom: () => void;
-  handleSettingsOpen: () => void;
-  handleLeaveRoom: () => void;
 }
 
 const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string) => {
@@ -88,18 +77,11 @@ const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string) => {
 
 export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
   messagesChatEnabled,
-  currentUserExpert,
-  errorRoomStartReview,
-  loadingRoomStartReview,
   // ScreenShare
   // screenStream,
   roomQuestionsLoading,
   roomQuestions,
   initialQuestion,
-  handleInvitationsOpen,
-  handleLeaveRoom,
-  handleSettingsOpen,
-  handleStartReviewRoom,
 }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();

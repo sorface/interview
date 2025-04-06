@@ -38,10 +38,6 @@ import {
   VoiceRecognitionCommand,
 } from '../../hooks/useVoiceRecognitionAccum';
 import { AiAssistant, AiAssistantScriptName } from '../AiAssistant/AiAssistant';
-import {
-  OtherComment,
-  ReviewUserOpinion,
-} from '../../../RoomAnaytics/components/ReviewUserOpinion/ReviewUserOpinion';
 import { AnalyticsUserReview } from '../../../../types/analytics';
 import { AiEndpoint, useAiAnswerSource } from '../../hooks/useAiAnswerSource';
 import { AuthContext } from '../../../../context/AuthContext';
@@ -53,10 +49,6 @@ import {
 import { RoomCodeEditor } from '../RoomCodeEditor/RoomCodeEditor';
 import { CodeEditorLang } from '../../../../types/question';
 import { AnyObject } from '../../../../types/anyObject';
-import {
-  MessagesChatAi,
-  MessagesChatAiMessage,
-} from '../MessagesChatAi/MessagesChatAi';
 import { Theme, ThemeContext } from '../../../../context/ThemeContext';
 
 const notFoundCode = 404;
@@ -239,38 +231,6 @@ const getNextQuestion = (
     return randomNodeFromRoot.question;
   }
   return getRandomQuestionWithExclude(nodes, excludedQuestions);
-};
-
-const getCustomCommets = (
-  lastValidAiAnswer: AnyObject | null,
-): OtherComment[] => {
-  if (!lastValidAiAnswer) {
-    return [];
-  }
-
-  const localizations = {
-    recommendation: LocalizationKey.Recommendation,
-    expected: LocalizationKey.ExampleOfCorrectAnswer,
-    performance: LocalizationKey.CodePerformance,
-    bestPractice: LocalizationKey.BestPractice,
-    vulnerabilities: LocalizationKey.Vulnerabilities,
-    comments: LocalizationKey.CodeComments,
-    refactoringProposal: LocalizationKey.RefactoringProposal,
-    referenceCode: LocalizationKey.ReferenceCode,
-  };
-
-  const comments: OtherComment[] = [];
-  Object.entries(localizations).forEach(([key, value]) => {
-    const comment = lastValidAiAnswer[key];
-    if (!comment) {
-      return;
-    }
-    comments.push({
-      title: value,
-      value: comment,
-    });
-  });
-  return comments;
 };
 
 export interface RoomQuestionPanelAiProps {
@@ -702,6 +662,21 @@ export const RoomQuestionPanelAi: FunctionComponent<
           </div>
           <Gap sizeRem={1.75} horizontal />
           <div className='relative bg-wrap flex-1 rounded-2.5 flex flex-col' style={{ width: '840px' }}>
+            {totalErrorRoomQuestionEvaluation && (
+              <Typography size="m" error>
+                {totalErrorRoomQuestionEvaluation}
+              </Typography>
+            )}
+            {errorRoomStartReview && (
+              <div className="flex items-center justify-center">
+                <Typography size="m" error>
+                  <Icon name={IconNames.Information} />
+                </Typography>
+                <Typography size="m" error>
+                  {errorRoomStartReview}
+                </Typography>
+              </div>
+            )}
             {statusPanelVisible && (
               <>
                 <Gap sizeRem={copilotAnswerOpen ? 1.6875 : 7.6875} />
@@ -749,9 +724,10 @@ export const RoomQuestionPanelAi: FunctionComponent<
                           right: '-1.25rem',
                           top: 'calc(50% - 1.25rem)',
                         }}
+                        disabled={nextQuestionButtonLoading}
                         onClick={readyToReview ? handleStartReviewRoom : handleNextQuestion}
                       >
-                        <Icon size="s" name={IconNames.ChevronForward} />
+                        {nextQuestionButtonLoading ? <Loader /> : <Icon size="s" name={IconNames.ChevronForward} />}
                       </Button>
                       <Gap sizeRem={2} />
                       <div className='flex flex-1'>
