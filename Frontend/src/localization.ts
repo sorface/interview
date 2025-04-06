@@ -276,6 +276,7 @@ export const enum LocalizationKey {
   ExpectsExecuteResultsPassed,
   ExpectsExecuteResultsNotPassed,
   ExecutionResultsSubmit,
+  Completed,
 }
 
 export const LocalizationCaptions: Record<
@@ -597,6 +598,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.ExpectsExecuteResultsNotPassed]:
       'Not all tests were passed successfully',
     [LocalizationKey.ExecutionResultsSubmit]: 'Send code for review',
+    [LocalizationKey.Completed]: 'Completed',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -917,5 +919,6 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.ExpectsExecuteResultsNotPassed]:
       'Не все проверки пройдены успешно',
     [LocalizationKey.ExecutionResultsSubmit]: 'Отправить код на проверку',
+    [LocalizationKey.Completed]: 'Пройдено',
   },
 };

@@ -16,6 +16,7 @@ export interface TypographyProps {
     | 'landing-l'
     | 'landing-m';
   bold?: boolean;
+  semibold?: boolean;
   error?: boolean;
   secondary?: boolean;
   children: ReactNode;
@@ -24,6 +25,7 @@ export interface TypographyProps {
 export const Typography: FunctionComponent<TypographyProps> = ({
   size,
   bold,
+  semibold,
   error,
   secondary,
   children,
@@ -40,7 +42,7 @@ export const Typography: FunctionComponent<TypographyProps> = ({
 
   return (
     <span
-      className={`typography typography-${size} ${bold ? 'typography-bold' : ''} ${error ? errorClassName : ''} ${secondary ? secondaryClassName : ''}`}
+      className={`typography typography-${size} ${bold ? 'typography-bold' : ''} ${semibold ? 'typography-semibold' : ''} ${error ? errorClassName : ''} ${secondary ? secondaryClassName : ''}`}
     >
       {children}
     </span>

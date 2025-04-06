@@ -33,6 +33,7 @@ import { Theme, ThemeContext } from '../../../../context/ThemeContext';
 import { Button } from '../../../../components/Button/Button';
 import { ThemeSwitchMini } from '../../../../components/ThemeSwitchMini/ThemeSwitchMini';
 import { LangSwitch } from '../../../../components/LangSwitch/LangSwitch';
+import { QuestionsProgress } from './QuestionsProgress';
 
 import './VideoChatAi.css';
 
@@ -135,6 +136,8 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
   const { activeReactions } = useReactionsStatus({
     lastWsMessageParsed,
   });
+  const closedQuestions = roomQuestions.filter(q => q.state === 'Closed');
+  const questionsProgress = ~~(closedQuestions.length / roomQuestions.length * 100);
 
   useEffect(() => {
     if (!roomState) {
@@ -314,6 +317,8 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
             <LangSwitch elementType='button' />
             <Gap sizeRem={0.5} horizontal />
             <ThemeSwitchMini variant='button' />
+            <Gap sizeRem={0.5} horizontal />
+            <QuestionsProgress value={questionsProgress} />
           </div>
           <Gap sizeRem={1.875} />
         </div>
