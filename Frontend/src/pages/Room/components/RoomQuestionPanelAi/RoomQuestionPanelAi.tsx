@@ -736,7 +736,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                       <Gap sizeRem={3.625} />
                       <div className='flex'>
                         <Gap sizeRem={7.5} horizontal />
-                        <Typography size='xs' secondary>{secondLineCaption}</Typography>
+                        <Typography size='s' secondary>{secondLineCaption}</Typography>
                       </div>
                     </div>
                   )}
