@@ -57,6 +57,7 @@ import {
   MessagesChatAi,
   MessagesChatAiMessage,
 } from '../MessagesChatAi/MessagesChatAi';
+import { Theme, ThemeContext } from '../../../../context/ThemeContext';
 
 const notFoundCode = 404;
 const aiAssistantGoodRate = 6;
@@ -301,6 +302,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
       setAiAssistantCurrentScript,
       setRecognitionEnabled,
     } = useContext(RoomContext);
+    const { themeInUi } = useContext(ThemeContext);
     const {
       recognitionAccum,
       recognitionCommand,
@@ -693,7 +695,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
               style={{
                 borderTopLeftRadius: 0,
                 borderBottomLeftRadius: 0,
-                background: 'linear-gradient(270deg, rgba(67, 184, 241, 0.07) 0%, rgba(245, 246, 248, 0.07) 92.16%)',
+                background: themeInUi === Theme.Light ? 'linear-gradient(270deg, rgba(67, 184, 241, 0.07) 0%, rgba(245, 246, 248, 0.07) 92.16%)' : '',
               }}
             ></div>
             <Gap sizeRem={2.75} />
@@ -754,8 +756,10 @@ export const RoomQuestionPanelAi: FunctionComponent<
                       <Gap sizeRem={2} />
                       <div className='flex'>
                         <div
-                          className='flex-1 flex flex-col text-left px-1.875 h-full rounded-1.5'
-                          style={{ background: 'linear-gradient(180.08deg, #F6F9FF 3.79%, #FFFFFF 105.65%)' }}
+                          className={`flex-1 flex flex-col text-left px-1.875 h-full rounded-1.5 ${themeInUi === Theme.Dark ? 'bg-dark-active' : ''}`}
+                          style={{
+                            background: themeInUi === Theme.Light ? 'linear-gradient(180.08deg, #F6F9FF 3.79%, #FFFFFF 105.65%)' : ''
+                          }}
                         >
                           <Gap sizeRem={1.375} />
                           <div className='flex justify-between'>
@@ -774,8 +778,10 @@ export const RoomQuestionPanelAi: FunctionComponent<
                         </div>
                         <Gap sizeRem={0.625} horizontal />
                         <div
-                          className='flex-1 flex flex-col text-left px-1.875 h-full rounded-1.5'
-                          style={{ background: 'linear-gradient(359.67deg, #FFFFFF 0.27%, #FDF8FF 97.33%)' }}
+                          className={`flex-1 flex flex-col text-left px-1.875 h-full rounded-1.5 ${themeInUi === Theme.Dark ? 'bg-dark-active' : ''}`}
+                          style={{
+                            background: themeInUi === Theme.Light ? 'linear-gradient(359.67deg, #FFFFFF 0.27%, #FDF8FF 97.33%)' : ''
+                          }}
                         >
                           <Gap sizeRem={2} />
                           <Typography size='m' bold>{localizationCaptions[LocalizationKey.ExampleOfCorrectAnswer]}</Typography>
@@ -836,7 +842,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
               style={{
                 borderTopRightRadius: 0,
                 borderBottomRightRadius: 0,
-                background: 'linear-gradient(89.03deg, #EFF0FF -2.02%, #F5F6F8 96.31%)',
+                background: themeInUi === Theme.Light ? 'linear-gradient(89.03deg, #EFF0FF -2.02%, #F5F6F8 96.31%)' : '',
               }}
             ></div>
             <Gap sizeRem={2.75} />

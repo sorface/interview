@@ -298,17 +298,19 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                   </Button>
                 </div>
               </div>
-              <div style={{
-                position: 'absolute',
-                width: '931px',
-                height: '547px',
-                top: '87px',
-                left: '-124px',
-                background: 'rgba(128, 112, 196, 0.23)',
-                filter: 'blur(79.1px)',
-                transform: 'rotate(40.92deg)',
-                pointerEvents: 'none',
-              }}></div>
+              {themeInUi === Theme.Light && (
+                <div style={{
+                  position: 'absolute',
+                  width: '931px',
+                  height: '547px',
+                  top: '87px',
+                  left: '-124px',
+                  background: 'rgba(128, 112, 196, 0.23)',
+                  filter: 'blur(79.1px)',
+                  transform: 'rotate(40.92deg)',
+                  pointerEvents: 'none',
+                }}></div>
+              )}
             </div>
           </RoomQuestionPanelAi>
           <Gap sizeRem={3.375} />
