@@ -906,7 +906,6 @@ export const RoomQuestionPanelAi: FunctionComponent<
           <Gap sizeRem={2.75} />
         </div>
       </div>
-      <Gap sizeRem={1} />
     </>
   );
 };
