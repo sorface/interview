@@ -11,9 +11,10 @@ import {
   SwitcherButton,
   SwitcherButtonContent,
 } from '../SwitcherButton/SwitcherButton';
+import { Button } from '../Button/Button';
 
 interface LangSwitchProps {
-  elementType?: 'switcherButton' | 'select';
+  elementType?: 'switcherButton' | 'select' | 'button';
 }
 
 export const LangSwitch = ({
@@ -74,9 +75,30 @@ export const LangSwitch = ({
     );
   };
 
+  const button = () => {
+    return (
+      <Button
+        variant="invertedAlternative"
+        className="min-w-unset w-2.375 h-2.375 p-0"
+        onClick={() =>
+          setLang(
+            lang === LocalizationLang.ru
+              ? LocalizationLang.en
+              : LocalizationLang.ru,
+          )
+        }
+      >
+        <Typography size="s" semibold>
+          {lang === LocalizationLang.ru ? 'RU' : 'EN'}
+        </Typography>
+      </Button>
+    );
+  };
+
   const elements = {
     select: select,
     switcherButton: switcherButton(),
+    button: button(),
   };
 
   return elements[elementType];

@@ -13,7 +13,7 @@ export default [
   pluginReact.configs.flat.recommended,
   reactHooks.configs['recommended-latest'],
   {
-    ignores: ['src/setupProxy.js', 'build', 'node_modules', 'coverage'],
+    ignores: ['src/setupProxy.js', 'build', 'node_modules', 'coverage', 'public'],
   },
   { settings: { react: { version: 'detect' } } },
 ];

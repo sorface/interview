@@ -351,7 +351,7 @@ const AiAssistantComponent: FunctionComponent<
       position={[0, -0.5, -6]}
     >
       {/* eslint-disable-next-line react/no-unknown-property */}
-      <icosahedronGeometry args={[2, 8]} />
+      <icosahedronGeometry args={[2, 2]} />
       <shaderMaterial
         // eslint-disable-next-line react/no-unknown-property
         wireframe
