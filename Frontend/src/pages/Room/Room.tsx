@@ -663,6 +663,64 @@ export const Room: FunctionComponent = () => {
                           </Link>
                         </span>
                       </div>
+                      {!aiRoom && (
+                        <div className="flex">
+                          {!!roomTimer?.startTime && (
+                            <>
+                              <RoomTimer
+                                durationSec={roomTimer.durationSec}
+                                startTime={roomTimer.startTime}
+                              />
+                              <Gap sizeRem={0.5} horizontal />
+                            </>
+                          )}
+                          <SwitcherButton
+                            items={[
+                              {
+                                id: 0,
+                                content: (
+                                  <div className="flex items-center">
+                                    <div>
+                                      {
+                                        localizationCaptions[
+                                        LocalizationKey.Chat
+                                        ]
+                                      }
+                                    </div>
+                                    {!!unreadChatMessages && (
+                                      <>
+                                        <Gap sizeRem={0.5} horizontal />
+                                        <UnreadChatMessagesCounter
+                                          value={unreadChatMessages}
+                                        />
+                                      </>
+                                    )}
+                                  </div>
+                                ),
+                              },
+                              {
+                                id: 1,
+                                content: (
+                                  <div className="flex items-center">
+                                    <div>
+                                      {
+                                        localizationCaptions[
+                                        LocalizationKey.RoomParticipants
+                                        ]
+                                      }
+                                    </div>
+                                    <Gap sizeRem={0.5} horizontal />
+                                    <div>{peers.length + 1}</div>
+                                  </div>
+                                ),
+                              },
+                            ]}
+                            activeIndex={messagesChatEnabled ? 0 : 1}
+                            variant="alternative"
+                            onClick={handleSwitchMessagesChat}
+                          />
+                        </div>
+                      )}
                     </div>
                     <div className="room-page-main-content">
                       <div className="room-columns">
