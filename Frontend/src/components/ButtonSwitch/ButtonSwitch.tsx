@@ -14,11 +14,14 @@ export const ButtonSwitch: FunctionComponent<ButtonSwitchProps> = ({
 }) => {
   return (
     <Button
-      variant='invertedAlternative'
-      className='min-w-unset w-2.5 h-2.5 p-0'
+      variant="invertedAlternative"
+      className="min-w-unset w-2.5 h-2.5 p-0"
       onClick={onToggle}
     >
-      <Icon size='s' name={toggled ? IconNames.ThemeSwitchLight : IconNames.ThemeSwitchDark} />
+      <Icon
+        size="s"
+        name={toggled ? IconNames.ThemeSwitchLight : IconNames.ThemeSwitchDark}
+      />
     </Button>
   );
 };

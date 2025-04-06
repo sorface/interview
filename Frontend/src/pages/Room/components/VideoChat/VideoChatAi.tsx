@@ -118,8 +118,11 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
   const { activeReactions } = useReactionsStatus({
     lastWsMessageParsed,
   });
-  const closedQuestions = roomQuestions.filter(q => q.state === 'Closed');
-  const questionsProgress = ~~(closedQuestions.length / roomQuestions.length * 100);
+  const closedQuestions = roomQuestions.filter((q) => q.state === 'Closed');
+  const questionsProgress = ~~(
+    (closedQuestions.length / roomQuestions.length) *
+    100
+  );
 
   useEffect(() => {
     if (!roomState) {
@@ -235,9 +238,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
   return (
     <>
       <div className="flex-1 flex justify-center">
-        <div
-          className="w-full flex flex-col relative rounded-1.125"
-        >
+        <div className="w-full flex flex-col relative rounded-1.125">
           <RoomQuestionPanelAi
             questionWithCode={codeEditorEnabled}
             roomQuestionsLoading={roomQuestionsLoading}
@@ -251,7 +252,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                 bottom: '-53px',
               }}
             >
-              <div className='z-50'>
+              <div className="z-50">
                 <video
                   ref={userVideoMainContent}
                   className="rounded-full videochat-video object-cover z-1"
@@ -262,13 +263,19 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                 >
                   Video not supported
                 </video>
-                <div className="absolute flex justify-center" style={{ width: '213px', bottom: '-0.75rem' }}>
+                <div
+                  className="absolute flex justify-center"
+                  style={{ width: '213px', bottom: '-0.75rem' }}
+                >
                   <Button
                     variant="invertedAlternative"
                     className="min-w-unset w-2.5 h-2.5 p-0 z-1"
                     onClick={handleMicSwitch}
                   >
-                    <Icon size="s" name={micEnabled ? IconNames.MicOn : IconNames.MicOff} />
+                    <Icon
+                      size="s"
+                      name={micEnabled ? IconNames.MicOn : IconNames.MicOff}
+                    />
                   </Button>
                   <Gap sizeRem={0.5} horizontal />
                   <Button
@@ -276,31 +283,40 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                     className="min-w-unset w-2.5 h-2.5 p-0 z-1"
                     onClick={handleCameraSwitch}
                   >
-                    <Icon size="s" name={cameraEnabled ? IconNames.VideocamOn : IconNames.VideocamOff} />
+                    <Icon
+                      size="s"
+                      name={
+                        cameraEnabled
+                          ? IconNames.VideocamOn
+                          : IconNames.VideocamOff
+                      }
+                    />
                   </Button>
                 </div>
               </div>
               {themeInUi === Theme.Light && (
-                <div style={{
-                  position: 'absolute',
-                  width: '931px',
-                  height: '547px',
-                  top: '87px',
-                  left: '-124px',
-                  background: 'rgba(128, 112, 196, 0.23)',
-                  filter: 'blur(79.1px)',
-                  transform: 'rotate(40.92deg)',
-                  pointerEvents: 'none',
-                }}></div>
+                <div
+                  style={{
+                    position: 'absolute',
+                    width: '931px',
+                    height: '547px',
+                    top: '87px',
+                    left: '-124px',
+                    background: 'rgba(128, 112, 196, 0.23)',
+                    filter: 'blur(79.1px)',
+                    transform: 'rotate(40.92deg)',
+                    pointerEvents: 'none',
+                  }}
+                ></div>
               )}
             </div>
           </RoomQuestionPanelAi>
           <Gap sizeRem={3.375} />
           <div className="flex">
             <Gap sizeRem={3.375} horizontal />
-            <LangSwitch elementType='button' />
+            <LangSwitch elementType="button" />
             <Gap sizeRem={0.5} horizontal />
-            <ThemeSwitchMini variant='button' />
+            <ThemeSwitchMini variant="button" />
             <Gap sizeRem={0.5} horizontal />
             <QuestionsProgress value={questionsProgress} />
           </div>

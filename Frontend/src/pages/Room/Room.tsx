@@ -631,7 +631,9 @@ export const Room: FunctionComponent = () => {
                             className="no-underline"
                           >
                             <div className="room-page-header-wrapper flex items-center">
-                              <div className={`w-2.375 pr-1 ${aiRoom ? 'px-1' : ''}`}>
+                              <div
+                                className={`w-2.375 pr-1 ${aiRoom ? 'px-1' : ''}`}
+                              >
                                 <img
                                   className="w-2.375 h-2.375 rounded-0.375"
                                   src="/logo192.png"
@@ -663,7 +665,7 @@ export const Room: FunctionComponent = () => {
                                     <div>
                                       {
                                         localizationCaptions[
-                                        LocalizationKey.Chat
+                                          LocalizationKey.Chat
                                         ]
                                       }
                                     </div>
@@ -685,7 +687,7 @@ export const Room: FunctionComponent = () => {
                                     <div>
                                       {
                                         localizationCaptions[
-                                        LocalizationKey.RoomParticipants
+                                          LocalizationKey.RoomParticipants
                                         ]
                                       }
                                     </div>
@@ -708,7 +710,7 @@ export const Room: FunctionComponent = () => {
                           <div>
                             {
                               localizationCaptions[
-                              LocalizationKey.ErrorLoadingRoomState
+                                LocalizationKey.ErrorLoadingRoomState
                               ]
                             }
                             ...
