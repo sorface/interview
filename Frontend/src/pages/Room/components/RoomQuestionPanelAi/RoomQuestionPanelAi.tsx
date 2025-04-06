@@ -705,7 +705,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
             {statusPanelVisible && (
               <>
                 <Gap sizeRem={copilotAnswerOpen ? 1.6875 : 7.6875} />
-                <div className='flex flex-col px-4.75'>
+                <div className='flex flex-col px-4.75 h-full'>
                   <div className='flex'>
                     <div className="flex items-center justify-center">
                       <div
@@ -754,9 +754,9 @@ export const RoomQuestionPanelAi: FunctionComponent<
                         <Icon size="s" name={IconNames.ChevronForward} />
                       </Button>
                       <Gap sizeRem={2} />
-                      <div className='flex'>
+                      <div className='flex flex-1'>
                         <div
-                          className={`flex-1 flex flex-col text-left px-1.875 h-full rounded-1.5 ${themeInUi === Theme.Dark ? 'bg-dark-active' : ''}`}
+                          className={`flex-1 flex flex-col text-left px-1.875 h-full rounded-1.5 ${themeInUi === Theme.Dark ? 'bg-dark-dark1' : ''}`}
                           style={{
                             background: themeInUi === Theme.Light ? 'linear-gradient(180.08deg, #F6F9FF 3.79%, #FFFFFF 105.65%)' : ''
                           }}
@@ -778,7 +778,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                         </div>
                         <Gap sizeRem={0.625} horizontal />
                         <div
-                          className={`flex-1 flex flex-col text-left px-1.875 h-full rounded-1.5 ${themeInUi === Theme.Dark ? 'bg-dark-active' : ''}`}
+                          className={`flex-1 flex flex-col text-left px-1.875 h-full rounded-1.5 ${themeInUi === Theme.Dark ? 'bg-dark-dark1' : ''}`}
                           style={{
                             background: themeInUi === Theme.Light ? 'linear-gradient(359.67deg, #FFFFFF 0.27%, #FDF8FF 97.33%)' : ''
                           }}
@@ -789,6 +789,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                           <Typography size='m'>{totalLastValidAiAnswer?.expected}</Typography>
                         </div>
                       </div>
+                      <Gap sizeRem={3.125} />
                     </>
                   )}
                 </div>
