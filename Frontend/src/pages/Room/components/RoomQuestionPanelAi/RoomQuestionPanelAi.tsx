@@ -732,6 +732,17 @@ export const RoomQuestionPanelAi: FunctionComponent<
                   </div>
                   {copilotAnswerOpen && (
                     <>
+                      <Button
+                        variant='invertedActive'
+                        className='absolute min-w-unset w-2.5 h-2.5 p-0 z-1'
+                        style={{
+                          right: '-1.25rem',
+                          top: 'calc(50% - 1.25rem)',
+                        }}
+                        onClick={readyToReview ? handleStartReviewRoom : handleNextQuestion}
+                      >
+                        <Icon size="s" name={IconNames.ChevronForward} />
+                      </Button>
                       <Gap sizeRem={2} />
                       <div className='flex'>
                         <div
