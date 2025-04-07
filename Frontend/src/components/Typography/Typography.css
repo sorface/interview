@@ -40,6 +40,10 @@
   font-size: 1.875rem;
 }
 
+.typography-semibold {
+  font-weight: 500;
+}
+
 .typography-bold {
   font-weight: 600;
 }

@@ -3,24 +3,32 @@ import { Icon } from '../Icon/Icon';
 import { IconNames } from '../../../../constants';
 import { Gap } from '../../../../components/Gap/Gap';
 import { padTime } from '../../../../utils/padTime';
+import { Typography } from '../../../../components/Typography/Typography';
 
 const updateIntervalMs = 1000;
 
-const formatTime = (timeMs: number) => {
+const formatTime = (timeMs: number, mini?: boolean) => {
   const hours = Math.floor(timeMs / (1000 * 60 * 60));
-  const minutes = Math.floor((timeMs / 1000 / 60) % 60);
+  const minutes = mini
+    ? Math.floor(timeMs / 1000 / 60)
+    : Math.floor((timeMs / 1000 / 60) % 60);
   const seconds = Math.floor((timeMs / 1000) % 60);
+  if (mini) {
+    return `${padTime(minutes)}:${padTime(seconds)}`;
+  }
   return `${padTime(hours)}:${padTime(minutes)}:${padTime(seconds)}`;
 };
 
 interface RoomTimerProps {
   startTime: string;
   durationSec: number;
+  mini?: boolean;
 }
 
 export const RoomTimer: FunctionComponent<RoomTimerProps> = ({
   startTime,
   durationSec,
+  mini,
 }) => {
   const [remainingTimeMs, setRemainingTimeMs] = useState(0);
 
@@ -43,11 +51,17 @@ export const RoomTimer: FunctionComponent<RoomTimerProps> = ({
   }, [startTime, durationSec]);
 
   return (
-    <div className="flex items-center justify-center px-1 py-0.625 bg-wrap rounded-2">
-      <Icon name={IconNames.Time} />
+    <div
+      className={`flex items-center justify-center px-1 py-0.625 rounded-2 ${mini ? '' : 'bg-wrap'}`}
+    >
+      <Icon size={mini ? 's' : 'm'} name={IconNames.Time} />
       <Gap sizeRem={0.25} horizontal />
-      <div className="w-4 text-left">
-        {formatTime(remainingTimeMs <= 0 ? 0 : remainingTimeMs)}
+      <div
+        className={`${mini ? 'w-2.3125' : 'w-4'} text-left whitespace-nowrap`}
+      >
+        <Typography size={mini ? 'm' : 'l'}>
+          {formatTime(remainingTimeMs <= 0 ? 0 : remainingTimeMs, mini)}
+        </Typography>
       </div>
     </div>
   );

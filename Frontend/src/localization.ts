@@ -258,6 +258,9 @@ export const enum LocalizationKey {
   QuestionTreeCollapseAll,
   QuestionTreeRootNode,
   Recommendation,
+  From10,
+  AnswerEvaluation,
+  EmotionalAssessment,
   ExampleOfCorrectAnswer,
   CodeReadability,
   CodePerformance,
@@ -273,6 +276,8 @@ export const enum LocalizationKey {
   ExpectsExecuteResultsPassed,
   ExpectsExecuteResultsNotPassed,
   ExecutionResultsSubmit,
+  Completed,
+  MeetingBeingRecorded,
 }
 
 export const LocalizationCaptions: Record<
@@ -573,7 +578,10 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.QuestionTreeCollapseAll]: 'Collapse all',
     [LocalizationKey.QuestionTreeRootNode]: 'Beginning',
     [LocalizationKey.Recommendation]: 'Recommendation',
-    [LocalizationKey.ExampleOfCorrectAnswer]: 'Example of correct answer',
+    [LocalizationKey.From10]: 'from 10',
+    [LocalizationKey.AnswerEvaluation]: 'Evaluation of the answer',
+    [LocalizationKey.EmotionalAssessment]: 'Emotional assessment',
+    [LocalizationKey.ExampleOfCorrectAnswer]: 'Correct answer',
     [LocalizationKey.CodeReadability]: 'Code readability',
     [LocalizationKey.CodePerformance]: 'Performance optimization',
     [LocalizationKey.BestPractice]:
@@ -591,6 +599,8 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.ExpectsExecuteResultsNotPassed]:
       'Not all tests were passed successfully',
     [LocalizationKey.ExecutionResultsSubmit]: 'Send code for review',
+    [LocalizationKey.Completed]: 'Completed',
+    [LocalizationKey.MeetingBeingRecorded]: 'Meeting is being recorded',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -889,7 +899,10 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.QuestionTreeCollapseAll]: 'Свернуть все',
     [LocalizationKey.QuestionTreeRootNode]: 'Начало',
     [LocalizationKey.Recommendation]: 'Рекомендация',
-    [LocalizationKey.ExampleOfCorrectAnswer]: 'Пример правильного ответа',
+    [LocalizationKey.From10]: 'из 10',
+    [LocalizationKey.AnswerEvaluation]: 'Оценка ответа',
+    [LocalizationKey.EmotionalAssessment]: 'Оценка эмоций',
+    [LocalizationKey.ExampleOfCorrectAnswer]: 'Правильный ответ',
     [LocalizationKey.CodeReadability]: 'Читаемость кода',
     [LocalizationKey.CodePerformance]: 'Оптимизация производительности',
     [LocalizationKey.BestPractice]:
@@ -908,5 +921,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.ExpectsExecuteResultsNotPassed]:
       'Не все проверки пройдены успешно',
     [LocalizationKey.ExecutionResultsSubmit]: 'Отправить код на проверку',
+    [LocalizationKey.Completed]: 'Пройдено',
+    [LocalizationKey.MeetingBeingRecorded]: 'Идет запись встречи',
   },
 };
