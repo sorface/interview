@@ -157,6 +157,9 @@
 .\!bg-dark {
   background-color: var(--dark) !important;
 }
+.bg-dark-white {
+  background-color: var(--dark-white);
+}
 .bg-dark-0\.5 {
   background-color: color-mix(in srgb, var(--dark), transparent 50%);
 }
@@ -174,6 +177,9 @@
 }
 .bg-red {
   background-color: var(--red);
+}
+.bg-green {
+  background-color: var(--green);
 }
 .bg-red-light {
   background-color: var(--red-light);
@@ -572,6 +578,9 @@
 .w-full {
   width: 100%;
 }
+.w-0\.5 {
+  width: 0.5rem;
+}
 .w-0\.75 {
   width: 0.75rem;
 }
@@ -676,6 +685,9 @@
 }
 .h-0\.125 {
   height: 0.125rem;
+}
+.h-0\.5 {
+  height: 0.5rem;
 }
 .h-0\.75 {
   height: 0.75rem;
