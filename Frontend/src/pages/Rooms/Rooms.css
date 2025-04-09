@@ -40,7 +40,7 @@
   display: grid;
   align-items: center;
   gap: 4.5rem;
-  grid-template-columns: 1fr 5.375rem 7.125rem min-content 1rem;
+  grid-template-columns: 1fr 5.375rem 7.125rem 7.125rem 1rem;
   padding: 1rem;
   font-size: 0.875rem;
 }
