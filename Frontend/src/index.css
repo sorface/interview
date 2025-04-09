@@ -285,7 +285,7 @@ progress::-moz-progress-bar {
 }
 
 progress::-webkit-progress-bar {
-  background-color: var(--wrap-bg);
+  background-color: var(--grey-active);
 }
 progress::-webkit-progress-value {
   background-color: var(--button-active-bg) !important;
