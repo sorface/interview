@@ -18,7 +18,7 @@ public static class ServiceCollectionExt
                 options.MetadataAddress = $@"{openIdConnectOptions.Issuer}{openIdConnectOptions.MetadataPath}";
                 options.RequireHttpsMetadata = openIdConnectOptions.RequireHttpsMetadata;
                 options.MapInboundClaims = false;
-                options.SaveToken = false;
+                options.SaveToken = true;
 
                 options.Events = new JwtBearerEvents
                 {
