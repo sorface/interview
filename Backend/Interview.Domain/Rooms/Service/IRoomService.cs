@@ -13,7 +13,7 @@ namespace Interview.Domain.Rooms.Service;
 public interface IRoomService : IService
 {
     Task<IPagedList<RoomPageDetail>> FindPageAsync(
-        RoomPageDetailRequestFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+        RoomPageDetailRequestFilter filter, int pageNumber, int pageSize, EVSortOrder dateSort, CancellationToken cancellationToken = default);
 
     Task<List<RoomCalendarItem>> GetCalendarAsync(RoomCalendarRequest filter, CancellationToken cancellationToken = default);
 

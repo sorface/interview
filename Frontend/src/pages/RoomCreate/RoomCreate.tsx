@@ -83,22 +83,19 @@ const parseScheduledStartTime = (
   };
 };
 
-const parseRoomDate = (roomFields: RoomFields) => {
-  const roomDateStart = new Date(roomFields.date);
-  const roomStartTime = roomFields.startTime.split(':');
-  roomDateStart.setHours(parseInt(roomStartTime[0]));
-  roomDateStart.setMinutes(parseInt(roomStartTime[1]));
+const getRoomDuration = (roomFields: RoomFields) => {
   const roomEndTime = roomFields.endTime.split(':');
-  const roomDateEnd = new Date(roomDateStart);
+  const roomDateEnd = new Date(roomFields.scheduleStartTime);
   if (roomEndTime.length > 1) {
     roomDateEnd.setHours(parseInt(roomEndTime[0]));
     roomDateEnd.setMinutes(parseInt(roomEndTime[1]));
   }
-  if (roomDateEnd < roomDateStart) {
+  if (roomDateEnd < roomFields.scheduleStartTime) {
     roomDateEnd.setDate(roomDateEnd.getDate() + 1);
   }
-  const duration = (roomDateEnd.getTime() - roomDateStart.getTime()) / 1000;
-  return { roomDateStart, duration };
+  const duration =
+    (roomDateEnd.getTime() - roomFields.scheduleStartTime.getTime()) / 1000;
+  return duration;
 };
 
 const formatDuration = (durationSec: number) => {
@@ -107,7 +104,7 @@ const formatDuration = (durationSec: number) => {
   return `${padTime(hours)}:${padTime(minutes)}`;
 };
 
-const getAiRoomStartDate = () => {
+const getInitialRoomStartDate = () => {
   const currDate = new Date();
   currDate.setMinutes(currDate.getMinutes() + 15);
   return currDate;
@@ -127,8 +124,7 @@ enum CreationStep {
 type RoomFields = {
   name: string;
   questionTreeId: string;
-  date: string;
-  startTime: string;
+  scheduleStartTime: Date;
   endTime: string;
 };
 
@@ -195,11 +191,10 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
   const [roomFields, setRoomFields] = useState<RoomFields>({
     name: '',
     questionTreeId: '',
-    date: formatDate(new Date()),
-    startTime: aiRoom ? formatTime(getAiRoomStartDate()) : '',
+    scheduleStartTime: getInitialRoomStartDate(),
     endTime: aiRoom ? formatTime(getAiRoomEndDate()) : '',
   });
-  const parsedRoomDate = parseRoomDate(roomFields);
+  const roomDuration = getRoomDuration(roomFields);
   const [selectedQuestions, setSelectedQuestions] = useState<
     RoomQuestionListItem[]
   >([]);
@@ -296,18 +291,11 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     if (!roomFields.name) {
       return localizationCaptions[LocalizationKey.EmptyRoomNameError];
     }
-    if (!roomFields.startTime) {
+    if (!roomFields.scheduleStartTime) {
       return localizationCaptions[LocalizationKey.RoomEmptyStartTimeError];
     }
-    if (!roomFields.date) {
-      return localizationCaptions[LocalizationKey.RoomEmptyStartTimeError];
-    }
-    const roomDateStart = new Date(roomFields.date);
-    const roomStartTime = roomFields.startTime.split(':');
-    roomDateStart.setHours(parseInt(roomStartTime[0]));
-    roomDateStart.setMinutes(parseInt(roomStartTime[1]));
     if (
-      roomDateStart.getTime() <
+      roomFields.scheduleStartTime.getTime() <
       Date.now() - 1000 * 60 * roomStartTimeShiftMinutes
     ) {
       return localizationCaptions[
@@ -344,8 +332,8 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
                 order: index,
               })),
             }),
-        scheduleStartTime: parsedRoomDate.roomDateStart.toISOString(),
-        durationSec: parsedRoomDate.duration,
+        scheduleStartTime: roomFields.scheduleStartTime.toISOString(),
+        durationSec: roomDuration,
       });
     } else {
       fetchData({
@@ -364,10 +352,36 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         examinees: [],
         tags: [],
         accessType: RoomAccessType.Private,
-        scheduleStartTime: parsedRoomDate.roomDateStart.toISOString(),
-        duration: parsedRoomDate.duration,
+        scheduleStartTime: roomFields.scheduleStartTime.toISOString(),
+        duration: roomDuration,
       });
     }
+  };
+
+  const handleChangeStartDate = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const selectedDate = new Date(e.target.value);
+    selectedDate.setHours(roomFields.scheduleStartTime.getHours());
+    selectedDate.setMinutes(roomFields.scheduleStartTime.getMinutes());
+    setRoomFields({
+      ...roomFields,
+      scheduleStartTime: selectedDate,
+    });
+  };
+
+  const handleChangeStartTime = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const [selectedHours, selectedMinutes] = e.target.value.split(':');
+    console.log(selectedHours, selectedMinutes);
+    const selectedDate = new Date(roomFields.scheduleStartTime);
+    selectedDate.setHours(+selectedHours);
+    selectedDate.setMinutes(+selectedMinutes);
+    setRoomFields({
+      ...roomFields,
+      scheduleStartTime: selectedDate,
+    });
   };
 
   const handleChangeField =
@@ -503,20 +517,20 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
                 <input
                   id="roomDate"
                   name={dateFieldName}
-                  value={roomFields.date}
+                  value={formatDate(roomFields.scheduleStartTime)}
                   type="date"
                   required
                   className="mr-0.5"
-                  onChange={handleChangeField('date')}
+                  onChange={handleChangeStartDate}
                 />
                 <input
                   id="roomTimeStart"
                   name={startTimeFieldName}
-                  value={roomFields.startTime}
+                  value={formatTime(roomFields.scheduleStartTime)}
                   type="time"
                   required
                   className="mr-0.5"
-                  onChange={handleChangeField('startTime')}
+                  onChange={handleChangeStartTime}
                 />
                 <span className="mr-0.5">
                   <Typography size="s">-</Typography>
@@ -532,7 +546,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
                 {!!roomFields.endTime && (
                   <Typography size="m">
                     {localizationCaptions[LocalizationKey.RoomDuration]}:{' '}
-                    {formatDuration(parsedRoomDate.duration)}
+                    {formatDuration(roomDuration)}
                   </Typography>
                 )}
               </RoomCreateField.Content>

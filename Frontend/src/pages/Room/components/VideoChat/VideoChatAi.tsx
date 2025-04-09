@@ -18,19 +18,19 @@ import { EventsSearch } from '../../../../types/event';
 import { useReactionsStatus } from '../../hooks/useReactionsStatus';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
-import { RoomToolsPanel } from '../RoomToolsPanel/RoomToolsPanel';
 import { UserStreamsContext } from '../../context/UserStreamsContext';
 import { IconNames } from '../../../../constants';
 import { Gap } from '../../../../components/Gap/Gap';
-import { ContextMenu } from '../../../../components/ContextMenu/ContextMenu';
-import { Loader } from '../../../../components/Loader/Loader';
-import { Typography } from '../../../../components/Typography/Typography';
 import { Icon } from '../Icon/Icon';
 import { RoomContext } from '../../context/RoomContext';
 import { RoomQuestionPanelAi } from '../RoomQuestionPanelAi/RoomQuestionPanelAi';
 import { RoomQuestion } from '../../../../types/room';
 import { sortRoomQuestion } from '../../../../utils/sortRoomQestions';
 import { Theme, ThemeContext } from '../../../../context/ThemeContext';
+import { Button } from '../../../../components/Button/Button';
+import { ThemeSwitchMini } from '../../../../components/ThemeSwitchMini/ThemeSwitchMini';
+import { LangSwitch } from '../../../../components/LangSwitch/LangSwitch';
+import { QuestionsProgress } from './QuestionsProgress';
 
 import './VideoChatAi.css';
 
@@ -39,19 +39,11 @@ const viewerOrder = 666;
 
 interface VideoChatAiProps {
   messagesChatEnabled: boolean;
-  recognitionNotSupported: boolean;
-  currentUserExpert: boolean;
-  loadingRoomStartReview: boolean;
-  errorRoomStartReview: string | null;
   // ScreenShare
   // screenStream: MediaStream | null;
   roomQuestionsLoading: boolean;
   roomQuestions: RoomQuestion[];
   initialQuestion?: RoomQuestion;
-  handleInvitationsOpen: () => void;
-  handleStartReviewRoom: () => void;
-  handleSettingsOpen: () => void;
-  handleLeaveRoom: () => void;
 }
 
 const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string) => {
@@ -85,18 +77,11 @@ const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string) => {
 
 export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
   messagesChatEnabled,
-  currentUserExpert,
-  errorRoomStartReview,
-  loadingRoomStartReview,
   // ScreenShare
   // screenStream,
   roomQuestionsLoading,
   roomQuestions,
   initialQuestion,
-  handleInvitationsOpen,
-  handleLeaveRoom,
-  handleSettingsOpen,
-  handleStartReviewRoom,
 }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
@@ -133,6 +118,11 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
   const { activeReactions } = useReactionsStatus({
     lastWsMessageParsed,
   });
+  const closedQuestions = roomQuestions.filter((q) => q.state === 'Closed');
+  const questionsProgress = ~~(
+    (closedQuestions.length / roomQuestions.length) *
+    100
+  );
 
   useEffect(() => {
     if (!roomState) {
@@ -245,125 +235,92 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
     setCameraEnabled(!cameraEnabled);
   };
 
-  const renderMain = () => {
-    return (
-      <>
-        <RoomQuestionPanelAi
-          questionWithCode={codeEditorEnabled}
-          roomQuestionsLoading={roomQuestionsLoading}
-          roomQuestions={roomQuestions?.sort(sortRoomQuestion) || []}
-          initialQuestion={initialQuestion}
-        />
-        <div className="flex items-center justify-center">
-          <div className="flex flex-col">
-            <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
-              <RoomToolsPanel.SwitchButton
-                enabled={true}
-                alternative={themeInUi === Theme.Light}
-                iconEnabledName={IconNames.Settings}
-                iconDisabledName={IconNames.Settings}
-                onClick={handleSettingsOpen}
-              />
-            </RoomToolsPanel.ButtonsGroupWrapper>
-            <Gap sizeRem={0.5} />
-            <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
-              <ContextMenu
-                toggleContent={
-                  <RoomToolsPanel.SwitchButton
-                    enabled={true}
-                    alternative={themeInUi === Theme.Light}
-                    iconEnabledName={IconNames.Call}
-                    iconDisabledName={IconNames.Call}
-                    onClick={currentUserExpert ? () => {} : handleLeaveRoom}
-                    danger
-                  />
-                }
-                translateRem={{ x: -14.25, y: -6.75 }}
-              >
-                {loadingRoomStartReview && <Loader />}
-                {errorRoomStartReview && (
-                  <div className="flex items-center justify-center">
-                    <Typography size="m" error>
-                      <Icon name={IconNames.Information} />
-                    </Typography>
-                    <Typography size="m" error>
-                      {errorRoomStartReview}
-                    </Typography>
-                  </div>
-                )}
-                {currentUserExpert && (
-                  <>
-                    <ContextMenu.Item
-                      title={
-                        localizationCaptions[
-                          LocalizationKey.CompleteAndEvaluateCandidate
-                        ]
-                      }
-                      onClick={handleStartReviewRoom}
-                    />
-                    <ContextMenu.Item
-                      title={localizationCaptions[LocalizationKey.Invitations]}
-                      onClick={handleInvitationsOpen}
-                    />
-                  </>
-                )}
-                <ContextMenu.Item
-                  title={localizationCaptions[LocalizationKey.Exit]}
-                  onClick={handleLeaveRoom}
-                />
-              </ContextMenu>
-            </RoomToolsPanel.ButtonsGroupWrapper>
-          </div>
-          <Gap sizeRem={0.625} horizontal />
-          <video
-            ref={userVideoMainContent}
-            className="w-12.5 h-10 videochat-video object-cover z-1"
-            style={{
-              right: '5.5rem',
-              bottom: '1.5rem',
-            }}
-            muted
-            autoPlay
-            playsInline
-          >
-            Video not supported
-          </video>
-          <Gap sizeRem={0.625} horizontal />
-          <div className="flex flex-col">
-            <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
-              <RoomToolsPanel.SwitchButton
-                enabled={micEnabled}
-                alternative={themeInUi === Theme.Light}
-                iconEnabledName={IconNames.MicOn}
-                iconDisabledName={IconNames.MicOff}
-                onClick={handleMicSwitch}
-              />
-            </RoomToolsPanel.ButtonsGroupWrapper>
-            <Gap sizeRem={0.5} />
-            <RoomToolsPanel.ButtonsGroupWrapper noPaddingBottom>
-              <RoomToolsPanel.SwitchButton
-                enabled={cameraEnabled}
-                alternative={themeInUi === Theme.Light}
-                iconEnabledName={IconNames.VideocamOn}
-                iconDisabledName={IconNames.VideocamOff}
-                onClick={handleCameraSwitch}
-              />
-            </RoomToolsPanel.ButtonsGroupWrapper>
-          </div>
-        </div>
-        <Gap sizeRem={0.25} />
-      </>
-    );
-  };
-
   return (
     <>
       <div className="flex-1 flex justify-center">
-        <div
-          style={{ maxWidth: '840px' }}
-          className="w-full flex flex-col relative rounded-1.125"
-        >
-          {renderMain()}
+        <div className="w-full flex flex-col relative rounded-1.125">
+          <RoomQuestionPanelAi
+            questionWithCode={codeEditorEnabled}
+            roomQuestionsLoading={roomQuestionsLoading}
+            roomQuestions={roomQuestions?.sort(sortRoomQuestion) || []}
+            initialQuestion={initialQuestion}
+          >
+            <div
+              className="absolute flex flex-col items-end justify-center"
+              style={{
+                right: '-106px',
+                bottom: '-53px',
+              }}
+            >
+              <div className="z-50">
+                <video
+                  ref={userVideoMainContent}
+                  className="rounded-full videochat-video object-cover z-1"
+                  style={{ width: '213px', height: '213px' }}
+                  muted
+                  autoPlay
+                  playsInline
+                >
+                  Video not supported
+                </video>
+                <div
+                  className="absolute flex justify-center"
+                  style={{ width: '213px', bottom: '-0.75rem' }}
+                >
+                  <Button
+                    variant="invertedAlternative"
+                    className="min-w-unset w-2.5 h-2.5 p-0 z-1"
+                    onClick={handleMicSwitch}
+                  >
+                    <Icon
+                      size="s"
+                      name={micEnabled ? IconNames.MicOn : IconNames.MicOff}
+                    />
+                  </Button>
+                  <Gap sizeRem={0.5} horizontal />
+                  <Button
+                    variant="invertedAlternative"
+                    className="min-w-unset w-2.5 h-2.5 p-0 z-1"
+                    onClick={handleCameraSwitch}
+                  >
+                    <Icon
+                      size="s"
+                      name={
+                        cameraEnabled
+                          ? IconNames.VideocamOn
+                          : IconNames.VideocamOff
+                      }
+                    />
+                  </Button>
+                </div>
+              </div>
+              {themeInUi === Theme.Light && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    width: '931px',
+                    height: '547px',
+                    top: '87px',
+                    left: '-124px',
+                    background: 'rgba(128, 112, 196, 0.23)',
+                    filter: 'blur(79.1px)',
+                    transform: 'rotate(40.92deg)',
+                    pointerEvents: 'none',
+                  }}
+                ></div>
+              )}
+            </div>
+          </RoomQuestionPanelAi>
+          <Gap sizeRem={1.5} />
+          <div className="flex h-2.375">
+            <Gap sizeRem={3.375} horizontal />
+            <LangSwitch elementType="button" />
+            <Gap sizeRem={0.5} horizontal />
+            <ThemeSwitchMini variant="button" />
+            <Gap sizeRem={1.75} horizontal />
+            <QuestionsProgress value={questionsProgress} />
+          </div>
+          <Gap sizeRem={1.875} />
         </div>
       </div>
 

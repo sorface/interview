@@ -78,6 +78,8 @@ export const enum IconNames {
   Grid = 'grid-outline',
   Menu = 'menu-sharp',
   Notifications = 'notifications-outline',
+  Happy = 'happy-outline',
+  RadioButtonOn = 'radio-button-on-outline',
 }
 
 export const reactionIcon: Record<string, IconNames> = {

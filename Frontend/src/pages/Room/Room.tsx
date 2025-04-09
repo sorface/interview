@@ -16,14 +16,12 @@ import useWebSocket from 'react-use-websocket';
 import toast from 'react-hot-toast';
 import {
   ApplyRoomInviteBody,
-  CompleteRoomReviewsBody,
   GenerateRoomInviteBody,
   GetRoomParticipantParams,
   GetRoomQuestionsBody,
   RoomIdParam,
   roomInviteApiDeclaration,
   roomQuestionApiDeclaration,
-  roomReviewApiDeclaration,
   roomsApiDeclaration,
 } from '../../apiDeclarations';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
@@ -75,6 +73,7 @@ import { useUserStreams } from './hooks/useUserStreams';
 import { useRoomSounds } from './hooks/useRoomSounds';
 import { AiAssistantScriptName } from './components/AiAssistant/AiAssistant';
 import { mapInvitesForAiRoom } from '../../utils/mapInvitesForAiRoom';
+import { Typography } from '../../components/Typography/Typography';
 import { Icon } from './components/Icon/Icon';
 
 import './Room.css';
@@ -236,16 +235,6 @@ export const Room: FunctionComponent = () => {
     process: { loading: loadingRoomState, error: errorRoomState },
     data: roomState,
   } = apiRoomStateState;
-
-  const {
-    apiMethodState: apiRoomCompleteAiMethodState,
-    fetchData: fetchRoomCompleteAi,
-  } = useApiMethod<unknown, CompleteRoomReviewsBody>(
-    roomReviewApiDeclaration.completeAi,
-  );
-  const {
-    process: { loading: loadingCompleteAi, error: errorCompleteAi },
-  } = apiRoomCompleteAiMethodState;
 
   const {
     apiMethodState: apiRoomStartReviewMethodState,
@@ -532,14 +521,6 @@ export const Room: FunctionComponent = () => {
     fetchRoomStartReview(room.id);
   };
 
-  const handleStartReviewRoomAi = () => {
-    if (!room?.id) {
-      console.warn('Room id not found');
-      return;
-    }
-    fetchRoomCompleteAi({ roomId: room.id });
-  };
-
   if (roomClose && id) {
     return (
       <Navigate to={generatePath(pathnames.roomAnalytics, { id })} replace />
@@ -589,7 +570,7 @@ export const Room: FunctionComponent = () => {
       }}
     >
       <UserStreamsContext.Provider value={userStreams}>
-        <MainContentWrapper withMargin className="room-wrapper">
+        <MainContentWrapper withMargin={!aiRoom} className="room-wrapper">
           <EnterVideoChatModal
             open={welcomeScreen}
             loading={
@@ -647,30 +628,31 @@ export const Room: FunctionComponent = () => {
               >
                 <div className="room-page">
                   <div className="room-page-main">
-                    {aiRoom && <Gap sizeRem={0.75} />}
-                    {!aiRoom && (
-                      <div className="room-page-header justify-between">
-                        <div>
-                          <span
-                            className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
+                    <div className="room-page-header justify-between">
+                      <div>
+                        <span
+                          className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
+                        >
+                          <Link
+                            to={pathnames.highlightRooms}
+                            className="no-underline"
                           >
-                            <Link
-                              to={pathnames.highlightRooms}
-                              className="no-underline"
-                            >
-                              <div className="room-page-header-wrapper flex items-center">
-                                <div className="w-2.375 pr-1">
-                                  <img
-                                    className="w-2.375 h-2.375 rounded-0.375"
-                                    src="/logo192.png"
-                                    alt="site logo"
-                                  />
-                                </div>
-                                <h3>{room?.name}</h3>
+                            <div className="room-page-header-wrapper flex items-center">
+                              <div
+                                className={`w-2.375 pr-1 ${aiRoom ? 'px-1' : ''}`}
+                              >
+                                <img
+                                  className="w-2.375 h-2.375 rounded-0.375"
+                                  src="/logo192.png"
+                                  alt="site logo"
+                                />
                               </div>
-                            </Link>
-                          </span>
-                        </div>
+                              <h3>{room?.name}</h3>
+                            </div>
+                          </Link>
+                        </span>
+                      </div>
+                      {!aiRoom && (
                         <div className="flex">
                           {!!roomTimer?.startTime && (
                             <>
@@ -735,8 +717,31 @@ export const Room: FunctionComponent = () => {
                             <Icon size="s" name={IconNames.Search} />
                           </Button>
                         </div>
-                      </div>
-                    )}
+                      )}
+                      {aiRoom && (
+                        <div className="flex">
+                          <div className="flex items-center bg-wrap px-1 h-2.5 rounded-6.25">
+                            <Typography size="m" error>
+                              <div className="flex">
+                                <Icon
+                                  inheritFontSize
+                                  name={IconNames.RadioButtonOn}
+                                />
+                              </div>
+                            </Typography>
+                            <Gap sizeRem={0.25} horizontal />
+                            <Typography size="m">
+                              {
+                                localizationCaptions[
+                                  LocalizationKey.MeetingBeingRecorded
+                                ]
+                              }
+                            </Typography>
+                          </div>
+                          <Gap sizeRem={10.375} horizontal />
+                        </div>
+                      )}
+                    </div>
                     <div className="room-page-main-content">
                       <div className="room-columns">
                         {errorRoomState && (
@@ -761,10 +766,6 @@ export const Room: FunctionComponent = () => {
                         {aiRoom ? (
                           <VideoChatAi
                             messagesChatEnabled={messagesChatEnabled}
-                            recognitionNotSupported={recognitionNotSupported}
-                            currentUserExpert={currentUserExpert}
-                            loadingRoomStartReview={loadingCompleteAi}
-                            errorRoomStartReview={errorCompleteAi}
                             // ScreenShare
                             // screenStream={screenStream}
                             roomQuestionsLoading={roomQuestionsLoading}
@@ -772,10 +773,6 @@ export const Room: FunctionComponent = () => {
                               roomQuestions?.sort(sortRoomQuestion) || []
                             }
                             initialQuestion={currentQuestion}
-                            handleInvitationsOpen={handleInvitationsOpen}
-                            handleStartReviewRoom={handleStartReviewRoomAi}
-                            handleSettingsOpen={handleSettingsOpen}
-                            handleLeaveRoom={handleLeaveRoom}
                           />
                         ) : (
                           <VideoChat
