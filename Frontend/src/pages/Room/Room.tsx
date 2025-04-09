@@ -714,7 +714,7 @@ export const Room: FunctionComponent = () => {
                             variant="invertedAlternative"
                             className="min-w-unset w-2.5 h-2.5 p-0"
                           >
-                            <Icon size="s" name={IconNames.Search} />
+                            <Icon size="s" name={IconNames.Grid} />
                           </Button>
                         </div>
                       )}
