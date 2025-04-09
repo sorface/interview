@@ -1,13 +1,13 @@
-import React, { Fragment, FunctionComponent, useContext } from 'react';
+import React, { FunctionComponent, useContext } from 'react';
 import { LocalizationContext } from '../../context/LocalizationContext';
 import { CalendarDay } from './CalendarDay';
 import { Typography } from '../Typography/Typography';
-import { Gap } from '../Gap/Gap';
 import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';
 import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme } from '../../context/ThemeContext';
 import { chunkArray } from '../../utils/chunkArray';
+import { getMonthName } from '../../utils/getMonthName';
 
 interface CalendarProps {
   loading: boolean;
@@ -19,10 +19,6 @@ interface CalendarProps {
   onMonthForwardClick: () => void;
   onDayClick: (day: Date) => void;
 }
-
-const getMonthName = (monthStartDate: Date, locale: string) => {
-  return monthStartDate.toLocaleDateString(locale, { month: 'long' });
-};
 
 const getDaysInMonth = (monthStartDate: Date) => {
   return new Date(
@@ -61,7 +57,8 @@ const pushNextMonth = (days: Date[]) => {
     return days;
   }
   const result = [...days];
-  const nextMonthStartDate = new Date(days[0]);
+  const nextMonthStartDate = new Date(days[days.length - 1]);
+  nextMonthStartDate.setDate(1);
   nextMonthStartDate.setMonth(nextMonthStartDate.getMonth() + 1);
   for (let i = 0; i < pushCount; i++) {
     const dateToPush = new Date(nextMonthStartDate);
@@ -113,8 +110,8 @@ export const Calendar: FunctionComponent<CalendarProps> = ({
   );
 
   return (
-    <div className="w-fit h-fit p-0.25 select-none bg-wrap rounded-1.125">
-      <div className="capitalize flex justify-between px-0.5 py-0.375 h-2 items-center">
+    <div className="w-fit h-fit select-none bg-wrap rounded-1.125">
+      <div className="capitalize flex justify-between px-0.875 py-0.25 h-2 items-center">
         <div className="cursor-pointer opacity-0.5" onClick={onMonthBackClick}>
           <Icon name={IconNames.ChevronBack} size="s" />
         </div>
@@ -131,32 +128,29 @@ export const Calendar: FunctionComponent<CalendarProps> = ({
       <div
         className={`flex items-center h-1.375 border-b-1 border-b-solid ${daysThemedClassName}`}
       >
-        {days.map((day, dayIndex) => (
-          <Fragment key={day}>
-            <div className="capitalize w-1.875">
-              <Typography size="xs">{day}</Typography>
-            </div>
-            {dayIndex !== days.length - 1 && <Gap sizeRem={0.625} horizontal />}
-          </Fragment>
+        {days.map((day) => (
+          <div key={day} className="capitalize w-2.5">
+            <Typography size="xs">{day}</Typography>
+          </div>
         ))}
       </div>
-      <Gap sizeRem={0.25} />
       {daysChunks.map((daysChunk, index) => (
-        <Fragment key={`daysChunk${index}`}>
-          <div className={`flex ${loading ? 'opacity-0.5' : ''}`}>
-            {daysChunk.map((day, dayIndex) => (
-              <CalendarDay
-                key={day ? day.valueOf() : `null-day${dayIndex}`}
-                day={day}
-                currentDate={currentDate}
-                selectedDay={selectedDay}
-                filledItemsStartDates={filledItemsStartDates}
-                onClick={() => day && onDayClick(day)}
-              />
-            ))}
-          </div>
-          {index !== daysChunks.length - 1 && <Gap sizeRem={0.625} />}
-        </Fragment>
+        <div
+          key={`daysChunk${index}`}
+          className={`flex ${loading ? 'opacity-0.5' : ''}`}
+        >
+          {daysChunk.map((day, dayIndex) => (
+            <CalendarDay
+              key={day ? day.valueOf() : `null-day${dayIndex}`}
+              day={day}
+              monthStartDate={monthStartDate}
+              currentDate={currentDate}
+              selectedDay={selectedDay}
+              filledItemsStartDates={filledItemsStartDates}
+              onClick={() => day && onDayClick(day)}
+            />
+          ))}
+        </div>
       ))}
     </div>
   );

@@ -1,12 +1,15 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useContext } from 'react';
 import { Typography } from '../Typography/Typography';
 import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme } from '../../context/ThemeContext';
 import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';
+import { LocalizationContext } from '../../context/LocalizationContext';
+import { getMonthName } from '../../utils/getMonthName';
 
 interface CalendarDayProps {
   day: Date | null;
+  monthStartDate: Date;
   currentDate: Date;
   selectedDay: Date | null;
   filledItemsStartDates: Array<number | undefined>;
@@ -15,19 +18,21 @@ interface CalendarDayProps {
 
 export const CalendarDay: FunctionComponent<CalendarDayProps> = ({
   day,
+  monthStartDate,
   currentDate,
   selectedDay,
   filledItemsStartDates,
   onClick,
 }) => {
-  const notCurrentMonth = day?.getMonth() !== currentDate.getMonth();
+  const { lang } = useContext(LocalizationContext);
+  const notCurrentMonth = day?.getMonth() !== monthStartDate.getMonth();
   const filledThemedClassName = useThemeClassName({
     [Theme.Dark]: 'bg-dark-dark-button',
     [Theme.Light]: 'bg-blue-light',
   });
   const notCurrentMonthThemedClassName = useThemeClassName({
-    [Theme.Dark]: 'bg-dark-grey4',
-    [Theme.Light]: 'bg-grey-active',
+    [Theme.Dark]: 'text-grey3 bg-dark-dark-button',
+    [Theme.Light]: 'text-grey3 bg-grey-active',
   });
   const currentDayThemedClassName = useThemeClassName({
     [Theme.Dark]: 'bg-blue-dark text-white',
@@ -41,8 +46,8 @@ export const CalendarDay: FunctionComponent<CalendarDayProps> = ({
   const filledClassName = filledItemsStartDates.includes(day?.valueOf())
     ? filledThemedClassName
     : '';
-  const currentDayClassName =
-    day?.valueOf() === currentDate.valueOf() ? currentDayThemedClassName : '';
+  const currentDay = day?.valueOf() === currentDate.valueOf();
+  const currentDayClassName = currentDay ? currentDayThemedClassName : '';
   const selectedDayClassName = selected
     ? 'border border-solid border-button-border'
     : '';
@@ -53,17 +58,28 @@ export const CalendarDay: FunctionComponent<CalendarDayProps> = ({
   return (
     <>
       <div
-        className={`flex items-center justify-center w-2.5 h-2.5 ${notCurrentMonth ? '' : 'rounded-full'} cursor-pointer box-border ${currentDayClassName || filledClassName || notCurrentMonthClassName} ${selectedDayClassName}`}
+        className={`relative flex items-center justify-center w-2.5 h-2.5 p-0.3125 ${notCurrentMonth ? '' : 'rounded-full'} cursor-pointer box-border ${notCurrentMonthClassName}`}
         onClick={onClick}
       >
-        <Typography size="m">{day?.getDate() || ''}</Typography>
-        {selected && (
-          <div
-            className={`${closeThemedClassName} absolute translate-x-0.75-y--0.75 w-1 h-1 flex items-center justify-center rounded-full`}
-          >
-            <Icon name={IconNames.Close} inheritFontSize size="s" />
+        {day?.getDate() === 1 && !currentDay && !selected && (
+          <div className="absolute leading-0" style={{ top: 0 }}>
+            <Typography size="xs" secondary>
+              {getMonthName(day, lang)}
+            </Typography>
           </div>
         )}
+        <div
+          className={`w-full h-full flex items-center justify-center rounded-full ${currentDayClassName || filledClassName || notCurrentMonthClassName} ${selectedDayClassName}`}
+        >
+          <Typography size="m">{day?.getDate() || ''}</Typography>
+          {selected && (
+            <div
+              className={`${closeThemedClassName} absolute translate-x-0.75-y--0.75 w-1 h-1 flex items-center justify-center rounded-full`}
+            >
+              <Icon name={IconNames.Close} inheritFontSize size="s" />
+            </div>
+          )}
+        </div>
       </div>
     </>
   );

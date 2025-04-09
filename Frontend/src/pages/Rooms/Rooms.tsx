@@ -548,7 +548,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
           {mode === RoomsPageMode.Home && (
             <div className="flex overflow-auto">
               <Gap sizeRem={1} horizontal />
-              <div className="flex flex-col overflow-auto w-17.375">
+              <div className="flex flex-col overflow-auto">
                 {!!errorRoomsCalendar && (
                   <Typography size="m" error>
                     <div className="text-left flex items-center">
