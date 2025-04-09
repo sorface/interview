@@ -3,8 +3,8 @@ import { deepEqual } from './deepEqual';
 
 const expectCode = `
   const __expectCalls = [];
-  const expect = (result, expected) => {
-    __expectCalls.push([result, expected]);
+  const expect = (fn, args, expected) => {
+    __expectCalls.push([args, fn(...args), expected]);
   };
 `;
 
@@ -21,7 +21,7 @@ export interface ExecuteCodeResult {
 
 export type ExpectResults = Array<{
   id: number;
-  arguments: [Arg, Arg];
+  arguments: [Arg, Arg, Arg];
   passed: boolean;
 }>;
 
@@ -36,11 +36,11 @@ export const executeCodeWithExpect = (
     const executeResult = executeCodeWithExpect();
 
     return {
-      results: executeResult.map(([result, expect]) => {
+      results: executeResult.map(([args, result, expect]) => {
         const passed = deepEqual(result, expect);
         return {
           id: Math.random(),
-          arguments: [result, expect],
+          arguments: [args, result, expect],
           passed,
         };
       }),
