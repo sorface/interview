@@ -20,6 +20,7 @@ export const PageHeaderNotifications: FunctionComponent = () => {
     <div className="flex items-stretch justify-end h-2.5">
       <ContextMenu
         translateRem={{ x: -15, y: 0.25 }}
+        variant="alternative"
         toggleContent={
           <div className="cursor-pointer">
             <Button
