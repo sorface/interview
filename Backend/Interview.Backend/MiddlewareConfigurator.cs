@@ -36,8 +36,6 @@ public class MiddlewareConfigurator(WebApplication app)
         // }
         app.UseCors("All");
 
-        // app.UseRateLimiter();
-
         var logger = app.Services.GetRequiredService<ILogger<MiddlewareConfigurator>>();
 
         app.Use((context, func) =>
