@@ -30,6 +30,7 @@ export const PageHeaderSearch: FunctionComponent<PageHeaderSearchProps> = ({
     <div className="flex items-stretch justify-end h-2.5">
       <input
         type="text"
+        className="muted"
         placeholder={localizationCaptions[LocalizationKey.SearchByName]}
         value={searchValue}
         style={{

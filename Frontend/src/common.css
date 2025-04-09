@@ -142,6 +142,9 @@
 .bg-blue-light {
   background-color: var(--blue-light);
 }
+.hover\:bg-blue-light:hover {
+  background-color: var(--blue-light);
+}
 .\!bg-blue-light {
   background-color: var(--blue-light) !important;
 }
@@ -283,11 +286,20 @@
 .border {
   border-width: 1px;
 }
+.hover\:border:hover {
+  border-width: 1px;
+}
 .border-solid {
+  border-style: solid;
+}
+.hover\:border-solid:hover {
   border-style: solid;
 }
 .border-button {
   border-color: var(--button-border-color);
+}
+.border-blue-main {
+  border-color: var(--blue-main);
 }
 .rounded-full {
   border-radius: 9999px;
@@ -595,6 +607,9 @@
 }
 .w-12\.5 {
   width: 12.5rem;
+}
+.w-13\.3125 {
+  width: 13.3125rem;
 }
 .w-13\.75 {
   width: 13.75rem;

@@ -1,6 +1,6 @@
-.videochat {
-  --videochat-video-width: 300px;
-  --videochat-video-height: 230px;
+.room-columns {
+  --videochat-video-width: 230px;
+  --videochat-video-height: 173px;
 }
 
 .room-columns .videochat-field {
@@ -92,26 +92,29 @@
 }
 
 .videochat-caption {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 0.25rem;
+  padding: 0.5rem;
+  border-radius: 1rem;
 }
 
 .videochat-switch-buttons button:last-child {
   margin-right: 0rem;
 }
 
-.videochat-overlay {
+.videochat-participant-name-wrapper {
   position: absolute;
-  background-color: color-mix(in srgb, var(--form-bg), transparent 15%);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  bottom: 0.25rem;
   z-index: 1;
 }
 
 .videochat-participant-name {
   display: flex;
   align-items: center;
-  bottom: 1rem;
-  right: 0.5rem;
+  background: rgba(39, 39, 39, 0.3);
+  backdrop-filter: blur(2px);
+  color: white;
 }
 
 .videochat-participant-reactions {

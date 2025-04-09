@@ -28,7 +28,12 @@ import {
 } from '../../apiDeclarations';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { VITE_WS_URL } from '../../config';
-import { EventName, inviteParamName, pathnames } from '../../constants';
+import {
+  EventName,
+  IconNames,
+  inviteParamName,
+  pathnames,
+} from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import {
@@ -70,6 +75,7 @@ import { useUserStreams } from './hooks/useUserStreams';
 import { useRoomSounds } from './hooks/useRoomSounds';
 import { AiAssistantScriptName } from './components/AiAssistant/AiAssistant';
 import { mapInvitesForAiRoom } from '../../utils/mapInvitesForAiRoom';
+import { Icon } from './components/Icon/Icon';
 
 import './Room.css';
 
@@ -721,6 +727,13 @@ export const Room: FunctionComponent = () => {
                             nonActiveVariant="invertedAlternative"
                             onClick={handleSwitchMessagesChat}
                           />
+                          <Gap sizeRem={0.875} horizontal />
+                          <Button
+                            variant="invertedAlternative"
+                            className="min-w-unset w-2.5 h-2.5 p-0"
+                          >
+                            <Icon size="s" name={IconNames.Search} />
+                          </Button>
                         </div>
                       </div>
                     )}

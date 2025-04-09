@@ -40,7 +40,7 @@ export const LangSwitch = ({
           <LocalizationCaption captionKey={LocalizationKey.Language} />:
         </Typography>
       </div>
-      <select className="w-full" value={lang} onChange={handleLangChange}>
+      <select className="w-full muted" value={lang} onChange={handleLangChange}>
         {Object.entries(LocalizationLang)?.map(([, langValue]) => (
           <option key={langValue} value={langValue}>
             {langLocalization[langValue]}

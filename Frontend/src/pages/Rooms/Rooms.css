@@ -1,6 +1,6 @@
 .rooms-page .grid-view .items-grid {
   display: grid;
-  gap: 1rem;
+  gap: 0.5rem;
   grid-template-columns: repeat(auto-fill, minmax(17.125rem, 1fr));
 }
 

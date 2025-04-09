@@ -45,6 +45,8 @@ import {
   SwitcherButtonContent,
 } from '../../components/SwitcherButton/SwitcherButton';
 import { RoomsView, useSavedRoomsView } from '../../hooks/useSavedRoomsView';
+import { useThemeClassName } from '../../hooks/useThemeClassName';
+import { Theme } from '../../context/ThemeContext';
 
 import './Rooms.css';
 
@@ -154,6 +156,11 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
     : [];
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const triggerResetAccumData = `${roomsUpdateTrigger}${searchValue}${mode}${selectedDay}`;
+  const roomItemThemedClassName = useThemeClassName({
+    [Theme.Dark]: 'hover:bg-dark-history-hover',
+    [Theme.Light]:
+      'hover:bg-blue-light hover:border hover:border-solid border-blue-main',
+  });
 
   const getPageTitle = () => {
     switch (mode) {
@@ -298,7 +305,10 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
 
     if (view === RoomsView.List) {
       return (
-        <div key={room.id} className="room-item-wrapper">
+        <div
+          key={room.id}
+          className={`room-item-wrapper ${roomItemThemedClassName}`}
+        >
           <li>
             <Link to={roomLink}>
               <div className="room-item">
@@ -312,7 +322,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
                     mini
                   />
                 )}
-                <div className="room-status-wrapper">
+                <div className="room-status-wrapper w-fit">
                   <Tag state={tagStates[room.status]}>
                     {roomStatusCaption[room.status]}
                   </Tag>
@@ -350,7 +360,10 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
     }
 
     return (
-      <div key={room.id} className="room-item-wrapper">
+      <div
+        key={room.id}
+        className={`room-item-wrapper ${roomItemThemedClassName}`}
+      >
         <li>
           <Link to={roomLink}>
             <div className="room-item">

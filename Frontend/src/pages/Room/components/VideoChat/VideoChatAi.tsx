@@ -387,7 +387,6 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                     ? viewerOrder
                     : videoOrder[peer.targetUserId]
                 }
-                avatar={peer?.avatar}
                 nickname={peer?.nickname}
                 reaction={activeReactions[peer.peerID]}
               >
