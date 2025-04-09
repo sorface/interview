@@ -45,9 +45,10 @@ export const RoomAnayticsDetails: FunctionComponent<
           },
         ]}
         activeIndex={activeTab}
-        {...(themeInUi === Theme.Dark && {
-          variant: 'alternative',
-        })}
+        activeVariant="invertedActive"
+        nonActiveVariant={
+          themeInUi === Theme.Dark ? 'invertedAlternative' : 'inverted'
+        }
         onClick={setActiveTab}
       />
       <Gap sizeRem={2.25} />

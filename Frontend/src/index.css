@@ -237,6 +237,10 @@ input[type='color'] {
   background-color: var(--form-bg);
 }
 
+:root[data-theme='Dark'] input.muted {
+  background-color: var(--page-bg);
+}
+
 h2 {
   margin: 0px;
   font-size: 1.25rem;
@@ -265,6 +269,10 @@ select {
   padding: 0.5rem 1.25rem;
   cursor: pointer;
   margin: 0;
+}
+
+:root[data-theme='Dark'] select.muted {
+  background-color: var(--page-bg);
 }
 
 progress {

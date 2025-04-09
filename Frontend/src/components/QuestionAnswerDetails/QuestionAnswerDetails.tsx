@@ -99,9 +99,10 @@ export const QuestionAnswerDetails: FunctionComponent<
                   },
                 ]}
                 activeIndex={codeQuestionTab}
-                {...(themeInUi === Theme.Dark && {
-                  variant: 'alternative',
-                })}
+                activeVariant="invertedActive"
+                nonActiveVariant={
+                  themeInUi === Theme.Dark ? 'invertedAlternative' : 'inverted'
+                }
                 onClick={setCodeQuestionTab}
               />
             </>

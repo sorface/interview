@@ -33,6 +33,14 @@
   flex-direction: column;
 }
 
+.room-page .room-page-header .switcher-button {
+  width: 11rem;
+}
+
+.room-page .room-page-header .switcher-button button {
+  min-width: unset;
+}
+
 .room-page .room-page-main {
   flex: 1;
   display: flex;

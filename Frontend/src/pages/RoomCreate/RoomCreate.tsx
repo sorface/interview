@@ -694,6 +694,8 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
                 },
               ]}
               activeIndex={creationStep}
+              activeVariant="invertedActive"
+              nonActiveVariant="inverted"
             />
             <Gap sizeRem={2.25} />
           </>

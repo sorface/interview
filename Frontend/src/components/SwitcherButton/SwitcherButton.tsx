@@ -1,5 +1,5 @@
-import React, { FunctionComponent, ReactNode } from 'react';
-import { Button } from '../Button/Button';
+import React, { Fragment, FunctionComponent, ReactNode } from 'react';
+import { Button, ButtonProps } from '../Button/Button';
 
 import './SwitcherButton.css';
 
@@ -13,7 +13,9 @@ export interface SwitcherButtonContent {
 interface SwitcherButtonProps {
   items: [SwitcherButtonContent, SwitcherButtonContent];
   activeIndex: ActiveIndex;
-  variant?: 'alternative';
+  activeVariant: ButtonProps['variant'];
+  nonActiveVariant: ButtonProps['variant'];
+  mini?: boolean;
   disabled?: boolean;
   onClick?: (index: ActiveIndex) => void;
 }
@@ -21,25 +23,29 @@ interface SwitcherButtonProps {
 export const SwitcherButton: FunctionComponent<SwitcherButtonProps> = ({
   items,
   activeIndex,
-  variant,
+  activeVariant,
+  nonActiveVariant,
+  mini,
   disabled,
   onClick,
 }) => {
-  const nonActiveVariant =
-    variant === 'alternative' ? 'invertedAlternative' : 'inverted';
   const disabledClassName = disabled ? 'cursor-not-allowed' : '';
   return (
-    <div className={`switcher-button flex ${disabledClassName}`}>
+    <div
+      className={`switcher-button ${mini ? 'mini' : 'max'} flex ${disabledClassName}`}
+    >
       {items.map((item, index) => (
-        <Button
-          key={item.id}
-          variant={index === activeIndex ? 'invertedActive' : nonActiveVariant}
-          onClick={() => {
-            onClick?.(index as ActiveIndex);
-          }}
-        >
-          {item.content}
-        </Button>
+        <Fragment key={item.id}>
+          <Button
+            className={`${mini ? 'min-w-unset' : ''}`}
+            variant={index === activeIndex ? activeVariant : nonActiveVariant}
+            onClick={() => {
+              onClick?.(index as ActiveIndex);
+            }}
+          >
+            {item.content}
+          </Button>
+        </Fragment>
       ))}
     </div>
   );

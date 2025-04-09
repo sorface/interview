@@ -40,6 +40,13 @@ import { Loader } from '../../components/Loader/Loader';
 import { Typography } from '../../components/Typography/Typography';
 import { ContextMenu } from '../../components/ContextMenu/ContextMenu';
 import { useThemedAiAvatar } from '../../hooks/useThemedAiAvatar';
+import {
+  SwitcherButton,
+  SwitcherButtonContent,
+} from '../../components/SwitcherButton/SwitcherButton';
+import { RoomsView, useSavedRoomsView } from '../../hooks/useSavedRoomsView';
+import { useThemeClassName } from '../../hooks/useThemeClassName';
+import { Theme } from '../../context/ThemeContext';
 
 import './Rooms.css';
 
@@ -101,6 +108,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
   const themedAiAvatar = useThemedAiAvatar();
+  const { view, setView } = useSavedRoomsView();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const { apiMethodState, fetchData } = useApiMethod<
     RoomWtithType[],
@@ -148,6 +156,11 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
     : [];
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const triggerResetAccumData = `${roomsUpdateTrigger}${searchValue}${mode}${selectedDay}`;
+  const roomItemThemedClassName = useThemeClassName({
+    [Theme.Dark]: 'hover:bg-dark-history-hover',
+    [Theme.Light]:
+      'hover:bg-blue-light hover:border hover:border-solid border-blue-main',
+  });
 
   const getPageTitle = () => {
     switch (mode) {
@@ -291,8 +304,67 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
     const canEditInStatus = room.status === 'New' || room.status === 'Active';
     const aiRoom = room.type === 'AI';
 
+    if (view === RoomsView.List) {
+      return (
+        <div
+          key={room.id}
+          className={`room-item-wrapper ${roomItemThemedClassName}`}
+        >
+          <li>
+            <Link to={roomLink}>
+              <div className="room-item">
+                <div className="room-name">{room.name}</div>
+                {room.scheduledStartTime && (
+                  <RoomDateAndTime
+                    typographySize="s"
+                    scheduledStartTime={room.scheduledStartTime}
+                    timer={room.timer}
+                    col
+                    mini
+                  />
+                )}
+                <div className="room-status-wrapper w-fit">
+                  <Tag state={tagStates[room.status]}>
+                    {roomStatusCaption[room.status]}
+                  </Tag>
+                </div>
+                <RoomParticipants
+                  participants={[
+                    ...room.participants,
+                    ...(room.type === 'AI'
+                      ? [
+                          {
+                            ...aiParticipant,
+                            avatar: themedAiAvatar,
+                          },
+                        ]
+                      : []),
+                  ]}
+                />
+                <div className="room-action-links">
+                  {!aiRoom && expertInRoom && canEditInStatus && (
+                    <>
+                      <div
+                        className="room-edit-participants-link rotate-90"
+                        onClick={handleOpenEditModal(room.id)}
+                      >
+                        <Icon size="s" secondary name={IconNames.Options} />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </Link>
+          </li>
+        </div>
+      );
+    }
+
     return (
-      <div key={room.id} className="room-item-wrapper">
+      <div
+        key={room.id}
+        className={`room-item-wrapper ${roomItemThemedClassName}`}
+      >
         <li>
           <Link to={roomLink}>
             <div className="room-item">
@@ -353,11 +425,43 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
     </Button>
   );
 
+  const headerActionSwitcherItems: [
+    SwitcherButtonContent,
+    SwitcherButtonContent,
+  ] = [
+    {
+      id: RoomsView.Grid,
+      content: <Icon name={IconNames.Grid} />,
+    },
+    {
+      id: RoomsView.List,
+      content: <Icon name={IconNames.Menu} />,
+    },
+  ];
+
+  const headerActionItems = (
+    <div className="flex">
+      <SwitcherButton
+        items={headerActionSwitcherItems}
+        activeIndex={view === RoomsView.Grid ? 0 : 1}
+        activeVariant="active2"
+        nonActiveVariant="invertedAlternative"
+        mini
+        onClick={(activeIndex) =>
+          setView(activeIndex === 0 ? RoomsView.Grid : RoomsView.List)
+        }
+      />
+      <Gap sizeRem={2} horizontal />
+    </div>
+  );
+
   return (
     <>
       <PageHeader
         title={getPageTitle()}
+        notifications
         searchValue={searchValueInput}
+        actionItem={headerActionItems}
         onSearchChange={setSearchValueInput}
       >
         <ContextMenu
@@ -388,7 +492,9 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
           />
         )}
         <div className="flex overflow-auto h-full">
-          <div className="flex-1 overflow-auto h-full">
+          <div
+            className={`flex-1 overflow-auto h-full ${view === RoomsView.Grid ? 'grid-view' : 'list-view'}`}
+          >
             <ItemsGrid
               currentData={rooms}
               loading={loading}
@@ -443,7 +549,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
           {mode === RoomsPageMode.Home && (
             <div className="flex overflow-auto">
               <Gap sizeRem={1} horizontal />
-              <div className="flex flex-col overflow-auto w-17.375">
+              <div className="flex flex-col overflow-auto">
                 {!!errorRoomsCalendar && (
                   <Typography size="m" error>
                     <div className="text-left flex items-center">

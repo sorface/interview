@@ -4,36 +4,46 @@ import { IconNames } from '../../constants';
 import { Dropdown, DropdownProps } from '../Dropdown/Dropdown';
 import { Typography } from '../Typography/Typography';
 import { ButtonProps } from '../Button/Button';
+import { useThemeClassName } from '../../hooks/useThemeClassName';
+import { Theme } from '../../context/ThemeContext';
 
 export interface ContextMenuProps {
   translateRem: { x: number; y: number };
   toggleContent?: DropdownProps['toggleContent'];
+  contentClassName?: string;
   useButton?: DropdownProps['useButton'];
   buttonVariant?: ButtonProps['variant'];
+  variant?: 'alternative';
   children: ReactNode;
 }
 
 const ContextMenuComponent: FunctionComponent<ContextMenuProps> = ({
   translateRem,
   toggleContent,
+  contentClassName,
   useButton,
   buttonVariant,
+  variant,
   children,
 }) => {
   const defaultToggleContent = <Icon name={IconNames.EllipsisVertical} />;
+  const contentThemedClassName = useThemeClassName({
+    [Theme.Dark]: variant === 'alternative' ? 'bg-modal-bg' : 'bg-wrap',
+    [Theme.Light]: 'bg-wrap',
+  });
 
   return (
     <Dropdown
       toggleContent={toggleContent || defaultToggleContent}
       useButton={useButton}
       buttonVariant={buttonVariant}
-      contentClassName="w-13.75 rounded-0.75"
+      contentClassName={contentClassName ?? 'w-13.75 rounded-0.75'}
       toggleClassName="flex"
       contentStyle={{
         transform: `translate(${translateRem.x}rem, ${translateRem.y}rem)`,
       }}
     >
-      <div className="bg-wrap py-0.5">{children}</div>
+      <div className={`${contentThemedClassName} py-0.5`}>{children}</div>
     </Dropdown>
   );
 };

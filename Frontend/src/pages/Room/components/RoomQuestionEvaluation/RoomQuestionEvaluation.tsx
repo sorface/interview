@@ -113,7 +113,7 @@ export const RoomQuestionEvaluation: FunctionComponent<
       <div className="flex">
         {markGroups.map((markGroup, markGroupIndex) => (
           <Fragment key={`markGroup${markGroupIndex}`}>
-            <div>
+            <div className="text-center">
               <div
                 className={`rounded-l-2 rounded-r-2 overflow-hidden whitespace-nowrap ${themeClassName['nonActive']}`}
               >

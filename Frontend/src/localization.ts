@@ -280,6 +280,9 @@ export const enum LocalizationKey {
   ExecutionResultsSubmit,
   Completed,
   MeetingBeingRecorded,
+  NewNotifications,
+  NoNewNotifications,
+  Clear,
 }
 
 export const LocalizationCaptions: Record<
@@ -603,6 +606,9 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.ExecutionResultsSubmit]: 'Rate the answer',
     [LocalizationKey.Completed]: 'Completed',
     [LocalizationKey.MeetingBeingRecorded]: 'Meeting is being recorded',
+    [LocalizationKey.NewNotifications]: 'New notifications',
+    [LocalizationKey.NoNewNotifications]: 'No new notifications',
+    [LocalizationKey.Clear]: 'Clear',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -924,5 +930,8 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.ExecutionResultsSubmit]: 'Оценить ответ',
     [LocalizationKey.Completed]: 'Пройдено',
     [LocalizationKey.MeetingBeingRecorded]: 'Идет запись встречи',
+    [LocalizationKey.NewNotifications]: 'Новые уведомления',
+    [LocalizationKey.NoNewNotifications]: 'Новых уведомлений нет',
+    [LocalizationKey.Clear]: 'Очистить',
   },
 };

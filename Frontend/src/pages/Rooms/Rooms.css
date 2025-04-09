@@ -1,7 +1,16 @@
-.rooms-page .items-grid {
+.rooms-page .grid-view .items-grid {
   display: grid;
-  gap: 1rem;
+  gap: 0.5rem;
   grid-template-columns: repeat(auto-fill, minmax(17.125rem, 1fr));
+}
+
+.rooms-page .list-view .items-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.rooms-page .list-view .items-grid .room-item-wrapper {
+  margin-bottom: 0.25rem;
 }
 
 .rooms-page .room-item-wrapper {
@@ -20,14 +29,23 @@
   text-decoration: none;
 }
 
-.rooms-page .items-grid .room-item {
+.rooms-page .grid-view .items-grid .room-item {
   display: flex;
   flex-direction: column;
   padding: 1rem;
   font-size: 0.875rem;
 }
 
-.room-item .room-status-wrapper {
+.rooms-page .list-view .items-grid .room-item {
+  display: grid;
+  align-items: center;
+  gap: 4.5rem;
+  grid-template-columns: 1fr 5.375rem 7.125rem 7.125rem 1rem;
+  padding: 1rem;
+  font-size: 0.875rem;
+}
+
+.grid-view .room-item .room-status-wrapper {
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;

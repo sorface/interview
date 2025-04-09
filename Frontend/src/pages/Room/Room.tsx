@@ -705,9 +705,17 @@ export const Room: FunctionComponent = () => {
                               },
                             ]}
                             activeIndex={messagesChatEnabled ? 0 : 1}
-                            variant="alternative"
+                            activeVariant="invertedActive"
+                            nonActiveVariant="invertedAlternative"
                             onClick={handleSwitchMessagesChat}
                           />
+                          <Gap sizeRem={0.875} horizontal />
+                          <Button
+                            variant="invertedAlternative"
+                            className="min-w-unset w-2.5 h-2.5 p-0"
+                          >
+                            <Icon size="s" name={IconNames.Search} />
+                          </Button>
                         </div>
                       )}
                       {aiRoom && (
