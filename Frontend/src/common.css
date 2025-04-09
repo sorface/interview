@@ -223,6 +223,9 @@
 .bg-dark-dark2 {
   background-color: var(--dark-dark2);
 }
+.bg-dark-dark-button {
+  background-color: var(--dark-dark-button);
+}
 .bg-modal-bg {
   background-color: var(--modal-bg);
 }

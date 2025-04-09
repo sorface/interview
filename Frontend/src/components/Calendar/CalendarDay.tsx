@@ -20,9 +20,14 @@ export const CalendarDay: FunctionComponent<CalendarDayProps> = ({
   filledItemsStartDates,
   onClick,
 }) => {
+  const notCurrentMonth = day?.getMonth() !== currentDate.getMonth();
   const filledThemedClassName = useThemeClassName({
-    [Theme.Dark]: 'bg-dark-grey4',
+    [Theme.Dark]: 'bg-dark-dark-button',
     [Theme.Light]: 'bg-blue-light',
+  });
+  const notCurrentMonthThemedClassName = useThemeClassName({
+    [Theme.Dark]: 'bg-dark-grey4',
+    [Theme.Light]: 'bg-grey-active',
   });
   const currentDayThemedClassName = useThemeClassName({
     [Theme.Dark]: 'bg-blue-dark text-white',
@@ -41,11 +46,14 @@ export const CalendarDay: FunctionComponent<CalendarDayProps> = ({
   const selectedDayClassName = selected
     ? 'border border-solid border-button-border'
     : '';
+  const notCurrentMonthClassName = notCurrentMonth
+    ? notCurrentMonthThemedClassName
+    : '';
 
   return (
     <>
       <div
-        className={`flex items-center justify-center w-1.875 h-1.875 rounded-full cursor-pointer box-border ${currentDayClassName || filledClassName} ${selectedDayClassName}`}
+        className={`flex items-center justify-center w-2.5 h-2.5 ${notCurrentMonth ? '' : 'rounded-full'} cursor-pointer box-border ${currentDayClassName || filledClassName || notCurrentMonthClassName} ${selectedDayClassName}`}
         onClick={onClick}
       >
         <Typography size="m">{day?.getDate() || ''}</Typography>

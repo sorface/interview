@@ -7,7 +7,6 @@ import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';
 import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme } from '../../context/ThemeContext';
-import { unshiftNull } from '../../utils/unshiftNull';
 import { chunkArray } from '../../utils/chunkArray';
 
 interface CalendarProps {
@@ -43,6 +42,35 @@ const getWeekDays = (locale: string) => {
   return weekDays;
 };
 
+const unshiftPrevMonth = (daysInMonth: Date[], startMonthShift: number) => {
+  const result = [...daysInMonth];
+  const prevMonthStartDate = new Date(daysInMonth[0]);
+  prevMonthStartDate.setMonth(prevMonthStartDate.getMonth() - 1);
+  const prevMonthDaysCount = getDaysInMonth(prevMonthStartDate);
+  for (let i = 0; i < startMonthShift; i++) {
+    const dateToUnshift = new Date(prevMonthStartDate);
+    dateToUnshift.setDate(prevMonthDaysCount - i);
+    result.unshift(dateToUnshift);
+  }
+  return result;
+};
+
+const pushNextMonth = (days: Date[]) => {
+  const pushCount = 7 - (days.length % 7);
+  if (pushCount === 7) {
+    return days;
+  }
+  const result = [...days];
+  const nextMonthStartDate = new Date(days[0]);
+  nextMonthStartDate.setMonth(nextMonthStartDate.getMonth() + 1);
+  for (let i = 0; i < pushCount; i++) {
+    const dateToPush = new Date(nextMonthStartDate);
+    dateToPush.setDate(i + 1);
+    result.push(dateToPush);
+  }
+  return result;
+};
+
 export const Calendar: FunctionComponent<CalendarProps> = ({
   loading,
   monthStartDate,
@@ -69,7 +97,9 @@ export const Calendar: FunctionComponent<CalendarProps> = ({
     date.setDate(index + 1);
     return date;
   });
-  const unshiftedDaysInMonth = unshiftNull(daysInMonth, startMonthShift);
+  const unshiftedDaysInMonth = pushNextMonth(
+    unshiftPrevMonth(daysInMonth, startMonthShift),
+  );
   const daysChunks = chunkArray(unshiftedDaysInMonth, 7);
   const filledItemsStartDates: Array<number | undefined> = filledItems.map(
     (filledItem) => {
@@ -115,18 +145,14 @@ export const Calendar: FunctionComponent<CalendarProps> = ({
         <Fragment key={`daysChunk${index}`}>
           <div className={`flex ${loading ? 'opacity-0.5' : ''}`}>
             {daysChunk.map((day, dayIndex) => (
-              <Fragment key={day ? day.valueOf() : `null-day${dayIndex}`}>
-                <CalendarDay
-                  day={day}
-                  currentDate={currentDate}
-                  selectedDay={selectedDay}
-                  filledItemsStartDates={filledItemsStartDates}
-                  onClick={() => day && onDayClick(day)}
-                />
-                {dayIndex !== daysChunk.length - 1 && (
-                  <Gap sizeRem={0.625} horizontal />
-                )}
-              </Fragment>
+              <CalendarDay
+                key={day ? day.valueOf() : `null-day${dayIndex}`}
+                day={day}
+                currentDate={currentDate}
+                selectedDay={selectedDay}
+                filledItemsStartDates={filledItemsStartDates}
+                onClick={() => day && onDayClick(day)}
+              />
             ))}
           </div>
           {index !== daysChunks.length - 1 && <Gap sizeRem={0.625} />}
