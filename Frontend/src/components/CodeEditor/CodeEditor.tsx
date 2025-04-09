@@ -225,6 +225,9 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
           expectResultsPassed &&
           !expectResult.error && (
             <ModalFooter>
+              <Button onClick={handleModalExpectClose}>
+                {localizationCaptions[LocalizationKey.Close]}
+              </Button>
               <Button variant="active" onClick={handleExecutionResultsSubmit}>
                 {localizationCaptions[LocalizationKey.ExecutionResultsSubmit]}
               </Button>
