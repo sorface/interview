@@ -17,7 +17,7 @@ export const ParticipantReactions: FunctionComponent<
     <div className="participant-reactions">
       {!!reaction && (
         <span key={reaction} className="participant-reaction">
-          <Icon name={reactionIcon[reaction] || defaultIconName} />
+          <Icon size="s" name={reactionIcon[reaction] || defaultIconName} />
         </span>
       )}
     </div>

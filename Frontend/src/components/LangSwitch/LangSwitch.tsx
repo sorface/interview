@@ -41,7 +41,7 @@ export const LangSwitch = ({
           <LocalizationCaption captionKey={LocalizationKey.Language} />:
         </Typography>
       </div>
-      <select className="w-full" value={lang} onChange={handleLangChange}>
+      <select className="w-full muted" value={lang} onChange={handleLangChange}>
         {Object.entries(LocalizationLang)?.map(([, langValue]) => (
           <option key={langValue} value={langValue}>
             {langLocalization[langValue]}
@@ -67,7 +67,8 @@ export const LangSwitch = ({
       <SwitcherButton
         items={items}
         activeIndex={items.findIndex((i) => i.id === lang) as 0 | 1}
-        variant="alternative"
+        activeVariant="invertedActive"
+        nonActiveVariant="invertedAlternative"
         onClick={(activeIndex) =>
           setLang(items[activeIndex].id as LocalizationLang)
         }

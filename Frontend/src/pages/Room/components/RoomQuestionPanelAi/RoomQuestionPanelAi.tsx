@@ -526,7 +526,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
   }, [readOnly, room, initialQuestion, getRoomQuestionEvaluation]);
 
   useEffect(() => {
-    if (!roomQuestionEvaluation) {
+    if (!roomQuestionEvaluation || roomQuestionEvaluation.mark === null) {
       return;
     }
     const activeQuestion = roomQuestions?.find(

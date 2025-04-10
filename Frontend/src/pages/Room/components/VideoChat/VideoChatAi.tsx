@@ -32,8 +32,6 @@ import { ThemeSwitchMini } from '../../../../components/ThemeSwitchMini/ThemeSwi
 import { LangSwitch } from '../../../../components/LangSwitch/LangSwitch';
 import { QuestionsProgress } from './QuestionsProgress';
 
-import './VideoChatAi.css';
-
 const transcriptsMaxLength = 100;
 const viewerOrder = 666;
 
@@ -344,7 +342,6 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                     ? viewerOrder
                     : videoOrder[peer.targetUserId]
                 }
-                avatar={peer?.avatar}
                 nickname={peer?.nickname}
                 reaction={activeReactions[peer.peerID]}
               >

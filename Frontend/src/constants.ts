@@ -75,6 +75,9 @@ export const enum IconNames {
   LogIn = 'log-in-outline',
   Expand = 'expand-outline',
   Collapse = 'chevron-collapse-outline',
+  Grid = 'grid-outline',
+  Menu = 'menu-sharp',
+  Notifications = 'notifications-outline',
   Happy = 'happy-outline',
   RadioButtonOn = 'radio-button-on-outline',
 }
