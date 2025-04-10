@@ -9,10 +9,11 @@ import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames, pathnames } from '../../constants';
 import { Button } from '../Button/Button';
 import { useLogout } from '../../hooks/useLogout';
+import {VITE_GATEWAY_LOGOUT_URL, VITE_GATEWAY_POST_LOGOUT_URL} from "../../config";
 
 export const PageHeaderUserAvatar: FunctionComponent = () => {
-  const auth = useContext(AuthContext);
-  const { logout } = useLogout();
+    const auth = useContext(AuthContext);
+    const { logout } = useLogout();
 
   return (
     <>
@@ -50,9 +51,12 @@ export const PageHeaderUserAvatar: FunctionComponent = () => {
               </Link>
             </div>
             <div>
-              <Button variant="text" onClick={logout}>
-                <Icon name={IconNames.Exit} />
-              </Button>
+                <form method={'POST'}
+                      action={`${VITE_GATEWAY_LOGOUT_URL}?redirect-location=${VITE_GATEWAY_POST_LOGOUT_URL}`}>
+                    <Button variant="text">
+                        <Icon name={IconNames.Exit}/>
+                    </Button>
+                </form>
             </div>
           </div>
         </div>
