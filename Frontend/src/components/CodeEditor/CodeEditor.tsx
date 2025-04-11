@@ -81,9 +81,9 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   const [expectResult, setExpectResult] = useState<ExecuteCodeResult>({
     results: [],
   });
-  const expectResultsPassed = expectResult.results.every(
-    (expectResult) => expectResult.passed,
-  );
+  const expectResultsPassed =
+    expectResult.results.length > 0 &&
+    expectResult.results.every((expectResult) => expectResult.passed);
   const [modalExpectResults, setModalExpectResults] = useState(false);
   const codeEditorComponentRef = useRef<HTMLDivElement | null>(null);
 
