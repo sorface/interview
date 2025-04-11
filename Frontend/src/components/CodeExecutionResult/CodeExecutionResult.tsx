@@ -1,11 +1,15 @@
 import React, { FunctionComponent, useState } from 'react';
-import { ExecuteCodeResult } from '../../utils/executeCodeWithExpect';
+import {
+  ExecuteCodeResult,
+  ExpectResult,
+} from '../../utils/executeCodeWithExpect';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { Gap } from '../Gap/Gap';
 import { Button } from '../Button/Button';
 import { Tag, TagState } from '../Tag/Tag';
 import { CodeExecutionResultInfo } from './CodeExecutionResultInfo';
+import { Typography } from '../Typography/Typography';
 
 interface CodeExecutionResultProps {
   expectResult: ExecuteCodeResult;
@@ -16,10 +20,12 @@ export const CodeExecutionResult: FunctionComponent<
 > = ({ expectResult }) => {
   const localizationCaptions = useLocalizationCaptions();
   const [activeResultIndex, setActiveResultIndex] = useState(0);
-  const activeResult = expectResult.results[activeResultIndex];
+  const activeResult: ExpectResult | undefined =
+    expectResult.results[activeResultIndex];
   const expectResultsPassed = expectResult.results.every(
     (expectResult) => expectResult.passed,
   );
+  const noData = expectResult.results.length === 0;
   const statusLocalizationKey = expectResultsPassed
     ? LocalizationKey.ExpectsExecuteResultsPassed
     : LocalizationKey.ExpectsExecuteResultsNotPassed;
@@ -27,6 +33,26 @@ export const CodeExecutionResult: FunctionComponent<
   const handleActiveResultIndexChange = (newActiveResult: number) => () => {
     setActiveResultIndex(newActiveResult);
   };
+
+  if (expectResult.error) {
+    return (
+      <div>
+        <Typography size="l" error>
+          {expectResult.error}
+        </Typography>
+      </div>
+    );
+  }
+
+  if (noData) {
+    return (
+      <div>
+        <Typography size="l">
+          {localizationCaptions[LocalizationKey.NoData]}
+        </Typography>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -62,19 +88,19 @@ export const CodeExecutionResult: FunctionComponent<
       <Gap sizeRem={1.5} />
       <CodeExecutionResultInfo
         title={localizationCaptions[LocalizationKey.ExpectsExecuteInput]}
-        subtitle={JSON.stringify(activeResult.arguments[0])}
+        subtitle={JSON.stringify(activeResult?.arguments[0])}
       />
       <Gap sizeRem={0.25} />
       <CodeExecutionResultInfo
         title={
           localizationCaptions[LocalizationKey.ExpectsExecuteOutputExpected]
         }
-        subtitle={JSON.stringify(activeResult.arguments[1])}
+        subtitle={JSON.stringify(activeResult?.arguments[1])}
       />
       <Gap sizeRem={0.25} />
       <CodeExecutionResultInfo
         title={localizationCaptions[LocalizationKey.ExpectsExecuteOutput]}
-        subtitle={JSON.stringify(activeResult.arguments[2])}
+        subtitle={JSON.stringify(activeResult?.arguments[2])}
       />
     </div>
   );

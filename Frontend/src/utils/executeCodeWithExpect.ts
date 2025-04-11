@@ -15,15 +15,15 @@ const expectCallsReturnCode = `
 type Arg = number | string | AnyObject;
 
 export interface ExecuteCodeResult {
-  results: ExpectResults;
+  results: ExpectResult[];
   error?: string;
 }
 
-export type ExpectResults = Array<{
+export type ExpectResult = {
   id: number;
   arguments: [Arg, Arg, Arg];
   passed: boolean;
-}>;
+};
 
 export const executeCodeWithExpect = (
   code: string | undefined,
