@@ -5,7 +5,6 @@
   "dependencies": {
     "@convergencelabs/monaco-collab-ext": "^0.4.0",
     "@dagrejs/dagre": "^1.1.4",
-    "@mediapipe/camera_utils": "^0.3.1675466862",
     "@mediapipe/selfie_segmentation": "^0.1.1675465747",
     "@monaco-editor/react": "^4.6.0",
     "@react-three/drei": "^9.105.4",
