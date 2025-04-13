@@ -1,8 +1,10 @@
-using System.Collections.Immutable;
 using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Storage;
+using Interview.Domain.Questions;
 using Interview.Domain.Questions.QuestionAnswers;
+using Interview.Domain.Questions.QuestionTreeById;
+using Interview.Domain.Questions.QuestionTreePage;
 using Interview.Domain.Reactions;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Request.Transcription;
@@ -13,11 +15,9 @@ using Interview.Domain.Rooms.Records.Response.RoomStates;
 using Interview.Domain.Rooms.RoomInvites;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.RoomParticipants.Service;
-using Interview.Domain.Rooms.RoomQuestionEvaluations;
 using Interview.Domain.Rooms.RoomQuestionReactions.Mappers;
 using Interview.Domain.Rooms.RoomQuestionReactions.Specifications;
 using Interview.Domain.Rooms.RoomQuestions;
-using Interview.Domain.Rooms.RoomReviews;
 using Interview.Domain.Rooms.RoomTimers;
 using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
@@ -32,7 +32,6 @@ using Entity = Interview.Domain.Repository.Entity;
 namespace Interview.Domain.Rooms.Service;
 
 public sealed class RoomService(
-    IRoomQuestionRepository roomQuestionRepository,
     IRoomEventDispatcher roomEventDispatcher,
     IHotEventStorage hotEventStorage,
     IRoomInviteService roomInviteService,
@@ -41,19 +40,20 @@ public sealed class RoomService(
     AppDbContext db,
     ILogger<RoomService> logger,
     ISystemClock clock,
-    RoomAnalyticService roomAnalyticService)
+    RoomAnalyticService roomAnalyticService,
+    RoomStatusUpdater roomStatusUpdater)
     : IRoomServiceWithoutPermissionCheck
 {
     public async Task<IPagedList<RoomPageDetail>> FindPageAsync(
         RoomPageDetailRequestFilter filter,
         int pageNumber,
         int pageSize,
+        EVSortOrder dateSort,
         CancellationToken cancellationToken = default)
     {
         IQueryable<Room> queryable = db.Rooms
             .Include(e => e.Participants)
             .ThenInclude(e => e.User)
-            .Include(e => e.Questions)
             .Include(e => e.Configuration)
             .Include(e => e.Tags)
             .Include(e => e.Timer)
@@ -61,7 +61,7 @@ public sealed class RoomService(
                 e.Status == SERoomStatus.Review ? 2 :
                 e.Status == SERoomStatus.New ? 3 :
                 4)
-            .ThenBy(e => e.ScheduleStartTime);
+            .ThenBy(e => e.ScheduleStartTime, dateSort);
         var filterName = filter.Name?.Trim().ToLower();
         if (!string.IsNullOrWhiteSpace(filterName))
         {
@@ -107,16 +107,6 @@ public sealed class RoomService(
             {
                 Id = e.Id,
                 Name = e.Name,
-                Questions = e.Questions.OrderBy(rq => rq.Order)
-                    .Select(question => new RoomQuestionDetail
-                    {
-                        Id = question.Question!.Id,
-                        Value = question.Question.Value,
-                        Order = question.Order,
-                        Answers = null,
-                        CodeEditor = null,
-                    })
-                    .ToList(),
                 Participants = e.Participants.Select(participant =>
                         new RoomUserDetail
                         {
@@ -130,6 +120,7 @@ public sealed class RoomService(
                 Tags = e.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
                 Timer = e.Timer == null ? null : new { Duration = e.Timer.Duration, ActualStartTime = e.Timer.ActualStartTime, },
                 ScheduledStartTime = e.ScheduleStartTime,
+                Type = e.Type,
             })
             .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
 
@@ -137,12 +128,12 @@ public sealed class RoomService(
         {
             Id = e.Id,
             Name = e.Name,
-            Questions = e.Questions,
             Participants = e.Participants,
             Status = e.RoomStatus,
             Tags = e.Tags,
             Timer = e.Timer == null ? null : new RoomTimerDetail { DurationSec = (long)e.Timer.Duration.TotalSeconds, StartTime = e.Timer.ActualStartTime, },
             ScheduledStartTime = e.ScheduledStartTime,
+            Type = e.Type.EnumValue,
         });
     }
 
@@ -205,7 +196,7 @@ public sealed class RoomService(
             .Include(e => e.Participants)
             .Include(e => e.Configuration)
             .Include(e => e.Timer)
-            .Include(e => e.Category)
+            .Include(e => e.QuestionTree)
             .Include(e => e.Questions).ThenInclude(e => e.Question).ThenInclude(e => e!.Answers)
             .Include(e => e.Questions).ThenInclude(e => e.Question).ThenInclude(e => e!.CodeEditor)
             .Select(e => new
@@ -261,11 +252,22 @@ public sealed class RoomService(
                             Lang = q.Question.CodeEditor.Lang,
                         },
                 }).ToList(),
-                Category = e.Category != null
-                    ? new RoomCategoryResponse { Id = e.Category.Id, Name = e.Category.Name }
+                QuestionTree = e.QuestionTree != null
+                    ? new QuestionTreeByIdResponse
+                    {
+                        Id = e.QuestionTree.Id,
+                        Name = e.QuestionTree.Name,
+                        RootQuestionSubjectTreeId = e.QuestionTree.RootQuestionSubjectTreeId,
+                        Tree = new List<QuestionTreeByIdResponseTree>(),
+                    }
                     : null,
             })
             .FirstOrDefaultAsync(room => room.Id == id, cancellationToken: cancellationToken) ?? throw NotFoundException.Create<Room>(id);
+
+        if (res.QuestionTree is not null)
+        {
+            await res.QuestionTree.FillTreeAsync(db, cancellationToken);
+        }
 
         return new RoomDetail
         {
@@ -285,7 +287,7 @@ public sealed class RoomService(
                 },
             ScheduledStartTime = res.ScheduledStartTime,
             Questions = res.Questions,
-            Category = res.Category,
+            QuestionTree = res.QuestionTree,
         };
     }
 
@@ -315,34 +317,36 @@ public sealed class RoomService(
         var experts = await FindByIdsOrErrorAsync(db.Users, requestExperts, "experts", cancellationToken);
         var examinees = await FindByIdsOrErrorAsync(db.Users, request.Examinees, "examinees", cancellationToken);
         var tags = await Tag.EnsureValidTagsAsync(db.Tag, request.Tags, cancellationToken);
-        var room = new Room(name, request.AccessType)
+        var type = request.QuestionTreeId is not null ? SERoomType.AI : SERoomType.Standard;
+        var room = new Room(name, request.AccessType, type)
         {
             Tags = tags,
             ScheduleStartTime = request.ScheduleStartTime,
             Timer = CreateRoomTimer(request.DurationSec),
-            CategoryId = request.CategoryId,
+            QuestionTreeId = request.QuestionTreeId,
         };
 
-        if (request.CategoryId is not null)
+        if (request.QuestionTreeId is not null)
         {
-            var requiredQuestionIds = request.Questions.Select(e => e.Id).ToList();
-            var allCategories = await db.GetWithChildCategoriesAsync(request.CategoryId.Value, cancellationToken);
-            var questionsFromCategories = await db.Questions
-                .Where(e => e.CategoryId != null && allCategories.Contains(e.CategoryId.Value) && !requiredQuestionIds.Contains(e.Id))
-                .Select(e => e.Id)
+            var questionTree = await db.QuestionTree
+                .Select(e => new { Id = e.Id, Name = e.Name, RootQuestionSubjectTreeId = e.RootQuestionSubjectTreeId, })
+                .FirstAsync(e => e.Id == request.QuestionTreeId, cancellationToken);
+            var allSubjectTreeIds = await db.QuestionSubjectTree.GetAllChildrenAsync(questionTree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
+            var questionsFromTree = await db.QuestionSubjectTree.AsNoTracking()
+                .Where(e => allSubjectTreeIds.Contains(e.Id) && e.QuestionId != null)
+                .Select(e => new
+                {
+                    Id = e.QuestionId!.Value,
+                    e.Order,
+                })
                 .ToListAsync(cancellationToken);
 
-            var startOrder = request.Questions.Count > 0
-                ? request.Questions.Select(e => e.Order).Max() + 1
-
-                // first question should start from 0
-                : -1;
-            foreach (var questionsFromCategoryId in questionsFromCategories)
+            foreach (var question in questionsFromTree)
             {
                 request.Questions.Add(new RoomQuestionRequest
                 {
-                    Id = questionsFromCategoryId,
-                    Order = ++startOrder,
+                    Id = question.Id,
+                    Order = question.Order,
                 });
             }
         }
@@ -390,16 +394,6 @@ public sealed class RoomService(
                 {
                     Id = room.Id,
                     Name = room.Name,
-                    Questions = room.Questions.OrderBy(rq => rq.Order)
-                        .Select(question => new RoomQuestionDetail
-                        {
-                            Id = question.Question!.Id,
-                            Value = question.Question.Value,
-                            Order = question.Order,
-                            Answers = null,
-                            CodeEditor = null,
-                        })
-                        .ToList(),
                     Participants = room.Participants.Select(participant =>
                             new RoomUserDetail
                             {
@@ -410,11 +404,22 @@ public sealed class RoomService(
                             })
                         .ToList(),
                     Status = room.Status.EnumValue,
-                    Tags = room.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
+                    Tags = room.Tags.Select(t => new TagItem
+                    {
+                        Id = t.Id,
+                        Value = t.Value,
+                        HexValue = t.HexColor,
+                    })
+                        .ToList(),
                     Timer = room.Timer == null
                         ? null
-                        : new RoomTimerDetail { DurationSec = (long)room.Timer.Duration.TotalSeconds, StartTime = room.Timer.ActualStartTime, },
+                        : new RoomTimerDetail
+                        {
+                            DurationSec = (long)room.Timer.Duration.TotalSeconds,
+                            StartTime = room.Timer.ActualStartTime,
+                        },
                     ScheduledStartTime = room.ScheduleStartTime,
+                    Type = room.Type.EnumValue,
                 };
             },
             cancellationToken);
@@ -443,29 +448,45 @@ public sealed class RoomService(
             throw NotFoundException.Create<User>(roomId);
         }
 
+        if (foundRoom.QuestionTreeId is not null && request.QuestionTreeId is null)
+        {
+            throw new UserException("Question tree id should not be null");
+        }
+
+        if (foundRoom.QuestionTreeId is null && request.QuestionTreeId is not null)
+        {
+            throw new UserException("Question tree id should be null");
+        }
+
         EnsureAvailableRoomEdit(foundRoom);
         EnsureValidScheduleStartTime(request.ScheduleStartTime, foundRoom.ScheduleStartTime);
 
         var tags = await Tag.EnsureValidTagsAsync(db.Tag, request.Tags, cancellationToken);
 
-        if (request.CategoryId != null && request.CategoryId != (foundRoom.CategoryId ?? Guid.Empty))
+        if (request.QuestionTreeId != null && request.QuestionTreeId != (foundRoom.QuestionTreeId ?? Guid.Empty))
         {
             // When a user sets up a category, you must remove all questions from the room.
             request.Questions.Clear();
 
-            var allCategories = await db.GetWithChildCategoriesAsync(request.CategoryId.Value, cancellationToken);
-            var questionsFromCategories = await db.Questions
-                .Where(e => e.CategoryId != null && allCategories.Contains(e.CategoryId.Value))
-                .Select(e => e.Id)
+            var questionTree = await db.QuestionTree
+                .Select(e => new { Id = e.Id, Name = e.Name, RootQuestionSubjectTreeId = e.RootQuestionSubjectTreeId, })
+                .FirstAsync(e => e.Id == request.QuestionTreeId, cancellationToken);
+            var allSubjectTreeIds = await db.QuestionSubjectTree.GetAllChildrenAsync(questionTree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
+            var questions = await db.QuestionSubjectTree.AsNoTracking()
+                .Where(e => allSubjectTreeIds.Contains(e.Id) && e.QuestionId != null)
+                .Select(e => new
+                {
+                    Id = e.QuestionId!.Value,
+                    e.Order,
+                })
                 .ToListAsync(cancellationToken);
 
-            var startOrder = 0;
-            foreach (var questionsFromCategoryId in questionsFromCategories)
+            foreach (var question in questions)
             {
                 request.Questions.Add(new RoomQuestionRequest
                 {
-                    Id = questionsFromCategoryId,
-                    Order = startOrder++,
+                    Id = question.Id,
+                    Order = question.Order,
                 });
             }
         }
@@ -528,7 +549,7 @@ public sealed class RoomService(
 
         foundRoom.ScheduleStartTime = request.ScheduleStartTime;
         foundRoom.Name = name;
-        foundRoom.CategoryId = request.CategoryId;
+        foundRoom.QuestionTreeId = request.QuestionTreeId;
         foundRoom.Tags.Clear();
         foundRoom.Tags.AddRange(tags);
         db.Update(foundRoom);
@@ -626,15 +647,9 @@ public sealed class RoomService(
     /// <param name="roomId">Room id.</param>
     /// <param name="cancellationToken">Token.</param>
     /// <returns>Result.</returns>
-    public Task CloseAsync(Guid roomId, CancellationToken cancellationToken = default)
-    {
-        return UpdateRoomStatusAsync(roomId, SERoomStatus.Close, cancellationToken);
-    }
+    public Task CloseAsync(Guid roomId, CancellationToken cancellationToken = default) => roomStatusUpdater.CloseWithoutReviewAsync(roomId, cancellationToken: cancellationToken);
 
-    public Task StartReviewAsync(Guid roomId, CancellationToken cancellationToken)
-    {
-        return UpdateRoomStatusAsync(roomId, SERoomStatus.Review, cancellationToken);
-    }
+    public Task StartReviewAsync(Guid roomId, CancellationToken cancellationToken) => roomStatusUpdater.StartReviewAsync(roomId, cancellationToken: cancellationToken);
 
     public async Task<ActualRoomStateResponse> GetActualStateAsync(Guid roomId, CancellationToken cancellationToken = default)
     {
@@ -642,14 +657,48 @@ public sealed class RoomService(
             .Include(e => e.Questions)
             .Include(e => e.Configuration)
             .Include(e => e.RoomStates)
-            .Include(e => e.Category)
+            .Include(e => e.QuestionTree)
             .Where(e => e.Id == roomId)
-            .Select(ActualRoomStateResponse.Mapper.Expression)
+            .Select(room => new ActualRoomStateResponse
+            {
+                Id = room.Id,
+                Name = room.Name,
+                ActiveQuestion = room.Questions.Select(q => new RoomStateQuestion
+                {
+                    Id = q.Id,
+                    Value = q.Question!.Value,
+                    State = q.State!,
+                }).FirstOrDefault(q => q.State == RoomQuestionState.Active),
+                CodeEditor = new CodeEditorStateResponse
+                {
+                    Content = room.Configuration == null ? null : room.Configuration.CodeEditorContent,
+                    Enabled = room.Configuration != null && room.Configuration.CodeEditorEnabled,
+                },
+                States = room.RoomStates.Select(e => new RoomStateResponse
+                {
+                    Payload = e.Payload,
+                    Type = e.Type,
+                }).ToList(),
+                QuestionTree = room.QuestionTree != null
+                    ? new QuestionTreeByIdResponse
+                    {
+                        Id = room.QuestionTree.Id,
+                        Name = room.QuestionTree.Name,
+                        RootQuestionSubjectTreeId = room.QuestionTree.RootQuestionSubjectTreeId,
+                        Tree = new List<QuestionTreeByIdResponseTree>(),
+                    }
+                    : null,
+            })
             .FirstOrDefaultAsync(cancellationToken);
 
         if (roomState == null)
         {
             throw NotFoundException.Create<Room>(roomId);
+        }
+
+        if (roomState.QuestionTree is not null)
+        {
+            await roomState.QuestionTree.FillTreeAsync(db, cancellationToken);
         }
 
         var spec = new RoomReactionsSpecification(roomId);
@@ -948,47 +997,6 @@ public sealed class RoomService(
         }
 
         return new RoomTimer { Duration = TimeSpan.FromSeconds(durationSec.Value), };
-    }
-
-    private async Task UpdateRoomStatusAsync(Guid roomId, SERoomStatus status, CancellationToken cancellationToken)
-    {
-        var currentRoom = await db.Rooms.FirstOrDefaultAsync(e => e.Id == roomId, cancellationToken);
-        if (currentRoom is null)
-        {
-            throw NotFoundException.Create<Room>(roomId);
-        }
-
-        if (currentRoom.Status == status)
-        {
-            throw new UserException($"Room already in '{status}' status");
-        }
-
-        await db.RunTransactionAsync(async _ =>
-            {
-                currentRoom.Status = status;
-
-                await roomQuestionRepository.CloseActiveQuestionAsync(roomId, cancellationToken);
-                if (status == SERoomStatus.Close)
-                {
-                    await db.RoomQuestionEvaluation
-                        .Include(e => e.RoomQuestion)
-                        .Where(e => e.RoomQuestion!.RoomId == roomId && e.State == SERoomQuestionEvaluationState.Draft)
-                        .ExecuteUpdateAsync(
-                            calls => calls.SetProperty(e => e.State, SERoomQuestionEvaluationState.Rejected),
-                            cancellationToken);
-
-                    await db.RoomReview
-                        .Include(e => e.Participant)
-                        .Where(e => e.Participant!.RoomId == roomId && e.State == SERoomReviewState.Open)
-                        .ExecuteUpdateAsync(
-                            calls => calls.SetProperty(e => e.State, SERoomReviewState.Rejected),
-                            cancellationToken);
-                }
-
-                await db.SaveChangesAsync(cancellationToken);
-                return DBNull.Value;
-            },
-            cancellationToken);
     }
 
     private void EnsureAvailableRoomEdit(Room room)

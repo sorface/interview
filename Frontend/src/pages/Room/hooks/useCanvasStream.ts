@@ -7,8 +7,7 @@ import {
   Dispatch,
   SetStateAction,
 } from 'react';
-import { Results } from '@mediapipe/selfie_segmentation';
-import { Camera } from '@mediapipe/camera_utils';
+import { GpuBuffer, Results } from '@mediapipe/selfie_segmentation';
 import { useSelfieSegmentation } from './useSelfieSegmentation';
 import { AuthContext } from '../../../context/AuthContext';
 
@@ -82,8 +81,10 @@ export const useCanvasStream = ({
   const [video, setVideo] = useState<HTMLVideoElement | null>(null);
   const [avatar, setAvatar] = useState<HTMLImageElement | null>(null);
   const requestRef = useRef<number>();
-  const backgroundRemoveEnabledRef = useRef(false);
-  backgroundRemoveEnabledRef.current = backgroundRemoveEnabled;
+  const backgroundRemoveEnabledRef = useRef(backgroundRemoveEnabled);
+  const videoLoadedRef = useRef(false);
+  const lastSegmentationMaskRef = useRef<GpuBuffer | null>(null);
+  const lastSegmentationResultProcessedRef = useRef(true);
 
   const userNickname = auth?.nickname ?? 'no camera';
 
@@ -92,80 +93,35 @@ export const useCanvasStream = ({
       if (!context || !cameraStream || !video) {
         return;
       }
-      const canvasElement = context.canvas;
-      context.clearRect(0, 0, canvasElement.width, canvasElement.height);
-      context.save();
-      context.filter = 'blur(0)';
-
-      context.drawImage(
-        results.segmentationMask,
-        0,
-        0,
-        canvasElement.width,
-        canvasElement.height,
-      );
-      context.globalCompositeOperation = 'source-in';
-      context.drawImage(
-        results.image,
-        0,
-        0,
-        canvasElement.width,
-        canvasElement.height,
-      );
-      context.globalCompositeOperation = 'destination-atop';
-      context.filter = 'blur(8px)';
-
-      context.drawImage(
-        results.image,
-        0,
-        0,
-        canvasElement.width,
-        canvasElement.height,
-      );
-
-      context.restore();
+      lastSegmentationMaskRef.current = results.segmentationMask;
+      lastSegmentationResultProcessedRef.current = true;
     },
     [context, cameraStream, video],
   );
 
-  const selfieSegmentationEnabled = Boolean(
-    backgroundRemoveEnabled && cameraStream && video,
-  );
+  const selfieSegmentationEnabled = Boolean(cameraStream && video);
   const selfieSegmentation = useSelfieSegmentation(
     selfieSegmentationEnabled,
     onResults,
   );
 
   useEffect(() => {
-    if (!video || !cameraStream || !context) {
+    backgroundRemoveEnabledRef.current = backgroundRemoveEnabled;
+  }, [backgroundRemoveEnabled]);
+
+  useEffect(() => {
+    if (!cameraStream || !video) {
       return;
     }
-    const newCamera = new Camera(video, {
-      onFrame: async () => {
-        if (
-          video &&
-          cameraStream &&
-          selfieSegmentation &&
-          backgroundRemoveEnabledRef.current
-        ) {
-          try {
-            await selfieSegmentation.send({ image: video });
-          } catch (err) {
-            console.warn(err);
-          }
-        }
-      },
-      width: video.width,
-      height: video.height,
-    });
-    newCamera.start();
-
-    return () => {
-      newCamera.stop().then(() => {
-        cameraStream.getTracks().forEach((track) => track.stop());
-      });
+    videoLoadedRef.current = false;
+    video.onloadeddata = () => {
+      videoLoadedRef.current = true;
     };
-  }, [video, context, width, height, cameraStream, selfieSegmentation]);
+    video.srcObject = cameraStream;
+    video.play();
+    lastSegmentationResultProcessedRef.current = true;
+    lastSegmentationMaskRef.current = null;
+  }, [video, cameraStream]);
 
   useEffect(() => {
     if (!enabled) {
@@ -182,14 +138,14 @@ export const useCanvasStream = ({
     if (!canvasContext) {
       throw new Error('Failed to get context for blank stream');
     }
+    canvasContext.imageSmoothingEnabled = true;
     const stream = canvas.captureStream(frameRate);
     const videoTrack = stream.getVideoTracks()[0];
     videoTrack.enabled = true;
-    fillNoCamera(canvasContext, userNickname, avatar);
     setVideo(newVideo);
     setContext(canvasContext);
     setMediaStream(new MediaStream([videoTrack]));
-  }, [frameRate, height, width, userNickname, enabled, avatar]);
+  }, [frameRate, height, width, enabled]);
 
   useEffect(() => {
     if (!context) {
@@ -197,19 +153,63 @@ export const useCanvasStream = ({
     }
     const triggerCanvasUpdate = () => {
       if (cameraStream && video) {
-        if (!backgroundRemoveEnabled) {
+        const canvasElement = context.canvas;
+        context.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        context.save();
+        context.filter = 'blur(0)';
+
+        if (
+          lastSegmentationMaskRef.current &&
+          backgroundRemoveEnabledRef.current
+        ) {
+          context.drawImage(
+            lastSegmentationMaskRef.current,
+            0,
+            0,
+            canvasElement.width,
+            canvasElement.height,
+          );
+        }
+
+        context.scale(-1, 1);
+        if (backgroundRemoveEnabledRef.current) {
+          context.globalCompositeOperation = 'source-in';
           context.drawImage(
             video,
             0,
             0,
-            context.canvas.width,
-            context.canvas.height,
+            -canvasElement.width,
+            canvasElement.height,
           );
         }
-        requestRef.current = requestAnimationFrame(triggerCanvasUpdate);
-        return;
+
+        context.globalCompositeOperation = 'destination-atop';
+        if (backgroundRemoveEnabledRef.current) {
+          context.filter = 'blur(8px)';
+        }
+
+        context.drawImage(
+          video,
+          0,
+          0,
+          -canvasElement.width,
+          canvasElement.height,
+        );
+        context.scale(1, 1);
+
+        context.restore();
+
+        if (
+          lastSegmentationResultProcessedRef.current &&
+          selfieSegmentation &&
+          videoLoadedRef.current
+        ) {
+          lastSegmentationResultProcessedRef.current = false;
+          selfieSegmentation.send({ image: video });
+        }
+      } else {
+        fillNoCamera(context, userNickname, avatar);
       }
-      fillNoCamera(context, userNickname, avatar);
       requestRef.current = requestAnimationFrame(triggerCanvasUpdate);
     };
     requestRef.current = requestAnimationFrame(triggerCanvasUpdate);
@@ -218,14 +218,7 @@ export const useCanvasStream = ({
         cancelAnimationFrame(requestRef.current);
       }
     };
-  }, [
-    context,
-    video,
-    cameraStream,
-    userNickname,
-    avatar,
-    backgroundRemoveEnabled,
-  ]);
+  }, [context, video, avatar, userNickname, cameraStream, selfieSegmentation]);
 
   useEffect(() => {
     if (auth?.avatar) loadAvatar(auth?.avatar, setAvatar);

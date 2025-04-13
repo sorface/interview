@@ -1,8 +1,18 @@
+.switcher-button.mini {
+  background-color: var(--button-inverted-alternative-background-color);
+  border-radius: 2rem;
+  width: 5.25rem;
+}
+
+.switcher-button.mini button {
+  border: unset !important;
+}
+
 .switcher-button button {
   position: relative;
 }
 
-.switcher-button button:first-child:not(.invertedActive) {
+.switcher-button.max button:first-child:not(.invertedActive) {
   border-right: unset;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
@@ -13,13 +23,24 @@
   padding-right: 1.5rem;
 }
 
+.switcher-button.mini button:first-child {
+  padding-left: 0.6875rem;
+  padding-right: 0.6875rem;
+}
+
 .switcher-button button:last-child {
   transform: translateX(-1rem);
   padding-left: 1.5rem;
   margin-right: -1rem;
 }
 
-.switcher-button button:last-child:not(.invertedActive) {
+.switcher-button.mini button:last-child {
+  transform: translateX(0rem);
+  padding-left: 0.6875rem;
+  padding-right: 0.6875rem;
+}
+
+.switcher-button.max button:last-child:not(.invertedActive) {
   border-left: unset;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;

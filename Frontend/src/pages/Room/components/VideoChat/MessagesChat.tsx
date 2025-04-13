@@ -100,7 +100,7 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
             localizationCaptions[LocalizationKey.ChatMessagePlaceholder]
           }
           ref={messageInputRef}
-          className="flex-1 h-[2.125rem]"
+          className="flex-1 w-full"
           maxLength={1000}
           onKeyDown={handleInputKeyDown}
         />

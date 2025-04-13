@@ -27,8 +27,8 @@ public class RoomActiveStatusPreProcessorTest
     [Fact(DisplayName = "The room has been changed to the active status. The current date is entered in the timer.")]
     public async Task RoomStatusChangeWithUpdateActiveStartTime()
     {
-        var roomOriginal = new Room("default", SERoomAccessType.Private) { Status = SERoomStatus.New };
-        var roomCurrent = new Room("default", SERoomAccessType.Private)
+        var roomOriginal = new Room("default", SERoomAccessType.Private, SERoomType.Standard) { Status = SERoomStatus.New };
+        var roomCurrent = new Room("default", SERoomAccessType.Private, SERoomType.Standard)
         {
             Timer = new RoomTimer(),
             Status = SERoomStatus.Active
@@ -46,8 +46,8 @@ public class RoomActiveStatusPreProcessorTest
         "The room has not been changed to the active status. The current date is entered in the timer.")]
     public async Task RoomStatusNotChangeWithUpdateActiveStartTime()
     {
-        var roomOriginal = new Room("default", SERoomAccessType.Private) { Status = SERoomStatus.New };
-        var roomCurrent = new Room("default", SERoomAccessType.Private)
+        var roomOriginal = new Room("default", SERoomAccessType.Private, SERoomType.Standard) { Status = SERoomStatus.New };
+        var roomCurrent = new Room("default", SERoomAccessType.Private, SERoomType.Standard)
         {
             Timer = new RoomTimer(),
             Status = SERoomStatus.Review

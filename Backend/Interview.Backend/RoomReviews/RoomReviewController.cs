@@ -117,11 +117,28 @@ public class RoomReviewController(IRoomReviewService roomReviewService) : Contro
     [Authorize]
     [HttpPost("complete")]
     [Produces(MediaTypeNames.Application.Json)]
-    [ProducesResponseType(typeof(RoomReviewDetail), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(RoomCompleteResponse), StatusCodes.Status201Created)]
     public async Task<RoomCompleteResponse> CompleteAsync([FromBody] RoomReviewCompletionRequest request, [FromServices] ICurrentUserAccessor currentUserAccessor)
     {
         var userId = currentUserAccessor.GetUserIdOrThrow();
 
         return await roomReviewService.CompleteAsync(request, userId, HttpContext.RequestAborted);
+    }
+
+    /// <summary>
+    /// completion ai room.
+    /// </summary>
+    /// <param name="request">User Request.</param>
+    /// <param name="currentUserAccessor">Current user accessor</param>
+    /// <returns>HTTP result</returns>
+    [Authorize]
+    [HttpPost("complete/ai")]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(RoomCompleteResponse), StatusCodes.Status201Created)]
+    public async Task<RoomCompleteResponse> CompleteAIAsync([FromBody] RoomReviewCompletionRequest request, [FromServices] ICurrentUserAccessor currentUserAccessor)
+    {
+        var userId = currentUserAccessor.GetUserIdOrThrow();
+
+        return await roomReviewService.CompleteAIAsync(request, userId, HttpContext.RequestAborted);
     }
 }

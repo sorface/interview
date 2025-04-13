@@ -14,10 +14,10 @@ namespace Interview.Domain.Rooms.Permissions;
 
 public class RoomServicePermissionAccessor(IRoomService roomService, ISecurityService securityService) : IRoomService, IServiceDecorator
 {
-    public async Task<IPagedList<RoomPageDetail>> FindPageAsync(RoomPageDetailRequestFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<IPagedList<RoomPageDetail>> FindPageAsync(RoomPageDetailRequestFilter filter, int pageNumber, int pageSize, EVSortOrder dateSort, CancellationToken cancellationToken = default)
     {
         await securityService.EnsurePermissionAsync(SEPermission.RoomFindPage, cancellationToken);
-        return await roomService.FindPageAsync(filter, pageNumber, pageSize, cancellationToken);
+        return await roomService.FindPageAsync(filter, pageNumber, pageSize, dateSort, cancellationToken);
     }
 
     public async Task<List<RoomCalendarItem>> GetCalendarAsync(RoomCalendarRequest filter, CancellationToken cancellationToken = default)

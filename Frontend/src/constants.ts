@@ -1,5 +1,6 @@
 export const inviteParamName = 'invite';
 export const roomReviewMaxLength = 500;
+export const aiExpertNickname = 'AI Expert';
 
 export const pathnames = {
   home: '/:redirect?',
@@ -20,6 +21,9 @@ export const pathnames = {
   categoriesCreate: '/categories/create',
   categoriesEdit: '/categories/edit/:id',
   logoutError: '/logoutError',
+  questionTrees: '/questionTrees',
+  questionTreeCreate: '/questionTrees/create',
+  questionTreeEdit: '/questionTrees/:id',
 };
 
 export const enum IconNames {
@@ -68,6 +72,14 @@ export const enum IconNames {
   TodayOutline = 'today-outline',
   Search = 'search',
   Hourglass = 'hourglass',
+  LogIn = 'log-in-outline',
+  Expand = 'expand-outline',
+  Collapse = 'chevron-collapse-outline',
+  Grid = 'grid-outline',
+  Menu = 'menu-sharp',
+  Notifications = 'notifications-outline',
+  Happy = 'happy-outline',
+  RadioButtonOn = 'radio-button-on-outline',
 }
 
 export const reactionIcon: Record<string, IconNames> = {
@@ -80,6 +92,7 @@ export const enum EventName {
   CodeEditor = 'CodeEditor',
   CodeEditorLanguage = 'CodeEditorLanguage',
   CodeEditorCursor = 'CodeEditorCursor',
+  ValidAiAnswer = 'ValidAiAnswer',
 }
 
 export enum HttpResponseCode {

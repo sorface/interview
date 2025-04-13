@@ -9,19 +9,6 @@ import { RoomsHistoryItem } from './RoomsHistoryItem';
 interface RoomsHistoryProps {
   rooms: Room[];
 }
-
-const sortRoomsByTime = (room1: Room, room2: Room) => {
-  const room1Date = new Date(room1.scheduledStartTime);
-  const room2Date = new Date(room2.scheduledStartTime);
-  if (room1Date < room2Date) {
-    return 1;
-  }
-  if (room1Date > room2Date) {
-    return -1;
-  }
-  return 0;
-};
-
 export const RoomsHistory: FunctionComponent<RoomsHistoryProps> = ({
   rooms,
 }) => {
@@ -37,7 +24,7 @@ export const RoomsHistory: FunctionComponent<RoomsHistoryProps> = ({
         <Gap sizeRem={0.5} />
       </div>
       <div>
-        {rooms.sort(sortRoomsByTime).map((room) => (
+        {rooms.map((room) => (
           <RoomsHistoryItem key={room.id} room={room} />
         ))}
       </div>

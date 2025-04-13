@@ -419,6 +419,48 @@ public class SEPermission(Guid id, string name, string description, EVPermission
         "Getting a schedule of meetings",
         EVPermission.GetRoomCalendar);
 
+    public static readonly SEPermission QuestionTreeFindPage = new(
+        Guid.Parse("2E1670EC-F9D2-4CB8-BB57-F6239B16F24F"),
+        "QuestionTreeFindPage",
+        "Getting the questions tree page",
+        EVPermission.QuestionTreeFindPage);
+
+    public static readonly SEPermission QuestionTreeFindArchivedPage = new(
+        Guid.Parse("BADFC74C-4F2F-4B53-9B46-763B28676009"),
+        "QuestionTreeFindArchivedPage",
+        "Getting the archived questions tree page",
+        EVPermission.QuestionTreeFindArchivedPage);
+
+    public static readonly SEPermission GetQuestionTreeById = new(
+        Guid.Parse("8F12692D-8E94-4409-AAEF-84F2CEAACD5D"),
+        "GetQuestionTreeById",
+        "Getting the question tree by id",
+        EVPermission.GetQuestionTreeById);
+
+    public static readonly SEPermission GetArchiveQuestionTreeById = new(
+        Guid.Parse("1119039F-8127-43DC-AC11-247FC4D221D3"),
+        "GetArchiveQuestionTreeById",
+        "Getting archive the question tree by id",
+        EVPermission.GetArchiveQuestionTreeById);
+
+    public static readonly SEPermission UpsertQuestionTree = new(
+        Guid.Parse("03B8BDCA-DDA6-4063-915B-31BF0A2DBA74"),
+        "UpsertQuestionTree",
+        "Upsert question tree",
+        EVPermission.UpsertQuestionTree);
+
+    public static readonly SEPermission QuestionTreeArchive = new(
+        Guid.Parse("E6B59BAE-2F2C-40F3-8587-49A3E703AC44"),
+        "QuestionTreeArchive",
+        "Archiving a question tree",
+        EVPermission.QuestionTreeArchive);
+
+    public static readonly SEPermission QuestionTreeUnarchive = new(
+        Guid.Parse("1EE1E860-A1DC-4DEF-A191-1CBAC8956A90"),
+        "QuestionTreeUnarchive",
+        "Unarchiving the question tree",
+        EVPermission.QuestionTreeUnarchive);
+
     public Guid Id { get; } = id;
 
     public string Description { get; } = description;

@@ -51,7 +51,7 @@ export const RoomQuestionsSelectorPreview: FunctionComponent<
         }
         toggleClassName="w-[13.75rem] flex justify-between"
         toggleIcon
-        contentClassName="translate-x-[-4.25rem] translate-y-[0.25rem]"
+        contentClassName="overflow-auto max-h-[20rem] translate-x-[-4.25rem] translate-y-[0.25rem]"
       >
         <div
           className={`w-[18.125rem] rounded-[0.75rem] shadow-dark-bold ${contentWrapperClassName}`}

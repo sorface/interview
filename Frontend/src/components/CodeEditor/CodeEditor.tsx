@@ -14,12 +14,27 @@ import Editor, {
 } from '@monaco-editor/react';
 import { CodeEditorLang } from '../../types/question';
 import { Theme, ThemeContext } from '../../context/ThemeContext';
+import { Modal } from '../Modal/Modal';
+import { Gap } from '../Gap/Gap';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { LocalizationKey } from '../../localization';
+import { Button } from '../Button/Button';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
+import { IconNames } from '../../constants';
+import {
+  ExecuteCodeResult,
+  executeCodeWithExpect,
+} from '../../utils/executeCodeWithExpect';
+import { ModalFooter } from '../ModalFooter/ModalFooter';
+import { CodeExecutionResult } from '../CodeExecutionResult/CodeExecutionResult';
 
 import './CodeEditor.css';
 
 export const defaultCodeEditorFontSize = 13;
 
 const fontSizeOptions = [10, 12, 13, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48];
+
+const languagesForExecute: CodeEditorLang[] = [CodeEditorLang.Javascript];
 
 const renderOptions = (options: Array<number | string>) =>
   options.map((option) => (
@@ -40,6 +55,10 @@ interface CodeEditorProps {
   onChange?: OnChange | undefined;
   onLanguageChange?: (language: CodeEditorLang) => void;
   onFontSizeChange?: (size: number) => void;
+  onExecutionResultsSubmit?: (
+    code: string | undefined,
+    language: CodeEditorLang,
+  ) => void;
 }
 
 export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
@@ -54,11 +73,21 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   onChange,
   onLanguageChange,
   onFontSizeChange,
+  onExecutionResultsSubmit,
 }) => {
+  const localizationCaptions = useLocalizationCaptions();
   const { themeInUi } = useContext(ThemeContext);
   const [fontSize, setFontSize] = useState(defaultCodeEditorFontSize);
-
+  const [expectResult, setExpectResult] = useState<ExecuteCodeResult>({
+    results: [],
+  });
+  const expectResultsPassed =
+    expectResult.results.length > 0 &&
+    expectResult.results.every((expectResult) => expectResult.passed);
+  const [modalExpectResults, setModalExpectResults] = useState(false);
   const codeEditorComponentRef = useRef<HTMLDivElement | null>(null);
+
+  const handleModalExpectClose = () => setModalExpectResults(false);
 
   const handleFontSizeChange: ChangeEventHandler<HTMLSelectElement> = (
     event,
@@ -85,6 +114,20 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
       },
     };
     monaco.editor.defineTheme('my-dark', theme);
+  };
+
+  const handleExecuteCode = () => {
+    const executeCodeResult = executeCodeWithExpect(value);
+    setExpectResult(executeCodeResult);
+    setModalExpectResults(true);
+  };
+
+  const handleExecutionResultsSubmit = () => {
+    if (!onExecutionResultsSubmit) {
+      return;
+    }
+    setModalExpectResults(false);
+    onExecutionResultsSubmit(value, language);
   };
 
   useEffect(() => {
@@ -135,6 +178,17 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
         >
           {renderOptions(fontSizeOptions)}
         </select>
+        {languagesForExecute.includes(language) && (
+          <Button
+            className="min-h-[1.91rem]"
+            onClick={handleExecuteCode}
+            disabled={!value?.length}
+          >
+            {localizationCaptions[LocalizationKey.Run]}
+            <Gap sizeRem={0.25} horizontal />
+            <Icon inheritFontSize name={IconNames.PaperPlane} />
+          </Button>
+        )}
       </div>
       <div className="flex-1">
         <Editor
@@ -157,6 +211,29 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
           beforeMount={handleBeforeMount}
         />
       </div>
+
+      <Modal
+        contentLabel={
+          localizationCaptions[LocalizationKey.ExpectsExecuteResults]
+        }
+        onClose={handleModalExpectClose}
+        open={modalExpectResults}
+      >
+        <CodeExecutionResult expectResult={expectResult} />
+        <Gap sizeRem={1.5} />
+        {onExecutionResultsSubmit &&
+          expectResultsPassed &&
+          !expectResult.error && (
+            <ModalFooter>
+              <Button onClick={handleModalExpectClose}>
+                {localizationCaptions[LocalizationKey.Close]}
+              </Button>
+              <Button variant="active" onClick={handleExecutionResultsSubmit}>
+                {localizationCaptions[LocalizationKey.ExecutionResultsSubmit]}
+              </Button>
+            </ModalFooter>
+          )}
+      </Modal>
     </div>
   );
 };

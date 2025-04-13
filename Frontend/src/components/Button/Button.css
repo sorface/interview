@@ -86,6 +86,16 @@ button.toolsPanel {
   background-color: var(--dark-white);
 }
 
+button.toolsPanelAlternative {
+  border: none;
+  min-width: unset;
+  padding: 0;
+  border-radius: unset;
+  opacity: 0.5;
+  color: var(--dark);
+  background-color: var(--active-nav-tab);
+}
+
 button.toolsPanelDanger {
   border: none;
   min-width: unset;

@@ -11,9 +11,10 @@ import {
   SwitcherButton,
   SwitcherButtonContent,
 } from '../SwitcherButton/SwitcherButton';
+import { Button } from '../Button/Button';
 
 interface LangSwitchProps {
-  elementType?: 'switcherButton' | 'select';
+  elementType?: 'switcherButton' | 'select' | 'button';
 }
 
 export const LangSwitch = ({
@@ -40,7 +41,7 @@ export const LangSwitch = ({
           <LocalizationCaption captionKey={LocalizationKey.Language} />:
         </Typography>
       </div>
-      <select className="w-full" value={lang} onChange={handleLangChange}>
+      <select className="w-full muted" value={lang} onChange={handleLangChange}>
         {Object.entries(LocalizationLang)?.map(([, langValue]) => (
           <option key={langValue} value={langValue}>
             {langLocalization[langValue]}
@@ -66,7 +67,8 @@ export const LangSwitch = ({
       <SwitcherButton
         items={items}
         activeIndex={items.findIndex((i) => i.id === lang) as 0 | 1}
-        variant="alternative"
+        activeVariant="invertedActive"
+        nonActiveVariant="invertedAlternative"
         onClick={(activeIndex) =>
           setLang(items[activeIndex].id as LocalizationLang)
         }
@@ -74,9 +76,30 @@ export const LangSwitch = ({
     );
   };
 
+  const button = () => {
+    return (
+      <Button
+        variant="invertedAlternative"
+        className="min-w-unset w-2.375 h-2.375 p-0"
+        onClick={() =>
+          setLang(
+            lang === LocalizationLang.ru
+              ? LocalizationLang.en
+              : LocalizationLang.ru,
+          )
+        }
+      >
+        <Typography size="s" semibold>
+          {lang === LocalizationLang.ru ? 'RU' : 'EN'}
+        </Typography>
+      </Button>
+    );
+  };
+
   const elements = {
     select: select,
     switcherButton: switcherButton(),
+    button: button(),
   };
 
   return elements[elementType];

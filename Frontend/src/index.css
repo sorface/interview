@@ -8,6 +8,7 @@
   --blue-main: #0666e2;
   --blue-light: #ebf2ff;
   --blue-dark: #0058ca;
+  --blue-ai-room-timer: #e3f5ff;
   --dark: #24243a;
   --dark-dark1: #172849;
   --dark-dark2: #101e36;
@@ -17,6 +18,7 @@
   --grey1: #f5f6f8;
   --white: #ffffff;
   --red: #d91404;
+  --green: #7bb51e;
   --red-light: #f8e5e4;
   --green-light: #e9f8e7;
   --grey-active: #f1f3f8;
@@ -239,6 +241,10 @@ input[type='color'] {
   background-color: var(--form-bg);
 }
 
+:root[data-theme='Dark'] input.muted {
+  background-color: var(--page-bg);
+}
+
 h2 {
   margin: 0px;
   font-size: 1.25rem;
@@ -269,6 +275,10 @@ select {
   margin: 0;
 }
 
+:root[data-theme='Dark'] select.muted {
+  background-color: var(--page-bg);
+}
+
 progress {
   appearance: none;
   display: block;
@@ -279,7 +289,7 @@ progress::-moz-progress-bar {
 }
 
 progress::-webkit-progress-bar {
-  background-color: var(--wrap-bg);
+  background-color: var(--grey-active);
 }
 progress::-webkit-progress-value {
   background-color: var(--button-active-bg) !important;

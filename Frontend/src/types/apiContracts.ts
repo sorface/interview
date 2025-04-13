@@ -24,7 +24,7 @@ export interface ApiContractPatch {
   method: 'PATCH';
   baseUrl: string;
   urlParams?: object;
-  body: AnyObject;
+  body?: AnyObject;
 }
 
 export type ApiContract =

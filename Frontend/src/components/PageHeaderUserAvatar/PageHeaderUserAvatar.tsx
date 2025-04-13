@@ -18,6 +18,7 @@ export const PageHeaderUserAvatar: FunctionComponent = () => {
     <>
       <ContextMenu
         translateRem={{ x: -11.375, y: 0.25 }}
+        variant="alternative"
         toggleContent={
           <div className="cursor-pointer">
             <UserAvatar
