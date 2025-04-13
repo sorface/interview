@@ -30,7 +30,7 @@ export const PageHeader: FunctionComponent<PageHeaderProps> = ({
   return (
     <div className="flex items-center shrink-0 h-[4rem] my-[0.5rem]">
       <h1 className="m-0">
-        <Typography size="xl" bold>
+        <Typography size="xxl" semibold>
           {title}
         </Typography>
       </h1>
