@@ -465,7 +465,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
         onSearchChange={setSearchValueInput}
       >
         <ContextMenu
-          translateRem={{ x: -3.75, y: 0.25 }}
+          translateRem={{ x: -2.75, y: 0.25 }}
           toggleContent={renderCreateRoomButton()}
         >
           {[

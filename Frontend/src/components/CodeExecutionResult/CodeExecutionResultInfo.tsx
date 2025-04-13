@@ -19,7 +19,7 @@ export const CodeExecutionResultInfo: FunctionComponent<
 
   return (
     <div
-      className={`flex flex-col text-left rounded-1.125 px-1 py-0.5 ${themedClassName}`}
+      className={`flex flex-col text-left rounded-[1.125rem] px-[1rem] py-[0.5rem] ${themedClassName}`}
     >
       <Typography size="m" semibold>
         {title}

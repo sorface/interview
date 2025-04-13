@@ -34,7 +34,9 @@ export const PageHeader: FunctionComponent<PageHeaderProps> = ({
           {title}
         </Typography>
       </h1>
-      <div className={`ml-auto flex items-center ${children ? 'pr-[2rem]' : ''}`}>
+      <div
+        className={`ml-auto flex items-center ${children ? 'pr-[2rem]' : ''}`}
+      >
         {actionItem && actionItem}
         {!!(typeof searchValue === 'string' && onSearchChange) && (
           <>

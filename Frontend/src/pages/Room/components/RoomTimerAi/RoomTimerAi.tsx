@@ -19,7 +19,7 @@ export const RoomTimerAi: FunctionComponent<RoomTimerAiProps> = ({
 
   return (
     <div
-      className={`${progressThemedClassName} rounded-6.25 flex justify-center items-center`}
+      className={`${progressThemedClassName} rounded-[6.25rem] flex justify-center items-center`}
     >
       <RoomTimer startTime={startTime} durationSec={durationSec} mini />
     </div>

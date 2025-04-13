@@ -628,7 +628,9 @@ export const Room: FunctionComponent = () => {
               >
                 <div className="room-page">
                   <div className="room-page-main">
-                    <div className="room-page-header justify-between">
+                    <div
+                      className={`room-page-header justify-between ${aiRoom ? 'mt-[1.375rem] mb-[1.625rem] !pt-[0rem] !pb-[0rem]' : ''}`}
+                    >
                       <div>
                         <span
                           className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
@@ -639,7 +641,7 @@ export const Room: FunctionComponent = () => {
                           >
                             <div className="room-page-header-wrapper flex items-center">
                               <div
-                                className={`w-[2.375rem] pr-[1rem] ${aiRoom ? 'px-[1rem]' : ''}`}
+                                className={`pr-[1rem] ${aiRoom ? 'w-[4.375rem] px-[1rem]' : 'w-[3.375rem]'}`}
                               >
                                 <img
                                   className="w-[2.375rem] h-[2.375rem] rounded-[0.375rem]"
@@ -712,7 +714,7 @@ export const Room: FunctionComponent = () => {
                           <Gap sizeRem={0.875} horizontal />
                           <Button
                             variant="invertedAlternative"
-                            className="min-w-unset w-2.5 h-2.5 p-0"
+                            className="min-w-[0rem] w-[2.5rem] h-[2.5rem] !p-[0rem]"
                           >
                             <Icon size="s" name={IconNames.Grid} />
                           </Button>
@@ -720,7 +722,7 @@ export const Room: FunctionComponent = () => {
                       )}
                       {aiRoom && (
                         <div className="flex">
-                          <div className="flex items-center bg-wrap px-1 h-2.5 rounded-6.25">
+                          <div className="flex items-center bg-wrap px-[1rem] h-[2.5rem] rounded-[6.25rem]">
                             <Typography size="m" error>
                               <div className="flex">
                                 <Icon

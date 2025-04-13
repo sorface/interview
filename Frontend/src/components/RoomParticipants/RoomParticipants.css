@@ -8,6 +8,11 @@
   margin-left: 0;
 }
 
+.room-participant {
+  width: calc(2.1875rem);
+  height: calc(2.1875rem);
+}
+
 .room-participant .user-avatar {
   width: calc(2.1875rem - 2px);
   height: calc(2.1875rem - 2px);

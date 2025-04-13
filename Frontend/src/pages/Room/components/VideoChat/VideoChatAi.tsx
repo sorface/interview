@@ -235,7 +235,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
 
   return (
     <>
-      <div className="flex-1 flex justify-center">
+      <div className="flex-1 flex justify-center z-10">
         <div className="w-full flex flex-col relative rounded-[1.125rem]">
           <RoomQuestionPanelAi
             questionWithCode={codeEditorEnabled}
@@ -250,7 +250,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                 bottom: '-53px',
               }}
             >
-              <div className="z-50">
+              <div className="z-20">
                 <video
                   ref={userVideoMainContent}
                   className="rounded-full videochat-video object-cover z-1"
@@ -267,7 +267,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                 >
                   <Button
                     variant="invertedAlternative"
-                    className="min-w-unset w-[2.5rem] h-[2.5rem] p-[0rem] z-1"
+                    className="min-w-[0rem] w-[2.5rem] h-[2.5rem] !p-[0rem] z-1"
                     onClick={handleMicSwitch}
                   >
                     <Icon
@@ -278,7 +278,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                   <Gap sizeRem={0.5} horizontal />
                   <Button
                     variant="invertedAlternative"
-                    className="min-w-unset w-[2.5rem] h-[2.5rem] p-[0rem] z-1"
+                    className="min-w-[0rem] w-[2.5rem] h-[2.5rem] !p-[0rem] z-1"
                     onClick={handleCameraSwitch}
                   >
                     <Icon

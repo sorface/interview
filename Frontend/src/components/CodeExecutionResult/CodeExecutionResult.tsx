@@ -66,7 +66,7 @@ export const CodeExecutionResult: FunctionComponent<
             }
           >
             <div
-              className={`w-0.5 h-0.5 rounded-full ${result.passed ? 'bg-green' : 'bg-red'}`}
+              className={`w-[0.5rem] h-[0.5rem] rounded-full ${result.passed ? 'bg-green' : 'bg-red'}`}
             />
             <Gap sizeRem={0.5} horizontal />
             <div>

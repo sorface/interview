@@ -60,7 +60,7 @@ export const RoomSettings: FunctionComponent<RoomSettingsProps> = ({
           </div>
         </div>
         <Gap sizeRem={1} />
-        <div className="w-full max-w-29.25">
+        <div className="w-full max-w-[29.25rem]">
           <div className="flex">
             <DeviceSelect
               devices={devices.mic}

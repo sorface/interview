@@ -38,9 +38,7 @@ const ButtonsGroupWrapper: FunctionComponent<ButtonsGroupWrapperProps> = ({
   children,
 }) => {
   return (
-    <div
-      className={`flex flex-col ${noPaddingBottom ? '' : 'pb-[1.5rem]'}`}
-    >
+    <div className={`flex flex-col ${noPaddingBottom ? '' : 'pb-[1.5rem]'}`}>
       {children}
     </div>
   );

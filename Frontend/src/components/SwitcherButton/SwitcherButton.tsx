@@ -37,7 +37,7 @@ export const SwitcherButton: FunctionComponent<SwitcherButtonProps> = ({
       {items.map((item, index) => (
         <Fragment key={item.id}>
           <Button
-            className={`${mini ? 'min-w-unset' : ''}`}
+            className={`${mini ? 'min-w-[0rem]' : ''}`}
             variant={index === activeIndex ? activeVariant : nonActiveVariant}
             onClick={() => {
               onClick?.(index as ActiveIndex);

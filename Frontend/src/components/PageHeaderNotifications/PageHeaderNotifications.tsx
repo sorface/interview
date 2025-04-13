@@ -17,7 +17,7 @@ export const PageHeaderNotifications: FunctionComponent = () => {
   };
 
   return (
-    <div className="flex items-stretch justify-end h-2.5">
+    <div className="flex items-stretch justify-end h-[2.5rem]">
       <ContextMenu
         translateRem={{ x: -15, y: 0.25 }}
         variant="alternative"
@@ -25,16 +25,16 @@ export const PageHeaderNotifications: FunctionComponent = () => {
           <div className="cursor-pointer">
             <Button
               variant="invertedAlternative"
-              className="min-w-unset w-2.5 h-2.5 p-0"
+              className="min-w-[0rem] w-[2.5rem] h-[2.5rem] !p-[0rem]"
               onClick={handleOpenSwitch}
             >
               <Icon size="s" name={IconNames.Notifications} />
             </Button>
           </div>
         }
-        contentClassName="w-17.5 rounded-0.75"
+        contentClassName="w-[17.5rem] rounded-[0.75rem]"
       >
-        <div className="flex flex-col py-1.5 px-1">
+        <div className="flex flex-col py-[1.5rem] px-[1rem]">
           <div className="flex justify-between items-baseline">
             <Typography size="m" bold>
               {localizationCaptions[LocalizationKey.NewNotifications]}
@@ -46,7 +46,7 @@ export const PageHeaderNotifications: FunctionComponent = () => {
             </div>
           </div>
           <Gap sizeRem={1.5} />
-          <div className="h-18.25 flex items-center justify-center">
+          <div className="h-[18.25rem] flex items-center justify-center">
             <Typography size="s" secondary>
               {localizationCaptions[LocalizationKey.NoNewNotifications]}
             </Typography>

@@ -105,7 +105,7 @@ export const QuestionTrees: FunctionComponent = () => {
         onSearchChange={setSearchValueInput}
       >
         <Link to={pathnames.questionTreeCreate}>
-          <Button variant="active" className="h-2.5">
+          <Button variant="active" className="h-[2.5rem]">
             <Icon name={IconNames.Add} />
             {localizationCaptions[LocalizationKey.CreateQuestionTree]}
           </Button>

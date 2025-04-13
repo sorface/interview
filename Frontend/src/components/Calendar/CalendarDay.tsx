@@ -62,7 +62,7 @@ export const CalendarDay: FunctionComponent<CalendarDayProps> = ({
         onClick={onClick}
       >
         {day?.getDate() === 1 && !currentDay && !selected && (
-          <div className="absolute leading-0" style={{ top: 0 }}>
+          <div className="absolute leading-[0rem]" style={{ top: 0 }}>
             <Typography size="xs" secondary>
               {getMonthName(day, lang)}
             </Typography>
@@ -74,7 +74,7 @@ export const CalendarDay: FunctionComponent<CalendarDayProps> = ({
           <Typography size="m">{day?.getDate() || ''}</Typography>
           {selected && (
             <div
-              className={`${closeThemedClassName} absolute translate-x-0.75-y--0.75 w-1 h-1 flex items-center justify-center rounded-full`}
+              className={`${closeThemedClassName} absolute translate-x-[0.75rem] translate-y-[-0.75rem] w-[1rem] h-[1rem] flex items-center justify-center rounded-full`}
             >
               <Icon name={IconNames.Close} inheritFontSize size="s" />
             </div>

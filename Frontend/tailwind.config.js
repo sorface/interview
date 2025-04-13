@@ -43,6 +43,7 @@ module.exports = {
         'dark-blue-0.25': 'color-mix(in srgb, #0666e2, transparent 75%)',
         'dark-green-0.25': 'color-mix(in srgb, #3fa96a, transparent 75%)',
         'dark-orange-0.25': 'color-mix(in srgb, #e94d2b, transparent 75%)',
+        'blue-ai-room-timer': '#e3f5ff',
       },
       boxShadow: {
         'dark-bold': '0 4px 12px rgba(16, 9, 8, 1.0)',
