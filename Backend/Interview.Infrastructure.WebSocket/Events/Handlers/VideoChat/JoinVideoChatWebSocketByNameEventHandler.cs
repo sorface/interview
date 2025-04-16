@@ -2,12 +2,10 @@ using Interview.Domain.Events;
 using Interview.Domain.Events.Events;
 using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Events.Sender;
-using Interview.Domain.Rooms.RoomParticipants;
-using Interview.Domain.Users;
 using Interview.Infrastructure.WebSocket.Events.ConnectionListener;
 using Microsoft.Extensions.Logging;
 
-namespace Interview.Infrastructure.WebSocket.Events.Handlers;
+namespace Interview.Infrastructure.WebSocket.Events.Handlers.VideoChat;
 
 public class JoinVideoChatWebSocketByNameEventHandler(
     ILogger<JoinVideoChatWebSocketByNameEventHandler> logger,

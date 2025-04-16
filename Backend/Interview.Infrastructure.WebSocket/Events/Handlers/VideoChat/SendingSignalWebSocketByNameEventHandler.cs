@@ -5,7 +5,7 @@ using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Infrastructure.WebSocket.Events.ConnectionListener;
 using Microsoft.Extensions.Logging;
 
-namespace Interview.Infrastructure.WebSocket.Events.Handlers;
+namespace Interview.Infrastructure.WebSocket.Events.Handlers.VideoChat;
 
 public class SendingSignalWebSocketByNameEventHandler(
     ILogger<WebSocketByNameEventHandlerBase<SendingSignalWebSocketByNameEventHandler.ReceivePayload>> logger,

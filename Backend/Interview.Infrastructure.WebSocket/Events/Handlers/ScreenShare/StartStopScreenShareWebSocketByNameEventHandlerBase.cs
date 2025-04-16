@@ -3,6 +3,7 @@ using Interview.Domain.Events.Events;
 using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Events.Sender;
 using Interview.Infrastructure.WebSocket.Events.ConnectionListener;
+using Interview.Infrastructure.WebSocket.Events.Handlers.VideoChat;
 using Microsoft.Extensions.Logging;
 
 namespace Interview.Infrastructure.WebSocket.Events.Handlers.ScreenShare;
