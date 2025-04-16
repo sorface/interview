@@ -49,6 +49,7 @@ module.exports = {
       },
       boxShadow: {
         'dark-bold': '0 4px 12px rgba(16, 9, 8, 1.0)',
+        'dark-medium': '0px 4px 12px var(--shadow)',
       },
       gridTemplateColumns: {
         'questions-list': '1.5rem auto 1.125rem',

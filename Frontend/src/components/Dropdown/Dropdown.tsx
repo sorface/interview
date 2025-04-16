@@ -85,7 +85,7 @@ export const Dropdown: FunctionComponent<DropdownProps> = ({
       )}
       {open && (
         <div
-          className={`${contentClassName} absolute overflow-auto z-50 translate-y-[0.25rem] shadow`}
+          className={`${contentClassName} absolute overflow-auto z-50 translate-y-[0.25rem] shadow-dark-medium`}
           style={contentStyle}
         >
           {children}
