@@ -92,3 +92,10 @@ public class UserDetail
 
     public required EVRoomParticipantType ParticipantType { get; init; }
 }
+
+#pragma warning disable SA1402
+public class AllUserDetail : UserDetail
+#pragma warning restore SA1402
+{
+    public required bool ScreenShareEnabled { get; init; }
+}

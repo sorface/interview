@@ -2,16 +2,13 @@ using Interview.Domain.Events;
 using Interview.Domain.Events.Events;
 using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.Events.Sender;
-using Interview.Domain.Rooms.RoomParticipants;
-using Interview.Domain.Users;
 using Interview.Infrastructure.WebSocket.Events.ConnectionListener;
 using Microsoft.Extensions.Logging;
 
-namespace Interview.Infrastructure.WebSocket.Events.Handlers;
+namespace Interview.Infrastructure.WebSocket.Events.Handlers.ScreenShare;
 
-public class JoinVideoChatWebSocketByNameEventHandler(
-    ILogger<JoinVideoChatWebSocketByNameEventHandler> logger,
-    IVideChatConnectionProvider videChatConnectionProvider,
+public abstract class StartStopScreenShareWebSocketByNameEventHandlerBase(
+    ILogger<StartStopScreenShareWebSocketByNameEventHandlerBase> logger,
     IUserWebSocketConnectionProvider userWebSocketConnectionProvider,
     ILogger<WebSocketEventSender> webSocketEventSender,
     IEventSenderAdapter eventSenderAdapter,
@@ -19,12 +16,11 @@ public class JoinVideoChatWebSocketByNameEventHandler(
     IEventDeserializer deserializer)
     : WebSocketByNameEventHandlerBase(logger, deserializer)
 {
-    protected override string SupportType => "join video chat";
+    protected IUserWebSocketConnectionProvider UserWebSocketConnectionProvider => userWebSocketConnectionProvider;
 
     protected override async Task HandleEventAsync(SocketEventDetail detail, string? payload, CancellationToken cancellationToken)
     {
-        var successConnectResult = await videChatConnectionProvider.TryConnectAsync(detail, cancellationToken);
-        if (!successConnectResult)
+        if (!PerformAction(detail.UserId, detail.RoomId, detail.WebSocket))
         {
             return;
         }
@@ -39,14 +35,14 @@ public class JoinVideoChatWebSocketByNameEventHandler(
         }
     }
 
+    protected abstract bool PerformAction(Guid userId, Guid roomId, System.Net.WebSockets.WebSocket webSocket);
+
     private async Task SendEventsAsync(SocketEventDetail detail, CancellationToken cancellationToken)
     {
-        if (!videChatConnectionProvider.TryGetConnections(detail.RoomId, out var subscribers))
+        if (!userWebSocketConnectionProvider.TryGetConnections(detail.RoomId, out var subscribers))
         {
             return;
         }
-
-        userWebSocketConnectionProvider.TryGetConnections(detail.RoomId, out var connections);
 
         var users = subscribers
             .DistinctBy(e => e.User.Id)
@@ -56,7 +52,7 @@ public class JoinVideoChatWebSocketByNameEventHandler(
                 Nickname = e.User.Nickname,
                 Avatar = e.User.Avatar,
                 ParticipantType = e.ParticipantType,
-                ScreenShareEnabled = connections != null && connections.Any(cc => ReferenceEquals(cc.WebSocket, detail.WebSocket)),
+                ScreenShareEnabled = e.ScreenShareEnabled,
             }).ToList();
         var strPayload = serializer.SerializePayloadAsString(users);
         var newEvent = new RoomEvent
@@ -71,3 +67,10 @@ public class JoinVideoChatWebSocketByNameEventHandler(
         await eventSenderAdapter.SendAsync(provider, sender, cancellationToken);
     }
 }
+
+/*
+Make event 'start screen share' similar to 'join video chat'.
+Make event 'screen share started' similar to 'user joined'.
+The event adds a screen share to the list of room participants. A separate indicator is needed that this is a screen share.
+Add 'screen share stop'
+ */

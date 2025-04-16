@@ -79,4 +79,9 @@ public class EventType
     /// Event sent when editing the code editor content.
     /// </summary>
     public static readonly string CodeEditorChange = "code";
+
+    /// <summary>
+    /// Event sent when start/stop screen share or user connected to video chat.
+    /// </summary>
+    public static readonly string AllUsers = "all users";
 }
