@@ -15,10 +15,10 @@ export const RoomsHistory: FunctionComponent<RoomsHistoryProps> = ({
   const localizationCaptions = useLocalizationCaptions();
 
   return (
-    <div className="text-left overflow-auto flex flex-col h-full px-[1.125rem] bg-wrap rounded-[1.125rem]">
+    <div className="invisible-scroll text-left overflow-auto flex flex-col h-full px-[0.625rem] bg-wrap rounded-[1.125rem]">
       <Gap sizeRem={1.5} />
       <div className="sticky top-0 bg-wrap w-full z-1">
-        <Typography size="m" bold>
+        <Typography size="m" semibold>
           {localizationCaptions[LocalizationKey.InterviewHistoryTitle]}
         </Typography>
         <Gap sizeRem={0.5} />

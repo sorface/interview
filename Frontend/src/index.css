@@ -313,3 +313,11 @@ textarea {
   color: var(--text);
   opacity: 0.75; /* Firefox */
 }
+
+.invisible-scroll {
+  scrollbar-width: none;
+}
+
+.invisible-scroll::-webkit-scrollbar { 
+  display: none;
+}
