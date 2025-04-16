@@ -52,7 +52,7 @@ export const RoomTimer: FunctionComponent<RoomTimerProps> = ({
 
   return (
     <div
-      className={`flex items-center justify-center px-[1rem] py-[0.625rem] rounded-[2rem] ${mini ? '' : 'bg-wrap'}`}
+      className={`flex items-center justify-center px-[1rem] py-[0.625rem] rounded-[2rem] ${mini ? 'h-[2.5625rem]' : 'bg-wrap'}`}
     >
       <Icon size={mini ? 's' : 'm'} name={IconNames.Time} />
       <Gap sizeRem={0.25} horizontal />

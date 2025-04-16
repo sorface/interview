@@ -649,7 +649,11 @@ export const Room: FunctionComponent = () => {
                                   alt="site logo"
                                 />
                               </div>
-                              <h3>{room?.name}</h3>
+                              <h3>
+                                <Typography size="xl" semibold>
+                                  {room?.name}
+                                </Typography>
+                              </h3>
                             </div>
                           </Link>
                         </span>

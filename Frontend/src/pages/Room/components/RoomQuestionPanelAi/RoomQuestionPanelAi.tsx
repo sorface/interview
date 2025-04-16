@@ -672,8 +672,8 @@ export const RoomQuestionPanelAi: FunctionComponent<
         >
           {!copilotAnswerOpen && questionTimerStartDate && (
             <div
-              className="absolute"
-              style={{ top: '1.125rem', right: '1.625rem' }}
+              className="absolute z-10"
+              style={{ top: '1rem', right: '1.875rem' }}
             >
               <RoomTimerAi
                 startTime={questionTimerStartDate}
@@ -860,14 +860,13 @@ export const RoomQuestionPanelAi: FunctionComponent<
           {children}
           {!statusPanelVisible && (
             <div
-              className="absolute flex items-center justify-center z-60"
+              className="absolute flex items-center justify-center z-20"
               style={{
                 bottom: '97px',
                 right: '44px',
               }}
             >
               <div
-                className={`z-0`}
                 style={{
                   width: '86px',
                   height: '86px',

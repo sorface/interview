@@ -324,9 +324,6 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
 
       <div
         className="absolute videochat-field overflow-auto right-[1rem]"
-        style={{
-          height: 'calc(100% - 0.75rem)',
-        }}
       >
         <div
           className={`videochat ${messagesChatEnabled ? 'invisible h-full' : 'visible'}`}

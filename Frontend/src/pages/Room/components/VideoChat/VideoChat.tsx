@@ -393,15 +393,12 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
               onClick={handleScreenShare}
             /> */}
             {currentUserExpert && (
-              <>
-                <Gap sizeRem={0.125} />
-                <RoomToolsPanel.SwitchButton
-                  enabled={true}
-                  iconEnabledName={IconNames.PersonAdd}
-                  iconDisabledName={IconNames.PersonAdd}
-                  onClick={handleInvitationsOpen}
-                />
-              </>
+              <RoomToolsPanel.SwitchButton
+                enabled={true}
+                iconEnabledName={IconNames.PersonAdd}
+                iconDisabledName={IconNames.PersonAdd}
+                onClick={handleInvitationsOpen}
+              />
             )}
             <Gap sizeRem={0.125} />
             <RoomToolsPanel.SwitchButton

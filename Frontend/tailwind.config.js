@@ -16,6 +16,7 @@ module.exports = {
         grey1: '#f5f6f8',
         white: '#ffffff',
         red: '#d91404',
+        green: '#7bb51e',
         'red-light': '#f8e5e4',
         'green-light': '#e9f8e7',
         'grey-active': '#f1f3f8',
@@ -44,6 +45,7 @@ module.exports = {
         'dark-green-0.25': 'color-mix(in srgb, #3fa96a, transparent 75%)',
         'dark-orange-0.25': 'color-mix(in srgb, #e94d2b, transparent 75%)',
         'blue-ai-room-timer': '#e3f5ff',
+        'room-tools-panel-bg': '#0b152940',
       },
       boxShadow: {
         'dark-bold': '0 4px 12px rgba(16, 9, 8, 1.0)',

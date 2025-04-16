@@ -363,7 +363,7 @@ export const EnterVideoChatModal: FunctionComponent<
       }}
     >
       <Link to={pathnames.highlightRooms} className="no-underline">
-        <div className="action-modal-header absolute flex items-center px-[0.5rem] py-[0.5rem] h-[4rem]">
+        <div className="action-modal-header absolute flex items-center h-[2.375rem] mt-[1.3125rem] ml-[0.5rem]">
           <div className="w-[2.375rem] h-[2.375rem] mr-[1rem]">
             <img
               className="w-[2.375rem] h-[2.375rem] rounded-[0.375rem]"
@@ -371,7 +371,11 @@ export const EnterVideoChatModal: FunctionComponent<
               alt="site logo"
             />
           </div>
-          <h3>{room?.name}</h3>
+          <h3>
+            <Typography size="xl" semibold>
+              {room?.name}
+              </Typography>
+          </h3>
         </div>
       </Link>
       <div className="flex items-center justify-center mt-auto mb-auto">

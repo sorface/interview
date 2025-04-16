@@ -162,11 +162,13 @@ export const ActiveQuestionSelector: FunctionComponent<
           </div>
         </div>
         <Gap sizeRem={1} />
-        <progress
-          className="w-full h-[0.125rem]"
-          value={closedQuestionsCount}
-          max={questionsCount}
-        ></progress>
+        {initialQuestion && (
+          <progress
+            className="w-full h-[0.125rem]"
+            value={closedQuestionsCount}
+            max={questionsCount}
+          ></progress>
+        )}
         {showMenu && (
           <div className="text-left">
             {questions.length === 0 && (
