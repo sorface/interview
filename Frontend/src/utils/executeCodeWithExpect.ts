@@ -3,8 +3,17 @@ import { deepEqual } from './deepEqual';
 
 const expectCode = `
   const __expectCalls = [];
-  const expect = (fn, args, expected) => {
-    __expectCalls.push([args, fn(...args), expected]);
+  const expect = (fn, ...argsWithExpected) => {
+    const args = [...argsWithExpected];
+    args.length--;
+    const expected = argsWithExpected[argsWithExpected.length - 1];
+    const result = args.reduce((accum, val) => {
+      if (accum === undefined) {
+        return fn(...val);
+      }
+      return accum(...val);
+    }, undefined);
+    __expectCalls.push([args, result, expected]);
   };
 `;
 
