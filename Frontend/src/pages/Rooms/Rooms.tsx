@@ -345,10 +345,10 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
                   {!aiRoom && expertInRoom && canEditInStatus && (
                     <>
                       <div
-                        className="room-edit-participants-link rotate-90"
+                        className="rotate-90"
                         onClick={handleOpenEditModal(room.id)}
                       >
-                        <Icon size="s" secondary name={IconNames.Options} />
+                        <Icon size="s" secondary hover name={IconNames.Options} />
                       </div>
                     </>
                   )}
@@ -377,10 +377,10 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
                   {!aiRoom && expertInRoom && canEditInStatus && (
                     <>
                       <div
-                        className="room-edit-participants-link rotate-90"
+                        className="rotate-90"
                         onClick={handleOpenEditModal(room.id)}
                       >
-                        <Icon size="s" secondary name={IconNames.Options} />
+                        <Icon size="s" secondary hover name={IconNames.Options} />
                       </div>
                     </>
                   )}
