@@ -24,7 +24,7 @@ export const Feedback: FunctionComponent = () => {
 
   return (
     <div
-      className={`absolute z-1 ${themedClassName} right-1 bottom-0 bg-wrap px-1.25 rounded-t-0.75`}
+      className={`absolute z-50 ${themedClassName} right-[1rem] bottom-0 bg-wrap px-[1.25rem] !rounded-t-[0.75rem]`}
     >
       {open && <Gap sizeRem={1} />}
       <div
@@ -37,12 +37,12 @@ export const Feedback: FunctionComponent = () => {
         </Typography>
         <Gap sizeRem={0.25} horizontal />
         {!open && (
-          <div className="h-1.25 rotate-180">
+          <div className="h-[1.25rem] rotate-180">
             <Icon size="s" name={IconNames.ChevronDown} />
           </div>
         )}
         {open && (
-          <div className="h-1.25 ml-auto">
+          <div className="h-[1.25rem] ml-auto">
             <Icon size="m" name={IconNames.ChevronDown} />
           </div>
         )}
@@ -50,7 +50,7 @@ export const Feedback: FunctionComponent = () => {
       {open && (
         <>
           <Gap sizeRem={0.25} />
-          <div className="flex w-25 h-32.25">
+          <div className="flex w-[25rem] h-[32.25rem]">
             <iframe
               title={localizationCaptions[LocalizationKey.Feedback]}
               className="flex-1 border-none"

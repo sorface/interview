@@ -3,7 +3,6 @@ button {
   background-color: var(--button-bg);
   font-size: 0.875rem;
   border: 1px solid var(--button-border-color);
-  padding: 0.25rem 1rem;
   min-width: 7.5rem;
   min-height: 2.5rem;
   text-align: center;

@@ -39,7 +39,7 @@ export const QuestionAnswers: FunctionComponent<QuestionAnswersProps> = ({
           variant={
             answer === selectedAnswer ? buttonThemeActiveVariant : 'inverted'
           }
-          className="mr-0.25"
+          className="mr-[0.25rem]"
           onClick={() => setSelectedAnswer(answer)}
         >
           <Typography size="m">{answer.title}</Typography>
@@ -63,7 +63,7 @@ export const QuestionAnswers: FunctionComponent<QuestionAnswersProps> = ({
             readOnly
             scrollBeyondLastLine={false}
             alwaysConsumeMouseWheel={false}
-            className="h-32.25"
+            className="h-[32.25rem]"
           />
         </>
       )}

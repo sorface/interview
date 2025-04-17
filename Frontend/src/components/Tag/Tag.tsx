@@ -41,7 +41,7 @@ export const Tag: FunctionComponent<TagProps> = ({
   const themeClassName = useThemeClassName(themeClassNames)[state];
   return (
     <div
-      className={`flex items-center py-0.125 px-0.375 rounded-0.375 ${themeClassName}`}
+      className={`flex items-center py-[0.125rem] px-[0.375rem] rounded-[0.375rem] ${themeClassName}`}
     >
       <Typography size={typographySize || 's'} semibold={typographySemibold}>
         {children}

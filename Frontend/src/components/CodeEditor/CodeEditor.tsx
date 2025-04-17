@@ -158,10 +158,10 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
 
   return (
     <div
-      className={`code-editor flex flex-col rounded-1.125 overflow-hidden ${className}`}
+      className={`code-editor flex flex-col rounded-[1.125rem] overflow-hidden ${className}`}
       ref={codeEditorComponentRef}
     >
-      <div className="code-editor-tools">
+      <div className="code-editor-tools flex">
         <select
           className="code-editor-tools-select"
           value={language}
@@ -180,7 +180,7 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
         </select>
         {languagesForExecute.includes(language) && (
           <Button
-            className="min-h-[1.91rem]"
+            className="min-h-[1.75rem] !p-0 text-[0.75rem]"
             onClick={handleExecuteCode}
             disabled={!value?.length}
           >

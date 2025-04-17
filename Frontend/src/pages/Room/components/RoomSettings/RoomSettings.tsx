@@ -41,7 +41,7 @@ export const RoomSettings: FunctionComponent<RoomSettingsProps> = ({
       onClose={onRequestClose}
     >
       <div className="flex-1 flex flex-col items-center">
-        <div className="w-full max-w-29.25 grid grid-cols-settings-list gap-y-1">
+        <div className="w-full max-w-[29.25rem] grid grid-cols-settings-list gap-y-[1rem]">
           <ThemeSwitch />
           <LangSwitch />
           <RecognitionLangSwitch />
@@ -60,7 +60,7 @@ export const RoomSettings: FunctionComponent<RoomSettingsProps> = ({
           </div>
         </div>
         <Gap sizeRem={1} />
-        <div className="w-full max-w-29.25">
+        <div className="w-full max-w-[29.25rem]">
           <div className="flex">
             <DeviceSelect
               devices={devices.mic}

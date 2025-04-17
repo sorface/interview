@@ -393,15 +393,12 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
               onClick={handleScreenShare}
             /> */}
             {currentUserExpert && (
-              <>
-                <Gap sizeRem={0.125} />
-                <RoomToolsPanel.SwitchButton
-                  enabled={true}
-                  iconEnabledName={IconNames.PersonAdd}
-                  iconDisabledName={IconNames.PersonAdd}
-                  onClick={handleInvitationsOpen}
-                />
-              </>
+              <RoomToolsPanel.SwitchButton
+                enabled={true}
+                iconEnabledName={IconNames.PersonAdd}
+                iconDisabledName={IconNames.PersonAdd}
+                onClick={handleInvitationsOpen}
+              />
             )}
             <Gap sizeRem={0.125} />
             <RoomToolsPanel.SwitchButton
@@ -453,13 +450,13 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           </ContextMenu>
         </RoomToolsPanel.ButtonsGroupWrapper>
       </RoomToolsPanel.Wrapper>
-      <div className="videochat-field relative videochat-field-main bg-wrap rounded-1.125">
+      <div className="videochat-field relative videochat-field-main bg-wrap rounded-[1.125rem]">
         <RoomCodeEditor visible={codeEditorEnabled} />
         {!codeEditorEnabled && renderMain()}
       </div>
 
       <div
-        className={`relative videochat-field rounded-1.125 ${rightPanelThemedClassName}`}
+        className={`relative videochat-field rounded-[1.125rem] ${rightPanelThemedClassName}`}
       >
         <div
           className={`videochat ${messagesChatEnabled ? 'invisible h-full' : 'visible'}`}

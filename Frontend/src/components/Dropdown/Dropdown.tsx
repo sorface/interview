@@ -68,7 +68,7 @@ export const Dropdown: FunctionComponent<DropdownProps> = ({
           {toggleContent}
           {toggleIcon && (
             <span
-              className={`cursor-pointer h-1.125 ${open ? 'rotate-90' : ''}`}
+              className={`cursor-pointer h-[1.125rem] ${open ? 'rotate-90' : ''}`}
             >
               <Icon size="s" name={IconNames.ChevronForward} />
             </span>
@@ -85,7 +85,7 @@ export const Dropdown: FunctionComponent<DropdownProps> = ({
       )}
       {open && (
         <div
-          className={`${contentClassName} absolute overflow-auto z-50 translate-y-0.25 shadow`}
+          className={`${contentClassName} absolute overflow-auto z-50 translate-y-[0.25rem] shadow-dark-medium`}
           style={contentStyle}
         >
           {children}

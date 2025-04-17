@@ -29,7 +29,9 @@ export const RoomsHistoryItem: FunctionComponent<RoomsHistoryItemProps> = ({
   });
 
   return (
-    <div className={`p-0.5 cursor-pointer rounded-0.375 ${themeClassName}`}>
+    <div
+      className={`p-[0.5rem] cursor-pointer rounded-[0.375rem] ${themeClassName}`}
+    >
       <Link to={roomLink} className="no-underline">
         <div className="flex items-center justify-between">
           <RoomDateAndTime

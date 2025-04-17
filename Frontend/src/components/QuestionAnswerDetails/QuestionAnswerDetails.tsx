@@ -112,7 +112,7 @@ export const QuestionAnswerDetails: FunctionComponent<
             </Button>
           )}
           <Gap sizeRem={1} />
-          <div className="h-32.25">
+          <div className="h-[32.25rem]">
             <CodeEditor
               language={data.codeEditor?.lang || CodeEditorLang.Plaintext}
               languages={[data.codeEditor?.lang || CodeEditorLang.Plaintext]}

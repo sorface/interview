@@ -419,7 +419,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
   };
 
   const renderCreateRoomButton = () => (
-    <Button variant="active" className="h-2.5" aria-hidden>
+    <Button variant="active" className="h-[2.5rem]" aria-hidden>
       <Icon name={IconNames.Add} />
       {localizationCaptions[LocalizationKey.CreateRoom]}
     </Button>
@@ -465,7 +465,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
         onSearchChange={setSearchValueInput}
       >
         <ContextMenu
-          translateRem={{ x: -3.75, y: 0.25 }}
+          translateRem={{ x: -2.75, y: 0.25 }}
           toggleContent={renderCreateRoomButton()}
         >
           {[
@@ -517,7 +517,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
                   <ContextMenu
                     translateRem={{ x: 0, y: 0 }}
                     toggleContent={
-                      <Button className="h-2.5 text-grey3" aria-hidden>
+                      <Button className="h-[2.5rem] text-grey3" aria-hidden>
                         <Icon name={IconNames.Add} />
                         {localizationCaptions[LocalizationKey.CreateRoom]}
                       </Button>
@@ -586,7 +586,7 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
                   </Typography>
                 )}
                 {!roomsHistory || loadingRoomsHistory ? (
-                  <div className="flex justify-center items-center w-full h-full bg-wrap rounded-1.125">
+                  <div className="flex justify-center items-center w-full h-full bg-wrap rounded-[1.125rem]">
                     <Loader />
                   </div>
                 ) : (
