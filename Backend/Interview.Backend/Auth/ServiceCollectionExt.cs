@@ -1,9 +1,11 @@
+using Interview.Backend.Auth.Dev;
 using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Responses;
 using Interview.Backend.Users;
 using Interview.Domain.Users.Service;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Controllers;
 
 namespace Interview.Backend.Auth;
@@ -16,9 +18,66 @@ public static class ServiceCollectionExt
         [typeof(UserController)] = [nameof(UserController.GetMyself)],
     };
 
-    public static void AddAppAuth(this IServiceCollection self, AuthorizationService authorizationService)
+    public static void AddAppAuth(this IServiceCollection self, IHostEnvironment environment, AuthorizationService authorizationService)
     {
         self.AddSingleton<SemaphoreLockProvider<string>>();
+        if (environment.IsDevelopment())
+        {
+            AddDev(self, authorizationService);
+        }
+        else
+        {
+            AddProd(self, authorizationService);
+        }
+    }
+
+    private static void AddDev(IServiceCollection self, AuthorizationService authorizationService)
+    {
+        var defaultScheme = "DevBearer";
+        self
+            .AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = defaultScheme;
+                options.DefaultChallengeScheme = defaultScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.Audience = "Audience";
+                options.Authority = "Authority";
+                options.RequireHttpsMetadata = false;
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = async context =>
+                    {
+                        var user = context.Principal?.ToUser();
+                        if (user is null)
+                        {
+                            return;
+                        }
+
+                        var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
+                        var upsertUser = await userService.UpsertByExternalIdAsync(user);
+
+                        context.Principal!.EnrichRolesWithId(upsertUser);
+                    },
+                };
+            });
+
+        self.AddAuthentication(defaultScheme)
+            .AddScheme<DevelopmentAuthenticationSchemeOptions, DevelopmentAuthenticationHandler>(defaultScheme, null);
+
+        // This is custom and you might need change it to your needs.
+        self.AddAuthorization(option =>
+        {
+            option.AddPolicy("DevBearer", builder =>
+            {
+                builder.RequireAuthenticatedUser();
+            });
+        });
+    }
+
+    private static void AddProd(IServiceCollection self, AuthorizationService authorizationService)
+    {
         self.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;

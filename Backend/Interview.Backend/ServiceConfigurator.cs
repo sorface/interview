@@ -155,7 +155,7 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
         serviceCollection
             .AddSingleton<ITicketStore, DistributedCacheTicketStore>()
             .AddSession()
-            .AddAppAuth(sorfaceAuth);
+            .AddAppAuth(environment, sorfaceAuth);
     }
 
     private void AddRateLimiter(IServiceCollection serviceCollection)
@@ -209,6 +209,36 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
                 Contact = new OpenApiContact { Name = "Vladislav Petyukevich", Url = new Uri("https://github.com/VladislavPetyukevich"), Email = "test@yandex.ru", },
                 License = new OpenApiLicense { Name = "Example License", Url = new Uri("https://example.com/license"), },
             });
+
+            if (environment.IsDevelopment())
+            {
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization header using the Bearer scheme. Example: 'DevBearer TEST_BACKEND_DEV_USER'",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "DevBearer",
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "DevBearer",
+                            },
+                            Scheme = "oauth2",
+                            Name = "DevBearer",
+                            In = ParameterLocation.Header,
+                        },
+                        new List<string>()
+                    },
+                });
+            }
 
             var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
