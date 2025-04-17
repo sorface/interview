@@ -58,11 +58,11 @@ export const CalendarDay: FunctionComponent<CalendarDayProps> = ({
   return (
     <>
       <div
-        className={`relative flex items-center justify-center w-2.5 h-2.5 p-0.3125 ${notCurrentMonth ? '' : 'rounded-full'} cursor-pointer box-border ${notCurrentMonthClassName}`}
+        className={`relative flex items-center justify-center w-[2.5rem] h-[2.5rem] p-[0.3125rem] ${notCurrentMonth ? '' : 'rounded-full'} cursor-pointer box-border ${notCurrentMonthClassName}`}
         onClick={onClick}
       >
         {day?.getDate() === 1 && !currentDay && !selected && (
-          <div className="absolute leading-0" style={{ top: 0 }}>
+          <div className="absolute leading-[0rem]" style={{ top: 0 }}>
             <Typography size="xs" secondary>
               {getMonthName(day, lang)}
             </Typography>
@@ -74,7 +74,7 @@ export const CalendarDay: FunctionComponent<CalendarDayProps> = ({
           <Typography size="m">{day?.getDate() || ''}</Typography>
           {selected && (
             <div
-              className={`${closeThemedClassName} absolute translate-x-0.75-y--0.75 w-1 h-1 flex items-center justify-center rounded-full`}
+              className={`${closeThemedClassName} absolute translate-x-[0.75rem] translate-y-[-0.75rem] w-[1rem] h-[1rem] flex items-center justify-center rounded-full`}
             >
               <Icon name={IconNames.Close} inheritFontSize size="s" />
             </div>

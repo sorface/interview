@@ -27,7 +27,7 @@ export const VideochatParticipantWithoutVideo: FunctionComponent<
       style={{ order: orderSafe }}
     >
       <div
-        className={`h-full flex flex-col items-center justify-center rounded-1.25 ${viewerThemedClassName}`}
+        className={`h-full flex flex-col items-center justify-center rounded-[1.25rem] ${viewerThemedClassName}`}
       >
         <div className="flex items-center">
           <Typography size="xxl">{nickname}</Typography>

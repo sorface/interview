@@ -27,7 +27,7 @@ export const QuestionsProgress: FunctionComponent<QuestionsProgressProps> = ({
         className={`absolute h-full move-transition ${progressThemedClassName}`}
         style={{ width: `${value}%` }}
       ></div>
-      <div className="absolute h-full flex items-center px-1.25">
+      <div className="absolute h-full flex items-center px-[1.25rem]">
         <Typography size="m" semibold>
           {localizationCaptions[LocalizationKey.Completed]} {value}%
         </Typography>

@@ -37,13 +37,13 @@ const ContextMenuComponent: FunctionComponent<ContextMenuProps> = ({
       toggleContent={toggleContent || defaultToggleContent}
       useButton={useButton}
       buttonVariant={buttonVariant}
-      contentClassName={contentClassName ?? 'w-13.75 rounded-0.75'}
+      contentClassName={contentClassName ?? 'w-[13.75rem] rounded-[0.75rem]'}
       toggleClassName="flex"
       contentStyle={{
         transform: `translate(${translateRem.x}rem, ${translateRem.y}rem)`,
       }}
     >
-      <div className={`${contentThemedClassName} py-0.5`}>{children}</div>
+      <div className={`${contentThemedClassName} py-[0.5rem]`}>{children}</div>
     </Dropdown>
   );
 };
@@ -58,7 +58,10 @@ const ContextMenuItem: FunctionComponent<ContextMenuItemProps> = ({
   onClick,
 }) => {
   return (
-    <div className="cursor-pointer hover:bg-form px-1 py-0.5" onClick={onClick}>
+    <div
+      className="cursor-pointer hover:bg-form px-[1rem] py-[0.5rem]"
+      onClick={onClick}
+    >
       <Typography size="m">{title}</Typography>
     </div>
   );

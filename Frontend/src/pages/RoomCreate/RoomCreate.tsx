@@ -455,7 +455,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
   ) => (
     <Fragment>
       <div className="flex w-full">
-        <div className="flex flex-col w-1.75 text-right text-grey2">
+        <div className="flex flex-col w-[1.75rem] text-right text-grey2">
           <Gap sizeRem={1} />
           <Typography size="xxl" bold>
             {index + 1}
@@ -520,7 +520,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
                   value={formatDate(roomFields.scheduleStartTime)}
                   type="date"
                   required
-                  className="mr-0.5"
+                  className="mr-[0.5rem]"
                   onChange={handleChangeStartDate}
                 />
                 <input
@@ -529,10 +529,10 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
                   value={formatTime(roomFields.scheduleStartTime)}
                   type="time"
                   required
-                  className="mr-0.5"
+                  className="mr-[0.5rem]"
                   onChange={handleChangeStartTime}
                 />
-                <span className="mr-0.5">
+                <span className="mr-[0.5rem]">
                   <Typography size="s">-</Typography>
                 </span>
                 <input

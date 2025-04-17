@@ -193,10 +193,10 @@ export const EnterVideoChatModal: FunctionComponent<
   const screens: { [key in Screen]: JSX.Element } = {
     [Screen.Joining]: (
       <>
-        <div className="pr-4">
-          <div className="relative w-37 h-28">
+        <div className="pr-[4rem]">
+          <div className="relative w-[37rem] h-[28rem]">
             <div
-              className={`flex items-center justify-center w-37 h-28 rounded-1.25 ${joinPreviewThemedClassName}`}
+              className={`flex items-center justify-center w-[37rem] h-[28rem] rounded-[1.25rem] ${joinPreviewThemedClassName}`}
             >
               <Typography size="xxl">{auth?.nickname}</Typography>
             </div>
@@ -238,7 +238,7 @@ export const EnterVideoChatModal: FunctionComponent<
             </Typography>
           </div>
         </div>
-        <div className="w-20 flex flex-col items-center text-center">
+        <div className="w-[20rem] flex flex-col items-center text-center">
           {joiningRoomHeader}
           {loading ? (
             <Loader />
@@ -260,14 +260,14 @@ export const EnterVideoChatModal: FunctionComponent<
     ),
     [Screen.SetupDevices]: (
       <>
-        <div className="pr-4">
-          <div className="relative w-37 h-28">
+        <div className="pr-[4rem]">
+          <div className="relative w-[37rem] h-[28rem]">
             <video
               ref={userVideo}
               muted
               autoPlay
               playsInline
-              className="w-37 h-28 rounded-1.25 object-cover"
+              className="w-[37rem] h-[28rem] rounded-[1.25rem] object-cover"
             >
               Video not supported
             </video>
@@ -300,7 +300,7 @@ export const EnterVideoChatModal: FunctionComponent<
             />
           </Typography>
         </div>
-        <div className="w-20 flex flex-col items-center text-center">
+        <div className="w-[20rem] flex flex-col items-center text-center">
           {joiningRoomHeader}
           <div>
             <div className="flex items-center">
@@ -321,7 +321,7 @@ export const EnterVideoChatModal: FunctionComponent<
               />
             </div>
             <Gap sizeRem={1.25} />
-            <div className="w-full max-w-29.25 grid grid-cols-settings-list gap-y-1">
+            <div className="w-full max-w-[29.25rem] grid grid-cols-settings-list gap-y-[1rem]">
               <RecognitionLangSwitch />
             </div>
             <Gap sizeRem={0.25} />
@@ -363,15 +363,19 @@ export const EnterVideoChatModal: FunctionComponent<
       }}
     >
       <Link to={pathnames.highlightRooms} className="no-underline">
-        <div className="action-modal-header absolute flex items-center px-0.5 py-0.5 h-4">
-          <div className="w-2.375 h-2.375 pr-1">
+        <div className="action-modal-header absolute flex items-center h-[2.375rem] mt-[1.3125rem] ml-[0.5rem]">
+          <div className="w-[2.375rem] h-[2.375rem] mr-[1rem]">
             <img
-              className="w-2.375 h-2.375 rounded-0.375"
+              className="w-[2.375rem] h-[2.375rem] rounded-[0.375rem]"
               src="/logo192.png"
               alt="site logo"
             />
           </div>
-          <h3>{room?.name}</h3>
+          <h3>
+            <Typography size="xl" semibold>
+              {room?.name}
+              </Typography>
+          </h3>
         </div>
       </Link>
       <div className="flex items-center justify-center mt-auto mb-auto">

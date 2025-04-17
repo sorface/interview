@@ -9,6 +9,8 @@ import { ThemeSwitch } from '../../../../components/ThemeSwitch/ThemeSwitch';
 import { Checkbox } from '../../../../components/Checkbox/Checkbox';
 import { Typography } from '../../../../components/Typography/Typography';
 import { UserStreamsContext } from '../../context/UserStreamsContext';
+import { DeviceSelect } from '../VideoChat/DeviceSelect';
+import { IconNames } from '../../../../constants';
 
 interface RoomSettingsProps {
   open: boolean;
@@ -20,8 +22,13 @@ export const RoomSettings: FunctionComponent<RoomSettingsProps> = ({
   onRequestClose,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
-  const { backgroundRemoveEnabled, setBackgroundRemoveEnabled } =
-    useContext(UserStreamsContext);
+  const {
+    backgroundRemoveEnabled,
+    devices,
+    setBackgroundRemoveEnabled,
+    setSelectedCameraId,
+    setSelectedMicId,
+  } = useContext(UserStreamsContext);
 
   const handleBackgroundRemoveSwitch = () => {
     setBackgroundRemoveEnabled(!backgroundRemoveEnabled);
@@ -34,7 +41,7 @@ export const RoomSettings: FunctionComponent<RoomSettingsProps> = ({
       onClose={onRequestClose}
     >
       <div className="flex-1 flex flex-col items-center">
-        <div className="w-full max-w-29.25 grid grid-cols-settings-list gap-y-1">
+        <div className="w-full max-w-[29.25rem] grid grid-cols-settings-list gap-y-[1rem]">
           <ThemeSwitch />
           <LangSwitch />
           <RecognitionLangSwitch />
@@ -49,6 +56,26 @@ export const RoomSettings: FunctionComponent<RoomSettingsProps> = ({
               label=""
               checked={backgroundRemoveEnabled}
               onChange={handleBackgroundRemoveSwitch}
+            />
+          </div>
+        </div>
+        <Gap sizeRem={1} />
+        <div className="w-full max-w-[29.25rem]">
+          <div className="flex">
+            <DeviceSelect
+              devices={devices.mic}
+              localStorageKey="defalutMic"
+              onSelect={setSelectedMicId}
+              icon={IconNames.MicOn}
+            />
+          </div>
+          <Gap sizeRem={1} />
+          <div className="flex">
+            <DeviceSelect
+              devices={devices.camera}
+              localStorageKey="defalutCamera"
+              onSelect={setSelectedCameraId}
+              icon={IconNames.VideocamOn}
             />
           </div>
         </div>

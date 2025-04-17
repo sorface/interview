@@ -233,7 +233,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
               <Icon name={IconNames.ThemeSwitchDark} />
             </div>
           </div>
-          <div className="nav-menu-build h-1.125 opacity-0.5">
+          <div className="nav-menu-build h-[1.125rem] opacity-50">
             <Typography size="s">
               {localizationCaptions[LocalizationKey.BuildHash]}:{' '}
               {VITE_BUILD_HASH}

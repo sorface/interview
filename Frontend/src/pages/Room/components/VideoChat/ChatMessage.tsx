@@ -31,8 +31,8 @@ export const ChatMessage: FunctionComponent<ChatMessageProps> = ({
     [Theme.Light]: 'bg-grey1',
   });
   const currentUserMessageClassName = useThemeClassName({
-    [Theme.Dark]: 'bg-dark-active rounded-br-0',
-    [Theme.Light]: 'bg-blue-light rounded-br-0',
+    [Theme.Dark]: 'bg-dark-active rounded-br-none',
+    [Theme.Light]: 'bg-blue-light rounded-br-none',
   });
 
   return (
@@ -48,7 +48,7 @@ export const ChatMessage: FunctionComponent<ChatMessageProps> = ({
           </div>
         )}
         <div
-          className={`${fromCurrentUser ? currentUserMessageClassName : messageClassName} ${fromCurrentUser ? 'max-w-12' : ''} overflow-auto flex flex-1 flex-col py-0.25 px-0.5 rounded-0.5`}
+          className={`${fromCurrentUser ? currentUserMessageClassName : messageClassName} ${fromCurrentUser ? 'max-w-[12rem]' : ''} overflow-auto flex flex-1 flex-col py-[0.25rem] px-[0.5rem] rounded-[0.5rem]`}
         >
           {!fromCurrentUser && !stackWithPrevious && (
             <div className="flex items-center">

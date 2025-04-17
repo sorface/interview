@@ -639,8 +639,6 @@ export const RoomQuestionPanelAi: FunctionComponent<
 
   return (
     <>
-      <Gap sizeRem={1} />
-
       {errorRoomActiveQuestion && (
         <>
           <Gap sizeRem={1} />
@@ -653,7 +651,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
         <div className="flex flex-col">
           <Gap sizeRem={2.5} />
           <div
-            className="bg-wrap rounded-2.5 flex-1 flex flex-col"
+            className="bg-wrap rounded-[2.5rem] flex-1 flex flex-col"
             style={{
               borderTopLeftRadius: 0,
               borderBottomLeftRadius: 0,
@@ -669,13 +667,13 @@ export const RoomQuestionPanelAi: FunctionComponent<
         </div>
         <Gap sizeRem={1.75} horizontal />
         <div
-          className="relative bg-wrap flex-1 rounded-2.5 flex flex-col"
+          className="relative bg-wrap flex-1 rounded-[2.5rem] flex flex-col"
           style={{ width: '840px' }}
         >
           {!copilotAnswerOpen && questionTimerStartDate && (
             <div
-              className="absolute"
-              style={{ top: '1.125rem', right: '1.625rem' }}
+              className="absolute z-10"
+              style={{ top: '1rem', right: '1.875rem' }}
             >
               <RoomTimerAi
                 startTime={questionTimerStartDate}
@@ -705,7 +703,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
           {statusPanelVisible && (
             <>
               <Gap sizeRem={copilotAnswerOpen ? 1.6875 : 7.6875} />
-              <div className="flex flex-col px-4.75 h-full">
+              <div className="flex flex-col px-[4.75rem] h-full">
                 <div className="flex">
                   <div className="flex items-center justify-center">
                     <div
@@ -754,7 +752,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                   <>
                     <Button
                       variant="invertedActive"
-                      className="absolute min-w-unset w-2.5 h-2.5 p-0 z-1"
+                      className="absolute min-w-[0rem] w-[2.5rem] h-[2.5rem] !p-[0rem] z-1"
                       style={{
                         right: '-1.25rem',
                         top: 'calc(50% - 1.25rem)',
@@ -775,7 +773,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                     <Gap sizeRem={2} />
                     <div className="flex flex-1">
                       <div
-                        className={`flex-1 flex flex-col text-left px-1.875 h-full rounded-1.5 ${themeInUi === Theme.Dark ? 'bg-dark-dark1' : ''}`}
+                        className={`flex-1 flex flex-col text-left px-[1.875rem] h-full rounded-[1.5rem] ${themeInUi === Theme.Dark ? 'bg-dark-dark1' : ''}`}
                         style={{
                           background:
                             themeInUi === Theme.Light
@@ -820,7 +818,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                       </div>
                       <Gap sizeRem={0.625} horizontal />
                       <div
-                        className={`flex-1 flex flex-col text-left px-1.875 h-full rounded-1.5 ${themeInUi === Theme.Dark ? 'bg-dark-dark1' : ''}`}
+                        className={`flex-1 flex flex-col text-left px-[1.875rem] h-full rounded-[1.5rem] ${themeInUi === Theme.Dark ? 'bg-dark-dark1' : ''}`}
                         style={{
                           background:
                             themeInUi === Theme.Light
@@ -862,14 +860,13 @@ export const RoomQuestionPanelAi: FunctionComponent<
           {children}
           {!statusPanelVisible && (
             <div
-              className="absolute flex items-center justify-center z-60"
+              className="absolute flex items-center justify-center z-20"
               style={{
                 bottom: '97px',
                 right: '44px',
               }}
             >
               <div
-                className={`z-0`}
                 style={{
                   width: '86px',
                   height: '86px',
@@ -895,7 +892,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
         <div className="flex flex-col">
           <Gap sizeRem={2.5} />
           <div
-            className="bg-wrap rounded-2.5 flex-1 flex flex-col"
+            className="bg-wrap rounded-[2.5rem] flex-1 flex flex-col"
             style={{
               borderTopRightRadius: 0,
               borderBottomRightRadius: 0,
