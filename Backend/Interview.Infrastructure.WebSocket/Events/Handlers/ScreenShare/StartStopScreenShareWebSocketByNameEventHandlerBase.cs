@@ -11,6 +11,7 @@ namespace Interview.Infrastructure.WebSocket.Events.Handlers.ScreenShare;
 public abstract class StartStopScreenShareWebSocketByNameEventHandlerBase(
     ILogger<StartStopScreenShareWebSocketByNameEventHandlerBase> logger,
     IUserWebSocketConnectionProvider userWebSocketConnectionProvider,
+    ILogger<StartStopScreenShareWebSocketByNameEventHandlerBase> startStopScreenShareWebSocketByNameEventHandlerBaseLogger,
     ILogger<WebSocketEventSender> webSocketEventSender,
     IEventSenderAdapter eventSenderAdapter,
     IEventSerializer serializer,
@@ -19,20 +20,22 @@ public abstract class StartStopScreenShareWebSocketByNameEventHandlerBase(
 {
     protected IUserWebSocketConnectionProvider UserWebSocketConnectionProvider => userWebSocketConnectionProvider;
 
+    protected abstract string SendUserEventType { get; }
+
     protected override async Task HandleEventAsync(SocketEventDetail detail, string? payload, CancellationToken cancellationToken)
     {
-        if (!PerformAction(detail.UserId, detail.RoomId, detail.WebSocket))
-        {
-            return;
-        }
-
         try
         {
+            if (!PerformAction(detail.UserId, detail.RoomId, detail.WebSocket))
+            {
+                return;
+            }
+
             await SendEventsAsync(detail, cancellationToken);
         }
         catch (Exception e)
         {
-            Logger.LogError(e, "During send join video chat event");
+            startStopScreenShareWebSocketByNameEventHandlerBaseLogger.LogError(e, "During {SendUserEventType}", SendUserEventType);
         }
     }
 
@@ -45,33 +48,25 @@ public abstract class StartStopScreenShareWebSocketByNameEventHandlerBase(
             return;
         }
 
-        var users = subscribers
-            .DistinctBy(e => e.User.Id)
-            .Select(e => new AllUserDetail
-            {
-                Id = e.User.Id,
-                Nickname = e.User.Nickname,
-                Avatar = e.User.Avatar,
-                ParticipantType = e.ParticipantType,
-                ScreenShareEnabled = e.ScreenShareEnabled,
-            }).ToList();
-        var strPayload = serializer.SerializePayloadAsString(users);
-        var newEvent = new RoomEvent
+        var payloadForSerialization = new
+        {
+            UserId = detail.User.Id,
+            ParticipantType = detail.ParticipantType,
+        };
+
+        var payloadStr = serializer.SerializePayloadAsString(payloadForSerialization);
+        var sendEvent = new RoomEvent
         {
             RoomId = detail.RoomId,
-            Type = EventType.AllUsers,
-            Value = strPayload,
+            Type = SendUserEventType,
+            Value = payloadStr,
             CreatedById = detail.UserId,
         };
-        var provider = new CachedRoomEventProvider(newEvent, serializer);
-        var sender = new WebSocketEventSender(webSocketEventSender, detail.WebSocket);
-        await eventSenderAdapter.SendAsync(provider, sender, cancellationToken);
+        var provider = new CachedRoomEventProvider(sendEvent, serializer);
+        foreach (var subscriber in subscribers)
+        {
+            var sender = new WebSocketEventSender(webSocketEventSender, subscriber.WebSocket);
+            await eventSenderAdapter.SendAsync(provider, sender, cancellationToken);
+        }
     }
 }
-
-/*
-Make event 'start screen share' similar to 'join video chat'.
-Make event 'screen share started' similar to 'user joined'.
-The event adds a screen share to the list of room participants. A separate indicator is needed that this is a screen share.
-Add 'screen share stop'
- */

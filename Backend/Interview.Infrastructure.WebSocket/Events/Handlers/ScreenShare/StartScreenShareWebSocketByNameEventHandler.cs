@@ -11,12 +11,15 @@ public class StartScreenShareWebSocketByNameEventHandler(
     ILogger<StartScreenShareWebSocketByNameEventHandler> logger,
     IUserWebSocketConnectionProvider userWebSocketConnectionProvider,
     ILogger<WebSocketEventSender> webSocketEventSender,
+    ILogger<StartScreenShareWebSocketByNameEventHandler> startStopScreenShareWebSocketByNameEventHandlerBaseLogger,
     IEventSenderAdapter eventSenderAdapter,
     IEventSerializer serializer,
     IEventDeserializer deserializer)
-    : StartStopScreenShareWebSocketByNameEventHandlerBase(logger, userWebSocketConnectionProvider, webSocketEventSender, eventSenderAdapter, serializer, deserializer)
+    : StartStopScreenShareWebSocketByNameEventHandlerBase(logger, userWebSocketConnectionProvider, startStopScreenShareWebSocketByNameEventHandlerBaseLogger, webSocketEventSender, eventSenderAdapter, serializer, deserializer)
 {
     protected override string SupportType => "start screen share";
+
+    protected override string SendUserEventType => "screen share started";
 
     protected override bool PerformAction(Guid userId, Guid roomId, System.Net.WebSockets.WebSocket webSocket)
         => UserWebSocketConnectionProvider.StartScreenShare(userId, roomId, webSocket);
