@@ -12,6 +12,7 @@ export interface IconProps {
   inheritFontSize?: boolean;
   secondary?: boolean;
   danger?: boolean;
+  hover?: boolean;
 }
 
 const getSizeClassName = (size: IconProps['size']) => {
@@ -35,6 +36,7 @@ export const Icon: FunctionComponent<IconProps> = ({
   inheritFontSize,
   secondary,
   danger,
+  hover,
 }) => {
   const sizeClassName = inheritFontSize ? '' : getSizeClassName(size || 'm');
   const themeSecondaryClassName = useThemeClassName({
@@ -47,13 +49,18 @@ export const Icon: FunctionComponent<IconProps> = ({
     [Theme.Light]: 'text-red',
   });
   const dangerClassName = danger ? themeDangerClassName : '';
+  const themeHoverClassName = useThemeClassName({
+    [Theme.Dark]: 'hover:text-grey2',
+    [Theme.Light]: 'hover:text-dark',
+  });
+  const hoverClassName = hover ? themeHoverClassName : '';
 
   return (
     <div
       className={`icon ${sizeClassName} ${secondaryClassName} ${dangerClassName}`}
       role="img"
     >
-      <div className="icon-inner">
+      <div className={`icon-inner ${hoverClassName}`}>
         <svg>
           <use href={`${iconsSpritesheet}#${name}`} />
         </svg>
