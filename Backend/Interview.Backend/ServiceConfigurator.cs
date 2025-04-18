@@ -142,7 +142,7 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
         serviceCollection.AddAppServices(serviceOption);
 
         var openIdConnectOptions = configuration.GetSection(nameof(OpenIdConnectOptions)).Get<OpenIdConnectOptions>()!;
-        serviceCollection.AddAppAuth(openIdConnectOptions);
+        serviceCollection.AddAppAuth(environment, openIdConnectOptions);
     }
 
     private void AddRateLimiter(IServiceCollection serviceCollection)

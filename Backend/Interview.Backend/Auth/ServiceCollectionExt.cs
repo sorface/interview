@@ -107,5 +107,4 @@ public static class ServiceCollectionExt
                 .Build();
         });
     }
-
 }
