@@ -80,7 +80,7 @@ export const LangSwitch = ({
     return (
       <Button
         variant="invertedAlternative"
-        className="min-w-unset w-2.375 h-2.375 p-0"
+        className="min-w-[0rem] w-[2.375rem] h-[2.375rem] p-[0rem]"
         onClick={() =>
           setLang(
             lang === LocalizationLang.ru

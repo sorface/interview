@@ -36,13 +36,17 @@ export const Session: FunctionComponent = () => {
             {auth?.nickname || ''}
           </Typography>
           <Gap sizeRem={2} />
-          <div className="w-full max-w-29.25 grid grid-cols-settings-list gap-y-1">
+          <div className="w-full max-w-[29.25rem] grid grid-cols-settings-list gap-y-[1rem]">
             <ThemeSwitch />
             <LangSwitch />
             <RecognitionLangSwitch />
           </div>
           <Gap sizeRem={2} />
-          <Button variant="danger" className="max-w-12" onClick={handleLogOut}>
+          <Button
+            variant="danger"
+            className="max-w-[12rem]"
+            onClick={handleLogOut}
+          >
             {localizationCaptions[LocalizationKey.LogOut]}
           </Button>
           <Gap sizeRem={10.625} />

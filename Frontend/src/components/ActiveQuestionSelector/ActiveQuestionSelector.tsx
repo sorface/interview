@@ -153,7 +153,7 @@ export const ActiveQuestionSelector: FunctionComponent<
               </Typography>
             </div>
             {!!initialQuestion && (
-              <div className="ml-auto border border-button border-solid px-0.75 py-0.125 rounded-2">
+              <div className="ml-auto border border-button border-solid px-[0.75rem] py-[0.125rem] rounded-[2rem]">
                 <Typography size="s">
                   {`${closedQuestionsCount} ${localizationCaptions[LocalizationKey.Of]} ${questionsCount}`}
                 </Typography>
@@ -162,11 +162,13 @@ export const ActiveQuestionSelector: FunctionComponent<
           </div>
         </div>
         <Gap sizeRem={1} />
-        <progress
-          className="w-full h-0.125"
-          value={closedQuestionsCount}
-          max={questionsCount}
-        ></progress>
+        {initialQuestion && (
+          <progress
+            className="w-full h-[0.125rem]"
+            value={closedQuestionsCount}
+            max={questionsCount}
+          ></progress>
+        )}
         {showMenu && (
           <div className="text-left">
             {questions.length === 0 && (
@@ -175,7 +177,7 @@ export const ActiveQuestionSelector: FunctionComponent<
               </div>
             )}
             <Gap sizeRem={1} />
-            <div className="grid grid-cols-questions-list gap-y-0.5">
+            <div className="grid grid-cols-questions-list gap-y-[0.5rem]">
               {questions.map((question) => (
                 <Fragment key={question.id}>
                   <Typography size="m">{question.order + 1}.</Typography>

@@ -5,7 +5,6 @@ import reportWebVitals from './reportWebVitals';
 import { loader } from '@monaco-editor/react';
 import '@convergencelabs/monaco-collab-ext/css/monaco-collab-ext.css';
 import './index.css';
-import './common.css';
 
 loader.config({ paths: { vs: '/vs' } });
 

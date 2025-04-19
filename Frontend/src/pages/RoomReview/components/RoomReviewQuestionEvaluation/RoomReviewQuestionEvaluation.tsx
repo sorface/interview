@@ -130,7 +130,7 @@ export const RoomReviewQuestionEvaluation: FunctionComponent<
         validateComment
         onChange={handleRoomQuestionEvaluationChange}
       />
-      <div className="text-left h-1.125">
+      <div className="text-left h-[1.125rem]">
         {mergedRoomQuestionEvaluation && (
           <Typography size="s">
             <Icon name={IconNames.CheckmarkDone} />

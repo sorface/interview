@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --pi: 3.14159265358979;
 
@@ -33,13 +37,16 @@
   --dark-disable: #182947;
   --dark-input: #4c556b;
   --dark-red: #e0473a;
-
-  --text: var(--dark-white);
   --page-bg: #0b1529;
-  --form-bg: var(--page-bg);
-  --wrap-bg: var(--dark-dark2);
   --active: #b9221c;
   --disabled-icon: #b9221c;
+  --shadow: #100908;
+  --bg: #400000;
+  --bg-success: #103000;
+
+  --text: var(--dark-white);
+  --form-bg: var(--page-bg);
+  --wrap-bg: var(--dark-dark2);
   --active-nav-tab: var(--dark-active);
   --nav-header-color: var(--text);
   --nav-item-color: var(--dark-grey4);
@@ -47,9 +54,6 @@
   --nav-item-active-background: var(--active-nav-tab);
   --nav-item-active-color: var(--text);
   --nav-category-item-active-color: var(--nav-item-active-color);
-  --shadow: #100908;
-  --bg: #400000;
-  --bg-success: #103000;
   --progress-bg: var(--shadow);
   --progress-1: var(--active);
   --progress-2: var(--form-bg);
@@ -308,4 +312,12 @@ textarea {
 ::placeholder {
   color: var(--text);
   opacity: 0.75; /* Firefox */
+}
+
+.invisible-scroll {
+  scrollbar-width: none;
+}
+
+.invisible-scroll::-webkit-scrollbar {
+  display: none;
 }

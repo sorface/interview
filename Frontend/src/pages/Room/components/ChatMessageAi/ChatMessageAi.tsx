@@ -43,7 +43,7 @@ export const ChatMessageAi: FunctionComponent<ChatMessageAiProps> = ({
       )}
       <div className={`flex ${children ? '' : 'w-fit'}`}>
         <div
-          className={`${fromAi ? messageClassName : currentUserMessageClassName} overflow-auto flex-1 text-left flex flex-col px-0.5 rounded-0.5`}
+          className={`${fromAi ? messageClassName : currentUserMessageClassName} overflow-auto flex-1 text-left flex flex-col px-[0.5rem] rounded-[0.5rem]`}
         >
           <Gap sizeRem={0.5} />
           {children || <Typography size="xxl">{message}</Typography>}

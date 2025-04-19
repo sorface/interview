@@ -235,8 +235,8 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
 
   return (
     <>
-      <div className="flex-1 flex justify-center">
-        <div className="w-full flex flex-col relative rounded-1.125">
+      <div className="flex-1 flex justify-center z-10">
+        <div className="w-full flex flex-col relative rounded-[1.125rem]">
           <RoomQuestionPanelAi
             questionWithCode={codeEditorEnabled}
             roomQuestionsLoading={roomQuestionsLoading}
@@ -250,7 +250,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                 bottom: '-53px',
               }}
             >
-              <div className="z-50">
+              <div className="z-20">
                 <video
                   ref={userVideoMainContent}
                   className="rounded-full videochat-video object-cover z-1"
@@ -267,7 +267,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                 >
                   <Button
                     variant="invertedAlternative"
-                    className="min-w-unset w-2.5 h-2.5 p-0 z-1"
+                    className="min-w-[0rem] w-[2.5rem] h-[2.5rem] !p-[0rem] z-1"
                     onClick={handleMicSwitch}
                   >
                     <Icon
@@ -278,7 +278,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                   <Gap sizeRem={0.5} horizontal />
                   <Button
                     variant="invertedAlternative"
-                    className="min-w-unset w-2.5 h-2.5 p-0 z-1"
+                    className="min-w-[0rem] w-[2.5rem] h-[2.5rem] !p-[0rem] z-1"
                     onClick={handleCameraSwitch}
                   >
                     <Icon
@@ -310,7 +310,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
             </div>
           </RoomQuestionPanelAi>
           <Gap sizeRem={1.5} />
-          <div className="flex h-2.375">
+          <div className="flex h-[2.375rem]">
             <Gap sizeRem={3.375} horizontal />
             <LangSwitch elementType="button" />
             <Gap sizeRem={0.5} horizontal />
@@ -322,12 +322,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
         </div>
       </div>
 
-      <div
-        className="absolute videochat-field overflow-auto right-1"
-        style={{
-          height: 'calc(100% - 0.75rem)',
-        }}
-      >
+      <div className="absolute videochat-field overflow-auto right-[1rem]">
         <div
           className={`videochat ${messagesChatEnabled ? 'invisible h-full' : 'visible'}`}
         >
@@ -356,7 +351,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
         </div>
 
         <div
-          className={`absolute top-0 h-full bg-wrap w-full ${messagesChatEnabled ? 'visible' : 'invisible'} z-1`}
+          className={`absolute top-[0rem] h-full bg-wrap w-full ${messagesChatEnabled ? 'visible' : 'invisible'} z-1`}
         >
           <MessagesChat
             textMessages={textMessages}

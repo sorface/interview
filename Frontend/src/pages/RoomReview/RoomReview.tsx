@@ -326,7 +326,7 @@ export const RoomReview: FunctionComponent = () => {
           </Typography>
           <Gap sizeRem={1} />
           <Textarea
-            className="h-3.625"
+            className="h-[3.625rem]"
             maxLength={roomReviewMaxLength}
             showMaxLength={true}
             value={roomReviewValue ?? myRoomReview?.review ?? ''}

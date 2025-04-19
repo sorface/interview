@@ -82,7 +82,7 @@ export const Calendar: FunctionComponent<CalendarProps> = ({
   const days = getWeekDays(lang);
 
   const daysThemedClassName = useThemeClassName({
-    [Theme.Dark]: 'border-grey-3',
+    [Theme.Dark]: 'border-grey3',
     [Theme.Light]: 'border-grey-active',
   });
   const startMonthShift =
@@ -110,26 +110,26 @@ export const Calendar: FunctionComponent<CalendarProps> = ({
   );
 
   return (
-    <div className="w-fit h-fit select-none bg-wrap rounded-1.125">
-      <div className="capitalize flex justify-between px-0.875 py-0.25 h-2 items-center">
-        <div className="cursor-pointer opacity-0.5" onClick={onMonthBackClick}>
+    <div className="w-fit h-fit select-none bg-wrap rounded-[1.125rem]">
+      <div className="capitalize flex justify-between px-[0.875rem] py-[0.25rem] h-[2rem] items-center">
+        <div className="cursor-pointer opacity-50" onClick={onMonthBackClick}>
           <Icon name={IconNames.ChevronBack} size="s" />
         </div>
         <Typography size="l" bold>
           {getMonthName(monthStartDate, lang)}
         </Typography>
         <div
-          className="cursor-pointer opacity-0.5"
+          className="cursor-pointer opacity-50"
           onClick={onMonthForwardClick}
         >
           <Icon name={IconNames.ChevronForward} size="s" />
         </div>
       </div>
       <div
-        className={`flex items-center h-1.375 border-b-1 border-b-solid ${daysThemedClassName}`}
+        className={`flex items-center h-[1.375rem] border-b-[1px] border-b-solid ${daysThemedClassName}`}
       >
         {days.map((day) => (
-          <div key={day} className="capitalize w-2.5">
+          <div key={day} className="capitalize w-[2.5rem]">
             <Typography size="xs">{day}</Typography>
           </div>
         ))}
@@ -137,7 +137,7 @@ export const Calendar: FunctionComponent<CalendarProps> = ({
       {daysChunks.map((daysChunk, index) => (
         <div
           key={`daysChunk${index}`}
-          className={`flex ${loading ? 'opacity-0.5' : ''}`}
+          className={`flex ${loading ? 'opacity-50' : ''}`}
         >
           {daysChunk.map((day, dayIndex) => (
             <CalendarDay
