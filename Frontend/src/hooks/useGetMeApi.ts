@@ -1,6 +1,7 @@
 import { useCallback, useReducer } from 'react';
 import { VITE_BACKEND_URL } from '../config';
 import { User } from '../types/user';
+import { getDevAuthorization } from '../utils/devAuthorization';
 
 interface GetMeState {
   process: {
@@ -87,6 +88,7 @@ export const useGetMeApi = () => {
     try {
       const response = await fetch(`${VITE_BACKEND_URL}/users/self`, {
         credentials: 'include',
+        headers: getDevAuthorization(),
       });
       dispatch({
         name: 'setCode',

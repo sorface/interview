@@ -7,7 +7,7 @@ import React, {
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
-import { HomeAction } from './components/HomeContent/HomeAction';
+import { HomeAction } from './components/HomeAction';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { Gap } from '../../components/Gap/Gap';
