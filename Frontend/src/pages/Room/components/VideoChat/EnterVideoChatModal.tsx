@@ -374,7 +374,7 @@ export const EnterVideoChatModal: FunctionComponent<
           <h3>
             <Typography size="xl" semibold>
               {room?.name}
-              </Typography>
+            </Typography>
           </h3>
         </div>
       </Link>
