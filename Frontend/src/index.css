@@ -318,6 +318,6 @@ textarea {
   scrollbar-width: none;
 }
 
-.invisible-scroll::-webkit-scrollbar { 
+.invisible-scroll::-webkit-scrollbar {
   display: none;
 }

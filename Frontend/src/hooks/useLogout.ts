@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useReducer } from 'react';
 import { VITE_BACKEND_URL } from '../config';
+import { clearDevAuthorization } from '../utils/devAuthorization';
 
 interface LogoutState {
   process: {
@@ -79,6 +80,11 @@ export const useLogout = () => {
   }, [logoutCode]);
 
   const logout = useCallback(async () => {
+    if (import.meta.env.MODE === 'development') {
+      clearDevAuthorization();
+      location.reload();
+      return;
+    }
     dispatch({ name: 'startLoad' });
     try {
       const response = await fetch(`${VITE_BACKEND_URL}/logout`, {
