@@ -48,5 +48,9 @@ export const useAudioProcessedStream = (
     };
   }, [audioInstruments, userAudioStream, enabled]);
 
-  return userAudioStream ? audioInstruments?.dest.stream : null;
+  if (!audioInstruments) {
+    return null;
+  }
+
+  return userAudioStream ? audioInstruments.dest.stream : null;
 };
