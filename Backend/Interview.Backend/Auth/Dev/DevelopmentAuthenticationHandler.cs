@@ -80,7 +80,6 @@ public class DevelopmentAuthenticationHandler(
         var appDbContext = Context.RequestServices.GetRequiredService<AppDbContext>();
         var dbUser = await appDbContext.Users
             .Include(e => e.Roles)
-            .AsNoTracking()
             .FirstOrDefaultAsync(e => e.Nickname == user);
         if (dbUser is null)
         {
