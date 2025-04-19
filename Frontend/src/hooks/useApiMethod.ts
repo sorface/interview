@@ -121,6 +121,7 @@ const createFetchRequestInit = (apiContract: ApiContract) => {
   return {
     ...defaultRequestInit,
     headers: {
+      ...defaultRequestInit.headers,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(apiContract.body),
