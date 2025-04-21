@@ -95,12 +95,12 @@ export const CodeExecutionResult: FunctionComponent<
         title={
           localizationCaptions[LocalizationKey.ExpectsExecuteOutputExpected]
         }
-        subtitle={JSON.stringify(activeResult?.arguments[1])}
+        subtitle={JSON.stringify(activeResult?.arguments[2])}
       />
       <Gap sizeRem={0.25} />
       <CodeExecutionResultInfo
         title={localizationCaptions[LocalizationKey.ExpectsExecuteOutput]}
-        subtitle={JSON.stringify(activeResult?.arguments[2])}
+        subtitle={JSON.stringify(activeResult?.arguments[1])}
       />
     </div>
   );
