@@ -51,6 +51,7 @@ import { CodeEditorLang } from '../../../../types/question';
 import { AnyObject } from '../../../../types/anyObject';
 import { Theme, ThemeContext } from '../../../../context/ThemeContext';
 import { RoomTimerAi } from '../RoomTimerAi/RoomTimerAi';
+import { CodeEditor } from '../../../../components/CodeEditor/CodeEditor';
 
 const notFoundCode = 404;
 const aiAssistantGoodRate = 6;
@@ -835,9 +836,20 @@ export const RoomQuestionPanelAi: FunctionComponent<
                           }
                         </Typography>
                         <Gap sizeRem={1.375} />
-                        <Typography size="m">
-                          {totalLastValidAiAnswer?.expected}
-                        </Typography>
+                        {totalLastValidAiAnswer?.expected && (
+                          <Typography size="m">
+                            {totalLastValidAiAnswer?.expected}
+                          </Typography>
+                        )}
+                        {totalLastValidAiAnswer?.referenceCode && (
+                          <CodeEditor
+                            language={CodeEditorLang.Javascript}
+                            languages={[CodeEditorLang.Javascript]}
+                            readOnly
+                            value={totalLastValidAiAnswer?.referenceCode}
+                          />
+                        )}
+                        <Gap sizeRem={2} />
                       </div>
                     </div>
                     <Gap sizeRem={3.125} />

@@ -5,6 +5,6 @@
   "vulnerabilities": "vulnerabilities",
   "comments": "comments",
   "refactoringProposal": [{"issue" : "Участок кода требующий улучшения", "solution": "Предложения по улучшению" }],
-  "referenceCode": "referenceCode",
+  "referenceCode": "// Проверить, что слово является палиндромом.\n\nconst isPalindrome = (word) => {\n  const cleanWord = word.trim();\n  if (cleanWord.length === 0) return true;\n  for (let i = 0; i < cleanWord.length / 2; i++) {\n    if (cleanWord[i] !== cleanWord[cleanWord.length - 1 - i]) {\n      return false;\n    }\n  }\n  return true;\n};\n\n// Примеры использования:\nconsole.log(isPalindrome(\"топот\")); // true\nconsole.log(isPalindrome(\"дед\"));   // true\nconsole.log(isPalindrome(\"топXт\")); // false\nconsole.log(isPalindrome(\"роза\"));  // false",
   "score": 10.0
 }
