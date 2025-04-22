@@ -283,6 +283,7 @@ export const enum LocalizationKey {
   NewNotifications,
   NoNewNotifications,
   Clear,
+  AnswerAgain,
 }
 
 export const LocalizationCaptions: Record<
@@ -609,6 +610,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.NewNotifications]: 'New notifications',
     [LocalizationKey.NoNewNotifications]: 'No new notifications',
     [LocalizationKey.Clear]: 'Clear',
+    [LocalizationKey.AnswerAgain]: 'Answer again',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -933,5 +935,6 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.NewNotifications]: 'Новые уведомления',
     [LocalizationKey.NoNewNotifications]: 'Новых уведомлений нет',
     [LocalizationKey.Clear]: 'Очистить',
+    [LocalizationKey.AnswerAgain]: 'Ответить заново',
   },
 };
