@@ -17,6 +17,7 @@ public class RoomCodeEditorEnabledWebSocketByNameEventHandler(ILogger<RoomCodeEd
     {
         if (detail.ParticipantType is not (EVRoomParticipantType.Expert or EVRoomParticipantType.Examinee))
         {
+            logger.LogDebug("Only expert and examine participants are supported");
             return Task.CompletedTask;
         }
 

@@ -22,6 +22,7 @@ public class ExpertReviewTypingWebSocketEventHandler(
     {
         if (detail.ParticipantType != EVRoomParticipantType.Expert)
         {
+            logger.LogDebug("Only expert review participant type is supported");
             return;
         }
 
@@ -30,6 +31,7 @@ public class ExpertReviewTypingWebSocketEventHandler(
                 e => e.ParticipantType == EVRoomParticipantType.Expert && e.User.Id != detail.UserId,
                 out var connections))
         {
+            logger.LogDebug("No experts to send review-typing event");
             return;
         }
 

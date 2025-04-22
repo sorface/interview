@@ -15,6 +15,16 @@ public abstract class WebSocketByNameEventHandlerBase<TPayload>(ILogger<WebSocke
         var isSupportType = SupportType.Equals(detail.Event.Type, StringComparison.InvariantCultureIgnoreCase);
         return new ValueTask<bool>(isSupportType);
     }
+
+    protected override IEnumerable<KeyValuePair<string, object>> CreateLogScope(SocketEventDetail detail)
+    {
+        foreach (var keyValuePair in base.CreateLogScope(detail))
+        {
+            yield return keyValuePair;
+        }
+
+        yield return new KeyValuePair<string, object>("SupportType", SupportType);
+    }
 }
 
 public abstract class WebSocketByNameEventHandlerBase(ILogger<WebSocketByNameEventHandlerBase> logger, IEventDeserializer deserializer)
