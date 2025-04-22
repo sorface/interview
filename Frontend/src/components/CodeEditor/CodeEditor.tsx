@@ -40,7 +40,11 @@ const fontSizeLocalStorageKey = 'codeEditorFontSize';
 
 const readFontSizeFromStorage = () => {
   const parsedValue = Number(localStorage.getItem(fontSizeLocalStorageKey));
-  if (isNaN(parsedValue) || typeof parsedValue !== 'number') {
+  if (
+    isNaN(parsedValue) ||
+    typeof parsedValue !== 'number' ||
+    parsedValue === 0
+  ) {
     return defaultCodeEditorFontSize;
   }
   return parsedValue;
