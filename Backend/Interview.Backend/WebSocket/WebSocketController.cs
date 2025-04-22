@@ -16,8 +16,22 @@ public class WebSocketController(WebSocketConnectionHandler connectionHandler, I
     [HttpGet("/ws")]
     public async Task Get()
     {
+        logger.LogDebug("Start ws connection");
+        try
+        {
+            await HandleWsConnectionAsync();
+        }
+        finally
+        {
+            logger.LogDebug("End ws connection");
+        }
+    }
+
+    private async Task HandleWsConnectionAsync()
+    {
         if (!HttpContext.WebSockets.IsWebSocketRequest)
         {
+            logger.LogDebug("Protocol request error. Use the websocket protocol");
             throw new UserException("Protocol request error. Use the websocket protocol");
         }
 
@@ -27,6 +41,7 @@ public class WebSocketController(WebSocketConnectionHandler connectionHandler, I
 
         if (!TryGetUser(out var user))
         {
+            logger.LogDebug("No user detected, disconnected from web socket");
             return;
         }
 
@@ -35,6 +50,7 @@ public class WebSocketController(WebSocketConnectionHandler connectionHandler, I
             var roomId = await ParseRoomIdAsync(webSocket, CancellationToken.None);
             if (roomId is null)
             {
+                logger.LogDebug("No room id detected, disconnected from web socket");
                 return;
             }
 
@@ -53,6 +69,7 @@ public class WebSocketController(WebSocketConnectionHandler connectionHandler, I
         }
         catch (Exception e)
         {
+            logger.LogDebug(e, "Exception in HandleWsConnectionAsync");
             try
             {
                 await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, e.Message, CancellationToken.None);
@@ -68,12 +85,14 @@ public class WebSocketController(WebSocketConnectionHandler connectionHandler, I
     {
         if (!HttpContext.Request.Query.TryGetValue("roomId", out var roomIdentityString))
         {
+            logger.LogDebug("Did not pass roomId for connection");
             await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Not found roomId", ct);
             return null;
         }
 
         if (!Guid.TryParse(roomIdentityString, out var roomIdentity))
         {
+            logger.LogDebug("Invalid room id format");
             await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Invalid room id format", ct);
             return null;
         }
