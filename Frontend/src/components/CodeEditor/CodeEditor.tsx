@@ -36,6 +36,23 @@ const fontSizeOptions = [10, 12, 13, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48];
 
 const languagesForExecute: CodeEditorLang[] = [CodeEditorLang.Javascript];
 
+const fontSizeLocalStorageKey = 'codeEditorFontSize';
+
+const readFontSizeFromStorage = () => {
+  const parsedValue = Number(localStorage.getItem(fontSizeLocalStorageKey));
+  if (
+    isNaN(parsedValue) ||
+    typeof parsedValue !== 'number' ||
+    parsedValue === 0
+  ) {
+    return defaultCodeEditorFontSize;
+  }
+  return parsedValue;
+};
+
+const saveFontSizeToStorage = (fontSize: number) =>
+  localStorage.setItem(fontSizeLocalStorageKey, String(fontSize));
+
 const renderOptions = (options: Array<number | string>) =>
   options.map((option) => (
     <option key={option} value={option}>
@@ -77,7 +94,7 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
 }) => {
   const localizationCaptions = useLocalizationCaptions();
   const { themeInUi } = useContext(ThemeContext);
-  const [fontSize, setFontSize] = useState(defaultCodeEditorFontSize);
+  const [fontSize, setFontSize] = useState(readFontSizeFromStorage());
   const [expectResult, setExpectResult] = useState<ExecuteCodeResult>({
     results: [],
   });
@@ -86,6 +103,10 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
     expectResult.results.every((expectResult) => expectResult.passed);
   const [modalExpectResults, setModalExpectResults] = useState(false);
   const codeEditorComponentRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    saveFontSizeToStorage(fontSize);
+  }, [fontSize]);
 
   const handleModalExpectClose = () => setModalExpectResults(false);
 
@@ -173,7 +194,6 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
         <select
           className="code-editor-tools-select"
           value={fontSize}
-          disabled={!onFontSizeChange}
           onChange={handleFontSizeChange}
         >
           {renderOptions(fontSizeOptions)}
