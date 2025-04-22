@@ -1,16 +1,16 @@
+using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
-using Interview.Domain.Events.Storage;
 using NSpecifications;
 
-namespace Interview.Test;
+namespace Interview.Domain.Events.Storage;
 
 public sealed class InMemoryHotEventStorage : IHotEventStorage
 {
-    private readonly List<IStorageEvent> _storage = [];
+    private ImmutableArray<IStorageEvent> _storage = [];
 
     public ValueTask AddAsync(IStorageEvent @event, CancellationToken cancellationToken)
     {
-        _storage.Add(@event);
+        _storage = _storage.Add(@event);
         return ValueTask.CompletedTask;
     }
 
@@ -34,7 +34,7 @@ public sealed class InMemoryHotEventStorage : IHotEventStorage
     {
         foreach (var e in items)
         {
-            _storage.Remove(e);
+            _storage = _storage.Remove(e);
         }
 
         return ValueTask.CompletedTask;
