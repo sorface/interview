@@ -50,7 +50,7 @@ import { EnterVideoChatModal } from './components/VideoChat/EnterVideoChatModal'
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useUnreadChatMessages } from './hooks/useUnreadChatMessages';
 // ScreenShare
-// import { useScreenStream } from './hooks/useScreenStream';
+import { useScreenStream } from './hooks/useScreenStream';
 import { LocalizationKey } from '../../localization';
 import { MessagePage } from '../../components/MessagePage/MessagePage';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
@@ -145,7 +145,7 @@ export const Room: FunctionComponent = () => {
     [lastMessage],
   );
   // ScreenShare
-  // const { screenStream, requestScreenStream } = useScreenStream();
+  const { screenStream, requestScreenStream } = useScreenStream();
   const localizationCaptions = useLocalizationCaptions();
 
   const handleVoiceRecognition = (transcript: string) => {
@@ -357,6 +357,17 @@ export const Room: FunctionComponent = () => {
   }, [roomState]);
 
   useEffect(() => {
+    if (!screenStream) {
+      return;
+    }
+    sendMessage(
+      JSON.stringify({
+        Type: 'start screen share',
+      }),
+    );
+  }, [screenStream, sendMessage]);
+
+  useEffect(() => {
     if (!lastWsMessageParsed) {
       return;
     }
@@ -454,9 +465,9 @@ export const Room: FunctionComponent = () => {
   }, [id, currentQuestionId, updateQuestions]);
 
   // ScreenShare
-  // const handleScreenShare = () => {
-  //   requestScreenStream();
-  // };
+  const handleScreenShare = () => {
+    requestScreenStream();
+  };
 
   const loaders = [{}, {}, { height: '890px' }];
 
@@ -795,9 +806,10 @@ export const Room: FunctionComponent = () => {
                             loadingRoomStartReview={loadingRoomStartReview}
                             errorRoomStartReview={errorRoomStartReview}
                             // ScreenShare
-                            // screenStream={screenStream}
+                            screenStream={screenStream}
                             setRecognitionEnabled={setRecognitionEnabled}
                             handleInvitationsOpen={handleInvitationsOpen}
+                            handleScreenShare={handleScreenShare}
                             handleStartReviewRoom={handleStartReviewRoom}
                             handleSettingsOpen={handleSettingsOpen}
                             handleLeaveRoom={handleLeaveRoom}

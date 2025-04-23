@@ -49,9 +49,10 @@ interface VideoChatProps {
   loadingRoomStartReview: boolean;
   errorRoomStartReview: string | null;
   // ScreenShare
-  // screenStream: MediaStream | null;
+  screenStream: MediaStream | null;
   setRecognitionEnabled: (enabled: boolean) => void;
   handleInvitationsOpen: () => void;
+  handleScreenShare: () => void;
   handleStartReviewRoom: () => void;
   handleSettingsOpen: () => void;
   handleLeaveRoom: () => void;
@@ -105,8 +106,9 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   reactionsVisible,
   loadingRoomStartReview,
   // ScreenShare
-  // screenStream,
+  screenStream,
   setRecognitionEnabled,
+  handleScreenShare,
   handleInvitationsOpen,
   handleLeaveRoom,
   handleSettingsOpen,
@@ -385,20 +387,22 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
         )}
         {!viewerMode && (
           <RoomToolsPanel.ButtonsGroupWrapper>
-            {/* ScreenShare */}
-            {/* <RoomToolsPanel.SwitchButton
-              enabled={true}
-              iconEnabledName={IconNames.TV}
-              iconDisabledName={IconNames.TV}
-              onClick={handleScreenShare}
-            /> */}
             {currentUserExpert && (
-              <RoomToolsPanel.SwitchButton
-                enabled={true}
-                iconEnabledName={IconNames.PersonAdd}
-                iconDisabledName={IconNames.PersonAdd}
-                onClick={handleInvitationsOpen}
-              />
+              <>
+                <RoomToolsPanel.SwitchButton
+                  enabled={true}
+                  iconEnabledName={IconNames.TV}
+                  iconDisabledName={IconNames.TV}
+                  onClick={handleScreenShare}
+                />
+                <Gap sizeRem={0.125} />
+                <RoomToolsPanel.SwitchButton
+                  enabled={true}
+                  iconEnabledName={IconNames.PersonAdd}
+                  iconDisabledName={IconNames.PersonAdd}
+                  onClick={handleInvitationsOpen}
+                />
+              </>
             )}
             <Gap sizeRem={0.125} />
             <RoomToolsPanel.SwitchButton
