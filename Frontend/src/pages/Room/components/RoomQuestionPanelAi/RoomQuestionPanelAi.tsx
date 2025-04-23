@@ -410,10 +410,13 @@ export const RoomQuestionPanelAi: FunctionComponent<
     if (!room?.questionTree) {
       return;
     }
-    localStorage.setItem(room.questionTree.id, JSON.stringify({
-      closed: closedQuestions.length,
-      all: roomQuestions.length,
-    }));
+    localStorage.setItem(
+      room.questionTree.id,
+      JSON.stringify({
+        closed: closedQuestions.length,
+        all: roomQuestions.length,
+      }),
+    );
   }, [roomQuestions, closedQuestions, room?.questionTree]);
 
   useEffect(() => {
@@ -629,10 +632,13 @@ export const RoomQuestionPanelAi: FunctionComponent<
     if (!room?.id) {
       throw new Error('Room id not found');
     }
-    localStorage.setItem(room?.questionTree?.id || '', JSON.stringify({
-      closed: roomQuestions.length,
-      all: roomQuestions.length,
-    }));
+    localStorage.setItem(
+      room?.questionTree?.id || '',
+      JSON.stringify({
+        closed: roomQuestions.length,
+        all: roomQuestions.length,
+      }),
+    );
     fetchRoomStartReview({ roomId: room.id });
   };
 

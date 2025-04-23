@@ -4,6 +4,7 @@ import { MilestoneTree } from './MilestoneTree';
 import { useThemeClassName } from '../../../hooks/useThemeClassName';
 import { Theme } from '../../../context/ThemeContext';
 import { Gap } from '../../../components/Gap/Gap';
+import { getTreeProgress } from '../utils/getTreeProgress';
 interface MilestoneTreeItem {
   id: string;
   name: string;
@@ -31,6 +32,12 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
     [Theme.Light]: 'border-text-light',
   });
 
+  const sumProgress = trees.reduce(
+    (accum, currTree) => accum + getTreeProgress(currTree.id),
+    0,
+  );
+  const totalProgress = ~~(sumProgress / trees.length);
+
   const handleCreateRoom = (tree: MilestoneTreeItem) => () => {
     onCreateRoom(tree.id, tree.name);
   };
@@ -55,11 +62,16 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
           ></div>
         </div>
       )}
-      <MilestoneRect caption={name} />
+      <MilestoneRect caption={`${name} (${totalProgress}%)`} />
       <Gap sizeRem={0.5} />
       <div className="pl-[1.5rem] flex flex-col items-start">
         {trees.map((tree) => (
-          <MilestoneTree key={tree.id} name={tree.name} onCreate={handleCreateRoom(tree)} />
+          <MilestoneTree
+            key={tree.id}
+            id={tree.id}
+            name={tree.name}
+            onCreate={handleCreateRoom(tree)}
+          />
         ))}
       </div>
       <Gap sizeRem={2.25} />

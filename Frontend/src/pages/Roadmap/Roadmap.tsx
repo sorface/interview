@@ -68,7 +68,7 @@ export const Roadmap: FunctionComponent = () => {
           <div className="w-full max-w-[64rem] flex">
             <div className="w-full">
               <Milestone
-                name="Сеть (0%)"
+                name="Сеть"
                 arrow
                 trees={[
                   {
@@ -84,7 +84,7 @@ export const Roadmap: FunctionComponent = () => {
               />
 
               <Milestone
-                name="Основы (0%)"
+                name="Основы"
                 trees={[
                   {
                     id: 'Основы',
@@ -125,7 +125,7 @@ export const Roadmap: FunctionComponent = () => {
             <Gap sizeRem={2} horizontal />
             <div className="w-full">
               <Milestone
-                name="Базовые задачи (0%)"
+                name="Базовые задачи"
                 arrow
                 trees={[
                   {
@@ -136,14 +136,14 @@ export const Roadmap: FunctionComponent = () => {
                 onCreateRoom={handleCreateRoom}
               />
               <Milestone
-                name="Творческие задачи (0%)"
+                name="Творческие задачи"
                 trees={[
                   {
-                    id: 'Задачи с фкнкциями',
+                    id: 'e54916ca-6103-4c65-927f-010b8cccf8c7',
                     name: 'Задачи с фкнкциями',
                   },
                   {
-                    id: 'Задачи с классами',
+                    id: '9c59607a-0036-4154-8246-2a3873b8d890',
                     name: 'Задачи с классами',
                   },
                 ]}
