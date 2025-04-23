@@ -22,6 +22,7 @@ public class DevelopmentAuthenticationHandler(
     {
         if (!Context.Request.Headers.TryGetValue("Authorization", out var authorizationHeader))
         {
+            Logger.LogDebug("No authorization header found");
             return AuthenticateResult.Fail("Unauthorized");
         }
 
@@ -29,6 +30,8 @@ public class DevelopmentAuthenticationHandler(
 
         if (auth.Scheme == "Bearer")
         {
+            Logger.LogDebug("Bearer token found");
+
             // If Bearer is used, it means the user wants to use the REAL authentication method and not the development accounts.
             return AuthenticateResult.Fail("Bearer requests should use the real JWT validation scheme");
         }
@@ -65,10 +68,14 @@ public class DevelopmentAuthenticationHandler(
 
     private async Task<List<Claim>> GetClaimsForUser(string? user)
     {
+        var token = user;
         var roles = GetRolesForUser(user).ToList();
+        Logger.LogDebug("Found roles in token [{Roles}]", string.Join(", ", roles));
+
         user = user?.Split(" ")?.FirstOrDefault();
         if (user is null || string.IsNullOrWhiteSpace(user))
         {
+            Logger.LogWarning("Failed to find the user's Nickname in the token. {Token}", token);
             throw new AccessDeniedException("Can't set specific account for local development because the user is not recognized");
         }
 
@@ -76,6 +83,17 @@ public class DevelopmentAuthenticationHandler(
             name => name.Name,
             role => role,
             (name, _) => new Role(name)).ToList();
+        if (actualUserRoles.Count != roles.Count)
+        {
+            Logger.LogWarning("A match was not found for every role listed. Specified Roles: [{SpecifiedRoles}], Matched Roles: [{MatchedRoles}]. Make sure the case in the role name matches. Available Roles: [{AvailableRoles]}",
+                string.Join(", ", roles),
+                string.Join(", ", actualUserRoles.Select(e => e.Name)),
+                string.Join(", ", RoleName.List.Select(e => e.Name)));
+            throw new AccessDeniedException(string.Format("A match was not found for every role listed. Specified Roles: [{0}], Matched Roles: [{1}]. Make sure the case in the role name matches. Available Roles: [{2}]",
+                string.Join(", ", roles),
+                string.Join(", ", actualUserRoles.Select(e => e.Name)),
+                string.Join(", ", RoleName.List.Select(e => e.Name))));
+        }
 
         var appDbContext = Context.RequestServices.GetRequiredService<AppDbContext>();
         var dbUser = await appDbContext.Users
@@ -83,6 +101,7 @@ public class DevelopmentAuthenticationHandler(
             .FirstOrDefaultAsync(e => e.Nickname == user);
         if (dbUser is null)
         {
+            Logger.LogDebug("No user found by {Nickname} in database, a new user must be created", user);
             dbUser = new User(user, Guid.NewGuid().ToString("N"));
 
             foreach (var role in actualUserRoles)
@@ -92,6 +111,7 @@ public class DevelopmentAuthenticationHandler(
 
             if (dbUser.Roles.Count == 0)
             {
+                Logger.LogWarning("User should have at least one role");
                 throw new AccessDeniedException("User should have at least one role. User format: 'DevBearer USER_NICKNAME ROLE1_ROLE2'");
             }
         }
@@ -99,14 +119,20 @@ public class DevelopmentAuthenticationHandler(
         {
             if (actualUserRoles.Count > 0)
             {
+                Logger.LogDebug("Update user roles");
                 dbUser.Roles.Clear();
                 foreach (var role in actualUserRoles)
                 {
                     dbUser.Roles.Add(role);
                 }
             }
+            else
+            {
+                Logger.LogDebug("No roles to update db user");
+            }
         }
 
+        Logger.LogDebug("Upsert user in database");
         var userService = Context.RequestServices.GetRequiredService<IUserService>();
         dbUser = await userService.UpsertByExternalIdAsync(dbUser);
 

@@ -43,6 +43,9 @@ export const useAiAnswerSource = ({
 
   useEffect(() => {
     if (!enabled) {
+      setlastValidAiAnswer(null);
+      setCompleted(false);
+      setLoading(false);
       return;
     }
     const abortController = new AbortController();
