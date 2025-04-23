@@ -32,10 +32,13 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
     [Theme.Light]: 'border-text-light',
   });
 
-  const sumProgress = trees.reduce(
-    (accum, currTree) => accum + getTreeProgress(currTree.id),
-    0,
-  );
+  const sumProgress = trees.reduce((accum, currTree) => {
+    const progress = getTreeProgress(currTree.id);
+    if (progress !== 100) {
+      return accum;
+    }
+    return accum + getTreeProgress(currTree.id);
+  }, 0);
   const totalProgress = ~~(sumProgress / trees.length);
 
   const handleCreateRoom = (tree: MilestoneTreeItem) => () => {
