@@ -46,6 +46,7 @@ module.exports = {
         'dark-orange-0.25': 'color-mix(in srgb, #e94d2b, transparent 75%)',
         'blue-ai-room-timer': '#e3f5ff',
         'room-tools-panel-bg': '#0b152940',
+        'text-light': '#1f1f1f',
       },
       boxShadow: {
         'dark-bold': '0 4px 12px rgba(16, 9, 8, 1.0)',

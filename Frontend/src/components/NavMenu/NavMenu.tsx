@@ -142,6 +142,14 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
         />
       ) : null,
     },
+    {
+      path: pathnames.roadmapJs,
+      caption: (
+        <LocalizationCaption captionKey={LocalizationKey.RoadmapJsPageName} />
+      ),
+      icon: IconNames.Golf,
+      onClick: handleItemClick,
+    },
     admin
       ? {
           path: pathnames.categories,

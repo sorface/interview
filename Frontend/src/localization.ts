@@ -284,6 +284,7 @@ export const enum LocalizationKey {
   NoNewNotifications,
   Clear,
   AnswerAgain,
+  RoadmapJsPageName,
 }
 
 export const LocalizationCaptions: Record<
@@ -611,6 +612,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.NoNewNotifications]: 'No new notifications',
     [LocalizationKey.Clear]: 'Clear',
     [LocalizationKey.AnswerAgain]: 'Answer again',
+    [LocalizationKey.RoadmapJsPageName]: 'Roadmap JS',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -936,5 +938,6 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.NoNewNotifications]: 'Новых уведомлений нет',
     [LocalizationKey.Clear]: 'Очистить',
     [LocalizationKey.AnswerAgain]: 'Ответить заново',
+    [LocalizationKey.RoadmapJsPageName]: 'Roadmap JS',
   },
 };
