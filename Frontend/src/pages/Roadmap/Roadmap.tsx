@@ -14,48 +14,9 @@ import { Gap } from '../../components/Gap/Gap';
 
 const roomDuration = 3600;
 
-const getTreeProgress = (treeId: string): number => {
-  const defaultValue = 0;
-  try {
-    const storageData = localStorage.getItem(treeId);
-    if (!storageData) {
-      return defaultValue;
-    }
-    const parsed = JSON.parse(storageData);
-    if (!parsed) {
-      return defaultValue;
-    }
-    if (typeof parsed?.all !== 'number' || typeof parsed?.closed !== 'number') {
-      return defaultValue;
-    }
-    return ~~((parsed.closed / parsed.all) * 100);
-  } catch {
-    return defaultValue;
-  }
-};
-
-interface TreeMap {
-  treeId: string;
-  treeName: string;
-  treeProgress: number;
-}
-
 export const Roadmap: FunctionComponent = () => {
   const localizationCaptions = useLocalizationCaptions();
   const navigate = useNavigate();
-
-  const trees: TreeMap[] = [
-    {
-      treeId: 'e54916ca-6103-4c65-927f-010b8cccf8c7',
-      treeName: 'JS Собеседование',
-      treeProgress: getTreeProgress('e54916ca-6103-4c65-927f-010b8cccf8c7'),
-    },
-    {
-      treeId: '9c59607a-0036-4154-8246-2a3873b8d890',
-      treeName: 'JavaScript Задачи',
-      treeProgress: getTreeProgress('9c59607a-0036-4154-8246-2a3873b8d890'),
-    },
-  ];
 
   const { apiMethodState, fetchData } = useApiMethod<Room, CreateRoomBody>(
     roomsApiDeclaration.create,
@@ -65,13 +26,13 @@ export const Roadmap: FunctionComponent = () => {
     data: createdRoom,
   } = apiMethodState;
 
-  const handleCreateRoom = (treeIndex: number) => () => {
+  const handleCreateRoom = (treeId: string, treeName: string) => {
     const roomStartDate = new Date();
     roomStartDate.setMinutes(roomStartDate.getMinutes() + 15);
 
     fetchData({
-      name: trees[treeIndex].treeName,
-      questionTreeId: trees[treeIndex].treeId,
+      name: treeName,
+      questionTreeId: treeId,
       experts: [],
       examinees: [],
       tags: [],
@@ -119,6 +80,7 @@ export const Roadmap: FunctionComponent = () => {
                     name: 'Протокол HTTP',
                   },
                 ]}
+                onCreateRoom={handleCreateRoom}
               />
 
               <Milestone
@@ -157,6 +119,7 @@ export const Roadmap: FunctionComponent = () => {
                     name: 'Асинхронность',
                   },
                 ]}
+                onCreateRoom={handleCreateRoom}
               />
             </div>
             <Gap sizeRem={2} horizontal />
@@ -166,10 +129,11 @@ export const Roadmap: FunctionComponent = () => {
                 arrow
                 trees={[
                   {
-                    id: 'Основные задачи',
+                    id: '9c59607a-0036-4154-8246-2a3873b8d890',
                     name: 'Основные задачи',
                   },
                 ]}
+                onCreateRoom={handleCreateRoom}
               />
               <Milestone
                 name="Творческие задачи (0%)"
@@ -183,6 +147,7 @@ export const Roadmap: FunctionComponent = () => {
                     name: 'Задачи с классами',
                   },
                 ]}
+                onCreateRoom={handleCreateRoom}
               />
             </div>
           </div>

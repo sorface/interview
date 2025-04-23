@@ -13,12 +13,14 @@ interface MilestoneProps {
   name: string;
   arrow?: boolean;
   trees: MilestoneTreeItem[];
+  onCreateRoom: (treeId: string, treeName: string) => void;
 }
 
 export const Milestone: FunctionComponent<MilestoneProps> = ({
   name,
   arrow,
   trees,
+  onCreateRoom,
 }) => {
   const lineStroke = useThemeClassName({
     [Theme.Dark]: 'border-dark-grey4',
@@ -28,6 +30,10 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
     [Theme.Dark]: 'border-dark-grey4',
     [Theme.Light]: 'border-text-light',
   });
+
+  const handleCreateRoom = (tree: MilestoneTreeItem) => () => {
+    onCreateRoom(tree.id, tree.name);
+  };
 
   return (
     <div className="relative flex flex-col items-start">
@@ -53,7 +59,7 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
       <Gap sizeRem={0.5} />
       <div className="pl-[1.5rem] flex flex-col items-start">
         {trees.map((tree) => (
-          <MilestoneTree key={tree.id} name={tree.name} />
+          <MilestoneTree key={tree.id} name={tree.name} onCreate={handleCreateRoom(tree)} />
         ))}
       </div>
       <Gap sizeRem={2.25} />
