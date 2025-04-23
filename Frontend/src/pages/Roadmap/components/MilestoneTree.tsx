@@ -19,7 +19,7 @@ export const MilestoneTree: FunctionComponent<MilestoneTreeProps> = ({
   const treeCompleted = getTreeProgress(id) === 100;
 
   return (
-    <div className="hover:underline hover:cursor-pointer" onClick={onCreate}>
+    <li className="hover:underline hover:cursor-pointer" onClick={onCreate}>
       <Typography size="l" semibold success={treeCompleted}>
         <div className="flex items-center">
           {treeCompleted && (
@@ -29,6 +29,6 @@ export const MilestoneTree: FunctionComponent<MilestoneTreeProps> = ({
           {name}
         </div>
       </Typography>
-    </div>
+    </li>
   );
 };

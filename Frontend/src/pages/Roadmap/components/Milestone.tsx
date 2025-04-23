@@ -64,7 +64,7 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
       )}
       <MilestoneRect caption={`${name} (${totalProgress}%)`} />
       <Gap sizeRem={0.5} />
-      <div className="pl-[1.5rem] flex flex-col items-start">
+      <ul className="pl-[1.5rem] flex flex-col items-start">
         {trees.map((tree) => (
           <MilestoneTree
             key={tree.id}
@@ -73,7 +73,7 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
             onCreate={handleCreateRoom(tree)}
           />
         ))}
-      </div>
+      </ul>
       <Gap sizeRem={2.25} />
     </div>
   );
