@@ -55,16 +55,19 @@ export const Roadmap: FunctionComponent = () => {
         title={localizationCaptions[LocalizationKey.RoadmapJsPageName]}
       />
 
-      <div className="flex items-center justify-center">
+      <div className="flex flex-col items-center justify-center">
         {loading && <Loader />}
 
         {error && (
-          <Typography size="m" error>
-            {error}
-          </Typography>
+          <div>
+            <Typography size="m" error>
+              {error}
+            </Typography>
+            <Gap sizeRem={1} />
+          </div>
         )}
 
-        {!!(!loading && !error) && (
+        {!loading && (
           <div className="w-full max-w-[64rem] flex">
             <div className="w-full">
               <Milestone
