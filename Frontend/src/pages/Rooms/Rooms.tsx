@@ -348,7 +348,12 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
                         className="rotate-90"
                         onClick={handleOpenEditModal(room.id)}
                       >
-                        <Icon size="s" secondary hover name={IconNames.Options} />
+                        <Icon
+                          size="s"
+                          secondary
+                          hover
+                          name={IconNames.Options}
+                        />
                       </div>
                     </>
                   )}
@@ -380,7 +385,12 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
                         className="rotate-90"
                         onClick={handleOpenEditModal(room.id)}
                       >
-                        <Icon size="s" secondary hover name={IconNames.Options} />
+                        <Icon
+                          size="s"
+                          secondary
+                          hover
+                          name={IconNames.Options}
+                        />
                       </div>
                     </>
                   )}

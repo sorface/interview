@@ -75,6 +75,7 @@ import { AiAssistantScriptName } from './components/AiAssistant/AiAssistant';
 import { mapInvitesForAiRoom } from '../../utils/mapInvitesForAiRoom';
 import { Typography } from '../../components/Typography/Typography';
 import { Icon } from './components/Icon/Icon';
+import { getDevAuthorization } from '../../utils/devAuthorization';
 
 import './Room.css';
 
@@ -121,7 +122,11 @@ export const Room: FunctionComponent = () => {
   const [lastVoiceRecognition, setLastVoiceRecognition] = useState('');
   const [aiAssistantCurrentScript, setAiAssistantCurrentScript] =
     useState<AiAssistantScriptName>(AiAssistantScriptName.Idle);
-  const socketUrl = `${VITE_WS_URL}/ws?roomId=${id}`;
+  const devAuthorization =
+    import.meta.env.MODE === 'development'
+      ? `&Authorization=${getDevAuthorization()?.Authorization}`
+      : '';
+  const socketUrl = `${VITE_WS_URL}/ws?roomId=${id}${devAuthorization}`;
   const checkWebSocketReadyToConnect = () => {
     if (!inviteParam) {
       return true;

@@ -110,7 +110,7 @@ public static class ServiceCollectionExt
         dependencyInjectionAppServiceOption.EventStorageConfigurator?.Invoke(builder);
         if (string.IsNullOrWhiteSpace(builder.RedisConnectionString))
         {
-            self.AddSingleton<IHotEventStorage, EmptyHotEventStorage>();
+            self.AddSingleton<IHotEventStorage, InMemoryHotEventStorage>();
         }
         else
         {

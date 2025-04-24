@@ -199,7 +199,7 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
 
             if (environment.IsDevelopment())
             {
-                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                options.AddSecurityDefinition("DevBearer", new OpenApiSecurityScheme
                 {
                     Description = @"JWT Authorization header using the Bearer scheme. Example: 'DevBearer TEST_BACKEND_DEV_USER'",
                     Name = "Authorization",

@@ -51,6 +51,7 @@ import { CodeEditorLang } from '../../../../types/question';
 import { AnyObject } from '../../../../types/anyObject';
 import { Theme, ThemeContext } from '../../../../context/ThemeContext';
 import { RoomTimerAi } from '../RoomTimerAi/RoomTimerAi';
+import { CodeEditor } from '../../../../components/CodeEditor/CodeEditor';
 
 const notFoundCode = 404;
 const aiAssistantGoodRate = 6;
@@ -630,6 +631,12 @@ export const RoomQuestionPanelAi: FunctionComponent<
     handleCopilotAnswerOpen();
   };
 
+  const handleAnswerAgain = () => {
+    setAiAssistantCurrentScript(AiAssistantScriptName.PleaseAnswer);
+    handleCopilotAnswerClose();
+    resetVoiceRecognitionAccum();
+  };
+
   const statusPanelVisible = questionWithCode ? copilotAnswerOpen : true;
   const loadingTotal =
     loadingRoomStartReview ||
@@ -815,6 +822,18 @@ export const RoomQuestionPanelAi: FunctionComponent<
                             totalLastValidAiAnswer?.codeReadability}
                         </Typography>
                         <Gap sizeRem={1.375} />
+                        <Button
+                          variant="inverted"
+                          className="!w-fit"
+                          disabled={!aiAnswerCompleted}
+                          onClick={handleAnswerAgain}
+                        >
+                          {aiAnswerCompleted ? (
+                            localizationCaptions[LocalizationKey.AnswerAgain]
+                          ) : (
+                            <Loader />
+                          )}
+                        </Button>
                       </div>
                       <Gap sizeRem={0.625} horizontal />
                       <div
@@ -835,9 +854,20 @@ export const RoomQuestionPanelAi: FunctionComponent<
                           }
                         </Typography>
                         <Gap sizeRem={1.375} />
-                        <Typography size="m">
-                          {totalLastValidAiAnswer?.expected}
-                        </Typography>
+                        {totalLastValidAiAnswer?.expected && (
+                          <Typography size="m">
+                            {totalLastValidAiAnswer?.expected}
+                          </Typography>
+                        )}
+                        {totalLastValidAiAnswer?.referenceCode && (
+                          <CodeEditor
+                            language={CodeEditorLang.Javascript}
+                            languages={[CodeEditorLang.Javascript]}
+                            readOnly
+                            value={totalLastValidAiAnswer?.referenceCode}
+                          />
+                        )}
+                        <Gap sizeRem={2} />
                       </div>
                     </div>
                     <Gap sizeRem={3.125} />

@@ -5,6 +5,7 @@ import { ApiContract } from '../types/apiContracts';
 import { useLogout } from './useLogout';
 import { useNavigate } from 'react-router-dom';
 import { AnyObject } from '../types/anyObject';
+import { getDevAuthorization } from '../utils/devAuthorization';
 
 interface ApiMethodState<ResponseData = AnyObject | string> {
   process: {
@@ -110,6 +111,7 @@ const createFetchRequestInit = (apiContract: ApiContract) => {
   const defaultRequestInit: RequestInit = {
     credentials: 'include',
     method: apiContract.method,
+    headers: getDevAuthorization(),
   };
 
   if (apiContract.method === 'GET') {
@@ -119,6 +121,7 @@ const createFetchRequestInit = (apiContract: ApiContract) => {
   return {
     ...defaultRequestInit,
     headers: {
+      ...defaultRequestInit.headers,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(apiContract.body),

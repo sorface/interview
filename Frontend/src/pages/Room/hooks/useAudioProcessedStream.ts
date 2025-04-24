@@ -2,8 +2,12 @@ import { useEffect, useMemo } from 'react';
 
 export const useAudioProcessedStream = (
   userAudioStream: MediaStream | null,
+  enabled: boolean,
 ) => {
   const audioInstruments = useMemo(() => {
+    if (!enabled) {
+      return null;
+    }
     const audioCtx = new AudioContext();
     const dest = audioCtx.createMediaStreamDestination();
 
@@ -29,10 +33,10 @@ export const useAudioProcessedStream = (
     filterHigh.connect(dest);
 
     return { audioCtx, dest, compressor };
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
-    if (!userAudioStream) {
+    if (!userAudioStream || !enabled || !audioInstruments) {
       return;
     }
     const source =
@@ -42,7 +46,11 @@ export const useAudioProcessedStream = (
     return () => {
       source.disconnect(audioInstruments.compressor);
     };
-  }, [audioInstruments, userAudioStream]);
+  }, [audioInstruments, userAudioStream, enabled]);
+
+  if (!audioInstruments) {
+    return null;
+  }
 
   return userAudioStream ? audioInstruments.dest.stream : null;
 };

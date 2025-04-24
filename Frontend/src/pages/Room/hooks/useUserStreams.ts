@@ -43,7 +43,10 @@ export const useUserStreams = () => {
   const [userAudioStream, setUserAudioStream] = useState<MediaStream | null>(
     null,
   );
-  const userAudioProcessedStream = useAudioProcessedStream(userAudioStream);
+  const userAudioProcessedStream = useAudioProcessedStream(
+    userAudioStream,
+    !!devices.mic.length,
+  );
   const [userVideoStream, setUserVideoStream] = useState<MediaStream | null>(
     null,
   );
