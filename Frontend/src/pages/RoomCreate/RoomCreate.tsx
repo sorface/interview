@@ -67,20 +67,13 @@ const formatTime = (value: Date) => {
   return `${hours}:${minutes}`;
 };
 
-const parseScheduledStartTime = (
-  scheduledStartTime: string,
-  durationSec?: number,
+const parseScheduledEndTime = (
+  scheduledStartTime: Date,
+  durationSec: number,
 ) => {
-  const parsed = new Date(scheduledStartTime);
   const parsedDuration = new Date(scheduledStartTime);
-  if (durationSec) {
-    parsedDuration.setSeconds(parsedDuration.getSeconds() + durationSec);
-  }
-  return {
-    date: formatDate(parsed),
-    startTime: formatTime(parsed),
-    ...(durationSec && { endTime: formatTime(parsedDuration) }),
-  };
+  parsedDuration.setSeconds(parsedDuration.getSeconds() + durationSec);
+  return formatTime(parsedDuration);
 };
 
 const getRoomDuration = (roomFields: RoomFields) => {
@@ -230,19 +223,15 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     if (!room) {
       return;
     }
-    const parsedScheduledStartTime =
-      room.scheduledStartTime &&
-      parseScheduledStartTime(room.scheduledStartTime, room.timer?.durationSec);
+    const scheduleStartTime = new Date(room.scheduledStartTime);
+    const parsedScheduledEndTime =
+      room.timer?.durationSec &&
+      parseScheduledEndTime(scheduleStartTime, room.timer.durationSec);
     setRoomFields((rf) => ({
       ...rf,
       ...room,
-      date: parsedScheduledStartTime ? parsedScheduledStartTime.date : '',
-      startTime: parsedScheduledStartTime
-        ? parsedScheduledStartTime.startTime
-        : '',
-      endTime: parsedScheduledStartTime
-        ? parsedScheduledStartTime.endTime || ''
-        : '',
+      scheduleStartTime: new Date(room.scheduledStartTime),
+      endTime: parsedScheduledEndTime || '',
     }));
     setSelectedQuestions(room.questions.sort(sortRoomQuestion));
   }, [room]);
@@ -374,7 +363,6 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const [selectedHours, selectedMinutes] = e.target.value.split(':');
-    console.log(selectedHours, selectedMinutes);
     const selectedDate = new Date(roomFields.scheduleStartTime);
     selectedDate.setHours(+selectedHours);
     selectedDate.setMinutes(+selectedMinutes);
