@@ -35,7 +35,7 @@ module.exports = {
         'dark-disable': '#182947',
         'dark-input': '#4c556b',
         'dark-red': '#e0473a',
-        'page-bg': '#0b1529',
+        'page-bg': 'var(--page-bg)',
         active: '#b9221c',
         'disabled-icon': '#b9221c',
         wrap: 'var(--wrap-bg)',
