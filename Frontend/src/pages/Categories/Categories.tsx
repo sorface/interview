@@ -24,8 +24,6 @@ import { Icon } from '../Room/components/Icon/Icon';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Button } from '../../components/Button/Button';
 
-import './Categories.css';
-
 const pageSize = 30;
 const initialPageNumber = 1;
 
@@ -117,7 +115,7 @@ export const Categories: FunctionComponent = () => {
         <Field className="flex items-center">
           <span>{category.name}</span>
           {!category.parentId && <Icon name={IconNames.Clipboard} />}
-          <div className="category-controls">
+          <div className="ml-auto">
             <Link to={pathnames.categoriesEdit.replace(':id', category.id)}>
               <Button>🖊️</Button>
             </Link>
@@ -141,7 +139,7 @@ export const Categories: FunctionComponent = () => {
   );
 
   return (
-    <MainContentWrapper className="categories-page">
+    <MainContentWrapper>
       <PageHeader
         title={localizationCaptions[LocalizationKey.CategoriesPageName]}
         searchValue={searchValueInput}
