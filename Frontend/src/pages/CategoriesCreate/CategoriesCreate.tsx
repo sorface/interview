@@ -273,6 +273,7 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
             name={orderFieldName}
             type="number"
             value={categoryOrder}
+            className="bg-page-bg"
             onChange={handleCategoryOrderChange}
           />
         </Field>
