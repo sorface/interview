@@ -83,29 +83,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
 
     public DbSet<QuestionSubjectTree> QuestionSubjectTree { get; private set; } = null!;
 
-    public async Task<HashSet<Guid>> GetWithChildCategoriesAsync(Guid categoryId, CancellationToken cancellationToken)
-    {
-        var res = new HashSet<Guid> { categoryId };
-        var checkCategories = new List<Guid> { categoryId };
-        do
-        {
-            var tmp = await Categories.AsNoTracking()
-                .Where(e => e.ParentId != null && checkCategories.Contains(e.ParentId.Value))
-                .Select(e => e.Id)
-                .ToListAsync(cancellationToken);
-            checkCategories.Clear();
-            foreach (var id in tmp)
-            {
-                if (res.Add(id))
-                {
-                    checkCategories.Add(id);
-                }
-            }
-        }
-        while (checkCategories.Count > 0);
-
-        return res;
-    }
+    public DbSet<QuestionSubjectTreeContext> QuestionSubjectTreeContext { get; private set; } = null!;
 
     /// <summary>
     /// Runs code within a transaction, taking into account previously created code.

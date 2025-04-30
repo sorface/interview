@@ -357,6 +357,32 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.ToTable("QuestionSubjectTree");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionSubjectTreeContext", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Context")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("QuestionSubjectTreeContext");
+                });
+
             modelBuilder.Entity("Interview.Domain.Questions.QuestionTree", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1708,6 +1734,15 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Navigation("ParentQuestionSubjectTree");
 
                     b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionSubjectTreeContext", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("Interview.Domain.Questions.QuestionTree", b =>
