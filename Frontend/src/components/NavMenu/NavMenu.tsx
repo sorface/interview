@@ -156,6 +156,18 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
       : null,
     admin
       ? {
+          path: pathnames.categoriesArchive,
+          caption: (
+            <LocalizationCaption
+              captionKey={LocalizationKey.CategoriesArchive}
+            />
+          ),
+          icon: IconNames.Clipboard,
+          onClick: handleItemClick,
+        }
+      : null,
+    admin
+      ? {
           path: pathnames.questionTrees,
           caption: (
             <LocalizationCaption
