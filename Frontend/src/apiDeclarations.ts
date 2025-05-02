@@ -486,7 +486,11 @@ export const categoriesApiDeclaration = {
   update: (category: UpdateCategoryBody): ApiContractPut => ({
     method: 'PUT',
     baseUrl: `/category/${category.id}`,
-    body: { name: category.name, parentId: category.parentId },
+    body: {
+      name: category.name,
+      parentId: category.parentId,
+      order: category.order,
+    },
   }),
   archive: (id: Category['id']): ApiContractPost => ({
     method: 'POST',
