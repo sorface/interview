@@ -183,7 +183,7 @@ export const Questions: FunctionComponent = () => {
         />
       )}
       <div className="questions-page flex-1 overflow-auto">
-        <div className="sticky top-0 bg-form z-1">
+        <div className="sticky top-0 bg-form z-10">
           <div className="flex items-center">
             {categoriesError && (
               <Typography size="m">
