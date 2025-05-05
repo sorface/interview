@@ -26,6 +26,7 @@ export const CodeExecutionResult: FunctionComponent<
     (expectResult) => expectResult.passed,
   );
   const noData = expectResult.results.length === 0;
+  const withoutArgs = activeResult?.arguments.length === 2;
   const statusLocalizationKey = expectResultsPassed
     ? LocalizationKey.ExpectsExecuteResultsPassed
     : LocalizationKey.ExpectsExecuteResultsNotPassed;
@@ -86,18 +87,26 @@ export const CodeExecutionResult: FunctionComponent<
         </Tag>
       </div>
       <Gap sizeRem={1.5} />
-      <CodeExecutionResultInfo
-        title={localizationCaptions[LocalizationKey.ExpectsExecuteInput]}
-        subtitle={JSON.stringify(activeResult?.arguments[0])}
-      />
-      <Gap sizeRem={0.25} />
-      <CodeExecutionResultInfo
-        title={
-          localizationCaptions[LocalizationKey.ExpectsExecuteOutputExpected]
-        }
-        subtitle={JSON.stringify(activeResult?.arguments[2])}
-      />
-      <Gap sizeRem={0.25} />
+      {!withoutArgs && (
+        <>
+          <CodeExecutionResultInfo
+            title={localizationCaptions[LocalizationKey.ExpectsExecuteInput]}
+            subtitle={JSON.stringify(activeResult?.arguments[0])}
+          />
+          <Gap sizeRem={0.25} />
+        </>
+      )}
+      {!withoutArgs && (
+        <>
+          <CodeExecutionResultInfo
+            title={
+              localizationCaptions[LocalizationKey.ExpectsExecuteOutputExpected]
+            }
+            subtitle={JSON.stringify(activeResult?.arguments[2])}
+          />
+          <Gap sizeRem={0.25} />
+        </>
+      )}
       <CodeExecutionResultInfo
         title={localizationCaptions[LocalizationKey.ExpectsExecuteOutput]}
         subtitle={JSON.stringify(activeResult?.arguments[1])}
