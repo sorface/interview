@@ -1,6 +1,10 @@
 export const deepEqual = (obj1: unknown, obj2: unknown) => {
   if (obj1 === obj2) return true;
 
+  if (typeof obj1 === 'number' && isNaN(obj1)) {
+    return typeof obj2 === 'number' && isNaN(obj2);
+  }
+
   if (
     obj1 === null ||
     obj2 === null ||
