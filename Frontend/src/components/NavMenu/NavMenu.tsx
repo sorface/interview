@@ -104,16 +104,18 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
   };
 
   const items: Array<MenuItem | null> = [
-    {
-      path: pathnames.highlightRooms,
-      caption: (
-        <LocalizationCaption
-          captionKey={LocalizationKey.HighlightsRoomsPageName}
-        />
-      ),
-      icon: IconNames.Cube,
-      onClick: handleItemClick,
-    },
+    admin
+      ? {
+          path: pathnames.highlightRooms,
+          caption: (
+            <LocalizationCaption
+              captionKey={LocalizationKey.HighlightsRoomsPageName}
+            />
+          ),
+          icon: IconNames.Cube,
+          onClick: handleItemClick,
+        }
+      : null,
     // {
     //   path: pathnames.currentRooms,
     //   caption: <LocalizationCaption captionKey={LocalizationKey.CurrentRoomsPageName} />,
@@ -126,22 +128,26 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
     //   icon: IconNames.Golf,
     //   onClick: handleItemClick,
     // },
-    {
-      path: pathnames.questions,
-      caption: (
-        <LocalizationCaption captionKey={LocalizationKey.QuestionsPageName} />
-      ),
-      icon: IconNames.Chat,
-      forceActive: questionsClicked || !!questionsPath,
-      onClick: handleQuestionsClick,
-      subitem: questionsClicked ? (
-        <CategoriesList
-          showOnlyWithoutParent={true}
-          activeId={selectedCategory?.id}
-          onCategoryClick={handleCategoryClick}
-        />
-      ) : null,
-    },
+    admin
+      ? {
+          path: pathnames.questions,
+          caption: (
+            <LocalizationCaption
+              captionKey={LocalizationKey.QuestionsPageName}
+            />
+          ),
+          icon: IconNames.Chat,
+          forceActive: questionsClicked || !!questionsPath,
+          onClick: handleQuestionsClick,
+          subitem: questionsClicked ? (
+            <CategoriesList
+              showOnlyWithoutParent={true}
+              activeId={selectedCategory?.id}
+              onCategoryClick={handleCategoryClick}
+            />
+          ) : null,
+        }
+      : null,
     {
       path: pathnames.roadmapJs,
       caption: (
