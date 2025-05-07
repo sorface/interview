@@ -577,6 +577,7 @@ export const Room: FunctionComponent = () => {
       <UserStreamsContext.Provider value={userStreams}>
         <MainContentWrapper withMargin={!aiRoom} className="room-wrapper">
           <EnterVideoChatModal
+            aiRoom={aiRoom}
             open={welcomeScreen}
             loading={
               loading ||

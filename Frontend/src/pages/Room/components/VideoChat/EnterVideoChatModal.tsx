@@ -31,6 +31,7 @@ import { Theme } from '../../../../context/ThemeContext';
 import { Link } from 'react-router-dom';
 
 interface EnterVideoChatModalProps {
+  aiRoom: boolean;
   open: boolean;
   loading: boolean;
   error: string | null;
@@ -47,7 +48,7 @@ const enum Screen {
 
 export const EnterVideoChatModal: FunctionComponent<
   EnterVideoChatModalProps
-> = ({ open, loading, error, onClose }) => {
+> = ({ aiRoom, open, loading, error, onClose }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
   const { viewerMode, room } = useContext(RoomContext);
@@ -250,7 +251,7 @@ export const EnterVideoChatModal: FunctionComponent<
             <Button
               variant="active"
               className="w-full"
-              onClick={handleSetupDevices}
+              onClick={aiRoom ? onClose : handleSetupDevices}
             >
               {localizationCaptions[LocalizationKey.SetupDevices]}
             </Button>
