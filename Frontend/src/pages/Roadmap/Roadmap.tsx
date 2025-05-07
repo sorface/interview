@@ -51,10 +51,12 @@ export const Roadmap: FunctionComponent = () => {
 
   return (
     <>
-      <PageHeader
-        title={localizationCaptions[LocalizationKey.RoadmapJsPageName]}
-      />
+      <PageHeader title="" />
 
+      <Typography size="xxxl">
+        {localizationCaptions[LocalizationKey.RoadmapJsPageName]}
+      </Typography>
+      <Gap sizeRem={2.75} />
       <div className="flex flex-col items-center justify-center">
         {loading && <Loader />}
 
