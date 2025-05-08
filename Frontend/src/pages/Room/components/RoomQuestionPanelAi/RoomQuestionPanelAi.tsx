@@ -912,8 +912,8 @@ export const RoomQuestionPanelAi: FunctionComponent<
             <div
               className="absolute flex items-center justify-center z-20"
               style={{
-                bottom: '97px',
-                right: '44px',
+                bottom: '12px',
+                right: '12px',
               }}
             >
               <div
