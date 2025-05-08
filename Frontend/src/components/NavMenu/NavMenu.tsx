@@ -104,18 +104,24 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
   };
 
   const items: Array<MenuItem | null> = [
-    admin
-      ? {
-          path: pathnames.highlightRooms,
-          caption: (
-            <LocalizationCaption
-              captionKey={LocalizationKey.HighlightsRoomsPageName}
-            />
-          ),
-          icon: IconNames.Cube,
-          onClick: handleItemClick,
-        }
-      : null,
+    {
+      path: pathnames.roadmapJs,
+      caption: (
+        <LocalizationCaption captionKey={LocalizationKey.RoadmapJsPageName} />
+      ),
+      icon: IconNames.Golf,
+      onClick: handleItemClick,
+    },
+    {
+      path: pathnames.highlightRooms,
+      caption: (
+        <LocalizationCaption
+          captionKey={LocalizationKey.HighlightsRoomsPageName}
+        />
+      ),
+      icon: IconNames.Cube,
+      onClick: handleItemClick,
+    },
     // {
     //   path: pathnames.currentRooms,
     //   caption: <LocalizationCaption captionKey={LocalizationKey.CurrentRoomsPageName} />,
@@ -128,33 +134,21 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
     //   icon: IconNames.Golf,
     //   onClick: handleItemClick,
     // },
-    admin
-      ? {
-          path: pathnames.questions,
-          caption: (
-            <LocalizationCaption
-              captionKey={LocalizationKey.QuestionsPageName}
-            />
-          ),
-          icon: IconNames.Chat,
-          forceActive: questionsClicked || !!questionsPath,
-          onClick: handleQuestionsClick,
-          subitem: questionsClicked ? (
-            <CategoriesList
-              showOnlyWithoutParent={true}
-              activeId={selectedCategory?.id}
-              onCategoryClick={handleCategoryClick}
-            />
-          ) : null,
-        }
-      : null,
     {
-      path: pathnames.roadmapJs,
+      path: pathnames.questions,
       caption: (
-        <LocalizationCaption captionKey={LocalizationKey.RoadmapJsPageName} />
+        <LocalizationCaption captionKey={LocalizationKey.QuestionsPageName} />
       ),
-      icon: IconNames.Golf,
-      onClick: handleItemClick,
+      icon: IconNames.Chat,
+      forceActive: questionsClicked || !!questionsPath,
+      onClick: handleQuestionsClick,
+      subitem: questionsClicked ? (
+        <CategoriesList
+          showOnlyWithoutParent={true}
+          activeId={selectedCategory?.id}
+          onCategoryClick={handleCategoryClick}
+        />
+      ) : null,
     },
     admin
       ? {
@@ -222,7 +216,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
           className={`nav-menu ${collapsed ? 'collapsed' : ''} move-transition`}
         >
           <NavLink
-            to={pathnames.home.replace(':redirect?', '')}
+            to={pathnames.roadmapJs}
             className="nav-menu-item nav-menu-item-first no-active move-transition"
           >
             <img className="site-logo" src="/logo192.png" alt="site logo" />
