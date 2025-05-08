@@ -403,7 +403,10 @@ export const EnterVideoChatModal: FunctionComponent<
         },
       }}
     >
-      <Link to={pathnames.highlightRooms} className="no-underline">
+      <Link
+        to={aiRoom ? pathnames.roadmapJs : pathnames.highlightRooms}
+        className="no-underline"
+      >
         <div className="action-modal-header absolute flex items-center h-[2.375rem] mt-[1.3125rem] ml-[0.5rem]">
           <div className="w-[2.375rem] h-[2.375rem] mr-[1rem]">
             <img
