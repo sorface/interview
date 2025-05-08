@@ -2,7 +2,6 @@ import React, {
   FunctionComponent,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from 'react';
 import { AuthContext } from '../../../../context/AuthContext';
@@ -37,8 +36,6 @@ const viewerOrder = 666;
 
 interface VideoChatAiProps {
   messagesChatEnabled: boolean;
-  // ScreenShare
-  // screenStream: MediaStream | null;
   roomQuestionsLoading: boolean;
   roomQuestions: RoomQuestion[];
   initialQuestion?: RoomQuestion;
@@ -75,8 +72,6 @@ const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string) => {
 
 export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
   messagesChatEnabled,
-  // ScreenShare
-  // screenStream,
   roomQuestionsLoading,
   roomQuestions,
   initialQuestion,
@@ -85,7 +80,6 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
   const localizationCaptions = useLocalizationCaptions();
   const { themeInUi } = useContext(ThemeContext);
   const {
-    viewerMode,
     roomState,
     lastWsMessageParsed,
     codeEditorEnabled,
@@ -96,23 +90,13 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
     sendWsMessage,
     setRecognitionEnabled,
   } = useContext(RoomContext);
-  const {
-    userVideoStream,
-    micEnabled,
-    cameraEnabled,
-    setMicEnabled,
-    setCameraEnabled,
-  } = useContext(UserStreamsContext);
+  const { micEnabled } = useContext(UserStreamsContext);
   const {
     apiMethodState: apiRoomEventsSearchState,
     fetchData: fetchRoomEventsSearch,
   } = useApiMethod<EventsSearch, RoomIdParam>(roomsApiDeclaration.eventsSearch);
   const { data: roomEventsSearch } = apiRoomEventsSearchState;
   const [textMessages, setTextMessages] = useState<Transcript[]>([]);
-  const userVideo = useRef<HTMLVideoElement>(null);
-  const userVideoMainContent = useRef<HTMLVideoElement>(null);
-  const userVideoMainContentBackground = useRef<HTMLVideoElement>(null);
-  const screenSharePeer = peers.find((peer) => peer.screenShare);
   const { activeReactions } = useReactionsStatus({
     lastWsMessageParsed,
   });
@@ -180,42 +164,6 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
     }
   }, [lastWsMessageParsed]);
 
-  const needToRenderMainField = screenSharePeer || codeEditorEnabled;
-
-  useEffect(() => {
-    if (!userVideoStream) {
-      return;
-    }
-    if (userVideo.current) {
-      userVideo.current.srcObject = userVideoStream;
-    }
-    if (userVideoMainContent.current) {
-      userVideoMainContent.current.srcObject = userVideoStream;
-    }
-    if (userVideoMainContentBackground.current) {
-      userVideoMainContentBackground.current.srcObject = userVideoStream;
-    }
-  }, [userVideoStream, needToRenderMainField]);
-
-  useEffect(() => {
-    if (videoOrder[auth?.id || ''] !== 1) {
-      return;
-    }
-    if (userVideoMainContent.current) {
-      userVideoMainContent.current.srcObject = userVideoStream;
-    }
-    if (userVideoMainContentBackground.current) {
-      userVideoMainContentBackground.current.srcObject = userVideoStream;
-    }
-  }, [auth?.id, videoOrder, userVideoStream]);
-
-  useEffect(() => {
-    if (viewerMode) {
-      return;
-    }
-    setRecognitionEnabled(micEnabled);
-  }, [viewerMode, micEnabled, setRecognitionEnabled]);
-
   const handleTextMessageSubmit = (message: string) => {
     sendWsMessage(
       JSON.stringify({
@@ -226,11 +174,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
   };
 
   const handleMicSwitch = () => {
-    setMicEnabled(!micEnabled);
-  };
-
-  const handleCameraSwitch = () => {
-    setCameraEnabled(!cameraEnabled);
+    setRecognitionEnabled(!micEnabled);
   };
 
   return (
@@ -250,48 +194,6 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                 bottom: '-53px',
               }}
             >
-              <div className="z-20">
-                <video
-                  ref={userVideoMainContent}
-                  className="rounded-full videochat-video object-cover z-1"
-                  style={{ width: '213px', height: '213px' }}
-                  muted
-                  autoPlay
-                  playsInline
-                >
-                  Video not supported
-                </video>
-                <div
-                  className="absolute flex justify-center"
-                  style={{ width: '213px', bottom: '-0.75rem' }}
-                >
-                  <Button
-                    variant="invertedAlternative"
-                    className="min-w-[0rem] w-[2.5rem] h-[2.5rem] !p-[0rem] z-1"
-                    onClick={handleMicSwitch}
-                  >
-                    <Icon
-                      size="s"
-                      name={micEnabled ? IconNames.MicOn : IconNames.MicOff}
-                    />
-                  </Button>
-                  <Gap sizeRem={0.5} horizontal />
-                  <Button
-                    variant="invertedAlternative"
-                    className="min-w-[0rem] w-[2.5rem] h-[2.5rem] !p-[0rem] z-1"
-                    onClick={handleCameraSwitch}
-                  >
-                    <Icon
-                      size="s"
-                      name={
-                        cameraEnabled
-                          ? IconNames.VideocamOn
-                          : IconNames.VideocamOff
-                      }
-                    />
-                  </Button>
-                </div>
-              </div>
               {themeInUi === Theme.Light && (
                 <div
                   style={{
@@ -317,6 +219,17 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
             <ThemeSwitchMini variant="button" />
             <Gap sizeRem={1.75} horizontal />
             <QuestionsProgress value={questionsProgress} />
+            <Button
+              variant="invertedAlternative"
+              className="min-w-[0rem] w-[2.375rem] h-[2.375rem] !p-[0rem] ml-auto"
+              onClick={handleMicSwitch}
+            >
+              <Icon
+                size="s"
+                name={micEnabled ? IconNames.MicOn : IconNames.MicOff}
+              />
+            </Button>
+            <Gap sizeRem={10.375} horizontal />
           </div>
           <Gap sizeRem={1.875} />
         </div>
