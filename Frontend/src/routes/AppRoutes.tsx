@@ -31,10 +31,15 @@ interface AppRoutesProps {
 export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
   const admin = checkAdmin(user);
   const location = useLocation();
-  const fullScreenPage = matchPath(
+  const roomPage = matchPath(
     { path: pathnames.room.replace(`/:${inviteParamName}?`, ''), end: false },
     location.pathname,
   );
+  const homePage = matchPath(
+    { path: pathnames.home.replace(`/:redirect?`, ''), end: false },
+    location.pathname,
+  );
+  const fullScreenPage = roomPage || homePage;
   const authenticated = !!user;
   const hasNavMenu = !fullScreenPage && authenticated;
 
