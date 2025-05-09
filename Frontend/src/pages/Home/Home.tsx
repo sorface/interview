@@ -20,6 +20,7 @@ import {
   AiAssistantScriptName,
 } from '../Room/components/AiAssistant/AiAssistant';
 import { Canvas } from '@react-three/fiber';
+import { ThemeSwitchMini } from '../../components/ThemeSwitchMini/ThemeSwitchMini';
 
 export const Home: FunctionComponent = () => {
   const auth = useContext(AuthContext);
@@ -54,9 +55,14 @@ export const Home: FunctionComponent = () => {
 
   return (
     <>
+      <div className='fixed top-0 pt-[1rem] pr-[1rem] w-full flex justify-end'>
+        <ThemeSwitchMini variant='button' />
+        <Gap sizeRem={0.25} horizontal />
+        <LangSwitch elementType="button" />
+      </div>
       <div className="pt-24">
         <div className="container px-3 mx-auto flex flex-wrap flex-col md:flex-row items-center">
-          <div className="flex flex-col w-full md:w-2/5 justify-center items-start text-center md:text-left">
+          <div className="flex flex-col w-full md:w-2/5 justify-center items-start text-center md:text-left z-50">
             <h1 className="my-4 text-5xl font-bold leading-tight">
               {VITE_APP_NAME}
             </h1>
@@ -100,7 +106,7 @@ export const Home: FunctionComponent = () => {
           </div>
         </div>
       </div>
-      <Gap sizeRem={2.75} />
+      <Gap sizeRem={4.75} />
       <div className="relative -mt-12 lg:-mt-24">
         <svg
           viewBox="0 0 1428 174"
@@ -211,10 +217,6 @@ export const Home: FunctionComponent = () => {
           </div>
         </div>
       </section>
-      <div className="fixed bottom-0 w-full flex flex-col items-center justify-center">
-        <LangSwitch elementType="switcherButton" />
-        <Gap sizeRem={0.75} />
-      </div>
     </>
   );
 };
