@@ -36,7 +36,7 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
     location.pathname,
   );
   const homePage = matchPath(
-    { path: pathnames.home.replace(`/:redirect?`, ''), end: false },
+    { path: pathnames.home, end: true },
     location.pathname,
   );
   const fullScreenPage = roomPage || homePage;
