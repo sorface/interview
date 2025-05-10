@@ -21,6 +21,7 @@ import {
 } from '../Room/components/AiAssistant/AiAssistant';
 import { Canvas } from '@react-three/fiber';
 import { ThemeSwitchMini } from '../../components/ThemeSwitchMini/ThemeSwitchMini';
+import { HomeInfoBlock } from './components/HomeInfoBlock';
 
 export const Home: FunctionComponent = () => {
   const auth = useContext(AuthContext);
@@ -55,8 +56,8 @@ export const Home: FunctionComponent = () => {
 
   return (
     <>
-      <div className='fixed top-0 pt-[1rem] pr-[1rem] w-full flex justify-end'>
-        <ThemeSwitchMini variant='button' />
+      <div className="fixed top-0 pt-[1rem] pr-[1rem] w-full flex justify-end">
+        <ThemeSwitchMini variant="button" />
         <Gap sizeRem={0.25} horizontal />
         <LangSwitch elementType="button" />
       </div>
@@ -152,36 +153,17 @@ export const Home: FunctionComponent = () => {
           <div className="w-full mb-4">
             <div className="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
           </div>
-          <div className="flex flex-wrap">
-            <div className="w-5/6 sm:w-1/2 p-6">
-              <h3 className="text-3xl text-gray-800 font-bold leading-none mb-3">
-                Собеседования по теории
-              </h3>
-              <p className="text-gray-600 mb-8">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam
-                at ipsum eu nunc commodo posuere et sit amet ligula.
-              </p>
-            </div>
-            <div className="w-full sm:w-1/2 p-6">
-              <img src="/ai-theory.png" />
-            </div>
-          </div>
-          <div className="flex flex-wrap flex-col-reverse sm:flex-row">
-            <div className="w-full sm:w-1/2 p-6 mt-6">
-              <img src="/ai-coding.png" />
-            </div>
-            <div className="w-full sm:w-1/2 p-6 mt-6">
-              <div className="align-middle">
-                <h3 className="text-3xl text-gray-800 font-bold leading-none mb-3">
-                  Собеседования по кодингу
-                </h3>
-                <p className="text-gray-600 mb-8">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Aliquam at ipsum eu nunc commodo posuere et sit amet ligula.
-                </p>
-              </div>
-            </div>
-          </div>
+          <HomeInfoBlock
+            title="Собеседования по теории"
+            info="Выходите за рамки статической информации. Взаимодействуйте, дискутируйте и совершенствуйте свое понимание посредством разговора."
+            iamgeSrc="/ai-theory.png"
+          />
+          <HomeInfoBlock
+            title="Собеседования по кодингу"
+            info="Независимо от того, практикуете ли вы алгоритмы, структуры данных или проблемы проектирования систем, наш ИИ анализирует ваши решения так же, как настоящий интервьюер, выявляя ошибки, предлагая оптимизации и помогая вам быстрее совершенствоваться."
+            iamgeSrc="/ai-coding.png"
+            reverseRow
+          />
         </div>
       </section>
       <section className="bg-gray-100 py-8">
