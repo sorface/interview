@@ -285,6 +285,15 @@ export const enum LocalizationKey {
   Clear,
   AnswerAgain,
   RoadmapJsPageName,
+  HomeInfoTitle,
+  HomeInfoTheoryBlockTitle,
+  HomeInfoTheoryBlockInfo,
+  HomeInfoCodingBlockTitle,
+  HomeInfoCodingBlockInfo,
+  HomeInfoPricingTitle,
+  HomeInfoPricingFree,
+  HomeInfoPricingPoint1,
+  HomeInfoPricingPoint2,
 }
 
 export const LocalizationCaptions: Record<
@@ -613,6 +622,15 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.Clear]: 'Clear',
     [LocalizationKey.AnswerAgain]: 'Answer again',
     [LocalizationKey.RoadmapJsPageName]: 'JavaScript Roadmap',
+    [LocalizationKey.HomeInfoTitle]: 'Interviews with AI',
+    [LocalizationKey.HomeInfoTheoryBlockTitle]: 'Theory interviews',
+    [LocalizationKey.HomeInfoTheoryBlockInfo]: 'Move beyond static information. Interact, debate, and refine your understanding through conversation.',
+    [LocalizationKey.HomeInfoCodingBlockTitle]: 'Coding Interviews',
+    [LocalizationKey.HomeInfoCodingBlockInfo]: 'Whether you\'re practicing algorithms, data structures, or system design problems, our AI analyzes your solutions just like a real interviewer—spotting errors, suggesting optimizations, and helping you improve faster.',
+    [LocalizationKey.HomeInfoPricingTitle]: 'Pricing',
+    [LocalizationKey.HomeInfoPricingFree]: 'Free',
+    [LocalizationKey.HomeInfoPricingPoint1]: 'Full access to all questions',
+    [LocalizationKey.HomeInfoPricingPoint2]: 'Endless number of interviews',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -939,5 +957,14 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.Clear]: 'Очистить',
     [LocalizationKey.AnswerAgain]: 'Ответить заново',
     [LocalizationKey.RoadmapJsPageName]: 'JavaScript Roadmap',
+    [LocalizationKey.HomeInfoTitle]: 'Собеседования с AI',
+    [LocalizationKey.HomeInfoTheoryBlockTitle]: 'Собеседования по теории',
+    [LocalizationKey.HomeInfoTheoryBlockInfo]: 'Выходите за рамки статической информации. Взаимодействуйте, дискутируйте и совершенствуйте свое понимание посредством разговора.',
+    [LocalizationKey.HomeInfoCodingBlockTitle]: 'Собеседования по кодингу',
+    [LocalizationKey.HomeInfoCodingBlockInfo]: 'Независимо от того, практикуете ли вы алгоритмы, структуры данных или проблемы проектирования систем, наш ИИ анализирует ваши решения так же, как настоящий интервьюер, выявляя ошибки, предлагая оптимизации и помогая вам быстрее совершенствоваться.',
+    [LocalizationKey.HomeInfoPricingTitle]: 'Стоимость',
+    [LocalizationKey.HomeInfoPricingFree]: 'Бесплатно',
+    [LocalizationKey.HomeInfoPricingPoint1]: 'Полный доступ к базе вопросов',
+    [LocalizationKey.HomeInfoPricingPoint2]: 'Бесконечное количество собеседований',
   },
 };

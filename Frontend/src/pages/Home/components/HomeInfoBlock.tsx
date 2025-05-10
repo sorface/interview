@@ -29,7 +29,7 @@ export const HomeInfoBlock: FunctionComponent<HomeInfoBlockProps> = ({
   );
 
   return (
-    <div className="flex flex-wrap text-left">
+    <div className="flex flex-wrap text-left mt-[1.5rem]">
       {reverseRow ? imageBlock : infoBlock}
       {reverseRow ? infoBlock : imageBlock}
     </div>
