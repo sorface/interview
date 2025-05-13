@@ -17,7 +17,6 @@ import { EventsSearch } from '../../../../types/event';
 import { useReactionsStatus } from '../../hooks/useReactionsStatus';
 import { LocalizationKey } from '../../../../localization';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
-import { UserStreamsContext } from '../../context/UserStreamsContext';
 import { IconNames } from '../../../../constants';
 import { Gap } from '../../../../components/Gap/Gap';
 import { Icon } from '../Icon/Icon';
@@ -87,10 +86,10 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
     videoOrder,
     peerToStream,
     allUsers,
+    recognitionEnabled,
     sendWsMessage,
     setRecognitionEnabled,
   } = useContext(RoomContext);
-  const { micEnabled } = useContext(UserStreamsContext);
   const {
     apiMethodState: apiRoomEventsSearchState,
     fetchData: fetchRoomEventsSearch,
@@ -173,8 +172,8 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
     );
   };
 
-  const handleMicSwitch = () => {
-    setRecognitionEnabled(!micEnabled);
+  const handleRecognitionSwitch = () => {
+    setRecognitionEnabled(!recognitionEnabled);
   };
 
   return (
@@ -222,11 +221,11 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
             <Button
               variant="invertedAlternative"
               className="min-w-[0rem] w-[2.375rem] h-[2.375rem] !p-[0rem] ml-auto"
-              onClick={handleMicSwitch}
+              onClick={handleRecognitionSwitch}
             >
               <Icon
                 size="s"
-                name={micEnabled ? IconNames.MicOn : IconNames.MicOff}
+                name={recognitionEnabled ? IconNames.MicOn : IconNames.MicOff}
               />
             </Button>
             <Gap sizeRem={10.375} horizontal />
