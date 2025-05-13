@@ -56,11 +56,14 @@ public class QuestionItem
                 UserId = e.CreatedBy.Id,
                 Nickname = e.CreatedBy.Nickname,
             },
+        Type = e.Type.EnumValue,
     });
 
     public Guid Id { get; init; }
 
     public string Value { get; init; } = string.Empty;
+
+    public required EVQuestionType Type { get; init; }
 
     public required List<TagItem> Tags { get; init; }
 

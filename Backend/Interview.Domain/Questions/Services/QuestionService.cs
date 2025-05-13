@@ -140,6 +140,7 @@ public class QuestionService(
                     Lang = result.CodeEditor.Lang,
                 },
             Author = null,
+            Type = result.Type.EnumValue,
         };
 
         SEQuestionType GetQuestionType()
@@ -301,6 +302,7 @@ public class QuestionService(
             CodeEditor = null,
             Category = null,
             Author = null,
+            Type = archiveQuestion.Type.EnumValue,
         };
     }
 
@@ -326,6 +328,7 @@ public class QuestionService(
             CodeEditor = null,
             Category = null,
             Author = null,
+            Type = unarchiveQuestion.Type.EnumValue,
         };
     }
 
@@ -485,6 +488,7 @@ public class QuestionService(
                     Nickname = entity.CreatedBy.Nickname,
                     UserId = entity.CreatedBy.Id,
                 },
+            Type = entity.Type.EnumValue,
         };
     }
 }
