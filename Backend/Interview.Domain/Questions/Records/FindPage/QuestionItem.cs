@@ -24,7 +24,13 @@ public class QuestionItem
             {
                 Id = e.Category.Id,
                 Name = e.Category.Name,
-                ParentId = e.Category.ParentId,
+                Parent = e.Category.ParentId == null
+                    ? null
+                    : new CategoryParentResponse
+                    {
+                        Id = e.Category.ParentId.Value,
+                        Name = e.Category.Parent == null ? string.Empty : e.Category.Parent.Name,
+                    },
                 Order = e.Category.Order,
             }
             : null,

@@ -124,15 +124,10 @@ public class QuestionService(
                 .ToList(),
             Category = result.CategoryId is not null
                 ? await db.Categories.AsNoTracking()
+                    .Include(e => e.Parent)
                     .Where(e => e.Id == result.CategoryId)
                     .OrderBy(e => e.Order)
-                    .Select(selector: e => new CategoryResponse
-                    {
-                        Id = e.Id,
-                        Name = e.Name,
-                        ParentId = e.ParentId,
-                        Order = e.Order,
-                    })
+                    .Select(CategoryResponse.Mapper.Expression)
                     .FirstOrDefaultAsync(cancellationToken)
                 : null,
             Answers = result.Answers.Select(QuestionAnswerResponse.Mapper.Map)
@@ -453,7 +448,7 @@ public class QuestionService(
         var category = entity.Category;
         if (category is null && entity.CategoryId is not null)
         {
-            category = await db.Categories.AsNoTracking().FirstOrDefaultAsync(e => e.Id == entity.CategoryId, cancellationToken);
+            category = await db.Categories.Include(e => e.Parent).AsNoTracking().FirstOrDefaultAsync(e => e.Id == entity.CategoryId, cancellationToken);
         }
 
         return new QuestionItem
@@ -467,15 +462,7 @@ public class QuestionService(
                 HexValue = e.HexColor,
             })
                 .ToList(),
-            Category = category is not null
-                ? new CategoryResponse
-                {
-                    Id = category.Id,
-                    Name = category.Name,
-                    ParentId = category.ParentId,
-                    Order = category.Order,
-                }
-                : null,
+            Category = category is null ? null : CategoryResponse.Mapper.Map(category),
             Answers = entity.Answers.Select(q => new QuestionAnswerResponse
             {
                 Id = q.Id,
