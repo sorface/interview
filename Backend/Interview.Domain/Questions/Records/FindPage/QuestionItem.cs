@@ -12,7 +12,13 @@ public class QuestionItem
     {
         Id = e.Id,
         Value = e.Value,
-        Tags = e.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
+        Tags = e.Tags.Select(t => new TagItem
+        {
+            Id = t.Id,
+            Value = t.Value,
+            HexValue = t.HexColor,
+        })
+            .ToList(),
         Category = e.Category != null
             ? new CategoryResponse
             {
@@ -37,6 +43,13 @@ public class QuestionItem
                 Content = e.CodeEditor.Content,
                 Lang = e.CodeEditor.Lang,
             },
+        Author = e.CreatedBy == null
+            ? null
+            : new QuestionItemAuthorResponse
+            {
+                UserId = e.CreatedBy.Id,
+                Nickname = e.CreatedBy.Nickname,
+            },
     });
 
     public Guid Id { get; init; }
@@ -50,4 +63,6 @@ public class QuestionItem
     public required QuestionCodeEditorResponse? CodeEditor { get; init; }
 
     public required CategoryResponse? Category { get; init; }
+
+    public required QuestionItemAuthorResponse? Author { get; init; }
 }
