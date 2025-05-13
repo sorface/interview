@@ -115,10 +115,15 @@ public class QuestionService(
         {
             Id = result.Id,
             Value = result.Value,
-            Tags = result.Tags.Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, })
+            Tags = result.Tags.Select(e => new TagItem
+            {
+                Id = e.Id,
+                Value = e.Value,
+                HexValue = e.HexColor,
+            })
                 .ToList(),
-            Category = result.CategoryId is not null ?
-                await db.Categories.AsNoTracking()
+            Category = result.CategoryId is not null
+                ? await db.Categories.AsNoTracking()
                     .Where(e => e.Id == result.CategoryId)
                     .OrderBy(e => e.Order)
                     .Select(selector: e => new CategoryResponse
@@ -130,7 +135,8 @@ public class QuestionService(
                     })
                     .FirstOrDefaultAsync(cancellationToken)
                 : null,
-            Answers = result.Answers.Select(QuestionAnswerResponse.Mapper.Map).ToList(),
+            Answers = result.Answers.Select(QuestionAnswerResponse.Mapper.Map)
+                .ToList(),
             CodeEditor = result.CodeEditor == null
                 ? null
                 : new QuestionCodeEditorResponse
@@ -138,6 +144,7 @@ public class QuestionService(
                     Content = result.CodeEditor.Content,
                     Lang = result.CodeEditor.Lang,
                 },
+            Author = null,
         };
 
         SEQuestionType GetQuestionType()
@@ -250,6 +257,7 @@ public class QuestionService(
             .Include(e => e.Category)
             .Include(e => e.CodeEditor)
             .Include(e => e.Answers)
+            .Include(e => e.CreatedBy)
             .Where(e => !e.IsArchived && e.Id == id)
             .Select(QuestionItem.Mapper.Expression)
             .FirstOrDefaultAsync(cancellationToken);
@@ -285,10 +293,19 @@ public class QuestionService(
             Id = archiveQuestion.Id,
             Value = archiveQuestion.Value,
             Tags = archiveQuestion.Tags
-                .Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, }).ToList(),
-            Answers = [],
+                .Select(e => new TagItem
+                {
+                    Id = e.Id,
+                    Value = e.Value,
+                    HexValue = e.HexColor,
+                })
+                .ToList(),
+            Answers =
+            [
+            ],
             CodeEditor = null,
             Category = null,
+            Author = null,
         };
     }
 
@@ -301,10 +318,19 @@ public class QuestionService(
             Id = unarchiveQuestion.Id,
             Value = unarchiveQuestion.Value,
             Tags = unarchiveQuestion.Tags
-                .Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, }).ToList(),
-            Answers = [],
+                .Select(e => new TagItem
+                {
+                    Id = e.Id,
+                    Value = e.Value,
+                    HexValue = e.HexColor,
+                })
+                .ToList(),
+            Answers =
+            [
+            ],
             CodeEditor = null,
             Category = null,
+            Author = null,
         };
     }
 
@@ -464,6 +490,13 @@ public class QuestionService(
                 {
                     Content = entity.CodeEditor.Content,
                     Lang = entity.CodeEditor.Lang,
+                },
+            Author = entity.CreatedBy == null
+                ? null
+                : new QuestionItemAuthorResponse
+                {
+                    Nickname = entity.CreatedBy.Nickname,
+                    UserId = entity.CreatedBy.Id,
                 },
         };
     }
