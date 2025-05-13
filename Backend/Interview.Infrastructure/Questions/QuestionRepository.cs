@@ -32,6 +32,7 @@ public class QuestionRepository(AppDbContext db) : EfRepository<Question>(db), I
             .Include(e => e.Tags)
             .Include(e => e.Category)
             .Include(e => e.CodeEditor)
-            .Include(e => e.Answers);
+            .Include(e => e.Answers)
+            .Include(e => e.CreatedBy);
     }
 }
