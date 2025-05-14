@@ -7,6 +7,7 @@ using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Reactions;
 using Interview.Domain.Repository;
+using Interview.Domain.Roadmaps;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomInvites;
 using Interview.Domain.Rooms.RoomParticipants;
@@ -84,6 +85,12 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<QuestionSubjectTree> QuestionSubjectTree { get; private set; } = null!;
 
     public DbSet<QuestionSubjectTreeContext> QuestionSubjectTreeContext { get; private set; } = null!;
+
+    public DbSet<Roadmap> Roadmap { get; private set; } = null!;
+
+    public DbSet<RoadmapMilestone> RoadmapMilestone { get; private set; } = null!;
+
+    public DbSet<RoadmapMilestoneItem> RoadmapMilestoneItem { get; private set; } = null!;
 
     /// <summary>
     /// Runs code within a transaction, taking into account previously created code.

@@ -475,6 +475,111 @@ namespace Interview.Migrations.Postgres.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Interview.Domain.Roadmaps.Roadmap", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("Roadmap");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.RoadmapMilestone", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("ParentRoadmapMilestoneId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RoadmapId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ParentRoadmapMilestoneId");
+
+                    b.HasIndex("RoadmapId");
+
+                    b.ToTable("RoadmapMilestone");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.RoadmapMilestoneItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("QuestionTreeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RoadmapMilestoneId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("QuestionTreeId");
+
+                    b.HasIndex("RoadmapMilestoneId");
+
+                    b.ToTable("RoadmapMilestoneItem");
+                });
+
             modelBuilder.Entity("Interview.Domain.Rooms.QueuedRoomEvent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1556,6 +1661,21 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.ToTable("QuestionTag");
                 });
 
+            modelBuilder.Entity("RoadmapTag", b =>
+                {
+                    b.Property<Guid>("RoadmapId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TagsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("RoadmapId", "TagsId");
+
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("RoadmapTag");
+                });
+
             modelBuilder.Entity("RoleUser", b =>
                 {
                     b.Property<Guid>("RolesId")
@@ -1780,6 +1900,61 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasForeignKey("CreatedById");
 
                     b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.Roadmap", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.RoadmapMilestone", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Roadmaps.RoadmapMilestone", "ParentRoadmapMilestone")
+                        .WithMany("ChildrenMilestones")
+                        .HasForeignKey("ParentRoadmapMilestoneId");
+
+                    b.HasOne("Interview.Domain.Roadmaps.Roadmap", null)
+                        .WithMany("Milestones")
+                        .HasForeignKey("RoadmapId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ParentRoadmapMilestone");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.RoadmapMilestoneItem", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Questions.QuestionTree", "QuestionTree")
+                        .WithMany()
+                        .HasForeignKey("QuestionTreeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Interview.Domain.Roadmaps.RoadmapMilestone", "RoadmapMilestone")
+                        .WithMany("Items")
+                        .HasForeignKey("RoadmapMilestoneId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("QuestionTree");
+
+                    b.Navigation("RoadmapMilestone");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.QueuedRoomEvent", b =>
@@ -2073,6 +2248,21 @@ namespace Interview.Migrations.Postgres.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RoadmapTag", b =>
+                {
+                    b.HasOne("Interview.Domain.Roadmaps.Roadmap", null)
+                        .WithMany()
+                        .HasForeignKey("RoadmapId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Interview.Domain.Tags.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("RoleUser", b =>
                 {
                     b.HasOne("Interview.Domain.Users.Roles.Role", null)
@@ -2126,6 +2316,18 @@ namespace Interview.Migrations.Postgres.Migrations
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
                 {
                     b.Navigation("Answers");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.Roadmap", b =>
+                {
+                    b.Navigation("Milestones");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.RoadmapMilestone", b =>
+                {
+                    b.Navigation("ChildrenMilestones");
+
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>
