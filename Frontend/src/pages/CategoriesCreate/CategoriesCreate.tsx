@@ -104,8 +104,10 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
       return;
     }
     setCategoryName(category.name);
-    setCategoryParent(category.parentId);
     setCategoryOrder(category.order);
+    if (category.parent) {
+      setCategoryParent(category.parent.id);
+    }
   }, [category]);
 
   useEffect(() => {
