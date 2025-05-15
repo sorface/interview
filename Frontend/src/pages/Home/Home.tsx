@@ -71,7 +71,7 @@ export const Home: FunctionComponent = () => {
               {localizationCaptions[LocalizationKey.HomeDescription]}
             </p>
             <HomeAction />
-            <Gap sizeRem={0.15} />
+            <Gap sizeRem={0.5} />
             <div className="whitespace-break-spaces">
               <Typography size="s" secondary>
                 {localizationCaptions[LocalizationKey.TermsOfUsageAcceptance]}
