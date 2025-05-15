@@ -376,7 +376,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.ErrorGetRoomEvent]: 'Error receiving meeting event',
     [LocalizationKey.ErrorSendingRoomEvent]: 'Error sending meeting event',
     [LocalizationKey.TermsOfUsageAcceptance]:
-      'By login, you acknowledge that you have read, understood, and agree to ',
+      'By login, you acknowledge that you have read,\nunderstood, and agree to ',
     [LocalizationKey.TermsOfUsage]: 'Terms of usage',
     [LocalizationKey.Login]: 'Login',
     [LocalizationKey.LikeTable]: '👍',
@@ -573,8 +573,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.LetsBeginDescription]:
       'To start an interview, say "{LetsStartCommand}".',
     [LocalizationKey.LetsBeginCommand]: "let's begin",
-    [LocalizationKey.HomeDescription]:
-      'AI interviews, video calls,\nquestion database.',
+    [LocalizationKey.HomeDescription]: 'AI interviews, video calls.',
     [LocalizationKey.QuestionTreesPageName]: 'Question trees',
     [LocalizationKey.CreateQuestionTree]: 'Create question trees',
     [LocalizationKey.QuestionTree]: 'Question tree',
@@ -708,7 +707,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.ErrorGetRoomEvent]: 'Ошибка в получении событий',
     [LocalizationKey.ErrorSendingRoomEvent]: 'Ошибка в отправке собтия',
     [LocalizationKey.TermsOfUsageAcceptance]:
-      'Входя, вы подтверждаете, что прочитали, поняли и соглашаетесь с ',
+      'Входя, вы подтверждаете, что прочитали,\nпоняли и соглашаетесь с ',
     [LocalizationKey.TermsOfUsage]: 'Условиями использования',
     [LocalizationKey.Login]: 'Войти',
     [LocalizationKey.LikeTable]: '👍',
@@ -910,8 +909,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.LetsBeginDescription]:
       'Для начала собеседования скажите "{LetsStartCommand}".',
     [LocalizationKey.LetsBeginCommand]: 'давай начнём',
-    [LocalizationKey.HomeDescription]:
-      'Собеседования с AI, видеозвонки,\nбаза вопросов.',
+    [LocalizationKey.HomeDescription]: 'Собеседования с AI, видеозвонки.',
     [LocalizationKey.QuestionTreesPageName]: 'Деревья вопросов',
     [LocalizationKey.CreateQuestionTree]: 'Создать дерево вопросов',
     [LocalizationKey.QuestionTree]: 'Дерево вопросов',
