@@ -1,4 +1,5 @@
-﻿using Interview.Domain.Database;
+using Interview.Domain.Database;
+using Interview.Domain.Roadmaps.RoadmapById;
 using Interview.Domain.Roadmaps.RoadmapPage;
 using Interview.Domain.Roadmaps.UpsertRoadmap;
 using Interview.Domain.ServiceResults.Success;
@@ -36,14 +37,13 @@ public class RoadmapService(AppDbContext db)
         return ServiceResult.Ok(roadmap.Id);
     }
 
-    public async Task<IPagedList<RoadmapPageResponse>> FindPageAsync(FilteredRequest<RoadmapPageRequestFilter> request, CancellationToken cancellationToken)
+    public async Task<RoadmapResponse> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        var spec = BuildSpecification(request);
         var tmpRes = await db.Roadmap
             .AsNoTracking()
             .Include(e => e.Tags)
             .Include(e => e.Milestones).ThenInclude(e => e.Items)
-            .Where(spec)
+            .Where(e => e.Id == id)
             .Select(e => new
             {
                 Id = e.Id,
@@ -69,50 +69,86 @@ public class RoadmapService(AppDbContext db)
                     }).OrderBy(tt => tt.Order).ToList(),
                 }).OrderBy(t => t.Order).ToList(),
             })
-            .OrderBy(e => e.Order)
-            .ToPagedListAsync(request.Page, cancellationToken);
-        var questionTreeIds = tmpRes.SelectMany(e =>
-            e.Items.SelectMany(t =>
-                t.Items.Select(tt => tt.QuestionTreeId)))
-            .ToHashSet();
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        if (tmpRes is null)
+        {
+            throw NotFoundException.Create<Roadmap>(id);
+        }
+
+        var questionTreeIds = tmpRes.Items.SelectMany(t => t.Items.Select(tt => tt.QuestionTreeId)).ToHashSet();
         var roomIdList = await db.Rooms
             .Where(e => e.QuestionTreeId != null && questionTreeIds.Contains(e.QuestionTreeId.Value))
             .Select(e => new { QuestionTreeId = e.QuestionTreeId!.Value, RoomId = e.Id })
             .ToListAsync(cancellationToken);
         var roomIdMap = roomIdList.ToLookup(e => e.QuestionTreeId);
 
-        return tmpRes.ConvertAll(e => new RoadmapPageResponse
+        var items = new List<RoadmapItemResponse>(tmpRes.Items.Count + 1 + tmpRes.Items.Select(e => e.Items.Count).Sum());
+        for (var index = 0; index < tmpRes.Items.Count; index++)
         {
-            Id = e.Id,
-            Name = e.Name,
-            Order = e.Order,
-            Tags = e.Tags,
-            Items = e.Items.SelectMany(t =>
+            var item = tmpRes.Items[index];
+            if (item.ParentRoadmapMilestoneId is null && index > 0)
             {
-                var items = new List<RoadmapPageItemResponse>(t.Items.Count + 1);
-                items.Add(new RoadmapPageItemResponse
+                items.Add(new RoadmapItemResponse
                 {
-                    Id = t.Id,
-                    Type = EVRoadmapItemType.Milestone,
-                    Name = t.Name,
+                    Id = null,
+                    Type = EVRoadmapItemType.VerticalSplit,
+                    Name = null,
                     QuestionTreeId = null,
                     RoomId = null,
-                    Order = t.Order,
+                    Order = -1,
                 });
-                items.AddRange(t.Items.Select(item => new RoadmapPageItemResponse
-                {
-                    Id = item.Id,
-                    Type = EVRoadmapItemType.QuestionTree,
-                    Name = null,
-                    QuestionTreeId = item.QuestionTreeId,
-                    RoomId = roomIdMap[item.QuestionTreeId].FirstOrDefault()?.RoomId,
-                    Order = item.Order,
-                }));
+            }
 
-                // TODO: add vertical split
-                return items;
-            }).ToList(),
-        });
+            items.Add(new RoadmapItemResponse
+            {
+                Id = item.Id,
+                Type = EVRoadmapItemType.Milestone,
+                Name = item.Name,
+                QuestionTreeId = null,
+                RoomId = null,
+                Order = item.Order,
+            });
+            items.AddRange(item.Items.Select(e => new RoadmapItemResponse
+            {
+                Id = e.Id,
+                Type = EVRoadmapItemType.QuestionTree,
+                Name = null,
+                QuestionTreeId = e.QuestionTreeId,
+                RoomId = roomIdMap[e.QuestionTreeId].FirstOrDefault()?.RoomId,
+                Order = e.Order,
+            }));
+        }
+
+        return new RoadmapResponse
+        {
+            Id = tmpRes.Id,
+            Name = tmpRes.Name,
+            Order = tmpRes.Order,
+            Tags = tmpRes.Tags,
+            Items = items,
+        };
+    }
+
+    public Task<IPagedList<RoadmapPageResponse>> FindPageAsync(FilteredRequest<RoadmapPageRequestFilter> request, CancellationToken cancellationToken)
+    {
+        var spec = BuildSpecification(request);
+        return db.Roadmap
+            .AsNoTracking()
+            .Include(e => e.Tags)
+            .Where(spec)
+            .OrderBy(e => e.Order)
+            .Select(e => new RoadmapPageResponse
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Tags = e.Tags.Select(t => new TagItem
+                {
+                    Id = t.Id,
+                    Value = t.Value,
+                    HexValue = t.HexColor,
+                }).ToList(),
+            })
+            .ToPagedListAsync(request.Page, cancellationToken);
 
         static ASpec<Roadmap> BuildSpecification(FilteredRequest<RoadmapPageRequestFilter> request)
         {

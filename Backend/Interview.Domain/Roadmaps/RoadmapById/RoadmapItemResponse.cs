@@ -1,8 +1,8 @@
-namespace Interview.Domain.Roadmaps.RoadmapPage;
+namespace Interview.Domain.Roadmaps.RoadmapById;
 
-public class RoadmapPageItemResponse
+public class RoadmapItemResponse
 {
-    public required Guid Id { get; set; }
+    public required Guid? Id { get; set; }
 
     public required EVRoadmapItemType Type { get; set; }
 
