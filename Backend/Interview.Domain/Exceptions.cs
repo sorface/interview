@@ -6,6 +6,11 @@ namespace Interview.Domain;
 public class UserException : Exception
 #pragma warning restore SA1649
 {
+    public UserException(IEnumerable<string> messages)
+        : base(string.Join(Environment.NewLine, messages))
+    {
+    }
+
     public UserException(string message)
         : base(message)
     {

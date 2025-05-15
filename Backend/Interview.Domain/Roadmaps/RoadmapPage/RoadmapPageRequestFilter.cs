@@ -1,4 +1,4 @@
-﻿namespace Interview.Domain.Roadmaps.RoadmapPage;
+namespace Interview.Domain.Roadmaps.RoadmapPage;
 
 public class RoadmapPageRequestFilter
 {

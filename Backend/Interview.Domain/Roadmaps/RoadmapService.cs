@@ -1,5 +1,7 @@
 ﻿using Interview.Domain.Database;
 using Interview.Domain.Roadmaps.RoadmapPage;
+using Interview.Domain.Roadmaps.UpsertRoadmap;
+using Interview.Domain.ServiceResults.Success;
 using Interview.Domain.Tags.Records.Response;
 using Microsoft.EntityFrameworkCore;
 using NSpecifications;
@@ -9,6 +11,31 @@ namespace Interview.Domain.Roadmaps;
 
 public class RoadmapService(AppDbContext db)
 {
+    public async Task<ServiceResult<Guid>> UpsertAsync(UpsertRoadmapRequest request, CancellationToken cancellationToken)
+    {
+        var validator = new UpsertRoadmapRequestValidator();
+        var result = validator.Validate(request);
+        if (!result.IsValid)
+        {
+            throw new UserException(result.Errors);
+        }
+
+        Roadmap? roadmap = null;
+        if (request.Id is not null)
+        {
+            roadmap = await db.Roadmap.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
+        }
+
+        if (roadmap is null)
+        {
+            roadmap = await CreateRoadmapAsync(request, cancellationToken);
+            return ServiceResult.Created(roadmap.Id);
+        }
+
+        await UpdateRoadmapAsync(roadmap, request, cancellationToken);
+        return ServiceResult.Ok(roadmap.Id);
+    }
+
     public async Task<IPagedList<RoadmapPageResponse>> FindPageAsync(FilteredRequest<RoadmapPageRequestFilter> request, CancellationToken cancellationToken)
     {
         var spec = BuildSpecification(request);
@@ -19,6 +46,7 @@ public class RoadmapService(AppDbContext db)
             .Where(spec)
             .Select(e => new
             {
+                Id = e.Id,
                 Name = e.Name,
                 Order = e.Order,
                 Tags = e.Tags.Select(t => new TagItem
@@ -29,11 +57,13 @@ public class RoadmapService(AppDbContext db)
                 }).ToList(),
                 Items = e.Milestones.Select(t => new
                 {
+                    t.Id,
                     t.Name,
                     t.Order,
                     t.ParentRoadmapMilestoneId,
                     Items = t.Items.Select(tt => new
                     {
+                        tt.Id,
                         tt.Order,
                         tt.QuestionTreeId,
                     }).OrderBy(tt => tt.Order).ToList(),
@@ -53,6 +83,7 @@ public class RoadmapService(AppDbContext db)
 
         return tmpRes.ConvertAll(e => new RoadmapPageResponse
         {
+            Id = e.Id,
             Name = e.Name,
             Order = e.Order,
             Tags = e.Tags,
@@ -61,24 +92,24 @@ public class RoadmapService(AppDbContext db)
                 var items = new List<RoadmapPageItemResponse>(t.Items.Count + 1);
                 items.Add(new RoadmapPageItemResponse
                 {
+                    Id = t.Id,
                     Type = EVRoadmapItemType.Milestone,
                     Name = t.Name,
                     QuestionTreeId = null,
                     RoomId = null,
                     Order = t.Order,
                 });
-                foreach (var item in t.Items)
+                items.AddRange(t.Items.Select(item => new RoadmapPageItemResponse
                 {
-                    items.Add(new RoadmapPageItemResponse
-                    {
-                        Type = EVRoadmapItemType.QuestionTree,
-                        Name = null,
-                        QuestionTreeId = item.QuestionTreeId,
-                        RoomId = roomIdMap[item.QuestionTreeId].FirstOrDefault()?.RoomId,
-                        Order = item.Order,
-                    });
-                }
+                    Id = item.Id,
+                    Type = EVRoadmapItemType.QuestionTree,
+                    Name = null,
+                    QuestionTreeId = item.QuestionTreeId,
+                    RoomId = roomIdMap[item.QuestionTreeId].FirstOrDefault()?.RoomId,
+                    Order = item.Order,
+                }));
 
+                // TODO: add vertical split
                 return items;
             }).ToList(),
         });
@@ -107,5 +138,15 @@ public class RoadmapService(AppDbContext db)
 
             return spec;
         }
+    }
+
+    private Task<Roadmap> CreateRoadmapAsync(UpsertRoadmapRequest request, CancellationToken cancellation)
+    {
+        throw new NotImplementedException();
+    }
+
+    private Task UpdateRoadmapAsync(Roadmap roadmap, UpsertRoadmapRequest request, CancellationToken cancellation)
+    {
+        throw new NotImplementedException();
     }
 }
