@@ -56,12 +56,12 @@ export const Home: FunctionComponent = () => {
 
   return (
     <>
-      <div className="fixed top-0 pt-[1rem] pr-[1rem] w-full flex justify-end">
+      <div className="fixed top-0 pt-[1rem] pr-[2rem] w-full flex justify-end">
         <ThemeSwitchMini variant="button" />
         <Gap sizeRem={0.25} horizontal />
         <LangSwitch elementType="button" />
       </div>
-      <div className="pt-24">
+      <div className="pt-24 ml-[-1rem] mr-[-1rem]">
         <div className="container px-3 mx-auto flex flex-wrap flex-col md:flex-row items-center">
           <div className="flex flex-col w-full md:w-2/5 justify-center items-start text-center md:text-left z-50">
             <h1 className="my-4 text-5xl font-bold leading-tight">
@@ -108,7 +108,7 @@ export const Home: FunctionComponent = () => {
         </div>
       </div>
       <Gap sizeRem={4.75} />
-      <div className="relative -mt-12 lg:-mt-24">
+      <div className="relative -mt-12 lg:-mt-24 ml-[-1rem] mr-[-1rem]">
         <svg
           viewBox="0 0 1428 174"
           version="1.1"
@@ -145,7 +145,7 @@ export const Home: FunctionComponent = () => {
           </g>
         </svg>
       </div>
-      <section className="bg-white border-b py-8">
+      <section className="bg-white border-b py-8 ml-[-1rem] mr-[-1rem]">
         <div className="container max-w-5xl mx-auto m-8">
           <h2 className="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">
             {localizationCaptions[LocalizationKey.HomeInfoTitle]}
@@ -170,7 +170,7 @@ export const Home: FunctionComponent = () => {
           />
         </div>
       </section>
-      <section className="bg-gray-100 py-8">
+      <section className="bg-gray-100 py-8 ml-[-1rem] mr-[-1rem]">
         <div className="container mx-auto px-2 pt-4 pb-12 text-gray-800">
           <h2 className="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">
             {localizationCaptions[LocalizationKey.HomeInfoPricingTitle]}
