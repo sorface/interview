@@ -461,6 +461,24 @@ public class SEPermission(Guid id, string name, string description, EVPermission
         "Unarchiving the question tree",
         EVPermission.QuestionTreeUnarchive);
 
+    public static readonly SEPermission RoadmapUpsert = new(
+        Guid.Parse("91EEED61-9E52-4486-9881-DE48991732E5"),
+        "RoadmapUpsert",
+        "Upsert roadmap",
+        EVPermission.RoadmapUpsert);
+
+    public static readonly SEPermission RoadmapGetById = new(
+        Guid.Parse("53F985B6-05CC-47EA-A889-52BC263603CB"),
+        "RoadmapGetById",
+        "Get roadmap by id",
+        EVPermission.RoadmapGetById);
+
+    public static readonly SEPermission RoadmapFindPage = new(
+        Guid.Parse("47084566-7F68-4621-94B7-D36256EB6ACA"),
+        "RoadmapFindPage",
+        "Find roadmap page",
+        EVPermission.RoadmapFindPage);
+
     public Guid Id { get; } = id;
 
     public string Description { get; } = description;

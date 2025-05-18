@@ -1,8 +1,10 @@
 using Interview.Domain.Database;
+using Interview.Domain.Questions;
 using Interview.Domain.Roadmaps.RoadmapById;
 using Interview.Domain.Roadmaps.RoadmapPage;
 using Interview.Domain.Roadmaps.UpsertRoadmap;
 using Interview.Domain.ServiceResults.Success;
+using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
 using Microsoft.EntityFrameworkCore;
 using NSpecifications;
@@ -10,7 +12,7 @@ using X.PagedList;
 
 namespace Interview.Domain.Roadmaps;
 
-public class RoadmapService(AppDbContext db)
+public class RoadmapService(AppDbContext db) : IRoadmapService
 {
     public async Task<ServiceResult<Guid>> UpsertAsync(UpsertRoadmapRequest request, CancellationToken cancellationToken)
     {
@@ -21,20 +23,68 @@ public class RoadmapService(AppDbContext db)
             throw new UserException(result.Errors);
         }
 
+        var tags = await EnsureDbCheckValidateAsync(db, request, result.Tree, cancellationToken);
+
         Roadmap? roadmap = null;
         if (request.Id is not null)
         {
-            roadmap = await db.Roadmap.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
+            var id = request.Id.Value;
+            roadmap = await db.Roadmap
+                .Include(e => e.Tags)
+                .Include(e => e.Milestones)
+                .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+            if (roadmap is null)
+            {
+                throw NotFoundException.Create<Roadmap>(id);
+            }
         }
 
         if (roadmap is null)
         {
-            roadmap = await CreateRoadmapAsync(request, cancellationToken);
+            roadmap = await CreateRoadmapAsync(result.Tree, tags, request, cancellationToken);
             return ServiceResult.Created(roadmap.Id);
         }
 
-        await UpdateRoadmapAsync(roadmap, request, cancellationToken);
+        await UpdateRoadmapAsync(result.Tree, roadmap, tags, request, cancellationToken);
         return ServiceResult.Ok(roadmap.Id);
+
+        static async Task<List<Tag>> EnsureDbCheckValidateAsync(AppDbContext db,
+                                                                UpsertRoadmapRequest request,
+                                                                UpsertRoadmapRequestValidator.RoadmapTree tree,
+                                                                CancellationToken cancellationToken)
+        {
+            var questionTreeIds = tree.RootMilestones
+                .SelectMany(e => e.QuestionTrees)
+                .Select(e => e.Id!.Value)
+                .ToHashSet();
+            var dbQuestionTrees = await db.QuestionTree.Where(e => questionTreeIds.Contains(e.Id))
+                .Select(e => e.Id)
+                .ToListAsync(cancellationToken);
+
+            questionTreeIds.ExceptWith(dbQuestionTrees);
+            if (questionTreeIds.Count > 0)
+            {
+                throw NotFoundException.Create<QuestionTree>(questionTreeIds);
+            }
+
+            if (db.Roadmap.Any(e => e.Order == request.Order))
+            {
+                throw new UserException("Roadmap order should be unique");
+            }
+
+            List<Tag>? tags = null;
+            if (request.Tags.Count > 0)
+            {
+                tags = await db.Tag.Where(e => request.Tags.Contains(e.Id)).ToListAsync(cancellationToken);
+                var notFoundTags = request.Tags.Except(tags.Select(e => e.Id)).ToList();
+                if (notFoundTags.Count > 0)
+                {
+                    throw NotFoundException.Create<Tag>(notFoundTags);
+                }
+            }
+
+            return tags ?? [];
+        }
     }
 
     public async Task<RoadmapResponse> GetByIdAsync(Guid id, CancellationToken cancellationToken)
@@ -176,13 +226,128 @@ public class RoadmapService(AppDbContext db)
         }
     }
 
-    private Task<Roadmap> CreateRoadmapAsync(UpsertRoadmapRequest request, CancellationToken cancellation)
+    private async Task<Roadmap> CreateRoadmapAsync(
+        UpsertRoadmapRequestValidator.RoadmapTree resultTree,
+        List<Tag> tags,
+        UpsertRoadmapRequest request,
+        CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var roadmap = new Roadmap { Name = request.Name, Order = request.Order, Tags = tags };
+
+        var rootMilestones = new Stack<(Guid? Parent, UpsertRoadmapRequestValidator.RoadmapMilestoneNode Current)>(
+            resultTree.RootMilestones.Select(e => ((Guid?)null, e)));
+        while (rootMilestones.TryPop(out var milestone))
+        {
+            var milestoneId = milestone.Current.Milestone.Id ?? Guid.NewGuid();
+            var roadmapMilestone = new RoadmapMilestone
+            {
+                Id = milestoneId,
+                Name = milestone.Current.Milestone.Name ?? string.Empty,
+                Order = milestone.Current.Milestone.Order,
+                RoadmapId = default,
+                ParentRoadmapMilestoneId = milestone.Parent ?? default,
+                Items = milestone.Current.QuestionTrees.Select(e => new RoadmapMilestoneItem
+                {
+                    RoadmapMilestoneId = milestoneId,
+                    QuestionTreeId = e.QuestionTreeId!.Value,
+                    Order = e.Order,
+                }).ToList(),
+            };
+            roadmap.Milestones.Add(roadmapMilestone);
+            foreach (var roadmapMilestoneNode in milestone.Current.Children)
+            {
+                rootMilestones.Push((roadmapMilestone.Id, roadmapMilestoneNode));
+            }
+        }
+
+        await db.Roadmap.AddAsync(roadmap, cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
+        return roadmap;
     }
 
-    private Task UpdateRoadmapAsync(Roadmap roadmap, UpsertRoadmapRequest request, CancellationToken cancellation)
+    private async Task UpdateRoadmapAsync(
+        UpsertRoadmapRequestValidator.RoadmapTree resultTree,
+        Roadmap roadmap,
+        List<Tag> tags,
+        UpsertRoadmapRequest request,
+        CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var milestonesQuery = request.Items
+            .Where(e => e is { Type: EVRoadmapItemType.Milestone, Id: not null })
+            .ToList();
+        var requiredRoadmapMilestones = milestonesQuery
+            .Select(e => e.Id!.Value)
+            .ToHashSet();
+        if (requiredRoadmapMilestones.Count > 0)
+        {
+            var existsRoadmapMilestones = await db.RoadmapMilestone
+                .Where(e => requiredRoadmapMilestones.Contains(e.Id))
+                .Select(e => new { e.Id, e.RoadmapId })
+                .ToListAsync(cancellationToken);
+            var nonRoadmapMilestones = existsRoadmapMilestones.Where(e => e.RoadmapId != roadmap.Id).ToList();
+            if (nonRoadmapMilestones.Count > 0)
+            {
+                throw new UserException($"These milestones [{string.Join(", ", nonRoadmapMilestones)}] are not related to the roadmap");
+            }
+
+            var notFoundMilestones = requiredRoadmapMilestones.Except(existsRoadmapMilestones.Select(e => e.Id)).ToList();
+            if (notFoundMilestones.Count > 0)
+            {
+                throw NotFoundException.Create<RoadmapMilestone>(notFoundMilestones);
+            }
+        }
+
+        roadmap.Tags.Clear();
+        roadmap.Tags.AddRange(tags);
+        roadmap.Order = request.Order;
+        roadmap.Name = request.Name;
+
+        // remove milestones
+        roadmap.Milestones.RemoveAll(e => !requiredRoadmapMilestones.Contains(e.Id));
+        var existsMilestoneMap = roadmap.Milestones.ToDictionary(e => e.Id, e => e);
+
+        var rootMilestones = new Stack<(Guid? Parent, UpsertRoadmapRequestValidator.RoadmapMilestoneNode Current)>(
+            resultTree.RootMilestones.Select(e => ((Guid?)null, e)));
+        while (rootMilestones.TryPop(out var milestone))
+        {
+            RoadmapMilestone roadmapMilestone;
+            if (milestone.Current.Milestone.Id is not null && existsMilestoneMap.TryGetValue(milestone.Current.Milestone.Id.Value, out var milestoneTree))
+            {
+                // update
+                roadmapMilestone = milestoneTree;
+                roadmapMilestone.Name = milestoneTree.Name;
+                roadmapMilestone.Order = milestoneTree.Order;
+                roadmapMilestone.ParentRoadmapMilestoneId = milestone.Parent;
+                roadmapMilestone.Items.Clear();
+            }
+            else
+            {
+                // add
+                var milestoneId = milestone.Current.Milestone.Id ?? Guid.NewGuid();
+                roadmapMilestone = new RoadmapMilestone
+                {
+                    Id = milestoneId,
+                    Name = milestone.Current.Milestone.Name ?? string.Empty,
+                    Order = milestone.Current.Milestone.Order,
+                    RoadmapId = roadmap.Id,
+                    ParentRoadmapMilestoneId = milestone.Parent,
+                };
+                roadmap.Milestones.Add(roadmapMilestone);
+            }
+
+            roadmapMilestone.Items.AddRange(milestone.Current.QuestionTrees.Select(e => new RoadmapMilestoneItem
+            {
+                RoadmapMilestoneId = roadmapMilestone.Id,
+                QuestionTreeId = e.QuestionTreeId!.Value,
+                Order = e.Order,
+            }));
+
+            foreach (var roadmapMilestoneNode in milestone.Current.Children)
+            {
+                rootMilestones.Push((roadmapMilestone.Id, roadmapMilestoneNode));
+            }
+        }
+
+        await db.SaveChangesAsync(cancellationToken);
     }
 }
