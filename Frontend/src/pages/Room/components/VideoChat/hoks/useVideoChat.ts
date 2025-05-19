@@ -13,7 +13,6 @@ import { ParsedWsMessage } from '../../../utils/parseWsMessage';
 import { checkIsAudioStream } from '../utils/checkIsAudioStream';
 import { useLocalizationCaptions } from '../../../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../../../localization';
-import { peerConfigServers } from '../../../servers';
 
 interface UseVideoChatProps {
   viewerMode: boolean;
@@ -102,7 +101,7 @@ export const useVideoChat = ({
             }),
           }),
         );
-        return new Peer(peerConfigServers);
+        return new Peer();
       }
 
       const streams: MediaStream[] = [];
@@ -128,7 +127,6 @@ export const useVideoChat = ({
             offerToReceiveVideo: false,
           },
         }),
-        ...peerConfigServers,
       });
 
       peer.on('signal', (signal) => {
@@ -221,7 +219,6 @@ export const useVideoChat = ({
         initiator: false,
         trickle: false,
         streams,
-        ...peerConfigServers,
       });
 
       peer.on('signal', (signal) => {
@@ -315,7 +312,7 @@ export const useVideoChat = ({
             break;
           }
           if (viewerMode && fromUser.ParticipantType === 'Viewer') {
-            const peer = new Peer(peerConfigServers);
+            const peer = new Peer();
             const newPeerMeta: PeerMeta = {
               peerID: fromUser.Id,
               nickname: fromUser.Nickname,
