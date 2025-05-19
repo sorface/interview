@@ -31,7 +31,7 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
             var id = request.Id.Value;
             roadmap = await db.Roadmap
                 .Include(e => e.Tags)
-                .Include(e => e.Milestones)
+                .Include(e => e.Milestones).ThenInclude(e => e.Items)
                 .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
             if (roadmap is null)
             {
@@ -41,11 +41,16 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
 
         if (roadmap is null)
         {
-            roadmap = await CreateRoadmapAsync(result.Tree, tags, request, cancellationToken);
+            roadmap = await db.RunTransactionAsync(ct => CreateRoadmapAsync(result.Tree, tags, request, ct), cancellationToken);
             return ServiceResult.Created(roadmap.Id);
         }
 
-        await UpdateRoadmapAsync(result.Tree, roadmap, tags, request, cancellationToken);
+        await db.RunTransactionAsync(async ct =>
+        {
+            await UpdateRoadmapAsync(result.Tree, roadmap, tags, request, ct);
+            return DBNull.Value;
+        },
+        cancellationToken);
         return ServiceResult.Ok(roadmap.Id);
 
         static async Task<List<Tag>> EnsureDbCheckValidateAsync(AppDbContext db,
@@ -55,7 +60,8 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
         {
             var questionTreeIds = tree.RootMilestones
                 .SelectMany(e => e.QuestionTrees)
-                .Select(e => e.Id!.Value)
+                .Where(e => e.QuestionTreeId is not null)
+                .Select(e => e.QuestionTreeId!.Value)
                 .ToHashSet();
             var dbQuestionTrees = await db.QuestionTree.Where(e => questionTreeIds.Contains(e.Id))
                 .Select(e => e.Id)
@@ -233,35 +239,42 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
         CancellationToken cancellationToken)
     {
         var roadmap = new Roadmap { Name = request.Name, Order = request.Order, Tags = tags };
+        await db.Roadmap.AddAsync(roadmap, cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
 
         var rootMilestones = new Stack<(Guid? Parent, UpsertRoadmapRequestValidator.RoadmapMilestoneNode Current)>(
             resultTree.RootMilestones.Select(e => ((Guid?)null, e)));
         while (rootMilestones.TryPop(out var milestone))
         {
-            var milestoneId = milestone.Current.Milestone.Id ?? Guid.NewGuid();
             var roadmapMilestone = new RoadmapMilestone
             {
-                Id = milestoneId,
                 Name = milestone.Current.Milestone.Name ?? string.Empty,
                 Order = milestone.Current.Milestone.Order,
-                RoadmapId = default,
-                ParentRoadmapMilestoneId = milestone.Parent ?? default,
-                Items = milestone.Current.QuestionTrees.Select(e => new RoadmapMilestoneItem
+                RoadmapId = roadmap.Id,
+                ParentRoadmapMilestoneId = milestone.Parent,
+                Items = [],
+            };
+            await db.RoadmapMilestone.AddAsync(roadmapMilestone, cancellationToken);
+
+            foreach (var e in milestone.Current.QuestionTrees)
+            {
+                var roadmapMilestoneItem = new RoadmapMilestoneItem
                 {
-                    RoadmapMilestoneId = milestoneId,
+                    RoadmapMilestoneId = roadmapMilestone.Id,
                     QuestionTreeId = e.QuestionTreeId!.Value,
                     Order = e.Order,
-                }).ToList(),
-            };
-            roadmap.Milestones.Add(roadmapMilestone);
+                };
+                roadmapMilestone.Items.Add(roadmapMilestoneItem);
+            }
+
+            await db.SaveChangesAsync(cancellationToken);
+
             foreach (var roadmapMilestoneNode in milestone.Current.Children)
             {
                 rootMilestones.Push((roadmapMilestone.Id, roadmapMilestoneNode));
             }
         }
 
-        await db.Roadmap.AddAsync(roadmap, cancellationToken);
-        await db.SaveChangesAsync(cancellationToken);
         return roadmap;
     }
 
@@ -323,16 +336,15 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
             else
             {
                 // add
-                var milestoneId = milestone.Current.Milestone.Id ?? Guid.NewGuid();
                 roadmapMilestone = new RoadmapMilestone
                 {
-                    Id = milestoneId,
                     Name = milestone.Current.Milestone.Name ?? string.Empty,
                     Order = milestone.Current.Milestone.Order,
                     RoadmapId = roadmap.Id,
                     ParentRoadmapMilestoneId = milestone.Parent,
                 };
                 roadmap.Milestones.Add(roadmapMilestone);
+                await db.SaveChangesAsync(cancellationToken);
             }
 
             roadmapMilestone.Items.AddRange(milestone.Current.QuestionTrees.Select(e => new RoadmapMilestoneItem
