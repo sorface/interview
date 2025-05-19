@@ -112,7 +112,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
         )}
       </div>
       <div className="ml-auto">
-        {contextMenu && (
+        {contextMenu ? (
           <div onClick={handleCheckboxAreaClick}>
             <ContextMenu
               {...contextMenu}
@@ -124,6 +124,8 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
               buttonVariant="text"
             />
           </div>
+        ) : (
+          <div className="h-[2.5rem]"></div>
         )}
         {hasCheckbox && (
           <div onClick={handleCheckboxAreaClick}>

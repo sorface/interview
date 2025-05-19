@@ -55,3 +55,10 @@ export interface Question {
 export interface QuestionById extends Question {
   type: QuestionType;
 }
+
+export interface QuestionWithAuthor extends Question {
+  author?: {
+    userId: string;
+    nickname: string;
+  };
+}
