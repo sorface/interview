@@ -971,7 +971,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.RoadmapJsPageName]: 'JavaScript Roadmap',
     [LocalizationKey.RoadmapYourProgress]: 'Ваш прогресс',
     [LocalizationKey.RoadmapLevel]: 'Уровень',
-    [LocalizationKey.RoadmapLevel0]: 'Самозванец',
+    [LocalizationKey.RoadmapLevel0]: 'Самозванец(ка)',
     [LocalizationKey.RoadmapLevel1]: 'Новичок',
     [LocalizationKey.RoadmapLevel2]: 'Опытный',
     [LocalizationKey.RoadmapLevel3]: 'Мастер собеседований',
