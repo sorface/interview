@@ -8,19 +8,29 @@ import { Gap } from '../../../components/Gap/Gap';
 interface MilestoneTreeProps {
   id: string;
   name: string;
+  notAvailable?: boolean;
   onCreate: () => void;
 }
 
 export const MilestoneTree: FunctionComponent<MilestoneTreeProps> = ({
   id,
   name,
+  notAvailable,
   onCreate,
 }) => {
   const treeCompleted = getTreeProgress(id) === 100;
 
   return (
-    <li className="hover:underline hover:cursor-pointer" onClick={onCreate}>
-      <Typography size="l" semibold success={treeCompleted}>
+    <li
+      className={`${notAvailable ? 'hover:cursor-not-allowed' : 'hover:underline hover:cursor-pointe'}`}
+      onClick={notAvailable ? undefined : onCreate}
+    >
+      <Typography
+        size="l"
+        semibold
+        success={!notAvailable && treeCompleted}
+        secondary={notAvailable}
+      >
         <div className="flex items-center">
           {treeCompleted && (
             <Icon name={IconNames.CheckmarkDone} inheritFontSize />

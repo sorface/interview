@@ -15,6 +15,7 @@ import { RoadmapProgress } from './components/RoadmapProgress';
 import { getRoadmapProgress } from './utils/getRoadmapProgress';
 
 const roomDuration = 3600;
+export const notAvailableId = 'notAvailable';
 
 const progressTreeIds = [
   '655c5171-a0ea-4858-bb14-fb53325178d5',
@@ -94,11 +95,11 @@ export const Roadmap: FunctionComponent = () => {
                     arrow
                     trees={[
                       {
-                        id: 'Архитектура клиент-сервер',
+                        id: notAvailableId,
                         name: 'Архитектура клиент-сервер',
                       },
                       {
-                        id: 'Протокол HTTP',
+                        id: notAvailableId,
                         name: 'Протокол HTTP',
                       },
                     ]}
@@ -109,35 +110,35 @@ export const Roadmap: FunctionComponent = () => {
                     name="Основы"
                     trees={[
                       {
-                        id: 'Основы',
+                        id: notAvailableId,
                         name: 'Основы',
                       },
                       {
-                        id: 'Переменные',
+                        id: notAvailableId,
                         name: 'Переменные',
                       },
                       {
-                        id: 'Функции',
+                        id: notAvailableId,
                         name: 'Функции',
                       },
                       {
-                        id: 'Область видимости',
+                        id: notAvailableId,
                         name: 'Область видимости',
                       },
                       {
-                        id: 'Условия, циклы',
+                        id: notAvailableId,
                         name: 'Условия, циклы',
                       },
                       {
-                        id: 'Лексическое окружение',
+                        id: notAvailableId,
                         name: 'Лексическое окружение',
                       },
                       {
-                        id: 'Контекст выполнения',
+                        id: notAvailableId,
                         name: 'Контекст выполнения',
                       },
                       {
-                        id: 'Асинхронность',
+                        id: notAvailableId,
                         name: 'Асинхронность',
                       },
                     ]}

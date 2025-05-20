@@ -5,6 +5,8 @@ import { useThemeClassName } from '../../../hooks/useThemeClassName';
 import { Theme } from '../../../context/ThemeContext';
 import { Gap } from '../../../components/Gap/Gap';
 import { getTreeProgress } from '../utils/getTreeProgress';
+import { notAvailableId } from '../Roadmap';
+
 interface MilestoneTreeItem {
   id: string;
   name: string;
@@ -73,6 +75,7 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
             key={tree.id}
             id={tree.id}
             name={tree.name}
+            notAvailable={tree.id === notAvailableId}
             onCreate={handleCreateRoom(tree)}
           />
         ))}
