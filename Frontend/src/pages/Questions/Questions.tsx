@@ -1,6 +1,7 @@
 import React, {
   FunctionComponent,
   useCallback,
+  useContext,
   useEffect,
   useState,
 } from 'react';
@@ -12,7 +13,7 @@ import {
 } from '../../apiDeclarations';
 import { IconNames } from '../../constants';
 import { useApiMethod } from '../../hooks/useApiMethod';
-import { Question } from '../../types/question';
+import { Question, QuestionWithAuthor } from '../../types/question';
 import { LocalizationKey } from '../../localization';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
@@ -26,6 +27,7 @@ import { Typography } from '../../components/Typography/Typography';
 import { Gap } from '../../components/Gap/Gap';
 import { Loader } from '../../components/Loader/Loader';
 import { QuestionCreate } from '../QuestionCreate/QuestionCreate';
+import { AuthContext } from '../../context/AuthContext';
 
 import './Questions.css';
 
@@ -33,6 +35,7 @@ const pageSize = 10;
 const initialPageNumber = 1;
 
 export const Questions: FunctionComponent = () => {
+  const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const [searchValueInput, setSearchValueInput] = useState('');
@@ -130,31 +133,35 @@ export const Questions: FunctionComponent = () => {
     archiveQuestion(question.id);
   };
 
-  const createQuestionItem = (question: Question) => (
+  const createQuestionItem = (question: QuestionWithAuthor) => (
     <li key={question.id} className="pb-[0.25rem]">
       <QuestionItem
         question={question}
         primary
-        contextMenu={{
-          translateRem: { x: -11.375, y: 0.25 },
-          useButton: true,
-          children: [
-            <ContextMenu.Item
-              key="ContextMenuItemEdit"
-              title={localizationCaptions[LocalizationKey.Edit]}
-              onClick={handleOpenEditModal(question.id)}
-            />,
-            <ContextMenu.Item
-              key="ContextMenuItemArchive"
-              title={
-                archiveLoading
-                  ? localizationCaptions[LocalizationKey.ArchiveLoading]
-                  : localizationCaptions[LocalizationKey.Archive]
+        contextMenu={
+          question.author && question.author.userId === auth?.id
+            ? {
+                translateRem: { x: -11.375, y: 0.25 },
+                useButton: true,
+                children: [
+                  <ContextMenu.Item
+                    key="ContextMenuItemEdit"
+                    title={localizationCaptions[LocalizationKey.Edit]}
+                    onClick={handleOpenEditModal(question.id)}
+                  />,
+                  <ContextMenu.Item
+                    key="ContextMenuItemArchive"
+                    title={
+                      archiveLoading
+                        ? localizationCaptions[LocalizationKey.ArchiveLoading]
+                        : localizationCaptions[LocalizationKey.Archive]
+                    }
+                    onClick={handlearchiveQuestion(question)}
+                  />,
+                ],
               }
-              onClick={handlearchiveQuestion(question)}
-            />,
-          ],
-        }}
+            : undefined
+        }
       />
     </li>
   );
@@ -183,7 +190,7 @@ export const Questions: FunctionComponent = () => {
         />
       )}
       <div className="questions-page flex-1 overflow-auto">
-        <div className="sticky top-0 bg-form z-1">
+        <div className="sticky top-0 bg-form z-10">
           <div className="flex items-center">
             {categoriesError && (
               <Typography size="m">

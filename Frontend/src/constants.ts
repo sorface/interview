@@ -20,6 +20,7 @@ export const pathnames = {
   categories: '/categories',
   categoriesCreate: '/categories/create',
   categoriesEdit: '/categories/edit/:id',
+  categoriesArchive: '/categories/archive',
   logoutError: '/logoutError',
   questionTrees: '/questionTrees',
   questionTreeCreate: '/questionTrees/create',

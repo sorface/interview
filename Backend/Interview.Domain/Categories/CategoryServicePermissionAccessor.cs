@@ -49,6 +49,6 @@ public class CategoryServicePermissionAccessor(ICategoryService service, ISecuri
     public async Task<CategoryResponse> UnarchiveAsync(Guid id, CancellationToken cancellationToken)
     {
         await securityService.EnsurePermissionAsync(SEPermission.CategoryUnarchive, cancellationToken);
-        return await service.ArchiveAsync(id, cancellationToken);
+        return await service.UnarchiveAsync(id, cancellationToken);
     }
 }

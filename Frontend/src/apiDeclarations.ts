@@ -474,6 +474,14 @@ export const categoriesApiDeclaration = {
       ...(params.parentId && { 'Filter.ParentId': params.parentId }),
     },
   }),
+  getPageArchived: (params: PaginationUrlParams): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: '/category/archive',
+    urlParams: {
+      'Page.PageSize': params.PageSize,
+      'Page.PageNumber': params.PageNumber,
+    },
+  }),
   get: (id: Category['id']): ApiContractGet => ({
     method: 'GET',
     baseUrl: `/category/${id}`,
@@ -486,11 +494,20 @@ export const categoriesApiDeclaration = {
   update: (category: UpdateCategoryBody): ApiContractPut => ({
     method: 'PUT',
     baseUrl: `/category/${category.id}`,
-    body: { name: category.name, parentId: category.parentId },
+    body: {
+      name: category.name,
+      parentId: category.parentId,
+      order: category.order,
+    },
   }),
   archive: (id: Category['id']): ApiContractPost => ({
     method: 'POST',
     baseUrl: `/category/archive/${id}`,
+    body: undefined,
+  }),
+  unarchive: (id: Category['id']): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: `/category/unarchive/${id}`,
     body: undefined,
   }),
 };

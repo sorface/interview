@@ -23,6 +23,7 @@ import { QuestionsArchive } from '../pages/QuestionsArchive/QuestionsArchive';
 import { QuestionTrees } from '../pages/QuestionTrees/QuestionTrees';
 import { QuestionTreeCreate } from '../pages/QuestionTreeCreate/QuestionTreeCreate';
 import { Roadmap } from '../pages/Roadmap/Roadmap';
+import { CategoriesArchive } from '../pages/CategoriesArchive/CategoriesArchive';
 
 interface AppRoutesProps {
   user: User | null;
@@ -140,6 +141,14 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <CategoriesCreate edit={true} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.categoriesArchive}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <CategoriesArchive />
                 </ProtectedRoute>
               }
             />

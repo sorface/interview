@@ -115,22 +115,23 @@ public class QuestionService(
         {
             Id = result.Id,
             Value = result.Value,
-            Tags = result.Tags.Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, })
+            Tags = result.Tags.Select(e => new TagItem
+            {
+                Id = e.Id,
+                Value = e.Value,
+                HexValue = e.HexColor,
+            })
                 .ToList(),
-            Category = result.CategoryId is not null ?
-                await db.Categories.AsNoTracking()
+            Category = result.CategoryId is not null
+                ? await db.Categories.AsNoTracking()
+                    .Include(e => e.Parent)
                     .Where(e => e.Id == result.CategoryId)
                     .OrderBy(e => e.Order)
-                    .Select(selector: e => new CategoryResponse
-                    {
-                        Id = e.Id,
-                        Name = e.Name,
-                        ParentId = e.ParentId,
-                        Order = e.Order,
-                    })
+                    .Select(CategoryResponse.Mapper.Expression)
                     .FirstOrDefaultAsync(cancellationToken)
                 : null,
-            Answers = result.Answers.Select(QuestionAnswerResponse.Mapper.Map).ToList(),
+            Answers = result.Answers.Select(QuestionAnswerResponse.Mapper.Map)
+                .ToList(),
             CodeEditor = result.CodeEditor == null
                 ? null
                 : new QuestionCodeEditorResponse
@@ -138,6 +139,8 @@ public class QuestionService(
                     Content = result.CodeEditor.Content,
                     Lang = result.CodeEditor.Lang,
                 },
+            Author = null,
+            Type = result.Type.EnumValue,
         };
 
         SEQuestionType GetQuestionType()
@@ -250,6 +253,7 @@ public class QuestionService(
             .Include(e => e.Category)
             .Include(e => e.CodeEditor)
             .Include(e => e.Answers)
+            .Include(e => e.CreatedBy)
             .Where(e => !e.IsArchived && e.Id == id)
             .Select(QuestionItem.Mapper.Expression)
             .FirstOrDefaultAsync(cancellationToken);
@@ -285,10 +289,20 @@ public class QuestionService(
             Id = archiveQuestion.Id,
             Value = archiveQuestion.Value,
             Tags = archiveQuestion.Tags
-                .Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, }).ToList(),
-            Answers = [],
+                .Select(e => new TagItem
+                {
+                    Id = e.Id,
+                    Value = e.Value,
+                    HexValue = e.HexColor,
+                })
+                .ToList(),
+            Answers =
+            [
+            ],
             CodeEditor = null,
             Category = null,
+            Author = null,
+            Type = archiveQuestion.Type.EnumValue,
         };
     }
 
@@ -301,10 +315,20 @@ public class QuestionService(
             Id = unarchiveQuestion.Id,
             Value = unarchiveQuestion.Value,
             Tags = unarchiveQuestion.Tags
-                .Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, }).ToList(),
-            Answers = [],
+                .Select(e => new TagItem
+                {
+                    Id = e.Id,
+                    Value = e.Value,
+                    HexValue = e.HexColor,
+                })
+                .ToList(),
+            Answers =
+            [
+            ],
             CodeEditor = null,
             Category = null,
+            Author = null,
+            Type = unarchiveQuestion.Type.EnumValue,
         };
     }
 
@@ -427,7 +451,7 @@ public class QuestionService(
         var category = entity.Category;
         if (category is null && entity.CategoryId is not null)
         {
-            category = await db.Categories.AsNoTracking().FirstOrDefaultAsync(e => e.Id == entity.CategoryId, cancellationToken);
+            category = await db.Categories.Include(e => e.Parent).AsNoTracking().FirstOrDefaultAsync(e => e.Id == entity.CategoryId, cancellationToken);
         }
 
         return new QuestionItem
@@ -441,15 +465,7 @@ public class QuestionService(
                 HexValue = e.HexColor,
             })
                 .ToList(),
-            Category = category is not null
-                ? new CategoryResponse
-                {
-                    Id = category.Id,
-                    Name = category.Name,
-                    ParentId = category.ParentId,
-                    Order = category.Order,
-                }
-                : null,
+            Category = category is null ? null : CategoryResponse.Mapper.Map(category),
             Answers = entity.Answers.Select(q => new QuestionAnswerResponse
             {
                 Id = q.Id,
@@ -465,6 +481,14 @@ public class QuestionService(
                     Content = entity.CodeEditor.Content,
                     Lang = entity.CodeEditor.Lang,
                 },
+            Author = entity.CreatedBy == null
+                ? null
+                : new QuestionItemAuthorResponse
+                {
+                    Nickname = entity.CreatedBy.Nickname,
+                    UserId = entity.CreatedBy.Id,
+                },
+            Type = entity.Type.EnumValue,
         };
     }
 }

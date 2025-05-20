@@ -228,6 +228,7 @@ export const enum LocalizationKey {
   Opinions,
   Transcription,
   CompleteAndEvaluateCandidate,
+  CategoriesArchive,
   QuestionsArchive,
   WaitingInterviewStart,
   RoomStartDescription,
@@ -564,6 +565,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.Transcription]: 'Transcription',
     [LocalizationKey.CompleteAndEvaluateCandidate]:
       'Complete and evaluate candidate',
+    [LocalizationKey.CategoriesArchive]: 'Categories archive',
     [LocalizationKey.QuestionsArchive]: 'Questions archive',
     [LocalizationKey.WaitingInterviewStart]: 'Waiting to start the interview',
     [LocalizationKey.RoomStartDescription]:
@@ -905,6 +907,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.Transcription]: 'Транскрибация',
     [LocalizationKey.CompleteAndEvaluateCandidate]:
       'Завершить и оценить кандидата',
+    [LocalizationKey.CategoriesArchive]: 'Архив категорий',
     [LocalizationKey.QuestionsArchive]: 'Архив вопросов',
     [LocalizationKey.WaitingInterviewStart]: 'Ожидание начала собеседования',
     [LocalizationKey.RoomStartDescription]:

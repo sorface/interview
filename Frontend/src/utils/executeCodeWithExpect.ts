@@ -15,6 +15,10 @@ const expectCode = `
     }, undefined);
     __expectCalls.push([args, result, expected]);
   };
+
+  const expectValue = (value1, value2) => {
+    __expectCalls.push([value1, value2]);
+  };
 `;
 
 const expectCallsReturnCode = `
@@ -30,7 +34,7 @@ export interface ExecuteCodeResult {
 
 export type ExpectResult = {
   id: number;
-  arguments: [Arg, Arg, Arg];
+  arguments: [Arg, Arg, Arg] | [Arg, Arg];
   passed: boolean;
 };
 
@@ -45,11 +49,15 @@ export const executeCodeWithExpect = (
     const executeResult = executeCodeWithExpect();
 
     return {
-      results: executeResult.map(([args, result, expect]) => {
-        const passed = deepEqual(result, expect);
+      results: executeResult.map((res) => {
+        const withoutArgs = res.length === 2;
+        const [args, result, expect] = res;
+        const passed = withoutArgs
+          ? deepEqual(args, result)
+          : deepEqual(result, expect);
         return {
           id: Math.random(),
-          arguments: [args, result, expect],
+          arguments: withoutArgs ? [args, result] : [args, result, expect],
           passed,
         };
       }),

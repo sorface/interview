@@ -104,8 +104,10 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
       return;
     }
     setCategoryName(category.name);
-    setCategoryParent(category.parentId);
     setCategoryOrder(category.order);
+    if (category.parent) {
+      setCategoryParent(category.parent.id);
+    }
   }, [category]);
 
   useEffect(() => {
@@ -273,6 +275,7 @@ export const CategoriesCreate: FunctionComponent<{ edit: boolean }> = ({
             name={orderFieldName}
             type="number"
             value={categoryOrder}
+            className="bg-page-bg"
             onChange={handleCategoryOrderChange}
           />
         </Field>

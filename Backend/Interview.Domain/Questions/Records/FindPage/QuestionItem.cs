@@ -12,13 +12,25 @@ public class QuestionItem
     {
         Id = e.Id,
         Value = e.Value,
-        Tags = e.Tags.Select(t => new TagItem { Id = t.Id, Value = t.Value, HexValue = t.HexColor, }).ToList(),
+        Tags = e.Tags.Select(t => new TagItem
+        {
+            Id = t.Id,
+            Value = t.Value,
+            HexValue = t.HexColor,
+        })
+            .ToList(),
         Category = e.Category != null
             ? new CategoryResponse
             {
                 Id = e.Category.Id,
                 Name = e.Category.Name,
-                ParentId = e.Category.ParentId,
+                Parent = e.Category.ParentId == null
+                    ? null
+                    : new CategoryParentResponse
+                    {
+                        Id = e.Category.ParentId.Value,
+                        Name = e.Category.Parent == null ? string.Empty : e.Category.Parent.Name,
+                    },
                 Order = e.Category.Order,
             }
             : null,
@@ -37,11 +49,21 @@ public class QuestionItem
                 Content = e.CodeEditor.Content,
                 Lang = e.CodeEditor.Lang,
             },
+        Author = e.CreatedBy == null
+            ? null
+            : new QuestionItemAuthorResponse
+            {
+                UserId = e.CreatedBy.Id,
+                Nickname = e.CreatedBy.Nickname,
+            },
+        Type = e.Type.EnumValue,
     });
 
     public Guid Id { get; init; }
 
     public string Value { get; init; } = string.Empty;
+
+    public required EVQuestionType Type { get; init; }
 
     public required List<TagItem> Tags { get; init; }
 
@@ -50,4 +72,6 @@ public class QuestionItem
     public required QuestionCodeEditorResponse? CodeEditor { get; init; }
 
     public required CategoryResponse? Category { get; init; }
+
+    public required QuestionItemAuthorResponse? Author { get; init; }
 }
