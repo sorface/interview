@@ -37,21 +37,18 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
             {
                 throw NotFoundException.Create<Roadmap>(id);
             }
+
+            await db.RunTransactionAsync(async ct =>
+                {
+                    await UpdateRoadmapAsync(result.Tree, roadmap, tags, request, ct);
+                    return DBNull.Value;
+                },
+                cancellationToken);
+            return ServiceResult.Ok(roadmap.Id);
         }
 
-        if (roadmap is null)
-        {
-            roadmap = await db.RunTransactionAsync(ct => CreateRoadmapAsync(result.Tree, tags, request, ct), cancellationToken);
-            return ServiceResult.Created(roadmap.Id);
-        }
-
-        await db.RunTransactionAsync(async ct =>
-        {
-            await UpdateRoadmapAsync(result.Tree, roadmap, tags, request, ct);
-            return DBNull.Value;
-        },
-        cancellationToken);
-        return ServiceResult.Ok(roadmap.Id);
+        roadmap = await db.RunTransactionAsync(ct => CreateRoadmapAsync(result.Tree, tags, request, ct), cancellationToken);
+        return ServiceResult.Created(roadmap.Id);
 
         static async Task<List<Tag>> EnsureDbCheckValidateAsync(AppDbContext db,
                                                                 UpsertRoadmapRequest request,
@@ -73,7 +70,13 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
                 throw NotFoundException.Create<QuestionTree>(questionTreeIds);
             }
 
-            if (db.Roadmap.Any(e => e.Order == request.Order))
+            ASpec<Roadmap>? orderCheckSpec = new Spec<Roadmap>(e => e.Order == request.Order);
+            if (request.Id is not null)
+            {
+                orderCheckSpec &= new Spec<Roadmap>(e => e.Id != request.Id);
+            }
+
+            if (db.Roadmap.Any(orderCheckSpec))
             {
                 throw new UserException("Roadmap order should be unique");
             }
@@ -254,7 +257,6 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
                 ParentRoadmapMilestoneId = milestone.Parent,
                 Items = [],
             };
-            await db.RoadmapMilestone.AddAsync(roadmapMilestone, cancellationToken);
 
             foreach (var e in milestone.Current.QuestionTrees)
             {
@@ -267,6 +269,7 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
                 roadmapMilestone.Items.Add(roadmapMilestoneItem);
             }
 
+            await db.RoadmapMilestone.AddAsync(roadmapMilestone, cancellationToken);
             await db.SaveChangesAsync(cancellationToken);
 
             foreach (var roadmapMilestoneNode in milestone.Current.Children)
@@ -328,8 +331,8 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
             {
                 // update
                 roadmapMilestone = milestoneTree;
-                roadmapMilestone.Name = milestoneTree.Name;
-                roadmapMilestone.Order = milestoneTree.Order;
+                roadmapMilestone.Name = milestone.Current.Milestone.Name ?? string.Empty;
+                roadmapMilestone.Order = milestone.Current.Milestone.Order;
                 roadmapMilestone.ParentRoadmapMilestoneId = milestone.Parent;
                 roadmapMilestone.Items.Clear();
             }
