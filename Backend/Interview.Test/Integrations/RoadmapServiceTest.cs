@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using FluentAssertions;
 using Interview.Domain;
 using Interview.Domain.Database;
@@ -30,18 +29,8 @@ public class RoadmapServiceTest
             Tags = [],
             Items =
             [
-                new UpsertRoadmapItemRequest
-                {
-                    Name = "New Milestone",
-                    Order = 0,
-                    Type = EVRoadmapItemType.Milestone
-                },
-                new UpsertRoadmapItemRequest
-                {
-                    Order = 0,
-                    Type = EVRoadmapItemType.QuestionTree,
-                    QuestionTreeId = questionTree.Id
-                },
+                new UpsertRoadmapItemRequest { Name = "New Milestone", Order = 0, Type = EVRoadmapItemType.Milestone },
+                new UpsertRoadmapItemRequest { Order = 0, Type = EVRoadmapItemType.QuestionTree, QuestionTreeId = questionTree.Id },
             ]
         };
 
@@ -51,10 +40,15 @@ public class RoadmapServiceTest
         // Assert
         result.Value.Should().NotBeEmpty();
 
-        var createdRoadmap = await dbContext.Roadmap.FindAsync(result.Value);
+        var createdRoadmap = await dbContext.Roadmap
+            .Include(e => e.Milestones)
+            .ThenInclude(e => e.Items)
+            .FirstAsync(e => e.Id == result.Value);
         createdRoadmap.Should().NotBeNull();
         createdRoadmap!.Name.Should().Be(request.Name);
         createdRoadmap.Order.Should().Be(request.Order);
+        createdRoadmap.Milestones.Should().HaveCount(1).And.ContainSingle(e => e.Name == "New Milestone");
+        createdRoadmap.Milestones[0].Items.Should().HaveCount(1).And.ContainSingle(e => e.QuestionTreeId == questionTree.Id);
     }
 
     [Fact]
@@ -86,18 +80,8 @@ public class RoadmapServiceTest
             Tags = [],
             Items =
             [
-                new UpsertRoadmapItemRequest
-                {
-                    Name = "New Milestone",
-                    Order = 0,
-                    Type = EVRoadmapItemType.Milestone
-                },
-                new UpsertRoadmapItemRequest
-                {
-                    Order = 0,
-                    Type = EVRoadmapItemType.QuestionTree,
-                    QuestionTreeId = questionTree.Id
-                },
+                new UpsertRoadmapItemRequest { Name = "New Milestone", Order = 0, Type = EVRoadmapItemType.Milestone },
+                new UpsertRoadmapItemRequest { Order = 0, Type = EVRoadmapItemType.QuestionTree, QuestionTreeId = questionTree.Id },
             ]
         };
 
@@ -107,9 +91,14 @@ public class RoadmapServiceTest
         // Assert
         result.Value.Should().Be(existingRoadmap.Id);
 
-        var updatedRoadmap = await dbContext.Roadmap.FindAsync(existingRoadmap.Id);
+        var updatedRoadmap = await dbContext.Roadmap
+            .Include(e => e.Milestones)
+            .ThenInclude(e => e.Items)
+            .FirstAsync(e => e.Id == result.Value);
         updatedRoadmap!.Name.Should().Be(request.Name);
         updatedRoadmap.Order.Should().Be(request.Order);
+        updatedRoadmap.Milestones.Should().HaveCount(1).And.ContainSingle(e => e.Name == "New Milestone");
+        updatedRoadmap.Milestones[0].Items.Should().HaveCount(1).And.ContainSingle(e => e.QuestionTreeId == questionTree.Id);
     }
 
     [Fact]
@@ -142,8 +131,7 @@ public class RoadmapServiceTest
         };
 
         // Act & Assert
-        await Assert.ThrowsAsync<UserException>(() =>
-            roadmapService.UpsertAsync(request, CancellationToken.None));
+        await Assert.ThrowsAsync<UserException>(() => roadmapService.UpsertAsync(request, CancellationToken.None));
     }
 
     [Fact]
@@ -167,24 +155,13 @@ public class RoadmapServiceTest
             Items =
             [
 
-                new UpsertRoadmapItemRequest
-                {
-                    Name = "New Milestone",
-                    Order = 0,
-                    Type = EVRoadmapItemType.Milestone
-                },
-                new UpsertRoadmapItemRequest
-                {
-                    Order = 0,
-                    Type = EVRoadmapItemType.QuestionTree,
-                    QuestionTreeId = questionTree.Id
-                },
+                new UpsertRoadmapItemRequest { Name = "New Milestone", Order = 0, Type = EVRoadmapItemType.Milestone },
+                new UpsertRoadmapItemRequest { Order = 0, Type = EVRoadmapItemType.QuestionTree, QuestionTreeId = questionTree.Id },
             ]
         };
 
         // Act & Assert
-        await Assert.ThrowsAsync<NotFoundException>(() =>
-            roadmapService.UpsertAsync(request, CancellationToken.None));
+        await Assert.ThrowsAsync<NotFoundException>(() => roadmapService.UpsertAsync(request, CancellationToken.None));
     }
 
     [Fact]
@@ -205,24 +182,14 @@ public class RoadmapServiceTest
             Tags = [],
             Items =
             [
-                new UpsertRoadmapItemRequest
-                {
-                    Name = "New Item",
-                    Type = EVRoadmapItemType.Milestone,
-                    Order = 0
-                },
-                new UpsertRoadmapItemRequest
-                {
-                    Type = EVRoadmapItemType.QuestionTree,
-                    Order = 1,
-                    QuestionTreeId = nonExistentQuestionTreeId // Несуществующий QuestionTree
-                }
+                new UpsertRoadmapItemRequest { Name = "New Item", Type = EVRoadmapItemType.Milestone, Order = 0 },
+                // Несуществующий QuestionTree
+                new UpsertRoadmapItemRequest { Type = EVRoadmapItemType.QuestionTree, Order = 1, QuestionTreeId = nonExistentQuestionTreeId }
             ]
         };
 
         // Act & Assert
-        await Assert.ThrowsAsync<NotFoundException>(() =>
-            roadmapService.UpsertAsync(request, CancellationToken.None));
+        await Assert.ThrowsAsync<NotFoundException>(() => roadmapService.UpsertAsync(request, CancellationToken.None));
     }
 
     [Fact]
@@ -233,6 +200,10 @@ public class RoadmapServiceTest
         var roadmapService = new RoadmapService(dbContext);
 
         // Arrange
+        var tags = new[] { new Tag { Value = "T1" }, new Tag { Value = "T2" }, new Tag { Value = "T3" }, };
+        dbContext.Tag.AddRange(tags);
+        dbContext.SaveChanges();
+
         var questionTree = await CreateQuestionTreeAsync(dbContext);
         var questionTreeId = questionTree.Id;
 
@@ -243,41 +214,15 @@ public class RoadmapServiceTest
             Items = new List<UpsertRoadmapItemRequest>
             {
                 // Root Milestone 1
-                new()
-                {
-                    Type = EVRoadmapItemType.Milestone,
-                    Name = "M1",
-                    Order = 1
-                },
-                // QuestionTree для M1
-                new()
-                {
-                    Type = EVRoadmapItemType.QuestionTree,
-                    Order = 1,
-                    QuestionTreeId = questionTreeId
-                },
-                // VerticalSplit
-                new()
-                {
-                    Type = EVRoadmapItemType.VerticalSplit,
-                    Order = -1
-                },
+                new() { Type = EVRoadmapItemType.Milestone, Name = "M1", Order = 1 },
+                new() { Type = EVRoadmapItemType.QuestionTree, Order = 1, QuestionTreeId = questionTreeId },
+                new() { Type = EVRoadmapItemType.VerticalSplit, Order = -1 },
+                
                 // Root Milestone 2
-                new()
-                {
-                    Type = EVRoadmapItemType.Milestone,
-                    Name = "M2",
-                    Order = 2
-                },
-                // QuestionTree для M2
-                new()
-                {
-                    Type = EVRoadmapItemType.QuestionTree,
-                    Order = 1,
-                    QuestionTreeId = questionTreeId
-                }
+                new() { Type = EVRoadmapItemType.Milestone, Name = "M2", Order = 2 },
+                new() { Type = EVRoadmapItemType.QuestionTree, Order = 1, QuestionTreeId = questionTreeId }
             },
-            Tags = new HashSet<Guid>()
+            Tags = tags.Select(e => e.Id).ToHashSet()
         };
 
         // Act
@@ -285,13 +230,23 @@ public class RoadmapServiceTest
 
         // Assert
         var roadmap = await dbContext.Roadmap
+            .Include(e => e.Tags)
             .Include(r => r.Milestones)
             .ThenInclude(m => m.Items)
             .FirstAsync(e => e.Id == result.Value);
 
+        roadmap.Tags.Should().HaveCount(3)
+            .And.ContainSingle(e => e.Id == tags[0].Id)
+            .And.ContainSingle(e => e.Id == tags[1].Id)
+            .And.ContainSingle(e => e.Id == tags[2].Id);
+
         roadmap.Milestones.Should().HaveCount(2);
         roadmap.Milestones[0].Items.Should().ContainSingle();
         roadmap.Milestones[1].Items.Should().ContainSingle();
+
+        roadmap.Milestones.Should().HaveCount(2)
+            .And.ContainSingle(e => e.Name == "M1" && e.Items.Count == 1 && e.Items[0].QuestionTreeId == questionTreeId)
+            .And.ContainSingle(e => e.Name == "M2" && e.Items.Count == 1 && e.Items[0].QuestionTreeId == questionTreeId);
     }
 
     [Fact]
@@ -311,33 +266,10 @@ public class RoadmapServiceTest
             Items = new List<UpsertRoadmapItemRequest>
             {
                 // Root Milestone
-                new()
-                {
-                    Type = EVRoadmapItemType.Milestone,
-                    Name = "Root",
-                    Order = 1
-                },
-                // QuestionTree
-                new()
-                {
-                    Type = EVRoadmapItemType.QuestionTree,
-                    Order = 1,
-                    QuestionTreeId = questionTree1.Id
-                },
-                // Child Milestone (Order=-1)
-                new()
-                {
-                    Type = EVRoadmapItemType.Milestone,
-                    Name = "Child",
-                    Order = -1
-                },
-                // QuestionTree для Child
-                new()
-                {
-                    Type = EVRoadmapItemType.QuestionTree,
-                    Order = 1,
-                    QuestionTreeId = questionTree2.Id
-                }
+                new() { Type = EVRoadmapItemType.Milestone, Name = "Root", Order = 1 },
+                new() { Type = EVRoadmapItemType.QuestionTree, Order = 1, QuestionTreeId = questionTree1.Id },
+                new() { Type = EVRoadmapItemType.Milestone, Name = "Child", Order = -1 },
+                new() { Type = EVRoadmapItemType.QuestionTree, Order = 1, QuestionTreeId = questionTree2.Id }
             },
             Tags = new HashSet<Guid>()
         };
@@ -381,8 +313,7 @@ public class RoadmapServiceTest
         {
             Milestones = new List<RoadmapMilestone>
             {
-                new()
-                {
+                new() {
                     Id = Guid.NewGuid(),
                     Order = 1,
                     Items = new List<RoadmapMilestoneItem>(),
@@ -413,40 +344,13 @@ public class RoadmapServiceTest
             Items = new List<UpsertRoadmapItemRequest>
             {
                 // Обновленный корневой Milestone
-                new()
-                {
-                    Type = EVRoadmapItemType.Milestone,
-                    Id = existingRoadmap.Milestones[0].Id,
-                    Order = 1,
-                    Name = "Updated"
-                },
-                // Новый QuestionTree
-                new()
-                {
-                    Type = EVRoadmapItemType.QuestionTree,
-                    Order = 1,
-                    QuestionTreeId = questionTree1.Id
-                },
-                // VerticalSplit
-                new()
-                {
-                    Type = EVRoadmapItemType.VerticalSplit,
-                    Order = -1
-                },
+                new() { Type = EVRoadmapItemType.Milestone, Id = existingRoadmap.Milestones[0].Id, Order = 1, Name = "Updated" },
+                new() { Type = EVRoadmapItemType.QuestionTree, Order = 1, QuestionTreeId = questionTree1.Id },
+                new() { Type = EVRoadmapItemType.VerticalSplit, Order = -1 },
+                
                 // Новый корневой Milestone
-                new()
-                {
-                    Type = EVRoadmapItemType.Milestone,
-                    Order = 2,
-                    Name = "New Root"
-                },
-                // Новый QuestionTree
-                new()
-                {
-                    Type = EVRoadmapItemType.QuestionTree,
-                    Order = 1,
-                    QuestionTreeId = questionTree1.Id
-                },
+                new() { Type = EVRoadmapItemType.Milestone, Order = 2, Name = "New Root" },
+                new() { Type = EVRoadmapItemType.QuestionTree, Order = 1, QuestionTreeId = questionTree1.Id },
             },
             Name = "New name",
             Order = 0,
@@ -499,57 +403,18 @@ public class RoadmapServiceTest
             Items = new List<UpsertRoadmapItemRequest>
             {
                 // Root 1
-                new()
-                {
-                    Type = EVRoadmapItemType.Milestone,
-                    Order = 1,
-                    Name = "Root 1"
-                },
-                new()
-                {
-                    Type = EVRoadmapItemType.QuestionTree,
-                    Order = 1,
-                    QuestionTreeId = questionTree1.Id
-                },
-                new()
-                {
-                    Type = EVRoadmapItemType.VerticalSplit,
-                    Order = -1
-                },
+                new() { Type = EVRoadmapItemType.Milestone, Order = 1, Name = "Root 1" },
+                new() { Type = EVRoadmapItemType.QuestionTree, Order = 1, QuestionTreeId = questionTree1.Id },
+                new() { Type = EVRoadmapItemType.VerticalSplit, Order = -1 },
 
                 // Root 2
-                new()
-                {
-                    Type = EVRoadmapItemType.Milestone,
-                    Order = 2,
-                    Name = "Root 2"
-                },
-                new()
-                {
-                    Type = EVRoadmapItemType.QuestionTree,
-                    Order = 1,
-                    QuestionTreeId = questionTree2.Id
-                },
+                new() { Type = EVRoadmapItemType.Milestone, Order = 2, Name = "Root 2" },
+                new() { Type = EVRoadmapItemType.QuestionTree, Order = 1, QuestionTreeId = questionTree2.Id },
 
                 // Child для Root 2
-                new()
-                {
-                    Type = EVRoadmapItemType.Milestone,
-                    Order = -1,
-                    Name = "Root 2.Child1"
-                },
-                new()
-                {
-                    Type = EVRoadmapItemType.QuestionTree,
-                    Order = 1,
-                    QuestionTreeId = questionTree3.Id
-                },
-                new()
-                {
-                    Type = EVRoadmapItemType.QuestionTree,
-                    Order = 2,
-                    QuestionTreeId = questionTree4.Id
-                }
+                new() { Type = EVRoadmapItemType.Milestone, Order = -1, Name = "Root 2.Child1" },
+                new() { Type = EVRoadmapItemType.QuestionTree, Order = 1, QuestionTreeId = questionTree3.Id },
+                new() { Type = EVRoadmapItemType.QuestionTree, Order = 2, QuestionTreeId = questionTree4.Id }
             }
         };
 
