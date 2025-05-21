@@ -22,7 +22,7 @@ export const MilestoneTree: FunctionComponent<MilestoneTreeProps> = ({
 
   return (
     <li
-      className={`${notAvailable ? 'hover:cursor-not-allowed' : 'hover:underline hover:cursor-pointe'}`}
+      className={`${notAvailable ? 'hover:cursor-not-allowed' : 'hover:underline hover:cursor-pointer'}`}
       onClick={notAvailable ? undefined : onCreate}
     >
       <Typography
