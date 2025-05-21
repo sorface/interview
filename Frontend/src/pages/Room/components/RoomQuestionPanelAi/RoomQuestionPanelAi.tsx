@@ -407,6 +407,19 @@ export const RoomQuestionPanelAi: FunctionComponent<
     : letsStartDescription;
 
   useEffect(() => {
+    if (!room?.questionTree) {
+      return;
+    }
+    localStorage.setItem(
+      room.questionTree.id,
+      JSON.stringify({
+        closed: closedQuestions.length,
+        all: roomQuestions.length,
+      }),
+    );
+  }, [roomQuestions, closedQuestions, room?.questionTree]);
+
+  useEffect(() => {
     if (readOnly) {
       return;
     }
@@ -615,12 +628,19 @@ export const RoomQuestionPanelAi: FunctionComponent<
     handleNextQuestion();
   }, [recognitionCommand, initialQuestion, room, handleNextQuestion]);
 
-  const handleStartReviewRoom = useCallback(() => {
+  const handleStartReviewRoom = () => {
     if (!room?.id) {
       throw new Error('Room id not found');
     }
+    localStorage.setItem(
+      room?.questionTree?.id || '',
+      JSON.stringify({
+        closed: roomQuestions.length,
+        all: roomQuestions.length,
+      }),
+    );
     fetchRoomStartReview({ roomId: room.id });
-  }, [room?.id, fetchRoomStartReview]);
+  };
 
   const handleExecutionResultsSubmit = (
     code: string | undefined,
@@ -892,8 +912,8 @@ export const RoomQuestionPanelAi: FunctionComponent<
             <div
               className="absolute flex items-center justify-center z-20"
               style={{
-                bottom: '97px',
-                right: '44px',
+                bottom: '12px',
+                right: '12px',
               }}
             >
               <div
