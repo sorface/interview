@@ -31,6 +31,7 @@ import { Theme } from '../../../../context/ThemeContext';
 import { Link } from 'react-router-dom';
 
 interface EnterVideoChatModalProps {
+  aiRoom: boolean;
   open: boolean;
   loading: boolean;
   error: string | null;
@@ -40,6 +41,7 @@ interface EnterVideoChatModalProps {
 const updateAnalyserDelay = 1000 / 30;
 
 const enum Screen {
+  JoiningAi,
   Joining,
   SetupDevices,
   Error,
@@ -47,7 +49,7 @@ const enum Screen {
 
 export const EnterVideoChatModal: FunctionComponent<
   EnterVideoChatModalProps
-> = ({ open, loading, error, onClose }) => {
+> = ({ aiRoom, open, loading, error, onClose }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
   const { viewerMode, room } = useContext(RoomContext);
@@ -78,11 +80,21 @@ export const EnterVideoChatModal: FunctionComponent<
   });
 
   useEffect(() => {
-    if (viewerMode) {
+    if (!aiRoom) {
+      return;
+    }
+    setScreen(Screen.JoiningAi);
+  }, [aiRoom]);
+
+  useEffect(() => {
+    if (viewerMode || loading) {
+      return;
+    }
+    if (aiRoom) {
       return;
     }
     requestDevices();
-  }, [viewerMode, requestDevices]);
+  }, [viewerMode, loading, aiRoom, requestDevices]);
 
   useEffect(() => {
     if (!error) {
@@ -191,6 +203,35 @@ export const EnterVideoChatModal: FunctionComponent<
   );
 
   const screens: { [key in Screen]: JSX.Element } = {
+    [Screen.JoiningAi]: (
+      <>
+        <div className="w-[20rem] flex flex-col items-center text-center">
+          {joiningRoomHeader}
+          <Gap sizeRem={1.25} />
+          <div className="w-full max-w-[29.25rem] grid grid-cols-settings-list gap-y-[1rem]">
+            <RecognitionLangSwitch />
+          </div>
+          <Gap sizeRem={0.25} />
+          <div className="text-left w-full">
+            <Typography size="s" secondary>
+              {
+                localizationCaptions[
+                  LocalizationKey.PleaseSelectRecognitionLanguage
+                ]
+              }
+            </Typography>
+          </div>
+          <Gap sizeRem={2} />
+          <Button variant="active" className="w-full" onClick={onClose}>
+            {localizationCaptions[LocalizationKey.Join]}
+          </Button>
+          <Gap sizeRem={1} />
+          <Typography size="s" secondary>
+            {localizationCaptions[LocalizationKey.CallRecording]}
+          </Typography>
+        </div>
+      </>
+    ),
     [Screen.Joining]: (
       <>
         <div className="pr-[4rem]">
@@ -362,7 +403,10 @@ export const EnterVideoChatModal: FunctionComponent<
         },
       }}
     >
-      <Link to={pathnames.highlightRooms} className="no-underline">
+      <Link
+        to={aiRoom ? pathnames.roadmapJs : pathnames.highlightRooms}
+        className="no-underline"
+      >
         <div className="action-modal-header absolute flex items-center h-[2.375rem] mt-[1.3125rem] ml-[0.5rem]">
           <div className="w-[2.375rem] h-[2.375rem] mr-[1rem]">
             <img
@@ -379,7 +423,7 @@ export const EnterVideoChatModal: FunctionComponent<
         </div>
       </Link>
       <div className="flex items-center justify-center mt-auto mb-auto">
-        {screens[screen]}
+        {loading ? <Loader /> : screens[screen]}
       </div>
     </Modal>
   );
