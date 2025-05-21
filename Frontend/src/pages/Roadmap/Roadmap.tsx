@@ -18,15 +18,18 @@ const roomDuration = 3600;
 export const notAvailableId = 'notAvailable';
 
 const progressTreeIds = [
-  '655c5171-a0ea-4858-bb14-fb53325178d5',
-  'b15b714c-93df-4c65-b100-eaa6f62594d0',
-  'b15b714c-93df-4c65-b100-eaa6f62594de',
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
+  '7727b396-c2c8-423f-8a69-c29a2a126c64',
+  'cd9a7aef-6a13-4369-8925-277db6ef4504',
+  '5314ccc7-9cd9-46cc-afb6-5fbaf32c1d6a',
+  'acb971a7-add1-4fcf-b158-4b14f54aeb54',
+  '91d092dd-a2af-4b08-9e93-fb59c702cdbb',
+  '1e4d88c2-ea15-4484-95f9-d2730e53ed67',
+  '9ffb195f-ea3a-4cae-abd9-013bda0d8ab0',
+  '55430493-cb5f-44bc-afc8-947bc06d7c76',
+  '9608b396-973b-4864-9103-9378fbb832c6',
+  'fd75ec8a-65c3-4104-ab40-f7cb96c268f7',
+  '1a43d56a-1f15-49ee-8f49-06b85352dea2',
+  '1fe41bb5-3424-481b-9577-651bc6392c20',
 ];
 
 export const Roadmap: FunctionComponent = () => {
@@ -110,36 +113,44 @@ export const Roadmap: FunctionComponent = () => {
                     name="Основы"
                     trees={[
                       {
-                        id: notAvailableId,
+                        id: '1fe41bb5-3424-481b-9577-651bc6392c20',
                         name: 'Основы',
                       },
                       {
-                        id: notAvailableId,
+                        id: '1a43d56a-1f15-49ee-8f49-06b85352dea2',
+                        name: 'Типы данных',
+                      },
+                      {
+                        id: 'fd75ec8a-65c3-4104-ab40-f7cb96c268f7',
                         name: 'Переменные',
                       },
                       {
-                        id: notAvailableId,
-                        name: 'Функции',
+                        id: '9608b396-973b-4864-9103-9378fbb832c6',
+                        name: 'Операторы',
                       },
                       {
-                        id: notAvailableId,
-                        name: 'Область видимости',
-                      },
-                      {
-                        id: notAvailableId,
+                        id: '55430493-cb5f-44bc-afc8-947bc06d7c76',
                         name: 'Условия, циклы',
                       },
                       {
-                        id: notAvailableId,
+                        id: '9ffb195f-ea3a-4cae-abd9-013bda0d8ab0',
+                        name: 'Сборщик мусора',
+                      },
+                      {
+                        id: '1e4d88c2-ea15-4484-95f9-d2730e53ed67',
+                        name: 'Функции',
+                      },
+                      {
+                        id: '91d092dd-a2af-4b08-9e93-fb59c702cdbb',
+                        name: 'Область видимости',
+                      },
+                      {
+                        id: 'acb971a7-add1-4fcf-b158-4b14f54aeb54',
                         name: 'Лексическое окружение',
                       },
                       {
-                        id: notAvailableId,
+                        id: '5314ccc7-9cd9-46cc-afb6-5fbaf32c1d6a',
                         name: 'Контекст выполнения',
-                      },
-                      {
-                        id: notAvailableId,
-                        name: 'Асинхронность',
                       },
                     ]}
                     onCreateRoom={handleCreateRoom}
@@ -148,12 +159,16 @@ export const Roadmap: FunctionComponent = () => {
                 <Gap sizeRem={2} horizontal />
                 <div className="w-full">
                   <Milestone
-                    name="Базовые задачи"
+                    name="Задачи с собеседований"
                     arrow
                     trees={[
                       {
-                        id: '9c59607a-0036-4154-8246-2a3873b8d890',
-                        name: 'Основные задачи',
+                        id: 'cd9a7aef-6a13-4369-8925-277db6ef4504',
+                        name: 'Задачи с собеседований 1',
+                      },
+                      {
+                        id: '7727b396-c2c8-423f-8a69-c29a2a126c64',
+                        name: 'Задачи с собеседований 2',
                       },
                     ]}
                     onCreateRoom={handleCreateRoom}
@@ -162,11 +177,11 @@ export const Roadmap: FunctionComponent = () => {
                     name="Творческие задачи"
                     trees={[
                       {
-                        id: 'e54916ca-6103-4c65-927f-010b8cccf8c7',
-                        name: 'Задачи с фкнкциями',
+                        id: notAvailableId,
+                        name: 'Задачи с функциями',
                       },
                       {
-                        id: '9c59607a-0036-4154-8246-2a3873b8d890',
+                        id: notAvailableId,
                         name: 'Задачи с классами',
                       },
                     ]}
