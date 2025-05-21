@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using FluentAssertions;
 using Interview.Domain;
 using Interview.Domain.Database;
@@ -388,6 +389,15 @@ public class RoadmapServiceTest
                     Name = "frst",
                     RoadmapId = default,
                     ParentRoadmapMilestoneId = null
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Order = 2,
+                    Items = new List<RoadmapMilestoneItem>(),
+                    Name = "scnd",
+                    RoadmapId = default,
+                    ParentRoadmapMilestoneId = null
                 }
             },
             Name = "Test",
@@ -467,6 +477,112 @@ public class RoadmapServiceTest
         childMilestone.Order.Should().Be(2);
         // ReSharper disable once EntityFramework.NPlusOne.IncompleteDataUsage
         childMilestone.Items.Should().NotBeNull().And.HaveCount(1).And.ContainSingle(e => e.QuestionTreeId == questionTree1.Id);
+    }
+
+    [Fact]
+    public async Task UpsertAsync_ComplexTreeWithVerticalSplit_BuildsCorrectly()
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var dbContext = new TestAppDbContextFactory().Create(testSystemClock);
+        var roadmapService = new RoadmapService(dbContext);
+        var questionTree1 = await CreateQuestionTreeAsync(dbContext);
+        var questionTree2 = await CreateQuestionTreeAsync(dbContext);
+        var questionTree3 = await CreateQuestionTreeAsync(dbContext);
+        var questionTree4 = await CreateQuestionTreeAsync(dbContext);
+
+        // Arrange
+        var request = new UpsertRoadmapRequest
+        {
+            Name = "Complex Tree",
+            Order = 0,
+            Tags = new HashSet<Guid>(),
+            Items = new List<UpsertRoadmapItemRequest>
+            {
+                // Root 1
+                new()
+                {
+                    Type = EVRoadmapItemType.Milestone,
+                    Order = 1,
+                    Name = "Root 1"
+                },
+                new()
+                {
+                    Type = EVRoadmapItemType.QuestionTree,
+                    Order = 1,
+                    QuestionTreeId = questionTree1.Id
+                },
+                new()
+                {
+                    Type = EVRoadmapItemType.VerticalSplit,
+                    Order = -1
+                },
+
+                // Root 2
+                new()
+                {
+                    Type = EVRoadmapItemType.Milestone,
+                    Order = 2,
+                    Name = "Root 2"
+                },
+                new()
+                {
+                    Type = EVRoadmapItemType.QuestionTree,
+                    Order = 1,
+                    QuestionTreeId = questionTree2.Id
+                },
+
+                // Child для Root 2
+                new()
+                {
+                    Type = EVRoadmapItemType.Milestone,
+                    Order = -1,
+                    Name = "Root 2.Child1"
+                },
+                new()
+                {
+                    Type = EVRoadmapItemType.QuestionTree,
+                    Order = 1,
+                    QuestionTreeId = questionTree3.Id
+                },
+                new()
+                {
+                    Type = EVRoadmapItemType.QuestionTree,
+                    Order = 2,
+                    QuestionTreeId = questionTree4.Id
+                }
+            }
+        };
+
+        // Act
+        var result = await roadmapService.UpsertAsync(request, CancellationToken.None);
+
+        // Assert
+        var roadmap = await dbContext.Roadmap
+            .Include(r => r.Milestones)
+            .ThenInclude(m => m.ChildrenMilestones)
+            .ThenInclude(e => e.Items)
+            .FirstAsync(e => e.Id == result.Value);
+
+        roadmap.Milestones.Should().HaveCount(3);
+        var rootMilestone = roadmap.Milestones.Single(e => e.ParentRoadmapMilestoneId is null && e.Name == "Root 1");
+        rootMilestone.Name.Should().Be("Root 1");
+        rootMilestone.Order.Should().Be(1);
+        // ReSharper disable once EntityFramework.NPlusOne.IncompleteDataUsage
+        rootMilestone.Items.Should().NotBeNull().And.HaveCount(1).And.ContainSingle(e => e.QuestionTreeId == questionTree1.Id);
+
+        var rootMilestone2 = roadmap.Milestones.Single(e => e.ParentRoadmapMilestoneId is null && e.Name == "Root 2");
+        rootMilestone2.Name.Should().Be("Root 2");
+        rootMilestone2.Order.Should().Be(2);
+        // ReSharper disable once EntityFramework.NPlusOne.IncompleteDataUsage
+        rootMilestone2.Items.Should().NotBeNull().And.HaveCount(1).And.ContainSingle(e => e.QuestionTreeId == questionTree2.Id);
+
+        var childMilestone = roadmap.Milestones.Single(e => e.ParentRoadmapMilestoneId == rootMilestone2.Id);
+        childMilestone.Name.Should().Be("Root 2.Child1");
+        childMilestone.Order.Should().Be(-1);
+        // ReSharper disable once EntityFramework.NPlusOne.IncompleteDataUsage
+        childMilestone.Items.Should().NotBeNull().And.HaveCount(2)
+            .And.ContainSingle(e => e.QuestionTreeId == questionTree3.Id && e.Order == 1)
+            .And.ContainSingle(e => e.QuestionTreeId == questionTree4.Id && e.Order == 2);
     }
 
     private async Task<QuestionTree> CreateQuestionTreeAsync(AppDbContext db)
