@@ -64,9 +64,17 @@ export const CategoriesArchive: FunctionComponent = () => {
 
   const createCategoryItem = (category: Category) => (
     <li key={category.id}>
-      <Field className="flex items-center bg-wrap">
-        <span>{category.name}</span>
-        {!category.parentId && <Icon name={IconNames.Clipboard} />}
+      <Field className="flex items-baseline bg-wrap">
+        <Typography size="m">{category.name}</Typography>
+        {category.parent && (
+          <>
+            <Gap sizeRem={0.25} horizontal />
+            <Typography size="s" secondary>
+              ({category.parent.name})
+            </Typography>
+          </>
+        )}
+        {!category.parent && <Icon name={IconNames.Clipboard} />}
         <div className="ml-auto">
           <ActionModal
             openButtonCaption={localizationCaptions[LocalizationKey.Unarchive]}

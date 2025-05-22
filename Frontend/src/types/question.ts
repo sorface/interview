@@ -51,3 +51,14 @@ export interface Question {
     parentId: string;
   };
 }
+
+export interface QuestionById extends Question {
+  type: QuestionType;
+}
+
+export interface QuestionWithAuthor extends Question {
+  author?: {
+    userId: string;
+    nickname: string;
+  };
+}

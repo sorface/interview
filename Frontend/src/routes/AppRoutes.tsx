@@ -22,6 +22,7 @@ import { LogoutError } from '../pages/LogoutError/LogoutError';
 import { QuestionsArchive } from '../pages/QuestionsArchive/QuestionsArchive';
 import { QuestionTrees } from '../pages/QuestionTrees/QuestionTrees';
 import { QuestionTreeCreate } from '../pages/QuestionTreeCreate/QuestionTreeCreate';
+import { Roadmap } from '../pages/Roadmap/Roadmap';
 import { CategoriesArchive } from '../pages/CategoriesArchive/CategoriesArchive';
 
 interface AppRoutesProps {
@@ -180,6 +181,14 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <QuestionTreeCreate edit={true} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.roadmapJs}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <Roadmap />
                 </ProtectedRoute>
               }
             />

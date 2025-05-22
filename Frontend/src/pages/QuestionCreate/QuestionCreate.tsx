@@ -23,6 +23,7 @@ import {
   CodeEditorLang,
   Question,
   QuestionAnswer,
+  QuestionById,
   QuestionType,
 } from '../../types/question';
 import { LocalizationKey } from '../../localization';
@@ -84,7 +85,7 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
   } = updatingQuestionState;
 
   const { apiMethodState: getQuestionState, fetchData: fetchQuestion } =
-    useApiMethod<Question, Question['id']>(questionsApiDeclaration.get);
+    useApiMethod<QuestionById, Question['id']>(questionsApiDeclaration.get);
   const {
     process: { loading: questionLoading, error: questionError },
     data: question,
@@ -164,6 +165,7 @@ export const QuestionCreate: FunctionComponent<QuestionCreateProps> = ({
     setQuestionValue(question.value);
     setCodeEditor(question.codeEditor || null);
     setAnswers(question.answers);
+    setType(question.type);
   }, [question]);
 
   useEffect(() => {

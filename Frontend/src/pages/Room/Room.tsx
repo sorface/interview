@@ -260,6 +260,7 @@ export const Room: FunctionComponent = () => {
   const currentUserExaminee = roomParticipant?.userType === 'Examinee';
   const viewerMode = !(currentUserExpert || currentUserExaminee);
   const aiRoom = !!room?.questionTree;
+  const exitLink = aiRoom ? pathnames.roadmapJs : pathnames.highlightRooms;
 
   const userStreams = useUserStreams();
   const { playJoinRoomSound, playChatMessageSound } = useRoomSounds();
@@ -515,7 +516,7 @@ export const Room: FunctionComponent = () => {
   };
 
   const handleLeaveRoom = () => {
-    navigate(pathnames.highlightRooms);
+    navigate(exitLink);
   };
 
   const handleStartReviewRoom = () => {
@@ -544,7 +545,7 @@ export const Room: FunctionComponent = () => {
         title={localizationCaptions[LocalizationKey.ConnectionError]}
         message={localizationCaptions[LocalizationKey.RoomConnectionError]}
       >
-        <Link to={pathnames.highlightRooms}>
+        <Link to={exitLink}>
           <Button>{localizationCaptions[LocalizationKey.Exit]}</Button>
         </Link>
       </MessagePage>
@@ -577,6 +578,7 @@ export const Room: FunctionComponent = () => {
       <UserStreamsContext.Provider value={userStreams}>
         <MainContentWrapper withMargin={!aiRoom} className="room-wrapper">
           <EnterVideoChatModal
+            aiRoom={aiRoom}
             open={welcomeScreen}
             loading={
               loading ||
@@ -640,10 +642,7 @@ export const Room: FunctionComponent = () => {
                         <span
                           className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
                         >
-                          <Link
-                            to={pathnames.highlightRooms}
-                            className="no-underline"
-                          >
+                          <Link to={exitLink} className="no-underline">
                             <div className="room-page-header-wrapper flex items-center">
                               <div
                                 className={`pr-[1rem] ${aiRoom ? 'w-[4.375rem] px-[1rem]' : 'w-[3.375rem]'}`}

@@ -15,6 +15,7 @@ public class CategoryService(AppDbContext db, ArchiveService<Category> archiveSe
     public async Task<CategoryResponse> FindByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var response = await db.Categories.AsNoTracking()
+            .Include(e => e.Parent)
             .Where(e => e.Id == id)
             .Select(CategoryResponse.Mapper.Expression)
             .FirstOrDefaultAsync(cancellationToken);
@@ -119,6 +120,7 @@ public class CategoryService(AppDbContext db, ArchiveService<Category> archiveSe
     {
         var filter = await BuildSpecificationAsync(archive, request, cancellationToken);
         return await db.Categories
+            .Include(e => e.Parent)
             .AsNoTracking()
             .Where(filter)
             .OrderBy(e => e.ParentId)
