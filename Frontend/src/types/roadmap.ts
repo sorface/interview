@@ -13,4 +13,4 @@ export interface RoadmapItem {
   order: number;
 }
 
-type RoadmapItemType = 'Milestone';
+type RoadmapItemType = 'Milestone' | 'QuestionTree' | 'VerticalSplit';
