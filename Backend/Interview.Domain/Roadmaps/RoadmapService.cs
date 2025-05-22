@@ -145,7 +145,8 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
         var roomIdMap = roomIdList.ToLookup(e => e.QuestionTreeId);
 
         var items = new List<RoadmapItemResponse>(tmpRes.Items.Count + 1 + tmpRes.Items.Select(e => e.Items.Count).Sum());
-        var tree = new Stack<RoadmapItemTree>(RoadmapItemTree.BuildRoadmapTree(tmpRes.Items).AsEnumerable().Reverse());
+        var buildRoadmapTree = RoadmapItemTree.BuildRoadmapTree(tmpRes.Items);
+        var tree = new Stack<RoadmapItemTree>(buildRoadmapTree.AsEnumerable().Reverse());
         while (tree.TryPop(out var item))
         {
             if (item.ParentRoadmapMilestoneId is null && items.Count > 0)
@@ -180,7 +181,7 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
                 Order = e.Order,
             }));
 
-            foreach (var roadmapItemTree in item.Children)
+            foreach (var roadmapItemTree in item.Children.AsEnumerable().Reverse())
             {
                 tree.Push(roadmapItemTree);
             }

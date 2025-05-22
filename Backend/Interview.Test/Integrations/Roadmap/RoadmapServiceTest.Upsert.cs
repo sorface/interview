@@ -7,9 +7,9 @@ using Interview.Domain.Roadmaps.UpsertRoadmap;
 using Interview.Domain.Tags;
 using Microsoft.EntityFrameworkCore;
 
-namespace Interview.Test.Integrations;
+namespace Interview.Test.Integrations.Roadmap;
 
-public class RoadmapServiceTest
+public partial class RoadmapServiceTest
 {
     [Fact]
     public async Task UpsertAsync_WhenRequestIdIsNull_ShouldCreateNewRoadmap()
@@ -59,7 +59,7 @@ public class RoadmapServiceTest
         var roadmapService = new RoadmapService(dbContext);
 
         // Arrange
-        var existingRoadmap = new Roadmap
+        var existingRoadmap = new Domain.Roadmaps.Roadmap
         {
             Id = Guid.NewGuid(),
             Name = "Existing Roadmap",
@@ -109,7 +109,7 @@ public class RoadmapServiceTest
         var roadmapService = new RoadmapService(dbContext);
 
         // Arrange
-        var existingRoadmap = new Roadmap
+        var existingRoadmap = new Domain.Roadmaps.Roadmap
         {
             Id = Guid.NewGuid(),
             Name = "Existing Roadmap",
@@ -309,7 +309,7 @@ public class RoadmapServiceTest
         var roadmapService = new RoadmapService(dbContext);
 
         // Arrange
-        var existingRoadmap = new Roadmap
+        var existingRoadmap = new Domain.Roadmaps.Roadmap
         {
             Milestones = new List<RoadmapMilestone>
             {
@@ -450,12 +450,11 @@ public class RoadmapServiceTest
             .And.ContainSingle(e => e.QuestionTreeId == questionTree4.Id && e.Order == 2);
     }
 
-    private async Task<QuestionTree> CreateQuestionTreeAsync(AppDbContext db)
+    private async Task<QuestionTree> CreateQuestionTreeAsync(AppDbContext db, Guid? questionTreeId = null)
     {
-        var questionTreeId = Guid.NewGuid();
         var questionTree = new QuestionTree
         {
-            Id = questionTreeId,
+            Id = questionTreeId ?? Guid.NewGuid(),
             Name = "t",
             RootQuestionSubjectTreeId = default,
             RootQuestionSubjectTree = new QuestionSubjectTree
