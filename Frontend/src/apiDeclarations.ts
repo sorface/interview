@@ -573,9 +573,9 @@ export const roadmapTreeApiDeclaration = {
     method: 'GET',
     baseUrl: `/roadmaps/${id}`,
   }),
-  upsert: (category: Partial<Roadmap>): ApiContractPut => ({
+  upsert: (roadmap: Partial<Roadmap>): ApiContractPut => ({
     method: 'PUT',
     baseUrl: '/roadmaps',
-    body: category,
+    body: roadmap,
   }),
 };
