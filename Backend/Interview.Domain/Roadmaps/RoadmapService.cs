@@ -3,6 +3,7 @@ using Interview.Domain.Questions;
 using Interview.Domain.Roadmaps.RoadmapById;
 using Interview.Domain.Roadmaps.RoadmapPage;
 using Interview.Domain.Roadmaps.UpsertRoadmap;
+using Interview.Domain.Rooms;
 using Interview.Domain.ServiceResults.Success;
 using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
@@ -139,7 +140,10 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
 
         var questionTreeIds = tmpRes.Items.SelectMany(t => t.Items.Select(tt => tt.QuestionTreeId)).ToHashSet();
         var roomIdList = await db.Rooms
-            .Where(e => e.QuestionTreeId != null && questionTreeIds.Contains(e.QuestionTreeId.Value))
+            .Where(e =>
+                e.QuestionTreeId != null &&
+                questionTreeIds.Contains(e.QuestionTreeId.Value) &&
+                (e.Status == SERoomStatus.New || e.Status == SERoomStatus.Active))
             .Select(e => new { QuestionTreeId = e.QuestionTreeId!.Value, RoomId = e.Id })
             .ToListAsync(cancellationToken);
         var roomIdMap = roomIdList.ToLookup(e => e.QuestionTreeId);
