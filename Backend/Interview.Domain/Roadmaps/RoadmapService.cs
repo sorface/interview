@@ -114,18 +114,21 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
                     Value = t.Value,
                     HexValue = t.HexColor,
                 }).ToList(),
-                Items = e.Milestones.Select(t => new
+                Items = e.Milestones.Select(t => new RoadmapItemTree
                 {
-                    t.Id,
-                    t.Name,
-                    t.Order,
-                    t.ParentRoadmapMilestoneId,
-                    Items = t.Items.Select(tt => new
+                    Id = t.Id,
+                    Name = t.Name,
+                    Order = t.Order,
+                    ParentRoadmapMilestoneId = t.ParentRoadmapMilestoneId,
+                    Items = t.Items.Select(tt => new RoadmapItemTree.Item
                     {
-                        tt.Id,
-                        tt.Order,
-                        tt.QuestionTreeId,
-                    }).OrderBy(tt => tt.Order).ToList(),
+                        Id = tt.Id,
+                        Order = tt.Order,
+                        QuestionTreeId = tt.QuestionTreeId,
+                    })
+                        .OrderBy(tt => tt.Order)
+                        .ToList(),
+                    Children = new List<RoadmapItemTree>(),
                 }).OrderBy(t => t.Order).ToList(),
             })
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
@@ -142,10 +145,10 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
         var roomIdMap = roomIdList.ToLookup(e => e.QuestionTreeId);
 
         var items = new List<RoadmapItemResponse>(tmpRes.Items.Count + 1 + tmpRes.Items.Select(e => e.Items.Count).Sum());
-        for (var index = 0; index < tmpRes.Items.Count; index++)
+        var tree = new Stack<RoadmapItemTree>(RoadmapItemTree.BuildRoadmapTree(tmpRes.Items).AsEnumerable().Reverse());
+        while (tree.TryPop(out var item))
         {
-            var item = tmpRes.Items[index];
-            if (item.ParentRoadmapMilestoneId is null && index > 0)
+            if (item.ParentRoadmapMilestoneId is null && items.Count > 0)
             {
                 items.Add(new RoadmapItemResponse
                 {
@@ -176,6 +179,11 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
                 RoomId = roomIdMap[e.QuestionTreeId].FirstOrDefault()?.RoomId,
                 Order = e.Order,
             }));
+
+            foreach (var roadmapItemTree in item.Children)
+            {
+                tree.Push(roadmapItemTree);
+            }
         }
 
         return new RoadmapResponse
@@ -364,5 +372,74 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
         }
 
         await db.SaveChangesAsync(cancellationToken);
+    }
+
+    private class RoadmapItemTree
+    {
+        public required Guid Id { get; set; }
+
+        public required string Name { get; set; }
+
+        public required int Order { get; set; }
+
+        public required Guid? ParentRoadmapMilestoneId { get; set; }
+
+        public required List<Item> Items { get; set; }
+
+        public required List<RoadmapItemTree> Children { get; set; }
+
+        public class Item
+        {
+            public required Guid Id { get; set; }
+
+            public required int Order { get; set; }
+
+            public required Guid QuestionTreeId { get; set; }
+        }
+
+        public static List<RoadmapItemTree> BuildRoadmapTree(ICollection<RoadmapItemTree> flatList)
+        {
+            var lookup = flatList.ToDictionary(x => x.Id, x => x);
+
+            var tree = new List<RoadmapItemTree>();
+
+            foreach (var item in flatList)
+            {
+                if (item.ParentRoadmapMilestoneId.HasValue && lookup.TryGetValue(item.ParentRoadmapMilestoneId.Value, out var parent))
+                {
+                    parent.Children.Add(item);
+                }
+                else
+                {
+                    // Корневые элементы
+                    tree.Add(item);
+                }
+            }
+
+            // Сортировка всей иерархии без рекурсии
+            tree.Sort((i1, i2) => i1.Order.CompareTo(i2.Order));
+            var stack = new Stack<RoadmapItemTree>(tree);
+
+            while (stack.Count > 0)
+            {
+                var current = stack.Pop();
+
+                // Сортируем детей текущего узла
+                if (current.Children is not { Count: > 0 })
+                {
+                    continue;
+                }
+
+                current.Children.Sort((i1, i2) => i1.Order.CompareTo(i2.Order));
+
+                // Добавляем детей в стек для дальнейшей обработки
+                foreach (var child in current.Children.AsEnumerable().Reverse())
+                {
+                    stack.Push(child);
+                }
+            }
+
+            return tree.OrderBy(x => x.Order).ToList();
+        }
     }
 }
