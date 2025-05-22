@@ -27,6 +27,7 @@ export enum CodeEditorLang {
   Typescript = 'typescript',
   Xml = 'xml',
   Yaml = 'yaml',
+  Json = 'json',
 }
 
 export interface QuestionAnswer {
