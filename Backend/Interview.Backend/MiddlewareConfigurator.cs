@@ -25,18 +25,16 @@ public class MiddlewareConfigurator(WebApplication app)
 
         app.UseWebSockets();
 
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseWebSocketsAuthorization(new WebSocketAuthorizationOptions
-            {
-                CookieName = WebSocketAuthorizationOptions.DefaultCookieName,
-                WebSocketQueryName = "Authorization",
-            });
-        }
-
+        // TODO: only for development
+        // if (app.Environment.IsDevelopment())
+        // {
+        //     app.UseWebSocketsAuthorization(new WebSocketAuthorizationOptions
+        //     {
+        //         CookieName = WebSocketAuthorizationOptions.DefaultCookieName,
+        //         WebSocketQueryName = "Authorization",
+        //     });
+        // }
         app.UseCors("All");
-
-        app.UseRateLimiter();
 
         var logger = app.Services.GetRequiredService<ILogger<MiddlewareConfigurator>>();
 
@@ -49,9 +47,6 @@ public class MiddlewareConfigurator(WebApplication app)
 
         app.UseAuthentication();
         app.UseAuthorization();
-
-        var cookieExpTimeConfig = app.Configuration.GetSection("AccessTokenExpiredTime");
-        app.UseAccessTokenExpiredTimeCookie("ate_t", new CookieOptions { Domain = cookieExpTimeConfig.GetValue<string>("Domain"), Secure = true, });
 
         app.Use((context, func) =>
         {
