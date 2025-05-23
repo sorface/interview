@@ -455,7 +455,7 @@ public partial class RoadmapServiceTest
         var questionTree = new QuestionTree
         {
             Id = questionTreeId ?? Guid.NewGuid(),
-            Name = "t",
+            Name = Guid.NewGuid().ToString("N"),
             RootQuestionSubjectTreeId = default,
             RootQuestionSubjectTree = new QuestionSubjectTree
             {

@@ -102,7 +102,7 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
         var tmpRes = await db.Roadmap
             .AsNoTracking()
             .Include(e => e.Tags)
-            .Include(e => e.Milestones).ThenInclude(e => e.Items)
+            .Include(e => e.Milestones).ThenInclude(e => e.Items).ThenInclude(e => e.QuestionTree)
             .Where(e => e.Id == id)
             .Select(e => new
             {
@@ -125,6 +125,7 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
                     {
                         Id = tt.Id,
                         Order = tt.Order,
+                        Name = tt.QuestionTree!.Name,
                         QuestionTreeId = tt.QuestionTreeId,
                     })
                         .OrderBy(tt => tt.Order)
@@ -179,7 +180,7 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
             {
                 Id = e.Id,
                 Type = EVRoadmapItemType.QuestionTree,
-                Name = null,
+                Name = e.Name,
                 QuestionTreeId = e.QuestionTreeId,
                 RoomId = roomIdMap[e.QuestionTreeId].FirstOrDefault()?.RoomId,
                 Order = e.Order,
@@ -396,6 +397,8 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
         public class Item
         {
             public required Guid Id { get; set; }
+
+            public required string Name { get; set; }
 
             public required int Order { get; set; }
 

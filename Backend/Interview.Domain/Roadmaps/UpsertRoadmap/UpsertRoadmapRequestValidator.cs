@@ -28,13 +28,12 @@ public class UpsertRoadmapRequestValidator
         var lastWasVerticalSplit = false;
         var hasRootMilestone = false;
 
-        var milestoneOrderSet = new HashSet<int>();
-
         RoadmapMilestoneNode? currentMilestoneNode = null;
-
+        var indexMap = new Dictionary<UpsertRoadmapItemRequest, int>(items.Count);
         for (var i = 0; i < items.Count; i++)
         {
             var item = items[i];
+            indexMap[item] = i;
             var nextItem = i + 1 < items.Count ? items[i + 1] : null;
 
             ValidateItem(item, result);
@@ -51,7 +50,7 @@ public class UpsertRoadmapRequestValidator
 
                         if (!hasRootMilestone)
                         {
-                            if (item.Order < 0 || !milestoneOrderSet.Add(item.Order))
+                            if (item.Order < 0)
                             {
                                 result.Errors.Add(Errors.RootMilestoneMustHaveUniqueOrder(i));
                             }
@@ -64,7 +63,7 @@ public class UpsertRoadmapRequestValidator
                         {
                             if (previousType == EVRoadmapItemType.VerticalSplit)
                             {
-                                if (item.Order < 0 || !milestoneOrderSet.Add(item.Order))
+                                if (item.Order < 0)
                                 {
                                     result.Errors.Add(Errors.NewRootMilestoneMustHaveUniqueOrder(i));
                                 }
@@ -159,6 +158,17 @@ public class UpsertRoadmapRequestValidator
             }
         }
 
+        var orders = new HashSet<int>();
+        foreach (var roadmapMilestoneNode in result.Tree.RootMilestones)
+        {
+            if (!orders.Add(roadmapMilestoneNode.Milestone.Order))
+            {
+                var idx = indexMap[roadmapMilestoneNode.Milestone];
+                result.Errors.Add(Errors.NewRootMilestoneMustHaveUniqueOrder(idx));
+            }
+        }
+
+        // TODO: check unique order for questionTree elements
         return result;
     }
 
