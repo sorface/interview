@@ -151,8 +151,8 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
 
         var items = new List<RoadmapItemResponse>(tmpRes.Items.Count + 1 + tmpRes.Items.Select(e => e.Items.Count).Sum());
         var buildRoadmapTree = RoadmapItemTree.BuildRoadmapTree(tmpRes.Items);
-        var tree = new Stack<RoadmapItemTree>(buildRoadmapTree.AsEnumerable().Reverse());
-        while (tree.TryPop(out var item))
+        var tree = new Queue<RoadmapItemTree>(buildRoadmapTree);
+        while (tree.TryDequeue(out var item))
         {
             if (item.ParentRoadmapMilestoneId is null && items.Count > 0)
             {
@@ -186,9 +186,9 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
                 Order = e.Order,
             }));
 
-            foreach (var roadmapItemTree in item.Children.AsEnumerable().Reverse())
+            foreach (var roadmapItemTree in item.Children)
             {
-                tree.Push(roadmapItemTree);
+                tree.Enqueue(roadmapItemTree);
             }
         }
 
@@ -424,14 +424,9 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
                 }
             }
 
-            // Сортировка всей иерархии без рекурсии
-            tree.Sort((i1, i2) => i1.Order.CompareTo(i2.Order));
-            var stack = new Stack<RoadmapItemTree>(tree);
-
-            while (stack.Count > 0)
+            var stack = new Queue<RoadmapItemTree>(tree);
+            while (stack.TryDequeue(out var current))
             {
-                var current = stack.Pop();
-
                 // Сортируем детей текущего узла
                 if (current.Children is not { Count: > 0 })
                 {
@@ -441,13 +436,14 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
                 current.Children.Sort((i1, i2) => i1.Order.CompareTo(i2.Order));
 
                 // Добавляем детей в стек для дальнейшей обработки
-                foreach (var child in current.Children.AsEnumerable().Reverse())
+                foreach (var child in current.Children)
                 {
-                    stack.Push(child);
+                    stack.Enqueue(child);
                 }
             }
 
-            return tree.OrderBy(x => x.Order).ToList();
+            tree.Sort((i1, i2) => i1.Order.CompareTo(i2.Order));
+            return tree;
         }
     }
 }

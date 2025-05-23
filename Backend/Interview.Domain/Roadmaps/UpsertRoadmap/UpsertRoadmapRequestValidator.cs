@@ -168,7 +168,6 @@ public class UpsertRoadmapRequestValidator
             }
         }
 
-        // TODO: check unique order for questionTree elements
         return result;
     }
 
