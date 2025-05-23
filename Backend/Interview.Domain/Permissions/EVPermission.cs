@@ -220,5 +220,14 @@ public enum EVPermission
 
     [Description("Unarchiving the question tree")]
     QuestionTreeUnarchive,
+
+    [Description("Upsert roadmap")]
+    RoadmapUpsert,
+
+    [Description("Get roadmap by id")]
+    RoadmapGetById,
+
+    [Description("Find roadmap page")]
+    RoadmapFindPage,
 #pragma warning restore SA1602
 }

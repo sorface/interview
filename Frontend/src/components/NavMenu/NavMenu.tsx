@@ -105,9 +105,9 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
 
   const items: Array<MenuItem | null> = [
     {
-      path: pathnames.roadmapJs,
+      path: pathnames.roadmaps,
       caption: (
-        <LocalizationCaption captionKey={LocalizationKey.RoadmapJsPageName} />
+        <LocalizationCaption captionKey={LocalizationKey.RoadmapsPageName} />
       ),
       icon: IconNames.Golf,
       onClick: handleItemClick,

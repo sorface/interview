@@ -15,7 +15,7 @@ public class EmptyDisposable : IDisposable
     }
 
     /// <summary>
-    /// Empry realization of dispose method.
+    /// Empty realization of dispose method.
     /// </summary>
     public void Dispose()
     {

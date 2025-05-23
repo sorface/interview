@@ -24,6 +24,8 @@ import { QuestionTrees } from '../pages/QuestionTrees/QuestionTrees';
 import { QuestionTreeCreate } from '../pages/QuestionTreeCreate/QuestionTreeCreate';
 import { Roadmap } from '../pages/Roadmap/Roadmap';
 import { CategoriesArchive } from '../pages/CategoriesArchive/CategoriesArchive';
+import { Roadmaps } from '../pages/Roadmaps/Roadmaps';
+import { RoadmapCreate } from '../pages/RoadmapCreate/RoadmapCreate';
 
 interface AppRoutesProps {
   user: User | null;
@@ -185,10 +187,26 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
               }
             />
             <Route
+              path={pathnames.roadmapCreate}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <RoadmapCreate />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path={pathnames.roadmapJs}
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <Roadmap />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.roadmaps}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <Roadmaps />
                 </ProtectedRoute>
               }
             />
