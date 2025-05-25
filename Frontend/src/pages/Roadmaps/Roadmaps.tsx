@@ -8,7 +8,7 @@ import React, {
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Roadmap } from '../../types/roadmap';
 import {
-  GetRoadmapsParams,
+  PaginationUrlParams,
   roadmapTreeApiDeclaration,
 } from '../../apiDeclarations';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
@@ -42,7 +42,7 @@ export const Roadmaps: FunctionComponent = () => {
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const { apiMethodState, fetchData } = useApiMethod<
     Roadmap[],
-    GetRoadmapsParams
+    PaginationUrlParams
   >(roadmapTreeApiDeclaration.getPage);
   const {
     process: { loading, error },
