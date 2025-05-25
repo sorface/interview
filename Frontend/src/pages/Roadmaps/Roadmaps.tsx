@@ -74,14 +74,18 @@ export const Roadmaps: FunctionComponent = () => {
     });
 
     return (
-      <div key={roadmap.id} className={roadmapItemThemedClassName}>
-        <li>
-          <div className="flex">
-            <Link to={roadmapLink}>{roadmap.name}</Link>
+      <li key={roadmap.id}>
+        <Link to={roadmapLink} className="no-underline">
+          <div
+            className={`${roadmapItemThemedClassName} bg-wrap p-[1rem] flex items-center rounded-[0.5rem]`}
+          >
+            <Typography size="m">{roadmap.name}</Typography>
             {admin && (
               <div className="flex ml-auto">
                 <Link to={roadmapEditLink}>
-                  <Icon size="m" name={IconNames.Settings} />
+                  <Button>
+                    <Icon size="m" name={IconNames.Settings} />
+                  </Button>
                 </Link>
                 <ActionModal
                   openButtonCaption="📁"
@@ -98,8 +102,8 @@ export const Roadmaps: FunctionComponent = () => {
               </div>
             )}
           </div>
-        </li>
-      </div>
+        </Link>
+      </li>
     );
   };
 
