@@ -89,6 +89,13 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
     setRoadmapItems([...roadmapItems, newItem]);
   };
 
+  const handleRemoveRoadmapItem = (id: string) => {
+    const newRoadmapItems = roadmapItems
+      .filter((item) => item.id !== id)
+      .map((item, index) => ({ ...item, order: index }));
+    setRoadmapItems(newRoadmapItems);
+  };
+
   const handleUpsert = () => {
     const itemsForRequest: UpsertRoadmapBody['items'] = roadmapItems.map(
       (item) => {
@@ -208,6 +215,12 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
               });
             }}
           />
+          <Button
+            variant="active2"
+            onClick={() => handleRemoveRoadmapItem(item.id)}
+          >
+            <Icon name={IconNames.Trash} />
+          </Button>
         </div>
       ))}
       <Gap sizeRem={0.85} />
