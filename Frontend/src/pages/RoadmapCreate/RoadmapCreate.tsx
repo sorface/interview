@@ -78,7 +78,7 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
     const newItem: RoadmapItem = {
       id: String(Math.random()),
       name: 'test',
-      order: 0,
+      order: roadmapItems.length,
       type: 'Milestone',
       questionTreeId: '',
     };
