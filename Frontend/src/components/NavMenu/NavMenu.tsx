@@ -228,7 +228,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
           className={`nav-menu ${collapsed ? 'collapsed' : ''} move-transition`}
         >
           <NavLink
-            to={pathnames.roadmapJs}
+            to={pathnames.roadmaps}
             className="nav-menu-item nav-menu-item-first no-active move-transition"
           >
             <img className="site-logo" src="/logo192.png" alt="site logo" />

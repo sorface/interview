@@ -74,7 +74,7 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
           <MilestoneTree
             key={tree.id}
             id={tree.id}
-            name={tree.name}
+            name={tree.id}
             notAvailable={tree.id === notAvailableId}
             onCreate={handleCreateRoom(tree)}
           />

@@ -190,12 +190,20 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
               path={pathnames.roadmapCreate}
               element={
                 <ProtectedRoute allowed={authenticated}>
-                  <RoadmapCreate />
+                  <RoadmapCreate edit={false} />
                 </ProtectedRoute>
               }
             />
             <Route
-              path={pathnames.roadmapJs}
+              path={pathnames.roadmapEdit}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <RoadmapCreate edit={true} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.roadmap}
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <Roadmap />

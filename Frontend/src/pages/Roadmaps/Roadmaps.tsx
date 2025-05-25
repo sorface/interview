@@ -1,5 +1,6 @@
 import React, {
   FunctionComponent,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -19,7 +20,10 @@ import { Icon } from '../Room/components/Icon/Icon';
 import { IconNames, pathnames } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { checkAdmin } from '../../utils/checkAdmin';
-import { Link } from 'react-router-dom';
+import { generatePath, Link } from 'react-router-dom';
+import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
+import { useThemeClassName } from '../../hooks/useThemeClassName';
+import { Theme } from '../../context/ThemeContext';
 
 const pageSize = 30;
 const initialPageNumber = 1;
@@ -28,6 +32,12 @@ export const Roadmaps: FunctionComponent = () => {
   const auth = useContext(AuthContext);
   const admin = checkAdmin(auth);
   const localizationCaptions = useLocalizationCaptions();
+  const roadmapItemThemedClassName = useThemeClassName({
+    [Theme.Dark]: 'hover:bg-dark-history-hover',
+    [Theme.Light]:
+      'hover:bg-blue-light hover:border hover:border-solid border-blue-main',
+  });
+
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const { apiMethodState, fetchData } = useApiMethod<
     Roadmap[],
@@ -46,6 +56,34 @@ export const Roadmaps: FunctionComponent = () => {
     });
   }, [pageNumber, fetchData]);
 
+  const handleNextPage = useCallback(() => {
+    setPageNumber(pageNumber + 1);
+  }, [pageNumber]);
+
+  const createRoadmapItem = (roadmap: Roadmap) => {
+    const roadmapLink = generatePath(pathnames.roadmap, { id: roadmap.id });
+    const roadmapEditLink = generatePath(pathnames.roadmapEdit, {
+      id: roadmap.id,
+    });
+
+    return (
+      <div key={roadmap.id} className={roadmapItemThemedClassName}>
+        <li>
+          <div className="flex">
+            <Link to={roadmapLink}>{roadmap.name}</Link>
+            {admin && (
+              <div className="ml-auto">
+                <Link to={roadmapEditLink}>
+                  <Icon size="m" name={IconNames.Settings} />
+                </Link>
+              </div>
+            )}
+          </div>
+        </li>
+      </div>
+    );
+  };
+
   return (
     <>
       <PageHeader
@@ -60,7 +98,15 @@ export const Roadmaps: FunctionComponent = () => {
           </Link>
         )}
       </PageHeader>
-      <Typography size="xl">{JSON.stringify(roadmaps)}</Typography>
+      <ItemsGrid
+        currentData={roadmaps}
+        loading={loading}
+        error={error}
+        triggerResetAccumData=""
+        renderItem={createRoadmapItem}
+        nextPageAvailable={false}
+        handleNextPage={handleNextPage}
+      />
     </>
   );
 };
