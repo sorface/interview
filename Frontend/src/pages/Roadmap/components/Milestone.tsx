@@ -4,7 +4,6 @@ import { MilestoneTree } from './MilestoneTree';
 import { useThemeClassName } from '../../../hooks/useThemeClassName';
 import { Theme } from '../../../context/ThemeContext';
 import { Gap } from '../../../components/Gap/Gap';
-import { getTreeProgress } from '../utils/getTreeProgress';
 import { notAvailableId } from '../Roadmap';
 
 interface MilestoneTreeItem {
@@ -38,15 +37,6 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
     [Theme.Light]: 'border-text-light',
   });
 
-  const sumProgress = trees.reduce((accum, currTree) => {
-    const progress = getTreeProgress(currTree.id);
-    if (progress !== 100) {
-      return accum;
-    }
-    return accum + getTreeProgress(currTree.id);
-  }, 0);
-  const totalProgress = ~~(sumProgress / trees.length);
-
   const handleCreateRoom = (tree: MilestoneTreeItem) => () => {
     if (tree.roomId) {
       onRoomAlreadyExists(tree.roomId);
@@ -75,13 +65,13 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
           ></div>
         </div>
       )}
-      <MilestoneRect caption={`${name} (${totalProgress}%)`} />
+      <MilestoneRect caption={name} />
       <Gap sizeRem={0.5} />
       <ul className="pl-[1.5rem] flex flex-col items-start">
         {trees.map((tree) => (
           <MilestoneTree
             key={tree.id}
-            id={tree.id}
+            id={tree.questionTreeId || ''}
             name={tree.name || ''}
             notAvailable={tree.id === notAvailableId}
             onCreate={handleCreateRoom(tree)}

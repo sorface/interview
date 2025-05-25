@@ -21,25 +21,9 @@ import { findMilestoneTrees } from './utils/findMilestoneTrees';
 const roomDuration = 3600;
 export const notAvailableId = 'notAvailable';
 
-const progressTreeIds = [
-  '7727b396-c2c8-423f-8a69-c29a2a126c64',
-  'cd9a7aef-6a13-4369-8925-277db6ef4504',
-  '5314ccc7-9cd9-46cc-afb6-5fbaf32c1d6a',
-  'acb971a7-add1-4fcf-b158-4b14f54aeb54',
-  '91d092dd-a2af-4b08-9e93-fb59c702cdbb',
-  '1e4d88c2-ea15-4484-95f9-d2730e53ed67',
-  '9ffb195f-ea3a-4cae-abd9-013bda0d8ab0',
-  '55430493-cb5f-44bc-afc8-947bc06d7c76',
-  '9608b396-973b-4864-9103-9378fbb832c6',
-  'fd75ec8a-65c3-4104-ab40-f7cb96c268f7',
-  '1a43d56a-1f15-49ee-8f49-06b85352dea2',
-  '1fe41bb5-3424-481b-9577-651bc6392c20',
-];
-
 export const Roadmap: FunctionComponent = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const roadmapProgress = getRoadmapProgress(progressTreeIds);
 
   const { apiMethodState, fetchData } = useApiMethod<Room, CreateRoomBody>(
     roomsApiDeclaration.create,
@@ -59,6 +43,9 @@ export const Roadmap: FunctionComponent = () => {
 
   const totalLoading = loading || roadmapLoading;
   const totalError = error || roadmapError;
+  const progressTreeIds =
+    roadmap?.items.map((item) => item.questionTreeId).filter(Boolean) || [];
+  const roadmapProgress = getRoadmapProgress(progressTreeIds);
 
   const handleCreateRoom = (treeId: string, treeName: string) => {
     const roomStartDate = new Date();
