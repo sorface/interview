@@ -58,6 +58,7 @@ export const QuestionTreeSelector: FunctionComponent<
 
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const [searchValueInput, setSearchValueInput] = useState('');
+  const searchValueDebounced = useDebounce(searchValueInput);
 
   const { apiMethodState: questionTreesState, fetchData: fetchQuestionTrees } =
     useApiMethod<GetPageQuestionsTreeResponse, GetQuestionsTreesParams>(
@@ -87,7 +88,7 @@ export const QuestionTreeSelector: FunctionComponent<
   } = treeState;
 
   const dataSafe = questionTrees?.data || [];
-  const triggerResetAccumData = `${searchValueInput}${archivedQuestionTree}`;
+  const triggerResetAccumData = `${searchValueDebounced}${archivedQuestionTree}`;
 
   useEffect(() => {
     if (!selectedTreeId) {
@@ -103,11 +104,11 @@ export const QuestionTreeSelector: FunctionComponent<
     fetchQuestionTrees({
       PageNumber: pageNumber,
       PageSize: pageSize,
-      name: searchValueInput,
+      name: searchValueDebounced,
     });
   }, [
     pageNumber,
-    searchValueInput,
+    searchValueDebounced,
     archivedQuestionTree,
     open,
     fetchQuestionTrees,
@@ -147,7 +148,12 @@ export const QuestionTreeSelector: FunctionComponent<
         {getedTree && <Typography size="s">{getedTree.name}</Typography>}
       </div>
       <Modal open={open} onClose={() => setOpen(false)} contentLabel="">
-        <div>
+        <div className="flex flex-col">
+          <input
+            type="text"
+            value={searchValueInput}
+            onChange={(e) => setSearchValueInput(e.target.value)}
+          />
           <Gap sizeRem={1.5} />
           <ItemsGrid
             currentData={dataSafe}
