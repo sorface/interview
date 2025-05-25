@@ -260,7 +260,7 @@ export const Room: FunctionComponent = () => {
   const currentUserExaminee = roomParticipant?.userType === 'Examinee';
   const viewerMode = !(currentUserExpert || currentUserExaminee);
   const aiRoom = !!room?.questionTree;
-  const exitLink = aiRoom ? pathnames.roadmapJs : pathnames.highlightRooms;
+  const exitLink = aiRoom ? pathnames.roadmaps : pathnames.highlightRooms;
 
   const userStreams = useUserStreams();
   const { playJoinRoomSound, playChatMessageSound } = useRoomSounds();

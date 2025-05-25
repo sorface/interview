@@ -51,7 +51,7 @@ export const Home: FunctionComponent = () => {
   }
 
   if (auth) {
-    return <Navigate to={pathnames.roadmapJs} replace />;
+    return <Navigate to={pathnames.roadmaps} replace />;
   }
 
   return (

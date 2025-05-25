@@ -4,12 +4,12 @@ import { MilestoneTree } from './MilestoneTree';
 import { useThemeClassName } from '../../../hooks/useThemeClassName';
 import { Theme } from '../../../context/ThemeContext';
 import { Gap } from '../../../components/Gap/Gap';
-import { getTreeProgress } from '../utils/getTreeProgress';
-import { notAvailableId } from '../Roadmap';
 
 interface MilestoneTreeItem {
   id: string;
-  name: string;
+  name?: string;
+  questionTreeId?: string;
+  roomId?: string;
 }
 
 interface MilestoneProps {
@@ -17,6 +17,7 @@ interface MilestoneProps {
   arrow?: boolean;
   trees: MilestoneTreeItem[];
   onCreateRoom: (treeId: string, treeName: string) => void;
+  onRoomAlreadyExists: (roomId: string) => void;
 }
 
 export const Milestone: FunctionComponent<MilestoneProps> = ({
@@ -24,6 +25,7 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
   arrow,
   trees,
   onCreateRoom,
+  onRoomAlreadyExists,
 }) => {
   const lineStroke = useThemeClassName({
     [Theme.Dark]: 'border-dark-grey4',
@@ -34,17 +36,12 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
     [Theme.Light]: 'border-text-light',
   });
 
-  const sumProgress = trees.reduce((accum, currTree) => {
-    const progress = getTreeProgress(currTree.id);
-    if (progress !== 100) {
-      return accum;
-    }
-    return accum + getTreeProgress(currTree.id);
-  }, 0);
-  const totalProgress = ~~(sumProgress / trees.length);
-
   const handleCreateRoom = (tree: MilestoneTreeItem) => () => {
-    onCreateRoom(tree.id, tree.name);
+    if (tree.roomId) {
+      onRoomAlreadyExists(tree.roomId);
+      return;
+    }
+    onCreateRoom(tree.questionTreeId || '', tree.name || '');
   };
 
   return (
@@ -67,15 +64,14 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
           ></div>
         </div>
       )}
-      <MilestoneRect caption={`${name} (${totalProgress}%)`} />
+      <MilestoneRect caption={name} />
       <Gap sizeRem={0.5} />
       <ul className="pl-[1.5rem] flex flex-col items-start">
         {trees.map((tree) => (
           <MilestoneTree
             key={tree.id}
-            id={tree.id}
-            name={tree.name}
-            notAvailable={tree.id === notAvailableId}
+            id={tree.questionTreeId || ''}
+            name={tree.name || ''}
             onCreate={handleCreateRoom(tree)}
           />
         ))}

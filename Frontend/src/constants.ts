@@ -25,7 +25,11 @@ export const pathnames = {
   questionTrees: '/questionTrees',
   questionTreeCreate: '/questionTrees/create',
   questionTreeEdit: '/questionTrees/:id',
-  roadmapJs: '/roadmap/js',
+  roadmaps: '/roadmap',
+  roadmapsArchive: '/roadmapsArchive',
+  roadmapCreate: '/roadmap/create',
+  roadmapEdit: '/roadmap/edit/:id',
+  roadmap: '/roadmap/:id',
 };
 
 export const enum IconNames {

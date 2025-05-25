@@ -4,9 +4,7 @@ using Interview.Backend.Healthy;
 using Interview.Backend.Logging;
 using Interview.Domain.Database;
 using Interview.Infrastructure.WebSocket.Events;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging.Console;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);

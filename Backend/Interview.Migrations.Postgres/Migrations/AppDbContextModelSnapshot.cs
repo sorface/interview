@@ -475,6 +475,114 @@ namespace Interview.Migrations.Postgres.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Interview.Domain.Roadmaps.Roadmap", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("Roadmap");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.RoadmapMilestone", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("ParentRoadmapMilestoneId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RoadmapId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ParentRoadmapMilestoneId");
+
+                    b.HasIndex("RoadmapId");
+
+                    b.ToTable("RoadmapMilestone");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.RoadmapMilestoneItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("QuestionTreeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RoadmapMilestoneId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("QuestionTreeId");
+
+                    b.HasIndex("RoadmapMilestoneId");
+
+                    b.ToTable("RoadmapMilestoneItem");
+                });
+
             modelBuilder.Entity("Interview.Domain.Rooms.QueuedRoomEvent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -984,6 +1092,13 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
+                            Id = new Guid("cf8fcdbc-b140-440f-becc-406259e7ab77"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "ArchiveRoadmap",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
                             Id = new Guid("c0afec8d-04d0-4a7a-9f20-c3d4c891f04e"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "CategoryArchive",
@@ -1155,6 +1270,34 @@ namespace Interview.Migrations.Postgres.Migrations
                             Id = new Guid("004cca49-9857-4973-9bda-79b57f60279b"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "ReactionFindPage",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("d281118b-2806-4563-9381-ed7ea47d6578"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "RoadmapFindArchivedPage",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("47084566-7f68-4621-94b7-d36256eb6aca"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "RoadmapFindPage",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("53f985b6-05cc-47ea-a889-52bc263603cb"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "RoadmapGetById",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("91eeed61-9e52-4486-9881-de48991732e5"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "RoadmapUpsert",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -1383,6 +1526,13 @@ namespace Interview.Migrations.Postgres.Migrations
                         },
                         new
                         {
+                            Id = new Guid("c410e408-6051-461f-b75c-7545d499cb73"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "UnarchiveRoadmap",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
                             Id = new Guid("03b8bdca-dda6-4063-915b-31bf0a2dba74"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "UpsertQuestionTree",
@@ -1554,6 +1704,21 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.HasIndex("TagsId");
 
                     b.ToTable("QuestionTag");
+                });
+
+            modelBuilder.Entity("RoadmapTag", b =>
+                {
+                    b.Property<Guid>("RoadmapId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TagsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("RoadmapId", "TagsId");
+
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("RoadmapTag");
                 });
 
             modelBuilder.Entity("RoleUser", b =>
@@ -1780,6 +1945,61 @@ namespace Interview.Migrations.Postgres.Migrations
                         .HasForeignKey("CreatedById");
 
                     b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.Roadmap", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.RoadmapMilestone", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Roadmaps.RoadmapMilestone", "ParentRoadmapMilestone")
+                        .WithMany("ChildrenMilestones")
+                        .HasForeignKey("ParentRoadmapMilestoneId");
+
+                    b.HasOne("Interview.Domain.Roadmaps.Roadmap", null)
+                        .WithMany("Milestones")
+                        .HasForeignKey("RoadmapId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ParentRoadmapMilestone");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.RoadmapMilestoneItem", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Questions.QuestionTree", "QuestionTree")
+                        .WithMany()
+                        .HasForeignKey("QuestionTreeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Interview.Domain.Roadmaps.RoadmapMilestone", "RoadmapMilestone")
+                        .WithMany("Items")
+                        .HasForeignKey("RoadmapMilestoneId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("QuestionTree");
+
+                    b.Navigation("RoadmapMilestone");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.QueuedRoomEvent", b =>
@@ -2073,6 +2293,21 @@ namespace Interview.Migrations.Postgres.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RoadmapTag", b =>
+                {
+                    b.HasOne("Interview.Domain.Roadmaps.Roadmap", null)
+                        .WithMany()
+                        .HasForeignKey("RoadmapId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Interview.Domain.Tags.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("RoleUser", b =>
                 {
                     b.HasOne("Interview.Domain.Users.Roles.Role", null)
@@ -2126,6 +2361,18 @@ namespace Interview.Migrations.Postgres.Migrations
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
                 {
                     b.Navigation("Answers");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.Roadmap", b =>
+                {
+                    b.Navigation("Milestones");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.RoadmapMilestone", b =>
+                {
+                    b.Navigation("ChildrenMilestones");
+
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>

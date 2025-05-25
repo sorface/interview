@@ -19,6 +19,7 @@ import {
 import { User, UserType } from './types/user';
 import { Category } from './types/category';
 import { TreeMeta, TreeNodeType } from './types/tree';
+import { Roadmap, RoadmapItemType } from './types/roadmap';
 
 export interface PaginationUrlParams {
   PageSize: number;
@@ -556,5 +557,57 @@ export const questionTreeApiDeclaration = {
     method: 'PATCH',
     baseUrl: `/questions/tree/${id}/archive`,
     body: undefined,
+  }),
+};
+
+export interface UpsertRoadmapBody {
+  id?: string;
+  tags: [];
+  name: string;
+  order: number;
+  items: Array<{
+    id?: string;
+    type: RoadmapItemType;
+    name?: string;
+    questionTreeId?: string;
+    order: number;
+  }>;
+}
+
+export const roadmapTreeApiDeclaration = {
+  getPage: (params: PaginationUrlParams): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: '/roadmaps',
+    urlParams: {
+      'Page.PageSize': params.PageSize,
+      'Page.PageNumber': params.PageNumber,
+    },
+  }),
+  getPageArchived: (params: PaginationUrlParams): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: '/roadmaps/archived',
+    urlParams: {
+      'Page.PageSize': params.PageSize,
+      'Page.PageNumber': params.PageNumber,
+    },
+  }),
+  get: (id: string): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: `/roadmaps/${id}`,
+  }),
+  upsert: (roadmap: UpsertRoadmapBody): ApiContractPut => ({
+    method: 'PUT',
+    baseUrl: '/roadmaps',
+    body: roadmap,
+  }),
+  archive: (id: Roadmap['id']): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: `/roadmaps/archive/${id}`,
+    body: {},
+  }),
+  unarchive: (id: Roadmap['id']): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: `/roadmaps/unarchive/${id}`,
+    body: {},
   }),
 };
