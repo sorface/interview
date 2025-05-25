@@ -111,20 +111,21 @@ export const Roadmap: FunctionComponent = () => {
             )}
 
             {!loading && (
-              <div className="w-full max-w-[64rem] flex">
+              <div className="w-full max-w-[64rem] flex flex-col">
                 {roadmap?.items.map((roadmapItem, roadmapItemIndex) => {
                   if (roadmapItem.type !== 'Milestone') {
                     return;
                   }
+                  const { trees, lastMilestone } = findMilestoneTrees(
+                    roadmap?.items || [],
+                    roadmapItemIndex,
+                  );
                   return (
                     <Milestone
                       key={roadmapItem.id}
                       name={roadmapItem.name || ''}
-                      arrow
-                      trees={findMilestoneTrees(
-                        roadmap?.items || [],
-                        roadmapItemIndex,
-                      )}
+                      arrow={!lastMilestone}
+                      trees={trees}
                       onCreateRoom={handleCreateRoom}
                     />
                   );
