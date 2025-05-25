@@ -77,7 +77,7 @@ export const Roadmaps: FunctionComponent = () => {
       <li key={roadmap.id}>
         <Link to={roadmapLink} className="no-underline">
           <div
-            className={`${roadmapItemThemedClassName} bg-wrap p-[1rem] flex items-center rounded-[0.5rem]`}
+            className={`${roadmapItemThemedClassName} bg-wrap p-[1rem] mb-[0.25rem] flex items-center rounded-[0.5rem]`}
           >
             <Typography size="m">{roadmap.name}</Typography>
             {admin && (
