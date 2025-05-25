@@ -119,7 +119,7 @@ export const Roadmap: FunctionComponent = () => {
                   return (
                     <Milestone
                       key={roadmapItem.id}
-                      name={roadmapItem.name}
+                      name={roadmapItem.name || ''}
                       arrow
                       trees={findMilestoneTrees(
                         roadmap?.items || [],

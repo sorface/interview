@@ -9,7 +9,10 @@ import { Button } from '../../components/Button/Button';
 import { Gap } from '../../components/Gap/Gap';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Roadmap, RoadmapItem, RoadmapItemType } from '../../types/roadmap';
-import { roadmapTreeApiDeclaration } from '../../apiDeclarations';
+import {
+  roadmapTreeApiDeclaration,
+  UpsertRoadmapBody,
+} from '../../apiDeclarations';
 import { Loader } from '../../components/Loader/Loader';
 import { Typography } from '../../components/Typography/Typography';
 import { useParams } from 'react-router-dom';
@@ -30,10 +33,12 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
   const { id } = useParams();
   const localizationCaptions = useLocalizationCaptions();
   const [editorValue, setEditorValue] = useState<string | undefined>('');
+  const [roadmapName, setRoadmapName] = useState('Roadmap');
+  const [roadmapOrder, setRoadmapOrder] = useState(0);
   const [roadmapItems, setRoadmapItems] = useState<RoadmapItem[]>([]);
   console.log('roadmapItems: ', roadmapItems);
 
-  const { apiMethodState, fetchData } = useApiMethod<string, Partial<Roadmap>>(
+  const { apiMethodState, fetchData } = useApiMethod<string, UpsertRoadmapBody>(
     roadmapTreeApiDeclaration.upsert,
   );
 
@@ -77,19 +82,45 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
   const handleAddRoadmapItem = () => {
     const newItem: RoadmapItem = {
       id: String(Math.random()),
-      name: 'test',
+      type: RoadmapItemType.Milestone,
+      name: `Milestone ${roadmapItems.length + 1}`,
       order: roadmapItems.length,
-      type: 'Milestone',
-      questionTreeId: '',
     };
     setRoadmapItems([...roadmapItems, newItem]);
   };
 
   const handleUpsert = () => {
-    if (!editorValue) {
-      return;
-    }
-    fetchData(JSON.parse(editorValue));
+    const itemsForRequest: UpsertRoadmapBody['items'] = roadmapItems.map(
+      (item) => {
+        if (item.type === RoadmapItemType.Milestone) {
+          return {
+            type: item.type,
+            name: item.name,
+            order: item.order,
+          };
+        }
+        if (item.type === RoadmapItemType.QuestionTree) {
+          return {
+            type: item.type,
+            questionTreeId: item.questionTreeId,
+            order: item.order,
+          };
+        }
+        if (item.type === RoadmapItemType.VerticalSplit) {
+          return {
+            type: item.type,
+            order: item.order,
+          };
+        }
+        return item;
+      },
+    );
+    fetchData({
+      tags: [],
+      name: roadmapName,
+      items: itemsForRequest,
+      order: roadmapOrder,
+    });
   };
 
   useEffect(() => {
@@ -114,6 +145,23 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
         {localizationCaptions[LocalizationKey.Save]}
       </Button>
       <Gap sizeRem={1.75} />
+      <div className="flex">
+        <input
+          type="text"
+          value={roadmapName}
+          onChange={(e) => {
+            setRoadmapName(e.target.value as string);
+          }}
+        />
+        <input
+          type="number"
+          value={roadmapOrder}
+          onChange={(e) => {
+            setRoadmapOrder(Number(e.target.value));
+          }}
+        />
+      </div>
+      <Gap sizeRem={0.75} />
       {roadmapItems.sort(sortByOrder).map((item) => (
         <div key={item.id} className="flex">
           <select

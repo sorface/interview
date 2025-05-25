@@ -9,7 +9,7 @@ import { notAvailableId } from '../Roadmap';
 
 interface MilestoneTreeItem {
   id: string;
-  name: string;
+  name?: string;
 }
 
 interface MilestoneProps {
@@ -44,7 +44,7 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
   const totalProgress = ~~(sumProgress / trees.length);
 
   const handleCreateRoom = (tree: MilestoneTreeItem) => () => {
-    onCreateRoom(tree.id, tree.name);
+    onCreateRoom(tree.id, tree.name || '');
   };
 
   return (

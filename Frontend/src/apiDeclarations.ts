@@ -19,7 +19,7 @@ import {
 import { User, UserType } from './types/user';
 import { Category } from './types/category';
 import { TreeMeta, TreeNodeType } from './types/tree';
-import { Roadmap } from './types/roadmap';
+import { Roadmap, RoadmapItemType } from './types/roadmap';
 
 export interface PaginationUrlParams {
   PageSize: number;
@@ -560,6 +560,20 @@ export const questionTreeApiDeclaration = {
   }),
 };
 
+export interface UpsertRoadmapBody {
+  id?: string;
+  tags: [];
+  name: string;
+  order: number;
+  items: Array<{
+    id?: string;
+    type: RoadmapItemType;
+    name?: string;
+    questionTreeId?: string;
+    order: number;
+  }>;
+}
+
 export const roadmapTreeApiDeclaration = {
   getPage: (params: PaginationUrlParams): ApiContractGet => ({
     method: 'GET',
@@ -573,7 +587,7 @@ export const roadmapTreeApiDeclaration = {
     method: 'GET',
     baseUrl: `/roadmaps/${id}`,
   }),
-  upsert: (roadmap: Partial<Roadmap>): ApiContractPut => ({
+  upsert: (roadmap: UpsertRoadmapBody): ApiContractPut => ({
     method: 'PUT',
     baseUrl: '/roadmaps',
     body: roadmap,

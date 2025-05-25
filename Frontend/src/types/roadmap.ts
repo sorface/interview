@@ -8,9 +8,13 @@ export interface Roadmap {
 export interface RoadmapItem {
   id: string;
   type: RoadmapItemType;
-  name: string;
-  questionTreeId: string;
+  name?: string;
+  questionTreeId?: string;
   order: number;
 }
 
-export type RoadmapItemType = 'Milestone' | 'QuestionTree' | 'VerticalSplit';
+export enum RoadmapItemType {
+  Milestone = 'Milestone',
+  QuestionTree = 'QuestionTree',
+  VerticalSplit = 'VerticalSplit',
+}
