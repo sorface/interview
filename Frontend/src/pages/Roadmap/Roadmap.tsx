@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
-import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Room, RoomAccessType } from '../../types/room';
@@ -13,7 +12,6 @@ import {
 import { pathnames } from '../../constants';
 import { Loader } from '../../components/Loader/Loader';
 import { Typography } from '../../components/Typography/Typography';
-import { LocalizationKey } from '../../localization';
 import { Milestone } from './components/Milestone';
 import { Gap } from '../../components/Gap/Gap';
 import { RoadmapProgress } from './components/RoadmapProgress';
@@ -39,7 +37,6 @@ const progressTreeIds = [
 ];
 
 export const Roadmap: FunctionComponent = () => {
-  const localizationCaptions = useLocalizationCaptions();
   const navigate = useNavigate();
   const { id } = useParams();
   const roadmapProgress = getRoadmapProgress(progressTreeIds);
@@ -59,6 +56,9 @@ export const Roadmap: FunctionComponent = () => {
     process: { loading: roadmapLoading, error: roadmapError },
     data: roadmap,
   } = roadmapApiMethodState;
+
+  const totalLoading = loading || roadmapLoading;
+  const totalError = error || roadmapError;
 
   const handleCreateRoom = (treeId: string, treeName: string) => {
     const roomStartDate = new Date();
@@ -99,12 +99,12 @@ export const Roadmap: FunctionComponent = () => {
           <Typography size="xxxl">{roadmap?.name}</Typography>
           <Gap sizeRem={2.75} />
           <div className="flex flex-col items-center justify-center">
-            {loading && <Loader />}
+            {totalLoading && <Loader />}
 
-            {error && (
+            {totalError && (
               <div>
                 <Typography size="m" error>
-                  {error}
+                  {totalError}
                 </Typography>
                 <Gap sizeRem={1} />
               </div>

@@ -3,8 +3,6 @@ import toast from 'react-hot-toast';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
-import { CodeEditor } from '../../components/CodeEditor/CodeEditor';
-import { CodeEditorLang } from '../../types/question';
 import { Button } from '../../components/Button/Button';
 import { Gap } from '../../components/Gap/Gap';
 import { useApiMethod } from '../../hooks/useApiMethod';
@@ -15,9 +13,9 @@ import {
 } from '../../apiDeclarations';
 import { Loader } from '../../components/Loader/Loader';
 import { Typography } from '../../components/Typography/Typography';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Icon } from '../Room/components/Icon/Icon';
-import { IconNames } from '../../constants';
+import { IconNames, pathnames } from '../../constants';
 import { QuestionTreeSelector } from '../Roadmap/components/QuestionTreeSelector';
 
 interface RoadmapCreateProps {
@@ -31,11 +29,11 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
   edit,
 }) => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const localizationCaptions = useLocalizationCaptions();
   const [roadmapName, setRoadmapName] = useState('Roadmap');
   const [roadmapOrder, setRoadmapOrder] = useState(0);
   const [roadmapItems, setRoadmapItems] = useState<RoadmapItem[]>([]);
-  console.log('roadmapItems: ', roadmapItems);
 
   const { apiMethodState, fetchData } = useApiMethod<string, UpsertRoadmapBody>(
     roadmapTreeApiDeclaration.upsert,
@@ -54,12 +52,15 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
     data: upsertedRoadmap,
   } = apiMethodState;
 
+  const totalLoading = roadmapLoading || loading;
+  const totalError = error || roadmapError;
+
   useEffect(() => {
     if (!id || !edit) {
       return;
     }
     fetchRoadmap(id);
-  }, [id, edit]);
+  }, [id, edit, fetchRoadmap]);
 
   useEffect(() => {
     if (!roadmap) {
@@ -141,17 +142,18 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
       return;
     }
     toast.success(localizationCaptions[LocalizationKey.Saved]);
-  }, [upsertedRoadmap]);
+    navigate(pathnames.roadmaps);
+  }, [upsertedRoadmap, localizationCaptions, navigate]);
 
   return (
     <>
       <PageHeader
         title={localizationCaptions[LocalizationKey.RoadmapCreatePageName]}
       />
-      {loading && <Loader />}
-      {error && (
+      {totalLoading && <Loader />}
+      {totalError && (
         <Typography size="m" error>
-          {error}
+          {totalError}
         </Typography>
       )}
       <div className="flex flex-col items-center">

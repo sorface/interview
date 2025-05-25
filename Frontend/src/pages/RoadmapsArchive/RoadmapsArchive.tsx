@@ -8,7 +8,7 @@ import React, {
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Roadmap } from '../../types/roadmap';
 import {
-  GetRoadmapsParams,
+  PaginationUrlParams,
   roadmapTreeApiDeclaration,
 } from '../../apiDeclarations';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
@@ -42,7 +42,7 @@ export const RoadmapsArchive: FunctionComponent = () => {
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const { apiMethodState, fetchData } = useApiMethod<
     Roadmap[],
-    GetRoadmapsParams
+    PaginationUrlParams
   >(roadmapTreeApiDeclaration.getPageArchived);
 
   const { apiMethodState: unarchiveRoadmapState, fetchData: unarchiveRoadmap } =
@@ -68,6 +68,13 @@ export const RoadmapsArchive: FunctionComponent = () => {
     setPageNumber(pageNumber + 1);
   }, [pageNumber]);
 
+  const handleUnarchiveRoadmap = useCallback(
+    (roadmapId: string) => () => {
+      unarchiveRoadmap(roadmapId);
+    },
+    [unarchiveRoadmap],
+  );
+
   const createRoadmapItem = (roadmap: Roadmap) => {
     const roadmapLink = generatePath(pathnames.roadmap, { id: roadmap.id });
     const roadmapEditLink = generatePath(pathnames.roadmapEdit, {
@@ -78,7 +85,9 @@ export const RoadmapsArchive: FunctionComponent = () => {
       <div key={roadmap.id} className={roadmapItemThemedClassName}>
         <li>
           <div className="flex">
-            <Link to={roadmapLink}>{roadmap.name}</Link>
+            <Link to={roadmapLink}>
+              <Typography size="m">{roadmap.name}</Typography>
+            </Link>
             {admin && (
               <div className="ml-auto">
                 <Link to={roadmapEditLink}>
@@ -92,9 +101,7 @@ export const RoadmapsArchive: FunctionComponent = () => {
                   loadingCaption={
                     localizationCaptions[LocalizationKey.ArchiveLoading]
                   }
-                  onAction={() => {
-                    unarchiveRoadmap(roadmap.id);
-                  }}
+                  onAction={handleUnarchiveRoadmap(roadmap.id)}
                 />
               </div>
             )}

@@ -574,10 +574,8 @@ export interface UpsertRoadmapBody {
   }>;
 }
 
-export interface GetRoadmapsParams extends PaginationUrlParams {}
-
 export const roadmapTreeApiDeclaration = {
-  getPage: (params: GetRoadmapsParams): ApiContractGet => ({
+  getPage: (params: PaginationUrlParams): ApiContractGet => ({
     method: 'GET',
     baseUrl: '/roadmaps',
     urlParams: {
@@ -585,7 +583,7 @@ export const roadmapTreeApiDeclaration = {
       'Page.PageNumber': params.PageNumber,
     },
   }),
-  getPageArchived: (params: GetRoadmapsParams): ApiContractGet => ({
+  getPageArchived: (params: PaginationUrlParams): ApiContractGet => ({
     method: 'GET',
     baseUrl: '/roadmaps/archived',
     urlParams: {

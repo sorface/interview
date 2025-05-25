@@ -1,46 +1,29 @@
 import React, {
-  ChangeEventHandler,
-  Fragment,
   FunctionComponent,
   useCallback,
   useEffect,
   useState,
 } from 'react';
 import { useApiMethod } from '../../../hooks/useApiMethod';
-import { Category } from '../../../types/category';
 import {
-  GetCategoriesParams,
   GetPageQuestionsTreeResponse,
-  GetQuestionsParams,
   GetQuestionsTreesParams,
-  PaginationUrlParams,
-  categoriesApiDeclaration,
   questionTreeApiDeclaration,
-  questionsApiDeclaration,
-  roadmapTreeApiDeclaration,
 } from '../../../apiDeclarations';
 import { useLocalizationCaptions } from '../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../localization';
 import { ModalFooter } from '../../../components/ModalFooter/ModalFooter';
-import { Question } from '../../../types/question';
 import { ItemsGrid } from '../../../components/ItemsGrid/ItemsGrid';
-import { QuestionItem } from '../../../components/QuestionItem/QuestionItem';
 import { Gap } from '../../../components/Gap/Gap';
-import { RoomQuestionListItem } from '../../../types/room';
 import { Button } from '../../../components/Button/Button';
 import { Typography } from '../../../components/Typography/Typography';
-import { Checkbox } from '../../../components/Checkbox/Checkbox';
 import { useDebounce } from '../../../utils/debounce';
-import { RoomCreateField } from '../../RoomCreate/RoomCreateField/RoomCreateField';
-import { RoomQuestionsSelectorPreview } from '../../RoomCreate/RoomQuestionsSelectorPreview/RoomQuestionsSelectorPreview';
 import { Modal } from '../../../components/Modal/Modal';
 import { Icon } from '../../Room/components/Icon/Icon';
 import { IconNames } from '../../../constants';
-import { Roadmap } from '../../../types/roadmap';
 import { TreeMeta } from '../../../types/tree';
-import { Field } from '../../../components/FieldsBlock/Field';
-import { ProcessWrapper } from '../../../components/ProcessWrapper/ProcessWrapper';
 import { QuestionsTree } from '../../../types/questionsTree';
+import { Loader } from '../../../components/Loader/Loader';
 
 interface QuestionTreeSelectorProps {
   selectedTreeId?: string;
@@ -69,15 +52,6 @@ export const QuestionTreeSelector: FunctionComponent<
     data: questionTrees,
   } = questionTreesState;
 
-  const {
-    apiMethodState: archiveQuestionTreeState,
-    fetchData: archiveQuestionTree,
-  } = useApiMethod<unknown, string>(questionTreeApiDeclaration.archive);
-  const {
-    process: { loading: archiveLoading, error: archiveError },
-    data: archivedQuestionTree,
-  } = archiveQuestionTreeState;
-
   const { apiMethodState: treeState, fetchData: fetchTree } = useApiMethod<
     QuestionsTree,
     string
@@ -88,14 +62,14 @@ export const QuestionTreeSelector: FunctionComponent<
   } = treeState;
 
   const dataSafe = questionTrees?.data || [];
-  const triggerResetAccumData = `${searchValueDebounced}${archivedQuestionTree}`;
+  const triggerResetAccumData = `${searchValueDebounced}`;
 
   useEffect(() => {
     if (!selectedTreeId) {
       return;
     }
     fetchTree(selectedTreeId);
-  }, [selectedTreeId]);
+  }, [selectedTreeId, fetchTree]);
 
   useEffect(() => {
     if (!open) {
@@ -106,13 +80,7 @@ export const QuestionTreeSelector: FunctionComponent<
       PageSize: pageSize,
       name: searchValueDebounced,
     });
-  }, [
-    pageNumber,
-    searchValueDebounced,
-    archivedQuestionTree,
-    open,
-    fetchQuestionTrees,
-  ]);
+  }, [pageNumber, searchValueDebounced, open, fetchQuestionTrees]);
 
   useEffect(() => {
     setPageNumber(initialPageNumber);
@@ -122,10 +90,13 @@ export const QuestionTreeSelector: FunctionComponent<
     setPageNumber(pageNumber + 1);
   }, [pageNumber]);
 
-  const handleSelectTree = (tree: TreeMeta) => {
-    onSelect(tree.id);
-    setOpen(false);
-  };
+  const handleSelectTree = useCallback(
+    (tree: TreeMeta) => {
+      onSelect(tree.id);
+      setOpen(false);
+    },
+    [onSelect],
+  );
 
   const createItem = useCallback(
     (tree: TreeMeta) => (
@@ -143,7 +114,7 @@ export const QuestionTreeSelector: FunctionComponent<
         <Gap sizeRem={0.5} />
       </li>
     ),
-    [archiveLoading, archiveError, localizationCaptions, archiveQuestionTree],
+    [handleSelectTree],
   );
 
   return (
@@ -155,6 +126,12 @@ export const QuestionTreeSelector: FunctionComponent<
         <Icon size="s" name={IconNames.Settings} />
         <Gap sizeRem={0.25} horizontal />
         {getedTree && <Typography size="m">{getedTree.name}</Typography>}
+        {treeLoading && <Loader />}
+        {treeError && (
+          <Typography size="m" error>
+            {treeError}
+          </Typography>
+        )}
       </div>
       <Modal open={open} onClose={() => setOpen(false)} contentLabel="">
         <div className="flex flex-col">
@@ -167,7 +144,7 @@ export const QuestionTreeSelector: FunctionComponent<
           <ItemsGrid
             currentData={dataSafe}
             loading={loading}
-            error={error || archiveError}
+            error={error}
             triggerResetAccumData={triggerResetAccumData}
             loaderClassName="field-wrap"
             renderItem={createItem}
