@@ -103,7 +103,7 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
           return {
             type: item.type,
             name: item.name,
-            order: item.order,
+            order: item.order === 0 ? item.order : -1,
           };
         }
         if (item.type === RoadmapItemType.QuestionTree) {
