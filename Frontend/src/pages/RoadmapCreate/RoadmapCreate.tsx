@@ -32,7 +32,6 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
 }) => {
   const { id } = useParams();
   const localizationCaptions = useLocalizationCaptions();
-  const [editorValue, setEditorValue] = useState<string | undefined>('');
   const [roadmapName, setRoadmapName] = useState('Roadmap');
   const [roadmapOrder, setRoadmapOrder] = useState(0);
   const [roadmapItems, setRoadmapItems] = useState<RoadmapItem[]>([]);
@@ -66,7 +65,13 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
     if (!roadmap) {
       return;
     }
-    setEditorValue(JSON.stringify(roadmap));
+    setRoadmapName(roadmap.name);
+    setRoadmapOrder(roadmap.order);
+    const newRoadmapItems = roadmap.items.map((item, index) => ({
+      ...item,
+      order: index,
+    }));
+    setRoadmapItems(newRoadmapItems);
   }, [roadmap]);
 
   const handleUpdateRoadmapItem = (newItem: RoadmapItem) => {
@@ -124,6 +129,7 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
     );
     fetchData({
       tags: [],
+      id: id || undefined,
       name: roadmapName,
       items: itemsForRequest,
       order: roadmapOrder,
