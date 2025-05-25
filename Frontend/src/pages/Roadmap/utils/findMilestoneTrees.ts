@@ -13,11 +13,8 @@ export const findMilestoneTrees = (
     },
   );
 
-  return {
-    trees: roadmapItems.slice(
-      milestoneItemIndex + 1,
-      nextMilestoneIndex === -1 ? roadmapItems.length : nextMilestoneIndex,
-    ),
-    lastMilestone: nextMilestoneIndex === -1,
-  };
+  return roadmapItems.slice(
+    milestoneItemIndex + 1,
+    nextMilestoneIndex === -1 ? roadmapItems.length : nextMilestoneIndex,
+  );
 };
