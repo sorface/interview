@@ -11,6 +11,7 @@ interface MilestoneTreeItem {
   id: string;
   name?: string;
   questionTreeId?: string;
+  roomId?: string;
 }
 
 interface MilestoneProps {
@@ -18,6 +19,7 @@ interface MilestoneProps {
   arrow?: boolean;
   trees: MilestoneTreeItem[];
   onCreateRoom: (treeId: string, treeName: string) => void;
+  onRoomAlreadyExists: (roomId: string) => void;
 }
 
 export const Milestone: FunctionComponent<MilestoneProps> = ({
@@ -25,6 +27,7 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
   arrow,
   trees,
   onCreateRoom,
+  onRoomAlreadyExists,
 }) => {
   const lineStroke = useThemeClassName({
     [Theme.Dark]: 'border-dark-grey4',
@@ -45,6 +48,10 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
   const totalProgress = ~~(sumProgress / trees.length);
 
   const handleCreateRoom = (tree: MilestoneTreeItem) => () => {
+    if (tree.roomId) {
+      onRoomAlreadyExists(tree.roomId);
+      return;
+    }
     onCreateRoom(tree.questionTreeId || '', tree.name || '');
   };
 

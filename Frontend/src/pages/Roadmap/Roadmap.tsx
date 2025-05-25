@@ -76,6 +76,10 @@ export const Roadmap: FunctionComponent = () => {
     });
   };
 
+  const handleRoomAlreadyExists = (roomId: string) => {
+    navigate(generatePath(pathnames.room, { id: roomId }));
+  };
+
   useEffect(() => {
     if (!id) {
       return;
@@ -127,6 +131,7 @@ export const Roadmap: FunctionComponent = () => {
                       arrow={!lastMilestone}
                       trees={trees}
                       onCreateRoom={handleCreateRoom}
+                      onRoomAlreadyExists={handleRoomAlreadyExists}
                     />
                   );
                 })}
