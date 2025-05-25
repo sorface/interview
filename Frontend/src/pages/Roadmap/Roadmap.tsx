@@ -19,7 +19,6 @@ import { getRoadmapProgress } from './utils/getRoadmapProgress';
 import { findMilestoneTrees } from './utils/findMilestoneTrees';
 
 const roomDuration = 3600;
-export const notAvailableId = 'notAvailable';
 
 export const Roadmap: FunctionComponent = () => {
   const navigate = useNavigate();

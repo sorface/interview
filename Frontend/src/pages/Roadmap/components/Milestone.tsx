@@ -4,7 +4,6 @@ import { MilestoneTree } from './MilestoneTree';
 import { useThemeClassName } from '../../../hooks/useThemeClassName';
 import { Theme } from '../../../context/ThemeContext';
 import { Gap } from '../../../components/Gap/Gap';
-import { notAvailableId } from '../Roadmap';
 
 interface MilestoneTreeItem {
   id: string;
@@ -73,7 +72,6 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
             key={tree.id}
             id={tree.questionTreeId || ''}
             name={tree.name || ''}
-            notAvailable={tree.id === notAvailableId}
             onCreate={handleCreateRoom(tree)}
           />
         ))}
