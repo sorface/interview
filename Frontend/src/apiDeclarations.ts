@@ -574,9 +574,7 @@ export interface UpsertRoadmapBody {
   }>;
 }
 
-export interface GetRoadmapsParams extends PaginationUrlParams {
-  Archived?: boolean;
-}
+export interface GetRoadmapsParams extends PaginationUrlParams {}
 
 export const roadmapTreeApiDeclaration = {
   getPage: (params: GetRoadmapsParams): ApiContractGet => ({
@@ -585,7 +583,14 @@ export const roadmapTreeApiDeclaration = {
     urlParams: {
       'Page.PageSize': params.PageSize,
       'Page.PageNumber': params.PageNumber,
-      'Filter.Archived': params.Archived,
+    },
+  }),
+  getPageArchived: (params: GetRoadmapsParams): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: '/roadmaps/archived',
+    urlParams: {
+      'Page.PageSize': params.PageSize,
+      'Page.PageNumber': params.PageNumber,
     },
   }),
   get: (id: string): ApiContractGet => ({
@@ -596,5 +601,15 @@ export const roadmapTreeApiDeclaration = {
     method: 'PUT',
     baseUrl: '/roadmaps',
     body: roadmap,
+  }),
+  archive: (id: Roadmap['id']): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: `/roadmaps/archive/${id}`,
+    body: {},
+  }),
+  unarchive: (id: Roadmap['id']): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: `/roadmaps/unarchive/${id}`,
+    body: {},
   }),
 };

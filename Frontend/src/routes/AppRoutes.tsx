@@ -26,6 +26,7 @@ import { Roadmap } from '../pages/Roadmap/Roadmap';
 import { CategoriesArchive } from '../pages/CategoriesArchive/CategoriesArchive';
 import { Roadmaps } from '../pages/Roadmaps/Roadmaps';
 import { RoadmapCreate } from '../pages/RoadmapCreate/RoadmapCreate';
+import { RoadmapsArchive } from '../pages/RoadmapsArchive/Roadmaps';
 
 interface AppRoutesProps {
   user: User | null;
@@ -183,6 +184,14 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <QuestionTreeCreate edit={true} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.roadmapsArchive}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <RoadmapsArchive />
                 </ProtectedRoute>
               }
             />

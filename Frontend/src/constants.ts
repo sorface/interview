@@ -26,6 +26,7 @@ export const pathnames = {
   questionTreeCreate: '/questionTrees/create',
   questionTreeEdit: '/questionTrees/:id',
   roadmaps: '/roadmap',
+  roadmapsArchive: '/roadmapsArchive',
   roadmapCreate: '/roadmap/create',
   roadmapEdit: '/roadmap/edit/:id',
   roadmap: '/roadmap/:id',

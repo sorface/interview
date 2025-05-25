@@ -112,6 +112,18 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
       icon: IconNames.Golf,
       onClick: handleItemClick,
     },
+    admin
+      ? {
+          path: pathnames.roadmapsArchive,
+          caption: (
+            <LocalizationCaption
+              captionKey={LocalizationKey.RoadmapsPageName}
+            />
+          ),
+          icon: IconNames.Golf,
+          onClick: handleItemClick,
+        }
+      : null,
     {
       path: pathnames.highlightRooms,
       caption: (

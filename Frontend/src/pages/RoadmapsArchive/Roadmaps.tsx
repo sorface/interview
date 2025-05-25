@@ -29,7 +29,7 @@ import { ActionModal } from '../../components/ActionModal/ActionModal';
 const pageSize = 30;
 const initialPageNumber = 1;
 
-export const Roadmaps: FunctionComponent = () => {
+export const RoadmapsArchive: FunctionComponent = () => {
   const auth = useContext(AuthContext);
   const admin = checkAdmin(auth);
   const localizationCaptions = useLocalizationCaptions();
@@ -43,25 +43,26 @@ export const Roadmaps: FunctionComponent = () => {
   const { apiMethodState, fetchData } = useApiMethod<
     Roadmap[],
     GetRoadmapsParams
-  >(roadmapTreeApiDeclaration.getPage);
+  >(roadmapTreeApiDeclaration.getPageArchived);
+
+  const { apiMethodState: unarchiveRoadmapState, fetchData: unarchiveRoadmap } =
+    useApiMethod<unknown, string>(roadmapTreeApiDeclaration.unarchive);
+  const {
+    process: { loading: unarchiveLoading, error: unarchiveError },
+    data: unarchivedRoadmap,
+  } = unarchiveRoadmapState;
+
   const {
     process: { loading, error },
     data: roadmaps,
   } = apiMethodState;
-
-  const { apiMethodState: archiveRoadmapState, fetchData: archiveRoadmap } =
-    useApiMethod<unknown, string>(roadmapTreeApiDeclaration.archive);
-  const {
-    process: { loading: archiveLoading, error: archiveError },
-    data: archivedRoadmap,
-  } = archiveRoadmapState;
 
   useEffect(() => {
     fetchData({
       PageSize: pageSize,
       PageNumber: pageNumber,
     });
-  }, [pageNumber, archivedRoadmap, fetchData]);
+  }, [pageNumber, unarchivedRoadmap, fetchData]);
 
   const handleNextPage = useCallback(() => {
     setPageNumber(pageNumber + 1);
@@ -79,20 +80,20 @@ export const Roadmaps: FunctionComponent = () => {
           <div className="flex">
             <Link to={roadmapLink}>{roadmap.name}</Link>
             {admin && (
-              <div className="flex ml-auto">
+              <div className="ml-auto">
                 <Link to={roadmapEditLink}>
                   <Icon size="m" name={IconNames.Settings} />
                 </Link>
                 <ActionModal
                   openButtonCaption="📁"
-                  error={archiveError}
-                  loading={archiveLoading}
-                  title={localizationCaptions[LocalizationKey.Archive]}
+                  error={unarchiveError}
+                  loading={unarchiveLoading}
+                  title={localizationCaptions[LocalizationKey.Unarchive]}
                   loadingCaption={
                     localizationCaptions[LocalizationKey.ArchiveLoading]
                   }
                   onAction={() => {
-                    archiveRoadmap(roadmap.id);
+                    unarchiveRoadmap(roadmap.id);
                   }}
                 />
               </div>
@@ -121,7 +122,7 @@ export const Roadmaps: FunctionComponent = () => {
         currentData={roadmaps}
         loading={loading}
         error={error}
-        triggerResetAccumData={`${archivedRoadmap}`}
+        triggerResetAccumData={`${unarchivedRoadmap}`}
         renderItem={createRoadmapItem}
         nextPageAvailable={false}
         handleNextPage={handleNextPage}
