@@ -26,7 +26,7 @@ import { Roadmap } from '../pages/Roadmap/Roadmap';
 import { CategoriesArchive } from '../pages/CategoriesArchive/CategoriesArchive';
 import { Roadmaps } from '../pages/Roadmaps/Roadmaps';
 import { RoadmapCreate } from '../pages/RoadmapCreate/RoadmapCreate';
-import { RoadmapsArchive } from '../pages/RoadmapsArchive/Roadmaps';
+import { RoadmapsArchive } from '../pages/RoadmapsArchive/RoadmapsArchive';
 
 interface AppRoutesProps {
   user: User | null;
