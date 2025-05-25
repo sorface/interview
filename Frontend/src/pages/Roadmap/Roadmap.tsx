@@ -86,8 +86,6 @@ export const Roadmap: FunctionComponent = () => {
 
       <div className="flex">
         <div className="flex-1">
-          <Typography size="xxxl">{roadmap?.name}</Typography>
-          <Gap sizeRem={2.75} />
           <div className="flex flex-col items-center justify-center">
             {totalLoading && <Loader />}
 
@@ -101,21 +99,23 @@ export const Roadmap: FunctionComponent = () => {
             )}
 
             {!loading && (
-              <div className="w-full max-w-[64rem] flex flex-col">
+              <div className="w-full max-w-[60rem] flex flex-col items-start">
+                <Typography size="xxxl" bold>
+                  {roadmap?.name}
+                </Typography>
+                <Gap sizeRem={2.25} />
                 {roadmap?.items.map((roadmapItem, roadmapItemIndex) => {
                   if (roadmapItem.type !== 'Milestone') {
                     return;
                   }
-                  const { trees, lastMilestone } = findMilestoneTrees(
-                    roadmap?.items || [],
-                    roadmapItemIndex,
-                  );
                   return (
                     <Milestone
                       key={roadmapItem.id}
                       name={roadmapItem.name || ''}
-                      arrow={!lastMilestone}
-                      trees={trees}
+                      trees={findMilestoneTrees(
+                        roadmap?.items || [],
+                        roadmapItemIndex,
+                      )}
                       onCreateRoom={handleCreateRoom}
                       onRoomAlreadyExists={handleRoomAlreadyExists}
                     />
