@@ -8,7 +8,7 @@ import React, {
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Roadmap } from '../../types/roadmap';
 import {
-  PaginationUrlParams,
+  GetRoadmapsParams,
   roadmapTreeApiDeclaration,
 } from '../../apiDeclarations';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
@@ -24,6 +24,7 @@ import { generatePath, Link } from 'react-router-dom';
 import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
 import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme } from '../../context/ThemeContext';
+import { Checkbox } from '../../components/Checkbox/Checkbox';
 
 const pageSize = 30;
 const initialPageNumber = 1;
@@ -39,9 +40,10 @@ export const Roadmaps: FunctionComponent = () => {
   });
 
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
+  const [archived, setArchived] = useState(false);
   const { apiMethodState, fetchData } = useApiMethod<
     Roadmap[],
-    PaginationUrlParams
+    GetRoadmapsParams
   >(roadmapTreeApiDeclaration.getPage);
 
   const {
@@ -53,8 +55,9 @@ export const Roadmaps: FunctionComponent = () => {
     fetchData({
       PageSize: pageSize,
       PageNumber: pageNumber,
+      Archived: archived,
     });
-  }, [pageNumber, fetchData]);
+  }, [pageNumber, archived, fetchData]);
 
   const handleNextPage = useCallback(() => {
     setPageNumber(pageNumber + 1);
@@ -98,6 +101,14 @@ export const Roadmaps: FunctionComponent = () => {
           </Link>
         )}
       </PageHeader>
+      {admin && (
+        <Checkbox
+          id='archiveCheckbox'
+          checked={archived}
+          label='archived'
+          onChange={() => setArchived(!archived)}
+        />
+      )}
       <ItemsGrid
         currentData={roadmaps}
         loading={loading}
