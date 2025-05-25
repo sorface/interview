@@ -154,85 +154,108 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
           {error}
         </Typography>
       )}
-      <Button variant="active" onClick={handleUpsert}>
-        {localizationCaptions[LocalizationKey.Save]}
-      </Button>
-      <Gap sizeRem={1.75} />
-      <div className="flex">
-        <input
-          type="text"
-          value={roadmapName}
-          onChange={(e) => {
-            setRoadmapName(e.target.value as string);
-          }}
-        />
-        <input
-          type="number"
-          value={roadmapOrder}
-          onChange={(e) => {
-            setRoadmapOrder(Number(e.target.value));
-          }}
-        />
-      </div>
-      <Gap sizeRem={0.75} />
-      {roadmapItems.sort(sortByOrder).map((item) => (
-        <div key={item.id} className="flex">
-          <select
-            className="w-full muted"
-            value={item.type}
-            onChange={(e) => {
-              handleUpdateRoadmapItem({
-                ...item,
-                type: e.target.value as RoadmapItemType,
-              });
-            }}
-          >
-            <option value="Milestone">Milestone</option>
-            <option value="QuestionTree">QuestionTree</option>
-            <option value="VerticalSplit">VerticalSplit</option>
-          </select>
-          {item.type === 'Milestone' && (
-            <input
-              type="text"
-              value={item.name}
-              onChange={(e) => {
-                handleUpdateRoadmapItem({
-                  ...item,
-                  name: e.target.value as string,
-                });
-              }}
-            />
-          )}
-          {item.type === 'QuestionTree' && (
-            <QuestionTreeSelector
-              selectedTreeId={item.questionTreeId}
-              onSelect={(treeId) => {
-                handleUpdateRoadmapItem({ ...item, questionTreeId: treeId });
-              }}
-            />
-          )}
-          <input
-            type="number"
-            value={item.order}
-            onChange={(e) => {
-              handleUpdateRoadmapItem({
-                ...item,
-                order: Number(e.target.value),
-              });
-            }}
-          />
-          <Button
-            variant="active2"
-            onClick={() => handleRemoveRoadmapItem(item.id)}
-          >
-            <Icon name={IconNames.Trash} />
-          </Button>
+      <div className="flex flex-col items-center">
+        <div>
+          <div className="flex">
+            <div className="flex items-center">
+              <Typography size="m">Name: </Typography>
+              <Gap sizeRem={0.5} horizontal />
+              <input
+                type="text"
+                className="bg-wrap"
+                value={roadmapName}
+                onChange={(e) => {
+                  setRoadmapName(e.target.value as string);
+                }}
+              />
+            </div>
+            <Gap sizeRem={0.5} horizontal />
+            <div className="flex items-center">
+              <Typography size="m">Order: </Typography>
+              <Gap sizeRem={0.5} horizontal />
+              <input
+                type="number"
+                className="bg-wrap"
+                value={roadmapOrder}
+                onChange={(e) => {
+                  setRoadmapOrder(Number(e.target.value));
+                }}
+              />
+            </div>
+          </div>
+          <Gap sizeRem={1.75} />
+          <div className="w-fit flex flex-col">
+            {roadmapItems.sort(sortByOrder).map((item) => (
+              <div key={item.id} className="flex mb-[0.5rem]">
+                <select
+                  className="muted w-[18rem] mr-[0.5rem]"
+                  value={item.type}
+                  onChange={(e) => {
+                    handleUpdateRoadmapItem({
+                      ...item,
+                      type: e.target.value as RoadmapItemType,
+                    });
+                  }}
+                >
+                  <option value="Milestone">Milestone</option>
+                  <option value="QuestionTree">QuestionTree</option>
+                  <option value="VerticalSplit">VerticalSplit</option>
+                </select>
+                {item.type === 'Milestone' && (
+                  <input
+                    type="text"
+                    className="bg-wrap w-[18rem] mr-[0.5rem]"
+                    value={item.name}
+                    onChange={(e) => {
+                      handleUpdateRoadmapItem({
+                        ...item,
+                        name: e.target.value as string,
+                      });
+                    }}
+                  />
+                )}
+                {item.type === 'QuestionTree' && (
+                  <QuestionTreeSelector
+                    selectedTreeId={item.questionTreeId}
+                    onSelect={(treeId) => {
+                      handleUpdateRoadmapItem({
+                        ...item,
+                        questionTreeId: treeId,
+                      });
+                    }}
+                  />
+                )}
+                <input
+                  type="number"
+                  className="bg-wrap w-[4rem] mr-[0.5rem]"
+                  value={item.order}
+                  onChange={(e) => {
+                    handleUpdateRoadmapItem({
+                      ...item,
+                      order: Number(e.target.value),
+                    });
+                  }}
+                />
+                <Button
+                  variant="active2"
+                  className="min-w-[5rem]"
+                  onClick={() => handleRemoveRoadmapItem(item.id)}
+                >
+                  <Icon size="s" name={IconNames.Trash} />
+                </Button>
+              </div>
+            ))}
+            <Gap sizeRem={0.85} />
+            <Button variant="active2" onClick={handleAddRoadmapItem}>
+              <Icon name={IconNames.Add} />
+            </Button>
+            <Gap sizeRem={0.75} />
+            <Button variant="active" onClick={handleUpsert}>
+              {localizationCaptions[LocalizationKey.Save]}
+            </Button>
+          </div>
         </div>
-      ))}
-      <Gap sizeRem={0.85} />
-      <Button variant="active" onClick={handleAddRoadmapItem}>
-        <Icon name={IconNames.Add} />
-      </Button>
+      </div>
     </>
   );
 };

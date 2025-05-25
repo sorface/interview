@@ -132,10 +132,15 @@ export const QuestionTreeSelector: FunctionComponent<
       <li key={tree.id}>
         <div className="flex">
           <div>{tree.name}</div>
-          <Button variant="active" onClick={() => handleSelectTree(tree)}>
-            <Icon name={IconNames.Checkmark} />
+          <Button
+            variant="active2"
+            className="ml-auto min-w-[0rem] w-[2.375rem] h-[2.375rem] !p-[0rem]"
+            onClick={() => handleSelectTree(tree)}
+          >
+            <Icon size="s" name={IconNames.ChevronForward} />
           </Button>
         </div>
+        <Gap sizeRem={0.5} />
       </li>
     ),
     [archiveLoading, archiveError, localizationCaptions, archiveQuestionTree],
@@ -143,9 +148,13 @@ export const QuestionTreeSelector: FunctionComponent<
 
   return (
     <>
-      <div onClick={() => setOpen(true)}>
-        <Icon name={IconNames.Settings} />
-        {getedTree && <Typography size="s">{getedTree.name}</Typography>}
+      <div
+        className="flex items-center w-[18rem] mr-[0.5rem]"
+        onClick={() => setOpen(true)}
+      >
+        <Icon size="s" name={IconNames.Settings} />
+        <Gap sizeRem={0.25} horizontal />
+        {getedTree && <Typography size="m">{getedTree.name}</Typography>}
       </div>
       <Modal open={open} onClose={() => setOpen(false)} contentLabel="">
         <div className="flex flex-col">
