@@ -229,5 +229,14 @@ public enum EVPermission
 
     [Description("Find roadmap page")]
     RoadmapFindPage,
+
+    [Description("Archive roadmap")]
+    ArchiveRoadmap,
+
+    [Description("Unarchive roadmap")]
+    UnarchiveRoadmap,
+
+    [Description("Find archived roadmap page")]
+    RoadmapFindArchivedPage,
 #pragma warning restore SA1602
 }

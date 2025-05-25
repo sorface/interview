@@ -3,7 +3,7 @@ using Ardalis.SmartEnum;
 namespace Interview.Domain.Permissions;
 
 public class SEPermission(Guid id, string name, string description, EVPermission value)
-    : SmartEnum<SEPermission>(name, (int)value)
+    : SmartEnum<SEPermission>(value.ToString(), (int)value)
 {
     public static readonly SEPermission Unknown = new(
         Guid.Parse("129319c5-2bff-46a6-8539-5fc6bf77983e"),
@@ -478,6 +478,24 @@ public class SEPermission(Guid id, string name, string description, EVPermission
         "RoadmapFindPage",
         "Find roadmap page",
         EVPermission.RoadmapFindPage);
+
+    public static readonly SEPermission ArchiveRoadmap = new(
+        Guid.Parse("CF8FCDBC-B140-440F-BECC-406259E7AB77"),
+        "ArchiveRoadmap",
+        "Archive roadmap",
+        EVPermission.ArchiveRoadmap);
+
+    public static readonly SEPermission UnarchiveRoadmap = new(
+        Guid.Parse("C410E408-6051-461F-B75C-7545D499CB73"),
+        "UnarchiveRoadmap",
+        "Unarchive roadmap",
+        EVPermission.UnarchiveRoadmap);
+
+    public static readonly SEPermission RoadmapFindArchivedPage = new(
+        Guid.Parse("D281118B-2806-4563-9381-ED7EA47D6578"),
+        "RoadmapFindArchivedPage",
+        "Find archived roadmap page",
+        EVPermission.RoadmapFindArchivedPage);
 
     public Guid Id { get; } = id;
 

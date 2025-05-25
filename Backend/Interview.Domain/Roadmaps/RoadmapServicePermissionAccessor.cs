@@ -26,4 +26,22 @@ public class RoadmapServicePermissionAccessor(IRoadmapService service, ISecurity
         await securityService.EnsurePermissionAsync(SEPermission.RoadmapFindPage, cancellationToken);
         return await service.FindPageAsync(request, cancellationToken);
     }
+
+    public async Task<IPagedList<RoadmapPageResponse>> FindArchivedPageAsync(FilteredRequest<RoadmapPageRequestFilter> request, CancellationToken cancellationToken)
+    {
+        await securityService.EnsurePermissionAsync(SEPermission.RoadmapFindArchivedPage, cancellationToken);
+        return await service.FindArchivedPageAsync(request, cancellationToken);
+    }
+
+    public async Task<RoadmapPageResponse> ArchiveAsync(Guid id, CancellationToken cancellationToken)
+    {
+        await securityService.EnsurePermissionAsync(SEPermission.ArchiveRoadmap, cancellationToken);
+        return await service.ArchiveAsync(id, cancellationToken);
+    }
+
+    public async Task<RoadmapPageResponse> UnarchiveAsync(Guid id, CancellationToken cancellationToken)
+    {
+        await securityService.EnsurePermissionAsync(SEPermission.UnarchiveRoadmap, cancellationToken);
+        return await service.UnarchiveAsync(id, cancellationToken);
+    }
 }

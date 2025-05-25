@@ -3,7 +3,7 @@ using Interview.Domain.Tags;
 
 namespace Interview.Domain.Roadmaps;
 
-public class Roadmap : Entity
+public class Roadmap : ArchiveEntity
 {
     public required string Name { get; set; }
 

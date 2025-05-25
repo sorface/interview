@@ -20,7 +20,7 @@ public partial class RoadmapServiceTest
 
         await SeedTestDataAsync(context);
 
-        var roadmapService = new RoadmapService(context);
+        var roadmapService = new RoadmapService(context, new ArchiveService<Domain.Roadmaps.Roadmap>(context));
 
         // Arrange
         var expectedId = Guid.Parse("00000000-0000-0000-0000-000000000001");
@@ -79,7 +79,7 @@ public partial class RoadmapServiceTest
 
         await SeedTestDataAsync(context);
 
-        var roadmapService = new RoadmapService(context);
+        var roadmapService = new RoadmapService(context, new ArchiveService<Domain.Roadmaps.Roadmap>(context));
 
         // Arrange
         var nonExistentId = Guid.NewGuid();

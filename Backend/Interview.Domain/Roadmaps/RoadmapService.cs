@@ -13,7 +13,7 @@ using X.PagedList;
 
 namespace Interview.Domain.Roadmaps;
 
-public class RoadmapService(AppDbContext db) : IRoadmapService
+public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveService) : IRoadmapService
 {
     public async Task<ServiceResult<Guid>> UpsertAsync(UpsertRoadmapRequest request, CancellationToken cancellationToken)
     {
@@ -204,49 +204,24 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
 
     public Task<IPagedList<RoadmapPageResponse>> FindPageAsync(FilteredRequest<RoadmapPageRequestFilter> request, CancellationToken cancellationToken)
     {
-        var spec = BuildSpecification(request);
-        return db.Roadmap
-            .AsNoTracking()
-            .Include(e => e.Tags)
-            .Where(spec)
-            .OrderBy(e => e.Order)
-            .Select(e => new RoadmapPageResponse
-            {
-                Id = e.Id,
-                Name = e.Name,
-                Tags = e.Tags.Select(t => new TagItem
-                {
-                    Id = t.Id,
-                    Value = t.Value,
-                    HexValue = t.HexColor,
-                }).ToList(),
-            })
-            .ToPagedListAsync(request.Page, cancellationToken);
+        return FindPagedCoreAsync(false, request, cancellationToken);
+    }
 
-        static ASpec<Roadmap> BuildSpecification(FilteredRequest<RoadmapPageRequestFilter> request)
-        {
-            if (request.Filter is null)
-            {
-                return Spec<Roadmap>.Any;
-            }
+    public Task<IPagedList<RoadmapPageResponse>> FindArchivedPageAsync(FilteredRequest<RoadmapPageRequestFilter> request, CancellationToken cancellationToken)
+    {
+        return FindPagedCoreAsync(true, request, cancellationToken);
+    }
 
-            var spec = Spec<Roadmap>.Any;
-            if (request.Filter.Name is not null)
-            {
-                var filterName = request.Filter.Name?.Trim().ToLower();
-                if (!string.IsNullOrWhiteSpace(filterName))
-                {
-                    spec = new Spec<Roadmap>(e => e.Name.ToLower().Contains(filterName));
-                }
-            }
+    public async Task<RoadmapPageResponse> ArchiveAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var item = await archiveService.ArchiveAsync(id, cancellationToken);
+        return new RoadmapPageResponse { Id = item.Id, Name = item.Name, Tags = [] };
+    }
 
-            if (request.Filter.Tags is not null)
-            {
-                spec &= new Spec<Roadmap>(e => e.Tags.Any(t => request.Filter.Tags.Contains(t.Id)));
-            }
-
-            return spec;
-        }
+    public async Task<RoadmapPageResponse> UnarchiveAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var item = await archiveService.UnarchiveAsync(id, cancellationToken);
+        return new RoadmapPageResponse { Id = item.Id, Name = item.Name, Tags = [] };
     }
 
     private async Task<Roadmap> CreateRoadmapAsync(
@@ -378,6 +353,53 @@ public class RoadmapService(AppDbContext db) : IRoadmapService
         }
 
         await db.SaveChangesAsync(cancellationToken);
+    }
+
+    private Task<IPagedList<RoadmapPageResponse>> FindPagedCoreAsync(bool archived, FilteredRequest<RoadmapPageRequestFilter> request, CancellationToken cancellationToken)
+    {
+        var spec = BuildSpecification(archived, request);
+        return db.Roadmap
+            .AsNoTracking()
+            .Include(e => e.Tags)
+            .Where(spec)
+            .OrderBy(e => e.Order)
+            .Select(e => new RoadmapPageResponse
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Tags = e.Tags.Select(t => new TagItem
+                {
+                    Id = t.Id,
+                    Value = t.Value,
+                    HexValue = t.HexColor,
+                }).ToList(),
+            })
+            .ToPagedListAsync(request.Page, cancellationToken);
+
+        static ASpec<Roadmap> BuildSpecification(bool archived, FilteredRequest<RoadmapPageRequestFilter> request)
+        {
+            ASpec<Roadmap> spec = new Spec<Roadmap>(e => e.IsArchived == archived);
+            if (request.Filter is null)
+            {
+                return spec;
+            }
+
+            if (request.Filter.Name is not null)
+            {
+                var filterName = request.Filter.Name?.Trim().ToLower();
+                if (!string.IsNullOrWhiteSpace(filterName))
+                {
+                    spec = new Spec<Roadmap>(e => e.Name.ToLower().Contains(filterName));
+                }
+            }
+
+            if (request.Filter.Tags is not null)
+            {
+                spec &= new Spec<Roadmap>(e => e.Tags.Any(t => request.Filter.Tags.Contains(t.Id)));
+            }
+
+            return spec;
+        }
     }
 
     private class RoadmapItemTree
