@@ -5,6 +5,7 @@ namespace Interview.Domain.Permissions;
 public enum EVPermission
 {
 #pragma warning disable SA1602
+    [Description("Unknown")]
     Unknown,
 
     [Description("Getting the questions page")]
@@ -20,7 +21,6 @@ public enum EVPermission
     QuestionUpdate,
 
     [Description("Search for a question by ID")]
-
     QuestionFindById,
 
     [Description("Permanently deleting a question")]
