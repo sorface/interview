@@ -16,5 +16,4 @@ export interface RoadmapItem {
 export enum RoadmapItemType {
   Milestone = 'Milestone',
   QuestionTree = 'QuestionTree',
-  VerticalSplit = 'VerticalSplit',
 }

@@ -119,12 +119,6 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
             order: item.order,
           };
         }
-        if (item.type === RoadmapItemType.VerticalSplit) {
-          return {
-            type: item.type,
-            order: item.order,
-          };
-        }
         return item;
       },
     );
@@ -201,7 +195,6 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
                 >
                   <option value="Milestone">Milestone</option>
                   <option value="QuestionTree">QuestionTree</option>
-                  <option value="VerticalSplit">VerticalSplit</option>
                 </select>
                 {item.type === 'Milestone' && (
                   <input
