@@ -71,7 +71,6 @@ export const executeCodeWithExpect = async (
     ) as () => Promise<Array<Arg[]>>;
 
     const executeResult = await executeCodeWithExpect();
-    console.log('executeResult: ', executeResult);
 
     return {
       results: executeResult.map((res) => {
