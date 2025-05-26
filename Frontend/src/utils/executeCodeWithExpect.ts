@@ -42,7 +42,7 @@ const expectCode = `
 `;
 
 const expectCallsReturnCode = `
-  if (!__expectedConsoleLogs) {
+  if (__expectedConsoleLogs.length === 0) {
     console.log = originalConsoleLog;
     res(__expectCalls);
   }
