@@ -8,12 +8,13 @@ const expectCode = `
   let __expectedConsoleLogs = [];
 
   const originalConsoleLog = console.log;
-  console.log = (...args) => {
-    __consoleLogs.push(args);
-    const currentConsoleLogIndex = __consoleLogs.length - 1;
-    __expectCalls.push([__expectedConsoleLogs[currentConsoleLogIndex], args]);
-    originalConsoleLog(...args);
+  console.log = (arg) => {
+    __consoleLogs.push(arg);
     if (__expectedConsoleLogs.length === __consoleLogs.length) {
+      console.log = originalConsoleLog;
+      __expectedConsoleLogs.forEach((expectedLog, index) =>
+        __expectCalls.push([__consoleLogs[index], expectedLog])
+      );
       res(__expectCalls);
     }
   };
@@ -42,6 +43,7 @@ const expectCode = `
 
 const expectCallsReturnCode = `
   if (!__expectedConsoleLogs) {
+    console.log = originalConsoleLog;
     res(__expectCalls);
   }
 });
