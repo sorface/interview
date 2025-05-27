@@ -77,11 +77,11 @@ public class CodeEditorContentProvider(
     /// 1. On the frontend side
     /// 2. Backend side.
     ///
-    /// We get the latest events in the required range and return the most recent one (if any)
+    /// We get the latest events in the required range and return the most recent one (if any).
     /// </summary>
     /// <param name="lastActiveQuestionTime">Last active question time.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>Code editor state</returns>
+    /// <returns>Code editor state.</returns>
     private async Task<string?> GetLastCodeEditorStateAsync(
         (DateTime StartActiveDate, DateTime EndActiveDate) lastActiveQuestionTime,
         CancellationToken cancellationToken)

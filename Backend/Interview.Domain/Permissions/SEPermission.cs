@@ -7,8 +7,6 @@ namespace Interview.Domain.Permissions;
 
 public class SEPermission(Guid id, EVPermission value) : SmartEnum<SEPermission>(value.ToString(), (int)value)
 {
-    private static readonly FrozenDictionary<EVPermission, string> _descriptionMap = BuildDescriptionMap();
-
     public static readonly SEPermission Unknown = new(
         Guid.Parse("129319c5-2bff-46a6-8539-5fc6bf77983e"),
         EVPermission.Unknown);
@@ -348,6 +346,8 @@ public class SEPermission(Guid id, EVPermission value) : SmartEnum<SEPermission>
     public Guid Id { get; } = id;
 
     public string Description { get; } = _descriptionMap[value];
+
+    private static readonly FrozenDictionary<EVPermission, string> _descriptionMap = BuildDescriptionMap();
 
     private static FrozenDictionary<EVPermission, string> BuildDescriptionMap()
     {

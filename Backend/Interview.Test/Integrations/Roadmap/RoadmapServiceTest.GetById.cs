@@ -226,14 +226,14 @@ public partial class RoadmapServiceTest
             }
         };
         context.Roadmap.Add(roadmap);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         context.Rooms.Add(new Room("Test", SERoomAccessType.Public, SERoomType.Standard)
         {
             Id = roomId,
             QuestionTreeId = questionTreeId1
         });
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         context.ChangeTracker.Clear();
     }

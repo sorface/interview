@@ -389,7 +389,9 @@ public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveServ
                 var filterName = request.Filter.Name?.Trim().ToLower();
                 if (!string.IsNullOrWhiteSpace(filterName))
                 {
+#pragma warning disable CA1862
                     spec = new Spec<Roadmap>(e => e.Name.ToLower().Contains(filterName));
+#pragma warning restore CA1862
                 }
             }
 

@@ -8,6 +8,7 @@ using Interview.Backend.Auth;
 using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Swagger;
 using Interview.DependencyInjection;
+using Interview.Domain;
 using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Infrastructure.WebSocket;
 using Interview.Infrastructure.WebSocket.PubSub;
@@ -90,7 +91,7 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
 
     private void AddAppServices(IServiceCollection serviceCollection)
     {
-        var sorfaceAuth = new OAuthServiceDispatcher(configuration).GetAuthService("sorface") ?? throw new Exception("Not found \"sorface\" section");
+        var sorfaceAuth = new OAuthServiceDispatcher(configuration).GetAuthService("sorface") ?? throw new UserException("Not found \"sorface\" section");
 
         serviceCollection.AddSingleton(sorfaceAuth);
         serviceCollection.AddHttpClient();

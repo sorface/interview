@@ -26,10 +26,10 @@ public class EventStorage2DatabaseServiceTest
         appDbContext.Rooms.Add(new Room("Test 2", SERoomAccessType.Public, SERoomType.Standard) { Status = SERoomStatus.Close, });
         appDbContext.Rooms.Add(new Room("Test 3", SERoomAccessType.Public, SERoomType.Standard) { Status = SERoomStatus.Close, });
         appDbContext.Rooms.Add(new Room("Test 4", SERoomAccessType.Public, SERoomType.Standard) { Status = SERoomStatus.Close, });
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
         var queuedRoomEvents = appDbContext.Rooms.Where(e => e.Id != room1.Id).Select(e => new QueuedRoomEvent { RoomId = e.Id, });
         appDbContext.QueuedRoomEvents.AddRange(queuedRoomEvents);
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
 
         var eventStorage = new TestInMemoryHotEventStorage();
         var storageEvents = new StorageEvent[]

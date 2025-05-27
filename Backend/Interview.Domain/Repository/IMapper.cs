@@ -11,7 +11,9 @@ public interface IMapper<TIn, TOut>
 
 public static class Mapper<TIn>
 {
+#pragma warning disable CA1000
     public static Mapper<TIn, TOut> Create<TOut>(Expression<Func<TIn, TOut>> expression)
+#pragma warning restore CA1000
     {
         return new Mapper<TIn, TOut>(expression);
     }

@@ -65,7 +65,9 @@ public sealed class RoomService(
         var filterName = filter.Name?.Trim().ToLower();
         if (!string.IsNullOrWhiteSpace(filterName))
         {
+#pragma warning disable CA1862
             queryable = queryable.Where(e => e.Name.ToLower().Contains(filterName));
+#pragma warning restore CA1862
         }
 
         if (filter.StartValue is not null)

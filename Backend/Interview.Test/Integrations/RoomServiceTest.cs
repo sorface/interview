@@ -117,7 +117,7 @@ public class RoomServiceTest
             Order = 0
         });
 
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
 
         var roomRepository = new RoomRepository(appDbContext);
@@ -249,11 +249,11 @@ public class RoomServiceTest
 
         var users = new User[]
         {
-            new("u1", "v1") { Id = Guid.Parse("587A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! } },
-            new("u2", "v2") { Id = Guid.Parse("597A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.Admin.Id)! } },
-            new("u3", "v3") { Id = Guid.Parse("5A7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! } },
-            new("u4", "v4") { Id = Guid.Parse("5B7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! } },
-            new("u5", "v5") { Id = Guid.Parse("5C7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! } },
+            new("u1", "v1") { Id = Guid.Parse("587A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { (await appDbContext.Roles.FindAsync(RoleName.User.Id))! } },
+            new("u2", "v2") { Id = Guid.Parse("597A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { (await appDbContext.Roles.FindAsync(RoleName.Admin.Id))! } },
+            new("u3", "v3") { Id = Guid.Parse("5A7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { (await appDbContext.Roles.FindAsync(RoleName.User.Id))! } },
+            new("u4", "v4") { Id = Guid.Parse("5B7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { (await appDbContext.Roles.FindAsync(RoleName.User.Id))! } },
+            new("u5", "v5") { Id = Guid.Parse("5C7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { (await appDbContext.Roles.FindAsync(RoleName.User.Id))! } },
         };
         appDbContext.Users.AddRange(users);
         await appDbContext.SaveChangesAsync();
@@ -313,8 +313,8 @@ public class RoomServiceTest
         appDbContext.RoomParticipants.AddRange(roomParticipants);
         await appDbContext.SaveChangesAsync();
 
-        var like = appDbContext.Reactions.Find(ReactionType.Like.Id) ?? throw new Exception("Unexpected state");
-        var dislike = appDbContext.Reactions.Find(ReactionType.Dislike.Id) ?? throw new Exception("Unexpected state");
+        var like = await appDbContext.Reactions.FindAsync(ReactionType.Like.Id) ?? throw new UserException("Unexpected state");
+        var dislike = await appDbContext.Reactions.FindAsync(ReactionType.Dislike.Id) ?? throw new UserException("Unexpected state");
 
         var questionReactions = new RoomQuestionReaction[]
         {
@@ -566,7 +566,7 @@ public class RoomServiceTest
         var room = new Room("test", SERoomAccessType.Private, SERoomType.Standard);
 
         memoryDatabase.Users.AddRange(user1, user2);
-        memoryDatabase.SaveChanges();
+        await memoryDatabase.SaveChangesAsync();
         memoryDatabase.Rooms.Add(room);
         memoryDatabase.Questions.AddRange(question, question1);
 
@@ -606,7 +606,7 @@ public class RoomServiceTest
         memoryDatabase.RoomReview.AddRange(roomReview1, roomReview2);
 
         await memoryDatabase.SaveChangesAsync(cancellationToken);
-        memoryDatabase.SaveChanges();
+        await memoryDatabase.SaveChangesAsync();
 
         var roomRepository = new RoomRepository(memoryDatabase);
 
@@ -631,7 +631,7 @@ public class RoomServiceTest
         var room = new Room("test", SERoomAccessType.Private, SERoomType.Standard);
 
         memoryDatabase.Users.AddRange(user1, user2);
-        memoryDatabase.SaveChanges();
+        await memoryDatabase.SaveChangesAsync();
         memoryDatabase.Rooms.Add(room);
         memoryDatabase.Questions.AddRange(question, question1);
 
@@ -670,7 +670,7 @@ public class RoomServiceTest
         memoryDatabase.RoomReview.AddRange(roomReview1);
 
         await memoryDatabase.SaveChangesAsync(cancellationToken);
-        memoryDatabase.SaveChanges();
+        await memoryDatabase.SaveChangesAsync();
 
         var roomRepository = new RoomRepository(memoryDatabase);
 
@@ -739,7 +739,7 @@ public class RoomServiceTest
         var question = new Question("question_value#1");
         appDbContext.Questions.AddRange(question);
 
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
         var roomPatchUpdateRequest = new RoomUpdateRequest
         {
@@ -773,7 +773,7 @@ public class RoomServiceTest
         var question = new Question("question_value#1");
         appDbContext.Questions.AddRange(question);
 
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
         var initialTimeId = room.Timer!.Id;
         var roomPatchUpdateRequest = new RoomUpdateRequest
@@ -809,7 +809,7 @@ public class RoomServiceTest
         var question = new Question("question_value#1");
         appDbContext.Questions.AddRange(question);
 
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
         var initialTimeId = room.Timer!.Id;
         var roomPatchUpdateRequest = new RoomUpdateRequest
@@ -840,7 +840,7 @@ public class RoomServiceTest
         appDbContext.Users.Add(user);
         var question = new Question("test");
         appDbContext.Questions.Add(question);
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
 
         var roomService = CreateRoomService(appDbContext, user);
@@ -881,7 +881,7 @@ public class RoomServiceTest
         };
 
         appDbContext.QuestionTree.Add(tree);
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
 
         var roomService = CreateRoomService(appDbContext, user);
@@ -945,7 +945,7 @@ public class RoomServiceTest
             ]
         };
         appDbContext.Rooms.Add(initialRoom);
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
 
         var roomService = CreateRoomService(appDbContext, user);

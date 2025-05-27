@@ -202,7 +202,7 @@ public partial class RoadmapServiceTest
         // Arrange
         var tags = new[] { new Tag { Value = "T1" }, new Tag { Value = "T2" }, new Tag { Value = "T3" }, };
         dbContext.Tag.AddRange(tags);
-        dbContext.SaveChanges();
+        await dbContext.SaveChangesAsync();
 
         var questionTree = await CreateQuestionTreeAsync(dbContext);
         var questionTreeId = questionTree.Id;
