@@ -2,7 +2,23 @@ import { AnyObject } from '../types/anyObject';
 import { deepEqual } from './deepEqual';
 
 const expectCode = `
+  return new Promise((res) => {
   const __expectCalls = [];
+  const __consoleLogs = [];
+  let __expectedConsoleLogs = [];
+
+  const originalConsoleLog = console.log;
+  console.log = (arg) => {
+    __consoleLogs.push(arg);
+    if (__expectedConsoleLogs.length === __consoleLogs.length) {
+      console.log = originalConsoleLog;
+      __expectedConsoleLogs.forEach((expectedLog, index) =>
+        __expectCalls.push([__consoleLogs[index], expectedLog])
+      );
+      res(__expectCalls);
+    }
+  };
+
   const expect = (fn, ...argsWithExpected) => {
     const args = [...argsWithExpected];
     args.length--;
@@ -19,10 +35,18 @@ const expectCode = `
   const expectValue = (value1, value2) => {
     __expectCalls.push([value1, value2]);
   };
+
+  const expectConsole = (expectedCalls) => {
+    __expectedConsoleLogs = expectedCalls;
+  };
 `;
 
 const expectCallsReturnCode = `
-  return __expectCalls;
+  if (__expectedConsoleLogs.length === 0) {
+    console.log = originalConsoleLog;
+    res(__expectCalls);
+  }
+});
 `;
 
 type Arg = number | string | AnyObject;
@@ -38,15 +62,15 @@ export type ExpectResult = {
   passed: boolean;
 };
 
-export const executeCodeWithExpect = (
+export const executeCodeWithExpect = async (
   code: string | undefined,
-): ExecuteCodeResult => {
+): Promise<ExecuteCodeResult> => {
   try {
     const executeCodeWithExpect = new Function(
       expectCode + code + expectCallsReturnCode,
-    ) as () => Array<Arg[]>;
+    ) as () => Promise<Array<Arg[]>>;
 
-    const executeResult = executeCodeWithExpect();
+    const executeResult = await executeCodeWithExpect();
 
     return {
       results: executeResult.map((res) => {

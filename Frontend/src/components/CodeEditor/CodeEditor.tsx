@@ -137,8 +137,8 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
     monaco.editor.defineTheme('my-dark', theme);
   };
 
-  const handleExecuteCode = () => {
-    const executeCodeResult = executeCodeWithExpect(value);
+  const handleExecuteCode = async () => {
+    const executeCodeResult = await executeCodeWithExpect(value);
     setExpectResult(executeCodeResult);
     setModalExpectResults(true);
   };
