@@ -4,7 +4,8 @@ namespace Interview.Domain.Users.Records;
 
 public class PermissionItem(Guid id, string type, string description, bool activate)
 {
-    public PermissionItem(SEPermission permission, bool activate) : this(permission.Id, permission.Name, permission.Description, activate)
+    public PermissionItem(SEPermission permission, bool activate)
+        : this(permission.Id, permission.Name, permission.Description, activate)
     {
     }
 

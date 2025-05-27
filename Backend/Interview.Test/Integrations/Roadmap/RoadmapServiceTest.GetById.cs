@@ -7,6 +7,7 @@ using Interview.Domain.Roadmaps.RoadmapById;
 using Interview.Domain.Roadmaps.UpsertRoadmap;
 using Interview.Domain.Rooms;
 using Interview.Domain.Tags;
+using Interview.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Test.Integrations.Roadmap;
@@ -20,7 +21,7 @@ public partial class RoadmapServiceTest
 
         await SeedTestDataAsync(context);
 
-        var roadmapService = new RoadmapService(context, new ArchiveService<Domain.Roadmaps.Roadmap>(context));
+        var roadmapService = CreateService(context);
 
         // Arrange
         var expectedId = Guid.Parse("00000000-0000-0000-0000-000000000001");
@@ -79,7 +80,7 @@ public partial class RoadmapServiceTest
 
         await SeedTestDataAsync(context);
 
-        var roadmapService = new RoadmapService(context, new ArchiveService<Domain.Roadmaps.Roadmap>(context));
+        var roadmapService = CreateService(context);
 
         // Arrange
         var nonExistentId = Guid.NewGuid();
@@ -226,14 +227,14 @@ public partial class RoadmapServiceTest
             }
         };
         context.Roadmap.Add(roadmap);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         context.Rooms.Add(new Room("Test", SERoomAccessType.Public, SERoomType.Standard)
         {
             Id = roomId,
             QuestionTreeId = questionTreeId1
         });
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         context.ChangeTracker.Clear();
     }

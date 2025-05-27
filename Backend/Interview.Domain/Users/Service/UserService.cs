@@ -90,7 +90,7 @@ public sealed class UserService(
 
         var userRoles = await GetUserRolesAsync(roles, cancellationToken);
 
-        if (userRoles is null || !userRoles.Any())
+        if (userRoles is null || userRoles.Count == 0)
         {
             throw new NotFoundException(ExceptionMessage.UserRoleNotFound());
         }

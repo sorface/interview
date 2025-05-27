@@ -45,7 +45,9 @@ public class QuestionService(
         if (!string.IsNullOrWhiteSpace(request.Value))
         {
             var questionValue = request.Value.Trim().ToLower();
+#pragma warning disable CA1862
             spec &= new Spec<Question>(e => e.Value.ToLower().Contains(questionValue));
+#pragma warning restore CA1862
         }
 
         if (request.CategoryId is not null)
@@ -354,7 +356,9 @@ public class QuestionService(
             if (!string.IsNullOrWhiteSpace(request.Filter.Name))
             {
                 var name = request.Filter.Name.Trim();
+#pragma warning disable CA1862
                 res &= new Spec<QuestionTree>(e => e.Name.ToLower().Contains(name));
+#pragma warning restore CA1862
             }
 
             if (request.Filter.ParentQuestionTreeId is not null)

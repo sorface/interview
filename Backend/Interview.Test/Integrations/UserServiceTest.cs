@@ -101,7 +101,9 @@ public class UserServiceTest
 
     private static CurrentPermissionAccessor CreateCurrentPermissionAccessor(AppDbContext appDbContext)
     {
+#pragma warning disable CA2000
         return new CurrentPermissionAccessor(appDbContext, new MemoryCache(new MemoryCacheOptions()), NullLogger<CurrentPermissionAccessor>.Instance);
+#pragma warning restore CA2000
     }
 
     private static Expression<Func<IMemberInfo, bool>> CreateDatesExcluder()

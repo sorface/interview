@@ -5,6 +5,7 @@ using Interview.Domain.Questions;
 using Interview.Domain.Roadmaps;
 using Interview.Domain.Roadmaps.UpsertRoadmap;
 using Interview.Domain.Tags;
+using Interview.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Interview.Test.Integrations.Roadmap;
@@ -18,7 +19,7 @@ public partial class RoadmapServiceTest
         await using var dbContext = new TestAppDbContextFactory().Create(testSystemClock);
         var questionTree = await CreateQuestionTreeAsync(dbContext);
 
-        var roadmapService = new RoadmapService(dbContext, new ArchiveService<Domain.Roadmaps.Roadmap>(dbContext));
+        var roadmapService = CreateService(dbContext);
 
         // Arrange
         var request = new UpsertRoadmapRequest
@@ -56,7 +57,7 @@ public partial class RoadmapServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var dbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var roadmapService = new RoadmapService(dbContext, new ArchiveService<Domain.Roadmaps.Roadmap>(dbContext));
+        var roadmapService = CreateService(dbContext);
 
         // Arrange
         var existingRoadmap = new Domain.Roadmaps.Roadmap
@@ -106,7 +107,7 @@ public partial class RoadmapServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var dbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var roadmapService = new RoadmapService(dbContext, new ArchiveService<Domain.Roadmaps.Roadmap>(dbContext));
+        var roadmapService = CreateService(dbContext);
 
         // Arrange
         var existingRoadmap = new Domain.Roadmaps.Roadmap
@@ -139,7 +140,7 @@ public partial class RoadmapServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var dbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var roadmapService = new RoadmapService(dbContext, new ArchiveService<Domain.Roadmaps.Roadmap>(dbContext));
+        var roadmapService = CreateService(dbContext);
 
         var questionTree = await CreateQuestionTreeAsync(dbContext);
 
@@ -169,7 +170,7 @@ public partial class RoadmapServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var dbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var roadmapService = new RoadmapService(dbContext, new ArchiveService<Domain.Roadmaps.Roadmap>(dbContext));
+        var roadmapService = CreateService(dbContext);
 
         // Arrange
         var nonExistentQuestionTreeId = Guid.NewGuid();
@@ -197,12 +198,12 @@ public partial class RoadmapServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var dbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var roadmapService = new RoadmapService(dbContext, new ArchiveService<Domain.Roadmaps.Roadmap>(dbContext));
+        var roadmapService = CreateService(dbContext);
 
         // Arrange
         var tags = new[] { new Tag { Value = "T1" }, new Tag { Value = "T2" }, new Tag { Value = "T3" }, };
         dbContext.Tag.AddRange(tags);
-        dbContext.SaveChanges();
+        await dbContext.SaveChangesAsync();
 
         var questionTree = await CreateQuestionTreeAsync(dbContext);
         var questionTreeId = questionTree.Id;
@@ -254,7 +255,7 @@ public partial class RoadmapServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var dbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var roadmapService = new RoadmapService(dbContext, new ArchiveService<Domain.Roadmaps.Roadmap>(dbContext));
+        var roadmapService = CreateService(dbContext);
         var questionTree1 = await CreateQuestionTreeAsync(dbContext);
         var questionTree2 = await CreateQuestionTreeAsync(dbContext);
 
@@ -306,7 +307,7 @@ public partial class RoadmapServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var dbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var roadmapService = new RoadmapService(dbContext, new ArchiveService<Domain.Roadmaps.Roadmap>(dbContext));
+        var roadmapService = CreateService(dbContext);
 
         // Arrange
         var existingRoadmap = new Domain.Roadmaps.Roadmap
@@ -388,7 +389,7 @@ public partial class RoadmapServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var dbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var roadmapService = new RoadmapService(dbContext, new ArchiveService<Domain.Roadmaps.Roadmap>(dbContext));
+        var roadmapService = CreateService(dbContext);
         var questionTree1 = await CreateQuestionTreeAsync(dbContext);
         var questionTree2 = await CreateQuestionTreeAsync(dbContext);
         var questionTree3 = await CreateQuestionTreeAsync(dbContext);
@@ -448,6 +449,11 @@ public partial class RoadmapServiceTest
         childMilestone.Items.Should().NotBeNull().And.HaveCount(2)
             .And.ContainSingle(e => e.QuestionTreeId == questionTree3.Id && e.Order == 1)
             .And.ContainSingle(e => e.QuestionTreeId == questionTree4.Id && e.Order == 2);
+    }
+
+    private static RoadmapService CreateService(AppDbContext dbContext)
+    {
+        return new RoadmapService(dbContext, new ArchiveService<Domain.Roadmaps.Roadmap>(dbContext), new CurrentUserAccessor());
     }
 
     private async Task<QuestionTree> CreateQuestionTreeAsync(AppDbContext db, Guid? questionTreeId = null)

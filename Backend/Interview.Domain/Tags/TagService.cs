@@ -25,7 +25,9 @@ public class TagService(ITagRepository tagRepository) : ITagService
 
         value = value?.ToLower();
         var specification = !string.IsNullOrWhiteSpace(value) ?
+#pragma warning disable CA1862
             new Spec<Tag>(tag => tag.Value.ToLower().Contains(value)) :
+#pragma warning restore CA1862
             Spec<Tag>.Any;
         return tagRepository.GetPageAsync(specification, mapper, pageNumber, pageSize, cancellationToken);
     }

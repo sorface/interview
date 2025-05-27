@@ -50,7 +50,7 @@ public class RoomReviewController(IRoomReviewService roomReviewService) : Contro
     }
 
     /// <summary>
-    /// Creating a review for a room
+    /// Creating a review for a room.
     /// </summary>
     /// <param name="request">User Request.</param>
     /// <returns>Review details.</returns>
@@ -75,11 +75,11 @@ public class RoomReviewController(IRoomReviewService roomReviewService) : Contro
     }
 
     /// <summary>
-    /// Upsert a review for a room
+    /// Upsert a review for a room.
     /// </summary>
     /// <param name="request">User Request.</param>
-    /// <param name="currentUserAccessor">Current user accessor</param>
-    /// <returns>Review details</returns>
+    /// <param name="currentUserAccessor">Current user accessor.</param>
+    /// <returns>Review details.</returns>
     [Authorize]
     [HttpPut("upsert")]
     [Produces(MediaTypeNames.Application.Json)]
@@ -93,7 +93,7 @@ public class RoomReviewController(IRoomReviewService roomReviewService) : Contro
     }
 
     /// <summary>
-    /// Update a review by id
+    /// Update a review by id.
     /// </summary>
     /// <param name="id">Id review.</param>
     /// <param name="request">User Request.</param>
@@ -112,8 +112,8 @@ public class RoomReviewController(IRoomReviewService roomReviewService) : Contro
     /// completion a review.
     /// </summary>
     /// <param name="request">User Request.</param>
-    /// <param name="currentUserAccessor">Current user accessor</param>
-    /// <returns>HTTP result</returns>
+    /// <param name="currentUserAccessor">Current user accessor.</param>
+    /// <returns>HTTP result.</returns>
     [Authorize]
     [HttpPost("complete")]
     [Produces(MediaTypeNames.Application.Json)]
@@ -129,8 +129,8 @@ public class RoomReviewController(IRoomReviewService roomReviewService) : Contro
     /// completion ai room.
     /// </summary>
     /// <param name="request">User Request.</param>
-    /// <param name="currentUserAccessor">Current user accessor</param>
-    /// <returns>HTTP result</returns>
+    /// <param name="currentUserAccessor">Current user accessor.</param>
+    /// <returns>HTTP result.</returns>
     [Authorize]
     [HttpPost("complete/ai")]
     [Produces(MediaTypeNames.Application.Json)]
