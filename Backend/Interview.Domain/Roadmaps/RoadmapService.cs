@@ -7,13 +7,14 @@ using Interview.Domain.Rooms;
 using Interview.Domain.ServiceResults.Success;
 using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
+using Interview.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using NSpecifications;
 using X.PagedList;
 
 namespace Interview.Domain.Roadmaps;
 
-public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveService) : IRoadmapService
+public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveService, ICurrentUserAccessor currentUserAccessor) : IRoadmapService
 {
     public async Task<ServiceResult<Guid>> UpsertAsync(UpsertRoadmapRequest request, CancellationToken cancellationToken)
     {
@@ -139,15 +140,25 @@ public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveServ
             throw NotFoundException.Create<Roadmap>(id);
         }
 
-        var questionTreeIds = tmpRes.Items.SelectMany(t => t.Items.Select(tt => tt.QuestionTreeId)).ToHashSet();
-        var roomIdList = await db.Rooms
-            .Where(e =>
-                e.QuestionTreeId != null &&
-                questionTreeIds.Contains(e.QuestionTreeId.Value) &&
-                (e.Status == SERoomStatus.New || e.Status == SERoomStatus.Active))
-            .Select(e => new { QuestionTreeId = e.QuestionTreeId!.Value, RoomId = e.Id })
-            .ToListAsync(cancellationToken);
-        var roomIdMap = roomIdList.ToLookup(e => e.QuestionTreeId);
+        ILookup<Guid, Guid> roomIdMap;
+        var currentUserId = currentUserAccessor.UserId;
+        if (currentUserId is not null)
+        {
+            var questionTreeIds = tmpRes.Items.SelectMany(t => t.Items.Select(tt => tt.QuestionTreeId)).ToHashSet();
+            var roomIdList = await db.Rooms
+                .Where(e =>
+                    e.QuestionTreeId != null &&
+                    questionTreeIds.Contains(e.QuestionTreeId.Value) &&
+                    e.CreatedById == currentUserId &&
+                    (e.Status == SERoomStatus.New || e.Status == SERoomStatus.Active))
+                .Select(e => new { QuestionTreeId = e.QuestionTreeId!.Value, RoomId = e.Id })
+                .ToListAsync(cancellationToken);
+            roomIdMap = roomIdList.ToLookup(e => e.QuestionTreeId, e => e.RoomId);
+        }
+        else
+        {
+            roomIdMap = Enumerable.Empty<Guid>().ToLookup(e => e, e => e);
+        }
 
         var items = new List<RoadmapItemResponse>(tmpRes.Items.Count + 1 + tmpRes.Items.Select(e => e.Items.Count).Sum());
         var buildRoadmapTree = RoadmapItemTree.BuildRoadmapTree(tmpRes.Items);
@@ -182,7 +193,7 @@ public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveServ
                 Type = EVRoadmapItemType.QuestionTree,
                 Name = e.Name,
                 QuestionTreeId = e.QuestionTreeId,
-                RoomId = roomIdMap[e.QuestionTreeId].FirstOrDefault()?.RoomId,
+                RoomId = roomIdMap[e.QuestionTreeId].Cast<Guid?>().FirstOrDefault(),
                 Order = e.Order,
             }));
 
