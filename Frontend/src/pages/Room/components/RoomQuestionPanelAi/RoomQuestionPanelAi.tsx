@@ -52,6 +52,7 @@ import { AnyObject } from '../../../../types/anyObject';
 import { Theme, ThemeContext } from '../../../../context/ThemeContext';
 import { RoomTimerAi } from '../RoomTimerAi/RoomTimerAi';
 import { CodeEditor } from '../../../../components/CodeEditor/CodeEditor';
+import { Wave } from '../Wave/Wave';
 
 const notFoundCode = 404;
 const aiAssistantGoodRate = 6;
@@ -262,6 +263,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
     lastVoiceRecognition,
     aiAssistantScript,
     lastWsMessageParsed,
+    recognitionEnabled,
     sendWsMessage,
     setAiAssistantCurrentScript,
     setRecognitionEnabled,
@@ -423,8 +425,12 @@ export const RoomQuestionPanelAi: FunctionComponent<
     if (readOnly) {
       return;
     }
-    setRecognitionEnabled(!copilotAnswerOpen);
-  }, [readOnly, copilotAnswerOpen, setRecognitionEnabled]);
+    if (copilotAnswerOpen || initialQuestion) {
+      setRecognitionEnabled(false);
+      return;
+    }
+    setRecognitionEnabled(true);
+  }, [readOnly, copilotAnswerOpen, initialQuestion, setRecognitionEnabled]);
 
   useEffect(() => {
     if (!lastVoiceRecognition || readOnly) {
@@ -651,6 +657,10 @@ export const RoomQuestionPanelAi: FunctionComponent<
     handleCopilotAnswerOpen();
   };
 
+  const handleStartAnswer = () => {
+    setRecognitionEnabled(true);
+  };
+
   const handleAnswerAgain = () => {
     setAiAssistantCurrentScript(AiAssistantScriptName.PleaseAnswer);
     handleCopilotAnswerClose();
@@ -769,9 +779,29 @@ export const RoomQuestionPanelAi: FunctionComponent<
                     <Gap sizeRem={3.625} />
                     <div className="flex">
                       <Gap sizeRem={7.5} horizontal />
-                      <Typography size="s" secondary>
-                        {secondLineCaption}
-                      </Typography>
+                      <div className="flex flex-col">
+                        {initialQuestion && !recognitionEnabled ? (
+                          <>
+                            <Button
+                              variant="active"
+                              className="w-fit"
+                              onClick={handleStartAnswer}
+                            >
+                              {
+                                localizationCaptions[
+                                  LocalizationKey.StartAnswer
+                                ]
+                              }
+                            </Button>
+                            <Gap sizeRem={0.5} />
+                          </>
+                        ) : (
+                          <Wave />
+                        )}
+                        <Typography size="s" secondary>
+                          {secondLineCaption}
+                        </Typography>
+                      </div>
                     </div>
                   </div>
                 )}
