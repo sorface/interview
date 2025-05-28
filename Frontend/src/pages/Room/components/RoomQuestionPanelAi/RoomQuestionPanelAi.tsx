@@ -31,7 +31,7 @@ import { Loader } from '../../../../components/Loader/Loader';
 import { Typography } from '../../../../components/Typography/Typography';
 import { Icon } from '../Icon/Icon';
 import { aiExpertNickname, EventName, IconNames } from '../../../../constants';
-import { Button } from '../../../../components/Button/Button';
+import { Button, ButtonVariant } from '../../../../components/Button/Button';
 import { RoomContext } from '../../context/RoomContext';
 import {
   useVoiceRecognitionAccum,
@@ -53,6 +53,7 @@ import { Theme, ThemeContext } from '../../../../context/ThemeContext';
 import { RoomTimerAi } from '../RoomTimerAi/RoomTimerAi';
 import { CodeEditor } from '../../../../components/CodeEditor/CodeEditor';
 import { Wave } from '../Wave/Wave';
+import { useThemeClassName } from '../../../../hooks/useThemeClassName';
 
 const notFoundCode = 404;
 const aiAssistantGoodRate = 6;
@@ -345,6 +346,11 @@ export const RoomQuestionPanelAi: FunctionComponent<
       : null;
   const totalErrorRoomQuestionEvaluation =
     errorMergeRoomQuestionEvaluation || getRoomQuestionEvaluationError;
+
+  const themedStartAnswerButton = useThemeClassName({
+    [Theme.Dark]: 'active2' as ButtonVariant,
+    [Theme.Light]: 'active' as ButtonVariant,
+  });
 
   const { aiAnswerCompleted, aiAnswerLoading, lastValidAiAnswer } =
     useAiAnswerSource({
@@ -783,7 +789,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                         {initialQuestion && !recognitionEnabled ? (
                           <>
                             <Button
-                              variant="active"
+                              variant={themedStartAnswerButton}
                               className="w-fit"
                               onClick={handleStartAnswer}
                             >
