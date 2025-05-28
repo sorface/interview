@@ -544,23 +544,23 @@ public class QuestionServiceTest
 
         var user = new User("nickname", "twitchChannel");
         appDbContext.Users.Add(user);
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
 
         var room = new Room("room#1", SERoomAccessType.Public, SERoomType.Standard);
         appDbContext.Rooms.Add(room);
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
 
         var question = new Question("question#1");
         appDbContext.Questions.Add(question);
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
 
         var reaction = new Reaction { Type = ReactionType.Like };
         appDbContext.Reactions.Add(reaction);
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
 
         var roomQuestion = new RoomQuestion { Room = room, Question = question, State = RoomQuestionState.Active, QuestionId = default, RoomId = default, Order = 0, };
         appDbContext.RoomQuestions.Add(roomQuestion);
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
 
         var roomQuestionReaction = new RoomQuestionReaction
         {
@@ -569,7 +569,7 @@ public class QuestionServiceTest
             Sender = user
         };
         appDbContext.RoomQuestionReactions.Add(roomQuestionReaction);
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
 
         await transaction.CommitAsync();
 

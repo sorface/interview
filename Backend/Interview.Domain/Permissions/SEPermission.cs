@@ -1,12 +1,10 @@
 using System.Collections.Frozen;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Ardalis.SmartEnum;
 
 namespace Interview.Domain.Permissions;
 
-[SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1202:Elements should be ordered by access", Justification = "Private _descriptionMap should initialize first")]
 public class SEPermission(Guid id, EVPermission value) : SmartEnum<SEPermission>(value.ToString(), (int)value)
 {
     private static readonly FrozenDictionary<EVPermission, string> _descriptionMap = BuildDescriptionMap();

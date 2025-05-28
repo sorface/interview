@@ -58,7 +58,7 @@ public class CategoryServiceTest
         await using var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
         var category = new Category { Name = "Test" };
         appDbContext.Categories.Add(category);
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
         appDbContext.ChangeTracker.Clear();
         var service = new CategoryService(appDbContext, new ArchiveService<Category>(appDbContext));
 
@@ -85,7 +85,7 @@ public class CategoryServiceTest
             }
         };
         appDbContext.Categories.Add(category);
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
         appDbContext.ChangeTracker.Clear();
         var service = new CategoryService(appDbContext, new ArchiveService<Category>(appDbContext));
 
@@ -117,7 +117,7 @@ public class CategoryServiceTest
             }
         };
         appDbContext.Categories.Add(category);
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
         appDbContext.ChangeTracker.Clear();
         var service = new CategoryService(appDbContext, new ArchiveService<Category>(appDbContext));
 
@@ -149,7 +149,7 @@ public class CategoryServiceTest
             }
         };
         appDbContext.Categories.Add(category);
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
         appDbContext.ChangeTracker.Clear();
         var service = new CategoryService(appDbContext, new ArchiveService<Category>(appDbContext));
 
@@ -192,7 +192,7 @@ public class CategoryServiceTest
             }
         };
         appDbContext.Categories.Add(category);
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
         appDbContext.ChangeTracker.Clear();
         var service = new CategoryService(appDbContext, new ArchiveService<Category>(appDbContext));
 

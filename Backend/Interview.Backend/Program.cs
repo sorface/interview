@@ -41,7 +41,7 @@ try
     middlewareConfigurator.AddMiddlewares();
 
     app.Logger.LogInformation("Application starting...");
-    await app.RunAsync();
+    app.Run();
 }
 catch (Exception e)
 {

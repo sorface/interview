@@ -271,7 +271,7 @@ public class RoomQuestionEvaluationServiceTest
         await appDbContext.Questions.AddRangeAsync(dbData.Select(e => e.Question));
         await appDbContext.RoomQuestions.AddRangeAsync(dbData.Select(e => e.RoomQuestion));
         await appDbContext.RoomQuestionEvaluation.AddRangeAsync(dbData.Select(e => e.Evaluation).Where(e => e is not null)!);
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
         appDbContext.ChangeTracker.Clear();
 
         var request = new UserRoomQuestionEvaluationsRequest { UserId = userId, RoomId = roomId, };

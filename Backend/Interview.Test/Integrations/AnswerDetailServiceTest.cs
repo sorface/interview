@@ -119,7 +119,7 @@ public class AnswerDetailServiceTest
             Lang = "C#",
             Source = EVRoomCodeEditorChangeSource.User
         };
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
         appDbContext.ChangeTracker.Clear();
 
         var request = new RoomQuestionAnswerDetailRequest { QuestionId = questionId, RoomId = roomId, };
@@ -152,7 +152,7 @@ public class AnswerDetailServiceTest
             State = RoomQuestionState.Open,
             Order = 0
         });
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
 
         var expectedDetails = new List<RoomQuestionAnswerDetailResponse.Detail>();
         foreach (var (start, end, generateTranscription, generateCodeEditor) in dates)
@@ -231,7 +231,7 @@ public class AnswerDetailServiceTest
             });
         }
 
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
         appDbContext.ChangeTracker.Clear();
 
         var request = new RoomQuestionAnswerDetailRequest { QuestionId = questionId, RoomId = roomId, };
@@ -261,7 +261,7 @@ public class AnswerDetailServiceTest
             State = RoomQuestionState.Open,
             Order = 0
         });
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
 
         var users = new Faker<User>()
             .CustomInstantiator(f => new User(f.Random.Guid(), f.Person.FullName, f.Random.Hash()))
@@ -345,7 +345,7 @@ public class AnswerDetailServiceTest
             });
         }
 
-        await appDbContext.SaveChangesAsync();
+        appDbContext.SaveChanges();
         appDbContext.ChangeTracker.Clear();
 
         var request = new RoomQuestionAnswerDetailRequest { QuestionId = questionId, RoomId = roomId, };

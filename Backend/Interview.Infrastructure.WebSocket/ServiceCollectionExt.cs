@@ -1,4 +1,3 @@
-using Interview.Domain;
 using Interview.Domain.PubSub.Factory;
 using Interview.Infrastructure.WebSocket.Events;
 using Interview.Infrastructure.WebSocket.Events.ConnectionListener;
@@ -20,7 +19,7 @@ public static class ServiceCollectionExt
         Action<PubSubFactoryConfiguration> pubSubFactoryConfiguration)
     {
         self.AddScoped<WebSocketConnectionHandler>();
-        self.TryAddSingleton<RecyclableMemoryStreamManager>();
+        self.TryAddSingleton(typeof(RecyclableMemoryStreamManager));
         self.AddScoped<WebSocketReader>();
         self.Scan(selector =>
         {
@@ -63,7 +62,7 @@ public sealed class PubSubFactoryConfiguration
     {
         if (_implementation is null)
         {
-            throw new UserException("You should specify implementation of PubSubFactory");
+            throw new Exception("You should specify implementation of PubSubFactory");
         }
 
         serviceCollection.AddSingleton(_implementation);

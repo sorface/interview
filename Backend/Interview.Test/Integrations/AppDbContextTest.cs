@@ -28,8 +28,8 @@ public class AppDbContextTest
                 }
             ]
         };
-        await appDbContext.AddAsync(room);
-        await appDbContext.SaveChangesAsync();
+        appDbContext.Add(room);
+        appDbContext.SaveChanges();
 
         room.Id.Should().NotBe(Guid.Empty);
         room.CreateDate.Should().NotBe(null);

@@ -1,5 +1,4 @@
 using System.Text.Json;
-using Interview.Domain;
 using Interview.Domain.Events.Events;
 using Interview.Domain.Events.Events.Serializers;
 using Interview.Domain.PubSub.Events;
@@ -51,7 +50,7 @@ public class HandleStatefulEventHandler(
     {
         try
         {
-            var roomEvent = deserializer.Deserialize<IRoomEvent>(busEvent.Event) ?? throw new UserException("Unable to parse event");
+            var roomEvent = deserializer.Deserialize<IRoomEvent>(busEvent.Event) ?? throw new Exception("Unable to parse event");
             await using var dbScope = serviceScopeFactory.CreateAsyncScope();
             var service = dbScope.ServiceProvider.GetRequiredService<IRoomServiceWithoutPermissionCheck>();
             try

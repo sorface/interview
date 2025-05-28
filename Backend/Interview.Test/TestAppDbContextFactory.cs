@@ -13,9 +13,7 @@ public class TestAppDbContextFactory
 {
     public AppDbContext Create(ISystemClock clock)
     {
-#pragma warning disable CA2000
         var sqliteConnection = new SqliteConnection("Data Source=:memory:");
-#pragma warning restore CA2000
         sqliteConnection.Open();
 
         var option = new DbContextOptionsBuilder().UseSqlite(

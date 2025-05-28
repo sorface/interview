@@ -74,7 +74,7 @@ public class SecurityServiceTest
         await using var db = CreateDbContext(type, out var room, out _);
         var userWithoutRoomParticipant = new User("WITHOUT ROOM PARTICIPANT", string.Empty);
         db.Users.Add(userWithoutRoomParticipant);
-        await db.SaveChangesAsync();
+        db.SaveChanges();
         db.ChangeTracker.Clear();
         var service = CreateService(db, userWithoutRoomParticipant);
 
@@ -113,9 +113,7 @@ public class SecurityServiceTest
     private static ISecurityService CreateService(AppDbContext dbContext, User user)
     {
         return new SecurityService(
-#pragma warning disable CA2000
             new CurrentPermissionAccessor(dbContext, new MemoryCache(new MemoryCacheOptions()), NullLogger<CurrentPermissionAccessor>.Instance),
-#pragma warning restore CA2000
             new CurrentUserAccessor(user),
             new RoomParticipantRepository(dbContext));
     }

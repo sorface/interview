@@ -37,8 +37,7 @@ public sealed class SEQuestionSubjectTreeType : SmartEnum<SEQuestionSubjectTreeT
 
     public static readonly SEQuestionSubjectTreeType Question = new SEQuestionSubjectTreeType(EVQuestionSubjectTreeType.Question, "Question", 'Q');
 
-    public SEQuestionSubjectTreeType(EVQuestionSubjectTreeType enumValue, string name, char value)
-        : base(name, value)
+    public SEQuestionSubjectTreeType(EVQuestionSubjectTreeType enumValue, string name, char value) : base(name, value)
     {
         EnumValue = enumValue;
     }
@@ -55,6 +54,6 @@ public sealed class SEQuestionSubjectTreeType : SmartEnum<SEQuestionSubjectTreeT
             }
         }
 
-        throw new UserException($"Not found item by value '{enumValue}'");
+        throw new Exception($"Not found item by value '{enumValue}'");
     }
 }

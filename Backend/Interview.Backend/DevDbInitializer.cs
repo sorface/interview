@@ -76,7 +76,7 @@ public class DevDbInitializer(AppDbContext appDbContext, IConfiguration configur
             Avatar = null,
             Roles =
             {
-                (await appDbContext.Roles.FindAsync([RoleName.User.Id], cancellationToken))!,
+                (await appDbContext.Roles.FindAsync(RoleName.User.Id))!,
             },
         };
         await appDbContext.Users.AddAsync(addUser, cancellationToken);

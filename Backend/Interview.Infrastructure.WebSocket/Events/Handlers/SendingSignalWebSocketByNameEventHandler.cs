@@ -22,7 +22,7 @@ public class SendingSignalWebSocketByNameEventHandler(
     {
         if (payload is null)
         {
-            Logger.LogDebug("Payload should not be null");
+            logger.LogDebug("Payload should not be null");
             return;
         }
 

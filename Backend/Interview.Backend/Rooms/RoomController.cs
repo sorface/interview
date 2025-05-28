@@ -47,9 +47,9 @@ public class RoomController(IRoomService roomService) : ControllerBase
     }
 
     /// <summary>
-    /// Getting a calendar rooms.
+    /// Getting a calendar rooms
     /// </summary>
-    /// <param name="request">FromQuery filter.</param>
+    /// <param name="request">FromQuery filter</param>
     /// <returns>Page.</returns>
     [Authorize]
     [HttpGet("calendar")]

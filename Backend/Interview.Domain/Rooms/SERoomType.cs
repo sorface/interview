@@ -8,8 +8,7 @@ public class SERoomType : SmartEnum<SERoomType, char>
 
     public static readonly SERoomType AI = new(EVRoomType.AI, "AI", 'A');
 
-    private SERoomType(EVRoomType enumValue, string name, char value)
-        : base(name, value)
+    private SERoomType(EVRoomType enumValue, string name, char value) : base(name, value)
     {
         EnumValue = enumValue;
     }

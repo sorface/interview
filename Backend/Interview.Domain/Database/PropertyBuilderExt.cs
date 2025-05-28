@@ -8,7 +8,7 @@ public static class PropertyBuilderExt
     public static PropertyBuilder<TProperty> ConfigureRequiredEnum<TProperty>(this PropertyBuilder<TProperty> self, TProperty defaultValue, int maxLength)
         where TProperty : struct, Enum
     {
-        var names = Enum.GetNames<TProperty>();
+        var names = Enum.GetNames(typeof(TProperty));
         var availableValuesStr = string.Join(", ", names);
         return self
             .HasConversion(e => e.ToString(), e => Enum.Parse<TProperty>(e))

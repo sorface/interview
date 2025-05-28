@@ -19,9 +19,7 @@ public class RoomActiveStatusPreProcessorTest
 
     public RoomActiveStatusPreProcessorTest()
     {
-#pragma warning disable CA2000
         var databaseContext = new TestAppDbContextFactory().Create(_systemClock);
-#pragma warning restore CA2000
         var mockLogger = new Mock<ILogger<RoomActiveStatusPreProcessor>>();
         _roomActiveStatusPreProcessor = new RoomActiveStatusPreProcessor(mockLogger.Object, databaseContext, _systemClock);
     }

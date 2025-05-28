@@ -9,13 +9,11 @@ indent_style = space
 # (Please don't specify an indent_size here; that has too many unintended consequences.)
 
 max_line_length=170
-
 # Code files
 [*.{cs,csx,vb,vbx}]
 indent_size = 4
 insert_final_newline = true
 charset = utf-8
-
 # XML project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
 indent_size = 4
@@ -171,85 +169,12 @@ dotnet_diagnostic.IDE0170.severity = warning
 
 # RS0016: Only enable if API files are present
 dotnet_public_api_analyzer.require_api_files = true
-dotnet_code_quality_unused_parameters=all:suggestion
-
-## Design rules ##
-dotnet_diagnostic.CA1000.severity=error
-dotnet_diagnostic.CA1001.severity=error
-dotnet_diagnostic.CA1044.severity=error
-dotnet_diagnostic.CA1047.severity=error
-dotnet_diagnostic.CA1050.severity=error
-dotnet_diagnostic.CA1064.severity=error
-
-dotnet_diagnostic.CA1507.severity=error
-dotnet_diagnostic.CA1514.severity=error
-
 dotnet_diagnostic.CA1821.severity=error
-dotnet_diagnostic.CA1825.severity=error
-dotnet_diagnostic.CA1826.severity=error
+dotnet_diagnostic.CA1836.severity=error
+dotnet_code_quality_unused_parameters=all:suggestion
 dotnet_diagnostic.CA1827.severity=error
 dotnet_diagnostic.CA1828.severity=error
 dotnet_diagnostic.CA1829.severity=error
-dotnet_diagnostic.CA1830.severity=error
-dotnet_diagnostic.CA1831.severity=error
-dotnet_diagnostic.CA1832.severity=error
-dotnet_diagnostic.CA1833.severity=error
-dotnet_diagnostic.CA1834.severity=error
-dotnet_diagnostic.CA1835.severity=error
-dotnet_diagnostic.CA1836.severity=error
-dotnet_diagnostic.CA1837.severity=error
-dotnet_diagnostic.CA1838.severity=error
-dotnet_diagnostic.CA1839.severity=error
-dotnet_diagnostic.CA1840.severity=error
-dotnet_diagnostic.CA1841.severity=error
-dotnet_diagnostic.CA1842.severity=error
-dotnet_diagnostic.CA1843.severity=error
-dotnet_diagnostic.CA1844.severity=error
-dotnet_diagnostic.CA1845.severity=error
-dotnet_diagnostic.CA1846.severity=error
-dotnet_diagnostic.CA1847.severity=error
-dotnet_diagnostic.CA1849.severity=error
-dotnet_diagnostic.CA1850.severity=error
-dotnet_diagnostic.CA1851.severity=error
-dotnet_diagnostic.CA1853.severity=error
-dotnet_diagnostic.CA1854.severity=error
-dotnet_diagnostic.CA1860.severity=error
-dotnet_diagnostic.CA1862.severity=error
-dotnet_diagnostic.CA1864.severity=error
-dotnet_diagnostic.CA1868.severity=error
-dotnet_diagnostic.CA1869.severity=error
-
-# Reliability rules
-dotnet_diagnostic.CA2000.severity=error
-dotnet_diagnostic.CA2009.severity=error
-dotnet_diagnostic.CA2013.severity=error
-dotnet_diagnostic.CA2014.severity=error
-dotnet_diagnostic.CA2016.severity=error
-dotnet_diagnostic.CA2017.severity=error
-dotnet_diagnostic.CA2019.severity=error
-dotnet_diagnostic.CA2021.severity=error
-dotnet_diagnostic.CA2022.severity=error
-dotnet_diagnostic.CA2024.severity=error
-
-# Usage rules
-dotnet_diagnostic.CA2200.severity=error
-dotnet_diagnostic.CA2201.severity=error
-dotnet_diagnostic.CA2215.severity=error
-dotnet_diagnostic.CA2218.severity=error
-dotnet_diagnostic.CA2224.severity=error
-dotnet_diagnostic.CA2231.severity=error
-dotnet_diagnostic.CA2241.severity=error
-dotnet_diagnostic.CA2242.severity=error
-dotnet_diagnostic.CA2244.severity=error
-dotnet_diagnostic.CA2245.severity=error
-dotnet_diagnostic.CA2248.severity=error
-dotnet_diagnostic.CA2249.severity=error
-dotnet_diagnostic.CA2250.severity=error
-dotnet_diagnostic.CA2251.severity=error
-dotnet_diagnostic.CA2254.severity=error
-dotnet_diagnostic.CA2263.severity=error
-dotnet_diagnostic.CA2265.severity=error
-
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
 tab_width = 4
 end_of_line = lf
@@ -274,8 +199,7 @@ csharp_new_line_before_finally = true
 csharp_new_line_before_members_in_object_initializers = true
 csharp_new_line_before_members_in_anonymous_types = true
 csharp_new_line_between_query_expression_clauses = true
-csharp_style_namespace_declarations=file_scoped:suggestion
-
+csharp_align_multiline_parameter=true
 # Indentation preferences
 csharp_indent_block_contents = true
 csharp_indent_braces = false
@@ -340,47 +264,30 @@ csharp_space_between_square_brackets = false
 csharp_prefer_braces = true:silent
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = true
-
-dotnet_diagnostic.SA1312.severity=none
-dotnet_diagnostic.SA1623.severity=none
-dotnet_diagnostic.SA1009.severity=none
-dotnet_diagnostic.SA1015.severity=none
-dotnet_diagnostic.SA1311.severity=none
+dotnet_diagnostic.SA1101.severity=none
 dotnet_diagnostic.SA1206.severity=none
 dotnet_diagnostic.SA1201.severity=none
 dotnet_diagnostic.SA1401.severity=none
 dotnet_diagnostic.SA1402.severity=none
 dotnet_diagnostic.SA1101.severity=none
 dotnet_diagnostic.SA1116.severity=none
+dotnet_diagnostic.SA1128.severity=none
 dotnet_diagnostic.SA1309.severity=none
 dotnet_diagnostic.SA1200.severity=none
 dotnet_diagnostic.SA1600.severity=none
 dotnet_diagnostic.SA1313.severity=none
 dotnet_diagnostic.SA1000.severity=none
-dotnet_diagnostic.SA1649.severity=none
-dotnet_diagnostic.SA1500.severity=error
-dotnet_diagnostic.SA1501.severity=error
-dotnet_diagnostic.SA1502.severity=error
+dotnet_diagnostic.SA1629.severity=none
+dotnet_diagnostic.SA1513.severity=error
 dotnet_diagnostic.SA1503.severity=error
 dotnet_diagnostic.SA1505.severity=error
 dotnet_diagnostic.SA1506.severity=error
 dotnet_diagnostic.SA1507.severity=error
 dotnet_diagnostic.SA1508.severity=error
 dotnet_diagnostic.SA1509.severity=error
-dotnet_diagnostic.SA1510.severity=error
-dotnet_diagnostic.SA1511.severity=error
-dotnet_diagnostic.SA1513.severity=error
-dotnet_diagnostic.SA1514.severity=error
-dotnet_diagnostic.SA1517.severity=error
-dotnet_diagnostic.SA1519.severity=error
-dotnet_diagnostic.SA1520.severity=error
 dotnet_diagnostic.SA1406.severity=error
 dotnet_diagnostic.SA1405.severity=error
 dotnet_diagnostic.SA1302.severity=error
-
-dotnet_diagnostic.CS1998.severity=error
-dotnet_diagnostic.CS4014.severity=error
-
 csharp_using_directive_placement = outside_namespace:silent
 csharp_prefer_simple_using_statement = true:suggestion
 csharp_style_namespace_declarations = block_scoped:silent
@@ -392,8 +299,6 @@ dotnet_diagnostic.SA1633.severity = silent
 dotnet_diagnostic.SA0001.severity = none
 
 [src/{Analyzers,CodeStyle,Features,Workspaces,EditorFeatures,VisualStudio}/**/*.{cs,vb}]
-
-csharp_style_namespace_declarations=file_scoped:suggestion
 
 # IDE0011: Add braces
 csharp_prefer_braces = when_multiline:warning
