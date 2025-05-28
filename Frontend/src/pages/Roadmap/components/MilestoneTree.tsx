@@ -21,7 +21,7 @@ export const MilestoneTree: FunctionComponent<MilestoneTreeProps> = ({
   const treeCompleted = getTreeProgress(id) === 100;
   const iconBg = useThemeClassName({
     [Theme.Dark]: 'bg-dark-dark1',
-    [Theme.Light]: 'bg-grey2',
+    [Theme.Light]: 'bg-millestone-item-light',
   });
   const iconBgCompleted = useThemeClassName({
     [Theme.Dark]: 'bg-dark-green',
