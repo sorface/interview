@@ -85,7 +85,7 @@ public class UserServiceTest
 
         var upsertUser = await userService.UpsertByExternalIdAsync(user);
 
-        var savedUser = await appDbContext.Users.SingleAsync(e => e.Id == upsertUser.Id);
+        var savedUser = await appDbContext.Users.SingleAsync(e => e.Id == upsertUser!.Id);
         upsertUser.Should().BeEquivalentTo(savedUser);
         upsertUser?.Roles.Should().ContainSingle(role => role.Name == expectedRoleName);
     }

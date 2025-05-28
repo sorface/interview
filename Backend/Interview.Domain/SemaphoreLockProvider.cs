@@ -3,16 +3,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Interview.Backend.Auth
 {
-    public class SemaphoreLockProvider<T>
+    public class SemaphoreLockProvider<T>(ILogger<SemaphoreLockProvider<T>> logger)
         where T : notnull
     {
         private readonly ConcurrentDictionary<T, SemaphoreSlim> _lockStore = new();
-        private readonly ILogger<SemaphoreLockProvider<T>> _logger;
-
-        public SemaphoreLockProvider(ILogger<SemaphoreLockProvider<T>> logger)
-        {
-            _logger = logger;
-        }
+        private readonly ILogger<SemaphoreLockProvider<T>> _logger = logger;
 
         /// <summary>
         /// Asynchronously puts thread to wait (according to the given ID)
@@ -34,11 +29,13 @@ namespace Interview.Backend.Auth
 
                 semaphoreLockProvider._logger.LogInformation("current capacity semaphore store {Count}, Release {Key}", semaphoreLockProvider._lockStore.Count, key);
 
-                if (semaphoreSlim.CurrentCount == 0)
+                if (semaphoreSlim.CurrentCount != 0)
                 {
-                    semaphoreLockProvider._logger.LogInformation("delete the semaphoreSlim {Key}", key);
-                    semaphoreLockProvider._lockStore.TryRemove(key, out _);
+                    return;
                 }
+
+                semaphoreLockProvider._logger.LogInformation("delete the semaphoreSlim {Key}", key);
+                semaphoreLockProvider._lockStore.TryRemove(key, out _);
             }
 
             public Task WaitAsync(CancellationToken cancellationToken)

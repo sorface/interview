@@ -91,8 +91,8 @@ public sealed class UserService(
     public async Task<User?> UpsertByExternalIdAsync(User user, CancellationToken cancellationToken = default)
     {
         var roles = user.Roles.Select(role => role.Name.Name).Order();
+        var externalIdLock = externalUserIdLockProvider.CreateWaiter("User:" + user.ExternalId);
 
-        using var externalIdLock = externalUserIdLockProvider.CreateWaiter("User:" + user.ExternalId);
         var cachedUser = new { user.Nickname, user.Avatar, user.ExternalId, Roles = string.Join(",", roles) };
 
         // пользователи массово создаются из-за того, что в кэш запись не будет добавлена
