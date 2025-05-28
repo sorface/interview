@@ -1,7 +1,5 @@
 using Interview.Backend.Auth;
 using Interview.Domain.Database;
-using Interview.Backend.Auth;
-using Interview.Domain.Database;
 using Interview.Domain.Permissions;
 using Interview.Domain.Repository;
 using Interview.Domain.Users.Permissions;
@@ -114,7 +112,7 @@ public sealed class UserService(
 
                         var userRoles = await GetUserRolesAsync(roles, token);
 
-                        if (userRoles is null || !userRoles.Any())
+                        if (userRoles is null || userRoles.Count == 0)
                         {
                             throw new NotFoundException(ExceptionMessage.UserRoleNotFound());
                         }
