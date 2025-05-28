@@ -416,7 +416,7 @@ export const Room: FunctionComponent = () => {
           if (parsedData?.Value === closeStatus) {
             setRoomClose(true);
           }
-          if (parsedData?.Value === reviewStatus) {
+          if (!aiRoom && parsedData?.Value === reviewStatus) {
             setRoomInReview(true);
           }
           if (parsedData?.Value !== newStatus) {
@@ -445,7 +445,7 @@ export const Room: FunctionComponent = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [id, auth, lastMessage, playChatMessageSound, updateQuestions]);
+  }, [id, auth, lastMessage, aiRoom, playChatMessageSound, updateQuestions]);
 
   useEffect(() => {
     if (!currentQuestionId) {
