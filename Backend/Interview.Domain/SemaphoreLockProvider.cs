@@ -16,10 +16,10 @@ namespace Interview.Backend.Auth
 
         /// <summary>
         /// Asynchronously puts thread to wait (according to the given ID)
-        /// until it can enter the LockProvider
+        /// until it can enter the LockProvider.
         /// </summary>
-        /// <param name="id">the unique ID to perform the lock</param>
-        /// <returns>A <see cref="Task"/>representing the asynchronous operation</returns>
+        /// <param name="id">the unique ID to perform the lock.</param>
+        /// <returns>A <see cref="Task"/>representing the asynchronous operation.</returns>
         public ILockWaiter CreateWaiter(T id)
         {
             var semaphoreSlim = _lockStore.GetOrAdd(id, static _ => new SemaphoreSlim(1, 1));
@@ -49,7 +49,9 @@ namespace Interview.Backend.Auth
     }
 }
 
+#pragma warning disable CA1050
 public interface ILockWaiter : IDisposable
 {
     Task WaitAsync(CancellationToken cancellationToken);
 }
+#pragma warning restore CA1050

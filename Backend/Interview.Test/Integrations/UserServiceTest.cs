@@ -42,8 +42,10 @@ public class UserServiceTest
             new RoomParticipantRepository(appDbContext)
         );
 
+        using var iMemoryCache = new MemoryCache(new MemoryCacheOptions());
+
         var userService = new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext),
-            new PermissionRepository(appDbContext), securityService, appDbContext, new MemoryCache(new MemoryCacheOptions()),
+            new PermissionRepository(appDbContext), securityService, appDbContext, iMemoryCache,
             new SemaphoreLockProvider<string>(NullLogger<SemaphoreLockProvider<string>>.Instance));
 
         var user = new User("Dima", "1");
@@ -69,10 +71,12 @@ public class UserServiceTest
             new CachedCurrentUserAccessor(new CurrentUserAccessor(), appDbContext),
             new RoomParticipantRepository(appDbContext)
         );
+        using var iMemoryCache = new MemoryCache(new MemoryCacheOptions());
+
         var userService = new UserService(
             new UserRepository(appDbContext), new RoleRepository(appDbContext),
             new PermissionRepository(appDbContext), securityService, appDbContext,
-            new MemoryCache(new MemoryCacheOptions()),
+            iMemoryCache,
             new SemaphoreLockProvider<string>(NullLogger<SemaphoreLockProvider<string>>.Instance)
         );
 
@@ -83,7 +87,7 @@ public class UserServiceTest
 
         var savedUser = await appDbContext.Users.SingleAsync(e => e.Id == upsertUser.Id);
         upsertUser.Should().BeEquivalentTo(savedUser);
-        upsertUser.Roles.Should().ContainSingle(role => role.Name == expectedRoleName);
+        upsertUser?.Roles.Should().ContainSingle(role => role.Name == expectedRoleName);
     }
 
     [Fact(DisplayName = "Inserting a user if there are no roles in the database")]
@@ -99,8 +103,9 @@ public class UserServiceTest
             new RoomParticipantRepository(appDbContext)
         );
 
+        using var iMemoryCache = new MemoryCache(new MemoryCacheOptions());
         var userService = new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext),
-            new PermissionRepository(appDbContext), securityService, appDbContext, new MemoryCache(new MemoryCacheOptions()),
+            new PermissionRepository(appDbContext), securityService, appDbContext, iMemoryCache,
             new SemaphoreLockProvider<string>(NullLogger<SemaphoreLockProvider<string>>.Instance));
 
         var user = new User("Dima", "1");

@@ -36,12 +36,13 @@ public class UserServiceTest
         _mockPermissionRepository = new Mock<IPermissionRepository>();
         _mockSecurityService = new Mock<ISecurityService>();
         _mockSemaphoreLockProvider = new SemaphoreLockProvider<string>(NullLogger<SemaphoreLockProvider<string>>.Instance);
-        var databaseContext = new TestAppDbContextFactory().Create(_systemClock);
+        using var testAppDbContextFactory = new TestAppDbContextFactory().Create(_systemClock);
+        using var iMemoryCache = new MemoryCache(new MemoryCacheOptions());
 
         _userService = new UserService(_mockUserRepository.Object, _mockRoleRepository.Object,
-            _mockPermissionRepository.Object, _mockSecurityService.Object, databaseContext, new MemoryCache(new MemoryCacheOptions()),
+            _mockPermissionRepository.Object, _mockSecurityService.Object, testAppDbContextFactory, iMemoryCache,
             _mockSemaphoreLockProvider
-            );
+        );
     }
 
     [Fact]
