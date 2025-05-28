@@ -2,7 +2,7 @@ import React, { FunctionComponent, ReactNode } from 'react';
 
 import './Button.css';
 
-type Variant =
+export type ButtonVariant =
   | 'active'
   | 'active2'
   | 'danger'
@@ -16,7 +16,7 @@ type Variant =
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: Variant;
+  variant?: ButtonVariant;
   disabled?: boolean;
   children: ReactNode;
 }

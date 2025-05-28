@@ -263,7 +263,7 @@ public class RoomReviewServiceTest
         var roomParticipant = new RoomParticipant(user, room, SERoomParticipantType.Expert);
         appDbContext.RoomParticipants.AddRange(roomParticipant);
         appDbContext.RoomReview.Add(new RoomReview(roomParticipant, SERoomReviewState.FromEnum(state)!) { Review = review, });
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
 
         var request = new UserRoomReviewRequest { UserId = userId, RoomId = roomId, };

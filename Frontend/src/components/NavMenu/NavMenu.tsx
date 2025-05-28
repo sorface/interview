@@ -105,13 +105,25 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
 
   const items: Array<MenuItem | null> = [
     {
-      path: pathnames.roadmapJs,
+      path: pathnames.roadmaps,
       caption: (
-        <LocalizationCaption captionKey={LocalizationKey.RoadmapJsPageName} />
+        <LocalizationCaption captionKey={LocalizationKey.RoadmapsPageName} />
       ),
       icon: IconNames.Golf,
       onClick: handleItemClick,
     },
+    admin
+      ? {
+          path: pathnames.roadmapsArchive,
+          caption: (
+            <LocalizationCaption
+              captionKey={LocalizationKey.RoadmapsPageName}
+            />
+          ),
+          icon: IconNames.Golf,
+          onClick: handleItemClick,
+        }
+      : null,
     {
       path: pathnames.highlightRooms,
       caption: (
@@ -228,7 +240,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
           className={`nav-menu ${collapsed ? 'collapsed' : ''} move-transition`}
         >
           <NavLink
-            to={pathnames.roadmapJs}
+            to={pathnames.roadmaps}
             className="nav-menu-item nav-menu-item-first no-active move-transition"
           >
             <img className="site-logo" src="/logo192.png" alt="site logo" />

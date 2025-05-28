@@ -285,6 +285,8 @@ export const enum LocalizationKey {
   NoNewNotifications,
   Clear,
   AnswerAgain,
+  RoadmapsPageName,
+  RoadmapCreatePageName,
   RoadmapJsPageName,
   RoadmapYourProgress,
   RoadmapLevel,
@@ -301,6 +303,7 @@ export const enum LocalizationKey {
   HomeInfoPricingFree,
   HomeInfoPricingPoint1,
   HomeInfoPricingPoint2,
+  StartAnswer,
 }
 
 export const LocalizationCaptions: Record<
@@ -628,6 +631,8 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.NoNewNotifications]: 'No new notifications',
     [LocalizationKey.Clear]: 'Clear',
     [LocalizationKey.AnswerAgain]: 'Answer again',
+    [LocalizationKey.RoadmapsPageName]: 'Roadmaps',
+    [LocalizationKey.RoadmapCreatePageName]: 'Create Roadmap',
     [LocalizationKey.RoadmapJsPageName]: 'JavaScript Roadmap',
     [LocalizationKey.RoadmapYourProgress]: 'Your Progress',
     [LocalizationKey.RoadmapLevel]: 'Level',
@@ -646,6 +651,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.HomeInfoPricingFree]: 'Free',
     [LocalizationKey.HomeInfoPricingPoint1]: 'Full access to all questions',
     [LocalizationKey.HomeInfoPricingPoint2]: 'Endless number of interviews',
+    [LocalizationKey.StartAnswer]: 'Start answer',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -971,6 +977,8 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.NoNewNotifications]: 'Новых уведомлений нет',
     [LocalizationKey.Clear]: 'Очистить',
     [LocalizationKey.AnswerAgain]: 'Ответить заново',
+    [LocalizationKey.RoadmapsPageName]: 'Roadmaps',
+    [LocalizationKey.RoadmapCreatePageName]: 'Создать Roadmap',
     [LocalizationKey.RoadmapJsPageName]: 'JavaScript Roadmap',
     [LocalizationKey.RoadmapYourProgress]: 'Ваш прогресс',
     [LocalizationKey.RoadmapLevel]: 'Уровень',
@@ -990,5 +998,6 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.HomeInfoPricingPoint1]: 'Полный доступ к базе вопросов',
     [LocalizationKey.HomeInfoPricingPoint2]:
       'Бесконечное количество собеседований',
+    [LocalizationKey.StartAnswer]: 'Начать ответ',
   },
 };

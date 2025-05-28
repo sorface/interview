@@ -1,4 +1,5 @@
 using Interview.Domain.Database;
+using Interview.Domain.Permissions;
 using Interview.Domain.Repository;
 using Microsoft.EntityFrameworkCore;
 using Moq;
