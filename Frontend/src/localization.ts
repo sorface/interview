@@ -303,6 +303,7 @@ export const enum LocalizationKey {
   HomeInfoPricingFree,
   HomeInfoPricingPoint1,
   HomeInfoPricingPoint2,
+  StartAnswer,
 }
 
 export const LocalizationCaptions: Record<
@@ -650,6 +651,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.HomeInfoPricingFree]: 'Free',
     [LocalizationKey.HomeInfoPricingPoint1]: 'Full access to all questions',
     [LocalizationKey.HomeInfoPricingPoint2]: 'Endless number of interviews',
+    [LocalizationKey.StartAnswer]: 'Start answer',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -996,5 +998,6 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.HomeInfoPricingPoint1]: 'Полный доступ к базе вопросов',
     [LocalizationKey.HomeInfoPricingPoint2]:
       'Бесконечное количество собеседований',
+    [LocalizationKey.StartAnswer]: 'Начать ответ',
   },
 };
