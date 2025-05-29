@@ -50,13 +50,16 @@ const createFakeQuestion = (roomQuestion: RoomQuestion): Question => ({
   },
 });
 
-const generateUserOpinion = (userReview: AnalyticsUserReview) => ({
+const generateUserOpinion = (
+  userReview: AnalyticsUserReview,
+  emptyReview: boolean,
+) => ({
   id: userReview.userId,
   nickname: userReview.nickname,
   participantType: userReview.participantType,
   evaluation: {
     mark: userReview.averageMark,
-    review: userReview.comment,
+    review: emptyReview ? '' : userReview.comment,
   },
 });
 
@@ -330,7 +333,10 @@ export const RoomAnaytics: FunctionComponent = () => {
                       .map((userReview) => (
                         <ReviewUserOpinion
                           key={userReview.userId}
-                          user={generateUserOpinion(userReview)}
+                          user={generateUserOpinion(
+                            userReview,
+                            !!data?.isAiRoom,
+                          )}
                           allUsers={allUsers}
                         />
                       ))}
