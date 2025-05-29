@@ -126,7 +126,7 @@ export const Roadmap: FunctionComponent = () => {
           </div>
         </div>
         <Gap sizeRem={1} horizontal />
-        <div className="flex w-full max-w-[14rem] justify-center">
+        <div className="flex w-full max-w-[18rem] justify-center">
           <div className="w-full max-w-[26rem]">
             <RoadmapProgress {...roadmapProgress} />
           </div>

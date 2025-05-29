@@ -17,8 +17,9 @@ export const getRoadmapProgress = (treeIds: Array<string | undefined>) => {
     (treeId) => getTreeProgress(treeId || '') === 100,
   ).length;
   const level = Math.trunc(doneCount / doneTreesPerLevel);
-  const levelProgressPercent = Math.trunc((levels.length / level) * 10);
+  const levelProgressPercent =
+    doneCount === 0 ? 0 : Math.trunc((levels.length / level) * 10);
   const levelCaption = levels[level];
 
-  return { level, levelCaption, levelProgressPercent };
+  return { levelCaption, levelProgressPercent };
 };

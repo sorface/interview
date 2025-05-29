@@ -287,12 +287,20 @@ progress {
 progress::-moz-progress-bar {
   background: var(--button-active-bg);
 }
-
 progress::-webkit-progress-bar {
   background-color: var(--grey-active);
 }
 progress::-webkit-progress-value {
   background-color: var(--button-active-bg) !important;
+}
+progress.rounded-progress::-moz-progress-bar {
+  border-radius: 1rem;
+}
+progress.rounded-progress::-webkit-progress-bar {
+  border-radius: 1rem;
+}
+progress.rounded-progress::-webkit-progress-value {
+  border-radius: 1rem;
 }
 progress[value] {
   -webkit-appearance: none;
