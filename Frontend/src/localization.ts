@@ -286,6 +286,7 @@ export const enum LocalizationKey {
   Clear,
   AnswerAgain,
   RoadmapsPageName,
+  RoadmapsPageDescription,
   RoadmapCreatePageName,
   RoadmapJsPageName,
   RoadmapYourProgress,
@@ -294,6 +295,7 @@ export const enum LocalizationKey {
   RoadmapLevel1,
   RoadmapLevel2,
   RoadmapLevel3,
+  RoadmapToFinish,
   HomeInfoTitle,
   HomeInfoTheoryBlockTitle,
   HomeInfoTheoryBlockInfo,
@@ -303,6 +305,8 @@ export const enum LocalizationKey {
   HomeInfoPricingFree,
   HomeInfoPricingPoint1,
   HomeInfoPricingPoint2,
+  StartAnswer,
+  Learn,
 }
 
 export const LocalizationCaptions: Record<
@@ -631,6 +635,8 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.Clear]: 'Clear',
     [LocalizationKey.AnswerAgain]: 'Answer again',
     [LocalizationKey.RoadmapsPageName]: 'Roadmaps',
+    [LocalizationKey.RoadmapsPageDescription]:
+      'Structured learning paths to guide your tech journey.',
     [LocalizationKey.RoadmapCreatePageName]: 'Create Roadmap',
     [LocalizationKey.RoadmapJsPageName]: 'JavaScript Roadmap',
     [LocalizationKey.RoadmapYourProgress]: 'Your Progress',
@@ -639,6 +645,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.RoadmapLevel1]: 'Newbie',
     [LocalizationKey.RoadmapLevel2]: 'Experienced',
     [LocalizationKey.RoadmapLevel3]: 'Interview Master',
+    [LocalizationKey.RoadmapToFinish]: 'to finish',
     [LocalizationKey.HomeInfoTitle]: 'Interviews with AI',
     [LocalizationKey.HomeInfoTheoryBlockTitle]: 'Theory interviews',
     [LocalizationKey.HomeInfoTheoryBlockInfo]:
@@ -650,6 +657,8 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.HomeInfoPricingFree]: 'Free',
     [LocalizationKey.HomeInfoPricingPoint1]: 'Full access to all questions',
     [LocalizationKey.HomeInfoPricingPoint2]: 'Endless number of interviews',
+    [LocalizationKey.StartAnswer]: 'Start answer',
+    [LocalizationKey.Learn]: 'Learn',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -976,6 +985,8 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.Clear]: 'Очистить',
     [LocalizationKey.AnswerAgain]: 'Ответить заново',
     [LocalizationKey.RoadmapsPageName]: 'Roadmaps',
+    [LocalizationKey.RoadmapsPageDescription]:
+      'Дорожные карты, которые помогут вам в освоении технологий.',
     [LocalizationKey.RoadmapCreatePageName]: 'Создать Roadmap',
     [LocalizationKey.RoadmapJsPageName]: 'JavaScript Roadmap',
     [LocalizationKey.RoadmapYourProgress]: 'Ваш прогресс',
@@ -984,6 +995,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.RoadmapLevel1]: 'Новичок',
     [LocalizationKey.RoadmapLevel2]: 'Опытный',
     [LocalizationKey.RoadmapLevel3]: 'Мастер собеседований',
+    [LocalizationKey.RoadmapToFinish]: 'до завершения',
     [LocalizationKey.HomeInfoTitle]: 'Собеседования с AI',
     [LocalizationKey.HomeInfoTheoryBlockTitle]: 'Собеседования по теории',
     [LocalizationKey.HomeInfoTheoryBlockInfo]:
@@ -996,5 +1008,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.HomeInfoPricingPoint1]: 'Полный доступ к базе вопросов',
     [LocalizationKey.HomeInfoPricingPoint2]:
       'Бесконечное количество собеседований',
+    [LocalizationKey.StartAnswer]: 'Начать ответ',
+    [LocalizationKey.Learn]: 'Изучение',
   },
 };

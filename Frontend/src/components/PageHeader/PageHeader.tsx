@@ -12,6 +12,7 @@ interface PageHeaderProps {
   title: string;
   actionItem?: ReactNode;
   notifications?: boolean;
+  overlapping?: boolean;
   children?: ReactNode;
   searchValue?: PageHeaderSearchProps['searchValue'];
   onSearchChange?: PageHeaderSearchProps['onSearchChange'];
@@ -21,6 +22,7 @@ export const PageHeader: FunctionComponent<PageHeaderProps> = ({
   title,
   actionItem,
   notifications,
+  overlapping,
   children,
   searchValue,
   onSearchChange,
@@ -28,7 +30,9 @@ export const PageHeader: FunctionComponent<PageHeaderProps> = ({
   const auth = useContext(AuthContext);
 
   return (
-    <div className="flex items-center shrink-0 h-[4rem] my-[0.5rem]">
+    <div
+      className={`flex items-center shrink-0 h-[4rem] my-[0.5rem] ${overlapping ? 'fixed right-[1rem]' : ''}`}
+    >
       <h1 className="m-0">
         <Typography size="xxl" semibold>
           {title}
