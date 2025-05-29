@@ -18,7 +18,6 @@ public partial class RoadmapServiceTest
     public async Task GetByIdAsync_ExistingId_ReturnsCorrectRoadmapResponse()
     {
         using var context = new TestAppDbContextFactory().Create(new TestSystemClock());
-
         await SeedTestDataAsync(context);
 
         var roadmapService = CreateService(context);
