@@ -83,7 +83,7 @@ export const Roadmaps: FunctionComponent = () => {
             <img
               className="object-cover"
               alt={`roadmap ${roadmap.name} image`}
-              src='roadmap-placeholder.png'
+              src="roadmap-placeholder.png"
             />
             <Gap sizeRem={0.75} />
             <Typography size="m" semibold>
@@ -122,7 +122,7 @@ export const Roadmaps: FunctionComponent = () => {
 
   return (
     <>
-      <PageHeader title="">
+      <PageHeader title="" overlapping>
         {admin && (
           <Link to={pathnames.roadmapCreate}>
             <Button variant="active" className="h-[2.5rem]" aria-hidden>
@@ -132,6 +132,7 @@ export const Roadmaps: FunctionComponent = () => {
           </Link>
         )}
       </PageHeader>
+      <Gap sizeRem={2.25} />
       <div className="text-left flex flex-col">
         <Typography size="xxxl" semibold>
           {localizationCaptions[LocalizationKey.RoadmapsPageName]}
