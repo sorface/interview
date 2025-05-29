@@ -295,6 +295,7 @@ export const enum LocalizationKey {
   RoadmapLevel1,
   RoadmapLevel2,
   RoadmapLevel3,
+  RoadmapToFinish,
   HomeInfoTitle,
   HomeInfoTheoryBlockTitle,
   HomeInfoTheoryBlockInfo,
@@ -644,6 +645,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.RoadmapLevel1]: 'Newbie',
     [LocalizationKey.RoadmapLevel2]: 'Experienced',
     [LocalizationKey.RoadmapLevel3]: 'Interview Master',
+    [LocalizationKey.RoadmapToFinish]: 'to finish',
     [LocalizationKey.HomeInfoTitle]: 'Interviews with AI',
     [LocalizationKey.HomeInfoTheoryBlockTitle]: 'Theory interviews',
     [LocalizationKey.HomeInfoTheoryBlockInfo]:
@@ -993,6 +995,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.RoadmapLevel1]: 'Новичок',
     [LocalizationKey.RoadmapLevel2]: 'Опытный',
     [LocalizationKey.RoadmapLevel3]: 'Мастер собеседований',
+    [LocalizationKey.RoadmapToFinish]: 'до завершения',
     [LocalizationKey.HomeInfoTitle]: 'Собеседования с AI',
     [LocalizationKey.HomeInfoTheoryBlockTitle]: 'Собеседования по теории',
     [LocalizationKey.HomeInfoTheoryBlockInfo]:
