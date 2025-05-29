@@ -335,7 +335,7 @@ public sealed class RoomService(
                 .FirstAsync(e => e.Id == request.QuestionTreeId, cancellationToken);
             var allSubjectTreeIds = await db.QuestionSubjectTree.GetAllChildrenAsync(questionTree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
             var questionsFromTree = await db.QuestionSubjectTree.AsNoTracking()
-                .Where(e => allSubjectTreeIds.Contains(e.Id) && e.QuestionId != null)
+                .Where(e => allSubjectTreeIds.Contains(e.Id) && e.QuestionId != null && e.Type == SEQuestionSubjectTreeType.Question)
                 .Select(e => new
                 {
                     Id = e.QuestionId!.Value,
