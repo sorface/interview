@@ -17,7 +17,7 @@ export const SvgRoadmapMilestone: FunctionComponent<
     [Theme.Light]: 'var(--green-light)',
   });
   const stroke = useThemeClassName({
-    [Theme.Dark]: 'var(--dark-grey4)',
+    [Theme.Dark]: 'var(--dark-closed-light)',
     [Theme.Light]: 'var(--grey3)',
   });
 

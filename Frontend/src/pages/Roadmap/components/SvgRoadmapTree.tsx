@@ -21,7 +21,7 @@ export const SvgRoadmapTree: FunctionComponent<SvgRoadmapTreeProps> = ({
     [Theme.Light]: 'var(--red-light)',
   });
   const stroke = useThemeClassName({
-    [Theme.Dark]: 'var(--dark-grey4)',
+    [Theme.Dark]: 'var(--dark-closed-light)',
     [Theme.Light]: 'var(--text)',
   });
 
