@@ -3,7 +3,7 @@ import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Room, RoomAccessType } from '../../types/room';
-import { Roadmap as RoadmapType } from '../../types/roadmap';
+import { RoadmapItem, Roadmap as RoadmapType } from '../../types/roadmap';
 import {
   CreateRoomBody,
   roadmapTreeApiDeclaration,
@@ -17,8 +17,18 @@ import { Gap } from '../../components/Gap/Gap';
 import { RoadmapProgress } from './components/RoadmapProgress';
 import { getRoadmapProgress } from './utils/getRoadmapProgress';
 import { findMilestoneTrees } from './utils/findMilestoneTrees';
+import { SvgRoadmap } from './components/SvgRoadmap';
 
 const roomDuration = 3600;
+const svgRoadmapFingerprint = 'MQQMQQQQQQQQQMQQQQMQQ';
+const getRoadmapFingerprint = (items: RoadmapItem[]) => {
+  const fingerprint = items
+    .map((item) => {
+      return item.type[0];
+    })
+    .join('');
+  return fingerprint;
+};
 
 export const Roadmap: FunctionComponent = () => {
   const navigate = useNavigate();
@@ -45,6 +55,8 @@ export const Roadmap: FunctionComponent = () => {
   const progressTreeIds =
     roadmap?.items.map((item) => item.questionTreeId).filter(Boolean) || [];
   const roadmapProgress = getRoadmapProgress(progressTreeIds);
+  const svgRoadmap =
+    getRoadmapFingerprint(roadmap?.items || []) === svgRoadmapFingerprint;
 
   const handleCreateRoom = (treeId: string, treeName: string) => {
     const roomStartDate = new Date();
@@ -104,23 +116,30 @@ export const Roadmap: FunctionComponent = () => {
                   {roadmap?.name}
                 </Typography>
                 <Gap sizeRem={2.25} />
-                {roadmap?.items.map((roadmapItem, roadmapItemIndex) => {
-                  if (roadmapItem.type !== 'Milestone') {
-                    return;
-                  }
-                  return (
-                    <Milestone
-                      key={roadmapItem.id}
-                      name={roadmapItem.name || ''}
-                      trees={findMilestoneTrees(
-                        roadmap?.items || [],
-                        roadmapItemIndex,
-                      )}
-                      onCreateRoom={handleCreateRoom}
-                      onRoomAlreadyExists={handleRoomAlreadyExists}
-                    />
-                  );
-                })}
+                {svgRoadmap ? (
+                  <SvgRoadmap
+                    items={roadmap?.items || []}
+                    handleCreateRoom={handleCreateRoom}
+                  />
+                ) : (
+                  roadmap?.items.map((roadmapItem, roadmapItemIndex) => {
+                    if (roadmapItem.type !== 'Milestone') {
+                      return;
+                    }
+                    return (
+                      <Milestone
+                        key={roadmapItem.id}
+                        name={roadmapItem.name || ''}
+                        trees={findMilestoneTrees(
+                          roadmap?.items || [],
+                          roadmapItemIndex,
+                        )}
+                        onCreateRoom={handleCreateRoom}
+                        onRoomAlreadyExists={handleRoomAlreadyExists}
+                      />
+                    );
+                  })
+                )}
               </div>
             )}
           </div>
