@@ -8,17 +8,31 @@ const levels = [
   LocalizationKey.RoadmapLevel3,
 ];
 
+const getDoneTreesPerLevel = (treeIds: Array<string | undefined>) => {
+  const doneTreesPerLevel = Math.floor(treeIds.length / levels.length);
+  if (doneTreesPerLevel === 0) {
+    return 1;
+  }
+  return doneTreesPerLevel;
+};
+
 export const getRoadmapProgress = (treeIds: Array<string | undefined>) => {
   if (treeIds.length === 0) {
     return { level: 0, levelCaption: levels[0], levelProgressPercent: 0 };
   }
-  const doneTreesPerLevel = Math.floor(treeIds.length / levels.length);
   const doneCount = treeIds.filter(
     (treeId) => getTreeProgress(treeId || '') === 100,
   ).length;
+  if (doneCount === treeIds.length) {
+    return {
+      level: levels.length - 1,
+      levelCaption: levels[levels.length - 1],
+      levelProgressPercent: 100,
+    };
+  }
+  const levelProgressPercent = Math.floor((doneCount / treeIds.length) * 100);
+  const doneTreesPerLevel = getDoneTreesPerLevel(treeIds);
   const level = Math.trunc(doneCount / doneTreesPerLevel);
-  const levelProgressPercent =
-    doneCount === 0 ? 0 : Math.trunc((levels.length / level) * 10);
   const levelCaption = levels[level];
 
   return { levelCaption, levelProgressPercent };
