@@ -907,6 +907,103 @@ public class RoomServiceTest
         dbRoom.Questions[0].QuestionId.Should().Be(tree.RootQuestionSubjectTree!.QuestionId!.Value);
     }
 
+    [Theory]
+    [InlineData(EVRoomStatus.New)]
+    [InlineData(EVRoomStatus.Active)]
+    public async Task Create_Should_Create_Room_When_Have_Exists_Active_Room_For_Another_User_With_QuestionTree(EVRoomStatus status)
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+        var user0 = new User("test 1", "test 1");
+        appDbContext.Users.Add(user0);
+        var user = new User("test", "test");
+        appDbContext.Users.Add(user);
+        var tree = new QuestionTree
+        {
+            Name = "dummy",
+            RootQuestionSubjectTreeId = default,
+            RootQuestionSubjectTree = new QuestionSubjectTree { QuestionId = null, Question = new Question("test"), Type = SEQuestionSubjectTreeType.Question },
+        };
+
+        appDbContext.QuestionTree.Add(tree);
+        appDbContext.Rooms.Add(new Room("test room", SERoomAccessType.Private, SERoomType.AI)
+        {
+            QuestionTreeId = tree.Id,
+            Status = SERoomStatus.FromEnum(status),
+            CreatedById = user0.Id
+        });
+        await appDbContext.SaveChangesAsync();
+        await appDbContext.SaveChangesAsync();
+        appDbContext.ChangeTracker.Clear();
+
+        var roomService = CreateRoomService(appDbContext, user);
+        var roomCreateRequest = new RoomCreateRequest
+        {
+            Questions = [],
+            Experts = [],
+            Examinees = [],
+            Tags = [],
+            Name = "My room",
+            AccessType = SERoomAccessType.Public,
+            ScheduleStartTime = new DateTime(2024, 1, 1, 0, 0, 0),
+            QuestionTreeId = tree.Id,
+        };
+
+        var createdRoom = await roomService.CreateAsync(roomCreateRequest, CancellationToken.None);
+
+        var dbRoom = await appDbContext.Rooms.Include(e => e.Questions).FirstAsync(e => e.Id == createdRoom.Id);
+
+        dbRoom.Name.Should().Be("My room");
+        dbRoom.AccessType!.Should().Be(SERoomAccessType.Public);
+        dbRoom.Questions.Should().HaveCount(1);
+        dbRoom.Questions[0].QuestionId.Should().Be(tree.RootQuestionSubjectTree!.QuestionId!.Value);
+    }
+
+    [Theory]
+    [InlineData(EVRoomStatus.New)]
+    [InlineData(EVRoomStatus.Active)]
+    public async Task Create_Should_Throw_Error_When_Exists_Active_Room_With_QuestionTree(EVRoomStatus status)
+    {
+        var testSystemClock = new TestSystemClock();
+        await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
+        var user = new User("test", "test");
+        appDbContext.Users.Add(user);
+        var tree = new QuestionTree
+        {
+            Name = "dummy",
+            RootQuestionSubjectTreeId = default,
+            RootQuestionSubjectTree = new QuestionSubjectTree { QuestionId = null, Question = new Question("test"), Type = SEQuestionSubjectTreeType.Question },
+        };
+
+        appDbContext.QuestionTree.Add(tree);
+        await appDbContext.SaveChangesAsync();
+        appDbContext.Rooms.Add(new Room("test room", SERoomAccessType.Private, SERoomType.AI)
+        {
+            QuestionTreeId = tree.Id,
+            Status = SERoomStatus.FromEnum(status),
+            CreatedById = user.Id
+        });
+        await appDbContext.SaveChangesAsync();
+        appDbContext.ChangeTracker.Clear();
+
+        var roomService = CreateRoomService(appDbContext, user);
+        var roomCreateRequest = new RoomCreateRequest
+        {
+            Questions = [],
+            Experts = [],
+            Examinees = [],
+            Tags = [],
+            Name = "My room",
+            AccessType = SERoomAccessType.Public,
+            ScheduleStartTime = new DateTime(2024, 1, 1, 0, 0, 0),
+            QuestionTreeId = tree.Id,
+        };
+
+        var ex = await Assert.ThrowsAsync<UserException>(() => roomService.CreateAsync(roomCreateRequest, CancellationToken.None));
+
+        ex.Message.Should().Be($"Room with id {tree.Id} already exists");
+    }
+
     [Fact]
     public async Task Update_Room_With_Questions()
     {

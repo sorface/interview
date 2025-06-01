@@ -330,6 +330,8 @@ public sealed class RoomService(
 
         if (request.QuestionTreeId is not null)
         {
+            await EnsureAvailableToAssignQuestionTreeToRoomAsync(currentUserId, request.QuestionTreeId.Value, cancellationToken);
+
             var questionTree = await db.QuestionTree
                 .Select(e => new { Id = e.Id, Name = e.Name, RootQuestionSubjectTreeId = e.RootQuestionSubjectTreeId, })
                 .FirstAsync(e => e.Id == request.QuestionTreeId, cancellationToken);
@@ -467,6 +469,8 @@ public sealed class RoomService(
 
         if (request.QuestionTreeId != null && request.QuestionTreeId != (foundRoom.QuestionTreeId ?? Guid.Empty))
         {
+            await EnsureAvailableToAssignQuestionTreeToRoomAsync(foundRoom.CreatedById, request.QuestionTreeId.Value, cancellationToken);
+
             // When a user sets up a category, you must remove all questions from the room.
             request.Questions.Clear();
 
@@ -999,6 +1003,24 @@ public sealed class RoomService(
         }
 
         return new RoomTimer { Duration = TimeSpan.FromSeconds(durationSec.Value), };
+    }
+
+    private async Task EnsureAvailableToAssignQuestionTreeToRoomAsync(Guid? userId, Guid questionTreeId, CancellationToken cancellationToken)
+    {
+        if (userId is null)
+        {
+            return;
+        }
+
+        var activeStatuses = SERoomStatus.ActiveStatuses;
+        var hasActiveQuestionTreeRoom = await db.Rooms
+            .AnyAsync(
+                e => e.CreatedById == userId && e.QuestionTreeId == questionTreeId && activeStatuses.Contains(e.Status),
+                cancellationToken);
+        if (hasActiveQuestionTreeRoom)
+        {
+            throw new UserException($"Room with id {questionTreeId} already exists");
+        }
     }
 
     private void EnsureAvailableRoomEdit(Room room)

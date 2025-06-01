@@ -145,12 +145,13 @@ public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveServ
         if (currentUserId is not null)
         {
             var questionTreeIds = tmpRes.Items.SelectMany(t => t.Items.Select(tt => tt.QuestionTreeId)).ToHashSet();
+            var activeStatuses = SERoomStatus.ActiveStatuses;
             var roomIdList = await db.Rooms
                 .Where(e =>
                     e.QuestionTreeId != null &&
                     questionTreeIds.Contains(e.QuestionTreeId.Value) &&
                     e.CreatedById == currentUserId &&
-                    (e.Status == SERoomStatus.New || e.Status == SERoomStatus.Active))
+                    activeStatuses.Contains(e.Status))
                 .Select(e => new { QuestionTreeId = e.QuestionTreeId!.Value, RoomId = e.Id })
                 .ToListAsync(cancellationToken);
             roomIdMap = roomIdList.ToLookup(e => e.QuestionTreeId, e => e.RoomId);
