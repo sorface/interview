@@ -167,6 +167,9 @@ public enum EVPermission
     [Description("Creating a new public room")]
     PublicRoomCreate,
 
+    [Description("Get room business analytic")]
+    GetRoomBusinessAnalytic,
+
     [Description("Create/Update category")]
     EditCategory,
 
