@@ -995,6 +995,16 @@ public sealed class RoomService(
             cancellationToken);
     }
 
+    private static RoomTimer? CreateRoomTimer(long? durationSec)
+    {
+        if (durationSec is null)
+        {
+            return null;
+        }
+
+        return new RoomTimer { Duration = TimeSpan.FromSeconds(durationSec.Value), };
+    }
+
     private async Task EnsureAvailableToAssignQuestionTreeToRoomAsync(Guid? userId, Guid questionTreeId, CancellationToken cancellationToken)
     {
         if (userId is null)
@@ -1011,16 +1021,6 @@ public sealed class RoomService(
         {
             throw new UserException($"Room with id {questionTreeId} already exists");
         }
-    }
-
-    private static RoomTimer? CreateRoomTimer(long? durationSec)
-    {
-        if (durationSec is null)
-        {
-            return null;
-        }
-
-        return new RoomTimer { Duration = TimeSpan.FromSeconds(durationSec.Value), };
     }
 
     private void EnsureAvailableRoomEdit(Room room)
