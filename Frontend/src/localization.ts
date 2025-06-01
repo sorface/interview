@@ -307,6 +307,8 @@ export const enum LocalizationKey {
   HomeInfoPricingPoint2,
   StartAnswer,
   Learn,
+  ErrorRecognitionNotSupportedTitle,
+  ErrorRecognitionNotSupportedDescription,
 }
 
 export const LocalizationCaptions: Record<
@@ -659,6 +661,10 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.HomeInfoPricingPoint2]: 'Endless number of interviews',
     [LocalizationKey.StartAnswer]: 'Start answer',
     [LocalizationKey.Learn]: 'Learn',
+    [LocalizationKey.ErrorRecognitionNotSupportedTitle]:
+      'Your browser does not support speech recognition.',
+    [LocalizationKey.ErrorRecognitionNotSupportedDescription]:
+      'Please try updating your browser or using a modern version of Chrome, Edge or Safari. We apologize for the inconvenience.',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -1010,5 +1016,9 @@ export const LocalizationCaptions: Record<
       'Бесконечное количество собеседований',
     [LocalizationKey.StartAnswer]: 'Начать ответ',
     [LocalizationKey.Learn]: 'Изучение',
+    [LocalizationKey.ErrorRecognitionNotSupportedTitle]:
+      'Ваш браузер не поддерживает функцию распознавания речи.',
+    [LocalizationKey.ErrorRecognitionNotSupportedDescription]:
+      ' Попробуйте обновить браузер или использовать современные версии Chrome, Edge или Safari. Приносим извинения за неудобства.',
   },
 };
