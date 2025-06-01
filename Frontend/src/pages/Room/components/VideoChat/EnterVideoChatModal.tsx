@@ -32,6 +32,7 @@ import { Link } from 'react-router-dom';
 
 interface EnterVideoChatModalProps {
   aiRoom: boolean;
+  recognitionNotSupported: boolean;
   open: boolean;
   loading: boolean;
   error: string | null;
@@ -45,11 +46,12 @@ const enum Screen {
   Joining,
   SetupDevices,
   Error,
+  ErrorRecognitionNotSupported,
 }
 
 export const EnterVideoChatModal: FunctionComponent<
   EnterVideoChatModalProps
-> = ({ aiRoom, open, loading, error, onClose }) => {
+> = ({ aiRoom, recognitionNotSupported, open, loading, error, onClose }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
   const { viewerMode, room } = useContext(RoomContext);
@@ -85,6 +87,12 @@ export const EnterVideoChatModal: FunctionComponent<
     }
     setScreen(Screen.JoiningAi);
   }, [aiRoom]);
+
+  useEffect(() => {
+    if (aiRoom && recognitionNotSupported) {
+      setScreen(Screen.ErrorRecognitionNotSupported);
+    }
+  }, [aiRoom, recognitionNotSupported]);
 
   useEffect(() => {
     if (viewerMode || loading) {
@@ -388,6 +396,31 @@ export const EnterVideoChatModal: FunctionComponent<
       </>
     ),
     [Screen.Error]: <div>{error}</div>,
+    [Screen.ErrorRecognitionNotSupported]: (
+      <div className="w-[28rem] flex flex-col items-center text-left">
+        <Typography size="l" bold>
+          {localizationCaptions[LocalizationKey.Error]}
+        </Typography>
+        <Gap sizeRem={1.25} />
+        <div className="text-left">
+          <Typography size="m">
+            {
+              localizationCaptions[
+                LocalizationKey.ErrorRecognitionNotSupportedTitle
+              ]
+            }
+          </Typography>
+          <Gap sizeRem={0.15} />
+          <Typography size="s" secondary>
+            {
+              localizationCaptions[
+                LocalizationKey.ErrorRecognitionNotSupportedDescription
+              ]
+            }
+          </Typography>
+        </div>
+      </div>
+    ),
   };
 
   return (
