@@ -753,24 +753,6 @@ public sealed class RoomService(
         await db.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task EnsureAvailableToAssignQuestionTreeToRoomAsync(Guid? userId, Guid questionTreeId, CancellationToken cancellationToken)
-    {
-        if (userId is null)
-        {
-            return;
-        }
-
-        var activeStatuses = SERoomStatus.ActiveStatuses;
-        var hasActiveQuestionTreeRoom = await db.Rooms
-            .AnyAsync(
-                e => e.CreatedById == userId && e.QuestionTreeId == questionTreeId && activeStatuses.Contains(e.Status),
-                cancellationToken);
-        if (hasActiveQuestionTreeRoom)
-        {
-            throw new UserException($"Room with id {questionTreeId} already exists");
-        }
-    }
-
     public async Task DeleteRoomStateAsync(Guid roomId, string type, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(type))
@@ -1011,6 +993,24 @@ public sealed class RoomService(
                 };
             },
             cancellationToken);
+    }
+
+    private async Task EnsureAvailableToAssignQuestionTreeToRoomAsync(Guid? userId, Guid questionTreeId, CancellationToken cancellationToken)
+    {
+        if (userId is null)
+        {
+            return;
+        }
+
+        var activeStatuses = SERoomStatus.ActiveStatuses;
+        var hasActiveQuestionTreeRoom = await db.Rooms
+            .AnyAsync(
+                e => e.CreatedById == userId && e.QuestionTreeId == questionTreeId && activeStatuses.Contains(e.Status),
+                cancellationToken);
+        if (hasActiveQuestionTreeRoom)
+        {
+            throw new UserException($"Room with id {questionTreeId} already exists");
+        }
     }
 
     private static RoomTimer? CreateRoomTimer(long? durationSec)
