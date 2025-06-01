@@ -8,8 +8,6 @@ public class BusinessAnalyticResponse
 
     public class Item
     {
-        public EVRoomAccessType AccessType { get; set; }
-
         public required DateOnly Date { get; set; }
 
         public required List<ItemStatus> Status { get; set; }

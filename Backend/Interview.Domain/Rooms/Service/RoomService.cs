@@ -48,6 +48,9 @@ public sealed class RoomService(
 {
     public async Task<BusinessAnalyticResponse> GetBusinessAnalyticAsync(BusinessAnalyticRequest request, CancellationToken cancellationToken = default)
     {
+        request.Filter.StartDate = request.Filter.StartDate.Date;
+        request.Filter.EndDate = request.Filter.EndDate.Date.AddDays(1).Subtract(TimeSpan.FromSeconds(1));
+
         if (request.Filter.StartDate > request.Filter.EndDate)
         {
             throw new UserException("The start date must be before the end date.");
