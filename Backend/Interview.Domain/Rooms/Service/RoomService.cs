@@ -58,7 +58,7 @@ public sealed class RoomService(
 
         const int MaxRangeInMonth = 2;
         var maxDate = request.Filter.StartDate.AddMonths(MaxRangeInMonth);
-        if (request.Filter.EndDate > maxDate)
+        if (request.Filter.EndDate.Date > maxDate)
         {
             throw new UserException($"The end date must not exceed the maximum allowable value. (not older than {MaxRangeInMonth} months)");
         }
