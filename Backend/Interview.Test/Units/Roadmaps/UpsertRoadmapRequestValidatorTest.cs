@@ -73,6 +73,26 @@ public class UpsertRoadmapRequestValidatorTest
     }
 
     [Fact]
+    public void Should_Return_Error_When_Description_Is_Too_Long()
+    {
+        var request = new UpsertRoadmapRequest
+        {
+            Name = "Aaaaa",
+            Description = new string('A', 200),
+            Order = 0,
+            Tags = new(),
+            Items = new List<UpsertRoadmapItemRequest>
+            {
+                new() { Type = EVRoadmapItemType.Milestone, Name = "Start", Order = 0 }
+            }
+        };
+
+        var result = _validator.Validate(request);
+
+        result.Errors.Should().Contain(UpsertRoadmapRequestValidator.Errors.DescriptionTooLong);
+    }
+
+    [Fact]
     public void Should_Return_Error_When_Items_Empty()
     {
         var request = new UpsertRoadmapRequest

@@ -487,6 +487,13 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Description")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("ImageBase64")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsArchived")
                         .HasColumnType("boolean");
 
