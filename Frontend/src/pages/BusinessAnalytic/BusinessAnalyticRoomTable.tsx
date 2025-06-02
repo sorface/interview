@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { Fragment, FunctionComponent } from 'react';
 import {
   RoomBusinessAnalyticTypeItem,
   RoomBusinessAnalyticTypeItemStatus,
@@ -24,13 +24,17 @@ const getStatusCount = (
 export const BusinessAnalyticRoomTable: FunctionComponent<
   BusinessAnalyticRoomTableProps
 > = ({ items }) => {
-  return items.map((item) => (
-    <tr key={item.date}>
-      <th>{item.date}</th>
-      <th>{getStatusCount(item, 'New')}</th>
-      <th>{getStatusCount(item, 'Active')}</th>
-      <th>{getStatusCount(item, 'Review')}</th>
-      <th>{getStatusCount(item, 'Close')}</th>
-    </tr>
-  ));
+  return (
+    <Fragment>
+      {items.map((item) => (
+        <tr key={item.date}>
+          <th>{item.date}</th>
+          <th>{getStatusCount(item, 'New')}</th>
+          <th>{getStatusCount(item, 'Active')}</th>
+          <th>{getStatusCount(item, 'Review')}</th>
+          <th>{getStatusCount(item, 'Close')}</th>
+        </tr>
+      ))}
+    </Fragment>
+  );
 };
