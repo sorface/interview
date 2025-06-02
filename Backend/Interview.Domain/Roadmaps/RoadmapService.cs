@@ -25,8 +25,6 @@ public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveServ
             throw new UserException(result.Errors);
         }
 
-        EnsureValidImage(request);
-
         var tags = await EnsureDbCheckValidateAsync(db, request, result.Tree, cancellationToken);
 
         Roadmap? roadmap = null;
@@ -236,20 +234,6 @@ public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveServ
     {
         var item = await archiveService.UnarchiveAsync(id, cancellationToken);
         return new RoadmapPageResponse { Id = item.Id, Name = item.Name, Tags = [], ImageBase64 = null, Description = null, };
-    }
-
-    private void EnsureValidImage(UpsertRoadmapRequest request)
-    {
-        if (string.IsNullOrEmpty(request.ImageBase64))
-        {
-            return;
-        }
-
-        const double maxImageLength = 300000;
-        if (request.ImageBase64.Length > maxImageLength)
-        {
-            throw new UserException("Image too large");
-        }
     }
 
     private async Task<Roadmap> CreateRoadmapAsync(

@@ -93,6 +93,26 @@ public class UpsertRoadmapRequestValidatorTest
     }
 
     [Fact]
+    public void Should_Return_Error_When_Image_Too_Large()
+    {
+        var request = new UpsertRoadmapRequest
+        {
+            Name = "Aaaaa",
+            ImageBase64 = new string('A', 300001),
+            Order = 0,
+            Tags = new(),
+            Items = new List<UpsertRoadmapItemRequest>
+            {
+                new() { Type = EVRoadmapItemType.Milestone, Name = "Start", Order = 0 }
+            }
+        };
+
+        var result = _validator.Validate(request);
+
+        result.Errors.Should().Contain(UpsertRoadmapRequestValidator.Errors.ImageTooLarge);
+    }
+
+    [Fact]
     public void Should_Return_Error_When_Items_Empty()
     {
         var request = new UpsertRoadmapRequest
