@@ -251,6 +251,10 @@ public class SEPermission(Guid id, EVPermission value) : SmartEnum<SEPermission>
         Guid.Parse("FCC9BBCA-15C6-4221-8D2D-E052B8CD4385"),
         EVPermission.PublicRoomCreate);
 
+    public static readonly SEPermission GetRoomBusinessAnalytic = new(
+        Guid.Parse("AFF113AC-C65B-4566-993B-AA7F6577F397"),
+        EVPermission.GetRoomBusinessAnalytic);
+
     public static readonly SEPermission EditCategory = new(
         Guid.Parse("1B2DD31B-B35E-48E2-8F33-D0366B9D60BA"),
         EVPermission.EditCategory);

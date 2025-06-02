@@ -30,6 +30,7 @@ export const pathnames = {
   roadmapCreate: '/roadmap/create',
   roadmapEdit: '/roadmap/edit/:id',
   roadmap: '/roadmap/:id',
+  businessAnalytic: '/businessAnalytic',
 };
 
 export const enum IconNames {

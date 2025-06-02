@@ -3,6 +3,7 @@ using Interview.Backend.Auth;
 using Interview.Backend.Responses;
 using Interview.Domain;
 using Interview.Domain.Events.Storage;
+using Interview.Domain.Rooms.BusinessAnalytic;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Request.Transcription;
 using Interview.Domain.Rooms.Records.Response;
@@ -44,6 +45,21 @@ public class RoomController(IRoomService roomService) : ControllerBase
             request.PageSize,
             dateSort,
             HttpContext.RequestAborted);
+    }
+
+    /// <summary>
+    /// Getting a Room Business Analytic page.
+    /// </summary>
+    /// <param name="request">Request.</param>
+    /// <returns>Business analytic.</returns>
+    [Authorize]
+    [HttpGet("businessAnalytic")]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(BusinessAnalyticResponse), StatusCodes.Status200OK)]
+    public Task<BusinessAnalyticResponse> GetBusinessAnalyticAsync(
+        [FromQuery] BusinessAnalyticRequest request)
+    {
+        return roomService.GetBusinessAnalyticAsync(request, HttpContext.RequestAborted);
     }
 
     /// <summary>
