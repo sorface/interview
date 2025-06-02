@@ -309,6 +309,7 @@ export const enum LocalizationKey {
   Learn,
   ErrorRecognitionNotSupportedTitle,
   ErrorRecognitionNotSupportedDescription,
+  BusinessAnalyticPageName,
 }
 
 export const LocalizationCaptions: Record<
@@ -665,6 +666,7 @@ export const LocalizationCaptions: Record<
       'Your browser does not support speech recognition.',
     [LocalizationKey.ErrorRecognitionNotSupportedDescription]:
       'Please try updating your browser or using a modern version of Chrome, Edge or Safari. We apologize for the inconvenience.',
+    [LocalizationKey.BusinessAnalyticPageName]: 'Analytics',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -1020,5 +1022,6 @@ export const LocalizationCaptions: Record<
       'Ваш браузер не поддерживает функцию распознавания речи.',
     [LocalizationKey.ErrorRecognitionNotSupportedDescription]:
       ' Попробуйте обновить браузер или использовать современные версии Chrome, Edge или Safari. Приносим извинения за неудобства.',
+    [LocalizationKey.BusinessAnalyticPageName]: 'Аналитика',
   },
 };

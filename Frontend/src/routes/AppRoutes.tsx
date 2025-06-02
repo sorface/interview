@@ -27,6 +27,7 @@ import { CategoriesArchive } from '../pages/CategoriesArchive/CategoriesArchive'
 import { Roadmaps } from '../pages/Roadmaps/Roadmaps';
 import { RoadmapCreate } from '../pages/RoadmapCreate/RoadmapCreate';
 import { RoadmapsArchive } from '../pages/RoadmapsArchive/RoadmapsArchive';
+import { BusinessAnalytic } from '../pages/BusinessAnalytic/BusinessAnalytic';
 
 interface AppRoutesProps {
   user: User | null;
@@ -224,6 +225,14 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <Roadmaps />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.businessAnalytic}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <BusinessAnalytic />
                 </ProtectedRoute>
               }
             />

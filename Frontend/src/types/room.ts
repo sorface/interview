@@ -134,3 +134,22 @@ export interface RoomQuestionAnswer {
     }>;
   }>;
 }
+
+export interface RoomBusinessAnalytic {
+  ai: RoomBusinessAnalyticTypeItem[];
+  standard: RoomBusinessAnalyticTypeItem[];
+}
+
+export interface RoomBusinessAnalyticTypeItem {
+  date: string;
+  status: Array<{
+    name: RoomBusinessAnalyticTypeItemStatus;
+    count: number;
+  }>;
+}
+
+export type RoomBusinessAnalyticTypeItemStatus =
+  | 'New'
+  | 'Active'
+  | 'Review'
+  | 'Close';

@@ -198,6 +198,18 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
           onClick: handleItemClick,
         }
       : null,
+    admin
+      ? {
+          path: pathnames.businessAnalytic,
+          caption: (
+            <LocalizationCaption
+              captionKey={LocalizationKey.BusinessAnalyticPageName}
+            />
+          ),
+          icon: IconNames.Cube,
+          onClick: handleItemClick,
+        }
+      : null,
   ];
 
   const createMenuItem = (item: MenuItem) => {

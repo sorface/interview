@@ -217,7 +217,11 @@ th {
 }
 
 table th {
-  background-color: var(--active-nav-tab);
+  background-color: var(--wrap-bg);
+}
+
+table thead > tr > th {
+  background-color: var(--nav-item-color);
 }
 
 table td {
