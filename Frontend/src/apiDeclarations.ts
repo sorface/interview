@@ -565,6 +565,8 @@ export interface UpsertRoadmapBody {
   tags: [];
   name: string;
   order: number;
+  imageBase64?: string;
+  description?: string;
   items: Array<{
     id?: string;
     type: RoadmapItemType;
