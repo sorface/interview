@@ -110,6 +110,8 @@ public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveServ
                 Id = e.Id,
                 Name = e.Name,
                 Order = e.Order,
+                ImageBase64 = e.ImageBase64,
+                Description = e.Description,
                 Tags = e.Tags.Select(t => new TagItem
                 {
                     Id = t.Id,
@@ -210,6 +212,8 @@ public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveServ
             Name = tmpRes.Name,
             Order = tmpRes.Order,
             Tags = tmpRes.Tags,
+            ImageBase64 = tmpRes.ImageBase64,
+            Description = tmpRes.Description,
             Items = items,
         };
     }
