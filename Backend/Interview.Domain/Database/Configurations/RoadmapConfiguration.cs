@@ -10,5 +10,7 @@ public class RoadmapConfiguration : EntityTypeConfigurationBase<Roadmap>
         builder.Property(e => e.Name).IsRequired().HasMaxLength(128);
         builder.Property(e => e.Order).IsRequired();
         builder.HasMany(e => e.Tags).WithMany();
+        builder.Property(e => e.ImageBase64);
+        builder.Property(e => e.Description).HasMaxLength(128);
     }
 }

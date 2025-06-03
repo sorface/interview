@@ -482,6 +482,13 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Description")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ImageBase64")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsArchived")
                         .HasColumnType("INTEGER");
 

@@ -2,6 +2,8 @@ export interface Roadmap {
   id: string;
   name: string;
   order: number;
+  imageBase64?: string;
+  description?: string;
   items: RoadmapItem[];
 }
 

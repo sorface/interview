@@ -83,7 +83,7 @@ export const Roadmaps: FunctionComponent = () => {
             <img
               className="object-cover"
               alt={`roadmap ${roadmap.name} image`}
-              src="roadmap-placeholder.png"
+              src={roadmap.imageBase64 || 'roadmap-placeholder.png'}
             />
             <Gap sizeRem={0.75} />
             <Typography size="m" semibold>
@@ -91,7 +91,8 @@ export const Roadmaps: FunctionComponent = () => {
             </Typography>
             <Gap sizeRem={0.25} />
             <Typography size="s" secondary>
-              {localizationCaptions[LocalizationKey.Learn]} {roadmap.name}.
+              {roadmap.description ||
+                `${localizationCaptions[LocalizationKey.Learn]} ${roadmap.name}.`}
             </Typography>
             {admin && (
               <div className="flex ml-auto">
