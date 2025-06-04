@@ -158,10 +158,11 @@ export const Room: FunctionComponent = () => {
     );
   };
 
-  const { recognitionNotSupported } = useSpeechRecognition({
-    recognitionEnabled,
-    onVoiceRecognition: handleVoiceRecognition,
-  });
+  const { recognitionNotSupported, recognitionNotAllowed } =
+    useSpeechRecognition({
+      recognitionEnabled,
+      onVoiceRecognition: handleVoiceRecognition,
+    });
   const { unreadChatMessages } = useUnreadChatMessages({
     lastWsMessageParsed,
     messagesChatEnabled,
@@ -536,6 +537,20 @@ export const Room: FunctionComponent = () => {
   if (roomInReview && id) {
     return (
       <Navigate to={getCloseRedirectLink(id, currentUserExpert)} replace />
+    );
+  }
+
+  if (aiRoom && recognitionNotAllowed) {
+    return (
+      <MessagePage
+        title={localizationCaptions[LocalizationKey.AllowAccessToMicrophone]}
+        message={
+          localizationCaptions[
+            LocalizationKey.AllowAccessToMicrophoneDescription
+          ]
+        }
+        iconName={IconNames.MicOff}
+      />
     );
   }
 
