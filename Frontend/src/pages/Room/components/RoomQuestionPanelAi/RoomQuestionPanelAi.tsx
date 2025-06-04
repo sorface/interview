@@ -351,6 +351,10 @@ export const RoomQuestionPanelAi: FunctionComponent<
     [Theme.Dark]: 'active2' as ButtonVariant,
     [Theme.Light]: 'active' as ButtonVariant,
   });
+  const themedAnswerAgainButton = useThemeClassName({
+    [Theme.Dark]: 'inverted' as ButtonVariant,
+    [Theme.Light]: 'active2' as ButtonVariant,
+  });
 
   const { aiAnswerCompleted, aiAnswerLoading, lastValidAiAnswer } =
     useAiAnswerSource({
@@ -836,7 +840,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                     <Gap sizeRem={2} />
                     <div className="flex flex-1">
                       <div
-                        className={`flex-1 flex flex-col text-left px-[1.875rem] h-full rounded-[1.5rem] ${themeInUi === Theme.Dark ? 'bg-dark-dark1' : ''}`}
+                        className={`flex-1 flex flex-col text-left px-[1.875rem] h-full rounded-[1.5rem] ${questionWithCode ? 'max-w-[400px]' : ''} ${themeInUi === Theme.Dark ? 'bg-dark-dark1' : ''}`}
                         style={{
                           background:
                             themeInUi === Theme.Light
@@ -859,18 +863,6 @@ export const RoomQuestionPanelAi: FunctionComponent<
                               }
                             </Typography>
                           </div>
-                          <div className="flex flex-col">
-                            <Typography size="xxxl">
-                              <Icon inheritFontSize name={IconNames.Happy} />
-                            </Typography>
-                            <Typography size="m" secondary>
-                              {
-                                localizationCaptions[
-                                  LocalizationKey.EmotionalAssessment
-                                ]
-                              }
-                            </Typography>
-                          </div>
                         </div>
                         <Gap sizeRem={1.875} />
                         <Typography size="m">
@@ -879,7 +871,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                         </Typography>
                         <Gap sizeRem={1.375} />
                         <Button
-                          variant="inverted"
+                          variant={themedAnswerAgainButton}
                           className="!w-fit"
                           disabled={!aiAnswerCompleted}
                           onClick={handleAnswerAgain}
