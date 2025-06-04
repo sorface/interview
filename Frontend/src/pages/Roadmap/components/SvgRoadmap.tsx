@@ -6,11 +6,13 @@ import { SvgRoadmapTree } from './SvgRoadmapTree';
 interface SvgRoadmapProps {
   items: RoadmapItem[];
   handleCreateRoom: (treeId: string, treeName: string) => void;
+  onRoomAlreadyExists: (roomId: string) => void;
 }
 
 export const SvgRoadmap: FunctionComponent<SvgRoadmapProps> = ({
   items,
   handleCreateRoom,
+  onRoomAlreadyExists,
 }) => {
   const getNextItem = (() => {
     let currIndex = 0;
@@ -19,6 +21,10 @@ export const SvgRoadmap: FunctionComponent<SvgRoadmapProps> = ({
 
   const handleClick = (item?: RoadmapItem) => {
     if (!item || !item.questionTreeId || !item.name) {
+      return;
+    }
+    if (item.roomId) {
+      onRoomAlreadyExists(item.roomId);
       return;
     }
     handleCreateRoom(item.questionTreeId, item.name);

@@ -12,6 +12,7 @@ export interface RoadmapItem {
   type: RoadmapItemType;
   name?: string;
   questionTreeId?: string;
+  roomId?: string;
   order: number;
 }
 

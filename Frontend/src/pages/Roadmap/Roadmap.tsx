@@ -120,6 +120,7 @@ export const Roadmap: FunctionComponent = () => {
                   <SvgRoadmap
                     items={roadmap?.items || []}
                     handleCreateRoom={handleCreateRoom}
+                    onRoomAlreadyExists={handleRoomAlreadyExists}
                   />
                 ) : (
                   roadmap?.items.map((roadmapItem, roadmapItemIndex) => {
