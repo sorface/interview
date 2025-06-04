@@ -310,6 +310,8 @@ export const enum LocalizationKey {
   ErrorRecognitionNotSupportedTitle,
   ErrorRecognitionNotSupportedDescription,
   BusinessAnalyticPageName,
+  AllowAccessToMicrophone,
+  AllowAccessToMicrophoneDescription,
 }
 
 export const LocalizationCaptions: Record<
@@ -667,6 +669,10 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.ErrorRecognitionNotSupportedDescription]:
       'Please try updating your browser or using a modern version of Chrome, Edge or Safari. We apologize for the inconvenience.',
     [LocalizationKey.BusinessAnalyticPageName]: 'Analytics',
+    [LocalizationKey.AllowAccessToMicrophone]:
+      'Please allow access to microphone',
+    [LocalizationKey.AllowAccessToMicrophoneDescription]:
+      'You have not allowed access to microphone in your browser settings.',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -1023,5 +1029,9 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.ErrorRecognitionNotSupportedDescription]:
       ' Попробуйте обновить браузер или использовать современные версии Chrome, Edge или Safari. Приносим извинения за неудобства.',
     [LocalizationKey.BusinessAnalyticPageName]: 'Аналитика',
+    [LocalizationKey.AllowAccessToMicrophone]:
+      'Пожалуйста, разрешите доступ к микрофону',
+    [LocalizationKey.AllowAccessToMicrophoneDescription]:
+      'Вы не разрешили доступ к микрофону в настройках браузера.',
   },
 };
