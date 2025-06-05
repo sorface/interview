@@ -239,6 +239,16 @@ const getNextQuestion = (
   return getRandomQuestionWithExclude(nodes, excludedQuestions);
 };
 
+const scaleScore = (score: number) => {
+  if (score >= 8) {
+    return 10;
+  }
+  if (score === 2) {
+    return 1;
+  }
+  return score;
+};
+
 export interface RoomQuestionPanelAiProps {
   questionWithCode: boolean;
   roomQuestionsLoading: boolean;
@@ -373,6 +383,9 @@ export const RoomQuestionPanelAi: FunctionComponent<
   const [wsLastValidAiAnswer, setWsLastValidAiAnswer] =
     useState<AnyObject | null>(null);
   const totalLastValidAiAnswer = lastValidAiAnswer || wsLastValidAiAnswer;
+  const scaledScore =
+    totalLastValidAiAnswer?.score &&
+    scaleScore(Number(totalLastValidAiAnswer?.score));
 
   const themedAiAvatar = useThemedAiAvatar();
   const allUsersWithAiExpert = new Map<string, AnalyticsUserReview>();
@@ -501,10 +514,10 @@ export const RoomQuestionPanelAi: FunctionComponent<
       return;
     }
     setRoomQuestionEvaluation({
-      mark: Math.round(lastValidAiAnswer?.score),
+      mark: Math.round(scaledScore),
       review: lastValidAiAnswer?.reason,
     });
-  }, [readOnly, aiAnswerCompleted, lastValidAiAnswer]);
+  }, [readOnly, aiAnswerCompleted, scaledScore, lastValidAiAnswer]);
 
   useEffect(() => {
     if (readOnly || !lastValidAiAnswer) {
@@ -538,12 +551,12 @@ export const RoomQuestionPanelAi: FunctionComponent<
     if (!aiAnswerCompleted) {
       return;
     }
-    if (lastValidAiAnswer?.score >= aiAssistantGoodRate) {
+    if (scaledScore >= aiAssistantGoodRate) {
       setAiAssistantCurrentScript(AiAssistantScriptName.GoodAnswer);
     } else {
       setAiAssistantCurrentScript(AiAssistantScriptName.NeedTrain);
     }
-  }, [aiAnswerCompleted, lastValidAiAnswer, setAiAssistantCurrentScript]);
+  }, [aiAnswerCompleted, scaledScore, setAiAssistantCurrentScript]);
 
   useEffect(() => {
     if (readOnly || !room || !initialQuestion) {
@@ -852,7 +865,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                         <div className="flex justify-between">
                           <div className="flex flex-col">
                             <Typography size="xxxl" bold>
-                              {totalLastValidAiAnswer?.score}{' '}
+                              {scaledScore}{' '}
                               {localizationCaptions[LocalizationKey.From10]}
                             </Typography>
                             <Typography size="m" secondary>
