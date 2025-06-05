@@ -117,18 +117,14 @@ export const BusinessAnalytic: FunctionComponent = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {Object.keys(businessAnalytic).map(
-                        (businessAnalyticKey) => (
-                          <BusinessAnalyticRoomTable
-                            key={businessAnalyticKey}
-                            items={
-                              businessAnalytic[
-                                businessAnalyticKey as keyof RoomBusinessAnalytic
-                              ]
-                            }
-                          />
-                        ),
-                      )}
+                      <BusinessAnalyticRoomTable
+                        key={businessAnalyticKey}
+                        items={
+                          businessAnalytic[
+                            businessAnalyticKey as keyof RoomBusinessAnalytic
+                          ]
+                        }
+                      />
                     </tbody>
                   </table>
                   <Gap sizeRem={2.15} />
