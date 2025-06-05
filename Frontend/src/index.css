@@ -221,7 +221,7 @@ table th {
 }
 
 table thead > tr > th {
-  background-color: var(--nav-item-color);
+  background-color: var(--button-active2-bg);
 }
 
 table td {
