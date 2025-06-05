@@ -10,7 +10,11 @@ import {
   RoomBusinessAnalyticParams,
   roomsApiDeclaration,
 } from '../../apiDeclarations';
-import { RoomBusinessAnalytic } from '../../types/room';
+import {
+  RoomBusinessAnalytic,
+  RoomBusinessAnalyticTypeItem,
+  RoomBusinessAnalyticTypeItemStatus,
+} from '../../types/room';
 import { BusinessAnalyticRoomTable } from './BusinessAnalyticRoomTable';
 import { Typography } from '../../components/Typography/Typography';
 import { Gap } from '../../components/Gap/Gap';
@@ -27,6 +31,21 @@ const getInitialStartDate = () => {
 
 const getInitialEndDate = () => {
   return formatDateForInput(new Date());
+};
+
+const getStatusSum = (
+  items: RoomBusinessAnalyticTypeItem[],
+  status: RoomBusinessAnalyticTypeItemStatus,
+) => {
+  const count = items.reduce((accumCount, currItem) => {
+    const statusItem = currItem.status.find((iStat) => iStat.name === status);
+    if (statusItem) {
+      return accumCount + statusItem.count;
+    }
+    return accumCount;
+  }, 0);
+
+  return count;
 };
 
 export const BusinessAnalytic: FunctionComponent = () => {
@@ -98,38 +117,61 @@ export const BusinessAnalytic: FunctionComponent = () => {
               </Typography>
             )}
             {businessAnalytic &&
-              Object.keys(businessAnalytic).map((businessAnalyticKey) => (
-                <div key={businessAnalyticKey}>
-                  <div className="capitalize">
-                    <Typography size="l" bold>
-                      {businessAnalyticKey}
-                    </Typography>
+              Object.keys(businessAnalytic).map((businessAnalyticKey) => {
+                const items =
+                  businessAnalytic[
+                    businessAnalyticKey as keyof RoomBusinessAnalytic
+                  ];
+
+                return (
+                  <div key={businessAnalyticKey}>
+                    <div className="capitalize">
+                      <Typography size="l" bold>
+                        {businessAnalyticKey}
+                      </Typography>
+                    </div>
+                    <Gap sizeRem={0.15} />
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>
+                            <Typography size="m" bold>
+                              Date
+                            </Typography>
+                          </th>
+                          <th>
+                            <Typography size="m" bold>
+                              New ({getStatusSum(items, 'New')})
+                            </Typography>
+                          </th>
+                          <th>
+                            <Typography size="m" bold>
+                              Active ({getStatusSum(items, 'Active')})
+                            </Typography>
+                          </th>
+                          <th>
+                            <Typography size="m" bold>
+                              Review ({getStatusSum(items, 'Review')})
+                            </Typography>
+                          </th>
+                          <th>
+                            <Typography size="m" bold>
+                              Close ({getStatusSum(items, 'Close')})
+                            </Typography>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <BusinessAnalyticRoomTable
+                          key={businessAnalyticKey}
+                          items={items}
+                        />
+                      </tbody>
+                    </table>
+                    <Gap sizeRem={2.15} />
                   </div>
-                  <Gap sizeRem={0.25} />
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>New</th>
-                        <th>Active</th>
-                        <th>Review</th>
-                        <th>Close</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <BusinessAnalyticRoomTable
-                        key={businessAnalyticKey}
-                        items={
-                          businessAnalytic[
-                            businessAnalyticKey as keyof RoomBusinessAnalytic
-                          ]
-                        }
-                      />
-                    </tbody>
-                  </table>
-                  <Gap sizeRem={2.15} />
-                </div>
-              ))}
+                );
+              })}
           </div>
         </div>
       </div>

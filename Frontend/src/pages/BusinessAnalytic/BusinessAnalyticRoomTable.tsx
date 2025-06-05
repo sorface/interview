@@ -3,6 +3,7 @@ import {
   RoomBusinessAnalyticTypeItem,
   RoomBusinessAnalyticTypeItemStatus,
 } from '../../types/room';
+import { Typography } from '../../components/Typography/Typography';
 
 interface BusinessAnalyticRoomTableProps {
   items: RoomBusinessAnalyticTypeItem[];
@@ -28,11 +29,21 @@ export const BusinessAnalyticRoomTable: FunctionComponent<
     <Fragment>
       {items.map((item) => (
         <tr key={item.date}>
-          <th>{item.date}</th>
-          <th>{getStatusCount(item, 'New')}</th>
-          <th>{getStatusCount(item, 'Active')}</th>
-          <th>{getStatusCount(item, 'Review')}</th>
-          <th>{getStatusCount(item, 'Close')}</th>
+          <th>
+            <Typography size="m">{item.date}</Typography>
+          </th>
+          <th>
+            <Typography size="m">{getStatusCount(item, 'New')}</Typography>
+          </th>
+          <th>
+            <Typography size="m">{getStatusCount(item, 'Active')}</Typography>
+          </th>
+          <th>
+            <Typography size="m">{getStatusCount(item, 'Review')}</Typography>
+          </th>
+          <th>
+            <Typography size="m">{getStatusCount(item, 'Close')}</Typography>
+          </th>
         </tr>
       ))}
     </Fragment>
