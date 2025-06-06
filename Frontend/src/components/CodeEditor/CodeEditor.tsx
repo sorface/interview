@@ -24,6 +24,7 @@ import { IconNames } from '../../constants';
 import {
   ExecuteCodeResult,
   executeCodeWithExpect,
+  getSrcForIframe,
 } from '../../utils/executeCodeWithExpect';
 import { ModalFooter } from '../ModalFooter/ModalFooter';
 import { CodeExecutionResult } from '../CodeExecutionResult/CodeExecutionResult';
@@ -34,7 +35,10 @@ export const defaultCodeEditorFontSize = 13;
 
 const fontSizeOptions = [10, 12, 13, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48];
 
-const languagesForExecute: CodeEditorLang[] = [CodeEditorLang.Javascript];
+const languagesForExecute: CodeEditorLang[] = [
+  CodeEditorLang.Javascript,
+  CodeEditorLang.Html,
+];
 
 const fontSizeLocalStorageKey = 'codeEditorFontSize';
 
@@ -103,6 +107,7 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
     expectResult.results.every((expectResult) => expectResult.passed);
   const [modalExpectResults, setModalExpectResults] = useState(false);
   const codeEditorComponentRef = useRef<HTMLDivElement | null>(null);
+  const languageForIframe = language === CodeEditorLang.Html;
 
   useEffect(() => {
     saveFontSizeToStorage(fontSize);
@@ -138,6 +143,10 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   };
 
   const handleExecuteCode = async () => {
+    if (languageForIframe) {
+      setModalExpectResults(true);
+      return;
+    }
     const executeCodeResult = await executeCodeWithExpect(value);
     setExpectResult(executeCodeResult);
     setModalExpectResults(true);
@@ -240,6 +249,7 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
         open={modalExpectResults}
       >
         <CodeExecutionResult expectResult={expectResult} />
+        {languageForIframe && <iframe src={getSrcForIframe(value || '')} />}
         <Gap sizeRem={1.5} />
         {onExecutionResultsSubmit &&
           expectResultsPassed &&

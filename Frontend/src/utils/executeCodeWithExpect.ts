@@ -49,6 +49,21 @@ const expectCallsReturnCode = `
 });
 `;
 
+const expectCodeForIframeStart = `
+  <script>
+    const __expectCalls = [];
+    const expectValue = (value1, value2) => {
+      __expectCalls.push([value1, value2]);
+    };
+  </script>
+`;
+
+const expectCodeForIframeEnd = `
+  <script>
+    console.log(__expectCalls);
+  </script>
+`;
+
 type Arg = number | string | AnyObject;
 
 export interface ExecuteCodeResult {
@@ -92,4 +107,9 @@ export const executeCodeWithExpect = async (
       error: error instanceof Error ? error.message : String(error),
     };
   }
+};
+
+export const getSrcForIframe = (code: string) => {
+  const resultCode = expectCodeForIframeStart + code + expectCodeForIframeEnd;
+  return `data:text/html;charset=utf-8,${encodeURIComponent(resultCode)}`;
 };
