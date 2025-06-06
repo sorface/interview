@@ -30,10 +30,10 @@ import {
 } from '../../utils/executeCodeWithExpect';
 import { ModalFooter } from '../ModalFooter/ModalFooter';
 import { CodeExecutionResult } from '../CodeExecutionResult/CodeExecutionResult';
-
-import './CodeEditor.css';
 import { Typography } from '../Typography/Typography';
 import { useThemeClassName } from '../../hooks/useThemeClassName';
+
+import './CodeEditor.css';
 
 export const defaultCodeEditorFontSize = 13;
 
