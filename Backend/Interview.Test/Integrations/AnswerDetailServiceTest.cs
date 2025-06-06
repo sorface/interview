@@ -69,7 +69,7 @@ public class AnswerDetailServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var storage = new InMemoryHotEventStorage();
+        var storage = new TestInMemoryHotEventStorage();
         var (service, _, questionId, serializer) = CreateService(appDbContext, storage, testSystemClock, addQueuedRoomEvent);
         var request = new RoomQuestionAnswerDetailRequest { QuestionId = questionId, RoomId = Guid.NewGuid(), };
         await Assert.ThrowsAsync<NotFoundException>(() => service.GetAnswerDetailsAsync(request, CancellationToken.None));
@@ -82,7 +82,7 @@ public class AnswerDetailServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var storage = new InMemoryHotEventStorage();
+        var storage = new TestInMemoryHotEventStorage();
         var (service, roomId, _, serializer) = CreateService(appDbContext, storage, testSystemClock, addQueuedRoomEvent);
         var request = new RoomQuestionAnswerDetailRequest { QuestionId = Guid.NewGuid(), RoomId = roomId, };
         await Assert.ThrowsAsync<NotFoundException>(() => service.GetAnswerDetailsAsync(request, CancellationToken.None));
@@ -95,7 +95,7 @@ public class AnswerDetailServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var storage = new InMemoryHotEventStorage();
+        var storage = new TestInMemoryHotEventStorage();
         var (service, roomId, questionId, serializer) = CreateService(appDbContext, storage, testSystemClock, addQueuedRoomEvent);
         var request = new RoomQuestionAnswerDetailRequest { QuestionId = questionId, RoomId = roomId, };
         var answerDetails = await service.GetAnswerDetailsAsync(request, CancellationToken.None);
@@ -110,7 +110,7 @@ public class AnswerDetailServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var storage = new InMemoryHotEventStorage();
+        var storage = new TestInMemoryHotEventStorage();
         var (service, roomId, questionId, serializer) = CreateService(appDbContext, storage, testSystemClock, addQueuedRoomEvent);
         var q = appDbContext.Questions.First(e => e.Id == questionId);
         q.CodeEditor = new QuestionCodeEditor
@@ -119,7 +119,7 @@ public class AnswerDetailServiceTest
             Lang = "C#",
             Source = EVRoomCodeEditorChangeSource.User
         };
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
 
         var request = new RoomQuestionAnswerDetailRequest { QuestionId = questionId, RoomId = roomId, };
@@ -135,7 +135,7 @@ public class AnswerDetailServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var storage = new InMemoryHotEventStorage();
+        var storage = new TestInMemoryHotEventStorage();
         var (service, roomId, questionId, serializer) = CreateService(appDbContext, storage, testSystemClock, false);
 
         var nextQuestion = new Question("Next question");
@@ -152,7 +152,7 @@ public class AnswerDetailServiceTest
             State = RoomQuestionState.Open,
             Order = 0
         });
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
 
         var expectedDetails = new List<RoomQuestionAnswerDetailResponse.Detail>();
         foreach (var (start, end, generateTranscription, generateCodeEditor) in dates)
@@ -231,7 +231,7 @@ public class AnswerDetailServiceTest
             });
         }
 
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
 
         var request = new RoomQuestionAnswerDetailRequest { QuestionId = questionId, RoomId = roomId, };
@@ -246,7 +246,7 @@ public class AnswerDetailServiceTest
     {
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
-        var storage = new InMemoryHotEventStorage();
+        var storage = new TestInMemoryHotEventStorage();
         var (service, roomId, questionId, serializer) = CreateService(appDbContext, storage, testSystemClock, true);
 
         var nextQuestion = new Question("Next question");
@@ -261,7 +261,7 @@ public class AnswerDetailServiceTest
             State = RoomQuestionState.Open,
             Order = 0
         });
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
 
         var users = new Faker<User>()
             .CustomInstantiator(f => new User(f.Random.Guid(), f.Person.FullName, f.Random.Hash()))
@@ -345,7 +345,7 @@ public class AnswerDetailServiceTest
             });
         }
 
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
         appDbContext.ChangeTracker.Clear();
 
         var request = new RoomQuestionAnswerDetailRequest { QuestionId = questionId, RoomId = roomId, };
@@ -395,7 +395,7 @@ public class AnswerDetailServiceTest
     {
         var user = new User("test user", "ID");
         db.Users.Add(user);
-        var room = new Room("MY ROOM", SERoomAccessType.Private);
+        var room = new Room("MY ROOM", SERoomAccessType.Private, SERoomType.Standard);
         db.Rooms.Add(room);
         if (addQueuedRoomEvent)
         {

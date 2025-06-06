@@ -74,7 +74,7 @@ public class SecurityServiceTest
         await using var db = CreateDbContext(type, out var room, out _);
         var userWithoutRoomParticipant = new User("WITHOUT ROOM PARTICIPANT", string.Empty);
         db.Users.Add(userWithoutRoomParticipant);
-        db.SaveChanges();
+        await db.SaveChangesAsync();
         db.ChangeTracker.Clear();
         var service = CreateService(db, userWithoutRoomParticipant);
 
@@ -85,7 +85,7 @@ public class SecurityServiceTest
     {
         var faker = new Faker();
         var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
-        room = new Room(faker.Random.Word(), SERoomAccessType.Public);
+        room = new Room(faker.Random.Word(), SERoomAccessType.Public, SERoomType.Standard);
         appDbContext.Rooms.Add(room);
         user = new User(faker.Random.Word(), string.Empty);
         appDbContext.Users.Add(user);
@@ -113,7 +113,9 @@ public class SecurityServiceTest
     private static ISecurityService CreateService(AppDbContext dbContext, User user)
     {
         return new SecurityService(
+#pragma warning disable CA2000
             new CurrentPermissionAccessor(dbContext, new MemoryCache(new MemoryCacheOptions()), NullLogger<CurrentPermissionAccessor>.Instance),
+#pragma warning restore CA2000
             new CurrentUserAccessor(user),
             new RoomParticipantRepository(dbContext));
     }

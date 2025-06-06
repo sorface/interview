@@ -18,6 +18,7 @@ export const PageHeaderUserAvatar: FunctionComponent = () => {
     <>
       <ContextMenu
         translateRem={{ x: -11.375, y: 0.25 }}
+        variant="alternative"
         toggleContent={
           <div className="cursor-pointer">
             <UserAvatar
@@ -29,7 +30,7 @@ export const PageHeaderUserAvatar: FunctionComponent = () => {
           </div>
         }
       >
-        <div className="flex flex-col items-center py-1.5">
+        <div className="flex flex-col items-center py-[1.5rem]">
           <UserAvatar
             nickname={auth?.nickname || ''}
             src={auth?.avatar || ''}
@@ -41,7 +42,7 @@ export const PageHeaderUserAvatar: FunctionComponent = () => {
           </Typography>
           <Gap sizeRem={1.5} />
           <div className="flex">
-            <div className="pr-1.5">
+            <div className="pr-[1.5rem]">
               <Link to={pathnames.session}>
                 <Button variant="text">
                   <Icon name={IconNames.Settings} />

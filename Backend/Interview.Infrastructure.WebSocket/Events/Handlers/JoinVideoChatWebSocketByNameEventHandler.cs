@@ -22,6 +22,7 @@ public class JoinVideoChatWebSocketByNameEventHandler(
         var successConnectResult = await videChatConnectionProvider.TryConnectAsync(detail, cancellationToken);
         if (!successConnectResult)
         {
+            logger.LogDebug("Unable to connect to video chat");
             return;
         }
 
@@ -39,6 +40,7 @@ public class JoinVideoChatWebSocketByNameEventHandler(
     {
         if (!videChatConnectionProvider.TryGetConnections(detail.RoomId, out var subscribers))
         {
+            logger.LogError("Unable to get video chat connections {RoomId}", detail.RoomId);
             return;
         }
 

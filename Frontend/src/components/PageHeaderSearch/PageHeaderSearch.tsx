@@ -27,21 +27,21 @@ export const PageHeaderSearch: FunctionComponent<PageHeaderSearchProps> = ({
   };
 
   return (
-    <div className="flex items-stretch justify-end h-2.5">
+    <div className="flex items-stretch justify-end h-[2.5rem]">
       <input
         type="text"
+        className="muted"
         placeholder={localizationCaptions[LocalizationKey.SearchByName]}
         value={searchValue}
         style={{
-          opacity: open ? '1' : '0',
-          transition: 'opacity 0.1s ease-in-out',
+          display: open ? 'block' : 'none',
         }}
         onChange={handleSearchChange}
       />
-      <Gap sizeRem={0.25} horizontal />
+      {open && <Gap sizeRem={0.25} horizontal />}
       <Button
         variant="invertedAlternative"
-        className="min-w-unset w-2.5 h-2.5 p-0"
+        className="min-w-[0rem] w-[2.5rem] h-[2.5rem] !px-[0rem] !py-[0rem]"
         onClick={handleOpenSwitch}
       >
         <Icon size="s" name={IconNames.Search} />

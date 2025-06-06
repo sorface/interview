@@ -35,6 +35,7 @@ public class WebSocketConnectionHandler(
         }
         catch (Exception e)
         {
+            logger.LogDebug(e, "Exception inside HandleAsyncCore");
             await CloseSafely(request.WebSocket, WebSocketCloseStatus.InvalidPayloadData, e.Message, ct);
         }
         finally

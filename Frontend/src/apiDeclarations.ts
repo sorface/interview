@@ -18,6 +18,8 @@ import {
 } from './types/room';
 import { User, UserType } from './types/user';
 import { Category } from './types/category';
+import { TreeMeta, TreeNodeType } from './types/tree';
+import { Roadmap, RoadmapItemType } from './types/roadmap';
 
 export interface PaginationUrlParams {
   PageSize: number;
@@ -27,7 +29,7 @@ export interface PaginationUrlParams {
 export interface CreateRoomBody {
   name: string;
   questions?: Array<{ id: Question['id']; order: number }> | null;
-  categoryId?: Category['id'] | null;
+  questionTreeId?: string | null;
   experts: Array<User['id']>;
   examinees: Array<User['id']>;
   tags: Array<Tag['id']>;
@@ -48,6 +50,7 @@ export interface GetRoomPageParams extends PaginationUrlParams {
   Statuses: RoomStatus[];
   StartValue?: string;
   EndValue?: string;
+  dateSort?: 'Asc' | 'Desc';
 }
 
 export interface GetRoomCalendarParams {
@@ -73,6 +76,12 @@ export interface RoomEditBody {
   categoryId?: Category['id'] | null;
   scheduleStartTime: Room['scheduledStartTime'];
   durationSec?: number;
+}
+
+export interface RoomBusinessAnalyticParams {
+  startDate: string;
+  endDate: string;
+  dateSort: 'Asc' | 'Desc';
 }
 
 const eventsSearchLimit = 50;
@@ -147,6 +156,15 @@ export const roomsApiDeclaration = {
     method: 'PATCH',
     baseUrl: `/rooms/${body.id}`,
     body,
+  }),
+  businessAnalytic: (params: RoomBusinessAnalyticParams): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: '/rooms/businessAnalytic',
+    urlParams: {
+      'Filter.StartDate': params.startDate,
+      'Filter.EndDate': params.endDate,
+      DateSort: params.dateSort,
+    },
   }),
 };
 
@@ -394,6 +412,11 @@ export const roomReviewApiDeclaration = {
     baseUrl: '/room-reviews/complete',
     body,
   }),
+  completeAi: (body: CompleteRoomReviewsBody): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: '/room-reviews/complete/ai',
+    body,
+  }),
 };
 
 export interface ApplyRoomInviteBody {
@@ -467,6 +490,14 @@ export const categoriesApiDeclaration = {
       ...(params.parentId && { 'Filter.ParentId': params.parentId }),
     },
   }),
+  getPageArchived: (params: PaginationUrlParams): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: '/category/archive',
+    urlParams: {
+      'Page.PageSize': params.PageSize,
+      'Page.PageNumber': params.PageNumber,
+    },
+  }),
   get: (id: Category['id']): ApiContractGet => ({
     method: 'GET',
     baseUrl: `/category/${id}`,
@@ -479,11 +510,121 @@ export const categoriesApiDeclaration = {
   update: (category: UpdateCategoryBody): ApiContractPut => ({
     method: 'PUT',
     baseUrl: `/category/${category.id}`,
-    body: { name: category.name, parentId: category.parentId },
+    body: {
+      name: category.name,
+      parentId: category.parentId,
+      order: category.order,
+    },
   }),
   archive: (id: Category['id']): ApiContractPost => ({
     method: 'POST',
     baseUrl: `/category/archive/${id}`,
     body: undefined,
+  }),
+  unarchive: (id: Category['id']): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: `/category/unarchive/${id}`,
+    body: undefined,
+  }),
+};
+
+export interface GetQuestionsTreesParams extends PaginationUrlParams {
+  name: string;
+}
+
+export interface CreateQuestionTreeBody {
+  id: string;
+  name: string;
+  order: number;
+  parentQuestionTreeId: string | null;
+  tree: Array<{
+    parentQuestionSubjectTreeId: string | null | undefined;
+    questionId: string | null;
+    type: TreeNodeType;
+    order: number;
+  }>;
+}
+
+export interface GetPageQuestionsTreeResponse {
+  data: Array<TreeMeta>;
+}
+
+export const questionTreeApiDeclaration = {
+  getPage: (params: GetCategoriesParams): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: '/questions/tree',
+    urlParams: {
+      'Page.PageSize': params.PageSize,
+      'Page.PageNumber': params.PageNumber,
+      Name: params.name,
+    },
+  }),
+  get: (id: string): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: `/questions/tree/${id}`,
+  }),
+  upsert: (category: CreateQuestionTreeBody): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: '/questions/tree',
+    body: category,
+  }),
+  archive: (id: string): ApiContractPatch => ({
+    method: 'PATCH',
+    baseUrl: `/questions/tree/${id}/archive`,
+    body: undefined,
+  }),
+};
+
+export interface UpsertRoadmapBody {
+  id?: string;
+  tags: [];
+  name: string;
+  order: number;
+  imageBase64?: string;
+  description?: string;
+  items: Array<{
+    id?: string;
+    type: RoadmapItemType;
+    name?: string;
+    questionTreeId?: string;
+    order: number;
+  }>;
+}
+
+export const roadmapTreeApiDeclaration = {
+  getPage: (params: PaginationUrlParams): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: '/roadmaps',
+    urlParams: {
+      'Page.PageSize': params.PageSize,
+      'Page.PageNumber': params.PageNumber,
+    },
+  }),
+  getPageArchived: (params: PaginationUrlParams): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: '/roadmaps/archived',
+    urlParams: {
+      'Page.PageSize': params.PageSize,
+      'Page.PageNumber': params.PageNumber,
+    },
+  }),
+  get: (id: string): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: `/roadmaps/${id}`,
+  }),
+  upsert: (roadmap: UpsertRoadmapBody): ApiContractPut => ({
+    method: 'PUT',
+    baseUrl: '/roadmaps',
+    body: roadmap,
+  }),
+  archive: (id: Roadmap['id']): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: `/roadmaps/archive/${id}`,
+    body: {},
+  }),
+  unarchive: (id: Roadmap['id']): ApiContractPost => ({
+    method: 'POST',
+    baseUrl: `/roadmaps/unarchive/${id}`,
+    body: {},
   }),
 };

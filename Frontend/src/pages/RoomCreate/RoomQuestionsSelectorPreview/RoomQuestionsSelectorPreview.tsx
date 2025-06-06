@@ -49,17 +49,17 @@ export const RoomQuestionsSelectorPreview: FunctionComponent<
             <Typography size="m">{qestions.length}</Typography>
           </div>
         }
-        toggleClassName="w-13.75 flex justify-between"
+        toggleClassName="w-[13.75rem] flex justify-between"
         toggleIcon
-        contentClassName="translate-x--4.25-y-0.25"
+        contentClassName="overflow-auto max-h-[20rem] translate-x-[-4.25rem] translate-y-[0.25rem]"
       >
         <div
-          className={`w-18.125 rounded-0.75 shadow ${contentWrapperClassName}`}
+          className={`w-[18.125rem] rounded-[0.75rem] shadow-dark-bold ${contentWrapperClassName}`}
         >
           {qestions.sort(sortRoomQuestion).map((qestion) => (
             <div
               key={qestion.id}
-              className={`flex items-center justify-between h-2.125 px-1 cursor-pointer ${itemClassName}`}
+              className={`flex items-center justify-between h-[2.125rem] px-[1rem] cursor-pointer ${itemClassName}`}
             >
               <Typography size="s">{qestion.value}</Typography>
               <span onClick={handleRemoveClick(qestion)} className="text-grey2">

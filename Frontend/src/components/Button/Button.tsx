@@ -2,7 +2,7 @@ import React, { FunctionComponent, ReactNode } from 'react';
 
 import './Button.css';
 
-type Variant =
+export type ButtonVariant =
   | 'active'
   | 'active2'
   | 'danger'
@@ -11,11 +11,12 @@ type Variant =
   | 'invertedActive'
   | 'text'
   | 'toolsPanel'
+  | 'toolsPanelAlternative'
   | 'toolsPanelDanger';
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: Variant;
+  variant?: ButtonVariant;
   disabled?: boolean;
   children: ReactNode;
 }
@@ -30,7 +31,7 @@ export const Button: FunctionComponent<ButtonProps> = ({
     <button
       disabled={disabled}
       {...rest}
-      className={`${variant || ''} ${rest.className || ''}`}
+      className={`px-[1.25rem] py-[0.5rem] text-[0.875rem] ${variant || ''} ${rest.className || ''}`}
     >
       {children}
     </button>

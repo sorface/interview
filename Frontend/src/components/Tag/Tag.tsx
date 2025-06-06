@@ -1,5 +1,5 @@
 import React, { FunctionComponent, ReactNode } from 'react';
-import { Typography } from '../Typography/Typography';
+import { Typography, TypographyProps } from '../Typography/Typography';
 import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme, ThemeInUi } from '../../context/ThemeContext';
 
@@ -12,6 +12,8 @@ export enum TagState {
 
 interface TagProps {
   state: TagState;
+  typographySize?: TypographyProps['size'];
+  typographySemibold?: TypographyProps['semibold'];
   children: ReactNode;
 }
 
@@ -30,13 +32,20 @@ const themeClassNames: Record<ThemeInUi, Record<TagState, string>> = {
   },
 };
 
-export const Tag: FunctionComponent<TagProps> = ({ state, children }) => {
+export const Tag: FunctionComponent<TagProps> = ({
+  state,
+  typographySize,
+  typographySemibold,
+  children,
+}) => {
   const themeClassName = useThemeClassName(themeClassNames)[state];
   return (
     <div
-      className={`flex items-center py-0.125 px-0.375 rounded-0.375 ${themeClassName}`}
+      className={`flex items-center py-[0.125rem] px-[0.375rem] rounded-[0.375rem] ${themeClassName}`}
     >
-      <Typography size="s">{children}</Typography>
+      <Typography size={typographySize || 's'} semibold={typographySemibold}>
+        {children}
+      </Typography>
     </div>
   );
 };

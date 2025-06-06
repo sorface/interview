@@ -1,4 +1,5 @@
 using Interview.Domain.Events.Storage;
+using Interview.Domain.Rooms.BusinessAnalytic;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Request.Transcription;
 using Interview.Domain.Rooms.Records.Response;
@@ -12,8 +13,10 @@ namespace Interview.Domain.Rooms.Service;
 
 public interface IRoomService : IService
 {
+    Task<BusinessAnalyticResponse> GetBusinessAnalyticAsync(BusinessAnalyticRequest request, CancellationToken cancellationToken = default);
+
     Task<IPagedList<RoomPageDetail>> FindPageAsync(
-        RoomPageDetailRequestFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+        RoomPageDetailRequestFilter filter, int pageNumber, int pageSize, EVSortOrder dateSort, CancellationToken cancellationToken = default);
 
     Task<List<RoomCalendarItem>> GetCalendarAsync(RoomCalendarRequest filter, CancellationToken cancellationToken = default);
 

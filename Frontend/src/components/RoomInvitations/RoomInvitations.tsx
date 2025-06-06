@@ -15,7 +15,7 @@ import { useParticipantTypeLocalization } from '../../hooks/useParticipantTypeLo
 
 interface RoomInvitationsProps {
   roomId: string;
-  roomInvitesData: RoomInvite[] | null;
+  roomInvitesData?: RoomInvite[] | null;
   roomInvitesLoading: boolean;
   roomInvitesError: string | null;
 }

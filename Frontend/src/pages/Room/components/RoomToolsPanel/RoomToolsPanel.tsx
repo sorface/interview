@@ -17,9 +17,9 @@ const Wrapper: FunctionComponent<WrapperProps> = ({
 }) => {
   return (
     <div
-      className="absolute flex flex-col p-0.625 w-2.5 rounded-1.25 bg-room-tools-panel-bg backdrop-blur z-1"
+      className="absolute w-auto flex flex-col p-[0.625rem] rounded-[1.25rem] bg-room-tools-panel-bg backdrop-blur z-10"
       style={{
-        right: rightPos || '0.5rem',
+        right: rightPos || '0.75rem',
         bottom: bottomPos || '0.5rem',
       }}
     >
@@ -38,9 +38,7 @@ const ButtonsGroupWrapper: FunctionComponent<ButtonsGroupWrapperProps> = ({
   children,
 }) => {
   return (
-    <div
-      className={`flex flex-col ${noPaddingBottom ? '' : 'pb-1.5'} first-button:rounded-t-0.75 last-button:rounded-b-0.75`}
-    >
+    <div className={`flex flex-col ${noPaddingBottom ? '' : 'pb-[1.5rem]'}`}>
       {children}
     </div>
   );
@@ -49,6 +47,7 @@ const ButtonsGroupWrapper: FunctionComponent<ButtonsGroupWrapperProps> = ({
 interface SwitchButtonProps {
   enabled: boolean;
   danger?: boolean;
+  alternative?: boolean;
   iconEnabledName: IconNames;
   iconDisabledName: IconNames;
   loading?: boolean;
@@ -62,6 +61,7 @@ interface SwitchButtonProps {
 const SwitchButton: FunctionComponent<SwitchButtonProps> = ({
   enabled,
   danger,
+  alternative,
   iconDisabledName,
   iconEnabledName,
   loading,
@@ -73,15 +73,21 @@ const SwitchButton: FunctionComponent<SwitchButtonProps> = ({
 
   return (
     <Button
-      variant={danger ? 'toolsPanelDanger' : 'toolsPanel'}
+      variant={
+        danger
+          ? 'toolsPanelDanger'
+          : alternative
+            ? 'toolsPanelAlternative'
+            : 'toolsPanel'
+      }
       disabled={htmlDisabled}
-      className="w-2.5 h-2.5 z-1"
+      className="w-[2.5rem] h-[2.5rem] z-1 first:rounded-t-[0.75rem] last:rounded-b-[0.75rem]"
       onClick={onClick}
     >
       {loading ? (
         <Loader />
       ) : (
-        <div className="absolute z-1">
+        <div className="absolute z-1 flex">
           <Icon name={iconName} />
         </div>
       )}

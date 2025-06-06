@@ -5,6 +5,7 @@ namespace Interview.Domain.Permissions;
 public enum EVPermission
 {
 #pragma warning disable SA1602
+    [Description("Unknown")]
     Unknown,
 
     [Description("Getting the questions page")]
@@ -20,7 +21,6 @@ public enum EVPermission
     QuestionUpdate,
 
     [Description("Search for a question by ID")]
-
     QuestionFindById,
 
     [Description("Permanently deleting a question")]
@@ -167,6 +167,9 @@ public enum EVPermission
     [Description("Creating a new public room")]
     PublicRoomCreate,
 
+    [Description("Get room business analytic")]
+    GetRoomBusinessAnalytic,
+
     [Description("Create/Update category")]
     EditCategory,
 
@@ -199,5 +202,44 @@ public enum EVPermission
 
     [Description("Getting a schedule of meetings")]
     GetRoomCalendar,
+
+    [Description("Getting the questions tree page")]
+    QuestionTreeFindPage,
+
+    [Description("Getting the archived questions tree page")]
+    QuestionTreeFindArchivedPage,
+
+    [Description("Getting the question tree by id")]
+    GetQuestionTreeById,
+
+    [Description("Getting archive the question tree by id")]
+    GetArchiveQuestionTreeById,
+
+    [Description("Upsert question tree")]
+    UpsertQuestionTree,
+
+    [Description("Archiving a question tree")]
+    QuestionTreeArchive,
+
+    [Description("Unarchiving the question tree")]
+    QuestionTreeUnarchive,
+
+    [Description("Upsert roadmap")]
+    RoadmapUpsert,
+
+    [Description("Get roadmap by id")]
+    RoadmapGetById,
+
+    [Description("Find roadmap page")]
+    RoadmapFindPage,
+
+    [Description("Archive roadmap")]
+    ArchiveRoadmap,
+
+    [Description("Unarchive roadmap")]
+    UnarchiveRoadmap,
+
+    [Description("Find archived roadmap page")]
+    RoadmapFindArchivedPage,
 #pragma warning restore SA1602
 }

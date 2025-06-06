@@ -17,6 +17,7 @@ interface ItemsGridProps<T extends object> {
   error: string | null;
   nextPageAvailable: boolean;
   triggerResetAccumData: string;
+  className?: string;
   loaderClassName?: string;
   renderItem: (room: T) => JSX.Element;
   handleNextPage: () => void;
@@ -28,6 +29,7 @@ export const ItemsGrid = <T extends object>({
   error,
   nextPageAvailable,
   triggerResetAccumData,
+  className,
   loaderClassName,
   renderItem,
   handleNextPage,
@@ -61,7 +63,7 @@ export const ItemsGrid = <T extends object>({
           </Typography>
         </div>
       )}
-      <ul className="items-grid m-0">
+      <ul className={`items-grid m-0 ${className}`}>
         {!!error && (
           <Typography size="m" error>
             <div className="flex items-center">

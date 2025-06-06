@@ -8,6 +8,7 @@ using Interview.Backend.Auth;
 using Interview.Backend.Auth.Sorface;
 using Interview.Backend.Swagger;
 using Interview.DependencyInjection;
+using Interview.Domain;
 using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Infrastructure.WebSocket;
 using Interview.Infrastructure.WebSocket.PubSub;
@@ -90,7 +91,7 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
 
     private void AddAppServices(IServiceCollection serviceCollection)
     {
-        var sorfaceAuth = new OAuthServiceDispatcher(configuration).GetAuthService("sorface") ?? throw new Exception("Not found \"sorface\" section");
+        var sorfaceAuth = new OAuthServiceDispatcher(configuration).GetAuthService("sorface") ?? throw new UserException("Not found \"sorface\" section");
 
         serviceCollection.AddSingleton(sorfaceAuth);
         serviceCollection.AddHttpClient();
@@ -155,7 +156,7 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
         serviceCollection
             .AddSingleton<ITicketStore, DistributedCacheTicketStore>()
             .AddSession()
-            .AddAppAuth(sorfaceAuth);
+            .AddAppAuth(environment, sorfaceAuth);
     }
 
     private void AddRateLimiter(IServiceCollection serviceCollection)
@@ -209,6 +210,36 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
                 Contact = new OpenApiContact { Name = "Vladislav Petyukevich", Url = new Uri("https://github.com/VladislavPetyukevich"), Email = "test@yandex.ru", },
                 License = new OpenApiLicense { Name = "Example License", Url = new Uri("https://example.com/license"), },
             });
+
+            if (environment.IsDevelopment())
+            {
+                options.AddSecurityDefinition("DevBearer", new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization header using the Bearer scheme. Example: 'DevBearer TEST_BACKEND_DEV_USER'",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "DevBearer",
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "DevBearer",
+                            },
+                            Scheme = "oauth2",
+                            Name = "DevBearer",
+                            In = ParameterLocation.Header,
+                        },
+                        new List<string>()
+                    },
+                });
+            }
 
             var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));

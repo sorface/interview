@@ -23,6 +23,18 @@
         "Expert",
         "Examinee"
       ]
+    },
+    {
+      "Type": "ValidAiAnswer",
+      "Stateful": true,
+      "Roles": [
+        "User",
+        "Admin"
+      ],
+      "ParticipantTypes": [
+        "Expert",
+        "Examinee"
+      ]
     }
   ]
 }

@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using Interview.Domain.Categories;
+using Interview.Domain.Questions;
 using Interview.Domain.Repository;
 using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Domain.Rooms.RoomInvites;
@@ -12,10 +13,10 @@ using Interview.Domain.Tags;
 
 namespace Interview.Domain.Rooms;
 
-public class Room(string name, SERoomAccessType accessType) : Entity
+public class Room(string name, SERoomAccessType accessType, SERoomType type) : Entity
 {
     private Room()
-        : this(string.Empty, SERoomAccessType.Public)
+        : this(string.Empty, SERoomAccessType.Public, SERoomType.Standard)
     {
     }
 
@@ -43,7 +44,9 @@ public class Room(string name, SERoomAccessType accessType) : Entity
 
     public QueuedRoomEvent? QueuedRoomEvent { get; set; }
 
-    public Guid? CategoryId { get; set; }
+    public Guid? QuestionTreeId { get; set; }
 
-    public Category? Category { get; set; }
+    public QuestionTree? QuestionTree { get; set; }
+
+    public SERoomType Type { get; set; } = type;
 }

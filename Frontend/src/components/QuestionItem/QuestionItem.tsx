@@ -64,8 +64,8 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
   });
 
   const accordionClassName = useThemeClassName({
-    [Theme.Dark]: `${primary ? 'bg-dark-dark2' : 'bg-dark-disable'} ${bgSelected ? 'bg-dark-dark2' : ''}`,
-    [Theme.Light]: `${primary ? 'bg-white' : 'bg-grey1'} ${bgSelected ? '!bg-blue-light' : ''}`,
+    [Theme.Dark]: `${bgSelected ? 'bg-dark-dark2' : primary ? 'bg-dark-dark2' : 'bg-dark-disable'}`,
+    [Theme.Light]: `${bgSelected ? '!bg-blue-light' : primary ? 'bg-white' : 'bg-grey1'}`,
   });
 
   const handleCheckboxChange = () => {
@@ -97,7 +97,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
         </>
       )}
       <div
-        className={`flex items-baseline ${!accordionDisabled ? 'px-0.75' : ''}`}
+        className={`flex items-baseline ${!accordionDisabled ? 'px-[0.75rem]' : ''}`}
       >
         <Typography size="m" bold>
           {question.value}
@@ -111,7 +111,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
           </>
         )}
       </div>
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center h-[1.3125rem]">
         {contextMenu && (
           <div onClick={handleCheckboxAreaClick}>
             <ContextMenu
@@ -141,7 +141,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
           </span>
         )}
         {onClick && (
-          <span className="opacity-0.5">
+          <span className="opacity-50">
             <Icon name={IconNames.ChevronForward} />
           </span>
         )}
@@ -154,7 +154,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
       title={title}
       disabled={accordionDisabled}
       openedByDefault={openedByDefault}
-      className={`${accordionClassName} rounded-0.75 py-1.25 px-1.5`}
+      className={`${accordionClassName} rounded-[0.75rem] py-[1.25rem] px-[1.5rem]`}
       classNameTitle="flex items-center"
       onClick={onClick ? handleOnClick : undefined}
     >
@@ -168,7 +168,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
             readOnly
             scrollBeyondLastLine={false}
             alwaysConsumeMouseWheel={false}
-            className="h-32.25"
+            className="h-[32.25rem]"
           />
         </>
       )}
@@ -186,7 +186,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
         <Button
           key={answer.id}
           variant={answer === selectedAnswer ? 'active' : undefined}
-          className="mr-0.25"
+          className="mr-[0.25rem]"
           onClick={() => setSelectedAnswer(answer)}
         >
           <Typography size="m">{answer.title}</Typography>
@@ -210,7 +210,7 @@ export const QuestionItem: FunctionComponent<QuestionItemProps> = ({
             readOnly
             scrollBeyondLastLine={false}
             alwaysConsumeMouseWheel={false}
-            className="h-32.25"
+            className="h-[32.25rem]"
           />
         </>
       )}

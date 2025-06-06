@@ -3,6 +3,7 @@ using Interview.Backend.Auth;
 using Interview.Backend.Responses;
 using Interview.Domain;
 using Interview.Domain.Events.Storage;
+using Interview.Domain.Rooms.BusinessAnalytic;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Request.Transcription;
 using Interview.Domain.Rooms.Records.Response;
@@ -27,26 +28,44 @@ public class RoomController(IRoomService roomService) : ControllerBase
     /// </summary>
     /// <param name="request">Request.</param>
     /// <param name="filter">Search filter.</param>
+    /// <param name="dateSort">Date sorting.</param>
     /// <returns>Page.</returns>
     [Authorize]
     [HttpGet]
     [Produces(MediaTypeNames.Application.Json)]
-    [ProducesResponseType(typeof(RoomReviewDetail), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RoomPageDetail), StatusCodes.Status200OK)]
     public Task<IPagedList<RoomPageDetail>> GetPage(
         [FromQuery] PageRequest request,
-        [FromQuery] RoomPageDetailRequestFilter? filter)
+        [FromQuery] RoomPageDetailRequestFilter? filter,
+        [FromQuery] EVSortOrder dateSort = EVSortOrder.Asc)
     {
         return roomService.FindPageAsync(
             filter ?? new RoomPageDetailRequestFilter(),
             request.PageNumber,
             request.PageSize,
+            dateSort,
             HttpContext.RequestAborted);
     }
 
     /// <summary>
-    /// Getting a calendar rooms
+    /// Getting a Room Business Analytic page.
     /// </summary>
-    /// <param name="request">FromQuery filter</param>
+    /// <param name="request">Request.</param>
+    /// <returns>Business analytic.</returns>
+    [Authorize]
+    [HttpGet("businessAnalytic")]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(BusinessAnalyticResponse), StatusCodes.Status200OK)]
+    public Task<BusinessAnalyticResponse> GetBusinessAnalyticAsync(
+        [FromQuery] BusinessAnalyticRequest request)
+    {
+        return roomService.GetBusinessAnalyticAsync(request, HttpContext.RequestAborted);
+    }
+
+    /// <summary>
+    /// Getting a calendar rooms.
+    /// </summary>
+    /// <param name="request">FromQuery filter.</param>
     /// <returns>Page.</returns>
     [Authorize]
     [HttpGet("calendar")]
@@ -138,7 +157,7 @@ public class RoomController(IRoomService roomService) : ControllerBase
             Tags = request.Tags,
             DurationSec = request.Duration,
             ScheduleStartTime = request.ScheduleStartTime,
-            CategoryId = request.CategoryId,
+            QuestionTreeId = request.QuestionTreeId,
         };
 
         var room = await roomService.CreateAsync(domainRequest, HttpContext.RequestAborted);

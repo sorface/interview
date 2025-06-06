@@ -8,6 +8,7 @@ using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Questions.Services;
+using Interview.Domain.Questions.UpsertQuestionTree;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Users;
@@ -104,7 +105,7 @@ public class QuestionCreatorTest
     public async Task CreateShouldFailIfRoomIsNotAvailable()
     {
         await using var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
-        var room = new Room("Test Room", SERoomAccessType.Public);
+        var room = new Room("Test Room", SERoomAccessType.Public, SERoomType.Standard);
         appDbContext.Rooms.Add(room);
         var category = new Category { Name = "Test" };
         appDbContext.Categories.Add(category);
@@ -140,9 +141,12 @@ public class QuestionCreatorTest
             questionRepository,
             new QuestionNonArchiveRepository(appDbContext),
             new ArchiveService<Question>(appDbContext),
+            new ArchiveService<QuestionTree>(appDbContext),
+            new ArchiveService<QuestionSubjectTree>(appDbContext),
             tagRepository,
             roomMembershipChecker,
             currentUser,
+            new QuestionTreeUpsert(appDbContext),
             appDbContext);
     }
 

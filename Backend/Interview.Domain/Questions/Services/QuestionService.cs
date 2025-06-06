@@ -3,9 +3,13 @@ using Interview.Domain.Categories.Page;
 using Interview.Domain.Database;
 using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
+using Interview.Domain.Questions.QuestionTreeById;
+using Interview.Domain.Questions.QuestionTreePage;
 using Interview.Domain.Questions.Records.FindPage;
+using Interview.Domain.Questions.UpsertQuestionTree;
 using Interview.Domain.Rooms.RoomConfigurations;
 using Interview.Domain.Rooms.RoomParticipants;
+using Interview.Domain.ServiceResults.Success;
 using Interview.Domain.Tags;
 using Interview.Domain.Tags.Records.Response;
 using Interview.Domain.Users;
@@ -19,9 +23,12 @@ public class QuestionService(
     IQuestionRepository questionRepository,
     IQuestionNonArchiveRepository questionNonArchiveRepository,
     ArchiveService<Question> archiveService,
+    ArchiveService<QuestionTree> archiveQuestionTreeService,
+    ArchiveService<QuestionSubjectTree> archiveQuestionSubjectTreeService,
     ITagRepository tagRepository,
     IRoomMembershipChecker roomMembershipChecker,
     ICurrentUserAccessor currentUserAccessor,
+    QuestionTreeUpsert questionTreeUpsert,
     AppDbContext db)
     : IQuestionService
 {
@@ -38,7 +45,9 @@ public class QuestionService(
         if (!string.IsNullOrWhiteSpace(request.Value))
         {
             var questionValue = request.Value.Trim().ToLower();
+#pragma warning disable CA1862
             spec &= new Spec<Question>(e => e.Value.ToLower().Contains(questionValue));
+#pragma warning restore CA1862
         }
 
         if (request.CategoryId is not null)
@@ -108,22 +117,23 @@ public class QuestionService(
         {
             Id = result.Id,
             Value = result.Value,
-            Tags = result.Tags.Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, })
+            Tags = result.Tags.Select(e => new TagItem
+            {
+                Id = e.Id,
+                Value = e.Value,
+                HexValue = e.HexColor,
+            })
                 .ToList(),
-            Category = result.CategoryId is not null ?
-                await db.Categories.AsNoTracking()
+            Category = result.CategoryId is not null
+                ? await db.Categories.AsNoTracking()
+                    .Include(e => e.Parent)
                     .Where(e => e.Id == result.CategoryId)
                     .OrderBy(e => e.Order)
-                    .Select(selector: e => new CategoryResponse
-                    {
-                        Id = e.Id,
-                        Name = e.Name,
-                        ParentId = e.ParentId,
-                        Order = e.Order,
-                    })
+                    .Select(CategoryResponse.Mapper.Expression)
                     .FirstOrDefaultAsync(cancellationToken)
                 : null,
-            Answers = result.Answers.Select(QuestionAnswerResponse.Mapper.Map).ToList(),
+            Answers = result.Answers.Select(QuestionAnswerResponse.Mapper.Map)
+                .ToList(),
             CodeEditor = result.CodeEditor == null
                 ? null
                 : new QuestionCodeEditorResponse
@@ -131,6 +141,8 @@ public class QuestionService(
                     Content = result.CodeEditor.Content,
                     Lang = result.CodeEditor.Lang,
                 },
+            Author = null,
+            Type = result.Type.EnumValue,
         };
 
         SEQuestionType GetQuestionType()
@@ -243,6 +255,7 @@ public class QuestionService(
             .Include(e => e.Category)
             .Include(e => e.CodeEditor)
             .Include(e => e.Answers)
+            .Include(e => e.CreatedBy)
             .Where(e => !e.IsArchived && e.Id == id)
             .Select(QuestionItem.Mapper.Expression)
             .FirstOrDefaultAsync(cancellationToken);
@@ -278,10 +291,20 @@ public class QuestionService(
             Id = archiveQuestion.Id,
             Value = archiveQuestion.Value,
             Tags = archiveQuestion.Tags
-                .Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, }).ToList(),
-            Answers = [],
+                .Select(e => new TagItem
+                {
+                    Id = e.Id,
+                    Value = e.Value,
+                    HexValue = e.HexColor,
+                })
+                .ToList(),
+            Answers =
+            [
+            ],
             CodeEditor = null,
             Category = null,
+            Author = null,
+            Type = archiveQuestion.Type.EnumValue,
         };
     }
 
@@ -294,11 +317,126 @@ public class QuestionService(
             Id = unarchiveQuestion.Id,
             Value = unarchiveQuestion.Value,
             Tags = unarchiveQuestion.Tags
-                .Select(e => new TagItem { Id = e.Id, Value = e.Value, HexValue = e.HexColor, }).ToList(),
-            Answers = [],
+                .Select(e => new TagItem
+                {
+                    Id = e.Id,
+                    Value = e.Value,
+                    HexValue = e.HexColor,
+                })
+                .ToList(),
+            Answers =
+            [
+            ],
             CodeEditor = null,
             Category = null,
+            Author = null,
+            Type = unarchiveQuestion.Type.EnumValue,
         };
+    }
+
+    public Task<IPagedList<QuestionTreePageResponse>> FindQuestionTreePageAsync(QuestionTreePageRequest request, CancellationToken cancellationToken)
+    {
+        var spec = BuildSpecification(request);
+        return db.QuestionTree.AsNoTracking()
+            .Where(spec)
+            .OrderBy(e => e.Order)
+            .ThenBy(e => e.CreateDate)
+            .Select(e => new QuestionTreePageResponse { Id = e.Id, Name = e.Name, ParentQuestionTreeId = e.ParentQuestionTreeId, })
+            .ToPagedListAsync(request.Page, cancellationToken);
+
+        static ASpec<QuestionTree> BuildSpecification(QuestionTreePageRequest request)
+        {
+            var archived = request.Filter?.Archived == true;
+            ASpec<QuestionTree>? res = new Spec<QuestionTree>(e => e.IsArchived == archived);
+            if (request.Filter is null)
+            {
+                return res;
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Filter.Name))
+            {
+                var name = request.Filter.Name.Trim();
+#pragma warning disable CA1862
+                res &= new Spec<QuestionTree>(e => e.Name.ToLower().Contains(name));
+#pragma warning restore CA1862
+            }
+
+            if (request.Filter.ParentQuestionTreeId is not null)
+            {
+                res &= new Spec<QuestionTree>(e => e.ParentQuestionTreeId == request.Filter.ParentQuestionTreeId);
+            }
+            else if (request.Filter.ParentlessOnly.GetValueOrDefault())
+            {
+                res &= new Spec<QuestionTree>(e => e.ParentQuestionTreeId == null);
+            }
+
+            return res;
+        }
+    }
+
+    public Task<ServiceResult<Guid>> UpsertQuestionTreeAsync(UpsertQuestionTreeRequest request, CancellationToken cancellationToken = default)
+        => questionTreeUpsert.UpsertQuestionTreeAsync(request, cancellationToken);
+
+    public async Task<QuestionTreeByIdResponse> GetQuestionTreeByIdAsync(Guid questionTreeId, bool archive, CancellationToken cancellationToken)
+    {
+        var questionTree = await db.QuestionTree.AsNoTracking()
+            .Select(e => new
+            {
+                e.Id,
+                e.Name,
+                e.RootQuestionSubjectTreeId,
+                e.IsArchived,
+            })
+            .FirstOrDefaultAsync(e => e.Id == questionTreeId && e.IsArchived == archive, cancellationToken);
+        if (questionTree is null)
+        {
+            throw NotFoundException.Create<QuestionTree>(questionTreeId);
+        }
+
+        var response = new QuestionTreeByIdResponse
+        {
+            Id = questionTree.Id,
+            RootQuestionSubjectTreeId = questionTree.RootQuestionSubjectTreeId,
+            Name = questionTree.Name,
+            Tree = new List<QuestionTreeByIdResponseTree>(),
+        };
+        await response.FillTreeAsync(db, cancellationToken);
+        return response;
+    }
+
+    public Task ArchiveQuestionTreeAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return db.RunTransactionAsync(async ct =>
+        {
+            var tree = await archiveQuestionTreeService.ArchiveAsync(id, false, ct);
+            var nodes = await db.QuestionSubjectTree.GetAllChildrenAsync(tree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
+            foreach (var subjectTreeId in nodes)
+            {
+                await archiveQuestionSubjectTreeService.ArchiveAsync(subjectTreeId, false, ct);
+            }
+
+            await db.SaveChangesAsync(ct);
+            return DBNull.Value;
+        },
+            cancellationToken);
+    }
+
+    public Task UnarchiveQuestionTreeAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return db.RunTransactionAsync(async ct =>
+            {
+                var tree = await archiveQuestionTreeService.UnarchiveAsync(id, false, ct);
+                await QuestionTreeUpsert.EnsureNonDuplicateByNameAsync(db, tree.Id, tree.Name, tree.ParentQuestionTreeId, cancellationToken);
+                var nodes = await db.QuestionSubjectTree.GetAllChildrenAsync(tree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
+                foreach (var subjectTreeId in nodes)
+                {
+                    await archiveQuestionSubjectTreeService.UnarchiveAsync(subjectTreeId, false, ct);
+                }
+
+                await db.SaveChangesAsync(ct);
+                return DBNull.Value;
+            },
+            cancellationToken);
     }
 
     private static string EnsureValidQuestionValue(string value)
@@ -317,7 +455,7 @@ public class QuestionService(
         var category = entity.Category;
         if (category is null && entity.CategoryId is not null)
         {
-            category = await db.Categories.AsNoTracking().FirstOrDefaultAsync(e => e.Id == entity.CategoryId, cancellationToken);
+            category = await db.Categories.Include(e => e.Parent).AsNoTracking().FirstOrDefaultAsync(e => e.Id == entity.CategoryId, cancellationToken);
         }
 
         return new QuestionItem
@@ -331,15 +469,7 @@ public class QuestionService(
                 HexValue = e.HexColor,
             })
                 .ToList(),
-            Category = category is not null
-                ? new CategoryResponse
-                {
-                    Id = category.Id,
-                    Name = category.Name,
-                    ParentId = category.ParentId,
-                    Order = category.Order,
-                }
-                : null,
+            Category = category is null ? null : CategoryResponse.Mapper.Map(category),
             Answers = entity.Answers.Select(q => new QuestionAnswerResponse
             {
                 Id = q.Id,
@@ -355,6 +485,14 @@ public class QuestionService(
                     Content = entity.CodeEditor.Content,
                     Lang = entity.CodeEditor.Lang,
                 },
+            Author = entity.CreatedBy == null
+                ? null
+                : new QuestionItemAuthorResponse
+                {
+                    Nickname = entity.CreatedBy.Nickname,
+                    UserId = entity.CreatedBy.Id,
+                },
+            Type = entity.Type.EnumValue,
         };
     }
 }

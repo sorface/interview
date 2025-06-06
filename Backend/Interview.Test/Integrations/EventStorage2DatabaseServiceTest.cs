@@ -21,17 +21,17 @@ public class EventStorage2DatabaseServiceTest
 
         var user = new User("TEST", "ID");
         appDbContext.Users.Add(user);
-        var room1 = new Room("Test 1", SERoomAccessType.Public) { Status = SERoomStatus.Close, };
+        var room1 = new Room("Test 1", SERoomAccessType.Public, SERoomType.Standard) { Status = SERoomStatus.Close, };
         appDbContext.Rooms.Add(room1);
-        appDbContext.Rooms.Add(new Room("Test 2", SERoomAccessType.Public) { Status = SERoomStatus.Close, });
-        appDbContext.Rooms.Add(new Room("Test 3", SERoomAccessType.Public) { Status = SERoomStatus.Close, });
-        appDbContext.Rooms.Add(new Room("Test 4", SERoomAccessType.Public) { Status = SERoomStatus.Close, });
-        appDbContext.SaveChanges();
+        appDbContext.Rooms.Add(new Room("Test 2", SERoomAccessType.Public, SERoomType.Standard) { Status = SERoomStatus.Close, });
+        appDbContext.Rooms.Add(new Room("Test 3", SERoomAccessType.Public, SERoomType.Standard) { Status = SERoomStatus.Close, });
+        appDbContext.Rooms.Add(new Room("Test 4", SERoomAccessType.Public, SERoomType.Standard) { Status = SERoomStatus.Close, });
+        await appDbContext.SaveChangesAsync();
         var queuedRoomEvents = appDbContext.Rooms.Where(e => e.Id != room1.Id).Select(e => new QueuedRoomEvent { RoomId = e.Id, });
         appDbContext.QueuedRoomEvents.AddRange(queuedRoomEvents);
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
 
-        var eventStorage = new InMemoryHotEventStorage();
+        var eventStorage = new TestInMemoryHotEventStorage();
         var storageEvents = new StorageEvent[]
         {
             new()

@@ -18,6 +18,7 @@ export const useSpeechRecognition = ({
     SpeechRecognition ? new SpeechRecognition() : null,
   );
   const [recognitionNotSupported, setRecognitionNotSupported] = useState(false);
+  const [recognitionNotAllowed, setRecognitionNotAllowed] = useState(false);
 
   useEffect(() => {
     if (!recognition.current) {
@@ -49,6 +50,25 @@ export const useSpeechRecognition = ({
       recog.onend = null;
     };
   }, [recognitionEnabled, recognitionLang]);
+
+  useEffect(() => {
+    if (recognitionNotAllowed) {
+      return;
+    }
+    const recog = recognition.current;
+    if (!recog) {
+      return;
+    }
+    recog.onerror = (e) => {
+      if (e.error === 'not-allowed') {
+        setRecognitionNotAllowed(true);
+      }
+    };
+
+    return () => {
+      recog.onerror = null;
+    };
+  }, [recognitionNotAllowed]);
 
   useEffect(() => {
     const recog = recognition.current;
@@ -111,5 +131,6 @@ export const useSpeechRecognition = ({
 
   return {
     recognitionNotSupported,
+    recognitionNotAllowed,
   };
 };

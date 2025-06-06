@@ -16,7 +16,7 @@ export const UnreadChatMessagesCounter: FunctionComponent<
   });
   return (
     <div
-      className={`${themedClassName} flex items-center justify-center w-0.75 h-0.75 p-0.25 rounded-0.75`}
+      className={`${themedClassName} flex items-center justify-center w-[0.75rem] h-[0.75rem] p-[0.25rem] rounded-[0.75rem]`}
     >
       <Typography size="s">{value}</Typography>
     </div>

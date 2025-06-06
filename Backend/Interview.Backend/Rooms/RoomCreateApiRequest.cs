@@ -23,5 +23,5 @@ public class RoomCreateApiRequest
 
     public DateTime ScheduleStartTime { get; set; }
 
-    public Guid? CategoryId { get; set; }
+    public Guid? QuestionTreeId { get; set; }
 }

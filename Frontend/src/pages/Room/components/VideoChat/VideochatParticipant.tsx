@@ -6,7 +6,6 @@ interface VideochatParticipantProps {
   viewer: boolean;
   order?: number;
   children: ReactNode;
-  avatar?: string;
   nickname?: string;
   reaction?: string | null;
   pinable?: boolean;

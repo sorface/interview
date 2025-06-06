@@ -36,9 +36,10 @@ public class WebSocketAuthorizationMiddleware
             return Task.CompletedTask;
         }
 
-        context.Request.Headers.Cookie = $"{_options.CookieName}={value}";
-        context.Request.Cookies = new CustomRequestCookieCollection { { $"{_options.CookieName}", value! } };
+        context.Request.Headers.Authorization = value;
 
+        // context.Request.Headers.Cookie = $"{_options.CookieName}={value}";
+        // context.Request.Cookies = new CustomRequestCookieCollection { { $"{_options.CookieName}", value! } };
         return _next(context);
     }
 

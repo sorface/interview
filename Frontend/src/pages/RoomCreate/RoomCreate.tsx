@@ -8,9 +8,10 @@ import React, {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  categoriesApiDeclaration,
   CreateRoomBody,
-  GetCategoriesParams,
+  GetPageQuestionsTreeResponse,
+  GetQuestionsTreesParams,
+  questionTreeApiDeclaration,
   RoomEditBody,
   RoomIdParam,
   roomInviteApiDeclaration,
@@ -37,12 +38,16 @@ import { RoomCreateField } from './RoomCreateField/RoomCreateField';
 import { ModalWithProgressWarning } from '../../components/ModalWithProgressWarning/ModalWithProgressWarning';
 import { Button } from '../../components/Button/Button';
 import { padTime } from '../../utils/padTime';
-import { Category } from '../../types/category';
 import { Question } from '../../types/question';
 import { QuestionItem } from '../../components/QuestionItem/QuestionItem';
 import { SwitcherButton } from '../../components/SwitcherButton/SwitcherButton';
 import { DragNDropList } from '../../components/DragNDropList/DragNDropList';
 import { RoomQuestionsSelector } from './RoomQuestionsSelector/RoomQuestionsSelector';
+import { sortRoomQuestion } from '../../utils/sortRoomQestions';
+import { TreeViewer } from '../../components/TreeViewer/TreeViewer';
+import { QuestionsTree } from '../../types/questionsTree';
+import { mapInvitesForAiRoom } from '../../utils/mapInvitesForAiRoom';
+import { formatDateForInput } from '../../utils/formatDateForInput';
 
 const nameFieldName = 'roomName';
 const dateFieldName = 'roomDate';
@@ -51,50 +56,34 @@ const endTimeFieldName = 'roomEndTime';
 
 const roomStartTimeShiftMinutes = 15;
 
-const formatDate = (value: Date) => {
-  const month = padTime(value.getMonth() + 1);
-  const date = padTime(value.getDate());
-  return `${value.getFullYear()}-${month}-${date}`;
-};
-
 const formatTime = (value: Date) => {
   const hours = padTime(value.getHours());
   const minutes = padTime(value.getMinutes());
   return `${hours}:${minutes}`;
 };
 
-const parseScheduledStartTime = (
-  scheduledStartTime: string,
-  durationSec?: number,
+const parseScheduledEndTime = (
+  scheduledStartTime: Date,
+  durationSec: number,
 ) => {
-  const parsed = new Date(scheduledStartTime);
   const parsedDuration = new Date(scheduledStartTime);
-  if (durationSec) {
-    parsedDuration.setSeconds(parsedDuration.getSeconds() + durationSec);
-  }
-  return {
-    date: formatDate(parsed),
-    startTime: formatTime(parsed),
-    ...(durationSec && { endTime: formatTime(parsedDuration) }),
-  };
+  parsedDuration.setSeconds(parsedDuration.getSeconds() + durationSec);
+  return formatTime(parsedDuration);
 };
 
-const parseRoomDate = (roomFields: RoomFields) => {
-  const roomDateStart = new Date(roomFields.date);
-  const roomStartTime = roomFields.startTime.split(':');
-  roomDateStart.setHours(parseInt(roomStartTime[0]));
-  roomDateStart.setMinutes(parseInt(roomStartTime[1]));
+const getRoomDuration = (roomFields: RoomFields) => {
   const roomEndTime = roomFields.endTime.split(':');
-  const roomDateEnd = new Date(roomDateStart);
+  const roomDateEnd = new Date(roomFields.scheduleStartTime);
   if (roomEndTime.length > 1) {
     roomDateEnd.setHours(parseInt(roomEndTime[0]));
     roomDateEnd.setMinutes(parseInt(roomEndTime[1]));
   }
-  if (roomDateEnd < roomDateStart) {
+  if (roomDateEnd < roomFields.scheduleStartTime) {
     roomDateEnd.setDate(roomDateEnd.getDate() + 1);
   }
-  const duration = (roomDateEnd.getTime() - roomDateStart.getTime()) / 1000;
-  return { roomDateStart, duration };
+  const duration =
+    (roomDateEnd.getTime() - roomFields.scheduleStartTime.getTime()) / 1000;
+  return duration;
 };
 
 const formatDuration = (durationSec: number) => {
@@ -103,7 +92,7 @@ const formatDuration = (durationSec: number) => {
   return `${padTime(hours)}:${padTime(minutes)}`;
 };
 
-const getAiRoomStartDate = () => {
+const getInitialRoomStartDate = () => {
   const currDate = new Date();
   currDate.setMinutes(currDate.getMinutes() + 15);
   return currDate;
@@ -122,9 +111,8 @@ enum CreationStep {
 
 type RoomFields = {
   name: string;
-  categoryId: string;
-  date: string;
-  startTime: string;
+  questionTreeId: string;
+  scheduleStartTime: Date;
   endTime: string;
 };
 
@@ -172,25 +160,29 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     data: roomInvitesData,
   } = apiRoomInvitesState;
 
+  const { apiMethodState: questionTreesState, fetchData: fetchQuestionTrees } =
+    useApiMethod<GetPageQuestionsTreeResponse, GetQuestionsTreesParams>(
+      questionTreeApiDeclaration.getPage,
+    );
   const {
-    apiMethodState: rootCategoriesState,
-    fetchData: fetchRootCategories,
-  } = useApiMethod<Category[], GetCategoriesParams>(
-    categoriesApiDeclaration.getPage,
-  );
+    process: { loading: questionTreesLoading, error: questionTreesError },
+    data: questionTrees,
+  } = questionTreesState;
+
+  const { apiMethodState: questionTreeGetState, fetchData: fetchQuestionTree } =
+    useApiMethod<QuestionsTree, string>(questionTreeApiDeclaration.get);
   const {
-    process: { loading: rootCategoriesLoading, error: rootCategoriesError },
-    data: rootCategories,
-  } = rootCategoriesState;
+    process: { loading: questionTreeLoading, error: questionTreeError },
+    data: questionTree,
+  } = questionTreeGetState;
 
   const [roomFields, setRoomFields] = useState<RoomFields>({
     name: '',
-    categoryId: '',
-    date: formatDate(new Date()),
-    startTime: aiRoom ? formatTime(getAiRoomStartDate()) : '',
+    questionTreeId: '',
+    scheduleStartTime: getInitialRoomStartDate(),
     endTime: aiRoom ? formatTime(getAiRoomEndDate()) : '',
   });
-  const parsedRoomDate = parseRoomDate(roomFields);
+  const roomDuration = getRoomDuration(roomFields);
   const [selectedQuestions, setSelectedQuestions] = useState<
     RoomQuestionListItem[]
   >([]);
@@ -198,6 +190,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     CreationStep.Step1,
   );
   const [questionsView, setQuestionsView] = useState(false);
+  const [displayTreeViewer, setDisplayTreeViewer] = useState(false);
   const [uiError, setUiError] = useState('');
   const modalTitle = editRoomId
     ? localizationCaptions[LocalizationKey.EditRoom]
@@ -207,13 +200,12 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
   const totalError = error || errorRoom || errorRoomEdit || uiError;
 
   useEffect(() => {
-    fetchRootCategories({
+    fetchQuestionTrees({
       name: '',
       PageNumber: 1,
       PageSize: 30,
-      showOnlyWithoutParent: true,
     });
-  }, [fetchRootCategories]);
+  }, [fetchQuestionTrees]);
 
   useEffect(() => {
     if (!editRoomId) {
@@ -226,20 +218,17 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     if (!room) {
       return;
     }
-    const parsedScheduledStartTime =
-      room.scheduledStartTime &&
-      parseScheduledStartTime(room.scheduledStartTime, room.timer?.durationSec);
+    const scheduleStartTime = new Date(room.scheduledStartTime);
+    const parsedScheduledEndTime =
+      room.timer?.durationSec &&
+      parseScheduledEndTime(scheduleStartTime, room.timer.durationSec);
     setRoomFields((rf) => ({
       ...rf,
       ...room,
-      date: parsedScheduledStartTime ? parsedScheduledStartTime.date : '',
-      startTime: parsedScheduledStartTime
-        ? parsedScheduledStartTime.startTime
-        : '',
-      endTime: parsedScheduledStartTime
-        ? parsedScheduledStartTime.endTime || ''
-        : '',
+      scheduleStartTime: new Date(room.scheduledStartTime),
+      endTime: parsedScheduledEndTime || '',
     }));
+    setSelectedQuestions(room.questions.sort(sortRoomQuestion));
   }, [room]);
 
   useEffect(() => {
@@ -258,9 +247,27 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     });
   }, [createdRoom, editedRoom, fetchRoomInvites]);
 
+  useEffect(() => {
+    if (!roomFields.questionTreeId) {
+      return;
+    }
+    fetchQuestionTree(roomFields.questionTreeId);
+  }, [roomFields.questionTreeId, fetchQuestionTree]);
+
+  useEffect(() => {
+    if (questionTreeLoading) {
+      setDisplayTreeViewer(false);
+      return;
+    }
+    if (questionTree) {
+      setDisplayTreeViewer(true);
+      return;
+    }
+  }, [questionTreeLoading, questionTree]);
+
   const getUiError = () => {
-    if (aiRoom && !roomFields.categoryId) {
-      return localizationCaptions[LocalizationKey.EmptyRoomCategoryError];
+    if (aiRoom && !roomFields.questionTreeId) {
+      return localizationCaptions[LocalizationKey.EmptyRoomQuestionTreeError];
     }
     if (!aiRoom && selectedQuestions.length === 0) {
       return localizationCaptions[LocalizationKey.RoomEmptyQuestionsListError];
@@ -268,18 +275,11 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
     if (!roomFields.name) {
       return localizationCaptions[LocalizationKey.EmptyRoomNameError];
     }
-    if (!roomFields.startTime) {
+    if (!roomFields.scheduleStartTime) {
       return localizationCaptions[LocalizationKey.RoomEmptyStartTimeError];
     }
-    if (!roomFields.date) {
-      return localizationCaptions[LocalizationKey.RoomEmptyStartTimeError];
-    }
-    const roomDateStart = new Date(roomFields.date);
-    const roomStartTime = roomFields.startTime.split(':');
-    roomDateStart.setHours(parseInt(roomStartTime[0]));
-    roomDateStart.setMinutes(parseInt(roomStartTime[1]));
     if (
-      roomDateStart.getTime() <
+      roomFields.scheduleStartTime.getTime() <
       Date.now() - 1000 * 60 * roomStartTimeShiftMinutes
     ) {
       return localizationCaptions[
@@ -308,7 +308,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         name: roomFields.name,
         ...(aiRoom
           ? {
-              categoryId: roomFields.categoryId,
+              questionTreeId: roomFields.questionTreeId,
             }
           : {
               questions: selectedQuestions.map((question, index) => ({
@@ -316,15 +316,15 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
                 order: index,
               })),
             }),
-        scheduleStartTime: parsedRoomDate.roomDateStart.toISOString(),
-        durationSec: parsedRoomDate.duration,
+        scheduleStartTime: roomFields.scheduleStartTime.toISOString(),
+        durationSec: roomDuration,
       });
     } else {
       fetchData({
         name: roomFields.name,
         ...(aiRoom
           ? {
-              categoryId: roomFields.categoryId,
+              questionTreeId: roomFields.questionTreeId,
             }
           : {
               questions: selectedQuestions.map((question, index) => ({
@@ -336,10 +336,35 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         examinees: [],
         tags: [],
         accessType: RoomAccessType.Private,
-        scheduleStartTime: parsedRoomDate.roomDateStart.toISOString(),
-        duration: parsedRoomDate.duration,
+        scheduleStartTime: roomFields.scheduleStartTime.toISOString(),
+        duration: roomDuration,
       });
     }
+  };
+
+  const handleChangeStartDate = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const selectedDate = new Date(e.target.value);
+    selectedDate.setHours(roomFields.scheduleStartTime.getHours());
+    selectedDate.setMinutes(roomFields.scheduleStartTime.getMinutes());
+    setRoomFields({
+      ...roomFields,
+      scheduleStartTime: selectedDate,
+    });
+  };
+
+  const handleChangeStartTime = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const [selectedHours, selectedMinutes] = e.target.value.split(':');
+    const selectedDate = new Date(roomFields.scheduleStartTime);
+    selectedDate.setHours(+selectedHours);
+    selectedDate.setMinutes(+selectedMinutes);
+    setRoomFields({
+      ...roomFields,
+      scheduleStartTime: selectedDate,
+    });
   };
 
   const handleChangeField =
@@ -351,13 +376,13 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
       });
     };
 
-  const handleChangeCategoryField = (
+  const handleChangeQuestionTreeField = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const [id, name] = e.target.value.split('|');
     setRoomFields({
       ...roomFields,
-      categoryId: id,
+      questionTreeId: id,
       name: name,
     });
   };
@@ -413,7 +438,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
   ) => (
     <Fragment>
       <div className="flex w-full">
-        <div className="flex flex-col w-1.75 text-right text-grey2">
+        <div className="flex flex-col w-[1.75rem] text-right text-grey2">
           <Gap sizeRem={1} />
           <Typography size="xxl" bold>
             {index + 1}
@@ -475,22 +500,22 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
                 <input
                   id="roomDate"
                   name={dateFieldName}
-                  value={roomFields.date}
+                  value={formatDateForInput(roomFields.scheduleStartTime)}
                   type="date"
                   required
-                  className="mr-0.5"
-                  onChange={handleChangeField('date')}
+                  className="mr-[0.5rem]"
+                  onChange={handleChangeStartDate}
                 />
                 <input
                   id="roomTimeStart"
                   name={startTimeFieldName}
-                  value={roomFields.startTime}
+                  value={formatTime(roomFields.scheduleStartTime)}
                   type="time"
                   required
-                  className="mr-0.5"
-                  onChange={handleChangeField('startTime')}
+                  className="mr-[0.5rem]"
+                  onChange={handleChangeStartTime}
                 />
-                <span className="mr-0.5">
+                <span className="mr-[0.5rem]">
                   <Typography size="s">-</Typography>
                 </span>
                 <input
@@ -504,7 +529,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
                 {!!roomFields.endTime && (
                   <Typography size="m">
                     {localizationCaptions[LocalizationKey.RoomDuration]}:{' '}
-                    {formatDuration(parsedRoomDate.duration)}
+                    {formatDuration(roomDuration)}
                   </Typography>
                 )}
               </RoomCreateField.Content>
@@ -538,41 +563,57 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
         )}
 
         {aiRoom && (
-          <RoomCreateField.Wrapper className="w-full max-w-15.75">
-            <RoomCreateField.Label>
-              <label htmlFor="rootCategory">
+          <RoomCreateField.Wrapper className="w-full">
+            <div className="">
+              <label htmlFor="questionTree">
                 <Typography size="m" bold>
-                  {localizationCaptions[LocalizationKey.Category]}
+                  {localizationCaptions[LocalizationKey.QuestionTree]}
                 </Typography>
               </label>
-            </RoomCreateField.Label>
+              <Gap sizeRem={0.5} />
+            </div>
             <RoomCreateField.Content>
-              {rootCategoriesError && (
+              {questionTreesError && (
                 <Typography error size="m">
-                  {rootCategoriesError}
+                  {questionTreesError}
                 </Typography>
               )}
-              {rootCategoriesLoading ? (
+              {questionTreesLoading ? (
                 <Loader />
               ) : (
-                <select
-                  id="rootCategory"
-                  className="w-full"
-                  defaultValue={roomFields.categoryId}
-                  onChange={handleChangeCategoryField}
-                >
-                  <option value="">
-                    {localizationCaptions[LocalizationKey.NotSelected]}
-                  </option>
-                  {rootCategories?.map((rootCategory) => (
-                    <option
-                      key={rootCategory.id}
-                      value={`${rootCategory.id}|${rootCategory.name}`}
-                    >
-                      {rootCategory.name}
+                <div>
+                  <select
+                    id="questionTree"
+                    className="w-full"
+                    defaultValue={roomFields.questionTreeId}
+                    onChange={handleChangeQuestionTreeField}
+                  >
+                    <option value="">
+                      {localizationCaptions[LocalizationKey.NotSelected]}
                     </option>
-                  ))}
-                </select>
+                    {questionTrees?.data.map((questionTree) => (
+                      <option
+                        key={questionTree.id}
+                        value={`${questionTree.id}|${questionTree.name}`}
+                      >
+                        {questionTree.name}
+                      </option>
+                    ))}
+                  </select>
+                  {questionTreeError && (
+                    <Typography error size="m">
+                      {questionTreeError}
+                    </Typography>
+                  )}
+                  {displayTreeViewer && questionTree && (
+                    <>
+                      <Gap sizeRem={0.75} />
+                      <div style={{ width: '100%', height: '500px' }}>
+                        <TreeViewer tree={questionTree.tree} />
+                      </div>
+                    </>
+                  )}
+                </div>
               )}
             </RoomCreateField.Content>
           </RoomCreateField.Wrapper>
@@ -592,7 +633,11 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
       <>
         <RoomInvitations
           roomId={createdRoom?.id || editedRoom?.id || ''}
-          roomInvitesData={roomInvitesData}
+          roomInvitesData={
+            !aiRoom
+              ? roomInvitesData
+              : mapInvitesForAiRoom(roomInvitesData || [])
+          }
           roomInvitesError={roomInvitesError}
           roomInvitesLoading={roomInvitesLoading}
         />
@@ -632,6 +677,8 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
                 },
               ]}
               activeIndex={creationStep}
+              activeVariant="invertedActive"
+              nonActiveVariant="inverted"
             />
             <Gap sizeRem={2.25} />
           </>

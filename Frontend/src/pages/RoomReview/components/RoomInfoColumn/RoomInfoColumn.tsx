@@ -14,7 +14,7 @@ export const RoomInfoColumn: FunctionComponent<RoomInfoColumnProps> = ({
   mini,
 }) => {
   return (
-    <div className={`flex flex-col ${mini ? 'w-22' : 'w-23.125'}`}>
+    <div className={`flex flex-col ${mini ? 'w-[22rem]' : 'w-[23.125rem]'}`}>
       <Typography size="s" bold>
         {header}
       </Typography>

@@ -9,35 +9,22 @@ import { RoomsHistoryItem } from './RoomsHistoryItem';
 interface RoomsHistoryProps {
   rooms: Room[];
 }
-
-const sortRoomsByTime = (room1: Room, room2: Room) => {
-  const room1Date = new Date(room1.scheduledStartTime);
-  const room2Date = new Date(room2.scheduledStartTime);
-  if (room1Date < room2Date) {
-    return 1;
-  }
-  if (room1Date > room2Date) {
-    return -1;
-  }
-  return 0;
-};
-
 export const RoomsHistory: FunctionComponent<RoomsHistoryProps> = ({
   rooms,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
 
   return (
-    <div className="text-left overflow-auto flex flex-col h-full px-1.125 bg-wrap rounded-1.125">
+    <div className="invisible-scroll text-left overflow-auto flex flex-col h-full px-[0.625rem] bg-wrap rounded-[1.125rem]">
       <Gap sizeRem={1.5} />
       <div className="sticky top-0 bg-wrap w-full z-1">
-        <Typography size="m" bold>
+        <Typography size="m" semibold>
           {localizationCaptions[LocalizationKey.InterviewHistoryTitle]}
         </Typography>
         <Gap sizeRem={0.5} />
       </div>
       <div>
-        {rooms.sort(sortRoomsByTime).map((room) => (
+        {rooms.map((room) => (
           <RoomsHistoryItem key={room.id} room={room} />
         ))}
       </div>

@@ -20,6 +20,14 @@ import { RoomReview } from '../pages/RoomReview/RoomReview';
 import { RoomAnaytics } from '../pages/RoomAnaytics/RoomAnaytics';
 import { LogoutError } from '../pages/LogoutError/LogoutError';
 import { QuestionsArchive } from '../pages/QuestionsArchive/QuestionsArchive';
+import { QuestionTrees } from '../pages/QuestionTrees/QuestionTrees';
+import { QuestionTreeCreate } from '../pages/QuestionTreeCreate/QuestionTreeCreate';
+import { Roadmap } from '../pages/Roadmap/Roadmap';
+import { CategoriesArchive } from '../pages/CategoriesArchive/CategoriesArchive';
+import { Roadmaps } from '../pages/Roadmaps/Roadmaps';
+import { RoadmapCreate } from '../pages/RoadmapCreate/RoadmapCreate';
+import { RoadmapsArchive } from '../pages/RoadmapsArchive/RoadmapsArchive';
+import { BusinessAnalytic } from '../pages/BusinessAnalytic/BusinessAnalytic';
 
 interface AppRoutesProps {
   user: User | null;
@@ -141,10 +149,90 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
               }
             />
             <Route
+              path={pathnames.categoriesArchive}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <CategoriesArchive />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path={pathnames.categories}
               element={
                 <ProtectedRoute allowed={authenticated}>
                   <Categories />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.questionTrees}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <QuestionTrees />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.questionTreeCreate}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <QuestionTreeCreate edit={false} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.questionTreeEdit}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <QuestionTreeCreate edit={true} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.roadmapsArchive}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <RoadmapsArchive />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.roadmapCreate}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <RoadmapCreate edit={false} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.roadmapEdit}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <RoadmapCreate edit={true} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.roadmap}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <Roadmap />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.roadmaps}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <Roadmaps />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.businessAnalytic}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <BusinessAnalytic />
                 </ProtectedRoute>
               }
             />

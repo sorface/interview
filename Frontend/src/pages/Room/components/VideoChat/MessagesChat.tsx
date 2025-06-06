@@ -73,7 +73,7 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
   return (
     <div className="messages-chat">
       <div
-        className="videochat-transcripts px-0.75"
+        className="videochat-transcripts px-[0.75rem]"
         ref={videochatTranscriptsRef}
       >
         <Gap sizeRem={1.5} />
@@ -93,21 +93,21 @@ export const MessagesChat: FunctionComponent<MessagesChatProps> = ({
         ))}
       </div>
       <Gap sizeRem={0.5} />
-      <div className="flex justify-between px-0.75">
+      <div className="flex justify-between px-[0.75rem]">
         <input
           type="text"
           placeholder={
             localizationCaptions[LocalizationKey.ChatMessagePlaceholder]
           }
           ref={messageInputRef}
-          className="flex-1"
+          className="flex-1 w-full"
           maxLength={1000}
           onKeyDown={handleInputKeyDown}
         />
         <Gap sizeRem={0.25} horizontal />
         <Button
           variant={chatButtonVariant}
-          className="min-w-fit !transition rounded-full p-0 w-2.125 h-2.125 min-h-unset"
+          className="min-w-fit !transition rounded-full !p-0 w-[2.125rem] h-[2.125rem] min-h-[2.125rem]"
           onClick={handleChatMessageSubmit}
         >
           <Icon size="s" name={IconNames.PaperPlane} />

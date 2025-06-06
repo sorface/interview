@@ -31,6 +31,7 @@ import { Theme } from '../../../../context/ThemeContext';
 import { Link } from 'react-router-dom';
 
 interface EnterVideoChatModalProps {
+  aiRoom: boolean;
   open: boolean;
   loading: boolean;
   error: string | null;
@@ -40,6 +41,7 @@ interface EnterVideoChatModalProps {
 const updateAnalyserDelay = 1000 / 30;
 
 const enum Screen {
+  JoiningAi,
   Joining,
   SetupDevices,
   Error,
@@ -47,7 +49,7 @@ const enum Screen {
 
 export const EnterVideoChatModal: FunctionComponent<
   EnterVideoChatModalProps
-> = ({ open, loading, error, onClose }) => {
+> = ({ aiRoom, open, loading, error, onClose }) => {
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
   const { viewerMode, room } = useContext(RoomContext);
@@ -78,11 +80,21 @@ export const EnterVideoChatModal: FunctionComponent<
   });
 
   useEffect(() => {
-    if (viewerMode) {
+    if (!aiRoom) {
+      return;
+    }
+    setScreen(Screen.JoiningAi);
+  }, [aiRoom]);
+
+  useEffect(() => {
+    if (viewerMode || loading) {
+      return;
+    }
+    if (aiRoom) {
       return;
     }
     requestDevices();
-  }, [viewerMode, requestDevices]);
+  }, [viewerMode, loading, aiRoom, requestDevices]);
 
   useEffect(() => {
     if (!error) {
@@ -186,17 +198,51 @@ export const EnterVideoChatModal: FunctionComponent<
       <Typography size="xl" bold>
         {localizationCaptions[LocalizationKey.JoiningRoom]}
       </Typography>
-      <Gap sizeRem={2} />
     </div>
   );
 
   const screens: { [key in Screen]: JSX.Element } = {
+    [Screen.JoiningAi]: (
+      <>
+        <div className="w-[20rem] flex flex-col items-center text-center">
+          {joiningRoomHeader}
+          <Gap sizeRem={2} />
+          <div className="text-left w-full">
+            <Typography size="m" semibold>
+              {localizationCaptions[LocalizationKey.AllowAccessToMicrophone]}
+            </Typography>
+          </div>
+          <Gap sizeRem={0.25} />
+          <div className="w-full max-w-[29.25rem] grid grid-cols-settings-list gap-y-[1rem]">
+            <RecognitionLangSwitch />
+          </div>
+          <Gap sizeRem={0.25} />
+          <div className="text-left w-full">
+            <Typography size="s" secondary>
+              {
+                localizationCaptions[
+                  LocalizationKey.PleaseSelectRecognitionLanguage
+                ]
+              }
+            </Typography>
+          </div>
+          <Gap sizeRem={2} />
+          <Button variant="active" className="w-full" onClick={onClose}>
+            {localizationCaptions[LocalizationKey.Join]}
+          </Button>
+          <Gap sizeRem={1} />
+          <Typography size="s" secondary>
+            {localizationCaptions[LocalizationKey.CallRecording]}
+          </Typography>
+        </div>
+      </>
+    ),
     [Screen.Joining]: (
       <>
-        <div className="pr-4">
-          <div className="relative w-37 h-28">
+        <div className="pr-[4rem]">
+          <div className="relative w-[37rem] h-[28rem]">
             <div
-              className={`flex items-center justify-center w-37 h-28 rounded-1.25 ${joinPreviewThemedClassName}`}
+              className={`flex items-center justify-center w-[37rem] h-[28rem] rounded-[1.25rem] ${joinPreviewThemedClassName}`}
             >
               <Typography size="xxl">{auth?.nickname}</Typography>
             </div>
@@ -238,8 +284,9 @@ export const EnterVideoChatModal: FunctionComponent<
             </Typography>
           </div>
         </div>
-        <div className="w-20 flex flex-col items-center text-center">
+        <div className="w-[20rem] flex flex-col items-center text-center">
           {joiningRoomHeader}
+          <Gap sizeRem={2} />
           {loading ? (
             <Loader />
           ) : viewerMode ? (
@@ -260,14 +307,14 @@ export const EnterVideoChatModal: FunctionComponent<
     ),
     [Screen.SetupDevices]: (
       <>
-        <div className="pr-4">
-          <div className="relative w-37 h-28">
+        <div className="pr-[4rem]">
+          <div className="relative w-[37rem] h-[28rem]">
             <video
               ref={userVideo}
               muted
               autoPlay
               playsInline
-              className="w-37 h-28 rounded-1.25 object-cover"
+              className="w-[37rem] h-[28rem] rounded-[1.25rem] object-cover"
             >
               Video not supported
             </video>
@@ -300,8 +347,9 @@ export const EnterVideoChatModal: FunctionComponent<
             />
           </Typography>
         </div>
-        <div className="w-20 flex flex-col items-center text-center">
+        <div className="w-[20rem] flex flex-col items-center text-center">
           {joiningRoomHeader}
+          <Gap sizeRem={2} />
           <div>
             <div className="flex items-center">
               <DeviceSelect
@@ -321,7 +369,7 @@ export const EnterVideoChatModal: FunctionComponent<
               />
             </div>
             <Gap sizeRem={1.25} />
-            <div className="w-full max-w-29.25 grid grid-cols-settings-list gap-y-1">
+            <div className="w-full max-w-[29.25rem] grid grid-cols-settings-list gap-y-[1rem]">
               <RecognitionLangSwitch />
             </div>
             <Gap sizeRem={0.25} />
@@ -362,20 +410,27 @@ export const EnterVideoChatModal: FunctionComponent<
         },
       }}
     >
-      <Link to={pathnames.highlightRooms} className="no-underline">
-        <div className="action-modal-header absolute flex items-center px-0.5 py-0.5 h-4">
-          <div className="w-2.375 h-2.375 pr-1">
+      <Link
+        to={aiRoom ? pathnames.roadmaps : pathnames.highlightRooms}
+        className="no-underline"
+      >
+        <div className="action-modal-header absolute flex items-center h-[2.375rem] mt-[1.3125rem] ml-[0.5rem]">
+          <div className="w-[2.375rem] h-[2.375rem] mr-[1rem]">
             <img
-              className="w-2.375 h-2.375 rounded-0.375"
+              className="w-[2.375rem] h-[2.375rem] rounded-[0.375rem]"
               src="/logo192.png"
               alt="site logo"
             />
           </div>
-          <h3>{room?.name}</h3>
+          <h3>
+            <Typography size="xl" semibold>
+              {room?.name}
+            </Typography>
+          </h3>
         </div>
       </Link>
       <div className="flex items-center justify-center mt-auto mb-auto">
-        {screens[screen]}
+        {loading ? <Loader /> : screens[screen]}
       </div>
     </Modal>
   );

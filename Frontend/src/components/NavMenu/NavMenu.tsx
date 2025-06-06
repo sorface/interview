@@ -16,7 +16,7 @@ import { LocalizationCaption } from '../LocalizationCaption/LocalizationCaption'
 import { CategoriesList } from '../CategoriesList/CategoriesList';
 import { Category } from '../../types/category';
 import { Typography } from '../Typography/Typography';
-import { VITE_NAME, VITE_BUILD_HASH } from '../../config';
+import { VITE_APP_NAME, VITE_BUILD_HASH } from '../../config';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 import './NavMenu.css';
@@ -105,6 +105,42 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
 
   const items: Array<MenuItem | null> = [
     {
+      path: pathnames.roadmaps,
+      caption: (
+        <LocalizationCaption captionKey={LocalizationKey.RoadmapsPageName} />
+      ),
+      icon: IconNames.Golf,
+      onClick: handleItemClick,
+    },
+    admin
+      ? {
+          path: pathnames.roadmapsArchive,
+          caption: (
+            <LocalizationCaption
+              captionKey={LocalizationKey.RoadmapsPageName}
+            />
+          ),
+          icon: IconNames.Golf,
+          onClick: handleItemClick,
+        }
+      : null,
+    {
+      path: pathnames.questions,
+      caption: (
+        <LocalizationCaption captionKey={LocalizationKey.QuestionsPageName} />
+      ),
+      icon: IconNames.Chat,
+      forceActive: questionsClicked || !!questionsPath,
+      onClick: handleQuestionsClick,
+      subitem: questionsClicked ? (
+        <CategoriesList
+          showOnlyWithoutParent={true}
+          activeId={selectedCategory?.id}
+          onCategoryClick={handleCategoryClick}
+        />
+      ) : null,
+    },
+    {
       path: pathnames.highlightRooms,
       caption: (
         <LocalizationCaption
@@ -126,22 +162,6 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
     //   icon: IconNames.Golf,
     //   onClick: handleItemClick,
     // },
-    {
-      path: pathnames.questions,
-      caption: (
-        <LocalizationCaption captionKey={LocalizationKey.QuestionsPageName} />
-      ),
-      icon: IconNames.Chat,
-      forceActive: questionsClicked || !!questionsPath,
-      onClick: handleQuestionsClick,
-      subitem: questionsClicked ? (
-        <CategoriesList
-          showOnlyWithoutParent={true}
-          activeId={selectedCategory?.id}
-          onCategoryClick={handleCategoryClick}
-        />
-      ) : null,
-    },
     admin
       ? {
           path: pathnames.categories,
@@ -151,6 +171,42 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
             />
           ),
           icon: IconNames.Clipboard,
+          onClick: handleItemClick,
+        }
+      : null,
+    admin
+      ? {
+          path: pathnames.categoriesArchive,
+          caption: (
+            <LocalizationCaption
+              captionKey={LocalizationKey.CategoriesArchive}
+            />
+          ),
+          icon: IconNames.Clipboard,
+          onClick: handleItemClick,
+        }
+      : null,
+    admin
+      ? {
+          path: pathnames.questionTrees,
+          caption: (
+            <LocalizationCaption
+              captionKey={LocalizationKey.QuestionTreesPageName}
+            />
+          ),
+          icon: IconNames.Expand,
+          onClick: handleItemClick,
+        }
+      : null,
+    admin
+      ? {
+          path: pathnames.businessAnalytic,
+          caption: (
+            <LocalizationCaption
+              captionKey={LocalizationKey.BusinessAnalyticPageName}
+            />
+          ),
+          icon: IconNames.Cube,
           onClick: handleItemClick,
         }
       : null,
@@ -196,7 +252,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
           className={`nav-menu ${collapsed ? 'collapsed' : ''} move-transition`}
         >
           <NavLink
-            to={pathnames.home.replace(':redirect?', '')}
+            to={pathnames.roadmaps}
             className="nav-menu-item nav-menu-item-first no-active move-transition"
           >
             <img className="site-logo" src="/logo192.png" alt="site logo" />
@@ -204,7 +260,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
               className="nav-menu-item-caption move-transition"
               style={{ width: collapsed ? '0rem' : 'var(--caption-width)' }}
             >
-              {VITE_NAME}
+              {VITE_APP_NAME}
             </h1>
           </NavLink>
           <div className="flex flex-col overflow-x-hidden overflow-y-auto">
@@ -221,7 +277,7 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
               <Icon name={IconNames.ThemeSwitchDark} />
             </div>
           </div>
-          <div className="nav-menu-build h-1.125 opacity-0.5">
+          <div className="nav-menu-build h-[1.125rem] opacity-50">
             <Typography size="s">
               {localizationCaptions[LocalizationKey.BuildHash]}:{' '}
               {VITE_BUILD_HASH}

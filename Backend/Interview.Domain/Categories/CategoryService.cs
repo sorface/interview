@@ -15,6 +15,7 @@ public class CategoryService(AppDbContext db, ArchiveService<Category> archiveSe
     public async Task<CategoryResponse> FindByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var response = await db.Categories.AsNoTracking()
+            .Include(e => e.Parent)
             .Where(e => e.Id == id)
             .Select(CategoryResponse.Mapper.Expression)
             .FirstOrDefaultAsync(cancellationToken);
@@ -119,6 +120,7 @@ public class CategoryService(AppDbContext db, ArchiveService<Category> archiveSe
     {
         var filter = await BuildSpecificationAsync(archive, request, cancellationToken);
         return await db.Categories
+            .Include(e => e.Parent)
             .AsNoTracking()
             .Where(filter)
             .OrderBy(e => e.ParentId)
@@ -159,33 +161,9 @@ public class CategoryService(AppDbContext db, ArchiveService<Category> archiveSe
         }
     }
 
-    private async Task<HashSet<Guid>> GetAllChildrenAsync(Guid categoryId, CancellationToken cancellationToken)
+    private Task<HashSet<Guid>> GetAllChildrenAsync(Guid categoryId, CancellationToken cancellationToken)
     {
-        var childrenList = await db.Categories
-            .AsNoTracking()
-            .Where(e => e.ParentId == categoryId)
-            .Select(e => e.Id)
-            .ToListAsync(cancellationToken);
-        var children = childrenList.ToHashSet();
-        var actualParent = children;
-        while (actualParent.Count > 0)
-        {
-            var childrenNLevel = await db.Categories
-                .AsNoTracking()
-                .Where(e => e.ParentId != null && actualParent.Contains(e.ParentId.Value))
-                .Select(e => e.Id)
-                .ToListAsync(cancellationToken);
-            actualParent = [];
-            foreach (var id in childrenNLevel)
-            {
-                if (children.Add(id))
-                {
-                    actualParent.Add(id);
-                }
-            }
-        }
-
-        return children;
+        return db.Categories.GetAllChildrenAsync(categoryId, e => e.ParentId, false, cancellationToken);
     }
 
     private Task<ServiceError?> EnsureValidAsync(CategoryEditRequest request, CancellationToken cancellationToken)

@@ -19,7 +19,7 @@ export const Label: FunctionComponent<RoomCreateFieldProps> = ({
 }) => {
   return (
     <>
-      <div className={`w-7.5 pr-0.5 ${className}`}>{children}</div>
+      <div className={`w-[7.5rem] mr-[0.5rem] ${className}`}>{children}</div>
       <Gap sizeRem={0.5} />
     </>
   );

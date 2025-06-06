@@ -1,5 +1,6 @@
 export const inviteParamName = 'invite';
 export const roomReviewMaxLength = 500;
+export const aiExpertNickname = 'AI Expert';
 
 export const pathnames = {
   home: '/:redirect?',
@@ -19,7 +20,17 @@ export const pathnames = {
   categories: '/categories',
   categoriesCreate: '/categories/create',
   categoriesEdit: '/categories/edit/:id',
+  categoriesArchive: '/categories/archive',
   logoutError: '/logoutError',
+  questionTrees: '/questionTrees',
+  questionTreeCreate: '/questionTrees/create',
+  questionTreeEdit: '/questionTrees/:id',
+  roadmaps: '/roadmap',
+  roadmapsArchive: '/roadmapsArchive',
+  roadmapCreate: '/roadmap/create',
+  roadmapEdit: '/roadmap/edit/:id',
+  roadmap: '/roadmap/:id',
+  businessAnalytic: '/businessAnalytic',
 };
 
 export const enum IconNames {
@@ -69,6 +80,17 @@ export const enum IconNames {
   Search = 'search',
   Hourglass = 'hourglass',
   Pin = 'pin-outline',
+  LogIn = 'log-in-outline',
+  Expand = 'expand-outline',
+  Collapse = 'chevron-collapse-outline',
+  Grid = 'grid-outline',
+  Menu = 'menu-sharp',
+  Notifications = 'notifications-outline',
+  Happy = 'happy-outline',
+  RadioButtonOn = 'radio-button-on-outline',
+  FileTray = 'file-tray-full-outline',
+  Sync = 'sync-outline',
+  Share = 'share-outline',
 }
 
 export const reactionIcon: Record<string, IconNames> = {
@@ -81,6 +103,7 @@ export const enum EventName {
   CodeEditor = 'CodeEditor',
   CodeEditorLanguage = 'CodeEditorLanguage',
   CodeEditorCursor = 'CodeEditorCursor',
+  ValidAiAnswer = 'ValidAiAnswer',
 }
 
 export enum HttpResponseCode {

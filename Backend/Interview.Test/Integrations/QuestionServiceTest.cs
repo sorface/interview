@@ -8,6 +8,7 @@ using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Questions.Records.FindPage;
 using Interview.Domain.Questions.Services;
+using Interview.Domain.Questions.UpsertQuestionTree;
 using Interview.Domain.Reactions;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomConfigurations;
@@ -543,23 +544,23 @@ public class QuestionServiceTest
 
         var user = new User("nickname", "twitchChannel");
         appDbContext.Users.Add(user);
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
 
-        var room = new Room("room#1", SERoomAccessType.Public);
+        var room = new Room("room#1", SERoomAccessType.Public, SERoomType.Standard);
         appDbContext.Rooms.Add(room);
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
 
         var question = new Question("question#1");
         appDbContext.Questions.Add(question);
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
 
         var reaction = new Reaction { Type = ReactionType.Like };
         appDbContext.Reactions.Add(reaction);
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
 
         var roomQuestion = new RoomQuestion { Room = room, Question = question, State = RoomQuestionState.Active, QuestionId = default, RoomId = default, Order = 0, };
         appDbContext.RoomQuestions.Add(roomQuestion);
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
 
         var roomQuestionReaction = new RoomQuestionReaction
         {
@@ -568,7 +569,7 @@ public class QuestionServiceTest
             Sender = user
         };
         appDbContext.RoomQuestionReactions.Add(roomQuestionReaction);
-        appDbContext.SaveChanges();
+        await appDbContext.SaveChangesAsync();
 
         await transaction.CommitAsync();
 
@@ -610,9 +611,12 @@ public class QuestionServiceTest
             questionRepository,
             questionArchiveRepository,
             archiveService,
+            new ArchiveService<QuestionTree>(appDbContext),
+            new ArchiveService<QuestionSubjectTree>(appDbContext),
             tagRepository,
             aRoomMembershipChecker,
             currentUser,
+            new QuestionTreeUpsert(appDbContext),
             appDbContext);
     }
 }

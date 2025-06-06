@@ -99,9 +99,10 @@ export const QuestionAnswerDetails: FunctionComponent<
                   },
                 ]}
                 activeIndex={codeQuestionTab}
-                {...(themeInUi === Theme.Dark && {
-                  variant: 'alternative',
-                })}
+                activeVariant="invertedActive"
+                nonActiveVariant={
+                  themeInUi === Theme.Dark ? 'invertedAlternative' : 'inverted'
+                }
                 onClick={setCodeQuestionTab}
               />
             </>
@@ -111,7 +112,7 @@ export const QuestionAnswerDetails: FunctionComponent<
             </Button>
           )}
           <Gap sizeRem={1} />
-          <div className="h-32.25">
+          <div className="h-[32.25rem]">
             <CodeEditor
               language={data.codeEditor?.lang || CodeEditorLang.Plaintext}
               languages={[data.codeEditor?.lang || CodeEditorLang.Plaintext]}

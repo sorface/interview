@@ -10,16 +10,16 @@ import { useParticipantTypeLocalization } from '../../../../hooks/useParticipant
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../../localization';
 
-interface DetailedEvaluation {
-  recommendation?: string;
-  expected?: string;
+export interface OtherComment {
+  title: LocalizationKey;
+  value: string;
 }
 
 interface ReviewUserOpinionProps {
   user: {
     id: User['id'];
-    evaluation?: Partial<Omit<RoomQuestionEvaluation, 'id'>> &
-      DetailedEvaluation;
+    evaluation?: Partial<Omit<RoomQuestionEvaluation, 'id'>>;
+    otherComments?: OtherComment[];
   };
   allUsers: Map<User['id'], AnalyticsUserReview>;
 }
@@ -46,7 +46,7 @@ export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
             <Typography size="m" bold>
               {currentUser?.nickname}
             </Typography>
-            <span className="opacity-0.5">
+            <span className="opacity-50">
               <Typography size="m" bold>
                 {currentUser &&
                   localizeParticipantType(currentUser.participantType)}
@@ -75,18 +75,19 @@ export const ReviewUserOpinion: FunctionComponent<ReviewUserOpinionProps> = ({
         {user.evaluation?.review ??
           localizationCaptions[LocalizationKey.RoomReviewWaiting]}
       </Typography>
-      {user.evaluation?.recommendation && (
-        <>
+      {user.otherComments?.map((comment) => (
+        <div key={`${comment.title}${comment.value}`} className="flex flex-col">
           <Gap sizeRem={1} />
-          <Typography size="m">{user.evaluation.recommendation}</Typography>
-        </>
-      )}
-      {user.evaluation?.expected && (
-        <>
-          <Gap sizeRem={1} />
-          <Typography size="m">{user.evaluation.expected}</Typography>
-        </>
-      )}
+          <Typography size="m" bold>
+            {localizationCaptions[comment.title]}
+          </Typography>
+          <Typography size="m">
+            {Array.isArray(comment.value)
+              ? JSON.stringify(comment.value)
+              : comment.value}
+          </Typography>
+        </div>
+      ))}
     </div>
   );
 };

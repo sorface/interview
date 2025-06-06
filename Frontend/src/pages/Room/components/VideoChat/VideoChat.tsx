@@ -32,6 +32,8 @@ import { Typography } from '../../../../components/Typography/Typography';
 import { Icon } from '../Icon/Icon';
 import { Reactions } from '../Reactions/Reactions';
 import { RoomContext } from '../../context/RoomContext';
+import { useThemeClassName } from '../../../../hooks/useThemeClassName';
+import { Theme } from '../../../../context/ThemeContext';
 
 import './VideoChat.css';
 
@@ -148,6 +150,10 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   const screenSharePeer = peers.find((peer) => peer.screenShare);
   const { activeReactions } = useReactionsStatus({
     lastWsMessageParsed,
+  });
+  const rightPanelThemedClassName = useThemeClassName({
+    [Theme.Dark]: '',
+    [Theme.Light]: 'bg-wrap',
   });
 
   useEffect(() => {
@@ -336,7 +342,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
 
   return (
     <>
-      <RoomToolsPanel.Wrapper rightPos="21.5rem" bottomPos="1.5rem">
+      <RoomToolsPanel.Wrapper rightPos="17.5rem" bottomPos="1.5rem">
         {!viewerMode && (
           <RoomToolsPanel.ButtonsGroupWrapper>
             <RoomToolsPanel.SwitchButton
@@ -392,15 +398,12 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
               onClick={handleScreenShare}
             /> */}
             {currentUserExpert && (
-              <>
-                <Gap sizeRem={0.125} />
-                <RoomToolsPanel.SwitchButton
-                  enabled={true}
-                  iconEnabledName={IconNames.PersonAdd}
-                  iconDisabledName={IconNames.PersonAdd}
-                  onClick={handleInvitationsOpen}
-                />
-              </>
+              <RoomToolsPanel.SwitchButton
+                enabled={true}
+                iconEnabledName={IconNames.PersonAdd}
+                iconDisabledName={IconNames.PersonAdd}
+                onClick={handleInvitationsOpen}
+              />
             )}
             <Gap sizeRem={0.125} />
             <RoomToolsPanel.SwitchButton
@@ -452,12 +455,14 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
           </ContextMenu>
         </RoomToolsPanel.ButtonsGroupWrapper>
       </RoomToolsPanel.Wrapper>
-      <div className="videochat-field relative videochat-field-main bg-wrap rounded-1.125">
+      <div className="videochat-field relative videochat-field-main bg-wrap rounded-[1.125rem]">
         <RoomCodeEditor visible={codeEditorEnabled} />
         {!codeEditorEnabled && renderMain()}
       </div>
 
-      <div className="relative videochat-field bg-wrap rounded-1.125">
+      <div
+        className={`relative videochat-field rounded-[1.125rem] ${rightPanelThemedClassName}`}
+      >
         <div
           className={`videochat ${messagesChatEnabled ? 'invisible h-full' : 'visible'}`}
         >
@@ -477,7 +482,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             handleUserPin={() => handleUserPin(auth?.id || '')}
             order={viewerMode ? viewerOrder - 1 : videoOrder[auth?.id || '']}
             viewer={viewerMode}
-            avatar={auth?.avatar}
             nickname={`${auth?.nickname} (${localizationCaptions[LocalizationKey.You]})`}
             reaction={activeReactions[auth?.id || '']}
             pinable={!viewerMode}
@@ -505,7 +509,6 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
                     ? viewerOrder
                     : videoOrder[peer.targetUserId]
                 }
-                avatar={peer?.avatar}
                 nickname={peer?.nickname}
                 reaction={activeReactions[peer.peerID]}
               >

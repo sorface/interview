@@ -13,7 +13,7 @@ public class AppDbContextTest
         var clock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(clock);
 
-        var room = new Room("Test room", SERoomAccessType.Public)
+        var room = new Room("Test room", SERoomAccessType.Public, SERoomType.Standard)
         {
             Questions =
             [
@@ -28,8 +28,8 @@ public class AppDbContextTest
                 }
             ]
         };
-        appDbContext.Add(room);
-        appDbContext.SaveChanges();
+        await appDbContext.AddAsync(room);
+        await appDbContext.SaveChangesAsync();
 
         room.Id.Should().NotBe(Guid.Empty);
         room.CreateDate.Should().NotBe(null);

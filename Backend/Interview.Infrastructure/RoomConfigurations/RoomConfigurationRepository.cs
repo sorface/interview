@@ -1,3 +1,4 @@
+using Interview.Domain;
 using Interview.Domain.Database;
 using Interview.Domain.Rooms.RoomConfigurations;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,7 @@ public class RoomConfigurationRepository(AppDbContext db) : EfRepository<RoomCon
             .FirstOrDefaultAsync(e => e.Id == request.RoomId, cancellationToken);
         if (room is null)
         {
-            throw new ApplicationException($"Unknown room '{request.RoomId}'");
+            throw new UserException($"Unknown room '{request.RoomId}'");
         }
 
         room.Configuration ??= new RoomConfiguration

@@ -27,6 +27,7 @@ export enum CodeEditorLang {
   Typescript = 'typescript',
   Xml = 'xml',
   Yaml = 'yaml',
+  Json = 'json',
 }
 
 export interface QuestionAnswer {
@@ -49,5 +50,16 @@ export interface Question {
     id: string;
     name: string;
     parentId: string;
+  };
+}
+
+export interface QuestionById extends Question {
+  type: QuestionType;
+}
+
+export interface QuestionWithAuthor extends Question {
+  author?: {
+    userId: string;
+    nickname: string;
   };
 }

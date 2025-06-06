@@ -41,7 +41,7 @@ export const RecognitionLangSwitch: FunctionComponent = () => {
         </Typography>
       </div>
       <select
-        className="w-full"
+        className="w-full muted"
         value={recognitionLang}
         onChange={handleRecognitionLangChange}
       >

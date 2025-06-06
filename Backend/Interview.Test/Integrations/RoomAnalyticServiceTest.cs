@@ -38,14 +38,14 @@ public class RoomAnalyticServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var room1 = new Room(DefaultRoomName, SERoomAccessType.Public);
+        var room1 = new Room(DefaultRoomName, SERoomAccessType.Public, SERoomType.Standard);
 
         appDbContext.Rooms.Add(room1);
 
         var dummyUser = new User("dummy", "dummy");
         appDbContext.Users.Add(dummyUser);
-        appDbContext.SaveChanges();
-        var dummyRoom = new Room("test room", SERoomAccessType.Public)
+        await appDbContext.SaveChangesAsync();
+        var dummyRoom = new Room("test room", SERoomAccessType.Public, SERoomType.Standard)
         {
             Questions =
             [
@@ -76,7 +76,7 @@ public class RoomAnalyticServiceTest
         dummyRoom.Participants.Add(new RoomParticipant(dummyUser, dummyRoom, SERoomParticipantType.Expert));
 
         appDbContext.Rooms.Add(dummyRoom);
-        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", SERoomAccessType.Public));
+        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", SERoomAccessType.Public, SERoomType.Standard));
 
         var questions = new Question[]
         {
@@ -90,17 +90,17 @@ public class RoomAnalyticServiceTest
         {
             new("u1", "v1")
             {
-                Id = Guid.Parse("587A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! }, Avatar = "dummy avatar 1"
+                Id = Guid.Parse("587A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { (await appDbContext.Roles.FindAsync(RoleName.User.Id))! }, Avatar = "dummy avatar 1"
             },
-            new("u2", "v2") { Id = Guid.Parse("597A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.Admin.Id)! } },
+            new("u2", "v2") { Id = Guid.Parse("597A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { (await appDbContext.Roles.FindAsync(RoleName.Admin.Id))! } },
             new("u3", "v3")
             {
-                Id = Guid.Parse("5A7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! }, Avatar = "dummy avatar 3"
+                Id = Guid.Parse("5A7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { (await appDbContext.Roles.FindAsync(RoleName.User.Id))! }, Avatar = "dummy avatar 3"
             },
-            new("u4", "v4") { Id = Guid.Parse("5B7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! } },
+            new("u4", "v4") { Id = Guid.Parse("5B7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { (await appDbContext.Roles.FindAsync(RoleName.User.Id))! } },
             new("u5", "v5")
             {
-                Id = Guid.Parse("5C7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! }, Avatar = "dummy avatar 5"
+                Id = Guid.Parse("5C7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { (await appDbContext.Roles.FindAsync(RoleName.User.Id))! }, Avatar = "dummy avatar 5"
             },
         };
         appDbContext.Users.AddRange(users);
@@ -334,14 +334,14 @@ public class RoomAnalyticServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var room1 = new Room(DefaultRoomName, SERoomAccessType.Public);
+        var room1 = new Room(DefaultRoomName, SERoomAccessType.Public, SERoomType.Standard);
 
         appDbContext.Rooms.Add(room1);
 
         var dummyUser = new User("dummy", "dummy");
         appDbContext.Users.Add(dummyUser);
-        appDbContext.SaveChanges();
-        var dummyRoom = new Room("test room", SERoomAccessType.Public)
+        await appDbContext.SaveChangesAsync();
+        var dummyRoom = new Room("test room", SERoomAccessType.Public, SERoomType.Standard)
         {
             Questions =
             [
@@ -372,7 +372,7 @@ public class RoomAnalyticServiceTest
         dummyRoom.Participants.Add(new RoomParticipant(dummyUser, dummyRoom, SERoomParticipantType.Expert));
 
         appDbContext.Rooms.Add(dummyRoom);
-        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", SERoomAccessType.Public));
+        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", SERoomAccessType.Public, SERoomType.Standard));
 
         var questions = new Question[]
         {
@@ -386,17 +386,17 @@ public class RoomAnalyticServiceTest
         {
             new("u1", "v1")
             {
-                Id = Guid.Parse("587A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! }, Avatar = "dummy avatar 1"
+                Id = Guid.Parse("587A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { (await appDbContext.Roles.FindAsync(RoleName.User.Id))! }, Avatar = "dummy avatar 1"
             },
-            new("u2", "v2") { Id = Guid.Parse("597A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.Admin.Id)! } },
+            new("u2", "v2") { Id = Guid.Parse("597A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { (await appDbContext.Roles.FindAsync(RoleName.Admin.Id))! } },
             new("u3", "v3")
             {
-                Id = Guid.Parse("5A7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! }, Avatar = "dummy avatar 3"
+                Id = Guid.Parse("5A7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { (await appDbContext.Roles.FindAsync(RoleName.User.Id))! }, Avatar = "dummy avatar 3"
             },
-            new("u4", "v4") { Id = Guid.Parse("5B7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! } },
+            new("u4", "v4") { Id = Guid.Parse("5B7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { (await appDbContext.Roles.FindAsync(RoleName.User.Id))! } },
             new("u5", "v5")
             {
-                Id = Guid.Parse("5C7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { appDbContext.Roles.Find(RoleName.User.Id)! }, Avatar = "dummy avatar 5"
+                Id = Guid.Parse("5C7A0279-4364-4940-BE4E-8DBEC08BA96C"), Roles = { (await appDbContext.Roles.FindAsync(RoleName.User.Id))! }, Avatar = "dummy avatar 5"
             },
         };
         appDbContext.Users.AddRange(users);

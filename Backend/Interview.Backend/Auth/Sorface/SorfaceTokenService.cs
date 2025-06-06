@@ -31,7 +31,10 @@ public class SorfaceTokenService(AuthorizationService options, IHttpClientFactor
 
         request.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64Secret);
 
-        using var response = await httpClientFactory.CreateClient()
+#pragma warning disable CA2000
+        var httpClient = httpClientFactory.CreateClient();
+#pragma warning restore CA2000
+        using var response = await httpClient
             .SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
@@ -64,8 +67,9 @@ public class SorfaceTokenService(AuthorizationService options, IHttpClientFactor
 
         try
         {
+#pragma warning disable CA2000
             var httpClient = httpClientFactory.CreateClient();
-
+#pragma warning restore CA2000
             await httpClient.SendAsync(request, httpContent.RequestAborted);
         }
         catch (Exception)
@@ -92,7 +96,10 @@ public class SorfaceTokenService(AuthorizationService options, IHttpClientFactor
         var bytes = Encoding.UTF8.GetBytes(chars);
         request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(bytes));
 
-        using var response = await httpClientFactory.CreateClient()
+#pragma warning disable CA2000
+        var httpClient = httpClientFactory.CreateClient();
+#pragma warning restore CA2000
+        using var response = await httpClient
             .SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
 
         if (!response.IsSuccessStatusCode)

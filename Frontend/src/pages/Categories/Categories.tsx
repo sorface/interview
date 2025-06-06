@@ -24,8 +24,6 @@ import { Icon } from '../Room/components/Icon/Icon';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Button } from '../../components/Button/Button';
 
-import './Categories.css';
-
 const pageSize = 30;
 const initialPageNumber = 1;
 
@@ -114,10 +112,10 @@ export const Categories: FunctionComponent = () => {
   const createCategoryItem = useCallback(
     (category: Category) => (
       <li key={category.id}>
-        <Field className="category-item">
+        <Field className="flex items-center">
           <span>{category.name}</span>
-          {!category.parentId && <Icon name={IconNames.Clipboard} />}
-          <div className="category-controls">
+          {!category.parent && <Icon name={IconNames.Clipboard} />}
+          <div className="ml-auto">
             <Link to={pathnames.categoriesEdit.replace(':id', category.id)}>
               <Button>🖊️</Button>
             </Link>
@@ -141,49 +139,47 @@ export const Categories: FunctionComponent = () => {
   );
 
   return (
-    <MainContentWrapper className="categories-page">
+    <MainContentWrapper>
       <PageHeader
         title={localizationCaptions[LocalizationKey.CategoriesPageName]}
         searchValue={searchValueInput}
         onSearchChange={setSearchValueInput}
       >
         <Link to={pathnames.categoriesCreate}>
-          <Button variant="active" className="h-2.5">
+          <Button variant="active" className="h-[2.5rem]">
             <Icon name={IconNames.Add} />
             {localizationCaptions[LocalizationKey.CreateCategory]}
           </Button>
         </Link>
       </PageHeader>
-      <Field className="!mt-0">
-        <div className="flex">
-          <input
-            id="showOnlyWithoutParent"
-            type="checkbox"
-            checked={showOnlyWithoutParent}
-            onChange={handleOnlyWithoutParentChange}
-          />
-          <label htmlFor="showOnlyWithoutParent" className="mr-1">
-            {localizationCaptions[LocalizationKey.RootCategories]}
-          </label>
-          <label htmlFor="parentID">
-            {localizationCaptions[LocalizationKey.Category]}:
-          </label>
-          <select
-            id="parentID"
-            value={categoryParent}
-            onChange={handleCategoryParentChange}
-          >
-            <option value="">
-              {localizationCaptions[LocalizationKey.NotSelected]}
+      <div className="bg-wrap flex items-center px-[1rem] py-[0.5rem] rounded-[0.5rem]">
+        <input
+          id="showOnlyWithoutParent"
+          type="checkbox"
+          checked={showOnlyWithoutParent}
+          onChange={handleOnlyWithoutParentChange}
+        />
+        <label htmlFor="showOnlyWithoutParent" className="mr-[1rem]">
+          {localizationCaptions[LocalizationKey.RootCategories]}
+        </label>
+        <label htmlFor="parentID">
+          {localizationCaptions[LocalizationKey.Category]}:
+        </label>
+        <select
+          id="parentID"
+          value={categoryParent}
+          onChange={handleCategoryParentChange}
+        >
+          <option value="">
+            {localizationCaptions[LocalizationKey.NotSelected]}
+          </option>
+          {rootCategories?.map((rootCategory) => (
+            <option key={rootCategory.id} value={rootCategory.id}>
+              {rootCategory.name}
             </option>
-            {rootCategories?.map((rootCategory) => (
-              <option key={rootCategory.id} value={rootCategory.id}>
-                {rootCategory.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </Field>
+          ))}
+        </select>
+      </div>
       <ProcessWrapper
         loading={false}
         error={error || archiveError || rootCategoriesError}
@@ -193,7 +189,7 @@ export const Categories: FunctionComponent = () => {
           loading={loading || rootCategoriesLoading}
           error={error || archiveError || rootCategoriesError}
           triggerResetAccumData={triggerResetAccumData}
-          loaderClassName="category-item field-wrap"
+          loaderClassName="field-wrap"
           renderItem={createCategoryItem}
           nextPageAvailable={categories?.length === pageSize}
           handleNextPage={handleNextPage}

@@ -29,7 +29,7 @@ export const ThemeSwitch: FunctionComponent = () => {
         </Typography>
       </div>
       <select
-        className="w-full"
+        className="w-full muted"
         value={themeInSetting}
         onChange={handleThemeChange}
       >

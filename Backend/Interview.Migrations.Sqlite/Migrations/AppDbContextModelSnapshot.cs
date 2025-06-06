@@ -315,6 +315,117 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.ToTable("QuestionAnswers");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionSubjectTree", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid?>("ParentQuestionSubjectTreeId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("QuestionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<char>("Type")
+                        .HasColumnType("TEXT")
+                        .HasComment("Available values: [Empty: E, Question: Q]");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ParentQuestionSubjectTreeId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("QuestionSubjectTree");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionSubjectTreeContext", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Context")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("QuestionSubjectTreeContext");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionTree", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid?>("ParentQuestionTreeId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("RootQuestionSubjectTreeId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ParentQuestionTreeId");
+
+                    b.HasIndex("RootQuestionSubjectTreeId");
+
+                    b.ToTable("QuestionTree");
+                });
+
             modelBuilder.Entity("Interview.Domain.Reactions.Reaction", b =>
                 {
                     b.Property<Guid>("Id")
@@ -359,6 +470,121 @@ namespace Interview.Migrations.Sqlite.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Interview.Domain.Roadmaps.Roadmap", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ImageBase64")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("Roadmap");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.RoadmapMilestone", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid?>("ParentRoadmapMilestoneId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("RoadmapId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ParentRoadmapMilestoneId");
+
+                    b.HasIndex("RoadmapId");
+
+                    b.ToTable("RoadmapMilestone");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.RoadmapMilestoneItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("QuestionTreeId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("RoadmapMilestoneId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("QuestionTreeId");
+
+                    b.HasIndex("RoadmapMilestoneId");
+
+                    b.ToTable("RoadmapMilestoneItem");
+                });
+
             modelBuilder.Entity("Interview.Domain.Rooms.QueuedRoomEvent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -398,9 +624,6 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(0);
 
-                    b.Property<Guid?>("CategoryId")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("TEXT");
 
@@ -412,6 +635,9 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasMaxLength(70)
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("QuestionTreeId")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("ScheduleStartTime")
                         .HasColumnType("TEXT");
 
@@ -420,14 +646,22 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasColumnType("TEXT")
                         .HasDefaultValue('N');
 
+                    b.Property<char>("Type")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(1)
+                        .IsUnicode(false)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue('S')
+                        .HasComment("Available values: A: AI, S: Standard");
+
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
-
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("QuestionTreeId");
 
                     b.ToTable("Rooms");
                 });
@@ -860,6 +1094,13 @@ namespace Interview.Migrations.Sqlite.Migrations
                         },
                         new
                         {
+                            Id = new Guid("cf8fcdbc-b140-440f-becc-406259e7ab77"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "ArchiveRoadmap",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
                             Id = new Guid("c0afec8d-04d0-4a7a-9f20-c3d4c891f04e"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "CategoryArchive",
@@ -902,9 +1143,30 @@ namespace Interview.Migrations.Sqlite.Migrations
                         },
                         new
                         {
+                            Id = new Guid("1119039f-8127-43dc-ac11-247fc4d221d3"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "GetArchiveQuestionTreeById",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
                             Id = new Guid("bc98d0b8-b4a3-4b66-b8c1-db1fca0647e0"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "GetCategoryById",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("8f12692d-8e94-4409-aaef-84f2ceaacd5d"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "GetQuestionTreeById",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("aff113ac-c65b-4566-993b-aa7f6577f397"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "GetRoomBusinessAnalytic",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -972,6 +1234,34 @@ namespace Interview.Migrations.Sqlite.Migrations
                         },
                         new
                         {
+                            Id = new Guid("e6b59bae-2f2c-40f3-8587-49a3e703ac44"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "QuestionTreeArchive",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("badfc74c-4f2f-4b53-9b46-763b28676009"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "QuestionTreeFindArchivedPage",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("2e1670ec-f9d2-4cb8-bb57-f6239b16f24f"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "QuestionTreeFindPage",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("1ee1e860-a1dc-4def-a191-1cbac8956a90"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "QuestionTreeUnarchive",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
                             Id = new Guid("32e18595-1c0a-4dd5-bad7-2cbfbccbcb2a"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "QuestionUnarchive",
@@ -989,6 +1279,34 @@ namespace Interview.Migrations.Sqlite.Migrations
                             Id = new Guid("004cca49-9857-4973-9bda-79b57f60279b"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "ReactionFindPage",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("d281118b-2806-4563-9381-ed7ea47d6578"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "RoadmapFindArchivedPage",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("47084566-7f68-4621-94b7-d36256eb6aca"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "RoadmapFindPage",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("53f985b6-05cc-47ea-a889-52bc263603cb"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "RoadmapGetById",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("91eeed61-9e52-4486-9881-de48991732e5"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "RoadmapUpsert",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -1217,6 +1535,20 @@ namespace Interview.Migrations.Sqlite.Migrations
                         },
                         new
                         {
+                            Id = new Guid("c410e408-6051-461f-b75c-7545d499cb73"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "UnarchiveRoadmap",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("03b8bdca-dda6-4063-915b-31bf0a2dba74"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "UpsertQuestionTree",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
                             Id = new Guid("0827aeef-bcc1-4412-b584-0de4694422ce"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "UpsertRoomState",
@@ -1383,6 +1715,21 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.ToTable("QuestionTag");
                 });
 
+            modelBuilder.Entity("RoadmapTag", b =>
+                {
+                    b.Property<Guid>("RoadmapId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("TagsId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("RoadmapId", "TagsId");
+
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("RoadmapTag");
+                });
+
             modelBuilder.Entity("RoleUser", b =>
                 {
                     b.Property<Guid>("RolesId")
@@ -1547,6 +1894,59 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Navigation("Question");
                 });
 
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionSubjectTree", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Questions.QuestionSubjectTree", "ParentQuestionSubjectTree")
+                        .WithMany()
+                        .HasForeignKey("ParentQuestionSubjectTreeId");
+
+                    b.HasOne("Interview.Domain.Questions.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ParentQuestionSubjectTree");
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionSubjectTreeContext", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Questions.QuestionTree", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Questions.QuestionTree", "ParentQuestionTree")
+                        .WithMany()
+                        .HasForeignKey("ParentQuestionTreeId");
+
+                    b.HasOne("Interview.Domain.Questions.QuestionSubjectTree", "RootQuestionSubjectTree")
+                        .WithMany()
+                        .HasForeignKey("RootQuestionSubjectTreeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ParentQuestionTree");
+
+                    b.Navigation("RootQuestionSubjectTree");
+                });
+
             modelBuilder.Entity("Interview.Domain.Reactions.Reaction", b =>
                 {
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
@@ -1554,6 +1954,61 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .HasForeignKey("CreatedById");
 
                     b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.Roadmap", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.RoadmapMilestone", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Roadmaps.RoadmapMilestone", "ParentRoadmapMilestone")
+                        .WithMany("ChildrenMilestones")
+                        .HasForeignKey("ParentRoadmapMilestoneId");
+
+                    b.HasOne("Interview.Domain.Roadmaps.Roadmap", null)
+                        .WithMany("Milestones")
+                        .HasForeignKey("RoadmapId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ParentRoadmapMilestone");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.RoadmapMilestoneItem", b =>
+                {
+                    b.HasOne("Interview.Domain.Users.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Interview.Domain.Questions.QuestionTree", "QuestionTree")
+                        .WithMany()
+                        .HasForeignKey("QuestionTreeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Interview.Domain.Roadmaps.RoadmapMilestone", "RoadmapMilestone")
+                        .WithMany("Items")
+                        .HasForeignKey("RoadmapMilestoneId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("QuestionTree");
+
+                    b.Navigation("RoadmapMilestone");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.QueuedRoomEvent", b =>
@@ -1573,15 +2028,17 @@ namespace Interview.Migrations.Sqlite.Migrations
 
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>
                 {
-                    b.HasOne("Interview.Domain.Categories.Category", null)
-                        .WithMany()
-                        .HasForeignKey("CategoryId");
-
                     b.HasOne("Interview.Domain.Users.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
+                    b.HasOne("Interview.Domain.Questions.QuestionTree", "QuestionTree")
+                        .WithMany()
+                        .HasForeignKey("QuestionTreeId");
+
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("QuestionTree");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.RoomConfigurations.RoomConfiguration", b =>
@@ -1845,6 +2302,21 @@ namespace Interview.Migrations.Sqlite.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RoadmapTag", b =>
+                {
+                    b.HasOne("Interview.Domain.Roadmaps.Roadmap", null)
+                        .WithMany()
+                        .HasForeignKey("RoadmapId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Interview.Domain.Tags.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("RoleUser", b =>
                 {
                     b.HasOne("Interview.Domain.Users.Roles.Role", null)
@@ -1898,6 +2370,18 @@ namespace Interview.Migrations.Sqlite.Migrations
             modelBuilder.Entity("Interview.Domain.Questions.Question", b =>
                 {
                     b.Navigation("Answers");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.Roadmap", b =>
+                {
+                    b.Navigation("Milestones");
+                });
+
+            modelBuilder.Entity("Interview.Domain.Roadmaps.RoadmapMilestone", b =>
+                {
+                    b.Navigation("ChildrenMilestones");
+
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("Interview.Domain.Rooms.Room", b =>

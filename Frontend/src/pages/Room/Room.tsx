@@ -26,7 +26,12 @@ import {
 } from '../../apiDeclarations';
 import { MainContentWrapper } from '../../components/MainContentWrapper/MainContentWrapper';
 import { VITE_WS_URL } from '../../config';
-import { EventName, inviteParamName, pathnames } from '../../constants';
+import {
+  EventName,
+  IconNames,
+  inviteParamName,
+  pathnames,
+} from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import {
@@ -67,6 +72,10 @@ import { useVideoChat } from './components/VideoChat/hoks/useVideoChat';
 import { useUserStreams } from './hooks/useUserStreams';
 import { useRoomSounds } from './hooks/useRoomSounds';
 import { AiAssistantScriptName } from './components/AiAssistant/AiAssistant';
+import { mapInvitesForAiRoom } from '../../utils/mapInvitesForAiRoom';
+import { Typography } from '../../components/Typography/Typography';
+import { Icon } from './components/Icon/Icon';
+import { getDevAuthorization } from '../../utils/devAuthorization';
 
 import './Room.css';
 
@@ -97,6 +106,7 @@ export const Room: FunctionComponent = () => {
   } = apiApplyRoomInviteState;
 
   const [roomInReview, setRoomInReview] = useState(false);
+  const [roomClose, setRoomClose] = useState(false);
   const [reactionsVisible, setReactionsVisible] = useState(false);
   const [currentQuestionId, setCurrentQuestionId] =
     useState<RoomQuestion['id']>();
@@ -112,7 +122,11 @@ export const Room: FunctionComponent = () => {
   const [lastVoiceRecognition, setLastVoiceRecognition] = useState('');
   const [aiAssistantCurrentScript, setAiAssistantCurrentScript] =
     useState<AiAssistantScriptName>(AiAssistantScriptName.Idle);
-  const socketUrl = `${VITE_WS_URL}/ws?roomId=${id}`;
+  const devAuthorization =
+    import.meta.env.MODE === 'development'
+      ? `&Authorization=${getDevAuthorization()?.Authorization}`
+      : '';
+  const socketUrl = `${VITE_WS_URL}/ws?roomId=${id}${devAuthorization}`;
   const checkWebSocketReadyToConnect = () => {
     if (!inviteParam) {
       return true;
@@ -144,10 +158,11 @@ export const Room: FunctionComponent = () => {
     );
   };
 
-  const { recognitionNotSupported } = useSpeechRecognition({
-    recognitionEnabled,
-    onVoiceRecognition: handleVoiceRecognition,
-  });
+  const { recognitionNotSupported, recognitionNotAllowed } =
+    useSpeechRecognition({
+      recognitionEnabled,
+      onVoiceRecognition: handleVoiceRecognition,
+    });
   const { unreadChatMessages } = useUnreadChatMessages({
     lastWsMessageParsed,
     messagesChatEnabled,
@@ -245,7 +260,8 @@ export const Room: FunctionComponent = () => {
   const currentUserExpert = roomParticipant?.userType === 'Expert';
   const currentUserExaminee = roomParticipant?.userType === 'Examinee';
   const viewerMode = !(currentUserExpert || currentUserExaminee);
-  const aiRoom = !!room?.category;
+  const aiRoom = !!room?.questionTree;
+  const exitLink = aiRoom ? pathnames.roadmaps : pathnames.highlightRooms;
 
   const userStreams = useUserStreams();
   const { playJoinRoomSound, playChatMessageSound } = useRoomSounds();
@@ -397,7 +413,11 @@ export const Room: FunctionComponent = () => {
         case 'ChangeRoomStatus': {
           const newStatus: RoomType['status'] = 'New';
           const reviewStatus: RoomType['status'] = 'Review';
-          if (parsedData?.Value === reviewStatus) {
+          const closeStatus: RoomType['status'] = 'Close';
+          if (parsedData?.Value === closeStatus) {
+            setRoomClose(true);
+          }
+          if (!aiRoom && parsedData?.Value === reviewStatus) {
             setRoomInReview(true);
           }
           if (parsedData?.Value !== newStatus) {
@@ -426,7 +446,7 @@ export const Room: FunctionComponent = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [id, auth, lastMessage, playChatMessageSound, updateQuestions]);
+  }, [id, auth, lastMessage, aiRoom, playChatMessageSound, updateQuestions]);
 
   useEffect(() => {
     if (!currentQuestionId) {
@@ -497,7 +517,7 @@ export const Room: FunctionComponent = () => {
   };
 
   const handleLeaveRoom = () => {
-    navigate(pathnames.highlightRooms);
+    navigate(exitLink);
   };
 
   const handleStartReviewRoom = () => {
@@ -508,9 +528,29 @@ export const Room: FunctionComponent = () => {
     fetchRoomStartReview(room.id);
   };
 
+  if (roomClose && id) {
+    return (
+      <Navigate to={generatePath(pathnames.roomAnalytics, { id })} replace />
+    );
+  }
+
   if (roomInReview && id) {
     return (
       <Navigate to={getCloseRedirectLink(id, currentUserExpert)} replace />
+    );
+  }
+
+  if (aiRoom && recognitionNotAllowed) {
+    return (
+      <MessagePage
+        title={localizationCaptions[LocalizationKey.AllowAccessToMicrophone]}
+        message={
+          localizationCaptions[
+            LocalizationKey.AllowAccessToMicrophoneDescription
+          ]
+        }
+        iconName={IconNames.MicOff}
+      />
     );
   }
 
@@ -520,7 +560,7 @@ export const Room: FunctionComponent = () => {
         title={localizationCaptions[LocalizationKey.ConnectionError]}
         message={localizationCaptions[LocalizationKey.RoomConnectionError]}
       >
-        <Link to={pathnames.highlightRooms}>
+        <Link to={exitLink}>
           <Button>{localizationCaptions[LocalizationKey.Exit]}</Button>
         </Link>
       </MessagePage>
@@ -545,6 +585,7 @@ export const Room: FunctionComponent = () => {
         allUsers,
         aiAssistantScript: aiAssistantCurrentScript,
         recognitionEnabled,
+        recognitionNotSupported,
         sendWsMessage: sendMessage,
         setCodeEditorEnabled,
         setAiAssistantCurrentScript,
@@ -552,8 +593,9 @@ export const Room: FunctionComponent = () => {
       }}
     >
       <UserStreamsContext.Provider value={userStreams}>
-        <MainContentWrapper withMargin className="room-wrapper">
+        <MainContentWrapper withMargin={!aiRoom} className="room-wrapper">
           <EnterVideoChatModal
+            aiRoom={aiRoom}
             open={welcomeScreen}
             loading={
               loading ||
@@ -574,7 +616,11 @@ export const Room: FunctionComponent = () => {
               <Invitations
                 open={invitationsOpen}
                 roomId={id || ''}
-                roomInvitesData={roomInvitesData}
+                roomInvitesData={
+                  !aiRoom
+                    ? roomInvitesData
+                    : mapInvitesForAiRoom(roomInvitesData || [])
+                }
                 roomInvitesError={
                   roomInvitesError ||
                   generateRoomInviteError ||
@@ -606,30 +652,34 @@ export const Room: FunctionComponent = () => {
               >
                 <div className="room-page">
                   <div className="room-page-main">
-                    {aiRoom && <Gap sizeRem={0.75} />}
-                    {!aiRoom && (
-                      <div className="room-page-header justify-between">
-                        <div>
-                          <span
-                            className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
-                          >
-                            <Link
-                              to={pathnames.highlightRooms}
-                              className="no-underline"
-                            >
-                              <div className="room-page-header-wrapper flex items-center">
-                                <div className="w-2.375 pr-1">
-                                  <img
-                                    className="w-2.375 h-2.375 rounded-0.375"
-                                    src="/logo192.png"
-                                    alt="site logo"
-                                  />
-                                </div>
-                                <h3>{room?.name}</h3>
+                    <div
+                      className={`room-page-header justify-between ${aiRoom ? 'mt-[1.375rem] mb-[1.625rem] !pt-[0rem] !pb-[0rem]' : ''}`}
+                    >
+                      <div>
+                        <span
+                          className={`room-page-header-caption ${viewerMode ? 'room-page-header-caption-viewer' : ''}`}
+                        >
+                          <Link to={exitLink} className="no-underline">
+                            <div className="room-page-header-wrapper flex items-center">
+                              <div
+                                className={`pr-[1rem] ${aiRoom ? 'w-[4.375rem] px-[1rem]' : 'w-[3.375rem]'}`}
+                              >
+                                <img
+                                  className="w-[2.375rem] h-[2.375rem] rounded-[0.375rem]"
+                                  src="/logo192.png"
+                                  alt="site logo"
+                                />
                               </div>
-                            </Link>
-                          </span>
-                        </div>
+                              <h3>
+                                <Typography size="xl" semibold>
+                                  {room?.name}
+                                </Typography>
+                              </h3>
+                            </div>
+                          </Link>
+                        </span>
+                      </div>
+                      {!aiRoom && (
                         <div className="flex">
                           {!!roomTimer?.startTime && (
                             <>
@@ -682,12 +732,43 @@ export const Room: FunctionComponent = () => {
                               },
                             ]}
                             activeIndex={messagesChatEnabled ? 0 : 1}
-                            variant="alternative"
+                            activeVariant="invertedActive"
+                            nonActiveVariant="invertedAlternative"
                             onClick={handleSwitchMessagesChat}
                           />
+                          <Gap sizeRem={0.875} horizontal />
+                          <Button
+                            variant="invertedAlternative"
+                            className="min-w-[0rem] w-[2.5rem] h-[2.5rem] !p-[0rem]"
+                          >
+                            <Icon size="s" name={IconNames.Grid} />
+                          </Button>
                         </div>
-                      </div>
-                    )}
+                      )}
+                      {aiRoom && (
+                        <div className="flex">
+                          <div className="flex items-center bg-wrap px-[1rem] h-[2.5rem] rounded-[6.25rem]">
+                            <Typography size="m" error>
+                              <div className="flex">
+                                <Icon
+                                  inheritFontSize
+                                  name={IconNames.RadioButtonOn}
+                                />
+                              </div>
+                            </Typography>
+                            <Gap sizeRem={0.25} horizontal />
+                            <Typography size="m">
+                              {
+                                localizationCaptions[
+                                  LocalizationKey.MeetingBeingRecorded
+                                ]
+                              }
+                            </Typography>
+                          </div>
+                          <Gap sizeRem={10.375} horizontal />
+                        </div>
+                      )}
+                    </div>
                     <div className="room-page-main-content">
                       <div className="room-columns">
                         {errorRoomState && (
@@ -712,10 +793,6 @@ export const Room: FunctionComponent = () => {
                         {aiRoom ? (
                           <VideoChatAi
                             messagesChatEnabled={messagesChatEnabled}
-                            recognitionNotSupported={recognitionNotSupported}
-                            currentUserExpert={currentUserExpert}
-                            loadingRoomStartReview={loadingRoomStartReview}
-                            errorRoomStartReview={errorRoomStartReview}
                             // ScreenShare
                             // screenStream={screenStream}
                             roomQuestionsLoading={roomQuestionsLoading}
@@ -723,9 +800,6 @@ export const Room: FunctionComponent = () => {
                               roomQuestions?.sort(sortRoomQuestion) || []
                             }
                             initialQuestion={currentQuestion}
-                            handleStartReviewRoom={handleStartReviewRoom}
-                            handleSettingsOpen={handleSettingsOpen}
-                            handleLeaveRoom={handleLeaveRoom}
                           />
                         ) : (
                           <VideoChat

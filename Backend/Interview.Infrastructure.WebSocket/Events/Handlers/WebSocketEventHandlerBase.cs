@@ -14,6 +14,7 @@ namespace Interview.Infrastructure.WebSocket.Events.Handlers
 
         public async Task<bool> HandleAsync(SocketEventDetail detail, CancellationToken cancellationToken)
         {
+            using var scope = Logger.BeginScope(CreateLogScope(detail));
             var isSupportType = await IsSupportTaskAsync(detail, cancellationToken);
             if (!isSupportType)
             {
@@ -36,6 +37,12 @@ namespace Interview.Infrastructure.WebSocket.Events.Handlers
             }
 
             return false;
+        }
+
+        protected virtual IEnumerable<KeyValuePair<string, object>> CreateLogScope(SocketEventDetail detail)
+        {
+            yield return new KeyValuePair<string, object>("WebSocketEventHandlerType", GetType().Name);
+            yield return new KeyValuePair<string, object>("Order", Order);
         }
 
         protected virtual bool IsValidPayload(TPayload? payload) => payload is not null;

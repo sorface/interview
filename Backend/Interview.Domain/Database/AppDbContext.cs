@@ -7,6 +7,7 @@ using Interview.Domain.Questions.CodeEditors;
 using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Reactions;
 using Interview.Domain.Repository;
+using Interview.Domain.Roadmaps;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomInvites;
 using Interview.Domain.Rooms.RoomParticipants;
@@ -79,29 +80,17 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
 
     public DbSet<RoomReview> RoomReview { get; private set; } = null!;
 
-    public async Task<HashSet<Guid>> GetWithChildCategoriesAsync(Guid categoryId, CancellationToken cancellationToken)
-    {
-        var res = new HashSet<Guid> { categoryId };
-        var checkCategories = new List<Guid> { categoryId };
-        do
-        {
-            var tmp = await Categories.AsNoTracking()
-                .Where(e => e.ParentId != null && checkCategories.Contains(e.ParentId.Value))
-                .Select(e => e.Id)
-                .ToListAsync(cancellationToken);
-            checkCategories.Clear();
-            foreach (var id in tmp)
-            {
-                if (res.Add(id))
-                {
-                    checkCategories.Add(id);
-                }
-            }
-        }
-        while (checkCategories.Count > 0);
+    public DbSet<QuestionTree> QuestionTree { get; private set; } = null!;
 
-        return res;
-    }
+    public DbSet<QuestionSubjectTree> QuestionSubjectTree { get; private set; } = null!;
+
+    public DbSet<QuestionSubjectTreeContext> QuestionSubjectTreeContext { get; private set; } = null!;
+
+    public DbSet<Roadmap> Roadmap { get; private set; } = null!;
+
+    public DbSet<RoadmapMilestone> RoadmapMilestone { get; private set; } = null!;
+
+    public DbSet<RoadmapMilestoneItem> RoadmapMilestoneItem { get; private set; } = null!;
 
     /// <summary>
     /// Runs code within a transaction, taking into account previously created code.

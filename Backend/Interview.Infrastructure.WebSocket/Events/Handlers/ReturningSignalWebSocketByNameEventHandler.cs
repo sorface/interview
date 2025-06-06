@@ -21,6 +21,7 @@ public class ReturningSignalWebSocketByNameEventHandler(
     {
         if (payload is null)
         {
+            Logger.LogDebug("Payload should not be null");
             return;
         }
 

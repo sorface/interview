@@ -1,3 +1,5 @@
+using Interview.Domain;
+
 namespace Interview.DependencyInjection;
 
 public sealed class EventStorageOptionBuilder
@@ -8,7 +10,7 @@ public sealed class EventStorageOptionBuilder
     {
         if (string.IsNullOrWhiteSpace(connectionString))
         {
-            throw new Exception("Redis connection string should not be empty");
+            throw new UserException("Redis connection string should not be empty");
         }
 
         RedisConnectionString = connectionString;

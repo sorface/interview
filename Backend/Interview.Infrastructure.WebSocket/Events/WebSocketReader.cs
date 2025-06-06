@@ -1,6 +1,7 @@
 using System.Buffers;
 using System.Net.WebSockets;
 using System.Text.Json;
+using Interview.Domain;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Events;
 using Interview.Domain.Events.Events.Serializers;
@@ -82,7 +83,7 @@ public class WebSocketReader
                     },
                     async busEvent =>
                     {
-                        var jsonParsedEvent = JsonSerializer.Deserialize<IRoomEvent>(busEvent.Event) ?? throw new Exception("Unable to parse event");
+                        var jsonParsedEvent = JsonSerializer.Deserialize<IRoomEvent>(busEvent.Event) ?? throw new UserException("Unable to parse event");
                         var provider = new CachedRoomEventProvider(jsonParsedEvent, _roomEventSerializer);
                         _logger.LogDebug("Start sending {@Event}", jsonParsedEvent);
                         var sender = new WebSocketEventSender(_webSocketEventSender, webSocket);

@@ -57,7 +57,7 @@ export const QuestionsArchive: FunctionComponent = () => {
   };
 
   const createQuestionItem = (question: Question) => (
-    <li key={question.id} className="pb-0.25">
+    <li key={question.id} className="pb-[0.25rem]">
       <QuestionItem
         question={question}
         categoryName={question.category.name}

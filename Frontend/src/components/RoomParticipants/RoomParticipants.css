@@ -8,9 +8,14 @@
   margin-left: 0;
 }
 
+.room-participant {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
 .room-participant .user-avatar {
-  width: calc(2.1875rem - 2px);
-  height: calc(2.1875rem - 2px);
+  width: calc(2.25rem - 2px);
+  height: calc(2.25rem - 2px);
   margin-left: -0.375rem;
   border: 2px solid var(--wrap-bg);
 }

@@ -1,5 +1,6 @@
 import { DragNDropListItem } from '../components/DragNDropList/DragNDropList';
 import { CodeEditorLang, Question, QuestionAnswer } from './question';
+import { QuestionsTree } from './questionsTree';
 import { Tag } from './tag';
 import { User, UserType } from './user';
 
@@ -22,15 +23,16 @@ export interface Room {
   status: RoomStatus;
   questions: RoomQuestionListItem[];
   scheduledStartTime: string;
-  category?: {
-    id: string;
-    name: string;
-  };
+  questionTree?: QuestionsTree;
   timer?: {
     durationSec: number;
     startTime?: string;
   };
 }
+
+export type RoomWtithType = Room & {
+  type: 'AI' | 'Standard';
+};
 
 export interface RoomCalendarItem {
   minScheduledStartTime: string;
@@ -132,3 +134,22 @@ export interface RoomQuestionAnswer {
     }>;
   }>;
 }
+
+export interface RoomBusinessAnalytic {
+  ai: RoomBusinessAnalyticTypeItem[];
+  standard: RoomBusinessAnalyticTypeItem[];
+}
+
+export interface RoomBusinessAnalyticTypeItem {
+  date: string;
+  status: Array<{
+    name: RoomBusinessAnalyticTypeItemStatus;
+    count: number;
+  }>;
+}
+
+export type RoomBusinessAnalyticTypeItemStatus =
+  | 'New'
+  | 'Active'
+  | 'Review'
+  | 'Close';

@@ -50,13 +50,16 @@ const createFakeQuestion = (roomQuestion: RoomQuestion): Question => ({
   },
 });
 
-const generateUserOpinion = (userReview: AnalyticsUserReview) => ({
+const generateUserOpinion = (
+  userReview: AnalyticsUserReview,
+  emptyReview: boolean,
+) => ({
   id: userReview.userId,
   nickname: userReview.nickname,
   participantType: userReview.participantType,
   evaluation: {
     mark: userReview.averageMark,
-    review: userReview.comment,
+    review: emptyReview ? '' : userReview.comment,
   },
 });
 
@@ -214,7 +217,7 @@ export const RoomAnaytics: FunctionComponent = () => {
         </div>
       )}
       {roomLoading ? (
-        <InfoBlock className="h-9.375 flex items-center justify-center">
+        <InfoBlock className="h-[9.375rem] flex items-center justify-center">
           <Loader />
         </InfoBlock>
       ) : (
@@ -278,7 +281,7 @@ export const RoomAnaytics: FunctionComponent = () => {
           {!viewNotAllowed && (
             <>
               <Gap sizeRem={0.5} horizontal />
-              <InfoBlock className="px-5 flex flex-col items-center">
+              <InfoBlock className="px-[5rem] flex flex-col items-center">
                 <Typography size="m" bold>
                   {localizationCaptions[LocalizationKey.AverageCandidateMark]}
                 </Typography>
@@ -307,7 +310,7 @@ export const RoomAnaytics: FunctionComponent = () => {
         <>
           <InfoBlock className="text-left">
             {!loadedData && loading ? (
-              <div className="h-9.375 flex items-center justify-center">
+              <div className="h-[9.375rem] flex items-center justify-center">
                 <Loader />
               </div>
             ) : (
@@ -330,7 +333,10 @@ export const RoomAnaytics: FunctionComponent = () => {
                       .map((userReview) => (
                         <ReviewUserOpinion
                           key={userReview.userId}
-                          user={generateUserOpinion(userReview)}
+                          user={generateUserOpinion(
+                            userReview,
+                            !!data?.isAiRoom,
+                          )}
                           allUsers={allUsers}
                         />
                       ))}
@@ -342,7 +348,7 @@ export const RoomAnaytics: FunctionComponent = () => {
           <Gap sizeRem={0.5} />
           <InfoBlock className="text-left">
             {!loadedData && loading ? (
-              <div className="h-4 flex items-center justify-center">
+              <div className="h-[4rem] flex items-center justify-center">
                 <Loader />
               </div>
             ) : (
