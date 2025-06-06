@@ -265,7 +265,7 @@ export const Room: FunctionComponent = () => {
 
   const userStreams = useUserStreams();
   const { playJoinRoomSound, playChatMessageSound } = useRoomSounds();
-  const { peers, videoOrder, peerToStream, allUsers } = useVideoChat({
+  const { peers, videoOrder, peerToStream, allUsers, pinUser } = useVideoChat({
     viewerMode,
     lastWsMessageParsed,
     userAudioStream: userStreams.userAudioStream,
@@ -579,6 +579,7 @@ export const Room: FunctionComponent = () => {
         codeEditorEnabled,
         codeEditorLanguage,
         peers,
+        pinUser: pinUser(),
         videoOrder,
         peerToStream,
         allUsers,

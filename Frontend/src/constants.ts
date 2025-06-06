@@ -79,6 +79,7 @@ export const enum IconNames {
   TodayOutline = 'today-outline',
   Search = 'search',
   Hourglass = 'hourglass',
+  Pin = 'pin-outline',
   LogIn = 'log-in-outline',
   Expand = 'expand-outline',
   Collapse = 'chevron-collapse-outline',

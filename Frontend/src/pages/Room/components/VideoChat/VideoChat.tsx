@@ -39,6 +39,7 @@ import './VideoChat.css';
 
 const transcriptsMaxLength = 100;
 const viewerOrder = 666;
+export const viewerPinOrder = -666;
 
 interface VideoChatProps {
   messagesChatEnabled: boolean;
@@ -55,6 +56,7 @@ interface VideoChatProps {
   handleStartReviewRoom: () => void;
   handleSettingsOpen: () => void;
   handleLeaveRoom: () => void;
+  pinUser?: () => void;
 }
 
 const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string) => {
@@ -86,9 +88,9 @@ const getChatMessageEvents = (roomEventsSearch: EventsSearch, type: string) => {
     .reverse();
 };
 
-const findUserByOrder = (videoOrder: Record<string, number>) => {
+const findUserByPinnedOrder = (videoOrder: Record<string, number>) => {
   const lounderUser = Object.entries(videoOrder).find(
-    ([, order]) => order === 1,
+    ([, order]) => order === viewerPinOrder,
   );
   if (lounderUser) {
     return lounderUser[0];
@@ -125,6 +127,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
     peerToStream,
     allUsers,
     sendWsMessage,
+    pinUser,
   } = useContext(RoomContext);
   const {
     userVideoStream,
@@ -273,6 +276,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       }),
     );
   };
+  const handleUserPin = (id: string) => pinUser(id);
 
   const handleMicSwitch = () => {
     setMicEnabled(!micEnabled);
@@ -296,8 +300,9 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
   };
 
   const renderMain = () => {
-    const userOrder1 = findUserByOrder(videoOrder);
-    if (!userOrder1 || userOrder1 === auth?.id) {
+    const pinnedOrderUserId = findUserByPinnedOrder(videoOrder);
+
+    if (!pinnedOrderUserId || pinnedOrderUserId === auth?.id) {
       return (
         <>
           <video
@@ -322,7 +327,7 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
       );
     }
     const userOrder1Peer = peers.find(
-      (peer) => peer.targetUserId === userOrder1,
+      (peer) => peer.targetUserId === pinnedOrderUserId,
     );
     if (!userOrder1Peer) {
       return <></>;
@@ -474,10 +479,12 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             </div>
           </VideochatParticipant> */}
           <VideochatParticipant
+            handleUserPin={() => handleUserPin(auth?.id || '')}
             order={viewerMode ? viewerOrder - 1 : videoOrder[auth?.id || '']}
             viewer={viewerMode}
             nickname={`${auth?.nickname} (${localizationCaptions[LocalizationKey.You]})`}
             reaction={activeReactions[auth?.id || '']}
+            pinable={!viewerMode}
           >
             <video
               ref={userVideo}
@@ -493,8 +500,10 @@ export const VideoChat: FunctionComponent<VideoChatProps> = ({
             .filter((peer) => !peer.screenShare)
             .map((peer) => (
               <VideochatParticipant
-                key={peer.peerID}
+                pinable={peer.participantType !== 'Viewer'}
+                handleUserPin={() => handleUserPin(peer.targetUserId)}
                 viewer={peer.participantType === 'Viewer'}
+                key={peer.peerID}
                 order={
                   peer.participantType === 'Viewer'
                     ? viewerOrder

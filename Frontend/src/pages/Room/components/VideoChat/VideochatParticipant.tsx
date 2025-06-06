@@ -8,6 +8,8 @@ interface VideochatParticipantProps {
   children: ReactNode;
   nickname?: string;
   reaction?: string | null;
+  pinable?: boolean;
+  handleUserPin?: () => void;
 }
 
 export const VideochatParticipant: FunctionComponent<

@@ -13,6 +13,7 @@ import { ParsedWsMessage } from '../../../utils/parseWsMessage';
 import { checkIsAudioStream } from '../utils/checkIsAudioStream';
 import { useLocalizationCaptions } from '../../../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../../../localization';
+import { viewerPinOrder } from '../VideoChat';
 
 interface UseVideoChatProps {
   viewerMode: boolean;
@@ -84,9 +85,30 @@ export const useVideoChat = ({
   const userIdToAudioAnalyser = useRef<Record<string, AnalyserNode>>({});
   const requestRef = useRef<number>();
   const louderUserId = useRef(auth?.id || '');
+  const [pinnedUserId, setPinnedUserId] = useState<string | null>(null);
   const [videoOrder, setVideoOrder] = useState<Record<string, number>>({
     [auth?.id || '']: 1,
   });
+
+  const pinUser = useCallback(() => {
+    return (userId: string) => {
+      setPinnedUserId((prevPinnedUserId) => {
+        if (prevPinnedUserId === userId) {
+          setVideoOrder((prevVideoOrder) => ({
+            ...prevVideoOrder,
+            [userId]: 1,
+          }));
+          return null;
+        } else {
+          setVideoOrder((prevVideoOrder) => ({
+            ...prevVideoOrder,
+            [userId]: viewerPinOrder,
+          }));
+          return userId;
+        }
+      });
+    };
+  }, []);
 
   const createPeer = useCallback(
     (to: string, forViewer?: boolean, screenShare?: boolean) => {
@@ -164,7 +186,7 @@ export const useVideoChat = ({
         if (averageVolume < audioVolumeThreshold) {
           continue;
         }
-        if (averageVolume > louderVolume) {
+        if (averageVolume > louderVolume && userId !== pinnedUserId) {
           newLouderUserId = userId;
           louderVolume = averageVolume;
         }
@@ -180,10 +202,11 @@ export const useVideoChat = ({
 
       if (newLouderUserId && newLouderUserId !== louderUserId.current) {
         updateLouderUserTimeout.current = updateLoudedUserTimeout;
-        setVideoOrder({
+        setVideoOrder((prevVideoOrder) => ({
+          ...prevVideoOrder,
           [newLouderUserId]: 1,
           [louderUserId.current]: 2,
-        });
+        }));
         louderUserId.current = newLouderUserId;
       }
       prevTime = time;
@@ -197,7 +220,7 @@ export const useVideoChat = ({
         cancelAnimationFrame(requestRef.current);
       }
     };
-  }, [auth, louderUserId]);
+  }, [auth, louderUserId, pinnedUserId]);
 
   const addPeer = useCallback(
     (
@@ -499,5 +522,6 @@ export const useVideoChat = ({
     videoOrder,
     peerToStream,
     allUsers,
+    pinUser,
   };
 };
