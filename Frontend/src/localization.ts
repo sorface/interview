@@ -312,6 +312,9 @@ export const enum LocalizationKey {
   BusinessAnalyticPageName,
   AllowAccessToMicrophone,
   AllowAccessToMicrophoneDescription,
+  TextAnswer,
+  SendAnswer,
+  StartInterview,
 }
 
 export const LocalizationCaptions: Record<
@@ -673,6 +676,9 @@ export const LocalizationCaptions: Record<
       'Please allow access to microphone',
     [LocalizationKey.AllowAccessToMicrophoneDescription]:
       'You have not allowed access to microphone in your browser settings.',
+    [LocalizationKey.TextAnswer]: 'Text response',
+    [LocalizationKey.SendAnswer]: 'Send answer',
+    [LocalizationKey.StartInterview]: 'Start interview',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -1033,5 +1039,8 @@ export const LocalizationCaptions: Record<
       'Пожалуйста, разрешите доступ к микрофону',
     [LocalizationKey.AllowAccessToMicrophoneDescription]:
       'Вы не разрешили доступ к микрофону в настройках браузера.',
+    [LocalizationKey.TextAnswer]: 'Текстовый ответ',
+    [LocalizationKey.SendAnswer]: 'Отправить ответ',
+    [LocalizationKey.StartInterview]: 'Начать собеседование',
   },
 };

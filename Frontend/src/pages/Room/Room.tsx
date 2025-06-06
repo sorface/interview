@@ -584,6 +584,7 @@ export const Room: FunctionComponent = () => {
         allUsers,
         aiAssistantScript: aiAssistantCurrentScript,
         recognitionEnabled,
+        recognitionNotSupported,
         sendWsMessage: sendMessage,
         setCodeEditorEnabled,
         setAiAssistantCurrentScript,
@@ -594,7 +595,6 @@ export const Room: FunctionComponent = () => {
         <MainContentWrapper withMargin={!aiRoom} className="room-wrapper">
           <EnterVideoChatModal
             aiRoom={aiRoom}
-            recognitionNotSupported={recognitionNotSupported}
             open={welcomeScreen}
             loading={
               loading ||

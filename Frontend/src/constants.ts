@@ -87,6 +87,9 @@ export const enum IconNames {
   Notifications = 'notifications-outline',
   Happy = 'happy-outline',
   RadioButtonOn = 'radio-button-on-outline',
+  FileTray = 'file-tray-full-outline',
+  Sync = 'sync-outline',
+  Share = 'share-outline',
 }
 
 export const reactionIcon: Record<string, IconNames> = {
