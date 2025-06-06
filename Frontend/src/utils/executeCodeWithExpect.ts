@@ -8,14 +8,19 @@ const expectCode = `
   let __expectedConsoleLogs = [];
 
   const originalConsoleLog = console.log;
+
+  const finishConsoleLogSpy = () => {
+    console.log = originalConsoleLog;
+    __expectedConsoleLogs.forEach((expectedLog, index) =>
+      __expectCalls.push([__consoleLogs[index], expectedLog])
+    );
+    res(__expectCalls);
+  };
+
   console.log = (arg) => {
     __consoleLogs.push(arg);
     if (__expectedConsoleLogs.length === __consoleLogs.length) {
-      console.log = originalConsoleLog;
-      __expectedConsoleLogs.forEach((expectedLog, index) =>
-        __expectCalls.push([__consoleLogs[index], expectedLog])
-      );
-      res(__expectCalls);
+      finishConsoleLogSpy();
     }
   };
 
@@ -38,6 +43,9 @@ const expectCode = `
 
   const expectConsole = (expectedCalls) => {
     __expectedConsoleLogs = expectedCalls;
+    setTimeout(() => {
+      finishConsoleLogSpy();
+    }, 1000);
   };
 `;
 
