@@ -220,7 +220,7 @@ export const useVideoChat = ({
         cancelAnimationFrame(requestRef.current);
       }
     };
-  }, [auth, louderUserId]);
+  }, [auth, louderUserId, pinnedUserId]);
 
   const addPeer = useCallback(
     (

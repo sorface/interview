@@ -28,13 +28,13 @@ export const VideochatParticipantWithVideo: FunctionComponent<
       style={{ order: orderSafe }}
     >
       <div className="videochat-participant-name-wrapper">
-      <div
-        className={`videochat-caption videochat-overlay videochat-participant-pin ${pin ? '' : 'opacity-0'} hover:opacity-100`}
-      >
-        {pinable && handleUserPin && (
-          <ParticipantPinButton handlePin={handleUserPin} pin={pin} />
-        )}
-      </div>
+        <div
+          className={`videochat-caption videochat-overlay videochat-participant-pin ${pin ? '' : 'opacity-0'} hover:opacity-100`}
+        >
+          {pinable && handleUserPin && (
+            <ParticipantPinButton handlePin={handleUserPin} pin={pin} />
+          )}
+        </div>
         <div className="videochat-caption videochat-participant-name">
           <Typography size="s">{nickname}</Typography>
           <Gap sizeRem={0.25} horizontal />
