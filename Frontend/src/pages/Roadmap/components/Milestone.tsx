@@ -32,7 +32,7 @@ export const Milestone: FunctionComponent<MilestoneProps> = ({
   };
 
   return (
-    <div className="relative flex flex-col items-start">
+    <div className="relative flex flex-col items-start pt-[0.75rem]">
       <Typography size="xl" bold>
         {name}
       </Typography>
