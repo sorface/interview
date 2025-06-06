@@ -315,6 +315,7 @@ export const enum LocalizationKey {
   TextAnswer,
   SendAnswer,
   StartInterview,
+  Preview,
 }
 
 export const LocalizationCaptions: Record<
@@ -679,6 +680,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.TextAnswer]: 'Text response',
     [LocalizationKey.SendAnswer]: 'Send answer',
     [LocalizationKey.StartInterview]: 'Start interview',
+    [LocalizationKey.Preview]: 'Preview',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.LoginRequired]:
@@ -1042,5 +1044,6 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.TextAnswer]: 'Текстовый ответ',
     [LocalizationKey.SendAnswer]: 'Отправить ответ',
     [LocalizationKey.StartInterview]: 'Начать собеседование',
+    [LocalizationKey.Preview]: 'Предпросмотр',
   },
 };

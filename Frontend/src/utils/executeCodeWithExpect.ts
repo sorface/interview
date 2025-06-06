@@ -60,11 +60,11 @@ const expectCodeForIframeStart = `
 
 const expectCodeForIframeEnd = `
   <script>
-    console.log(__expectCalls);
+    window.parent.postMessage(__expectCalls, '*');
   </script>
 `;
 
-type Arg = number | string | AnyObject;
+export type ExecuteCodeArg = number | string | AnyObject;
 
 export interface ExecuteCodeResult {
   results: ExpectResult[];
@@ -73,22 +73,18 @@ export interface ExecuteCodeResult {
 
 export type ExpectResult = {
   id: number;
-  arguments: [Arg, Arg, Arg] | [Arg, Arg];
+  arguments:
+    | [ExecuteCodeArg, ExecuteCodeArg, ExecuteCodeArg]
+    | [ExecuteCodeArg, ExecuteCodeArg];
   passed: boolean;
 };
 
-export const executeCodeWithExpect = async (
-  code: string | undefined,
-): Promise<ExecuteCodeResult> => {
+export const computEexecuteResult = (
+  expectResult: Array<ExecuteCodeArg[]>,
+): ExecuteCodeResult => {
   try {
-    const executeCodeWithExpect = new Function(
-      expectCode + code + expectCallsReturnCode,
-    ) as () => Promise<Array<Arg[]>>;
-
-    const executeResult = await executeCodeWithExpect();
-
     return {
-      results: executeResult.map((res) => {
+      results: expectResult.map((res) => {
         const withoutArgs = res.length === 2;
         const [args, result, expect] = res;
         const passed = withoutArgs
@@ -101,6 +97,24 @@ export const executeCodeWithExpect = async (
         };
       }),
     };
+  } catch (error) {
+    return {
+      results: [],
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+};
+
+export const executeCodeWithExpect = async (
+  code: string | undefined,
+): Promise<ExecuteCodeResult> => {
+  try {
+    const executeCodeWithExpect = new Function(
+      expectCode + code + expectCallsReturnCode,
+    ) as () => Promise<Array<ExecuteCodeArg[]>>;
+
+    const executeResult = await executeCodeWithExpect();
+    return computEexecuteResult(executeResult);
   } catch (error) {
     return {
       results: [],

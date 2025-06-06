@@ -22,6 +22,8 @@ import { Button } from '../Button/Button';
 import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';
 import {
+  computEexecuteResult,
+  ExecuteCodeArg,
   ExecuteCodeResult,
   executeCodeWithExpect,
   getSrcForIframe,
@@ -30,6 +32,8 @@ import { ModalFooter } from '../ModalFooter/ModalFooter';
 import { CodeExecutionResult } from '../CodeExecutionResult/CodeExecutionResult';
 
 import './CodeEditor.css';
+import { Typography } from '../Typography/Typography';
+import { useThemeClassName } from '../../hooks/useThemeClassName';
 
 export const defaultCodeEditorFontSize = 13;
 
@@ -108,10 +112,26 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   const [modalExpectResults, setModalExpectResults] = useState(false);
   const codeEditorComponentRef = useRef<HTMLDivElement | null>(null);
   const languageForIframe = language === CodeEditorLang.Html;
+  const iframeThemedClassName = useThemeClassName({
+    [Theme.Dark]: 'border-grey3',
+    [Theme.Light]: 'border-grey-active',
+  });
 
   useEffect(() => {
     saveFontSizeToStorage(fontSize);
   }, [fontSize]);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent<Array<ExecuteCodeArg[]>>) => {
+      setExpectResult(computEexecuteResult(event.data));
+    };
+
+    window.addEventListener('message', handleMessage);
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
 
   const handleModalExpectClose = () => setModalExpectResults(false);
 
@@ -249,7 +269,19 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
         open={modalExpectResults}
       >
         <CodeExecutionResult expectResult={expectResult} />
-        {languageForIframe && <iframe src={getSrcForIframe(value || '')} />}
+        {languageForIframe && (
+          <>
+            <Gap sizeRem={1} />
+            <Typography size="m" semibold>
+              {localizationCaptions[LocalizationKey.Preview]}:
+            </Typography>
+            <Gap sizeRem={0.25} />
+            <iframe
+              src={getSrcForIframe(value || '')}
+              className={`w-full h-[320px] border-[0.15rem] border-solid ${iframeThemedClassName}`}
+            />
+          </>
+        )}
         <Gap sizeRem={1.5} />
         {onExecutionResultsSubmit &&
           expectResultsPassed &&
