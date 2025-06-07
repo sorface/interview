@@ -1,5 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { ParticipantReactions } from './ParticipantReactions';
+import { ParticipantPinButton } from './ParticipantPinButton';
+import { viewerPinOrder } from './VideoChat';
 import { Typography } from '../../../../components/Typography/Typography';
 import { Gap } from '../../../../components/Gap/Gap';
 import { Icon } from '../Icon/Icon';
@@ -11,11 +13,13 @@ interface VideochatParticipantWithoutVideoProps {
   order?: number;
   nickname?: string;
   reaction?: string | null;
+  pinable?: boolean;
+  handleUserPin?: () => void;
 }
 
 export const VideochatParticipantWithoutVideo: FunctionComponent<
   VideochatParticipantWithoutVideoProps
-> = ({ order, nickname, reaction }) => {
+> = ({ order, nickname, reaction, pinable, handleUserPin }) => {
   const orderSafe = order || 2;
   const viewerThemedClassName = useThemeClassName({
     [Theme.Dark]: 'bg-dark-dark2',
@@ -31,6 +35,12 @@ export const VideochatParticipantWithoutVideo: FunctionComponent<
       >
         <div className="flex items-center">
           <Typography size="xxl">{nickname}</Typography>
+          {pinable && handleUserPin && (
+            <ParticipantPinButton
+              handlePin={handleUserPin}
+              pin={orderSafe === viewerPinOrder}
+            />
+          )}
           {!!reaction && <ParticipantReactions reaction={reaction} />}
         </div>
         <Gap sizeRem={0.6875} />

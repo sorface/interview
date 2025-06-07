@@ -47,6 +47,7 @@ import { sortRoomQuestion } from '../../utils/sortRoomQestions';
 import { TreeViewer } from '../../components/TreeViewer/TreeViewer';
 import { QuestionsTree } from '../../types/questionsTree';
 import { mapInvitesForAiRoom } from '../../utils/mapInvitesForAiRoom';
+import { formatDateForInput } from '../../utils/formatDateForInput';
 
 const nameFieldName = 'roomName';
 const dateFieldName = 'roomDate';
@@ -54,12 +55,6 @@ const startTimeFieldName = 'roomStartTime';
 const endTimeFieldName = 'roomEndTime';
 
 const roomStartTimeShiftMinutes = 15;
-
-const formatDate = (value: Date) => {
-  const month = padTime(value.getMonth() + 1);
-  const date = padTime(value.getDate());
-  return `${value.getFullYear()}-${month}-${date}`;
-};
 
 const formatTime = (value: Date) => {
   const hours = padTime(value.getHours());
@@ -505,7 +500,7 @@ export const RoomCreate: FunctionComponent<RoomCreateProps> = ({
                 <input
                   id="roomDate"
                   name={dateFieldName}
-                  value={formatDate(roomFields.scheduleStartTime)}
+                  value={formatDateForInput(roomFields.scheduleStartTime)}
                   type="date"
                   required
                   className="mr-[0.5rem]"

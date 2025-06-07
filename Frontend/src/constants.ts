@@ -30,6 +30,7 @@ export const pathnames = {
   roadmapCreate: '/roadmap/create',
   roadmapEdit: '/roadmap/edit/:id',
   roadmap: '/roadmap/:id',
+  businessAnalytic: '/businessAnalytic',
 };
 
 export const enum IconNames {
@@ -78,6 +79,7 @@ export const enum IconNames {
   TodayOutline = 'today-outline',
   Search = 'search',
   Hourglass = 'hourglass',
+  Pin = 'pin-outline',
   LogIn = 'log-in-outline',
   Expand = 'expand-outline',
   Collapse = 'chevron-collapse-outline',
@@ -86,6 +88,9 @@ export const enum IconNames {
   Notifications = 'notifications-outline',
   Happy = 'happy-outline',
   RadioButtonOn = 'radio-button-on-outline',
+  FileTray = 'file-tray-full-outline',
+  Sync = 'sync-outline',
+  Share = 'share-outline',
 }
 
 export const reactionIcon: Record<string, IconNames> = {

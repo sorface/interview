@@ -110,6 +110,8 @@ public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveServ
                 Id = e.Id,
                 Name = e.Name,
                 Order = e.Order,
+                ImageBase64 = e.ImageBase64,
+                Description = e.Description,
                 Tags = e.Tags.Select(t => new TagItem
                 {
                     Id = t.Id,
@@ -145,12 +147,13 @@ public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveServ
         if (currentUserId is not null)
         {
             var questionTreeIds = tmpRes.Items.SelectMany(t => t.Items.Select(tt => tt.QuestionTreeId)).ToHashSet();
+            var activeStatuses = SERoomStatus.ActiveStatuses;
             var roomIdList = await db.Rooms
                 .Where(e =>
                     e.QuestionTreeId != null &&
                     questionTreeIds.Contains(e.QuestionTreeId.Value) &&
                     e.CreatedById == currentUserId &&
-                    (e.Status == SERoomStatus.New || e.Status == SERoomStatus.Active))
+                    activeStatuses.Contains(e.Status))
                 .Select(e => new { QuestionTreeId = e.QuestionTreeId!.Value, RoomId = e.Id })
                 .ToListAsync(cancellationToken);
             roomIdMap = roomIdList.ToLookup(e => e.QuestionTreeId, e => e.RoomId);
@@ -209,6 +212,8 @@ public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveServ
             Name = tmpRes.Name,
             Order = tmpRes.Order,
             Tags = tmpRes.Tags,
+            ImageBase64 = tmpRes.ImageBase64,
+            Description = tmpRes.Description,
             Items = items,
         };
     }
@@ -226,13 +231,13 @@ public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveServ
     public async Task<RoadmapPageResponse> ArchiveAsync(Guid id, CancellationToken cancellationToken)
     {
         var item = await archiveService.ArchiveAsync(id, cancellationToken);
-        return new RoadmapPageResponse { Id = item.Id, Name = item.Name, Tags = [] };
+        return new RoadmapPageResponse { Id = item.Id, Name = item.Name, Tags = [], ImageBase64 = null, Description = null, };
     }
 
     public async Task<RoadmapPageResponse> UnarchiveAsync(Guid id, CancellationToken cancellationToken)
     {
         var item = await archiveService.UnarchiveAsync(id, cancellationToken);
-        return new RoadmapPageResponse { Id = item.Id, Name = item.Name, Tags = [] };
+        return new RoadmapPageResponse { Id = item.Id, Name = item.Name, Tags = [], ImageBase64 = null, Description = null, };
     }
 
     private async Task<Roadmap> CreateRoadmapAsync(
@@ -241,7 +246,14 @@ public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveServ
         UpsertRoadmapRequest request,
         CancellationToken cancellationToken)
     {
-        var roadmap = new Roadmap { Name = request.Name, Order = request.Order, Tags = tags };
+        var roadmap = new Roadmap
+        {
+            Name = request.Name,
+            Order = request.Order,
+            Tags = tags,
+            ImageBase64 = request.ImageBase64,
+            Description = request.Description,
+        };
         await db.Roadmap.AddAsync(roadmap, cancellationToken);
         await db.SaveChangesAsync(cancellationToken);
 
@@ -317,6 +329,8 @@ public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveServ
         roadmap.Tags.AddRange(tags);
         roadmap.Order = request.Order;
         roadmap.Name = request.Name;
+        roadmap.ImageBase64 = request.ImageBase64;
+        roadmap.Description = request.Description;
 
         // remove milestones
         roadmap.Milestones.RemoveAll(e => !requiredRoadmapMilestones.Contains(e.Id));
@@ -378,6 +392,8 @@ public class RoadmapService(AppDbContext db, ArchiveService<Roadmap> archiveServ
             {
                 Id = e.Id,
                 Name = e.Name,
+                ImageBase64 = e.ImageBase64,
+                Description = e.Description,
                 Tags = e.Tags.Select(t => new TagItem
                 {
                     Id = t.Id,

@@ -158,10 +158,11 @@ export const Room: FunctionComponent = () => {
     );
   };
 
-  const { recognitionNotSupported } = useSpeechRecognition({
-    recognitionEnabled,
-    onVoiceRecognition: handleVoiceRecognition,
-  });
+  const { recognitionNotSupported, recognitionNotAllowed } =
+    useSpeechRecognition({
+      recognitionEnabled,
+      onVoiceRecognition: handleVoiceRecognition,
+    });
   const { unreadChatMessages } = useUnreadChatMessages({
     lastWsMessageParsed,
     messagesChatEnabled,
@@ -264,7 +265,7 @@ export const Room: FunctionComponent = () => {
 
   const userStreams = useUserStreams();
   const { playJoinRoomSound, playChatMessageSound } = useRoomSounds();
-  const { peers, videoOrder, peerToStream, allUsers } = useVideoChat({
+  const { peers, videoOrder, peerToStream, allUsers, pinUser } = useVideoChat({
     viewerMode,
     lastWsMessageParsed,
     userAudioStream: userStreams.userAudioStream,
@@ -539,6 +540,20 @@ export const Room: FunctionComponent = () => {
     );
   }
 
+  if (aiRoom && recognitionNotAllowed) {
+    return (
+      <MessagePage
+        title={localizationCaptions[LocalizationKey.AllowAccessToMicrophone]}
+        message={
+          localizationCaptions[
+            LocalizationKey.AllowAccessToMicrophoneDescription
+          ]
+        }
+        iconName={IconNames.MicOff}
+      />
+    );
+  }
+
   if (wsClosed) {
     return (
       <MessagePage
@@ -564,11 +579,13 @@ export const Room: FunctionComponent = () => {
         codeEditorEnabled,
         codeEditorLanguage,
         peers,
+        pinUser: pinUser(),
         videoOrder,
         peerToStream,
         allUsers,
         aiAssistantScript: aiAssistantCurrentScript,
         recognitionEnabled,
+        recognitionNotSupported,
         sendWsMessage: sendMessage,
         setCodeEditorEnabled,
         setAiAssistantCurrentScript,

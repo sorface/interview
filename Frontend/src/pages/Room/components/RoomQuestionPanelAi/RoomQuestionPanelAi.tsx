@@ -54,6 +54,7 @@ import { RoomTimerAi } from '../RoomTimerAi/RoomTimerAi';
 import { CodeEditor } from '../../../../components/CodeEditor/CodeEditor';
 import { Wave } from '../Wave/Wave';
 import { useThemeClassName } from '../../../../hooks/useThemeClassName';
+import { Textarea } from '../../../../components/Textarea/Textarea';
 
 const notFoundCode = 404;
 const aiAssistantGoodRate = 6;
@@ -239,6 +240,16 @@ const getNextQuestion = (
   return getRandomQuestionWithExclude(nodes, excludedQuestions);
 };
 
+const scaleScore = (score: number) => {
+  if (score >= 8) {
+    return 10;
+  }
+  if (score === 2) {
+    return 1;
+  }
+  return score;
+};
+
 export interface RoomQuestionPanelAiProps {
   questionWithCode: boolean;
   roomQuestionsLoading: boolean;
@@ -265,6 +276,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
     aiAssistantScript,
     lastWsMessageParsed,
     recognitionEnabled,
+    recognitionNotSupported,
     sendWsMessage,
     setAiAssistantCurrentScript,
     setRecognitionEnabled,
@@ -288,6 +300,8 @@ export const RoomQuestionPanelAi: FunctionComponent<
   const [questionTimerStartDate, setQuestionTimerStartDate] = useState<
     string | null
   >(null);
+  const [textAnswerOpen, setTextAnswerOpen] = useState(false);
+  const [textAnswer, setTextAnswer] = useState('');
 
   const {
     apiMethodState: apiSendActiveQuestionState,
@@ -351,11 +365,15 @@ export const RoomQuestionPanelAi: FunctionComponent<
     [Theme.Dark]: 'active2' as ButtonVariant,
     [Theme.Light]: 'active' as ButtonVariant,
   });
+  const themedAnswerAgainButton = useThemeClassName({
+    [Theme.Dark]: 'inverted' as ButtonVariant,
+    [Theme.Light]: 'active2' as ButtonVariant,
+  });
 
   const { aiAnswerCompleted, aiAnswerLoading, lastValidAiAnswer } =
     useAiAnswerSource({
       enabled: copilotAnswerOpen && !readOnly,
-      answer: recognitionAccum,
+      answer: textAnswerOpen ? textAnswer : recognitionAccum,
       conversationId: `${room?.id}${initialQuestion?.id}${auth?.id}`,
       question: initialQuestion?.value || '',
       questionId: initialQuestion?.id || '',
@@ -369,6 +387,9 @@ export const RoomQuestionPanelAi: FunctionComponent<
   const [wsLastValidAiAnswer, setWsLastValidAiAnswer] =
     useState<AnyObject | null>(null);
   const totalLastValidAiAnswer = lastValidAiAnswer || wsLastValidAiAnswer;
+  const scaledScore =
+    totalLastValidAiAnswer?.score &&
+    scaleScore(Number(totalLastValidAiAnswer?.score));
 
   const themedAiAvatar = useThemedAiAvatar();
   const allUsersWithAiExpert = new Map<string, AnalyticsUserReview>();
@@ -433,9 +454,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
     }
     if (copilotAnswerOpen || initialQuestion) {
       setRecognitionEnabled(false);
-      return;
     }
-    setRecognitionEnabled(true);
   }, [readOnly, copilotAnswerOpen, initialQuestion, setRecognitionEnabled]);
 
   useEffect(() => {
@@ -497,10 +516,10 @@ export const RoomQuestionPanelAi: FunctionComponent<
       return;
     }
     setRoomQuestionEvaluation({
-      mark: Math.round(lastValidAiAnswer?.score),
+      mark: Math.round(scaledScore),
       review: lastValidAiAnswer?.reason,
     });
-  }, [readOnly, aiAnswerCompleted, lastValidAiAnswer]);
+  }, [readOnly, aiAnswerCompleted, scaledScore, lastValidAiAnswer]);
 
   useEffect(() => {
     if (readOnly || !lastValidAiAnswer) {
@@ -534,12 +553,12 @@ export const RoomQuestionPanelAi: FunctionComponent<
     if (!aiAnswerCompleted) {
       return;
     }
-    if (lastValidAiAnswer?.score >= aiAssistantGoodRate) {
+    if (scaledScore >= aiAssistantGoodRate) {
       setAiAssistantCurrentScript(AiAssistantScriptName.GoodAnswer);
     } else {
       setAiAssistantCurrentScript(AiAssistantScriptName.NeedTrain);
     }
-  }, [aiAnswerCompleted, lastValidAiAnswer, setAiAssistantCurrentScript]);
+  }, [aiAnswerCompleted, scaledScore, setAiAssistantCurrentScript]);
 
   useEffect(() => {
     if (readOnly || !room || !initialQuestion) {
@@ -611,6 +630,8 @@ export const RoomQuestionPanelAi: FunctionComponent<
     }
     handleCopilotAnswerClose();
     resetVoiceRecognitionAccum();
+    setTextAnswerOpen(false);
+    setTextAnswer('');
     sendRoomActiveQuestion({
       roomId: room.id,
       questionId: nextQuestion.id,
@@ -665,6 +686,22 @@ export const RoomQuestionPanelAi: FunctionComponent<
 
   const handleStartAnswer = () => {
     setRecognitionEnabled(true);
+    setTextAnswerOpen(false);
+  };
+
+  const handleTextAnswerOpen = () => {
+    setRecognitionEnabled(false);
+    setTextAnswerOpen(true);
+  };
+
+  const handleTextAnswerChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    setTextAnswer(e.target.value);
+  };
+
+  const handleSendTextAnswer = () => {
+    handleCopilotAnswerOpen();
   };
 
   const handleAnswerAgain = () => {
@@ -785,28 +822,107 @@ export const RoomQuestionPanelAi: FunctionComponent<
                     <Gap sizeRem={3.625} />
                     <div className="flex">
                       <Gap sizeRem={7.5} horizontal />
-                      <div className="flex flex-col">
-                        {initialQuestion && !recognitionEnabled ? (
-                          <>
+                      <div className="flex flex-col w-full">
+                        {initialQuestion && (
+                          <div className="flex">
                             <Button
                               variant={themedStartAnswerButton}
                               className="w-fit"
+                              disabled={
+                                recognitionEnabled || recognitionNotSupported
+                              }
                               onClick={handleStartAnswer}
                             >
+                              <Icon name={IconNames.MicOn} />
+                              <Gap sizeRem={0.25} horizontal />
                               {
                                 localizationCaptions[
                                   LocalizationKey.StartAnswer
                                 ]
                               }
                             </Button>
-                            <Gap sizeRem={0.5} />
-                          </>
-                        ) : (
-                          <Wave />
+                            <Gap sizeRem={0.5} horizontal />
+                            <Button
+                              variant="inverted"
+                              className="w-fit"
+                              disabled={textAnswerOpen}
+                              onClick={handleTextAnswerOpen}
+                            >
+                              <Icon name={IconNames.FileTray} />
+                              <Gap sizeRem={0.25} horizontal />
+                              {localizationCaptions[LocalizationKey.TextAnswer]}
+                            </Button>
+                          </div>
                         )}
-                        <Typography size="s" secondary>
-                          {secondLineCaption}
-                        </Typography>
+                        {recognitionNotSupported &&
+                          initialQuestion &&
+                          !textAnswerOpen && (
+                            <>
+                              <Gap sizeRem={0.5} />
+                              <Typography size="s" secondary>
+                                {
+                                  localizationCaptions[
+                                    LocalizationKey
+                                      .ErrorRecognitionNotSupportedTitle
+                                  ]
+                                }
+                              </Typography>
+                              <Gap sizeRem={0.15} />
+                              <Typography size="s" secondary>
+                                {
+                                  localizationCaptions[
+                                    LocalizationKey
+                                      .ErrorRecognitionNotSupportedDescription
+                                  ]
+                                }
+                              </Typography>
+                            </>
+                          )}
+                        {recognitionEnabled && (
+                          <div className="flex flex-col">
+                            <Wave />
+                            <Typography size="s" secondary>
+                              {secondLineCaption}
+                            </Typography>
+                          </div>
+                        )}
+                        {textAnswerOpen && (
+                          <div className="flex flex-col">
+                            <Gap sizeRem={0.75} />
+                            <Textarea
+                              value={textAnswer}
+                              maxLength={1000}
+                              showMaxLength
+                              className="w-full h-[8rem]"
+                              onChange={handleTextAnswerChange}
+                            />
+                            <Gap sizeRem={0.5} />
+                            <Button
+                              variant="active2"
+                              className="w-fit"
+                              onClick={handleSendTextAnswer}
+                            >
+                              <Icon name={IconNames.Share} />
+                              <Gap sizeRem={0.25} horizontal />
+                              {localizationCaptions[LocalizationKey.SendAnswer]}
+                            </Button>
+                          </div>
+                        )}
+                        {!initialQuestion && (
+                          <Button
+                            variant={themedStartAnswerButton}
+                            className="w-fit"
+                            onClick={handleNextQuestion}
+                          >
+                            <Icon name={IconNames.PlayOutline} />
+                            <Gap sizeRem={0.25} horizontal />
+                            {
+                              localizationCaptions[
+                                LocalizationKey.StartInterview
+                              ]
+                            }
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -836,7 +952,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                     <Gap sizeRem={2} />
                     <div className="flex flex-1">
                       <div
-                        className={`flex-1 flex flex-col text-left px-[1.875rem] h-full rounded-[1.5rem] ${themeInUi === Theme.Dark ? 'bg-dark-dark1' : ''}`}
+                        className={`flex-1 flex flex-col text-left px-[1.875rem] h-full rounded-[1.5rem] ${questionWithCode ? 'max-w-[400px]' : ''} ${themeInUi === Theme.Dark ? 'bg-dark-dark1' : ''}`}
                         style={{
                           background:
                             themeInUi === Theme.Light
@@ -848,25 +964,13 @@ export const RoomQuestionPanelAi: FunctionComponent<
                         <div className="flex justify-between">
                           <div className="flex flex-col">
                             <Typography size="xxxl" bold>
-                              {totalLastValidAiAnswer?.score}{' '}
+                              {scaledScore}{' '}
                               {localizationCaptions[LocalizationKey.From10]}
                             </Typography>
                             <Typography size="m" secondary>
                               {
                                 localizationCaptions[
                                   LocalizationKey.AnswerEvaluation
-                                ]
-                              }
-                            </Typography>
-                          </div>
-                          <div className="flex flex-col">
-                            <Typography size="xxxl">
-                              <Icon inheritFontSize name={IconNames.Happy} />
-                            </Typography>
-                            <Typography size="m" secondary>
-                              {
-                                localizationCaptions[
-                                  LocalizationKey.EmotionalAssessment
                                 ]
                               }
                             </Typography>
@@ -879,13 +983,21 @@ export const RoomQuestionPanelAi: FunctionComponent<
                         </Typography>
                         <Gap sizeRem={1.375} />
                         <Button
-                          variant="inverted"
+                          variant={themedAnswerAgainButton}
                           className="!w-fit"
                           disabled={!aiAnswerCompleted}
                           onClick={handleAnswerAgain}
                         >
                           {aiAnswerCompleted ? (
-                            localizationCaptions[LocalizationKey.AnswerAgain]
+                            <>
+                              <Icon name={IconNames.Sync} />
+                              <Gap sizeRem={0.25} horizontal />
+                              {
+                                localizationCaptions[
+                                  LocalizationKey.AnswerAgain
+                                ]
+                              }
+                            </>
                           ) : (
                             <Loader />
                           )}

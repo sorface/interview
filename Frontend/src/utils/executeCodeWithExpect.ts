@@ -8,14 +8,19 @@ const expectCode = `
   let __expectedConsoleLogs = [];
 
   const originalConsoleLog = console.log;
+
+  const finishConsoleLogSpy = () => {
+    console.log = originalConsoleLog;
+    __expectedConsoleLogs.forEach((expectedLog, index) =>
+      __expectCalls.push([__consoleLogs[index], expectedLog])
+    );
+    res(__expectCalls);
+  };
+
   console.log = (arg) => {
     __consoleLogs.push(arg);
     if (__expectedConsoleLogs.length === __consoleLogs.length) {
-      console.log = originalConsoleLog;
-      __expectedConsoleLogs.forEach((expectedLog, index) =>
-        __expectCalls.push([__consoleLogs[index], expectedLog])
-      );
-      res(__expectCalls);
+      finishConsoleLogSpy();
     }
   };
 
@@ -38,6 +43,9 @@ const expectCode = `
 
   const expectConsole = (expectedCalls) => {
     __expectedConsoleLogs = expectedCalls;
+    setTimeout(() => {
+      finishConsoleLogSpy();
+    }, 1000);
   };
 `;
 
@@ -49,7 +57,22 @@ const expectCallsReturnCode = `
 });
 `;
 
-type Arg = number | string | AnyObject;
+const expectCodeForIframeStart = `
+  <script>
+    const __expectCalls = [];
+    const expectValue = (value1, value2) => {
+      __expectCalls.push([value1, value2]);
+    };
+  </script>
+`;
+
+const expectCodeForIframeEnd = `
+  <script>
+    window.parent.postMessage(__expectCalls, '*');
+  </script>
+`;
+
+export type ExecuteCodeArg = number | string | AnyObject;
 
 export interface ExecuteCodeResult {
   results: ExpectResult[];
@@ -58,22 +81,18 @@ export interface ExecuteCodeResult {
 
 export type ExpectResult = {
   id: number;
-  arguments: [Arg, Arg, Arg] | [Arg, Arg];
+  arguments:
+    | [ExecuteCodeArg, ExecuteCodeArg, ExecuteCodeArg]
+    | [ExecuteCodeArg, ExecuteCodeArg];
   passed: boolean;
 };
 
-export const executeCodeWithExpect = async (
-  code: string | undefined,
-): Promise<ExecuteCodeResult> => {
+export const computEexecuteResult = (
+  expectResult: Array<ExecuteCodeArg[]>,
+): ExecuteCodeResult => {
   try {
-    const executeCodeWithExpect = new Function(
-      expectCode + code + expectCallsReturnCode,
-    ) as () => Promise<Array<Arg[]>>;
-
-    const executeResult = await executeCodeWithExpect();
-
     return {
-      results: executeResult.map((res) => {
+      results: expectResult.map((res) => {
         const withoutArgs = res.length === 2;
         const [args, result, expect] = res;
         const passed = withoutArgs
@@ -92,4 +111,27 @@ export const executeCodeWithExpect = async (
       error: error instanceof Error ? error.message : String(error),
     };
   }
+};
+
+export const executeCodeWithExpect = async (
+  code: string | undefined,
+): Promise<ExecuteCodeResult> => {
+  try {
+    const executeCodeWithExpect = new Function(
+      expectCode + code + expectCallsReturnCode,
+    ) as () => Promise<Array<ExecuteCodeArg[]>>;
+
+    const executeResult = await executeCodeWithExpect();
+    return computEexecuteResult(executeResult);
+  } catch (error) {
+    return {
+      results: [],
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+};
+
+export const getSrcForIframe = (code: string) => {
+  const resultCode = expectCodeForIframeStart + code + expectCodeForIframeEnd;
+  return `data:text/html;charset=utf-8,${encodeURIComponent(resultCode)}`;
 };

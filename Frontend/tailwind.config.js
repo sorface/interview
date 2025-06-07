@@ -56,6 +56,7 @@ module.exports = {
       gridTemplateColumns: {
         'questions-list': '1.5rem auto 1.125rem',
         'settings-list': '9.25rem auto',
+        'grid-view': 'repeat(auto-fill, minmax(17.125rem, 1fr))',
       },
     },
   },

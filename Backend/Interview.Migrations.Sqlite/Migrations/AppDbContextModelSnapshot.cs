@@ -482,6 +482,13 @@ namespace Interview.Migrations.Sqlite.Migrations
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Description")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ImageBase64")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsArchived")
                         .HasColumnType("INTEGER");
 
@@ -1153,6 +1160,13 @@ namespace Interview.Migrations.Sqlite.Migrations
                             Id = new Guid("8f12692d-8e94-4409-aaef-84f2ceaacd5d"),
                             CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "GetQuestionTreeById",
+                            UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("aff113ac-c65b-4566-993b-aa7f6577f397"),
+                            CreateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Type = "GetRoomBusinessAnalytic",
                             UpdateDate = new DateTime(2023, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new

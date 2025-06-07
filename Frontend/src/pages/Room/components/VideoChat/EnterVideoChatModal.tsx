@@ -198,7 +198,6 @@ export const EnterVideoChatModal: FunctionComponent<
       <Typography size="xl" bold>
         {localizationCaptions[LocalizationKey.JoiningRoom]}
       </Typography>
-      <Gap sizeRem={2} />
     </div>
   );
 
@@ -207,7 +206,13 @@ export const EnterVideoChatModal: FunctionComponent<
       <>
         <div className="w-[20rem] flex flex-col items-center text-center">
           {joiningRoomHeader}
-          <Gap sizeRem={1.25} />
+          <Gap sizeRem={2} />
+          <div className="text-left w-full">
+            <Typography size="m" semibold>
+              {localizationCaptions[LocalizationKey.AllowAccessToMicrophone]}
+            </Typography>
+          </div>
+          <Gap sizeRem={0.25} />
           <div className="w-full max-w-[29.25rem] grid grid-cols-settings-list gap-y-[1rem]">
             <RecognitionLangSwitch />
           </div>
@@ -281,6 +286,7 @@ export const EnterVideoChatModal: FunctionComponent<
         </div>
         <div className="w-[20rem] flex flex-col items-center text-center">
           {joiningRoomHeader}
+          <Gap sizeRem={2} />
           {loading ? (
             <Loader />
           ) : viewerMode ? (
@@ -343,6 +349,7 @@ export const EnterVideoChatModal: FunctionComponent<
         </div>
         <div className="w-[20rem] flex flex-col items-center text-center">
           {joiningRoomHeader}
+          <Gap sizeRem={2} />
           <div>
             <div className="flex items-center">
               <DeviceSelect

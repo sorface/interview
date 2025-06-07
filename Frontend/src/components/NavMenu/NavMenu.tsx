@@ -125,6 +125,22 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
         }
       : null,
     {
+      path: pathnames.questions,
+      caption: (
+        <LocalizationCaption captionKey={LocalizationKey.QuestionsPageName} />
+      ),
+      icon: IconNames.Chat,
+      forceActive: questionsClicked || !!questionsPath,
+      onClick: handleQuestionsClick,
+      subitem: questionsClicked ? (
+        <CategoriesList
+          showOnlyWithoutParent={true}
+          activeId={selectedCategory?.id}
+          onCategoryClick={handleCategoryClick}
+        />
+      ) : null,
+    },
+    {
       path: pathnames.highlightRooms,
       caption: (
         <LocalizationCaption
@@ -146,22 +162,6 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
     //   icon: IconNames.Golf,
     //   onClick: handleItemClick,
     // },
-    {
-      path: pathnames.questions,
-      caption: (
-        <LocalizationCaption captionKey={LocalizationKey.QuestionsPageName} />
-      ),
-      icon: IconNames.Chat,
-      forceActive: questionsClicked || !!questionsPath,
-      onClick: handleQuestionsClick,
-      subitem: questionsClicked ? (
-        <CategoriesList
-          showOnlyWithoutParent={true}
-          activeId={selectedCategory?.id}
-          onCategoryClick={handleCategoryClick}
-        />
-      ) : null,
-    },
     admin
       ? {
           path: pathnames.categories,
@@ -195,6 +195,18 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
             />
           ),
           icon: IconNames.Expand,
+          onClick: handleItemClick,
+        }
+      : null,
+    admin
+      ? {
+          path: pathnames.businessAnalytic,
+          caption: (
+            <LocalizationCaption
+              captionKey={LocalizationKey.BusinessAnalyticPageName}
+            />
+          ),
+          icon: IconNames.Cube,
           onClick: handleItemClick,
         }
       : null,

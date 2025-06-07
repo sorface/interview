@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Interview.Domain.Database;
 using Interview.Domain.Events;
 using Interview.Domain.Events.Storage;
@@ -6,6 +7,7 @@ using Interview.Domain.Questions.QuestionAnswers;
 using Interview.Domain.Questions.QuestionTreeById;
 using Interview.Domain.Questions.QuestionTreePage;
 using Interview.Domain.Reactions;
+using Interview.Domain.Rooms.BusinessAnalytic;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Request.Transcription;
 using Interview.Domain.Rooms.Records.Response;
@@ -44,6 +46,69 @@ public sealed class RoomService(
     RoomStatusUpdater roomStatusUpdater)
     : IRoomServiceWithoutPermissionCheck
 {
+    public async Task<BusinessAnalyticResponse> GetBusinessAnalyticAsync(BusinessAnalyticRequest request, CancellationToken cancellationToken = default)
+    {
+        request.Filter.StartDate = request.Filter.StartDate.Date;
+        request.Filter.EndDate = request.Filter.EndDate.Date.AddDays(1).Subtract(TimeSpan.FromSeconds(1));
+
+        if (request.Filter.StartDate > request.Filter.EndDate)
+        {
+            throw new UserException("The start date must be before the end date.");
+        }
+
+        const int MaxRangeInMonth = 2;
+        var maxDate = request.Filter.StartDate.AddMonths(MaxRangeInMonth);
+        if (request.Filter.EndDate.Date > maxDate)
+        {
+            throw new UserException($"The end date must not exceed the maximum allowable value. (not older than {MaxRangeInMonth} months)");
+        }
+
+        var spec = BuildSpec(request.Filter);
+        var result = await db.Rooms
+            .Where(spec)
+            .OrderBy(e => e.CreateDate, request.DateSort)
+            .Select(e => new { Date = e.CreateDate.Date, Type = e.Type, Status = e.Status, })
+            .ToListAsync(cancellationToken);
+
+        return new BusinessAnalyticResponse { Ai = BuildItems(SERoomType.AI).ToList(), Standard = BuildItems(SERoomType.Standard).ToList(), };
+
+        static ASpec<Room> BuildSpec(BusinessAnalyticRequestFilter request)
+        {
+            ASpec<Room> res = new Spec<Room>(e => e.CreateDate >= request.StartDate && e.CreateDate <= request.EndDate);
+            if (request.RoomTypes is not null && request.RoomTypes.Count != 0)
+            {
+                var roomTypes = SERoomType.List.Join(
+                    request.RoomTypes,
+                    e => e.EnumValue,
+                    e => e,
+                    (e, _) => e).ToList();
+                res &= new Spec<Room>(e => roomTypes.Contains(e.Type));
+            }
+
+            if (request.AccessType is not null)
+            {
+                var accessType = SERoomAccessType.List.First(e => e.EnumValue == request.AccessType);
+                res &= new Spec<Room>(e => e.AccessType == accessType);
+            }
+
+            return res;
+        }
+
+        IEnumerable<BusinessAnalyticResponse.Item> BuildItems(SERoomType type)
+        {
+            return result
+                .Where(e => e.Type == type)
+                .GroupBy(e => DateOnly.FromDateTime(e.Date))
+                .Select(e => new BusinessAnalyticResponse.Item
+                {
+                    Date = e.Key,
+                    Status = e.GroupBy(tt => tt.Status.EnumValue)
+                        .Select(tt => new BusinessAnalyticResponse.ItemStatus { Name = tt.Key, Count = tt.Count(), })
+                        .ToList(),
+                });
+        }
+    }
+
     public async Task<IPagedList<RoomPageDetail>> FindPageAsync(
         RoomPageDetailRequestFilter filter,
         int pageNumber,
@@ -330,12 +395,14 @@ public sealed class RoomService(
 
         if (request.QuestionTreeId is not null)
         {
+            await EnsureAvailableToAssignQuestionTreeToRoomAsync(currentUserId, request.QuestionTreeId.Value, cancellationToken);
+
             var questionTree = await db.QuestionTree
                 .Select(e => new { Id = e.Id, Name = e.Name, RootQuestionSubjectTreeId = e.RootQuestionSubjectTreeId, })
                 .FirstAsync(e => e.Id == request.QuestionTreeId, cancellationToken);
             var allSubjectTreeIds = await db.QuestionSubjectTree.GetAllChildrenAsync(questionTree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
             var questionsFromTree = await db.QuestionSubjectTree.AsNoTracking()
-                .Where(e => allSubjectTreeIds.Contains(e.Id) && e.QuestionId != null)
+                .Where(e => allSubjectTreeIds.Contains(e.Id) && e.QuestionId != null && e.Type == SEQuestionSubjectTreeType.Question)
                 .Select(e => new
                 {
                     Id = e.QuestionId!.Value,
@@ -467,6 +534,8 @@ public sealed class RoomService(
 
         if (request.QuestionTreeId != null && request.QuestionTreeId != (foundRoom.QuestionTreeId ?? Guid.Empty))
         {
+            await EnsureAvailableToAssignQuestionTreeToRoomAsync(foundRoom.CreatedById, request.QuestionTreeId.Value, cancellationToken);
+
             // When a user sets up a category, you must remove all questions from the room.
             request.Questions.Clear();
 
@@ -999,6 +1068,24 @@ public sealed class RoomService(
         }
 
         return new RoomTimer { Duration = TimeSpan.FromSeconds(durationSec.Value), };
+    }
+
+    private async Task EnsureAvailableToAssignQuestionTreeToRoomAsync(Guid? userId, Guid questionTreeId, CancellationToken cancellationToken)
+    {
+        if (userId is null)
+        {
+            return;
+        }
+
+        var activeStatuses = SERoomStatus.ActiveStatuses;
+        var hasActiveQuestionTreeRoom = await db.Rooms
+            .AnyAsync(
+                e => e.CreatedById == userId && e.QuestionTreeId == questionTreeId && activeStatuses.Contains(e.Status),
+                cancellationToken);
+        if (hasActiveQuestionTreeRoom)
+        {
+            throw new UserException($"Room with id {questionTreeId} already exists");
+        }
     }
 
     private void EnsureAvailableRoomEdit(Room room)

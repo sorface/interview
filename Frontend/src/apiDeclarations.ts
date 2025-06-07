@@ -78,6 +78,12 @@ export interface RoomEditBody {
   durationSec?: number;
 }
 
+export interface RoomBusinessAnalyticParams {
+  startDate: string;
+  endDate: string;
+  dateSort: 'Asc' | 'Desc';
+}
+
 const eventsSearchLimit = 50;
 
 export const roomsApiDeclaration = {
@@ -150,6 +156,15 @@ export const roomsApiDeclaration = {
     method: 'PATCH',
     baseUrl: `/rooms/${body.id}`,
     body,
+  }),
+  businessAnalytic: (params: RoomBusinessAnalyticParams): ApiContractGet => ({
+    method: 'GET',
+    baseUrl: '/rooms/businessAnalytic',
+    urlParams: {
+      'Filter.StartDate': params.startDate,
+      'Filter.EndDate': params.endDate,
+      DateSort: params.dateSort,
+    },
   }),
 };
 
@@ -565,6 +580,8 @@ export interface UpsertRoadmapBody {
   tags: [];
   name: string;
   order: number;
+  imageBase64?: string;
+  description?: string;
   items: Array<{
     id?: string;
     type: RoadmapItemType;

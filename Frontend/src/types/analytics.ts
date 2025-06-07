@@ -50,6 +50,7 @@ export interface AnalyticsUserReview {
 }
 
 export interface Analytics {
+  isAiRoom: boolean;
   completed: boolean;
   averageMark?: number;
   questions: AnalyticsQuestions[];

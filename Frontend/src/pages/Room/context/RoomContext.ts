@@ -23,6 +23,8 @@ export interface RoomContextType {
   allUsers: Map<string, Pick<User, 'nickname' | 'avatar'>>;
   aiAssistantScript: AiAssistantScriptName;
   recognitionEnabled: boolean;
+  recognitionNotSupported: boolean;
+  pinUser: (id: string) => void;
   sendWsMessage: SendMessage;
   setCodeEditorEnabled: (enabled: boolean) => void;
   setAiAssistantCurrentScript: (
@@ -48,6 +50,8 @@ const defaultValue: RoomContextType = {
   allUsers: new Map(),
   aiAssistantScript: AiAssistantScriptName.Idle,
   recognitionEnabled: false,
+  recognitionNotSupported: false,
+  pinUser: () => {},
   sendWsMessage: noop,
   setCodeEditorEnabled: noop,
   setAiAssistantCurrentScript: noop,

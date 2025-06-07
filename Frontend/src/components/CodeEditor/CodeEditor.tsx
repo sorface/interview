@@ -22,11 +22,16 @@ import { Button } from '../Button/Button';
 import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames } from '../../constants';
 import {
+  computEexecuteResult,
+  ExecuteCodeArg,
   ExecuteCodeResult,
   executeCodeWithExpect,
+  getSrcForIframe,
 } from '../../utils/executeCodeWithExpect';
 import { ModalFooter } from '../ModalFooter/ModalFooter';
 import { CodeExecutionResult } from '../CodeExecutionResult/CodeExecutionResult';
+import { Typography } from '../Typography/Typography';
+import { useThemeClassName } from '../../hooks/useThemeClassName';
 
 import './CodeEditor.css';
 
@@ -34,7 +39,10 @@ export const defaultCodeEditorFontSize = 13;
 
 const fontSizeOptions = [10, 12, 13, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48];
 
-const languagesForExecute: CodeEditorLang[] = [CodeEditorLang.Javascript];
+const languagesForExecute: CodeEditorLang[] = [
+  CodeEditorLang.Javascript,
+  CodeEditorLang.Html,
+];
 
 const fontSizeLocalStorageKey = 'codeEditorFontSize';
 
@@ -103,10 +111,27 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
     expectResult.results.every((expectResult) => expectResult.passed);
   const [modalExpectResults, setModalExpectResults] = useState(false);
   const codeEditorComponentRef = useRef<HTMLDivElement | null>(null);
+  const languageForIframe = language === CodeEditorLang.Html;
+  const iframeThemedClassName = useThemeClassName({
+    [Theme.Dark]: 'border-grey3',
+    [Theme.Light]: 'border-grey-active',
+  });
 
   useEffect(() => {
     saveFontSizeToStorage(fontSize);
   }, [fontSize]);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent<Array<ExecuteCodeArg[]>>) => {
+      setExpectResult(computEexecuteResult(event.data));
+    };
+
+    window.addEventListener('message', handleMessage);
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
 
   const handleModalExpectClose = () => setModalExpectResults(false);
 
@@ -138,6 +163,10 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   };
 
   const handleExecuteCode = async () => {
+    if (languageForIframe) {
+      setModalExpectResults(true);
+      return;
+    }
     const executeCodeResult = await executeCodeWithExpect(value);
     setExpectResult(executeCodeResult);
     setModalExpectResults(true);
@@ -240,6 +269,19 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
         open={modalExpectResults}
       >
         <CodeExecutionResult expectResult={expectResult} />
+        {languageForIframe && (
+          <>
+            <Gap sizeRem={1} />
+            <Typography size="m" semibold>
+              {localizationCaptions[LocalizationKey.Preview]}:
+            </Typography>
+            <Gap sizeRem={0.25} />
+            <iframe
+              src={getSrcForIframe(value || '')}
+              className={`w-full h-[320px] border-[0.15rem] border-solid ${iframeThemedClassName}`}
+            />
+          </>
+        )}
         <Gap sizeRem={1.5} />
         {onExecutionResultsSubmit &&
           expectResultsPassed &&

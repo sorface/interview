@@ -33,6 +33,12 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
   const localizationCaptions = useLocalizationCaptions();
   const [roadmapName, setRoadmapName] = useState('Roadmap');
   const [roadmapOrder, setRoadmapOrder] = useState(0);
+  const [roadmapDescription, setRoadmapDescription] = useState<
+    string | undefined
+  >(undefined);
+  const [roadmapImageBase64, setRoadmapImageBase64] = useState<
+    string | undefined
+  >(undefined);
   const [roadmapItems, setRoadmapItems] = useState<RoadmapItem[]>([]);
 
   const { apiMethodState, fetchData } = useApiMethod<string, UpsertRoadmapBody>(
@@ -68,6 +74,8 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
     }
     setRoadmapName(roadmap.name);
     setRoadmapOrder(roadmap.order);
+    setRoadmapDescription(roadmap.description);
+    setRoadmapImageBase64(roadmap.imageBase64);
     const newRoadmapItems = roadmap.items.map((item, index) => ({
       ...item,
       order: index,
@@ -128,6 +136,8 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
       name: roadmapName,
       items: itemsForRequest,
       order: roadmapOrder,
+      description: roadmapDescription,
+      imageBase64: roadmapImageBase64,
     });
   };
 
@@ -152,7 +162,7 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
       )}
       <div className="flex flex-col items-center">
         <div>
-          <div className="flex">
+          <div className="flex flex-col">
             <div className="flex items-center">
               <Typography size="m">Name: </Typography>
               <Gap sizeRem={0.5} horizontal />
@@ -165,7 +175,7 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
                 }}
               />
             </div>
-            <Gap sizeRem={0.5} horizontal />
+            <Gap sizeRem={0.5} />
             <div className="flex items-center">
               <Typography size="m">Order: </Typography>
               <Gap sizeRem={0.5} horizontal />
@@ -178,6 +188,65 @@ export const RoadmapCreate: FunctionComponent<RoadmapCreateProps> = ({
                 }}
               />
             </div>
+            <Gap sizeRem={0.5} />
+            <div className="flex items-center">
+              <Typography size="m">Description: </Typography>
+              <Gap sizeRem={0.5} horizontal />
+              <input
+                type="text"
+                className="bg-wrap"
+                value={roadmapDescription || ''}
+                onChange={(e) => {
+                  setRoadmapDescription(e.target.value as string);
+                }}
+              />
+            </div>
+            <Gap sizeRem={0.5} />
+            <div className="flex items-center">
+              <Typography size="m">Image: </Typography>
+              <Gap sizeRem={0.5} horizontal />
+              <input
+                type="file"
+                accept="image/*"
+                className="bg-wrap"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) {
+                    return;
+                  }
+                  const fileReader = new FileReader();
+                  fileReader.addEventListener('load', (frEvent) => {
+                    const result = frEvent.target?.result;
+                    if (typeof result === 'string') {
+                      setRoadmapImageBase64(result);
+                    }
+                  });
+
+                  fileReader.readAsDataURL(file);
+                }}
+              />
+              <Gap sizeRem={0.5} horizontal />
+              <Button
+                variant="invertedActive"
+                onClick={() => setRoadmapImageBase64(undefined)}
+              >
+                Clear
+              </Button>
+            </div>
+            {roadmapImageBase64 && (
+              <>
+                <Gap sizeRem={0.5} />
+                <div className="flex items-center">
+                  <Typography size="m">Image preview: </Typography>
+                  <Gap sizeRem={0.5} horizontal />
+                  <img
+                    src={roadmapImageBase64}
+                    alt="roadmap image preview"
+                    className="w-[16.125rem] h-[8.875rem] object-cover"
+                  />
+                </div>
+              </>
+            )}
           </div>
           <Gap sizeRem={1.75} />
           <div className="w-fit flex flex-col">

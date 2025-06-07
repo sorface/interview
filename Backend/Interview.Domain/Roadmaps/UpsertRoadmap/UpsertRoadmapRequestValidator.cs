@@ -17,6 +17,17 @@ public class UpsertRoadmapRequestValidator
             return result;
         }
 
+        if (!string.IsNullOrWhiteSpace(request.Description) && request.Description.Length > 128)
+        {
+            result.Errors.Add(Errors.DescriptionTooLong);
+        }
+
+        const double maxImageLength = 300000;
+        if (!string.IsNullOrEmpty(request.ImageBase64) && request.ImageBase64.Length > maxImageLength)
+        {
+            result.Errors.Add(Errors.ImageTooLarge);
+        }
+
         var items = request.Items;
 
         if (items[0].Type != EVRoadmapItemType.Milestone)
@@ -255,6 +266,8 @@ public class UpsertRoadmapRequestValidator
 
     public static class Errors
     {
+        public const string ImageTooLarge = "Image too large";
+        public const string DescriptionTooLong = "Roadmap description too long.";
         public const string NameTooShort = "Roadmap name must be at least 2 characters long.";
         public const string ItemsRequired = "Items must contain at least one element.";
         public const string FirstMustBeMilestone = "The first item must be of type Milestone.";

@@ -1,5 +1,6 @@
 using Interview.Domain.Events.Storage;
 using Interview.Domain.Permissions;
+using Interview.Domain.Rooms.BusinessAnalytic;
 using Interview.Domain.Rooms.Records.Request;
 using Interview.Domain.Rooms.Records.Request.Transcription;
 using Interview.Domain.Rooms.Records.Response;
@@ -14,6 +15,12 @@ namespace Interview.Domain.Rooms.Permissions;
 
 public class RoomServicePermissionAccessor(IRoomService roomService, ISecurityService securityService) : IRoomService, IServiceDecorator
 {
+    public async Task<BusinessAnalyticResponse> GetBusinessAnalyticAsync(BusinessAnalyticRequest request, CancellationToken cancellationToken = default)
+    {
+        await securityService.EnsurePermissionAsync(SEPermission.GetRoomBusinessAnalytic, cancellationToken);
+        return await roomService.GetBusinessAnalyticAsync(request, cancellationToken);
+    }
+
     public async Task<IPagedList<RoomPageDetail>> FindPageAsync(RoomPageDetailRequestFilter filter, int pageNumber, int pageSize, EVSortOrder dateSort, CancellationToken cancellationToken = default)
     {
         await securityService.EnsurePermissionAsync(SEPermission.RoomFindPage, cancellationToken);

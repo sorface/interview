@@ -25,6 +25,7 @@ import { ItemsGrid } from '../../components/ItemsGrid/ItemsGrid';
 import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme } from '../../context/ThemeContext';
 import { ActionModal } from '../../components/ActionModal/ActionModal';
+import { Gap } from '../../components/Gap/Gap';
 
 const pageSize = 30;
 const initialPageNumber = 1;
@@ -77,9 +78,22 @@ export const Roadmaps: FunctionComponent = () => {
       <li key={roadmap.id}>
         <Link to={roadmapLink} className="no-underline">
           <div
-            className={`${roadmapItemThemedClassName} bg-wrap p-[1rem] mb-[0.25rem] flex items-center rounded-[0.5rem]`}
+            className={`${roadmapItemThemedClassName} bg-wrap p-[1rem] mb-[0.25rem] flex flex-col rounded-[0.5rem]`}
           >
-            <Typography size="m">{roadmap.name}</Typography>
+            <img
+              className="object-cover"
+              alt={`roadmap ${roadmap.name} image`}
+              src={roadmap.imageBase64 || 'roadmap-placeholder.png'}
+            />
+            <Gap sizeRem={0.75} />
+            <Typography size="m" semibold>
+              {roadmap.name}
+            </Typography>
+            <Gap sizeRem={0.25} />
+            <Typography size="s" secondary>
+              {roadmap.description ||
+                `${localizationCaptions[LocalizationKey.Learn]} ${roadmap.name}.`}
+            </Typography>
             {admin && (
               <div className="flex ml-auto">
                 <Link to={roadmapEditLink}>
@@ -109,9 +123,7 @@ export const Roadmaps: FunctionComponent = () => {
 
   return (
     <>
-      <PageHeader
-        title={localizationCaptions[LocalizationKey.RoadmapsPageName]}
-      >
+      <PageHeader title="" overlapping>
         {admin && (
           <Link to={pathnames.roadmapCreate}>
             <Button variant="active" className="h-[2.5rem]" aria-hidden>
@@ -121,11 +133,23 @@ export const Roadmaps: FunctionComponent = () => {
           </Link>
         )}
       </PageHeader>
+      <Gap sizeRem={2.25} />
+      <div className="text-left flex flex-col">
+        <Typography size="xxxl" semibold>
+          {localizationCaptions[LocalizationKey.RoadmapsPageName]}
+        </Typography>
+        <Gap sizeRem={0.75} />
+        <Typography size="s" semibold secondary>
+          {localizationCaptions[LocalizationKey.RoadmapsPageDescription]}
+        </Typography>
+      </div>
+      <Gap sizeRem={1.75} />
       <ItemsGrid
         currentData={roadmaps}
         loading={loading}
         error={error}
         triggerResetAccumData={`${archivedRoadmap}`}
+        className="grid gap-[0.5rem] grid-cols-grid-view"
         renderItem={createRoadmapItem}
         nextPageAvailable={false}
         handleNextPage={handleNextPage}
