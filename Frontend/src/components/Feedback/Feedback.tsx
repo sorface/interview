@@ -24,7 +24,7 @@ export const Feedback: FunctionComponent = () => {
 
   return (
     <div
-      className={`absolute z-50 ${themedClassName} right-[1rem] bottom-0 bg-wrap px-[1.25rem] !rounded-t-[0.75rem]`}
+      className={`fixed z-50 ${themedClassName} right-[1rem] bottom-0 bg-wrap px-[1.25rem] !rounded-t-[0.75rem]`}
     >
       {open && <Gap sizeRem={1} />}
       <div
