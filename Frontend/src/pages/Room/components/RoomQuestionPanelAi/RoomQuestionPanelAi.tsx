@@ -55,6 +55,7 @@ import { CodeEditor } from '../../../../components/CodeEditor/CodeEditor';
 import { Wave } from '../Wave/Wave';
 import { useThemeClassName } from '../../../../hooks/useThemeClassName';
 import { Textarea } from '../../../../components/Textarea/Textarea';
+import { DeviceContext } from '../../../../context/DeviceContext';
 
 const notFoundCode = 404;
 const aiAssistantGoodRate = 6;
@@ -268,6 +269,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
   children,
 }) => {
   const auth = useContext(AuthContext);
+  const device = useContext(DeviceContext);
   const localizationCaptions = useLocalizationCaptions();
   const {
     room,
@@ -728,29 +730,31 @@ export const RoomQuestionPanelAi: FunctionComponent<
         </>
       )}
       <div className="flex flex-1">
-        <div className="flex flex-col">
-          <Gap sizeRem={2.5} />
-          <div
-            className="bg-wrap rounded-[2.5rem] flex-1 flex flex-col"
-            style={{
-              borderTopLeftRadius: 0,
-              borderBottomLeftRadius: 0,
-              padding: 0,
-              width: '138px',
-              background:
-                themeInUi === Theme.Light
-                  ? 'linear-gradient(270deg, rgba(67, 184, 241, 0.07) 0%, rgba(245, 246, 248, 0.07) 92.16%)'
-                  : '',
-            }}
-          ></div>
-          <Gap sizeRem={2.75} />
-        </div>
-        <Gap sizeRem={1.75} horizontal />
+        {device === 'Desktop' && (
+          <div className="flex flex-col">
+            <Gap sizeRem={2.5} />
+            <div
+              className="bg-wrap rounded-[2.5rem] flex-1 flex flex-col"
+              style={{
+                borderTopLeftRadius: 0,
+                borderBottomLeftRadius: 0,
+                padding: 0,
+                width: '138px',
+                background:
+                  themeInUi === Theme.Light
+                    ? 'linear-gradient(270deg, rgba(67, 184, 241, 0.07) 0%, rgba(245, 246, 248, 0.07) 92.16%)'
+                    : '',
+              }}
+            ></div>
+            <Gap sizeRem={2.75} />
+          </div>
+        )}
+        {device === 'Desktop' && <Gap sizeRem={1.75} horizontal />}
         <div
-          className="relative bg-wrap flex-1 rounded-[2.5rem] flex flex-col"
-          style={{ width: '840px' }}
+          className={`relative bg-wrap flex-1 rounded-[2.5rem] flex flex-col ${device === 'Mobile' && copilotAnswerOpen ? 'overflow-x-auto h-[calc(100svh-58px)]' : ''}`}
+          style={{ width: device === 'Desktop' ? '840px' : '100%' }}
         >
-          {!copilotAnswerOpen && questionTimerStartDate && (
+          {/* {!copilotAnswerOpen && questionTimerStartDate && (
             <div
               className="absolute z-10"
               style={{ top: '1rem', right: '1.875rem' }}
@@ -764,7 +768,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                 }
               />
             </div>
-          )}
+          )} */}
           {totalErrorRoomQuestionEvaluation && (
             <Typography size="m" error>
               {totalErrorRoomQuestionEvaluation}
@@ -783,7 +787,9 @@ export const RoomQuestionPanelAi: FunctionComponent<
           {statusPanelVisible && (
             <>
               <Gap sizeRem={copilotAnswerOpen ? 1.6875 : 7.6875} />
-              <div className="flex flex-col px-[4.75rem] h-full">
+              <div
+                className={`flex flex-col h-full ${device === 'Desktop' ? 'px-[4.75rem]' : 'px-[1rem]'}`}
+              >
                 <div className="flex">
                   <div className="flex items-center justify-center">
                     <div
@@ -819,9 +825,11 @@ export const RoomQuestionPanelAi: FunctionComponent<
                 </div>
                 {!copilotAnswerOpen && (
                   <div className="text-left">
-                    <Gap sizeRem={3.625} />
+                    <Gap sizeRem={device === 'Desktop' ? 3.625 : 1.5} />
                     <div className="flex">
-                      <Gap sizeRem={7.5} horizontal />
+                      {device === 'Desktop' && (
+                        <Gap sizeRem={7.5} horizontal />
+                      )}
                       <div className="flex flex-col w-full">
                         {initialQuestion && (
                           <div className="flex">
@@ -929,9 +937,12 @@ export const RoomQuestionPanelAi: FunctionComponent<
                 )}
                 {copilotAnswerOpen && (
                   <>
+                    {device === 'Mobile' && (
+                      <Gap sizeRem={1} />
+                    )}
                     <Button
-                      variant="invertedActive"
-                      className="absolute min-w-[0rem] w-[2.5rem] h-[2.5rem] !p-[0rem] z-1"
+                      variant={device === 'Desktop' ? "invertedActive" : 'active'}
+                      className={`${device === 'Desktop' ? ' absolute' : 'w-full'} min-w-[0rem] w-[2.5rem] h-[2.5rem] !p-[0rem] z-1`}
                       style={{
                         right: '-1.25rem',
                         top: 'calc(50% - 1.25rem)',
@@ -946,11 +957,23 @@ export const RoomQuestionPanelAi: FunctionComponent<
                       {nextQuestionButtonLoading ? (
                         <Loader />
                       ) : (
-                        <Icon size="s" name={IconNames.ChevronForward} />
+                        <>
+                        {device === 'Mobile' && (
+                            <>
+                              <Gap sizeRem={0.25} horizontal />
+                              <Typography size='m'>
+                                {localizationCaptions[LocalizationKey.NextRoomQuestion]}
+                              </Typography>
+                            </>
+                          )}
+                          <Icon size="s" name={IconNames.ChevronForward} />
+                        </>
                       )}
                     </Button>
-                    <Gap sizeRem={2} />
-                    <div className="flex flex-1">
+                    <Gap sizeRem={device === 'Desktop' ? 2 : 1} />
+                    <div
+                      className={`flex flex-1 ${device === 'Mobile' ? 'flex-col' : ''}`}
+                    >
                       <div
                         className={`flex-1 flex flex-col text-left px-[1.875rem] h-full rounded-[1.5rem] ${questionWithCode ? 'max-w-[400px]' : ''} ${themeInUi === Theme.Dark ? 'bg-dark-dark1' : ''}`}
                         style={{
@@ -1003,7 +1026,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                           )}
                         </Button>
                       </div>
-                      <Gap sizeRem={0.625} horizontal />
+                      <Gap sizeRem={0.625} horizontal={device === 'Desktop'} />
                       <div
                         className={`flex-1 flex flex-col text-left px-[1.875rem] h-full rounded-[1.5rem] ${themeInUi === Theme.Dark ? 'bg-dark-dark1' : ''}`}
                         style={{
@@ -1033,6 +1056,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                             languages={[CodeEditorLang.Javascript]}
                             readOnly
                             value={totalLastValidAiAnswer?.referenceCode}
+                            className={device === 'Mobile' ? 'h-[30rem]' : ''}
                           />
                         )}
                         <Gap sizeRem={2} />
@@ -1061,7 +1085,8 @@ export const RoomQuestionPanelAi: FunctionComponent<
               className="absolute flex items-center justify-center z-20"
               style={{
                 bottom: '12px',
-                right: '12px',
+                ...(device === 'Desktop' && { right: '12px' }),
+                ...(device === 'Mobile' && { left: '12px' }),
               }}
             >
               <div
@@ -1086,24 +1111,26 @@ export const RoomQuestionPanelAi: FunctionComponent<
             </div>
           )}
         </div>
-        <Gap sizeRem={1.75} horizontal />
-        <div className="flex flex-col">
-          <Gap sizeRem={2.5} />
-          <div
-            className="bg-wrap rounded-[2.5rem] flex-1 flex flex-col"
-            style={{
-              borderTopRightRadius: 0,
-              borderBottomRightRadius: 0,
-              padding: 0,
-              width: '138px',
-              background:
-                themeInUi === Theme.Light
-                  ? 'linear-gradient(89.03deg, #EFF0FF -2.02%, #F5F6F8 96.31%)'
-                  : '',
-            }}
-          ></div>
-          <Gap sizeRem={2.75} />
-        </div>
+        {device === 'Desktop' && <Gap sizeRem={1.75} horizontal />}
+        {device === 'Desktop' && (
+          <div className="flex flex-col">
+            <Gap sizeRem={2.5} />
+            <div
+              className="bg-wrap rounded-[2.5rem] flex-1 flex flex-col"
+              style={{
+                borderTopRightRadius: 0,
+                borderBottomRightRadius: 0,
+                padding: 0,
+                width: '138px',
+                background:
+                  themeInUi === Theme.Light
+                    ? 'linear-gradient(89.03deg, #EFF0FF -2.02%, #F5F6F8 96.31%)'
+                    : '',
+              }}
+            ></div>
+            <Gap sizeRem={2.75} />
+          </div>
+        )}
       </div>
     </>
   );

@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent, useContext, useEffect } from 'react';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { useApiMethod } from '../../hooks/useApiMethod';
@@ -18,6 +18,7 @@ import { RoadmapProgress } from './components/RoadmapProgress';
 import { getRoadmapProgress } from './utils/getRoadmapProgress';
 import { findMilestoneTrees } from './utils/findMilestoneTrees';
 import { SvgRoadmap } from './components/SvgRoadmap';
+import { DeviceContext } from '../../context/DeviceContext';
 
 const roomDuration = 3600;
 const svgRoadmapFingerprint = 'MQQMQQQQQQQQQMQQQQMQQ';
@@ -33,6 +34,7 @@ const getRoadmapFingerprint = (items: RoadmapItem[]) => {
 export const Roadmap: FunctionComponent = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const device = useContext(DeviceContext);
 
   const { apiMethodState, fetchData } = useApiMethod<Room, CreateRoomBody>(
     roomsApiDeclaration.create,
@@ -96,7 +98,7 @@ export const Roadmap: FunctionComponent = () => {
     <>
       <PageHeader title="" />
 
-      <div className="flex">
+      <div className={`flex ${device === 'Mobile' ? 'flex-col' : ''}`}>
         <div className="flex-1">
           <div className="flex flex-col items-center justify-center">
             {totalLoading && <Loader />}
@@ -115,7 +117,15 @@ export const Roadmap: FunctionComponent = () => {
                 <Typography size="xxxl" bold>
                   {roadmap?.name}
                 </Typography>
-                <Gap sizeRem={2.25} />
+                {device === 'Mobile' && (
+                  <>
+                  <Gap sizeRem={1} />
+                    <div className="w-full">
+                      <RoadmapProgress {...roadmapProgress} />
+                    </div>
+                  </>
+                )}
+                <Gap sizeRem={device === 'Desktop' ? 2.25 : 0.75} />
                 {svgRoadmap ? (
                   <SvgRoadmap
                     items={roadmap?.items || []}
@@ -145,12 +155,16 @@ export const Roadmap: FunctionComponent = () => {
             )}
           </div>
         </div>
-        <Gap sizeRem={1} horizontal />
-        <div className="flex w-full max-w-[18rem] justify-center">
-          <div className="w-full max-w-[26rem]">
-            <RoadmapProgress {...roadmapProgress} />
-          </div>
-        </div>
+        {device === 'Desktop' && (
+          <>
+            <Gap sizeRem={1} horizontal />
+            <div className="flex w-full max-w-[18rem] justify-center">
+              <div className="w-full max-w-[26rem]">
+                <RoadmapProgress {...roadmapProgress} />
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </>
   );
