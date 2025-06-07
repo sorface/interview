@@ -8,7 +8,6 @@ import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { ThemeSwitchMini } from '../ThemeSwitchMini/ThemeSwitchMini';
 import { Typography } from '../Typography/Typography';
 import { Gap } from '../Gap/Gap';
-import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { PageHeaderUserAvatar } from '../PageHeaderUserAvatar/PageHeaderUserAvatar';
 import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme } from '../../context/ThemeContext';
@@ -25,7 +24,6 @@ interface MenuItem {
 }
 
 export const NavMenu2: FunctionComponent<NavMenu2Props> = ({ admin }) => {
-  const localizationCaptions = useLocalizationCaptions();
   const navmenuThemeClassName = useThemeClassName({
     [Theme.Dark]: 'border-dark-dark2',
     [Theme.Light]: 'border-nav-menu-border-light',
@@ -148,21 +146,17 @@ export const NavMenu2: FunctionComponent<NavMenu2Props> = ({ admin }) => {
 
   return (
     <nav
-      className={`flex w-full text-nowrap border-b-[1px] px-[2.5rem] py-[1.25rem] ${navmenuThemeClassName}`}
+      className={`flex w-full text-nowrap border-b-[1px] px-[2.5rem] py-[0.75rem] ${navmenuThemeClassName}`}
     >
-      <div className="flex items-center overflow-y-auto">
+      <div className="flex items-center overflow-y-auto py-[0.5rem]">
         {items.map((item, index) =>
           item ? createMenuItem(item, index) : undefined,
         )}
       </div>
       <div className="ml-auto flex items-center">
-        <Typography size="m">
-          {localizationCaptions[LocalizationKey.ThemeDark]}
-        </Typography>
-        <Gap sizeRem={0.25} horizontal />
-        <ThemeSwitchMini />
-        <Gap sizeRem={0.75} horizontal />
-        <PageHeaderUserAvatar />
+        <ThemeSwitchMini variant="icon" />
+        <Gap sizeRem={1} horizontal />
+        <PageHeaderUserAvatar size="m" />
       </div>
     </nav>
   );

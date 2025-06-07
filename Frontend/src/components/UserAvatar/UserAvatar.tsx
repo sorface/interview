@@ -3,7 +3,7 @@ import { Typography } from '../Typography/Typography';
 
 import './UserAvatar.css';
 
-interface UserAvatarProps {
+export interface UserAvatarProps {
   src?: string;
   nickname: string;
   altarnativeBackgound?: boolean;
