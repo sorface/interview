@@ -54,22 +54,28 @@ export const NavMenu2: FunctionComponent<NavMenu2Props> = ({ admin }) => {
           icon: IconNames.Golf,
         }
       : null,
-    {
-      path: pathnames.questionsRootCategories,
-      caption: (
-        <LocalizationCaption captionKey={LocalizationKey.QuestionsPageName} />
-      ),
-      icon: IconNames.Chat,
-    },
-    {
-      path: pathnames.highlightRooms,
-      caption: (
-        <LocalizationCaption
-          captionKey={LocalizationKey.HighlightsRoomsPageName}
-        />
-      ),
-      icon: IconNames.Cube,
-    },
+    admin
+      ? {
+          path: pathnames.questionsRootCategories,
+          caption: (
+            <LocalizationCaption
+              captionKey={LocalizationKey.QuestionsPageName}
+            />
+          ),
+          icon: IconNames.Chat,
+        }
+      : null,
+    admin
+      ? {
+          path: pathnames.highlightRooms,
+          caption: (
+            <LocalizationCaption
+              captionKey={LocalizationKey.HighlightsRoomsPageName}
+            />
+          ),
+          icon: IconNames.Cube,
+        }
+      : null,
     admin
       ? {
           path: pathnames.categories,
