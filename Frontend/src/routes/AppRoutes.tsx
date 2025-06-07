@@ -50,7 +50,9 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
   return (
     <>
       {hasNavMenu && <NavMenu2 admin={admin} />}
-      <div className={`App ${fullScreenPage ? 'full-screen-page' : ''}`}>
+      <div
+        className={`App ${fullScreenPage ? 'full-screen-page' : ''} ${device === 'Desktop' ? 'px-[2.5rem]' : 'px-[1.25rem]'}`}
+      >
         <div
           className={`App-content ${device === 'Desktop' ? 'px-[11.5rem]' : ''}`}
         >

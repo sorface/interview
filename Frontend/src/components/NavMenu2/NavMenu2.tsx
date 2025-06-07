@@ -1,4 +1,9 @@
-import React, { Fragment, FunctionComponent, ReactNode } from 'react';
+import React, {
+  Fragment,
+  FunctionComponent,
+  ReactNode,
+  useContext,
+} from 'react';
 import { matchPath, NavLink } from 'react-router-dom';
 import { IconNames, pathnames } from '../../constants';
 import { VITE_APP_NAME } from '../../config';
@@ -11,6 +16,7 @@ import { Gap } from '../Gap/Gap';
 import { PageHeaderUserAvatar } from '../PageHeaderUserAvatar/PageHeaderUserAvatar';
 import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme } from '../../context/ThemeContext';
+import { DeviceContext } from '../../context/DeviceContext';
 
 interface NavMenu2Props {
   admin: boolean;
@@ -24,6 +30,7 @@ interface MenuItem {
 }
 
 export const NavMenu2: FunctionComponent<NavMenu2Props> = ({ admin }) => {
+  const device = useContext(DeviceContext);
   const navmenuThemeClassName = useThemeClassName({
     [Theme.Dark]: 'border-dark-dark2',
     [Theme.Light]: 'border-nav-menu-border-light',
@@ -152,7 +159,7 @@ export const NavMenu2: FunctionComponent<NavMenu2Props> = ({ admin }) => {
 
   return (
     <nav
-      className={`flex w-full text-nowrap border-b-[1px] px-[2.5rem] py-[0.75rem] ${navmenuThemeClassName}`}
+      className={`flex w-full text-nowrap border-b-[1px] ${device === 'Desktop' ? 'px-[2.5rem]' : 'px-[1rem]'} py-[0.75rem] ${navmenuThemeClassName}`}
     >
       <div className="flex items-center overflow-y-auto py-[0.5rem]">
         {items.map((item, index) =>
