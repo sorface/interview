@@ -55,7 +55,7 @@ export const NavMenu2: FunctionComponent<NavMenu2Props> = ({ admin }) => {
         }
       : null,
     {
-      path: pathnames.questions,
+      path: pathnames.questionsRootCategories,
       caption: (
         <LocalizationCaption captionKey={LocalizationKey.QuestionsPageName} />
       ),

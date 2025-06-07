@@ -11,7 +11,7 @@ import { RoomParticipants } from '../pages/RoomParticipants/RoomParticipants';
 import { ProtectedRoute } from './ProtectedRoute';
 import { User } from '../types/user';
 import { Terms } from '../pages/Terms/Terms';
-import { Categories } from '../pages/Categories/Categories';
+import { CategoriesAdmin } from '../pages/CategoriesAdmin/CategoriesAdmin';
 import { checkAdmin } from '../utils/checkAdmin';
 import { CategoriesCreate } from '../pages/CategoriesCreate/CategoriesCreate';
 import { Gap } from '../components/Gap/Gap';
@@ -29,6 +29,8 @@ import { RoadmapsArchive } from '../pages/RoadmapsArchive/RoadmapsArchive';
 import { BusinessAnalytic } from '../pages/BusinessAnalytic/BusinessAnalytic';
 import { NavMenu2 } from '../components/NavMenu2/NavMenu2';
 import { DeviceContext } from '../context/DeviceContext';
+import { QuestionsRootCategories } from '../pages/QuestionsRootCategories/QuestionsRootCategories';
+import { QuestionsSubCategories } from '../pages/QuestionsSubCategories/QuestionsSubCategories';
 
 interface AppRoutesProps {
   user: User | null;
@@ -121,6 +123,22 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
               }
             />
             <Route
+              path={pathnames.questionsRootCategories}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <QuestionsRootCategories />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.questionsSubCategories}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <QuestionsSubCategories />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path={pathnames.questions}
               element={
                 <ProtectedRoute allowed={authenticated}>
@@ -164,7 +182,7 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
               path={pathnames.categories}
               element={
                 <ProtectedRoute allowed={authenticated}>
-                  <Categories />
+                  <CategoriesAdmin />
                 </ProtectedRoute>
               }
             />
