@@ -50,7 +50,6 @@ import { RoomCodeEditor } from '../RoomCodeEditor/RoomCodeEditor';
 import { CodeEditorLang } from '../../../../types/question';
 import { AnyObject } from '../../../../types/anyObject';
 import { Theme, ThemeContext } from '../../../../context/ThemeContext';
-import { RoomTimerAi } from '../RoomTimerAi/RoomTimerAi';
 import { CodeEditor } from '../../../../components/CodeEditor/CodeEditor';
 import { Wave } from '../Wave/Wave';
 import { useThemeClassName } from '../../../../hooks/useThemeClassName';
@@ -59,8 +58,6 @@ import { DeviceContext } from '../../../../context/DeviceContext';
 
 const notFoundCode = 404;
 const aiAssistantGoodRate = 6;
-const questionAnswerTimer = 5 * 60;
-const questionWithCodeAnswerTimer = 30 * 60;
 
 const aiExpertId = 'aiExpertId';
 
@@ -299,9 +296,6 @@ export const RoomQuestionPanelAi: FunctionComponent<
   );
   const [copilotAnswerOpen, setCopilotAnswerOpen] = useState(false);
   const startedByVoiceRef = useRef(false);
-  const [questionTimerStartDate, setQuestionTimerStartDate] = useState<
-    string | null
-  >(null);
   const [textAnswerOpen, setTextAnswerOpen] = useState(false);
   const [textAnswer, setTextAnswer] = useState('');
 
@@ -480,7 +474,6 @@ export const RoomQuestionPanelAi: FunctionComponent<
     if (!initialQuestion?.id) {
       return;
     }
-    setQuestionTimerStartDate(new Date().toISOString());
     resetVoiceRecognitionAccum();
   }, [initialQuestion?.id, resetVoiceRecognitionAccum]);
 
@@ -754,21 +747,6 @@ export const RoomQuestionPanelAi: FunctionComponent<
           className={`relative bg-wrap flex-1 rounded-[2.5rem] flex flex-col ${device === 'Mobile' && copilotAnswerOpen ? 'overflow-x-auto h-[calc(100svh-58px)]' : ''}`}
           style={{ width: device === 'Desktop' ? '840px' : '100%' }}
         >
-          {/* {!copilotAnswerOpen && questionTimerStartDate && (
-            <div
-              className="absolute z-10"
-              style={{ top: '1rem', right: '1.875rem' }}
-            >
-              <RoomTimerAi
-                startTime={questionTimerStartDate}
-                durationSec={
-                  questionWithCode
-                    ? questionWithCodeAnswerTimer
-                    : questionAnswerTimer
-                }
-              />
-            </div>
-          )} */}
           {totalErrorRoomQuestionEvaluation && (
             <Typography size="m" error>
               {totalErrorRoomQuestionEvaluation}
@@ -827,9 +805,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                   <div className="text-left">
                     <Gap sizeRem={device === 'Desktop' ? 3.625 : 1.5} />
                     <div className="flex">
-                      {device === 'Desktop' && (
-                        <Gap sizeRem={7.5} horizontal />
-                      )}
+                      {device === 'Desktop' && <Gap sizeRem={7.5} horizontal />}
                       <div className="flex flex-col w-full">
                         {initialQuestion && (
                           <div className="flex">
@@ -937,11 +913,11 @@ export const RoomQuestionPanelAi: FunctionComponent<
                 )}
                 {copilotAnswerOpen && (
                   <>
-                    {device === 'Mobile' && (
-                      <Gap sizeRem={1} />
-                    )}
+                    {device === 'Mobile' && <Gap sizeRem={1} />}
                     <Button
-                      variant={device === 'Desktop' ? "invertedActive" : 'active'}
+                      variant={
+                        device === 'Desktop' ? 'invertedActive' : 'active'
+                      }
                       className={`${device === 'Desktop' ? ' absolute' : 'w-full'} min-w-[0rem] w-[2.5rem] h-[2.5rem] !p-[0rem] z-1`}
                       style={{
                         right: '-1.25rem',
@@ -958,11 +934,15 @@ export const RoomQuestionPanelAi: FunctionComponent<
                         <Loader />
                       ) : (
                         <>
-                        {device === 'Mobile' && (
+                          {device === 'Mobile' && (
                             <>
                               <Gap sizeRem={0.25} horizontal />
-                              <Typography size='m'>
-                                {localizationCaptions[LocalizationKey.NextRoomQuestion]}
+                              <Typography size="m">
+                                {
+                                  localizationCaptions[
+                                    LocalizationKey.NextRoomQuestion
+                                  ]
+                                }
                               </Typography>
                             </>
                           )}

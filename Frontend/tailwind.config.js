@@ -48,6 +48,7 @@ module.exports = {
         'room-tools-panel-bg': '#0b152940',
         'text-light': '#1f1f1f',
         'millestone-item-light': '#EBEDF2',
+        'nav-menu-border-light': '#E5E8EB',
       },
       boxShadow: {
         'dark-bold': '0 4px 12px rgba(16, 9, 8, 1.0)',

@@ -1,5 +1,4 @@
 import React, { FunctionComponent, useContext, useEffect } from 'react';
-import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { useApiMethod } from '../../hooks/useApiMethod';
 import { Room, RoomAccessType } from '../../types/room';
@@ -58,6 +57,7 @@ export const Roadmap: FunctionComponent = () => {
     roadmap?.items.map((item) => item.questionTreeId).filter(Boolean) || [];
   const roadmapProgress = getRoadmapProgress(progressTreeIds);
   const svgRoadmap =
+    device === 'Desktop' &&
     getRoadmapFingerprint(roadmap?.items || []) === svgRoadmapFingerprint;
 
   const handleCreateRoom = (treeId: string, treeName: string) => {
@@ -96,11 +96,10 @@ export const Roadmap: FunctionComponent = () => {
 
   return (
     <>
-      <PageHeader title="" />
-
+      <Gap sizeRem={2.25} />
       <div className={`flex ${device === 'Mobile' ? 'flex-col' : ''}`}>
         <div className="flex-1">
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col">
             {totalLoading && <Loader />}
 
             {totalError && (
@@ -119,7 +118,7 @@ export const Roadmap: FunctionComponent = () => {
                 </Typography>
                 {device === 'Mobile' && (
                   <>
-                  <Gap sizeRem={1} />
+                    <Gap sizeRem={1} />
                     <div className="w-full">
                       <RoadmapProgress {...roadmapProgress} />
                     </div>

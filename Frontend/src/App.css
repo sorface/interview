@@ -1,7 +1,7 @@
 .App-container {
   text-align: center;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   margin-right: auto;
   margin-left: auto;
@@ -13,7 +13,7 @@
   flex-direction: column;
   height: 100vh;
   overflow: auto;
-  padding: 0rem 1rem;
+  padding: 0rem 2.5rem;
 }
 
 .App.full-screen-page {

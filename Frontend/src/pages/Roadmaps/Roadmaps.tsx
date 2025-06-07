@@ -11,7 +11,6 @@ import {
   PaginationUrlParams,
   roadmapTreeApiDeclaration,
 } from '../../apiDeclarations';
-import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../localization';
 import { Typography } from '../../components/Typography/Typography';
@@ -123,17 +122,15 @@ export const Roadmaps: FunctionComponent = () => {
 
   return (
     <>
-      <PageHeader title="" overlapping>
-        {admin && (
-          <Link to={pathnames.roadmapCreate}>
-            <Button variant="active" className="h-[2.5rem]" aria-hidden>
-              <Icon name={IconNames.Add} />
-              {localizationCaptions[LocalizationKey.Create]}
-            </Button>
-          </Link>
-        )}
-      </PageHeader>
       <Gap sizeRem={2.25} />
+      {admin && (
+        <Link to={pathnames.roadmapCreate}>
+          <Button variant="active" className="h-[2.5rem]" aria-hidden>
+            <Icon name={IconNames.Add} />
+            {localizationCaptions[LocalizationKey.Create]}
+          </Button>
+        </Link>
+      )}
       <div className="text-left flex flex-col">
         <Typography size="xxxl" semibold>
           {localizationCaptions[LocalizationKey.RoadmapsPageName]}
