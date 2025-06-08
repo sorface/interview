@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useContext, useState } from 'react';
 import { IconNames } from '../../constants';
 import { Typography } from '../Typography/Typography';
 import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
@@ -8,9 +8,11 @@ import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { VITE_FEEDBACK_IFRAME_URL } from '../../config';
 import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme } from '../../context/ThemeContext';
+import { DeviceContext } from '../../context/DeviceContext';
 
 export const Feedback: FunctionComponent = () => {
   const localizationCaptions = useLocalizationCaptions();
+  const device = useContext(DeviceContext);
   const [open, setOpen] = useState(false);
 
   const themedClassName = useThemeClassName({
@@ -50,7 +52,9 @@ export const Feedback: FunctionComponent = () => {
       {open && (
         <>
           <Gap sizeRem={0.25} />
-          <div className="flex w-[25rem] h-[32.25rem]">
+          <div
+            className={`flex ${device === 'Desktop' ? 'w-[25rem]' : 'w-[80vw]'} h-[32.25rem]`}
+          >
             <iframe
               title={localizationCaptions[LocalizationKey.Feedback]}
               className="flex-1 border-none"
