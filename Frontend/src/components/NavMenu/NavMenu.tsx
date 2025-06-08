@@ -149,7 +149,10 @@ export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
             <Icon name={item.icon} />
           )}
           <Gap sizeRem={0.5} horizontal />
-          <Typography size={firstItem ? 'xl' : 'm'} bold={firstItem || active}>
+          <Typography
+            size={firstItem ? 'xl' : 'm'}
+            semibold={firstItem || active}
+          >
             {item.caption}
           </Typography>
         </NavLink>
