@@ -137,7 +137,7 @@ export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
         <NavLink
           key={item.path}
           to={item.path}
-          className={`flex items-center no-underline ${firstItem ? 'pr-[2rem]' : 'pr-[2.25rem]'}`}
+          className={`flex items-center no-underline ${firstItem ? 'pr-[2rem]' : 'pr-[2.25rem]'} ${active ? 'underline' : ''}`}
         >
           {item.logo ? (
             <img
@@ -149,7 +149,7 @@ export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
             <Icon name={item.icon} />
           )}
           <Gap sizeRem={0.5} horizontal />
-          <Typography size="m" bold={firstItem || active}>
+          <Typography size={firstItem ? 'xl' : 'm'} bold={firstItem || active}>
             {item.caption}
           </Typography>
         </NavLink>
@@ -159,7 +159,7 @@ export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
 
   return (
     <nav
-      className={`flex w-full text-nowrap border-b-[1px] ${device === 'Desktop' ? 'px-[2.5rem]' : 'px-[1rem]'} py-[0.75rem] ${navmenuThemeClassName}`}
+      className={`flex w-full text-nowrap border-b-[1px] ${device === 'Desktop' ? 'px-[2.5rem]' : 'px-[1rem]'} py-[0.625rem] ${navmenuThemeClassName}`}
     >
       <div className="flex items-center overflow-y-auto py-[0.5rem]">
         {items.map((item, index) =>

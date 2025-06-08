@@ -54,7 +54,7 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
         className={`App ${fullScreenPage ? 'full-screen-page' : ''} ${device === 'Desktop' ? 'px-[2.5rem]' : 'px-[1.25rem]'}`}
       >
         <div
-          className={`App-content ${device === 'Desktop' && !fullScreenPage ? 'px-[11.5rem]' : ''}`}
+          className={`App-content ${device === 'Desktop' && !fullScreenPage ? 'px-[13.625rem]' : ''}`}
         >
           <Routes>
             <Route path={pathnames.home} element={<Home />} />

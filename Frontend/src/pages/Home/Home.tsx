@@ -33,7 +33,7 @@ export const Home: FunctionComponent = () => {
     AiAssistantScriptName.Idle,
   );
   const [aiAssistantClicked, setAiAssistantClicked] = useState(false);
-  const pageMargin = device === 'Desktop' ? 'mx-[-14rem]' : 'mx-[-1.25rem]';
+  const pageMargin = device === 'Desktop' ? 'mx-[-16.125rem]' : 'mx-[-1.25rem]';
 
   const handleAiAssistantClick = () => {
     setAiAssistantScript(AiAssistantScriptName.Idle);
@@ -60,7 +60,7 @@ export const Home: FunctionComponent = () => {
   return (
     <>
       <div
-        className={`fixed top-0 pt-[1rem] ${device === 'Desktop' ? 'pr-[15rem]' : 'pr-[2rem]'} w-full flex justify-end`}
+        className={`fixed top-0 pt-[1rem] ${device === 'Desktop' ? 'pr-[17rem]' : 'pr-[2rem]'} w-full flex justify-end`}
       >
         <ThemeSwitchMini variant="button" />
         <Gap sizeRem={0.25} horizontal />
