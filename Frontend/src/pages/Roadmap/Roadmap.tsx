@@ -18,6 +18,8 @@ import { getRoadmapProgress } from './utils/getRoadmapProgress';
 import { findMilestoneTrees } from './utils/findMilestoneTrees';
 import { SvgRoadmap } from './components/SvgRoadmap';
 import { DeviceContext } from '../../context/DeviceContext';
+import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
+import { LocalizationKey } from '../../localization';
 
 const roomDuration = 3600;
 const svgRoadmapFingerprint = 'MQQMQQQQQQQQQMQQQQMQQ';
@@ -33,6 +35,7 @@ const getRoadmapFingerprint = (items: RoadmapItem[]) => {
 export const Roadmap: FunctionComponent = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const localizationCaptions = useLocalizationCaptions();
   const device = useContext(DeviceContext);
 
   const { apiMethodState, fetchData } = useApiMethod<Room, CreateRoomBody>(
@@ -115,6 +118,11 @@ export const Roadmap: FunctionComponent = () => {
               <div className="w-full max-w-[60rem] flex flex-col items-start">
                 <Typography size="xxxl" bold>
                   {roadmap?.name}
+                </Typography>
+                <Gap sizeRem={0.75} />
+                <Typography size="s" secondary>
+                  {roadmap?.description ||
+                    `${localizationCaptions[LocalizationKey.Learn]} ${roadmap?.name}.`}
                 </Typography>
                 {device === 'Mobile' && (
                   <>
