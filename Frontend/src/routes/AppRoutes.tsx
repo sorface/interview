@@ -27,7 +27,7 @@ import { Roadmaps } from '../pages/Roadmaps/Roadmaps';
 import { RoadmapCreate } from '../pages/RoadmapCreate/RoadmapCreate';
 import { RoadmapsArchive } from '../pages/RoadmapsArchive/RoadmapsArchive';
 import { BusinessAnalytic } from '../pages/BusinessAnalytic/BusinessAnalytic';
-import { NavMenu2 } from '../components/NavMenu2/NavMenu2';
+import { NavMenu } from '../components/NavMenu/NavMenu';
 import { DeviceContext } from '../context/DeviceContext';
 import { QuestionsRootCategories } from '../pages/QuestionsRootCategories/QuestionsRootCategories';
 import { QuestionsSubCategories } from '../pages/QuestionsSubCategories/QuestionsSubCategories';
@@ -49,7 +49,7 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
 
   return (
     <>
-      {hasNavMenu && <NavMenu2 admin={admin} />}
+      {hasNavMenu && <NavMenu admin={admin} />}
       <div
         className={`App ${fullScreenPage ? 'full-screen-page' : ''} ${device === 'Desktop' ? 'px-[2.5rem]' : 'px-[1.25rem]'}`}
       >
