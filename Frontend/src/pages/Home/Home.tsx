@@ -59,7 +59,7 @@ export const Home: FunctionComponent = () => {
 
   return (
     <>
-      <div className="fixed top-0 pt-[1rem] pr-[15rem] w-full flex justify-end">
+      <div className={`fixed top-0 pt-[1rem] ${device === 'Desktop' ? 'pr-[15rem]' : 'pr-[2rem]'} w-full flex justify-end`}>
         <ThemeSwitchMini variant="button" />
         <Gap sizeRem={0.25} horizontal />
         <LangSwitch elementType="button" />
