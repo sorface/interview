@@ -22,15 +22,18 @@ import {
 import { Canvas } from '@react-three/fiber';
 import { ThemeSwitchMini } from '../../components/ThemeSwitchMini/ThemeSwitchMini';
 import { HomeInfoBlock } from './components/HomeInfoBlock';
+import { DeviceContext } from '../../context/DeviceContext';
 
 export const Home: FunctionComponent = () => {
   const auth = useContext(AuthContext);
+  const device = useContext(DeviceContext);
   const { redirect } = useParams();
   const localizationCaptions = useLocalizationCaptions();
   const [aiAssistantScript, setAiAssistantScript] = useState(
     AiAssistantScriptName.Idle,
   );
   const [aiAssistantClicked, setAiAssistantClicked] = useState(false);
+  const pageMargin = device === 'Desktop' ? 'mx-[-16.125rem]' : 'mx-[-1.25rem]';
 
   const handleAiAssistantClick = () => {
     setAiAssistantScript(AiAssistantScriptName.Idle);
@@ -56,12 +59,14 @@ export const Home: FunctionComponent = () => {
 
   return (
     <>
-      <div className="fixed top-0 pt-[1rem] pr-[2rem] w-full flex justify-end">
+      <div
+        className={`fixed top-0 pt-[1rem] ${device === 'Desktop' ? 'pr-[17rem]' : 'pr-[2rem]'} w-full flex justify-end`}
+      >
         <ThemeSwitchMini variant="button" />
         <Gap sizeRem={0.25} horizontal />
         <LangSwitch elementType="button" />
       </div>
-      <div className="pt-24 ml-[-1rem] mr-[-1rem]">
+      <div className={`pt-24 ${pageMargin}`}>
         <div className="container px-3 mx-auto flex flex-wrap flex-col md:flex-row items-center">
           <div className="flex flex-col w-full md:w-2/5 justify-center items-start text-center md:text-left z-50">
             <h1 className="my-4 text-5xl font-bold leading-tight">
@@ -72,7 +77,7 @@ export const Home: FunctionComponent = () => {
             </p>
             <HomeAction />
             <Gap sizeRem={0.5} />
-            <div className="whitespace-break-spaces">
+            <div className="whitespace-break-spaces text-left">
               <Typography size="s" secondary>
                 {localizationCaptions[LocalizationKey.TermsOfUsageAcceptance]}
                 <Link to={pathnames.terms}>
@@ -83,12 +88,14 @@ export const Home: FunctionComponent = () => {
           </div>
           <div className="w-full md:w-3/5 py-6 text-center">
             <div className="w-full flex items-center justify-center md:w-4/5 z-50">
-              <div
-                style={{
-                  width: '291px',
-                  height: '291px',
-                }}
-              />
+              {device === 'Desktop' && (
+                <div
+                  style={{
+                    width: '291px',
+                    height: '291px',
+                  }}
+                />
+              )}
               <div
                 className="relative cursor-pointer"
                 style={{ width: '256px', height: '256px' }}
@@ -108,7 +115,7 @@ export const Home: FunctionComponent = () => {
         </div>
       </div>
       <Gap sizeRem={4.75} />
-      <div className="relative -mt-12 lg:-mt-24 ml-[-1rem] mr-[-1rem]">
+      <div className={`relative -mt-12 lg:-mt-24 ${pageMargin}`}>
         <svg
           viewBox="0 0 1428 174"
           version="1.1"
@@ -145,9 +152,11 @@ export const Home: FunctionComponent = () => {
           </g>
         </svg>
       </div>
-      <section className="bg-white border-b py-8 ml-[-1rem] mr-[-1rem]">
+      <section className={`bg-white border-b py-8 ${pageMargin}`}>
         <div className="container max-w-5xl mx-auto m-8">
-          <h2 className="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">
+          <h2
+            className={`w-full my-2 ${device === 'Desktop' ? 'text-5xl' : 'text-4xl'} font-bold leading-tight text-center text-gray-800`}
+          >
             {localizationCaptions[LocalizationKey.HomeInfoTitle]}
           </h2>
           <div className="w-full mb-4">
@@ -170,7 +179,7 @@ export const Home: FunctionComponent = () => {
           />
         </div>
       </section>
-      <section className="bg-gray-100 py-8 ml-[-1rem] mr-[-1rem]">
+      <section className={`bg-gray-100 py-8 ${pageMargin}`}>
         <div className="container mx-auto px-2 pt-4 pb-12 text-gray-800">
           <h2 className="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">
             {localizationCaptions[LocalizationKey.HomeInfoPricingTitle]}
@@ -179,7 +188,9 @@ export const Home: FunctionComponent = () => {
             <div className="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
           </div>
           <div className="flex flex-col sm:flex-row justify-center pt-12 my-12 sm:my-4">
-            <div className="flex flex-col w-[25.625rem] lg:w-1/3 mx-auto lg:mx-0 rounded-lg bg-white mt-4 sm:-mt-6 shadow-lg">
+            <div
+              className={`flex flex-col ${device === 'Desktop' ? 'w-[25.625rem]' : ''} lg:w-1/3 mx-auto lg:mx-0 rounded-lg bg-white mt-4 sm:-mt-6 shadow-lg`}
+            >
               <div className="flex-1 bg-white rounded-t rounded-b-none overflow-hidden shadow">
                 <div className="w-full p-8 text-3xl font-bold text-center">
                   {localizationCaptions[LocalizationKey.HomeInfoPricingFree]}

@@ -1,4 +1,5 @@
-import React, { FunctionComponent, ReactNode } from 'react';
+import React, { FunctionComponent, ReactNode, useContext } from 'react';
+import { DeviceContext } from '../../../../context/DeviceContext';
 
 interface ReviewUserGridProps {
   children: ReactNode;
@@ -7,5 +8,12 @@ interface ReviewUserGridProps {
 export const ReviewUserGrid: FunctionComponent<ReviewUserGridProps> = ({
   children,
 }) => {
-  return <div className="grid grid-cols-3 gap-[3rem]">{children}</div>;
+  const device = useContext(DeviceContext);
+  return (
+    <div
+      className={`grid ${device === 'Desktop' ? 'grid-cols-3' : 'grid-cols-1'} gap-[3rem]`}
+    >
+      {children}
+    </div>
+  );
 };

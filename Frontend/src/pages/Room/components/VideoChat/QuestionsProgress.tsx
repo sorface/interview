@@ -1,9 +1,10 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useContext } from 'react';
 import { Typography } from '../../../../components/Typography/Typography';
 import { useLocalizationCaptions } from '../../../../hooks/useLocalizationCaptions';
 import { LocalizationKey } from '../../../../localization';
 import { useThemeClassName } from '../../../../hooks/useThemeClassName';
 import { Theme } from '../../../../context/ThemeContext';
+import { DeviceContext } from '../../../../context/DeviceContext';
 
 interface QuestionsProgressProps {
   value: number;
@@ -12,6 +13,7 @@ interface QuestionsProgressProps {
 export const QuestionsProgress: FunctionComponent<QuestionsProgressProps> = ({
   value,
 }) => {
+  const device = useContext(DeviceContext);
   const localizationCaptions = useLocalizationCaptions();
   const progressThemedClassName = useThemeClassName({
     [Theme.Dark]: 'bg-dark-grey4',
@@ -21,7 +23,10 @@ export const QuestionsProgress: FunctionComponent<QuestionsProgressProps> = ({
   return (
     <div
       className="relative bg-wrap"
-      style={{ width: '18.9375rem', clipPath: 'inset(0% 0% 0% 0% round 2rem)' }}
+      style={{
+        width: device === 'Desktop' ? '18.9375rem' : '9.46875rem',
+        clipPath: 'inset(0% 0% 0% 0% round 2rem)',
+      }}
     >
       <div
         className={`absolute h-full move-transition ${progressThemedClassName}`}

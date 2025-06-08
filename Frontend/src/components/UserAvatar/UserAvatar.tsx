@@ -1,8 +1,9 @@
 import React, { FunctionComponent } from 'react';
+import { Typography } from '../Typography/Typography';
 
 import './UserAvatar.css';
 
-interface UserAvatarProps {
+export interface UserAvatarProps {
   src?: string;
   nickname: string;
   altarnativeBackgound?: boolean;
@@ -41,7 +42,7 @@ export const UserAvatar: FunctionComponent<UserAvatarProps> = ({
         className={`${altarnativeBackgound ? 'bg-wrap' : 'bg-form'} flex items-center justify-center user-avatar shrink-0 ${getSizeClassName(size)}`}
         {...restProps}
       >
-        {nickname[0].toLocaleUpperCase()}
+        <Typography size="m">{nickname[0].toLocaleUpperCase()}</Typography>
       </div>
     );
   }

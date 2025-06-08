@@ -13,6 +13,7 @@ import { LoadingAccountError } from './components/LoadingAccountError/LoadingAcc
 import { Icon } from './pages/Room/components/Icon/Icon';
 import { Feedback } from './components/Feedback/Feedback';
 import { VITE_FEEDBACK_IFRAME_URL } from './config';
+import { DeviceProvider } from './context/DeviceContext';
 
 import './App.css';
 
@@ -73,16 +74,18 @@ export const App: FunctionComponent = () => {
           },
         }}
       />
-      <ThemeProvider>
-        <LocalizationProvider>
-          <AuthContext.Provider value={user}>
-            <div className="App-container">
-              {renderMainContent()}
-              {!!VITE_FEEDBACK_IFRAME_URL && <Feedback />}
-            </div>
-          </AuthContext.Provider>
-        </LocalizationProvider>
-      </ThemeProvider>
+      <DeviceProvider>
+        <ThemeProvider>
+          <LocalizationProvider>
+            <AuthContext.Provider value={user}>
+              <div className="App-container">
+                {renderMainContent()}
+                {!!VITE_FEEDBACK_IFRAME_URL && <Feedback />}
+              </div>
+            </AuthContext.Provider>
+          </LocalizationProvider>
+        </ThemeProvider>
+      </DeviceProvider>
     </BrowserRouter>
   );
 };

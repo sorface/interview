@@ -1,116 +1,54 @@
 import React, {
   Fragment,
   FunctionComponent,
-  ReactElement,
   ReactNode,
-  useEffect,
-  useState,
+  useContext,
 } from 'react';
-import { NavLink, useNavigate, matchPath, useLocation } from 'react-router-dom';
-import { ThemeSwitchMini } from '../ThemeSwitchMini/ThemeSwitchMini';
+import { matchPath, NavLink } from 'react-router-dom';
 import { IconNames, pathnames } from '../../constants';
-import { Icon } from '../../pages/Room/components/Icon/Icon';
-import { useLocalizationCaptions } from '../../hooks/useLocalizationCaptions';
-import { LocalizationKey } from '../../localization';
+import { VITE_APP_NAME } from '../../config';
 import { LocalizationCaption } from '../LocalizationCaption/LocalizationCaption';
-import { CategoriesList } from '../CategoriesList/CategoriesList';
-import { Category } from '../../types/category';
+import { LocalizationKey } from '../../localization';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
+import { ThemeSwitchMini } from '../ThemeSwitchMini/ThemeSwitchMini';
 import { Typography } from '../Typography/Typography';
-import { VITE_APP_NAME, VITE_BUILD_HASH } from '../../config';
-import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { Gap } from '../Gap/Gap';
+import { PageHeaderUserAvatar } from '../PageHeaderUserAvatar/PageHeaderUserAvatar';
+import { useThemeClassName } from '../../hooks/useThemeClassName';
+import { Theme } from '../../context/ThemeContext';
+import { DeviceContext } from '../../context/DeviceContext';
 
-import './NavMenu.css';
+interface NavMenu2Props {
+  admin: boolean;
+}
 
 interface MenuItem {
   path: string;
   logo?: string;
   caption: ReactNode;
   icon: IconNames;
-  forceActive?: boolean;
-  subitem?: ReactElement | null;
-  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 }
 
-export interface NavMenuProps {
-  admin: boolean;
-}
-
-export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const localizationCaptions = useLocalizationCaptions();
-  const [collapsed, setCollapsed] = useState(true);
-  const [questionsClicked, setQuestionsClicked] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null,
-  );
-  const questionsPath = matchPath(
-    { path: pathnames.questions, end: false },
-    location.pathname,
-  );
-  const bigScreen = useMediaQuery('(min-width: 2048px)');
-
-  useEffect(() => {
-    if (!bigScreen) {
-      return;
-    }
-    setCollapsed(false);
-  }, [bigScreen]);
-
-  const handleQuestionsClick: React.MouseEventHandler<HTMLAnchorElement> = (
-    event,
-  ) => {
-    event.preventDefault();
-    setQuestionsClicked(!questionsClicked);
-    setSelectedCategory(null);
-  };
-
-  const handleItemClick = () => {
-    setSelectedCategory(null);
-    setQuestionsClicked(false);
-  };
-
-  const handleMouseEnter = () => {
-    setCollapsed(false);
-  };
-
-  const handleMouseLeave = () => {
-    setSelectedCategory(null);
-    setQuestionsClicked(false);
-    if (bigScreen) {
-      return;
-    }
-    setCollapsed(true);
-  };
-
-  const handleCategoryClick = (category: Category) => {
-    if (category === selectedCategory) {
-      setSelectedCategory(null);
-      return;
-    }
-    setSelectedCategory(category);
-  };
-
-  const handleSubCategoryClick = (category: Category) => {
-    const navigationUrl = pathnames.questions
-      .replace(':rootCategory', selectedCategory?.id || '')
-      .replace(':subCategory', category.id);
-    navigate(navigationUrl);
-    if (bigScreen) {
-      setSelectedCategory(null);
-      return;
-    }
-    handleMouseLeave();
-  };
+export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
+  const device = useContext(DeviceContext);
+  const navmenuThemeClassName = useThemeClassName({
+    [Theme.Dark]: 'border-dark-dark2',
+    [Theme.Light]: 'border-nav-menu-border-light',
+  });
 
   const items: Array<MenuItem | null> = [
+    {
+      path: pathnames.roadmaps,
+      logo: '/logo192.png',
+      caption: VITE_APP_NAME,
+      icon: IconNames.Golf,
+    },
     {
       path: pathnames.roadmaps,
       caption: (
         <LocalizationCaption captionKey={LocalizationKey.RoadmapsPageName} />
       ),
       icon: IconNames.Golf,
-      onClick: handleItemClick,
     },
     admin
       ? {
@@ -121,47 +59,30 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
             />
           ),
           icon: IconNames.Golf,
-          onClick: handleItemClick,
         }
       : null,
-    {
-      path: pathnames.questions,
-      caption: (
-        <LocalizationCaption captionKey={LocalizationKey.QuestionsPageName} />
-      ),
-      icon: IconNames.Chat,
-      forceActive: questionsClicked || !!questionsPath,
-      onClick: handleQuestionsClick,
-      subitem: questionsClicked ? (
-        <CategoriesList
-          showOnlyWithoutParent={true}
-          activeId={selectedCategory?.id}
-          onCategoryClick={handleCategoryClick}
-        />
-      ) : null,
-    },
-    {
-      path: pathnames.highlightRooms,
-      caption: (
-        <LocalizationCaption
-          captionKey={LocalizationKey.HighlightsRoomsPageName}
-        />
-      ),
-      icon: IconNames.Cube,
-      onClick: handleItemClick,
-    },
-    // {
-    //   path: pathnames.currentRooms,
-    //   caption: <LocalizationCaption captionKey={LocalizationKey.CurrentRoomsPageName} />,
-    //   icon: IconNames.Cube,
-    //   onClick: handleItemClick,
-    // },
-    // {
-    //   path: pathnames.closedRooms,
-    //   caption: <LocalizationCaption captionKey={LocalizationKey.ClosedRoomsPageName} />,
-    //   icon: IconNames.Golf,
-    //   onClick: handleItemClick,
-    // },
+    admin
+      ? {
+          path: pathnames.questionsRootCategories,
+          caption: (
+            <LocalizationCaption
+              captionKey={LocalizationKey.QuestionsPageName}
+            />
+          ),
+          icon: IconNames.Chat,
+        }
+      : null,
+    admin
+      ? {
+          path: pathnames.highlightRooms,
+          caption: (
+            <LocalizationCaption
+              captionKey={LocalizationKey.HighlightsRoomsPageName}
+            />
+          ),
+          icon: IconNames.Cube,
+        }
+      : null,
     admin
       ? {
           path: pathnames.categories,
@@ -171,7 +92,6 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
             />
           ),
           icon: IconNames.Clipboard,
-          onClick: handleItemClick,
         }
       : null,
     admin
@@ -183,7 +103,6 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
             />
           ),
           icon: IconNames.Clipboard,
-          onClick: handleItemClick,
         }
       : null,
     admin
@@ -195,7 +114,6 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
             />
           ),
           icon: IconNames.Expand,
-          onClick: handleItemClick,
         }
       : null,
     admin
@@ -207,96 +125,55 @@ export const NavMenu: FunctionComponent<NavMenuProps> = ({ admin }) => {
             />
           ),
           icon: IconNames.Cube,
-          onClick: handleItemClick,
         }
       : null,
   ];
 
-  const createMenuItem = (item: MenuItem) => {
-    const noActiveClassName =
-      !item.forceActive && (item.logo || questionsClicked);
+  const createMenuItem = (item: MenuItem, index: number) => {
+    const firstItem = index === 0;
+    const active = !!matchPath(window.location.pathname, item.path);
     return (
-      <Fragment key={item.path}>
+      <Fragment key={`${item.path}${item.logo}`}>
         <NavLink
           key={item.path}
           to={item.path}
-          className={`nav-menu-item ${noActiveClassName ? 'no-active' : ''} ${item.forceActive ? 'active' : ''} move-transition`}
-          onClick={item.onClick}
+          className={`flex items-center no-underline ${firstItem ? 'pr-[2rem]' : 'pr-[2.25rem]'} ${active ? 'underline' : ''}`}
         >
           {item.logo ? (
-            <img className="site-logo" src={item.logo} alt="site logo" />
+            <img
+              className="w-[1.25rem] h-[1.25rem] rounded-[0.25rem]"
+              src={item.logo}
+              alt="site logo"
+            />
           ) : (
             <Icon name={item.icon} />
           )}
-          <div
-            className="nav-menu-item-caption move-transition"
-            style={{ width: collapsed ? '0rem' : 'var(--caption-width)' }}
+          <Gap sizeRem={0.5} horizontal />
+          <Typography
+            size={firstItem ? 'xl' : 'm'}
+            semibold={firstItem || active}
           >
             {item.caption}
-          </div>
+          </Typography>
         </NavLink>
-        {!!item.subitem && item.subitem}
       </Fragment>
     );
   };
 
   return (
-    <>
-      {!!selectedCategory && <div className="nav-menu-page-overlay"></div>}
-      <div
-        className="nav-menu-container relative"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        <nav
-          className={`nav-menu ${collapsed ? 'collapsed' : ''} move-transition`}
-        >
-          <NavLink
-            to={pathnames.roadmaps}
-            className="nav-menu-item nav-menu-item-first no-active move-transition"
-          >
-            <img className="site-logo" src="/logo192.png" alt="site logo" />
-            <h1
-              className="nav-menu-item-caption move-transition"
-              style={{ width: collapsed ? '0rem' : 'var(--caption-width)' }}
-            >
-              {VITE_APP_NAME}
-            </h1>
-          </NavLink>
-          <div className="flex flex-col overflow-x-hidden overflow-y-auto">
-            {items.map((item) => (item ? createMenuItem(item) : undefined))}
-          </div>
-          <hr />
-          <div className="nav-menu-item move-transition nav-menu-theme-switch">
-            <ThemeSwitchMini />
-            <div
-              className="nav-menu-item-caption move-transition"
-              style={{ width: collapsed ? '0rem' : 'var(--caption-width)' }}
-            >
-              {localizationCaptions[LocalizationKey.ThemeDark]}
-              <Icon name={IconNames.ThemeSwitchDark} />
-            </div>
-          </div>
-          <div className="nav-menu-build h-[1.125rem] opacity-50">
-            <Typography size="s">
-              {localizationCaptions[LocalizationKey.BuildHash]}:{' '}
-              {VITE_BUILD_HASH}
-            </Typography>
-          </div>
-        </nav>
-        {!!selectedCategory && (
-          <>
-            <div className="nav-menu-overlay-gap"></div>
-            <div className="nav-menu-overlay flex flex-col">
-              <h4>{selectedCategory.name}</h4>
-              <CategoriesList
-                parentId={selectedCategory.id}
-                onCategoryClick={handleSubCategoryClick}
-              />
-            </div>
-          </>
+    <nav
+      className={`flex w-full text-nowrap border-b-[1px] ${device === 'Desktop' ? 'px-[2.5rem]' : 'px-[1rem]'} py-[0.625rem] ${navmenuThemeClassName}`}
+    >
+      <div className="flex items-center overflow-y-auto py-[0.5rem]">
+        {items.map((item, index) =>
+          item ? createMenuItem(item, index) : undefined,
         )}
       </div>
-    </>
+      <div className="ml-auto flex items-center">
+        <ThemeSwitchMini variant="icon" />
+        <Gap sizeRem={1} horizontal />
+        <PageHeaderUserAvatar size="m" />
+      </div>
+    </nav>
   );
 };

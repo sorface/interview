@@ -1,5 +1,5 @@
 .modal {
-  width: 52.5rem;
+  max-width: 52.5rem;
   max-height: calc(100vh - 2.5rem);
   margin-top: 2.5rem;
   margin-left: auto;

@@ -76,6 +76,7 @@ import { mapInvitesForAiRoom } from '../../utils/mapInvitesForAiRoom';
 import { Typography } from '../../components/Typography/Typography';
 import { Icon } from './components/Icon/Icon';
 import { getDevAuthorization } from '../../utils/devAuthorization';
+import { DeviceContext } from '../../context/DeviceContext';
 
 import './Room.css';
 
@@ -91,6 +92,7 @@ const getCloseRedirectLink = (roomId: string, currentUserExpert: boolean) => {
 export const Room: FunctionComponent = () => {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
+  const device = useContext(DeviceContext);
   const { id } = useParams();
   const { [inviteParamName]: inviteParam } = useParams();
 
@@ -765,7 +767,9 @@ export const Room: FunctionComponent = () => {
                               }
                             </Typography>
                           </div>
-                          <Gap sizeRem={10.375} horizontal />
+                          {device === 'Desktop' && (
+                            <Gap sizeRem={10.375} horizontal />
+                          )}
                         </div>
                       )}
                     </div>
