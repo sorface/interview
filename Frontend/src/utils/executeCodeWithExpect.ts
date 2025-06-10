@@ -5,23 +5,21 @@ const expectCode = `
   return new Promise((res) => {
   const __expectCalls = [];
   const __consoleLogs = [];
+  let __expectConsoleCalled = false;
   let __expectedConsoleLogs = [];
 
   const originalConsoleLog = console.log;
 
   const finishConsoleLogSpy = () => {
     console.log = originalConsoleLog;
-    __expectedConsoleLogs.forEach((expectedLog, index) =>
-      __expectCalls.push([__consoleLogs[index], expectedLog])
+    __consoleLogs.forEach((log, index) =>
+      __expectCalls.push([log, __expectedConsoleLogs[index]])
     );
     res(__expectCalls);
   };
 
   console.log = (arg) => {
     __consoleLogs.push(arg);
-    if (__expectedConsoleLogs.length === __consoleLogs.length) {
-      finishConsoleLogSpy();
-    }
   };
 
   const expect = (fn, ...argsWithExpected) => {
@@ -42,15 +40,16 @@ const expectCode = `
   };
 
   const expectConsole = (expectedCalls) => {
+    __expectConsoleCalled = true;
     __expectedConsoleLogs = expectedCalls;
     setTimeout(() => {
       finishConsoleLogSpy();
-    }, 1000);
+    }, 333);
   };
 `;
 
 const expectCallsReturnCode = `
-  if (__expectedConsoleLogs.length === 0) {
+  if (!__expectConsoleCalled) {
     console.log = originalConsoleLog;
     res(__expectCalls);
   }
