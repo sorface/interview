@@ -9,9 +9,10 @@ public class QueuedRoomEventRepository(AppDbContext db) : EfRepository<QueuedRoo
 {
     public Task<IPagedList<Guid>> GetNotProcessedRoomsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
+        var closeStatuses = SERoomStatus.CloseStatuses;
         return Db.Rooms.AsNoTracking()
             .Include(e => e.QueuedRoomEvent)
-            .Where(e => (e.Status == SERoomStatus.Close || e.Status == SERoomStatus.Review) && e.QueuedRoomEvent == null)
+            .Where(e => (closeStatuses.Contains(e.Status) || e.Status == SERoomStatus.Review) && e.QueuedRoomEvent == null)
             .Select(e => e.Id)
             .ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
