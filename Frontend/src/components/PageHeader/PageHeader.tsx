@@ -1,11 +1,9 @@
-import React, { FunctionComponent, ReactNode, useContext } from 'react';
+import React, { FunctionComponent, ReactNode } from 'react';
 import { Typography } from '../Typography/Typography';
-import { PageHeaderUserAvatar } from '../PageHeaderUserAvatar/PageHeaderUserAvatar';
 import {
   PageHeaderSearch,
   PageHeaderSearchProps,
 } from '../PageHeaderSearch/PageHeaderSearch';
-import { AuthContext } from '../../context/AuthContext';
 import { PageHeaderNotifications } from '../PageHeaderNotifications/PageHeaderNotifications';
 
 interface PageHeaderProps {
@@ -27,8 +25,6 @@ export const PageHeader: FunctionComponent<PageHeaderProps> = ({
   searchValue,
   onSearchChange,
 }) => {
-  const auth = useContext(AuthContext);
-
   return (
     <div
       className={`flex items-center shrink-0 h-[4rem] my-[0.5rem] ${overlapping ? 'fixed right-[1rem]' : ''}`}
@@ -57,7 +53,6 @@ export const PageHeader: FunctionComponent<PageHeaderProps> = ({
             )}
           </>
         )}
-        {auth && <PageHeaderUserAvatar />}
       </div>
       <div className="flex">{children}</div>
     </div>

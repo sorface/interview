@@ -29,6 +29,7 @@ import { Button } from '../../../../components/Button/Button';
 import { ThemeSwitchMini } from '../../../../components/ThemeSwitchMini/ThemeSwitchMini';
 import { LangSwitch } from '../../../../components/LangSwitch/LangSwitch';
 import { QuestionsProgress } from './QuestionsProgress';
+import { DeviceContext } from '../../../../context/DeviceContext';
 
 const transcriptsMaxLength = 100;
 const viewerOrder = 666;
@@ -78,6 +79,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
   const auth = useContext(AuthContext);
   const localizationCaptions = useLocalizationCaptions();
   const { themeInUi } = useContext(ThemeContext);
+  const device = useContext(DeviceContext);
   const {
     roomState,
     lastWsMessageParsed,
@@ -178,7 +180,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
 
   return (
     <>
-      <div className="flex-1 flex justify-center z-10">
+      <div className="flex-1 flex justify-center z-10 w-full">
         <div className="w-full flex flex-col relative rounded-[1.125rem]">
           <RoomQuestionPanelAi
             questionWithCode={codeEditorEnabled}
@@ -193,7 +195,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                 bottom: '-53px',
               }}
             >
-              {themeInUi === Theme.Light && (
+              {device === 'Desktop' && themeInUi === Theme.Light && (
                 <div
                   style={{
                     position: 'absolute',
@@ -212,11 +214,11 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
           </RoomQuestionPanelAi>
           <Gap sizeRem={1.5} />
           <div className="flex h-[2.375rem]">
-            <Gap sizeRem={3.375} horizontal />
+            <Gap sizeRem={device === 'Desktop' ? 3.375 : 0.5} horizontal />
             <LangSwitch elementType="button" />
             <Gap sizeRem={0.5} horizontal />
             <ThemeSwitchMini variant="button" />
-            <Gap sizeRem={1.75} horizontal />
+            <Gap sizeRem={device === 'Desktop' ? 1.75 : 0.5} horizontal />
             <QuestionsProgress value={questionsProgress} />
             <Button
               variant="invertedAlternative"
@@ -228,7 +230,7 @@ export const VideoChatAi: FunctionComponent<VideoChatAiProps> = ({
                 name={recognitionEnabled ? IconNames.MicOn : IconNames.MicOff}
               />
             </Button>
-            <Gap sizeRem={10.375} horizontal />
+            <Gap sizeRem={device === 'Desktop' ? 10.375 : 0.5} horizontal />
           </div>
           <Gap sizeRem={1.875} />
         </div>

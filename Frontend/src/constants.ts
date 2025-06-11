@@ -12,6 +12,8 @@ export const pathnames = {
   roomReview: '/rooms/:id/review',
   roomAnalytics: '/rooms/:id/analytics',
   questionsArchive: '/questions/archive',
+  questionsRootCategories: '/questions/rootCategories',
+  questionsSubCategories: '/questions/:rootCategory/subCategories',
   questions: '/questions/:rootCategory/:subCategory',
   questionsCreate: '/questions/create/:rootCategory/:subCategory',
   questionsEdit: '/questions/edit/:id',

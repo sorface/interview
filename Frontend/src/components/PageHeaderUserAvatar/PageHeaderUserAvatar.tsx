@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { UserAvatar } from '../UserAvatar/UserAvatar';
+import { UserAvatar, UserAvatarProps } from '../UserAvatar/UserAvatar';
 import { AuthContext } from '../../context/AuthContext';
 import { ContextMenu } from '../ContextMenu/ContextMenu';
 import { Typography } from '../Typography/Typography';
@@ -9,11 +9,17 @@ import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames, pathnames } from '../../constants';
 import { Button } from '../Button/Button';
 import { useLogout } from '../../hooks/useLogout';
-import {VITE_GATEWAY_LOGOUT_URL, VITE_GATEWAY_POST_LOGOUT_URL} from "../../config";
+import { VITE_BUILD_HASH } from '../../config';
 
-export const PageHeaderUserAvatar: FunctionComponent = () => {
-    const auth = useContext(AuthContext);
-    const { logout } = useLogout();
+interface PageHeaderUserAvatarProps {
+  size?: UserAvatarProps['size'];
+}
+
+export const PageHeaderUserAvatar: FunctionComponent<
+  PageHeaderUserAvatarProps
+> = ({ size }) => {
+  const auth = useContext(AuthContext);
+  const { logout } = useLogout();
 
   return (
     <>
@@ -25,7 +31,7 @@ export const PageHeaderUserAvatar: FunctionComponent = () => {
             <UserAvatar
               nickname={auth?.nickname || ''}
               src={auth?.avatar || ''}
-              size="m"
+              size={size || 's'}
               altarnativeBackgound
             />
           </div>
@@ -51,13 +57,15 @@ export const PageHeaderUserAvatar: FunctionComponent = () => {
               </Link>
             </div>
             <div>
-                <form method={'POST'}
-                      action={`${VITE_GATEWAY_LOGOUT_URL}?redirect-location=${VITE_GATEWAY_POST_LOGOUT_URL}`}>
-                    <Button variant="text">
-                        <Icon name={IconNames.Exit}/>
-                    </Button>
-                </form>
+              <Button variant="text" onClick={logout}>
+                <Icon name={IconNames.Exit} />
+              </Button>
             </div>
+          </div>
+          <div className="absolute bottom-[0rem]">
+            <Typography size="xs" secondary>
+              {VITE_BUILD_HASH}
+            </Typography>
           </div>
         </div>
       </ContextMenu>

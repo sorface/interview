@@ -110,6 +110,8 @@ export const RoomAnaytics: FunctionComponent = () => {
 
   const totalError = (!viewNotAllowed && error) || roomError;
 
+  const aiRoom = !!data?.isAiRoom;
+
   const allUsers = loadedData
     ? getAllUsers(loadedData)
     : new Map<User['id'], AnalyticsUserReview>();
@@ -222,66 +224,72 @@ export const RoomAnaytics: FunctionComponent = () => {
         </InfoBlock>
       ) : (
         <div className="flex text-left">
-          <InfoBlock className="flex-1">
-            <div className="flex">
-              {room?.scheduledStartTime && (
+          {!aiRoom && (
+            <InfoBlock className="flex-1">
+              <div className="flex">
+                {room?.scheduledStartTime && (
+                  <RoomInfoColumn
+                    header={
+                      localizationCaptions[LocalizationKey.RoomDateAndTime]
+                    }
+                    conent={
+                      <RoomDateAndTime
+                        typographySize="s"
+                        scheduledStartTime={room.scheduledStartTime}
+                        timer={room.timer}
+                        mini
+                      />
+                    }
+                    mini
+                  />
+                )}
                 <RoomInfoColumn
-                  header={localizationCaptions[LocalizationKey.RoomDateAndTime]}
+                  header={localizationCaptions[LocalizationKey.Examinee]}
                   conent={
-                    <RoomDateAndTime
-                      typographySize="s"
-                      scheduledStartTime={room.scheduledStartTime}
-                      timer={room.timer}
-                      mini
-                    />
+                    examinees?.length ? (
+                      <div className="flex items-center">
+                        {examinees.map((examinee) => (
+                          <Fragment key={examinee.id}>
+                            <Typography size="xs">
+                              <div className="flex">
+                                <UserAvatar
+                                  nickname={examinee.nickname}
+                                  size="xxs"
+                                  src={examinee.avatar}
+                                />
+                              </div>
+                            </Typography>
+                            <Gap sizeRem={0.25} horizontal />
+                            <span className="capitalize">
+                              {examinee.nickname}
+                            </span>
+                            <Gap sizeRem={1} horizontal />
+                          </Fragment>
+                        ))}
+                      </div>
+                    ) : (
+                      localizationCaptions[LocalizationKey.NotFound]
+                    )
                   }
                   mini
                 />
-              )}
+              </div>
+              <Gap sizeRem={2} />
               <RoomInfoColumn
-                header={localizationCaptions[LocalizationKey.Examinee]}
+                header={localizationCaptions[LocalizationKey.RoomParticipants]}
                 conent={
-                  examinees?.length ? (
-                    <div className="flex items-center">
-                      {examinees.map((examinee) => (
-                        <Fragment key={examinee.id}>
-                          <Typography size="xs">
-                            <div className="flex">
-                              <UserAvatar
-                                nickname={examinee.nickname}
-                                size="xxs"
-                                src={examinee.avatar}
-                              />
-                            </div>
-                          </Typography>
-                          <Gap sizeRem={0.25} horizontal />
-                          <span className="capitalize">
-                            {examinee.nickname}
-                          </span>
-                          <Gap sizeRem={1} horizontal />
-                        </Fragment>
-                      ))}
-                    </div>
-                  ) : (
-                    localizationCaptions[LocalizationKey.NotFound]
-                  )
+                  <RoomParticipants participants={room?.participants || []} />
                 }
                 mini
               />
-            </div>
-            <Gap sizeRem={2} />
-            <RoomInfoColumn
-              header={localizationCaptions[LocalizationKey.RoomParticipants]}
-              conent={
-                <RoomParticipants participants={room?.participants || []} />
-              }
-              mini
-            />
-          </InfoBlock>
+            </InfoBlock>
+          )}
           {!viewNotAllowed && (
             <>
-              <Gap sizeRem={0.5} horizontal />
-              <InfoBlock className="px-[5rem] flex flex-col items-center">
+              {!aiRoom && <Gap sizeRem={0.5} horizontal />}
+              <InfoBlock
+                className={`${aiRoom ? 'w-full' : ''} px-[5rem] flex flex-col items-center`}
+              >
                 <Typography size="m" bold>
                   {localizationCaptions[LocalizationKey.AverageCandidateMark]}
                 </Typography>
@@ -308,44 +316,45 @@ export const RoomAnaytics: FunctionComponent = () => {
       )}
       {!viewNotAllowed && (
         <>
-          <InfoBlock className="text-left">
-            {!loadedData && loading ? (
-              <div className="h-[9.375rem] flex items-center justify-center">
-                <Loader />
-              </div>
-            ) : (
-              <>
-                <Typography size="xl" bold>
-                  {localizationCaptions[LocalizationKey.OpinionsAndMarks]}
-                  <Gap sizeRem={2} />
-                  <ReviewUserGrid>
-                    {loadedData?.userReview
-                      .filter(
-                        (userReview) =>
-                          allUsers.get(userReview.userId)?.participantType ===
-                          'Expert',
-                      )
-                      .filter((userReview) =>
-                        data?.completed
-                          ? typeof userReview.averageMark === 'number'
-                          : true,
-                      )
-                      .map((userReview) => (
-                        <ReviewUserOpinion
-                          key={userReview.userId}
-                          user={generateUserOpinion(
-                            userReview,
-                            !!data?.isAiRoom,
-                          )}
-                          allUsers={allUsers}
-                        />
-                      ))}
-                  </ReviewUserGrid>
-                </Typography>
-              </>
-            )}
-          </InfoBlock>
-          <Gap sizeRem={0.5} />
+          {!aiRoom && (
+            <>
+              <InfoBlock className="text-left">
+                {!loadedData && loading ? (
+                  <div className="h-[9.375rem] flex items-center justify-center">
+                    <Loader />
+                  </div>
+                ) : (
+                  <>
+                    <Typography size="xl" bold>
+                      {localizationCaptions[LocalizationKey.OpinionsAndMarks]}
+                      <Gap sizeRem={2} />
+                      <ReviewUserGrid>
+                        {loadedData?.userReview
+                          .filter(
+                            (userReview) =>
+                              allUsers.get(userReview.userId)
+                                ?.participantType === 'Expert',
+                          )
+                          .filter((userReview) =>
+                            data?.completed
+                              ? typeof userReview.averageMark === 'number'
+                              : true,
+                          )
+                          .map((userReview) => (
+                            <ReviewUserOpinion
+                              key={userReview.userId}
+                              user={generateUserOpinion(userReview, aiRoom)}
+                              allUsers={allUsers}
+                            />
+                          ))}
+                      </ReviewUserGrid>
+                    </Typography>
+                  </>
+                )}
+              </InfoBlock>
+              <Gap sizeRem={0.5} />
+            </>
+          )}
           <InfoBlock className="text-left">
             {!loadedData && loading ? (
               <div className="h-[4rem] flex items-center justify-center">

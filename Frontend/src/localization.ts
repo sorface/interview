@@ -450,7 +450,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.LetsBeginDescription]:
       'To start an interview, say "{LetsStartCommand}".',
     [LocalizationKey.LetsBeginCommand]: "let's begin",
-    [LocalizationKey.HomeDescription]: 'AI interviews, video calls.',
+    [LocalizationKey.HomeDescription]: 'Preparing for interviews.',
     [LocalizationKey.QuestionTreesPageName]: 'Question trees',
     [LocalizationKey.CreateQuestionTree]: 'Create question trees',
     [LocalizationKey.QuestionTree]: 'Question tree',
@@ -729,7 +729,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.LetsBeginDescription]:
       'Для начала собеседования скажите "{LetsStartCommand}".',
     [LocalizationKey.LetsBeginCommand]: 'давай начнём',
-    [LocalizationKey.HomeDescription]: 'Собеседования с AI, видеозвонки.',
+    [LocalizationKey.HomeDescription]: 'Подготовка к собеседованиям.',
     [LocalizationKey.QuestionTreesPageName]: 'Деревья вопросов',
     [LocalizationKey.CreateQuestionTree]: 'Создать дерево вопросов',
     [LocalizationKey.QuestionTree]: 'Дерево вопросов',

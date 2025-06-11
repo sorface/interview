@@ -27,7 +27,7 @@ import { Button } from '../../components/Button/Button';
 const pageSize = 30;
 const initialPageNumber = 1;
 
-export const Categories: FunctionComponent = () => {
+export const CategoriesAdmin: FunctionComponent = () => {
   const localizationCaptions = useLocalizationCaptions();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const [searchValueInput, setSearchValueInput] = useState('');

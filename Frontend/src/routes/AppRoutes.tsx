@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useContext } from 'react';
 import { Routes, Route, useLocation, matchPath } from 'react-router-dom';
 import { inviteParamName, pathnames } from '../constants';
 import { Home } from '../pages/Home/Home';
@@ -11,8 +11,7 @@ import { RoomParticipants } from '../pages/RoomParticipants/RoomParticipants';
 import { ProtectedRoute } from './ProtectedRoute';
 import { User } from '../types/user';
 import { Terms } from '../pages/Terms/Terms';
-import { NavMenu } from '../components/NavMenu/NavMenu';
-import { Categories } from '../pages/Categories/Categories';
+import { CategoriesAdmin } from '../pages/CategoriesAdmin/CategoriesAdmin';
 import { checkAdmin } from '../utils/checkAdmin';
 import { CategoriesCreate } from '../pages/CategoriesCreate/CategoriesCreate';
 import { Gap } from '../components/Gap/Gap';
@@ -28,6 +27,10 @@ import { Roadmaps } from '../pages/Roadmaps/Roadmaps';
 import { RoadmapCreate } from '../pages/RoadmapCreate/RoadmapCreate';
 import { RoadmapsArchive } from '../pages/RoadmapsArchive/RoadmapsArchive';
 import { BusinessAnalytic } from '../pages/BusinessAnalytic/BusinessAnalytic';
+import { NavMenu } from '../components/NavMenu/NavMenu';
+import { DeviceContext } from '../context/DeviceContext';
+import { QuestionsRootCategories } from '../pages/QuestionsRootCategories/QuestionsRootCategories';
+import { QuestionsSubCategories } from '../pages/QuestionsSubCategories/QuestionsSubCategories';
 
 interface AppRoutesProps {
   user: User | null;
@@ -35,6 +38,7 @@ interface AppRoutesProps {
 
 export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
   const admin = checkAdmin(user);
+  const device = useContext(DeviceContext);
   const location = useLocation();
   const fullScreenPage = matchPath(
     { path: pathnames.room.replace(`/:${inviteParamName}?`, ''), end: false },
@@ -46,8 +50,12 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
   return (
     <>
       {hasNavMenu && <NavMenu admin={admin} />}
-      <div className={`App ${fullScreenPage ? 'full-screen-page' : ''}`}>
-        <div className="App-content">
+      <div
+        className={`App ${fullScreenPage ? 'full-screen-page' : ''} ${device === 'Desktop' ? 'px-[2.5rem]' : 'px-[1.25rem]'}`}
+      >
+        <div
+          className={`App-content ${device === 'Desktop' && !fullScreenPage ? 'px-[13.625rem]' : ''}`}
+        >
           <Routes>
             <Route path={pathnames.home} element={<Home />} />
             <Route path={pathnames.terms} element={<Terms />} />
@@ -117,6 +125,22 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
               }
             />
             <Route
+              path={pathnames.questionsRootCategories}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <QuestionsRootCategories />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={pathnames.questionsSubCategories}
+              element={
+                <ProtectedRoute allowed={authenticated}>
+                  <QuestionsSubCategories />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path={pathnames.questions}
               element={
                 <ProtectedRoute allowed={authenticated}>
@@ -160,7 +184,7 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
               path={pathnames.categories}
               element={
                 <ProtectedRoute allowed={authenticated}>
-                  <Categories />
+                  <CategoriesAdmin />
                 </ProtectedRoute>
               }
             />
