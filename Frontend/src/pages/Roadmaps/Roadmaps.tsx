@@ -75,10 +75,10 @@ export const Roadmaps: FunctionComponent = () => {
 
     return (
       <li key={roadmap.id}>
-        <Link to={roadmapLink} className="no-underline">
-          <div
-            className={`${roadmapItemThemedClassName} bg-wrap p-[1rem] mb-[0.25rem] flex flex-col rounded-[0.5rem]`}
-          >
+        <div
+          className={`${roadmapItemThemedClassName} bg-wrap p-[1rem] mb-[0.25rem] flex flex-col rounded-[0.5rem]`}
+        >
+          <Link to={roadmapLink} className="no-underline">
             <img
               className="object-cover"
               alt={`roadmap ${roadmap.name} image`}
@@ -93,29 +93,29 @@ export const Roadmaps: FunctionComponent = () => {
               {roadmap.description ||
                 `${localizationCaptions[LocalizationKey.Learn]} ${roadmap.name}.`}
             </Typography>
-            {admin && (
-              <div className="flex ml-auto">
-                <Link to={roadmapEditLink}>
-                  <Button>
-                    <Icon size="m" name={IconNames.Settings} />
-                  </Button>
-                </Link>
-                <ActionModal
-                  openButtonCaption="📁"
-                  error={archiveError}
-                  loading={archiveLoading}
-                  title={localizationCaptions[LocalizationKey.Archive]}
-                  loadingCaption={
-                    localizationCaptions[LocalizationKey.ArchiveLoading]
-                  }
-                  onAction={() => {
-                    archiveRoadmap(roadmap.id);
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        </Link>
+          </Link>
+          {admin && (
+            <div className="flex ml-auto">
+              <Link to={roadmapEditLink}>
+                <Button>
+                  <Icon size="m" name={IconNames.Settings} />
+                </Button>
+              </Link>
+              <ActionModal
+                openButtonCaption="📁"
+                error={archiveError}
+                loading={archiveLoading}
+                title={localizationCaptions[LocalizationKey.Archive]}
+                loadingCaption={
+                  localizationCaptions[LocalizationKey.ArchiveLoading]
+                }
+                onAction={() => {
+                  archiveRoadmap(roadmap.id);
+                }}
+              />
+            </div>
+          )}
+        </div>
       </li>
     );
   };
