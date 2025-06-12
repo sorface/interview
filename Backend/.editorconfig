@@ -220,7 +220,6 @@ dotnet_diagnostic.CA1868.severity=error
 dotnet_diagnostic.CA1869.severity=error
 
 # Reliability rules
-dotnet_diagnostic.CA2000.severity=error
 dotnet_diagnostic.CA2009.severity=error
 dotnet_diagnostic.CA2013.severity=error
 dotnet_diagnostic.CA2014.severity=error
