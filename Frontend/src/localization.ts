@@ -490,7 +490,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.AnswerAgain]: 'Answer again',
     [LocalizationKey.RoadmapsPageName]: 'Direction',
     [LocalizationKey.RoadmapsPageDescription]:
-      'Structured learning paths to guide your tech journey.',
+      'In what direction do you need to improve?',
     [LocalizationKey.RoadmapsArchivePageName]: 'Direction Archive',
     [LocalizationKey.RoadmapCreatePageName]: 'Create Roadmap',
     [LocalizationKey.RoadmapYourProgress]: 'Your Progress',
@@ -770,7 +770,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.AnswerAgain]: 'Ответить заново',
     [LocalizationKey.RoadmapsPageName]: 'Направления',
     [LocalizationKey.RoadmapsPageDescription]:
-      'Дорожные карты, которые помогут вам в освоении технологий.',
+      'Какое направление вам нужно прокачать?',
     [LocalizationKey.RoadmapsArchivePageName]: 'Архив направлений',
     [LocalizationKey.RoadmapCreatePageName]: 'Создать Roadmap',
     [LocalizationKey.RoadmapYourProgress]: 'Ваш прогресс',
