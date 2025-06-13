@@ -487,7 +487,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.NoNewNotifications]: 'No new notifications',
     [LocalizationKey.Clear]: 'Clear',
     [LocalizationKey.AnswerAgain]: 'Answer again',
-    [LocalizationKey.RoadmapsPageName]: 'Roadmaps',
+    [LocalizationKey.RoadmapsPageName]: 'Direction',
     [LocalizationKey.RoadmapsPageDescription]:
       'Structured learning paths to guide your tech journey.',
     [LocalizationKey.RoadmapCreatePageName]: 'Create Roadmap',
@@ -766,7 +766,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.NoNewNotifications]: 'Новых уведомлений нет',
     [LocalizationKey.Clear]: 'Очистить',
     [LocalizationKey.AnswerAgain]: 'Ответить заново',
-    [LocalizationKey.RoadmapsPageName]: 'Roadmaps',
+    [LocalizationKey.RoadmapsPageName]: 'Направления',
     [LocalizationKey.RoadmapsPageDescription]:
       'Дорожные карты, которые помогут вам в освоении технологий.',
     [LocalizationKey.RoadmapCreatePageName]: 'Создать Roadmap',
