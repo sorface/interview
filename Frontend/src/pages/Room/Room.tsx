@@ -542,20 +542,6 @@ export const Room: FunctionComponent = () => {
     );
   }
 
-  if (aiRoom && recognitionNotAllowed) {
-    return (
-      <MessagePage
-        title={localizationCaptions[LocalizationKey.AllowAccessToMicrophone]}
-        message={
-          localizationCaptions[
-            LocalizationKey.AllowAccessToMicrophoneDescription
-          ]
-        }
-        iconName={IconNames.MicOff}
-      />
-    );
-  }
-
   if (wsClosed) {
     return (
       <MessagePage
@@ -588,6 +574,7 @@ export const Room: FunctionComponent = () => {
         aiAssistantScript: aiAssistantCurrentScript,
         recognitionEnabled,
         recognitionNotSupported,
+        recognitionNotAllowed,
         sendWsMessage: sendMessage,
         setCodeEditorEnabled,
         setAiAssistantCurrentScript,

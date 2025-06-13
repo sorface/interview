@@ -276,6 +276,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
     lastWsMessageParsed,
     recognitionEnabled,
     recognitionNotSupported,
+    recognitionNotAllowed,
     sendWsMessage,
     setAiAssistantCurrentScript,
     setRecognitionEnabled,
@@ -813,7 +814,9 @@ export const RoomQuestionPanelAi: FunctionComponent<
                               variant={themedStartAnswerButton}
                               className="w-fit"
                               disabled={
-                                recognitionEnabled || recognitionNotSupported
+                                recognitionEnabled ||
+                                recognitionNotSupported ||
+                                recognitionNotAllowed
                               }
                               onClick={handleStartAnswer}
                             >
@@ -862,7 +865,30 @@ export const RoomQuestionPanelAi: FunctionComponent<
                               </Typography>
                             </>
                           )}
-                        {recognitionEnabled && (
+                        {recognitionNotAllowed &&
+                          initialQuestion &&
+                          !textAnswerOpen && (
+                            <>
+                              <Gap sizeRem={0.5} />
+                              <Typography size="s" secondary>
+                                {
+                                  localizationCaptions[
+                                    LocalizationKey.AllowAccessToMicrophone
+                                  ]
+                                }
+                              </Typography>
+                              <Gap sizeRem={0.15} />
+                              <Typography size="s" secondary>
+                                {
+                                  localizationCaptions[
+                                    LocalizationKey
+                                      .AllowAccessToMicrophoneDescription
+                                  ]
+                                }
+                              </Typography>
+                            </>
+                          )}
+                        {recognitionEnabled && !recognitionNotAllowed && (
                           <div className="flex flex-col">
                             <Wave />
                             <Typography size="s" secondary>

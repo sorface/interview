@@ -24,6 +24,7 @@ export interface RoomContextType {
   aiAssistantScript: AiAssistantScriptName;
   recognitionEnabled: boolean;
   recognitionNotSupported: boolean;
+  recognitionNotAllowed: boolean;
   pinUser: (id: string) => void;
   sendWsMessage: SendMessage;
   setCodeEditorEnabled: (enabled: boolean) => void;
@@ -51,6 +52,7 @@ const defaultValue: RoomContextType = {
   aiAssistantScript: AiAssistantScriptName.Idle,
   recognitionEnabled: false,
   recognitionNotSupported: false,
+  recognitionNotAllowed: false,
   pinUser: () => {},
   sendWsMessage: noop,
   setCodeEditorEnabled: noop,
