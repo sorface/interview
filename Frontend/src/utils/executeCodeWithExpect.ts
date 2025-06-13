@@ -105,6 +105,7 @@ export const computEexecuteResult = (
       }),
     };
   } catch (error) {
+    console.error(error);
     return {
       results: [],
       error: error instanceof Error ? error.message : String(error),
@@ -123,6 +124,7 @@ export const executeCodeWithExpect = async (
     const executeResult = await executeCodeWithExpect();
     return computEexecuteResult(executeResult);
   } catch (error) {
+    console.error(error);
     return {
       results: [],
       error: error instanceof Error ? error.message : String(error),
