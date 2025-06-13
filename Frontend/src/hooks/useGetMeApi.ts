@@ -100,6 +100,7 @@ export const useGetMeApi = () => {
       const responseJson = await response.json();
       dispatch({ name: 'setUser', payload: responseJson });
     } catch (err: unknown) {
+      console.error(err);
       dispatch({
         name: 'setError',
         payload: err instanceof Error ? err.message : 'Failed to get me',
