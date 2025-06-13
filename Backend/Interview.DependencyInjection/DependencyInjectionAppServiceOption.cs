@@ -1,3 +1,4 @@
+using Interview.Domain.Rooms.RoomExpireServices;
 using Interview.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,4 +11,6 @@ public sealed class DependencyInjectionAppServiceOption
     public required Action<EventStorageOptionBuilder> EventStorageConfigurator { get; init; }
 
     public required AdminUsers AdminUsers { get; init; }
+
+    public required RoomExpireSettings RoomExpireSettings { get; init; }
 }

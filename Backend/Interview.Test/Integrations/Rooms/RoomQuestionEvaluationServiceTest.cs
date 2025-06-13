@@ -13,7 +13,7 @@ using Interview.Domain.Users;
 using Interview.Infrastructure.RoomParticipants;
 using Interview.Infrastructure.RoomQuestions;
 
-namespace Interview.Test.Integrations;
+namespace Interview.Test.Integrations.Rooms;
 
 public class RoomQuestionEvaluationServiceTest
 {
@@ -284,12 +284,12 @@ public class RoomQuestionEvaluationServiceTest
     {
         var user = new User("test user", "ID");
         db.Users.Add(user);
-        var room = new Room("MY ROOM", SERoomAccessType.Private, SERoomType.Standard);
+        var room = new Domain.Rooms.Room("MY ROOM", SERoomAccessType.Private, SERoomType.Standard);
         db.Rooms.Add(room);
 
         foreach (var i in Enumerable.Range(0, Random.Shared.Next(1, 5)))
         {
-            var testRoom = new Room("TEST ROOM", SERoomAccessType.Private, SERoomType.Standard);
+            var testRoom = new Domain.Rooms.Room("TEST ROOM", SERoomAccessType.Private, SERoomType.Standard);
             db.Rooms.Add(testRoom);
             var question = new Question("Test " + i);
             db.Questions.Add(question);
