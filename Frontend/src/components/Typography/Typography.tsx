@@ -14,7 +14,8 @@ export interface TypographyProps {
     | 's'
     | 'xs'
     | 'landing-l'
-    | 'landing-m';
+    | 'landing-m'
+    | 'roadmaps-heading';
   bold?: boolean;
   semibold?: boolean;
   error?: boolean;
