@@ -52,7 +52,7 @@ export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
           path: pathnames.roadmapsArchive,
           caption: (
             <LocalizationCaption
-              captionKey={LocalizationKey.RoadmapsPageName}
+              captionKey={LocalizationKey.RoadmapsArchivePageName}
             />
           ),
         }

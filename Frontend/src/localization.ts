@@ -213,6 +213,7 @@ export const enum LocalizationKey {
   AnswerAgain,
   RoadmapsPageName,
   RoadmapsPageDescription,
+  RoadmapsArchivePageName,
   RoadmapCreatePageName,
   RoadmapYourProgress,
   RoadmapLevel0,
@@ -490,6 +491,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.RoadmapsPageName]: 'Direction',
     [LocalizationKey.RoadmapsPageDescription]:
       'Structured learning paths to guide your tech journey.',
+    [LocalizationKey.RoadmapsArchivePageName]: 'Direction Archive',
     [LocalizationKey.RoadmapCreatePageName]: 'Create Roadmap',
     [LocalizationKey.RoadmapYourProgress]: 'Your Progress',
     [LocalizationKey.RoadmapLevel0]: 'Impostor',
@@ -769,6 +771,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.RoadmapsPageName]: 'Направления',
     [LocalizationKey.RoadmapsPageDescription]:
       'Дорожные карты, которые помогут вам в освоении технологий.',
+    [LocalizationKey.RoadmapsArchivePageName]: 'Архив направлений',
     [LocalizationKey.RoadmapCreatePageName]: 'Создать Roadmap',
     [LocalizationKey.RoadmapYourProgress]: 'Ваш прогресс',
     [LocalizationKey.RoadmapLevel0]: 'Самозванец(ка)',
