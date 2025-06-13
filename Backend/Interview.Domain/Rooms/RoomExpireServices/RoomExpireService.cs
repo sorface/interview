@@ -11,7 +11,7 @@ public class RoomExpireService(
     AppDbContext dbContext,
     RoomExpireSettings roomExpireSettings,
     ISystemClock clock,
-    ILogger<RoomExpireService> logger)
+    ILogger<RoomExpireService> logger) : ISelfScopeService
 {
     public int PageSize { get; init; } = 500;
 
@@ -55,6 +55,7 @@ public class RoomExpireService(
                 rooms = await dbContext.Rooms.Where(e => e.Status == status && e.UpdateDate <= minDate)
                     .Take(PageSize)
                     .ToListAsync(cancellationToken);
+                logger.LogInformation("Marking room {Count}", rooms.Count);
                 foreach (var room in rooms)
                 {
                     room.Status = SERoomStatus.Expire;
@@ -62,7 +63,7 @@ public class RoomExpireService(
 
                 await dbContext.SaveChangesAsync(cancellationToken);
             }
-            while (rooms.Count > 0);
+            while (rooms.Count == PageSize);
         }
         catch (OperationCanceledException)
         {

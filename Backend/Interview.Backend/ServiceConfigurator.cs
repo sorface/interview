@@ -6,6 +6,7 @@ using System.Threading.RateLimiting;
 using Ardalis.SmartEnum.SystemTextJson;
 using Interview.Backend.Auth;
 using Interview.Backend.Auth.Sorface;
+using Interview.Backend.BackgroundServices;
 using Interview.Backend.Swagger;
 using Interview.DependencyInjection;
 using Interview.Domain;
@@ -58,6 +59,7 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
                 options.JsonSerializerOptions.Converters.Add(new SmartEnumNameConverter<RoomQuestionState, int>());
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
+        serviceCollection.AddHostedService<RoomExpireServiceBackgroundService>();
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         serviceCollection.AddEndpointsApiExplorer();

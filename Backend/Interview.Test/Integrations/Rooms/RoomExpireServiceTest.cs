@@ -84,7 +84,7 @@ public class RoomExpireServiceTest
 
     [Theory(DisplayName = "Should handle empty database correctly")]
     [MemberData(nameof(TestData))]
-    public async Task ProcessAsync_ShouldNotFailOnEmptyDatabase(SERoomType roomType)
+    public async Task ProcessAsync_ShouldNotFailOnEmptyDatabase()
     {
         var now = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         _mockClock.Setup(c => c.UtcNow).Returns(now);
@@ -101,7 +101,7 @@ public class RoomExpireServiceTest
 
     [Theory(DisplayName = "Should throw exception on DbContext failure")]
     [MemberData(nameof(TestData))]
-    public async Task ProcessAsync_ShouldLogErrorOnDbContextFailure(SERoomType roomType)
+    public async Task ProcessAsync_ShouldLogErrorOnDbContextFailure()
     {
         await _dbContext.DisposeAsync();
 
