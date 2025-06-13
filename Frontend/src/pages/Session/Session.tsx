@@ -11,6 +11,7 @@ import { UserAvatar } from '../../components/UserAvatar/UserAvatar';
 import { AuthContext } from '../../context/AuthContext';
 import { Typography } from '../../components/Typography/Typography';
 import { RecognitionLangSwitch } from '../../components/RecognitionLangSwitch/RecognitionLangSwitch';
+import { VITE_BUILD_HASH } from '../../config';
 
 export const Session: FunctionComponent = () => {
   const auth = useContext(AuthContext);
@@ -40,6 +41,11 @@ export const Session: FunctionComponent = () => {
             <ThemeSwitch />
             <LangSwitch />
             <RecognitionLangSwitch />
+          </div>
+          <div className="absolute bottom-[0.25rem]">
+            <Typography size="s" secondary>
+              {VITE_BUILD_HASH}
+            </Typography>
           </div>
           <Gap sizeRem={2} />
           <Button
