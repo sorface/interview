@@ -99,6 +99,7 @@ export const useLogout = () => {
         payload: response.status,
       });
     } catch (err: unknown) {
+      console.error(err);
       dispatch({
         name: 'setError',
         payload: err instanceof Error ? err.message : 'Failed to logout',

@@ -9,7 +9,6 @@ import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { IconNames, pathnames } from '../../constants';
 import { Button } from '../Button/Button';
 import { useLogout } from '../../hooks/useLogout';
-import { VITE_BUILD_HASH } from '../../config';
 
 interface PageHeaderUserAvatarProps {
   size?: UserAvatarProps['size'];
@@ -32,7 +31,6 @@ export const PageHeaderUserAvatar: FunctionComponent<
               nickname={auth?.nickname || ''}
               src={auth?.avatar || ''}
               size={size || 's'}
-              altarnativeBackgound
             />
           </div>
         }
@@ -61,11 +59,6 @@ export const PageHeaderUserAvatar: FunctionComponent<
                 <Icon name={IconNames.Exit} />
               </Button>
             </div>
-          </div>
-          <div className="absolute bottom-[0rem]">
-            <Typography size="xs" secondary>
-              {VITE_BUILD_HASH}
-            </Typography>
           </div>
         </div>
       </ContextMenu>

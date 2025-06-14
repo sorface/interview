@@ -5,11 +5,10 @@ import React, {
   useContext,
 } from 'react';
 import { matchPath, NavLink } from 'react-router-dom';
-import { IconNames, pathnames } from '../../constants';
+import { pathnames } from '../../constants';
 import { VITE_APP_NAME } from '../../config';
 import { LocalizationCaption } from '../LocalizationCaption/LocalizationCaption';
 import { LocalizationKey } from '../../localization';
-import { Icon } from '../../pages/Room/components/Icon/Icon';
 import { ThemeSwitchMini } from '../ThemeSwitchMini/ThemeSwitchMini';
 import { Typography } from '../Typography/Typography';
 import { Gap } from '../Gap/Gap';
@@ -17,6 +16,7 @@ import { PageHeaderUserAvatar } from '../PageHeaderUserAvatar/PageHeaderUserAvat
 import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme } from '../../context/ThemeContext';
 import { DeviceContext } from '../../context/DeviceContext';
+import { LangSwitch } from '../LangSwitch/LangSwitch';
 
 interface NavMenu2Props {
   admin: boolean;
@@ -26,14 +26,13 @@ interface MenuItem {
   path: string;
   logo?: string;
   caption: ReactNode;
-  icon: IconNames;
 }
 
 export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
   const device = useContext(DeviceContext);
   const navmenuThemeClassName = useThemeClassName({
-    [Theme.Dark]: 'border-dark-dark2',
-    [Theme.Light]: 'border-nav-menu-border-light',
+    [Theme.Dark]: 'bg-dark-dark2 border-dark-dark1',
+    [Theme.Light]: 'bg-white border-nav-menu-border-light',
   });
 
   const items: Array<MenuItem | null> = [
@@ -41,24 +40,21 @@ export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
       path: pathnames.roadmaps,
       logo: '/logo192.png',
       caption: VITE_APP_NAME,
-      icon: IconNames.Golf,
     },
     {
       path: pathnames.roadmaps,
       caption: (
         <LocalizationCaption captionKey={LocalizationKey.RoadmapsPageName} />
       ),
-      icon: IconNames.Golf,
     },
     admin
       ? {
           path: pathnames.roadmapsArchive,
           caption: (
             <LocalizationCaption
-              captionKey={LocalizationKey.RoadmapsPageName}
+              captionKey={LocalizationKey.RoadmapsArchivePageName}
             />
           ),
-          icon: IconNames.Golf,
         }
       : null,
     admin
@@ -69,7 +65,6 @@ export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
               captionKey={LocalizationKey.QuestionsPageName}
             />
           ),
-          icon: IconNames.Chat,
         }
       : null,
     admin
@@ -80,7 +75,6 @@ export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
               captionKey={LocalizationKey.HighlightsRoomsPageName}
             />
           ),
-          icon: IconNames.Cube,
         }
       : null,
     admin
@@ -91,7 +85,6 @@ export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
               captionKey={LocalizationKey.CategoriesPageName}
             />
           ),
-          icon: IconNames.Clipboard,
         }
       : null,
     admin
@@ -102,7 +95,6 @@ export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
               captionKey={LocalizationKey.CategoriesArchive}
             />
           ),
-          icon: IconNames.Clipboard,
         }
       : null,
     admin
@@ -113,7 +105,6 @@ export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
               captionKey={LocalizationKey.QuestionTreesPageName}
             />
           ),
-          icon: IconNames.Expand,
         }
       : null,
     admin
@@ -124,7 +115,6 @@ export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
               captionKey={LocalizationKey.BusinessAnalyticPageName}
             />
           ),
-          icon: IconNames.Cube,
         }
       : null,
   ];
@@ -139,20 +129,15 @@ export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
           to={item.path}
           className={`flex items-center no-underline ${firstItem ? 'pr-[2rem]' : 'pr-[2.25rem]'} ${active ? 'underline' : ''}`}
         >
-          {item.logo ? (
+          {item.logo && (
             <img
               className="w-[1.25rem] h-[1.25rem] rounded-[0.25rem]"
               src={item.logo}
               alt="site logo"
             />
-          ) : (
-            <Icon name={item.icon} />
           )}
           <Gap sizeRem={0.5} horizontal />
-          <Typography
-            size={firstItem ? 'xl' : 'm'}
-            semibold={firstItem || active}
-          >
+          <Typography size={firstItem ? 'xl' : 'm'} bold={firstItem || active}>
             {item.caption}
           </Typography>
         </NavLink>
@@ -170,8 +155,9 @@ export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
         )}
       </div>
       <div className="ml-auto flex items-center">
-        <ThemeSwitchMini variant="icon" />
-        <Gap sizeRem={1} horizontal />
+        <LangSwitch elementType="button" />
+        <ThemeSwitchMini variant="button" />
+        <Gap sizeRem={device === 'Desktop' ? 1 : 0.15} horizontal />
         <PageHeaderUserAvatar size="m" />
       </div>
     </nav>

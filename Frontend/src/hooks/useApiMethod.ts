@@ -195,6 +195,7 @@ export const useApiMethod = <ResponseData, RequestData = AnyObject>(
         }
         dispatch({ name: 'setData', payload: responseData });
       } catch (err: unknown) {
+        console.error(err);
         dispatch({
           name: 'setError',
           payload:
