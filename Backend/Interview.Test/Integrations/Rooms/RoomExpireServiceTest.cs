@@ -82,8 +82,7 @@ public class RoomExpireServiceTest
         activeRoom.Status.Should().Be(SERoomStatus.Expire);
     }
 
-    [Theory(DisplayName = "Should handle empty database correctly")]
-    [MemberData(nameof(TestData))]
+    [Fact(DisplayName = "Should handle empty database correctly")]
     public async Task ProcessAsync_ShouldNotFailOnEmptyDatabase()
     {
         var now = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -99,8 +98,7 @@ public class RoomExpireServiceTest
             It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.AtLeastOnce);
     }
 
-    [Theory(DisplayName = "Should throw exception on DbContext failure")]
-    [MemberData(nameof(TestData))]
+    [Fact(DisplayName = "Should throw exception on DbContext failure")]
     public async Task ProcessAsync_ShouldLogErrorOnDbContextFailure()
     {
         await _dbContext.DisposeAsync();
