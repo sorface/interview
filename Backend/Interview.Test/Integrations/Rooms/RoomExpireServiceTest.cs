@@ -53,7 +53,7 @@ public class RoomExpireServiceTest
 
         var reviewRoom = new Room("test", roomAccessType, roomType) { Status = SERoomStatus.Review, UpdateDate = now.AddDays(-31) };
         await _dbContext.Rooms.AddAsync(reviewRoom);
-        await _dbContext.Rooms.AddAsync(new Room("test 2", roomAccessType, roomType) { Status = SERoomStatus.New, UpdateDate = now.AddDays(-31) });
+        var newRoom = await _dbContext.Rooms.AddAsync(new Room("test 2", roomAccessType, roomType) { Status = SERoomStatus.New, UpdateDate = now.AddDays(-31) });
         await _dbContext.SaveChangesAsync();
         _dbContext.ChangeTracker.Clear();
 
@@ -61,6 +61,8 @@ public class RoomExpireServiceTest
 
         reviewRoom = _dbContext.Rooms.Single(e => e.Id == reviewRoom.Id);
         reviewRoom.Status.Should().Be(SERoomStatus.Expire);
+        var actualNewRoom = await _dbContext.Rooms.FindAsync(newRoom.Entity.Id);
+        actualNewRoom.Status.Should().Be(SERoomStatus.New);
     }
 
     [Theory(DisplayName = "Should process expired active rooms correctly")]
@@ -72,7 +74,7 @@ public class RoomExpireServiceTest
 
         var activeRoom = new Room("test", roomAccessType, roomType) { Status = SERoomStatus.Active, UpdateDate = now.AddDays(-61) };
         await _dbContext.Rooms.AddAsync(activeRoom);
-        await _dbContext.Rooms.AddAsync(new Room("test 2", roomAccessType, roomType) { Status = SERoomStatus.New, UpdateDate = now.AddDays(-31) });
+        var newRoom = await _dbContext.Rooms.AddAsync(new Room("test 2", roomAccessType, roomType) { Status = SERoomStatus.New, UpdateDate = now.AddDays(-31) });
         await _dbContext.SaveChangesAsync();
         _dbContext.ChangeTracker.Clear();
 
@@ -80,6 +82,29 @@ public class RoomExpireServiceTest
 
         activeRoom = _dbContext.Rooms.Single(e => e.Id == activeRoom.Id);
         activeRoom.Status.Should().Be(SERoomStatus.Expire);
+        var actualNewRoom = await _dbContext.Rooms.FindAsync(newRoom.Entity.Id);
+        actualNewRoom.Status.Should().Be(SERoomStatus.New);
+    }
+
+    [Theory(DisplayName = "Should not process active rooms with a date that does not match the overdue date")]
+    [MemberData(nameof(TestData))]
+    public async Task ProcessAsync_ShouldNotMarkActiveRoomsAsExpired(SERoomAccessType roomAccessType, SERoomType roomType)
+    {
+        var now = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        _mockClock.Setup(c => c.UtcNow).Returns(now);
+
+        var activeRoom = new Room("test", roomAccessType, roomType) { Status = SERoomStatus.Active, UpdateDate = now.AddDays(-1) };
+        await _dbContext.Rooms.AddAsync(activeRoom);
+        var newRoom = await _dbContext.Rooms.AddAsync(new Room("test 2", roomAccessType, roomType) { Status = SERoomStatus.New, UpdateDate = now.AddDays(-31) });
+        await _dbContext.SaveChangesAsync();
+        _dbContext.ChangeTracker.Clear();
+
+        await _service.ProcessAsync(CancellationToken.None);
+
+        activeRoom = _dbContext.Rooms.Single(e => e.Id == activeRoom.Id);
+        activeRoom.Status.Should().NotBe(SERoomStatus.Expire);
+        var actualNewRoom = await _dbContext.Rooms.FindAsync(newRoom.Entity.Id);
+        actualNewRoom.Status.Should().Be(SERoomStatus.New);
     }
 
     [Fact(DisplayName = "Should handle empty database correctly")]
@@ -124,7 +149,8 @@ public class RoomExpireServiceTest
 
         await _service.ProcessAsync(CancellationToken.None);
 
-        pendingRoom.Status.Should().Be(SERoomStatus.New);
+        var rooms = _dbContext.Rooms.ToList();
+        rooms.Should().AllSatisfy(e => e.Status.Should().Be(SERoomStatus.New));
     }
 
     [Theory(DisplayName = "Should process rooms in batches")]
@@ -141,7 +167,7 @@ public class RoomExpireServiceTest
         }
 
         await _dbContext.Rooms.AddRangeAsync(rooms);
-        await _dbContext.Rooms.AddAsync(new Room("test 2", roomAccessType, roomType) { Status = SERoomStatus.New, UpdateDate = now.AddDays(-31) });
+        var newRoom = await _dbContext.Rooms.AddAsync(new Room("test 2", roomAccessType, roomType) { Status = SERoomStatus.New, UpdateDate = now.AddDays(-31) });
         await _dbContext.SaveChangesAsync();
         _dbContext.ChangeTracker.Clear();
 
@@ -150,5 +176,34 @@ public class RoomExpireServiceTest
         var roomIds = rooms.ConvertAll(e => e.Id);
         rooms = _dbContext.Rooms.Where(e => roomIds.Contains(e.Id)).ToList();
         rooms.All(r => r.Status == SERoomStatus.Expire).Should().BeTrue();
+        var actualNewRoom = await _dbContext.Rooms.FindAsync(newRoom.Entity.Id);
+        actualNewRoom.Status.Should().Be(SERoomStatus.New);
+    }
+
+    [Theory(DisplayName = "Should not process rooms with a date that does not match the overdue date.")]
+    [MemberData(nameof(TestData))]
+    public async Task ProcessAsync_ShouldNotProcess_NonExpiredRoomsInBatches(SERoomAccessType roomAccessType, SERoomType roomType)
+    {
+        var now = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        _mockClock.Setup(c => c.UtcNow).Returns(now);
+
+        var rooms = new List<Room>();
+        for (int i = 0; i < 20; i++)
+        {
+            rooms.Add(new Room("test", roomAccessType, roomType) { Status = SERoomStatus.Review, UpdateDate = now.AddDays(-1) });
+        }
+
+        await _dbContext.Rooms.AddRangeAsync(rooms);
+        var newRoom = await _dbContext.Rooms.AddAsync(new Room("test 2", roomAccessType, roomType) { Status = SERoomStatus.New, UpdateDate = now.AddDays(-31) });
+        await _dbContext.SaveChangesAsync();
+        _dbContext.ChangeTracker.Clear();
+
+        await _service.ProcessAsync(CancellationToken.None);
+
+        var roomIds = rooms.ConvertAll(e => e.Id);
+        rooms = _dbContext.Rooms.Where(e => roomIds.Contains(e.Id)).ToList();
+        rooms.All(r => r.Status != SERoomStatus.Expire).Should().BeTrue();
+        var actualNewRoom = await _dbContext.Rooms.FindAsync(newRoom.Entity.Id);
+        actualNewRoom.Status.Should().Be(SERoomStatus.New);
     }
 }
