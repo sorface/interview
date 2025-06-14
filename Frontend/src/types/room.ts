@@ -4,7 +4,7 @@ import { QuestionsTree } from './questionsTree';
 import { Tag } from './tag';
 import { User, UserType } from './user';
 
-export type RoomStatus = 'New' | 'Active' | 'Review' | 'Close';
+export type RoomStatus = 'New' | 'Active' | 'Review' | 'Close' | 'Expire';
 
 export enum RoomAccessType {
   Public = 'Public',
@@ -143,13 +143,7 @@ export interface RoomBusinessAnalytic {
 export interface RoomBusinessAnalyticTypeItem {
   date: string;
   status: Array<{
-    name: RoomBusinessAnalyticTypeItemStatus;
+    name: RoomStatus;
     count: number;
   }>;
 }
-
-export type RoomBusinessAnalyticTypeItemStatus =
-  | 'New'
-  | 'Active'
-  | 'Review'
-  | 'Close';

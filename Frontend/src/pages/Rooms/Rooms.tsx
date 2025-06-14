@@ -280,12 +280,14 @@ export const Rooms: FunctionComponent<RoomsProps> = ({ mode }) => {
       Active: localizationCaptions[LocalizationKey.RoomStatusActive],
       Review: localizationCaptions[LocalizationKey.RoomStatusReview],
       Close: localizationCaptions[LocalizationKey.RoomStatusClose],
+      Expire: localizationCaptions[LocalizationKey.RoomStatusExpire],
     };
     const tagStates: Record<Room['status'], TagState> = {
       New: TagState.Waiting,
       Active: TagState.Pending,
       Review: TagState.WaitingForAction,
       Close: TagState.Closed,
+      Expire: TagState.Closed,
     };
 
     const roomLink = getRoomLink(room);
