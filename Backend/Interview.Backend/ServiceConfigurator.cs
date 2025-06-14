@@ -6,9 +6,11 @@ using System.Threading.RateLimiting;
 using Ardalis.SmartEnum.SystemTextJson;
 using Interview.Backend.Auth;
 using Interview.Backend.Auth.Sorface;
+using Interview.Backend.BackgroundServices;
 using Interview.Backend.Swagger;
 using Interview.DependencyInjection;
 using Interview.Domain;
+using Interview.Domain.Rooms.RoomExpireServices;
 using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Infrastructure.WebSocket;
 using Interview.Infrastructure.WebSocket.PubSub;
@@ -57,6 +59,7 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
                 options.JsonSerializerOptions.Converters.Add(new SmartEnumNameConverter<RoomQuestionState, int>());
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
+        serviceCollection.AddHostedService<RoomExpireServiceBackgroundService>();
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         serviceCollection.AddEndpointsApiExplorer();
@@ -101,6 +104,8 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
         var adminUsers = configuration.GetSection(nameof(AdminUsers))
             .Get<AdminUsers>() ?? throw new ArgumentException($"Not found \"{nameof(AdminUsers)}\" section");
 
+        var roomExpireSettings = GetRoomExpireSettings();
+
         var dbProvider = GetDbProvider();
         var serviceOption = new DependencyInjectionAppServiceOption
         {
@@ -116,7 +121,8 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
                             builder => builder.MigrationsAssembly(typeof(Migrations.Sqlite.AppDbContextFactory).Assembly.FullName));
                         break;
                     case DbProvider.Postgres:
-                        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+                        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior",
+                            true);
                         optionsBuilder.UseNpgsql(
                             connectionString,
                             builder => builder.MigrationsAssembly(typeof(Migrations.Postgres.AppDbContextFactory).Assembly.FullName));
@@ -129,7 +135,10 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
             EventStorageConfigurator = builder =>
             {
                 RedisEnvironmentConfigure.Configure(configuration,
-                    (host, port, username, password) =>
+                    (host,
+                        port,
+                        username,
+                        password) =>
                     {
                         logger.Information("Use redis event storage");
                         builder.UseRedis($@"redis://{username}:{password}@{host}:{port}");
@@ -147,6 +156,7 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
                         builder.UseEmpty();
                     });
             },
+            RoomExpireSettings = roomExpireSettings,
         };
 
         serviceCollection.AddAppServices(serviceOption);
@@ -275,6 +285,23 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
         }
 
         return DbProvider.Unknown;
+    }
+
+    private RoomExpireSettings GetRoomExpireSettings()
+    {
+        var roomExpireSettings = configuration.GetSection(nameof(RoomExpireSettings))
+            .Get<RoomExpireSettings>() ?? throw new ArgumentException($"Not found \"{nameof(RoomExpireSettings)}\" section");
+        if (roomExpireSettings.ActiveDayExpiration <= 0)
+        {
+            throw new ArgumentException("RoomExpireSettings.ActiveDayExpiration must be greater than zero");
+        }
+
+        if (roomExpireSettings.ReviewDayExpiration <= 0)
+        {
+            throw new ArgumentException("RoomExpireSettings.ReviewDayExpiration must be greater than zero");
+        }
+
+        return roomExpireSettings;
     }
 
     private enum DbProvider

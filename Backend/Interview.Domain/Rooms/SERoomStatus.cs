@@ -12,7 +12,11 @@ public class SERoomStatus(string name, char value, EVRoomStatus enumValue) : Sma
 
     public static readonly SERoomStatus Close = new SERoomStatus("Closed", 'C', EVRoomStatus.Close);
 
+    public static readonly SERoomStatus Expire = new SERoomStatus("Expired", 'E', EVRoomStatus.Expire);
+
     public static readonly SERoomStatus[] ActiveStatuses = [New, Active];
+
+    public static readonly SERoomStatus[] CloseStatuses = [Close, Expire];
 
     public EVRoomStatus EnumValue { get; } = enumValue;
 

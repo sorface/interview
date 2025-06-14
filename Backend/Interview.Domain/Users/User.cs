@@ -9,6 +9,8 @@ namespace Interview.Domain.Users;
 
 public class User(Guid id, string nickname, string externalId) : Entity(id)
 {
+    public static readonly User Backend = new(Guid.Parse("C560B516-238C-45DD-B394-352757FC6380"), "Backend", string.Empty);
+
     public User(string nickname, string externalId)
         : this(Guid.Empty, nickname, externalId)
     {

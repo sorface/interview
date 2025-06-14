@@ -91,7 +91,8 @@ public class RoomQuestionEvaluationService(
         }
         else
         {
-            if (questionEvaluation.RoomQuestion?.Room?.Status == SERoomStatus.Close)
+            var roomStatus = questionEvaluation.RoomQuestion?.Room?.Status;
+            if (roomStatus is not null && SERoomStatus.CloseStatuses.Contains(roomStatus))
             {
                 throw new UserException("The user cannot change the evaluation because the room is closed.");
             }
