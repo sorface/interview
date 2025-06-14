@@ -66,6 +66,7 @@ public class WebSocketController(WebSocketConnectionHandler connectionHandler, I
         catch (OperationCanceledException)
         {
             // ignore
+            throw;
         }
         catch (Exception e)
         {

@@ -1,11 +1,13 @@
 using System.Net.WebSockets;
 using Interview.Domain;
+using Interview.Domain.Database;
 using Interview.Domain.Rooms;
 using Interview.Domain.Rooms.RoomParticipants;
 using Interview.Domain.Rooms.Service;
 using Interview.Domain.Users;
 using Interview.Infrastructure.WebSocket.Events;
 using Interview.Infrastructure.WebSocket.Events.ConnectionListener;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -15,10 +17,10 @@ namespace Interview.Infrastructure.WebSocket;
 /// Web socket connection handler.
 /// </summary>
 public class WebSocketConnectionHandler(
-    IRoomService roomService,
     WebSocketReader webSocketReader,
     IEnumerable<IConnectionListener> connectionListeners,
-    ILogger<WebSocketConnectionHandler> logger)
+    ILogger<WebSocketConnectionHandler> logger,
+    AppDbContext dbContext)
 {
     private readonly IConnectionListener[] _connectListeners = connectionListeners.ToArray();
 
@@ -32,6 +34,7 @@ public class WebSocketConnectionHandler(
         catch (OperationCanceledException)
         {
             // ignore
+            throw;
         }
         catch (Exception e)
         {
@@ -76,14 +79,23 @@ public class WebSocketConnectionHandler(
 
     private async Task<WebSocketConnectDetail?> HandleAsyncCore(WebSocketConnectHandlerRequest request, CancellationToken ct)
     {
-        var (dbRoom, participant) = await roomService.AddParticipantAsync(request.RoomId, request.User.Id, ct);
-        using var scope = CreateLoggingScope(dbRoom, participant);
+        var roomParticipantDetail = await dbContext.RoomParticipants
+            .Include(e => e.Room)
+            .Where(e => e.RoomId == request.RoomId && e.UserId == request.User.Id)
+            .Select(e => new { e.Id, e.Type, e.Room })
+            .FirstOrDefaultAsync(ct);
+        if (roomParticipantDetail is null)
+        {
+            throw new AccessDeniedException("No room participants found");
+        }
+
+        using var scope = CreateLoggingScope(request, roomParticipantDetail.Room, roomParticipantDetail.Id, roomParticipantDetail.Type);
         logger.LogInformation("Connect to room");
 
         try
         {
-            var participantType = participant.Type.EnumValue;
-            var detail = new WebSocketConnectDetail(request.WebSocket, dbRoom, request.User, participantType);
+            var participantType = roomParticipantDetail.Type.EnumValue;
+            var detail = new WebSocketConnectDetail(request.WebSocket, roomParticipantDetail.Room, request.User, participantType);
 
             await HandleListenersSafely(
                 nameof(IConnectionListener.OnConnectAsync),
@@ -91,7 +103,7 @@ public class WebSocketConnectionHandler(
 
             var waitTask = CreateWaitTask(ct);
             var scopeFactory = request.ServiceProvider.GetRequiredService<CurrentUserServiceScopeFactory>();
-            var readerTask = Task.Run(() => webSocketReader.ReadAsync(request.User, dbRoom, participantType, scopeFactory, request.WebSocket, ct), ct);
+            var readerTask = Task.Run(() => webSocketReader.ReadAsync(request.User, roomParticipantDetail.Room, participantType, scopeFactory, request.WebSocket, ct), ct);
             await Task.WhenAny(waitTask, readerTask);
             await CloseSafely(request.WebSocket, WebSocketCloseStatus.NormalClosure, string.Empty, ct);
             return detail;
@@ -107,19 +119,19 @@ public class WebSocketConnectionHandler(
         }
     }
 
-    private IDisposable? CreateLoggingScope(Room dbRoom, RoomParticipant participant)
+    private IDisposable? CreateLoggingScope(WebSocketConnectHandlerRequest request, Room dbRoom, Guid participantId, SERoomParticipantType type)
     {
         var keyValuePairs = new List<KeyValuePair<string, object>>
         {
             new("RoomId", dbRoom.Id),
             new("RoomName", dbRoom.Name),
-            new("ParticipantId", participant.Id),
-            new("ParticipantType", participant.Type.Name),
-            new("UserId", participant.UserId),
+            new("ParticipantId", participantId),
+            new("ParticipantType", type.Name),
+            new("UserId", request.User.Id),
         };
-        if (participant.User?.Nickname is not null)
+        if (request.User?.Nickname is not null)
         {
-            keyValuePairs.Add(new KeyValuePair<string, object>("Nickname", participant.User.Nickname));
+            keyValuePairs.Add(new KeyValuePair<string, object>("Nickname", request.User.Nickname));
         }
 
         return logger.BeginScope(keyValuePairs);
