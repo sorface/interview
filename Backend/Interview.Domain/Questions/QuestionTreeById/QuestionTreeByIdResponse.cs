@@ -9,6 +9,8 @@ public class QuestionTreeByIdResponse
 
     public required string Name { get; set; }
 
+    public required string? ThemeAiDescription { get; set; }
+
     public required Guid RootQuestionSubjectTreeId { get; set; }
 
     public required List<QuestionTreeByIdResponseTree> Tree { get; set; }

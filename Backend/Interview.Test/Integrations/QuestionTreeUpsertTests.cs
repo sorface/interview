@@ -71,6 +71,7 @@ public class QuestionTreeUpsertTests
         {
             Id = Guid.NewGuid(),
             Name = "New Tree",
+            ThemeAiDescription = "Test Theme",
             Order = 1,
             Tree = new List<UpsertQuestionSubjectTreeRequest>
             {
@@ -95,6 +96,7 @@ public class QuestionTreeUpsertTests
             .Single(e => e.Id == request.Id);
 
         dbTree.Name.Should().Be(request.Name);
+        dbTree.ThemeAiDescription.Should().Be(request.ThemeAiDescription);
         dbTree.Order.Should().Be(request.Order);
         dbTree.ParentQuestionTreeId.Should().Be(request.ParentQuestionTreeId);
         dbTree.RootQuestionSubjectTreeId.Should().Be(request.Tree.Where(e => e.ParentQuestionSubjectTreeId is null).Select(e => e.Id).Single());
@@ -130,6 +132,7 @@ public class QuestionTreeUpsertTests
         {
             Id = existingTree.Id,
             Name = "Updated Tree",
+            ThemeAiDescription = "New Theme",
             Order = 2,
             Tree = new List<UpsertQuestionSubjectTreeRequest>
             {
@@ -153,6 +156,7 @@ public class QuestionTreeUpsertTests
             .Single(e => e.Id == request.Id);
 
         dbTree.Name.Should().Be(request.Name);
+        dbTree.ThemeAiDescription.Should().Be(request.ThemeAiDescription);
         dbTree.Order.Should().Be(request.Order);
         dbTree.ParentQuestionTreeId.Should().Be(request.ParentQuestionTreeId);
         dbTree.RootQuestionSubjectTreeId.Should().Be(request.Tree.Where(e => e.ParentQuestionSubjectTreeId is null).Select(e => e.Id).Single());

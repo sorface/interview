@@ -48,6 +48,7 @@ export const QuestionTreeCreate: FunctionComponent<QuestionTreeCreateProps> = ({
   const localizationCaptions = useLocalizationCaptions();
   const [rootNodeFakeId] = useState(crypto.randomUUID());
   const [name, setName] = useState('');
+  const [themeAiDescription, setThemeAiDescription] = useState('');
   const { id } = useParams();
   const navigate = useNavigate();
   const [displayTreeViewer, setDisplayTreeViewer] = useState(!edit);
@@ -85,6 +86,7 @@ export const QuestionTreeCreate: FunctionComponent<QuestionTreeCreateProps> = ({
     }
     const parsed = parseTreeFromBackend(getedTree);
     setName(getedTree.name);
+    setThemeAiDescription(getedTree.themeAiDescription || '');
     setTreeData({
       ...defaultTreeData,
       children: parsed,
@@ -106,6 +108,10 @@ export const QuestionTreeCreate: FunctionComponent<QuestionTreeCreateProps> = ({
 
   const handleCategoryOrderChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
+  };
+
+  const handleDescriptionChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setThemeAiDescription(event.target.value);
   };
 
   useEffect(() => {
@@ -152,6 +158,7 @@ export const QuestionTreeCreate: FunctionComponent<QuestionTreeCreateProps> = ({
     fetchUpsert({
       id: treeId,
       name: name,
+      themeAiDescription: themeAiDescription,
       order: 0,
       parentQuestionTreeId: null,
       tree: treeForBackend.map((node) => ({
@@ -167,22 +174,36 @@ export const QuestionTreeCreate: FunctionComponent<QuestionTreeCreateProps> = ({
       <PageHeader
         title={localizationCaptions[LocalizationKey.QuestionTreesPageName]}
       />
-      <div className="flex items-center">
-        <label htmlFor="name">
-          {localizationCaptions[LocalizationKey.QuestionTreeName]}:
-        </label>
-        <Gap sizeRem={0.5} horizontal />
-        <input
-          id="name"
-          name="name"
-          type="text"
-          size={30}
-          value={name}
-          onChange={handleCategoryOrderChange}
-        />
-        <Button className="ml-auto" onClick={handleCreate}>
-          {localizationCaptions[LocalizationKey.Save]}
-        </Button>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center">
+          <label htmlFor="name">
+            {localizationCaptions[LocalizationKey.QuestionTreeName]}:
+          </label>
+          <Gap sizeRem={0.5} horizontal />
+          <input
+            id="name"
+            name="name"
+            type="text"
+            size={30}
+            value={name}
+            onChange={handleCategoryOrderChange}
+          />
+        </div>
+        <div className="flex items-center">
+          <label htmlFor="themeAiDescription">Theme AI Description:</label>
+          <Gap sizeRem={0.5} horizontal />
+          <input
+            id="themeAiDescription"
+            name="themeAiDescription"
+            type="text"
+            size={50}
+            value={themeAiDescription}
+            onChange={handleDescriptionChange}
+          />
+          <Button className="ml-auto" onClick={handleCreate}>
+            {localizationCaptions[LocalizationKey.Save]}
+          </Button>
+        </div>
       </div>
       <Gap sizeRem={0.75} />
       <div className="flex items-center">

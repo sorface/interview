@@ -374,7 +374,10 @@ export const RoomQuestionPanelAi: FunctionComponent<
       conversationId: `${room?.id}${initialQuestion?.id}${auth?.id}`,
       question: initialQuestion?.value || '',
       questionId: initialQuestion?.id || '',
-      theme: room?.questionTree?.name || '',
+      theme:
+        room?.questionTree?.themeAiDescription ||
+        room?.questionTree?.name ||
+        '',
       userId: auth?.id || '',
       taskDescription: initialQuestion?.value || '',
       code: questionCode || '',

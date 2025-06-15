@@ -28,6 +28,7 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
         }
 
         request.Name = request.Name.Trim();
+        request.ThemeAiDescription = request.ThemeAiDescription?.Trim();
 
         if (!request.IsValidTree(out var errorMessage))
         {
@@ -144,6 +145,7 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
 
         tree.Order = request.Order;
         tree.Name = request.Name;
+        tree.ThemeAiDescription = request.ThemeAiDescription;
         tree.RootQuestionSubjectTreeId = request.Tree.Single(e => e.ParentQuestionSubjectTreeId is null).Id;
 
         await db.SaveChangesAsync(cancellationToken);
@@ -178,6 +180,7 @@ public class QuestionTreeUpsert(AppDbContext db) : ISelfScopeService
             ParentQuestionTreeId = request.ParentQuestionTreeId,
             Order = request.Order,
             RootQuestionSubjectTreeId = subjectTrees.Single(e => e.ParentQuestionSubjectTreeId is null).Id,
+            ThemeAiDescription = request.ThemeAiDescription,
         };
         await db.QuestionTree.AddAsync(tree, cancellationToken);
         await db.SaveChangesAsync(cancellationToken);
