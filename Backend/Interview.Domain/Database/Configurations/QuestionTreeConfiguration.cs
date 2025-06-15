@@ -10,6 +10,8 @@ public class QuestionTreeConfiguration : EntityTypeConfigurationBase<QuestionTre
         builder.Property(e => e.Name)
             .HasMaxLength(256)
             .IsRequired();
+        builder.Property(e => e.ThemeAiDescription)
+            .HasMaxLength(50);
         builder.Property(e => e.Order).IsRequired();
         builder.Property(e => e.RootQuestionSubjectTreeId).IsRequired();
         builder.HasOne(e => e.RootQuestionSubjectTree)

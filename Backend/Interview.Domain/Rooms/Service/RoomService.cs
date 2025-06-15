@@ -327,6 +327,7 @@ public sealed class RoomService(
                         Name = e.QuestionTree.Name,
                         RootQuestionSubjectTreeId = e.QuestionTree.RootQuestionSubjectTreeId,
                         Tree = new List<QuestionTreeByIdResponseTree>(),
+                        ThemeAiDescription = e.QuestionTree.ThemeAiDescription,
                     }
                     : null,
             })
@@ -758,6 +759,7 @@ public sealed class RoomService(
                         Name = room.QuestionTree.Name,
                         RootQuestionSubjectTreeId = room.QuestionTree.RootQuestionSubjectTreeId,
                         Tree = new List<QuestionTreeByIdResponseTree>(),
+                        ThemeAiDescription = room.QuestionTree.ThemeAiDescription,
                     }
                     : null,
             })

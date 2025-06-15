@@ -384,6 +384,7 @@ public class QuestionService(
             {
                 e.Id,
                 e.Name,
+                e.ThemeAiDescription,
                 e.RootQuestionSubjectTreeId,
                 e.IsArchived,
             })
@@ -399,6 +400,7 @@ public class QuestionService(
             RootQuestionSubjectTreeId = questionTree.RootQuestionSubjectTreeId,
             Name = questionTree.Name,
             Tree = new List<QuestionTreeByIdResponseTree>(),
+            ThemeAiDescription = questionTree.ThemeAiDescription,
         };
         await response.FillTreeAsync(db, cancellationToken);
         return response;
