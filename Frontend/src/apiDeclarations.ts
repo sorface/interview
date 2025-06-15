@@ -535,6 +535,7 @@ export interface GetQuestionsTreesParams extends PaginationUrlParams {
 export interface CreateQuestionTreeBody {
   id: string;
   name: string;
+  themeAiDescription?: string;
   order: number;
   parentQuestionTreeId: string | null;
   tree: Array<{
