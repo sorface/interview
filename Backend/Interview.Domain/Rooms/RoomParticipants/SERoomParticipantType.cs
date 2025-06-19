@@ -51,6 +51,7 @@ public sealed class SERoomParticipantType : SmartEnum<SERoomParticipantType>
         SEPermission.RoomReviewCompletion,
         SEPermission.RoomReviewUpsert,
         SEPermission.GetRoomQuestionAnswerDetails,
+        SEPermission.GetRoomQuestionClosedAnalytics,
     });
 
     public static readonly SERoomParticipantType Examinee = new("Examinee", EVRoomParticipantType.Examinee, new HashSet<SEPermission>

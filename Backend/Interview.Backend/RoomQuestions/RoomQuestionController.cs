@@ -54,4 +54,19 @@ public class RoomQuestionController(IRoomQuestionService roomQuestionService) : 
     {
         return roomQuestionService.GetAnswerDetailsAsync(request, HttpContext.RequestAborted);
     }
+
+    /// <summary>
+    /// Get analytics for closed questions.
+    /// </summary>
+    /// <param name="roomId">Room ID.</param>
+    /// <returns>Analytics for closed questions.</returns>
+    [Authorize]
+    [HttpGet("closed-analytics/{roomId:guid}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(RoomQuestionClosedAnalytics), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
+    public Task<RoomQuestionClosedAnalytics> GetClosedQuestionsAnalyticsAsync(Guid roomId)
+    {
+        return roomQuestionService.GetClosedQuestionsAnalyticsAsync(roomId, HttpContext.RequestAborted);
+    }
 }

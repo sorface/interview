@@ -241,5 +241,8 @@ public enum EVPermission
 
     [Description("Find archived roadmap page")]
     RoadmapFindArchivedPage,
+
+    [Description("Getting closed questions analytics")]
+    GetRoomQuestionClosedAnalytics,
 #pragma warning restore SA1602
 }

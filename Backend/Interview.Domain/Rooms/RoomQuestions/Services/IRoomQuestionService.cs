@@ -21,4 +21,6 @@ public interface IRoomQuestionService : IService
 
     Task<List<RoomQuestionResponse>> FindQuestionsAsync(
         RoomQuestionsRequest request, CancellationToken cancellationToken = default);
+
+    Task<RoomQuestionClosedAnalytics> GetClosedQuestionsAnalyticsAsync(Guid roomId, CancellationToken cancellationToken = default);
 }

@@ -46,4 +46,10 @@ public class RoomQuestionServicePermissionAccessor(
         await securityService.EnsureRoomPermissionAsync(request.RoomId, SEPermission.RoomQuestionFindGuids, cancellationToken);
         return await roomQuestionService.FindQuestionsAsync(request, cancellationToken);
     }
+
+    public async Task<RoomQuestionClosedAnalytics> GetClosedQuestionsAnalyticsAsync(Guid roomId, CancellationToken cancellationToken = default)
+    {
+        await securityService.EnsureRoomPermissionAsync(roomId, SEPermission.GetRoomQuestionClosedAnalytics, cancellationToken);
+        return await roomQuestionService.GetClosedQuestionsAnalyticsAsync(roomId, cancellationToken);
+    }
 }
