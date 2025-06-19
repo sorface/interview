@@ -67,11 +67,11 @@ export const QuestionsSubCategories: FunctionComponent = () => {
       });
       return (
         <li key={category.id}>
-          <div className="flex items-center bg-wrap p-[1rem] mb-[1rem] rounded-[0.5rem]">
-            <Link to={path}>
+          <Link to={path} className="no-underline">
+            <div className="flex items-center bg-wrap p-[1rem] mb-[1rem] rounded-[0.5rem]">
               <Typography size="l">{category.name}</Typography>
-            </Link>
-          </div>
+            </div>
+          </Link>
         </li>
       );
     },
@@ -81,7 +81,7 @@ export const QuestionsSubCategories: FunctionComponent = () => {
   return (
     <MainContentWrapper>
       <PageHeader
-        title={localizationCaptions[LocalizationKey.CategoriesPageName]}
+        title={localizationCaptions[LocalizationKey.QuestionsPageName]}
         searchValue={searchValueInput}
         onSearchChange={setSearchValueInput}
       >

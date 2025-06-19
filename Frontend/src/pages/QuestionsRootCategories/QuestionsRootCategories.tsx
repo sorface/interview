@@ -1,6 +1,7 @@
 import React, {
   FunctionComponent,
   useCallback,
+  useContext,
   useEffect,
   useState,
 } from 'react';
@@ -22,11 +23,15 @@ import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Button } from '../../components/Button/Button';
 import { Typography } from '../../components/Typography/Typography';
 import { Gap } from '../../components/Gap/Gap';
+import { AuthContext } from '../../context/AuthContext';
+import { checkAdmin } from '../../utils/checkAdmin';
 
 const pageSize = 30;
 const initialPageNumber = 1;
 
 export const QuestionsRootCategories: FunctionComponent = () => {
+  const auth = useContext(AuthContext);
+  const admin = checkAdmin(auth);
   const localizationCaptions = useLocalizationCaptions();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const [searchValueInput, setSearchValueInput] = useState('');
@@ -65,11 +70,11 @@ export const QuestionsRootCategories: FunctionComponent = () => {
     });
     return (
       <li key={category.id}>
-        <div className="flex items-center bg-wrap p-[1rem] mb-[1rem] rounded-[0.5rem]">
-          <Link to={path}>
+        <Link to={path} className="no-underline">
+          <div className="flex items-center bg-wrap p-[1rem] mb-[1rem] rounded-[0.5rem]">
             <Typography size="l">{category.name}</Typography>
-          </Link>
-        </div>
+          </div>
+        </Link>
       </li>
     );
   }, []);
@@ -77,25 +82,29 @@ export const QuestionsRootCategories: FunctionComponent = () => {
   return (
     <MainContentWrapper>
       <PageHeader
-        title={localizationCaptions[LocalizationKey.CategoriesPageName]}
+        title={localizationCaptions[LocalizationKey.QuestionsPageName]}
         searchValue={searchValueInput}
         onSearchChange={setSearchValueInput}
       >
-        <Link to={pathnames.categoriesCreate}>
-          <Button variant="active" className="h-[2.5rem]">
-            <Icon name={IconNames.Add} />
-            {localizationCaptions[LocalizationKey.CreateCategory]}
-          </Button>
-        </Link>
+        {admin && (
+          <Link to={pathnames.categoriesCreate}>
+            <Button variant="active" className="h-[2.5rem]">
+              <Icon name={IconNames.Add} />
+              {localizationCaptions[LocalizationKey.CreateCategory]}
+            </Button>
+          </Link>
+        )}
       </PageHeader>
-      <div className="text-left">
-        <Link to={pathnames.questionsArchive}>
-          <Typography size="l">
-            {localizationCaptions[LocalizationKey.QuestionsArchive]}
-          </Typography>
-        </Link>
-        <Gap sizeRem={1} />
-      </div>
+      {admin && (
+        <div className="text-left">
+          <Link to={pathnames.questionsArchive}>
+            <Typography size="l">
+              {localizationCaptions[LocalizationKey.QuestionsArchive]}
+            </Typography>
+          </Link>
+          <Gap sizeRem={1} />
+        </div>
+      )}
       <ProcessWrapper loading={false} error={error}>
         <ItemsGrid
           currentData={categories}

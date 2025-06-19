@@ -57,26 +57,20 @@ export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
           ),
         }
       : null,
-    admin
-      ? {
-          path: pathnames.questionsRootCategories,
-          caption: (
-            <LocalizationCaption
-              captionKey={LocalizationKey.QuestionsPageName}
-            />
-          ),
-        }
-      : null,
-    admin
-      ? {
-          path: pathnames.highlightRooms,
-          caption: (
-            <LocalizationCaption
-              captionKey={LocalizationKey.HighlightsRoomsPageName}
-            />
-          ),
-        }
-      : null,
+    {
+      path: pathnames.questionsRootCategories,
+      caption: (
+        <LocalizationCaption captionKey={LocalizationKey.QuestionsPageName} />
+      ),
+    },
+    {
+      path: pathnames.highlightRooms,
+      caption: (
+        <LocalizationCaption
+          captionKey={LocalizationKey.HighlightsRoomsPageName}
+        />
+      ),
+    },
     admin
       ? {
           path: pathnames.categories,
