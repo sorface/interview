@@ -842,6 +842,20 @@ export const RoomQuestionPanelAi: FunctionComponent<
                               <Gap sizeRem={0.25} horizontal />
                               {localizationCaptions[LocalizationKey.TextAnswer]}
                             </Button>
+                            <Gap sizeRem={0.5} horizontal />
+                            <Button
+                              variant="inverted"
+                              className="w-fit"
+                              onClick={handleNextQuestion}
+                            >
+                              <Icon name={IconNames.ChevronForward} />
+                              <Gap sizeRem={0.25} horizontal />
+                              {
+                                localizationCaptions[
+                                  LocalizationKey.SkipQuestion
+                                ]
+                              }
+                            </Button>
                           </div>
                         )}
                         {recognitionNotSupported &&
