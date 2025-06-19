@@ -137,4 +137,19 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
     {
         return questionService.DeletePermanentlyAsync(id, HttpContext.RequestAborted);
     }
+
+    /// <summary>
+    /// Get analytics for a question.
+    /// </summary>
+    /// <param name="id">Question ID.</param>
+    /// <returns>Question analytics data.</returns>
+    [Authorize]
+    [HttpGet("{id:guid}/analytics")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(QuestionAnalytics), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
+    public Task<QuestionAnalytics> GetAnalyticsAsync(Guid id)
+    {
+        return questionService.GetAnalyticsAsync(id, HttpContext.RequestAborted);
+    }
 }
