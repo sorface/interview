@@ -40,8 +40,8 @@ export const defaultCodeEditorFontSize = 13;
 const fontSizeOptions = [10, 12, 13, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48];
 
 const languagesForExecute: CodeEditorLang[] = [
-  CodeEditorLang.Javascript,
-  CodeEditorLang.Html,
+  // CodeEditorLang.Javascript,
+  // CodeEditorLang.Html,
 ];
 
 const fontSizeLocalStorageKey = 'codeEditorFontSize';
@@ -236,6 +236,16 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
             {localizationCaptions[LocalizationKey.Run]}
             <Gap sizeRem={0.25} horizontal />
             <Icon inheritFontSize name={IconNames.PaperPlane} />
+          </Button>
+        )}
+        {onExecutionResultsSubmit && (
+          <Button
+            variant="active"
+            className="min-h-[1.75rem] !p-0 text-[0.75rem]"
+            onClick={handleExecutionResultsSubmit}
+            disabled={!value?.length}
+          >
+            {localizationCaptions[LocalizationKey.ExecutionResultsSubmit]}
           </Button>
         )}
       </div>
