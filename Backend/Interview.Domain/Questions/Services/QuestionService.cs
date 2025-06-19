@@ -426,75 +426,68 @@ public class QuestionService(
     public Task UnarchiveQuestionTreeAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return db.RunTransactionAsync(async ct =>
+        {
+            var tree = await archiveQuestionTreeService.UnarchiveAsync(id, false, ct);
+            var nodes = await db.QuestionSubjectTree.GetAllChildrenAsync(tree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
+            foreach (var subjectTreeId in nodes)
             {
-                var tree = await archiveQuestionTreeService.UnarchiveAsync(id, false, ct);
-                await QuestionTreeUpsert.EnsureNonDuplicateByNameAsync(db, tree.Id, tree.Name, tree.ParentQuestionTreeId, cancellationToken);
-                var nodes = await db.QuestionSubjectTree.GetAllChildrenAsync(tree.RootQuestionSubjectTreeId, e => e.ParentQuestionSubjectTreeId, true, cancellationToken);
-                foreach (var subjectTreeId in nodes)
-                {
-                    await archiveQuestionSubjectTreeService.UnarchiveAsync(subjectTreeId, false, ct);
-                }
+                await archiveQuestionSubjectTreeService.UnarchiveAsync(subjectTreeId, false, ct);
+            }
 
-                await db.SaveChangesAsync(ct);
-                return DBNull.Value;
-            },
+            await db.SaveChangesAsync(ct);
+            return DBNull.Value;
+        },
             cancellationToken);
+    }
+
+    public Task<QuestionAnalytics> GetAnalyticsAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var questionAnalyticService = new QuestionAnalyticService(db);
+        return questionAnalyticService.GetAnalyticsAsync(id, cancellationToken);
     }
 
     private static string EnsureValidQuestionValue(string value)
     {
-        value = value?.Trim() ?? string.Empty;
-        if (string.IsNullOrWhiteSpace(value) || value.Length < 3)
+        if (string.IsNullOrWhiteSpace(value))
         {
-            throw new UserException("Question value must be at least 3 characters long");
+            throw new UserException("Question value cannot be empty.");
         }
 
-        return value;
+        return value.Trim();
     }
 
-    private async Task<QuestionItem> ToQuestionItemAsync(Question entity, CancellationToken cancellationToken)
+    private async Task<QuestionItem> ToQuestionItemAsync(Question question, CancellationToken cancellationToken)
     {
-        var category = entity.Category;
-        if (category is null && entity.CategoryId is not null)
-        {
-            category = await db.Categories.Include(e => e.Parent).AsNoTracking().FirstOrDefaultAsync(e => e.Id == entity.CategoryId, cancellationToken);
-        }
-
         return new QuestionItem
         {
-            Id = entity.Id,
-            Value = entity.Value,
-            Tags = entity.Tags.Select(e => new TagItem
+            Id = question.Id,
+            Value = question.Value,
+            Tags = question.Tags.Select(e => new TagItem
             {
                 Id = e.Id,
                 Value = e.Value,
                 HexValue = e.HexColor,
             })
                 .ToList(),
-            Category = category is null ? null : CategoryResponse.Mapper.Map(category),
-            Answers = entity.Answers.Select(q => new QuestionAnswerResponse
-            {
-                Id = q.Id,
-                Title = q.Title,
-                Content = q.Content,
-                CodeEditor = q.CodeEditor,
-            })
+            Category = question.CategoryId is not null
+                ? await db.Categories.AsNoTracking()
+                    .Include(e => e.Parent)
+                    .Where(e => e.Id == question.CategoryId)
+                    .OrderBy(e => e.Order)
+                    .Select(CategoryResponse.Mapper.Expression)
+                    .FirstOrDefaultAsync(cancellationToken)
+                : null,
+            Answers = question.Answers.Select(QuestionAnswerResponse.Mapper.Map)
                 .ToList(),
-            CodeEditor = entity.CodeEditor == null
+            CodeEditor = question.CodeEditor == null
                 ? null
                 : new QuestionCodeEditorResponse
                 {
-                    Content = entity.CodeEditor.Content,
-                    Lang = entity.CodeEditor.Lang,
+                    Content = question.CodeEditor.Content,
+                    Lang = question.CodeEditor.Lang,
                 },
-            Author = entity.CreatedBy == null
-                ? null
-                : new QuestionItemAuthorResponse
-                {
-                    Nickname = entity.CreatedBy.Nickname,
-                    UserId = entity.CreatedBy.Id,
-                },
-            Type = entity.Type.EnumValue,
+            Author = null,
+            Type = question.Type.EnumValue,
         };
     }
 }

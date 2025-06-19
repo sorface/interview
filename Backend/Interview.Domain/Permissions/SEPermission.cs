@@ -49,6 +49,10 @@ public class SEPermission(Guid id, EVPermission value) : SmartEnum<SEPermission>
         Guid.Parse("32e18595-1c0a-4dd5-bad7-2cbfbccbcb2a"),
         EVPermission.QuestionUnarchive);
 
+    public static readonly SEPermission QuestionGetAnalytics = new(
+        Guid.Parse("f8d2e595-1c0a-4dd5-bad7-2cbfbccbcb2b"),
+        EVPermission.QuestionGetAnalytics);
+
     public static readonly SEPermission ReactionFindPage = new(
         Guid.Parse("004cca49-9857-4973-9bda-79b57f60279b"),
         EVPermission.ReactionFindPage);

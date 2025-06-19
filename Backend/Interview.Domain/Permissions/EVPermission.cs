@@ -32,6 +32,9 @@ public enum EVPermission
     [Description("Unarchiving the question")]
     QuestionUnarchive,
 
+    [Description("Getting analytics for a question")]
+    QuestionGetAnalytics,
+
     [Description("Getting the reactions page")]
     ReactionFindPage,
 
