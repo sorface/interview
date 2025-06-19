@@ -44,6 +44,10 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
     { path: pathnames.room.replace(`/:${inviteParamName}?`, ''), end: false },
     location.pathname,
   );
+  const roomsPage = matchPath(
+    { path: pathnames.highlightRooms },
+    location.pathname,
+  );
   const authenticated = !!user;
   const hasNavMenu = !fullScreenPage && authenticated;
 
@@ -54,7 +58,7 @@ export const AppRoutes: FunctionComponent<AppRoutesProps> = ({ user }) => {
         className={`App ${fullScreenPage ? 'full-screen-page' : ''} ${device === 'Desktop' ? 'px-[2.5rem]' : 'px-[1.25rem]'}`}
       >
         <div
-          className={`App-content ${device === 'Desktop' && !fullScreenPage ? 'px-[13.625rem]' : ''}`}
+          className={`App-content ${device === 'Desktop' && !fullScreenPage && !roomsPage ? 'px-[13.625rem]' : ''}`}
         >
           <Routes>
             <Route path={pathnames.home} element={<Home />} />
