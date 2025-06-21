@@ -660,7 +660,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
     handleNextQuestion();
   }, [recognitionCommand, initialQuestion, room, handleNextQuestion]);
 
-  const handleStartReviewRoom = () => {
+  const handleStartReviewRoom = useCallback(() => {
     if (!room?.id) {
       throw new Error('Room id not found');
     }
@@ -672,7 +672,20 @@ export const RoomQuestionPanelAi: FunctionComponent<
       }),
     );
     fetchRoomStartReview({ roomId: room.id });
-  };
+  }, [
+    room?.id,
+    room?.questionTree?.id,
+    roomQuestions.length,
+    fetchRoomStartReview,
+  ]);
+
+  const handleNextQuestionOrReview = useCallback(() => {
+    if (readyToReview) {
+      handleStartReviewRoom();
+      return;
+    }
+    handleNextQuestion();
+  }, [readyToReview, handleStartReviewRoom, handleNextQuestion]);
 
   const handleExecutionResultsSubmit = (
     code: string | undefined,
@@ -846,7 +859,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                             <Button
                               variant="inverted"
                               className="w-fit"
-                              onClick={handleNextQuestion}
+                              onClick={handleNextQuestionOrReview}
                             >
                               <Icon name={IconNames.ChevronForward} />
                               <Gap sizeRem={0.25} horizontal />
@@ -939,7 +952,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                           <Button
                             variant={themedStartAnswerButton}
                             className="w-fit"
-                            onClick={handleNextQuestion}
+                            onClick={handleNextQuestionOrReview}
                           >
                             <Icon name={IconNames.PlayOutline} />
                             <Gap sizeRem={0.25} horizontal />
@@ -967,11 +980,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                         top: 'calc(50% - 1.25rem)',
                       }}
                       disabled={nextQuestionButtonLoading}
-                      onClick={
-                        readyToReview
-                          ? handleStartReviewRoom
-                          : handleNextQuestion
-                      }
+                      onClick={handleNextQuestionOrReview}
                     >
                       {nextQuestionButtonLoading ? (
                         <Loader />
@@ -1098,6 +1107,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                 language={CodeEditorLang.Javascript}
                 visible={!copilotAnswerOpen && questionWithCode}
                 onExecutionResultsSubmit={handleExecutionResultsSubmit}
+                onSkip={handleNextQuestionOrReview}
               />
             </div>
           )}
