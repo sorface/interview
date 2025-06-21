@@ -84,6 +84,7 @@ interface CodeEditorProps {
     code: string | undefined,
     language: CodeEditorLang,
   ) => void;
+  onSkip?: () => void;
 }
 
 export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
@@ -99,6 +100,7 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   onLanguageChange,
   onFontSizeChange,
   onExecutionResultsSubmit,
+  onSkip,
 }) => {
   const localizationCaptions = useLocalizationCaptions();
   const { themeInUi } = useContext(ThemeContext);
@@ -247,6 +249,18 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
           >
             {localizationCaptions[LocalizationKey.ExecutionResultsSubmit]}
           </Button>
+        )}
+        {onSkip && (
+          <>
+            <Gap sizeRem={0.25} horizontal />
+            <Button
+              variant="active2"
+              className="min-h-[1.75rem] !p-0 !px-[0.5rem] text-[0.75rem]"
+              onClick={onSkip}
+            >
+              {localizationCaptions[LocalizationKey.SkipQuestion]}
+            </Button>
+          </>
         )}
       </div>
       <div className="flex-1">
