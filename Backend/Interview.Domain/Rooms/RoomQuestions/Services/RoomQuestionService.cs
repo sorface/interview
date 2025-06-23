@@ -211,4 +211,105 @@ public class RoomQuestionService(
             Answers = e.Answers,
         });
     }
+
+    public async Task<RoomQuestionClosedAnalytics> GetClosedQuestionsAnalyticsAsync(Guid roomId, CancellationToken cancellationToken = default)
+    {
+        var room = await db.Rooms
+            .Include(r => r.Questions)
+                .ThenInclude(q => q.Question)
+            .Include(r => r.Questions)
+                .ThenInclude(q => q.Evaluations)
+                    .ThenInclude(e => e.CreatedBy)
+            .Include(r => r.Participants)
+            .FirstOrDefaultAsync(r => r.Id == roomId, cancellationToken);
+
+        if (room == null)
+        {
+            throw NotFoundException.Create<Room>(roomId);
+        }
+
+        var closedQuestions = room.Questions
+            .Where(q => q.State == RoomQuestionState.Closed)
+            .OrderByDescending(q => q.UpdatedAt)
+            .ToList();
+
+        if (!closedQuestions.Any())
+        {
+            return new RoomQuestionClosedAnalytics
+            {
+                Questions = new List<RoomQuestionClosedAnalytics.ClosedQuestionAnalytics>(),
+                OverallAverageMark = null,
+                TotalClosedQuestions = 0,
+                TotalEvaluations = 0,
+                LastClosedQuestionDate = DateTime.MinValue
+            };
+        }
+
+        var questions = new List<RoomQuestionClosedAnalytics.ClosedQuestionAnalytics>();
+        var totalEvaluations = 0;
+        var totalMarks = 0.0;
+        var totalValidMarks = 0;
+
+        foreach (var question in closedQuestions)
+        {
+            var evaluations = question.Evaluations
+                .Where(e => e.Mark.HasValue && e.Mark.Value > 0)
+                .ToList();
+
+            var markDistribution = evaluations
+                .GroupBy(e => e.Mark!.Value)
+                .Select(g => new RoomQuestionClosedAnalytics.EvaluationDistribution
+                {
+                    Mark = g.Key,
+                    Count = g.Count(),
+                    Percentage = (double)g.Count() / evaluations.Count * 100
+                })
+                .OrderBy(d => d.Mark)
+                .ToList();
+
+            var topEvaluators = evaluations
+                .GroupBy(e => e.CreatedBy)
+                .Select(g => new RoomQuestionClosedAnalytics.EvaluatorSummary
+                {
+                    UserId = g.Key.Id,
+                    Nickname = g.Key.Nickname,
+                    Avatar = g.Key.Avatar,
+                    ParticipantType = room.Participants.First(p => p.User.Id == g.Key.Id).Type.EnumValue,
+                    AverageMark = g.Average(e => e.Mark!.Value),
+                    TotalEvaluations = g.Count()
+                })
+                .OrderByDescending(e => e.AverageMark)
+                .Take(5)
+                .ToList();
+
+            var questionAnalytics = new RoomQuestionClosedAnalytics.ClosedQuestionAnalytics
+            {
+                QuestionId = question.Question!.Id,
+                QuestionValue = question.Question.Value,
+                ClosedDate = question.UpdatedAt,
+                AverageMark = evaluations.Any() ? evaluations.Average(e => e.Mark!.Value) : null,
+                TotalEvaluations = evaluations.Count,
+                MarkDistribution = markDistribution,
+                TopEvaluators = topEvaluators
+            };
+
+            questions.Add(questionAnalytics);
+            totalEvaluations += evaluations.Count;
+
+            if (questionAnalytics.AverageMark.HasValue)
+            {
+                totalMarks += questionAnalytics.AverageMark.Value;
+                totalValidMarks++;
+            }
+        }
+
+        return new RoomQuestionClosedAnalytics
+        {
+            Questions = questions,
+            OverallAverageMark = totalValidMarks > 0 ? totalMarks / totalValidMarks : null,
+            TotalClosedQuestions = closedQuestions.Count,
+            TotalEvaluations = totalEvaluations,
+            LastClosedQuestionDate = closedQuestions.First().UpdatedAt
+        };
+    }
 }
