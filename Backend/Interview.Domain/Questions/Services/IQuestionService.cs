@@ -37,4 +37,6 @@ public interface IQuestionService : IService
     Task ArchiveQuestionTreeAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task UnarchiveQuestionTreeAsync(Guid id, CancellationToken cancellationToken = default);
+
+    Task<QuestionAnalytics> GetAnalyticsAsync(Guid id, CancellationToken cancellationToken = default);
 }
