@@ -25,7 +25,6 @@ import {
   computEexecuteResult,
   ExecuteCodeArg,
   ExecuteCodeResult,
-  executeCodeWithExpect,
   getSrcForIframe,
 } from '../../utils/executeCodeWithExpect';
 import { ModalFooter } from '../ModalFooter/ModalFooter';
@@ -40,8 +39,8 @@ export const defaultCodeEditorFontSize = 13;
 const fontSizeOptions = [10, 12, 13, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48];
 
 const languagesForExecute: CodeEditorLang[] = [
-  // CodeEditorLang.Javascript,
-  // CodeEditorLang.Html,
+  CodeEditorLang.Javascript,
+  CodeEditorLang.Html,
 ];
 
 const fontSizeLocalStorageKey = 'codeEditorFontSize';
@@ -113,7 +112,8 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
     expectResult.results.every((expectResult) => expectResult.passed);
   const [modalExpectResults, setModalExpectResults] = useState(false);
   const codeEditorComponentRef = useRef<HTMLDivElement | null>(null);
-  const languageForIframe = language === CodeEditorLang.Html;
+  const languageForIframe = languagesForExecute.includes(language);
+  const iframeHidden = language !== CodeEditorLang.Html;
   const iframeThemedClassName = useThemeClassName({
     [Theme.Dark]: 'border-grey3',
     [Theme.Light]: 'border-grey-active',
@@ -125,6 +125,9 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent<Array<ExecuteCodeArg[]>>) => {
+      if (!Array.isArray(event.data)) {
+        return;
+      }
       setExpectResult(computEexecuteResult(event.data));
     };
 
@@ -165,12 +168,9 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
   };
 
   const handleExecuteCode = async () => {
-    if (languageForIframe) {
-      setModalExpectResults(true);
+    if (!languageForIframe) {
       return;
     }
-    const executeCodeResult = await executeCodeWithExpect(value);
-    setExpectResult(executeCodeResult);
     setModalExpectResults(true);
   };
 
@@ -240,16 +240,6 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
             <Icon inheritFontSize name={IconNames.PaperPlane} />
           </Button>
         )}
-        {onExecutionResultsSubmit && (
-          <Button
-            variant="active"
-            className="min-h-[1.75rem] !p-0 text-[0.75rem]"
-            onClick={handleExecutionResultsSubmit}
-            disabled={!value?.length}
-          >
-            {localizationCaptions[LocalizationKey.ExecutionResultsSubmit]}
-          </Button>
-        )}
         {onSkip && (
           <>
             <Gap sizeRem={0.25} horizontal />
@@ -293,19 +283,19 @@ export const CodeEditor: FunctionComponent<CodeEditorProps> = ({
         open={modalExpectResults}
       >
         <CodeExecutionResult expectResult={expectResult} />
-        {languageForIframe && (
-          <>
+        {languageForIframe ? (
+          <div className={iframeHidden ? 'hidden' : ''}>
             <Gap sizeRem={1} />
             <Typography size="m" semibold>
               {localizationCaptions[LocalizationKey.Preview]}:
             </Typography>
             <Gap sizeRem={0.25} />
             <iframe
-              src={getSrcForIframe(value || '')}
+              src={getSrcForIframe(value || '', language)}
               className={`w-full h-[320px] border-[0.15rem] border-solid ${iframeThemedClassName}`}
             />
-          </>
-        )}
+          </div>
+        ) : null}
         <Gap sizeRem={1.5} />
         {onExecutionResultsSubmit &&
           expectResultsPassed &&
