@@ -351,6 +351,10 @@ public class SEPermission(Guid id, EVPermission value) : SmartEnum<SEPermission>
         Guid.Parse("D281118B-2806-4563-9381-ED7EA47D6578"),
         EVPermission.RoadmapFindArchivedPage);
 
+    public static readonly SEPermission GetRoomQuestionClosedAnalytics = new(
+        Guid.Parse("7D8F5E3A-B2C1-4E9D-9F6A-1234567890AB"),
+        EVPermission.GetRoomQuestionClosedAnalytics);
+
     public Guid Id { get; } = id;
 
     public string Description { get; } = _descriptionMap[value];
