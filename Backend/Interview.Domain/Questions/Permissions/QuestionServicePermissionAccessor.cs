@@ -103,4 +103,10 @@ public class QuestionServicePermissionAccessor(IQuestionService questionService,
         await securityService.EnsurePermissionAsync(SEPermission.QuestionUnarchive, cancellationToken);
         return await questionService.UnarchiveAsync(id, cancellationToken);
     }
+
+    public async Task<QuestionAnalytics> GetAnalyticsAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        await securityService.EnsurePermissionAsync(SEPermission.QuestionGetAnalytics, cancellationToken);
+        return await questionService.GetAnalyticsAsync(id, cancellationToken);
+    }
 }
