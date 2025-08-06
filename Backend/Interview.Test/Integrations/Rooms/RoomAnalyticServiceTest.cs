@@ -10,7 +10,7 @@ using Interview.Domain.Rooms.Service;
 using Interview.Domain.Users;
 using Interview.Domain.Users.Roles;
 
-namespace Interview.Test.Integrations;
+namespace Interview.Test.Integrations.Rooms;
 
 public class RoomAnalyticServiceTest
 {
@@ -22,14 +22,14 @@ public class RoomAnalyticServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var room1 = new Room(DefaultRoomName, SERoomAccessType.Public, SERoomType.Standard);
+        var room1 = new Domain.Rooms.Room(DefaultRoomName, SERoomAccessType.Public, SERoomType.Standard);
 
         appDbContext.Rooms.Add(room1);
 
         var dummyUser = new User("dummy", "dummy");
         appDbContext.Users.Add(dummyUser);
         await appDbContext.SaveChangesAsync();
-        var dummyRoom = new Room("test room", SERoomAccessType.Public, SERoomType.Standard)
+        var dummyRoom = new Domain.Rooms.Room("test room", SERoomAccessType.Public, SERoomType.Standard)
         {
             Questions =
             [
@@ -60,7 +60,7 @@ public class RoomAnalyticServiceTest
         dummyRoom.Participants.Add(new RoomParticipant(dummyUser, dummyRoom, SERoomParticipantType.Expert));
 
         appDbContext.Rooms.Add(dummyRoom);
-        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", SERoomAccessType.Public, SERoomType.Standard));
+        appDbContext.Rooms.Add(new Domain.Rooms.Room(DefaultRoomName + "2", SERoomAccessType.Public, SERoomType.Standard));
 
         var questions = new Question[]
         {
@@ -318,14 +318,14 @@ public class RoomAnalyticServiceTest
         var testSystemClock = new TestSystemClock();
         await using var appDbContext = new TestAppDbContextFactory().Create(testSystemClock);
 
-        var room1 = new Room(DefaultRoomName, SERoomAccessType.Public, SERoomType.Standard);
+        var room1 = new Domain.Rooms.Room(DefaultRoomName, SERoomAccessType.Public, SERoomType.Standard);
 
         appDbContext.Rooms.Add(room1);
 
         var dummyUser = new User("dummy", "dummy");
         appDbContext.Users.Add(dummyUser);
         await appDbContext.SaveChangesAsync();
-        var dummyRoom = new Room("test room", SERoomAccessType.Public, SERoomType.Standard)
+        var dummyRoom = new Domain.Rooms.Room("test room", SERoomAccessType.Public, SERoomType.Standard)
         {
             Questions =
             [
@@ -356,7 +356,7 @@ public class RoomAnalyticServiceTest
         dummyRoom.Participants.Add(new RoomParticipant(dummyUser, dummyRoom, SERoomParticipantType.Expert));
 
         appDbContext.Rooms.Add(dummyRoom);
-        appDbContext.Rooms.Add(new Room(DefaultRoomName + "2", SERoomAccessType.Public, SERoomType.Standard));
+        appDbContext.Rooms.Add(new Domain.Rooms.Room(DefaultRoomName + "2", SERoomAccessType.Public, SERoomType.Standard));
 
         var questions = new Question[]
         {

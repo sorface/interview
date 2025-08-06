@@ -8,6 +8,8 @@ public class UpsertQuestionTreeRequest
 
     public int Order { get; set; }
 
+    public string? ThemeAiDescription { get; set; }
+
     public Guid? ParentQuestionTreeId { get; set; }
 
     public required List<UpsertQuestionSubjectTreeRequest> Tree { get; set; }

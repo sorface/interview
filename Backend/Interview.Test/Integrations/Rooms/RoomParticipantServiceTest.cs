@@ -11,7 +11,7 @@ using Interview.Infrastructure.Rooms;
 using Interview.Infrastructure.Users;
 using Microsoft.EntityFrameworkCore;
 
-namespace Interview.Test.Integrations;
+namespace Interview.Test.Integrations.Rooms;
 
 public class RoomParticipantServiceTest
 {
@@ -75,11 +75,11 @@ public class RoomParticipantServiceTest
         Assert(appDbContext, participantResponse.Id, newType, room, user);
     }
 
-    private static AppDbContext CreateDbContext(out Room room, out User user)
+    private static AppDbContext CreateDbContext(out Domain.Rooms.Room room, out User user)
     {
         var faker = new Faker();
         var appDbContext = new TestAppDbContextFactory().Create(new TestSystemClock());
-        room = new Room(faker.Random.Word(), SERoomAccessType.Public, SERoomType.Standard);
+        room = new Domain.Rooms.Room(faker.Random.Word(), SERoomAccessType.Public, SERoomType.Standard);
         appDbContext.Rooms.Add(room);
         user = new User(faker.Random.Word(), string.Empty);
         appDbContext.Users.Add(user);
@@ -91,7 +91,7 @@ public class RoomParticipantServiceTest
     private static void Assert(AppDbContext appDbContext,
         Guid participantId,
         SERoomParticipantType type,
-        Room room,
+        Domain.Rooms.Room room,
         User user)
     {
         // ReSharper disable once EntityFramework.NPlusOne.IncompleteDataQuery

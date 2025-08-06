@@ -34,9 +34,8 @@ export const Roadmaps: FunctionComponent = () => {
   const admin = checkAdmin(auth);
   const localizationCaptions = useLocalizationCaptions();
   const roadmapItemThemedClassName = useThemeClassName({
-    [Theme.Dark]: 'hover:bg-dark-history-hover',
-    [Theme.Light]:
-      'hover:bg-blue-light hover:border hover:border-solid border-blue-main',
+    [Theme.Dark]: 'border-dark-closed hover:bg-dark-history-hover',
+    [Theme.Light]: 'border-grey-active hover:bg-blue-light border-blue-main',
   });
 
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
@@ -75,17 +74,32 @@ export const Roadmaps: FunctionComponent = () => {
 
     return (
       <li key={roadmap.id}>
-        <div
-          className={`${roadmapItemThemedClassName} bg-wrap p-[1rem] mb-[0.25rem] flex flex-col rounded-[0.5rem]`}
-        >
-          <Link to={roadmapLink} className="no-underline">
-            <img
-              className="object-cover"
-              alt={`roadmap ${roadmap.name} image`}
-              src={roadmap.imageBase64 || 'roadmap-placeholder.png'}
+        {admin && (
+          <div className="flex ml-auto bg-wrap">
+            <Link to={roadmapEditLink}>
+              <Button>
+                <Icon size="m" name={IconNames.Settings} />
+              </Button>
+            </Link>
+            <ActionModal
+              openButtonCaption="📁"
+              error={archiveError}
+              loading={archiveLoading}
+              title={localizationCaptions[LocalizationKey.Archive]}
+              loadingCaption={
+                localizationCaptions[LocalizationKey.ArchiveLoading]
+              }
+              onAction={() => {
+                archiveRoadmap(roadmap.id);
+              }}
             />
-            <Gap sizeRem={0.75} />
-            <Typography size="m" semibold>
+          </div>
+        )}
+        <Link to={roadmapLink} className="no-underline">
+          <div
+            className={`${roadmapItemThemedClassName} bg-wrap border-[2px] border-solid p-[1rem] mb-[0.75rem] rounded-[0.5rem]`}
+          >
+            <Typography size="xl" bold>
               {roadmap.name}
             </Typography>
             <Gap sizeRem={0.25} />
@@ -93,29 +107,8 @@ export const Roadmaps: FunctionComponent = () => {
               {roadmap.description ||
                 `${localizationCaptions[LocalizationKey.Learn]} ${roadmap.name}.`}
             </Typography>
-          </Link>
-          {admin && (
-            <div className="flex ml-auto">
-              <Link to={roadmapEditLink}>
-                <Button>
-                  <Icon size="m" name={IconNames.Settings} />
-                </Button>
-              </Link>
-              <ActionModal
-                openButtonCaption="📁"
-                error={archiveError}
-                loading={archiveLoading}
-                title={localizationCaptions[LocalizationKey.Archive]}
-                loadingCaption={
-                  localizationCaptions[LocalizationKey.ArchiveLoading]
-                }
-                onAction={() => {
-                  archiveRoadmap(roadmap.id);
-                }}
-              />
-            </div>
-          )}
-        </div>
+          </div>
+        </Link>
       </li>
     );
   };
@@ -123,30 +116,29 @@ export const Roadmaps: FunctionComponent = () => {
   return (
     <>
       <Gap sizeRem={2.25} />
-      {admin && (
-        <Link to={pathnames.roadmapCreate}>
-          <Button variant="active" className="h-[2.5rem]" aria-hidden>
-            <Icon name={IconNames.Add} />
-            {localizationCaptions[LocalizationKey.Create]}
-          </Button>
-        </Link>
-      )}
-      <div className="text-left flex flex-col">
-        <Typography size="xxxl" semibold>
-          {localizationCaptions[LocalizationKey.RoadmapsPageName]}
-        </Typography>
-        <Gap sizeRem={0.75} />
-        <Typography size="s" semibold secondary>
+      <div className="flex flex-col items-center">
+        <Typography size="roadmaps-heading" bold>
           {localizationCaptions[LocalizationKey.RoadmapsPageDescription]}
         </Typography>
       </div>
+      {admin && (
+        <>
+          <Gap sizeRem={1} />
+          <Link to={pathnames.roadmapCreate}>
+            <Button variant="active" className="h-[2.5rem]" aria-hidden>
+              <Icon name={IconNames.Add} />
+              {localizationCaptions[LocalizationKey.Create]}
+            </Button>
+          </Link>
+        </>
+      )}
       <Gap sizeRem={1.75} />
       <ItemsGrid
         currentData={roadmaps}
         loading={loading}
         error={error}
         triggerResetAccumData={`${archivedRoadmap}`}
-        className="grid gap-[0.5rem] grid-cols-grid-view"
+        className=""
         renderItem={createRoadmapItem}
         nextPageAvailable={false}
         handleNextPage={handleNextPage}

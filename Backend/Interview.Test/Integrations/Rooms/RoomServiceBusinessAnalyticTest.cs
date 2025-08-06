@@ -15,7 +15,7 @@ using Interview.Infrastructure.Rooms;
 using Interview.Infrastructure.Users;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Interview.Test.Integrations;
+namespace Interview.Test.Integrations.Rooms;
 
 public class RoomServiceBusinessAnalyticTest
 {
@@ -99,7 +99,7 @@ public class RoomServiceBusinessAnalyticTest
 
         // Arrange
         var now = new DateTime(2024, 1, 15);
-        var rooms = new List<Room>
+        var rooms = new List<Domain.Rooms.Room>
         {
             new("test", SERoomAccessType.Public, SERoomType.AI) { Id = Guid.NewGuid(), CreateDate = new DateTime(2024, 1, 1), Status = SERoomStatus.Active },
             new("test", SERoomAccessType.Public, SERoomType.AI) { Id = Guid.NewGuid(), CreateDate = new DateTime(2024, 1, 1), Status = SERoomStatus.New },
@@ -149,7 +149,7 @@ public class RoomServiceBusinessAnalyticTest
         appDbContext.ChangeTracker.Clear();
 
         // Arrange
-        var rooms = new List<Room>
+        var rooms = new List<Domain.Rooms.Room>
         {
             new("test", SERoomAccessType.Public, SERoomType.AI) { Id = Guid.NewGuid(), CreateDate = new DateTime(2024, 1, 1), Status = SERoomStatus.Active },
             new("test", SERoomAccessType.Private, SERoomType.AI) { Id = Guid.NewGuid(), CreateDate = new DateTime(2024, 1, 1), Status = SERoomStatus.Active },

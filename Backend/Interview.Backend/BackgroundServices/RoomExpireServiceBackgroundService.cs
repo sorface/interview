@@ -1,10 +1,9 @@
-using Interview.Domain.Events;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Interview.Domain.Database;
+using Interview.Domain.Rooms.RoomExpireServices;
 
-namespace Interview.Infrastructure.WebSocket;
+namespace Interview.Backend.BackgroundServices;
 
-public class EventStorage2DatabaseBackgroundService(IServiceScopeFactory scopeFactory) : BackgroundService
+public class RoomExpireServiceBackgroundService(IServiceScopeFactory scopeFactory) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -12,7 +11,9 @@ public class EventStorage2DatabaseBackgroundService(IServiceScopeFactory scopeFa
         {
             await using (var scope = scopeFactory.CreateAsyncScope())
             {
-                var service = scope.ServiceProvider.GetRequiredService<EventStorage2DatabaseService>();
+                var userAccessor = scope.ServiceProvider.GetRequiredService<IEditableCurrentUserAccessor>();
+                userAccessor.SetUser(User.Backend);
+                var service = scope.ServiceProvider.GetRequiredService<RoomExpireService>();
                 try
                 {
                     await service.ProcessAsync(stoppingToken);

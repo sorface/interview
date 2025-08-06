@@ -49,12 +49,14 @@ interface RoomCodeEditorProps {
     code: string | undefined,
     language: CodeEditorLang,
   ) => void;
+  onSkip?: () => void;
 }
 
 export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
   visible,
   language,
   onExecutionResultsSubmit,
+  onSkip,
 }) => {
   const auth = useContext(AuthContext);
   const {
@@ -296,6 +298,7 @@ export const RoomCodeEditor: FunctionComponent<RoomCodeEditorProps> = ({
       onLanguageChange={handleLanguageChange}
       onFontSizeChange={handleFontSizeChange}
       onExecutionResultsSubmit={onExecutionResultsSubmit}
+      onSkip={onSkip}
     />
   );
 };

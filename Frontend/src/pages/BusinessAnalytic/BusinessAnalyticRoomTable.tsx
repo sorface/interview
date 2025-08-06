@@ -1,8 +1,5 @@
 import React, { Fragment, FunctionComponent } from 'react';
-import {
-  RoomBusinessAnalyticTypeItem,
-  RoomBusinessAnalyticTypeItemStatus,
-} from '../../types/room';
+import { RoomBusinessAnalyticTypeItem, RoomStatus } from '../../types/room';
 import { Typography } from '../../components/Typography/Typography';
 
 interface BusinessAnalyticRoomTableProps {
@@ -11,7 +8,7 @@ interface BusinessAnalyticRoomTableProps {
 
 const getStatusCount = (
   item: RoomBusinessAnalyticTypeItem,
-  status: RoomBusinessAnalyticTypeItemStatus,
+  status: RoomStatus,
 ) => {
   const itemWithStatus = item.status.find(
     (itemStatus) => itemStatus.name === status,
@@ -43,6 +40,9 @@ export const BusinessAnalyticRoomTable: FunctionComponent<
           </th>
           <th>
             <Typography size="m">{getStatusCount(item, 'Close')}</Typography>
+          </th>
+          <th>
+            <Typography size="m">{getStatusCount(item, 'Expire')}</Typography>
           </th>
         </tr>
       ))}

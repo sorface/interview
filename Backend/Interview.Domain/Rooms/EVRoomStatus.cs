@@ -24,4 +24,9 @@ public enum EVRoomStatus
     /// Close room status.
     /// </summary>
     Close,
+
+    /// <summary>
+    /// Expire room status.
+    /// </summary>
+    Expire,
 }

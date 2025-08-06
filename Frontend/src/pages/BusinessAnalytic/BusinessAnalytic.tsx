@@ -13,7 +13,7 @@ import {
 import {
   RoomBusinessAnalytic,
   RoomBusinessAnalyticTypeItem,
-  RoomBusinessAnalyticTypeItemStatus,
+  RoomStatus,
 } from '../../types/room';
 import { BusinessAnalyticRoomTable } from './BusinessAnalyticRoomTable';
 import { Typography } from '../../components/Typography/Typography';
@@ -35,7 +35,7 @@ const getInitialEndDate = () => {
 
 const getStatusSum = (
   items: RoomBusinessAnalyticTypeItem[],
-  status: RoomBusinessAnalyticTypeItemStatus,
+  status: RoomStatus,
 ) => {
   const count = items.reduce((accumCount, currItem) => {
     const statusItem = currItem.status.find((iStat) => iStat.name === status);
@@ -157,6 +157,11 @@ export const BusinessAnalytic: FunctionComponent = () => {
                           <th>
                             <Typography size="m" bold>
                               Close ({getStatusSum(items, 'Close')})
+                            </Typography>
+                          </th>
+                          <th>
+                            <Typography size="m" bold>
+                              Expire ({getStatusSum(items, 'Expire')})
                             </Typography>
                           </th>
                         </tr>

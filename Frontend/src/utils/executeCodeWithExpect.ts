@@ -1,73 +1,48 @@
 import { AnyObject } from '../types/anyObject';
+import { CodeEditorLang } from '../types/question';
 import { deepEqual } from './deepEqual';
-
-const expectCode = `
-  return new Promise((res) => {
-  const __expectCalls = [];
-  const __consoleLogs = [];
-  let __expectConsoleCalled = false;
-  let __expectedConsoleLogs = [];
-
-  const originalConsoleLog = console.log;
-
-  const finishConsoleLogSpy = () => {
-    console.log = originalConsoleLog;
-    __consoleLogs.forEach((log, index) =>
-      __expectCalls.push([log, __expectedConsoleLogs[index]])
-    );
-    res(__expectCalls);
-  };
-
-  console.log = (arg) => {
-    __consoleLogs.push(arg);
-  };
-
-  const expect = (fn, ...argsWithExpected) => {
-    const args = [...argsWithExpected];
-    args.length--;
-    const expected = argsWithExpected[argsWithExpected.length - 1];
-    const result = args.reduce((accum, val) => {
-      if (accum === undefined) {
-        return fn(...val);
-      }
-      return accum(...val);
-    }, undefined);
-    __expectCalls.push([args, result, expected]);
-  };
-
-  const expectValue = (value1, value2) => {
-    __expectCalls.push([value1, value2]);
-  };
-
-  const expectConsole = (expectedCalls) => {
-    __expectConsoleCalled = true;
-    __expectedConsoleLogs = expectedCalls;
-    setTimeout(() => {
-      finishConsoleLogSpy();
-    }, 333);
-  };
-`;
-
-const expectCallsReturnCode = `
-  if (!__expectConsoleCalled) {
-    console.log = originalConsoleLog;
-    res(__expectCalls);
-  }
-});
-`;
 
 const expectCodeForIframeStart = `
   <script>
     const __expectCalls = [];
+    const __consoleLogs = [];
+    let __expectConsoleCalled = false;
+    let __expectedConsoleLogs = [];
+    const originalConsoleLog = console.log;
+
+    const finishConsoleLogSpy = () => {
+      console.log = originalConsoleLog;
+      __consoleLogs.forEach((log, index) =>
+        __expectCalls.push([log, __expectedConsoleLogs[index]])
+      );
+      window.parent.postMessage(__expectCalls, '*');
+    };
+
+    console.log = (arg) => {
+      __consoleLogs.push(arg);
+    };
+
     const expectValue = (value1, value2) => {
       __expectCalls.push([value1, value2]);
     };
+
+    const expectConsole = (expectedCalls) => {
+      __expectConsoleCalled = true;
+      __expectedConsoleLogs = expectedCalls;
+      setTimeout(() => {
+        finishConsoleLogSpy();
+      }, 333);
+    };
+
   </script>
 `;
 
 const expectCodeForIframeEnd = `
   <script>
-    window.parent.postMessage(__expectCalls, '*');
+    if (!__expectConsoleCalled) {
+      console.log = originalConsoleLog;
+      window.parent.postMessage(__expectCalls, '*');
+    }
   </script>
 `;
 
@@ -105,6 +80,7 @@ export const computEexecuteResult = (
       }),
     };
   } catch (error) {
+    console.error(error);
     return {
       results: [],
       error: error instanceof Error ? error.message : String(error),
@@ -112,25 +88,15 @@ export const computEexecuteResult = (
   }
 };
 
-export const executeCodeWithExpect = async (
-  code: string | undefined,
-): Promise<ExecuteCodeResult> => {
-  try {
-    const executeCodeWithExpect = new Function(
-      expectCode + code + expectCallsReturnCode,
-    ) as () => Promise<Array<ExecuteCodeArg[]>>;
-
-    const executeResult = await executeCodeWithExpect();
-    return computEexecuteResult(executeResult);
-  } catch (error) {
-    return {
-      results: [],
-      error: error instanceof Error ? error.message : String(error),
-    };
+export const getSrcForIframe = (code: string, language?: CodeEditorLang) => {
+  let resultCode;
+  if (language === CodeEditorLang.Javascript) {
+    resultCode =
+      expectCodeForIframeStart +
+      `<script>${code}</script>` +
+      expectCodeForIframeEnd;
+  } else {
+    resultCode = expectCodeForIframeStart + code + expectCodeForIframeEnd;
   }
-};
-
-export const getSrcForIframe = (code: string) => {
-  const resultCode = expectCodeForIframeStart + code + expectCodeForIframeEnd;
   return `data:text/html;charset=utf-8,${encodeURIComponent(resultCode)}`;
 };

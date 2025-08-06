@@ -12,5 +12,6 @@ public sealed class UserTypeConfiguration : EntityTypeConfigurationBase<User>
         builder.HasMany(user => user.Roles).WithMany();
         builder.HasMany(user => user.Permissions).WithMany();
         builder.Property(e => e.ExternalId).IsRequired().HasMaxLength(36).IsUnicode();
+        builder.HasData(User.Backend);
     }
 }

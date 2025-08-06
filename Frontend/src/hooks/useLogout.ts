@@ -105,11 +105,12 @@ export const useLogout = () => {
         payload: response.status,
       });
     } catch (err: unknown) {
-      window.location.reload()
-      dispatch({
-        name: 'setError',
-        payload: err instanceof Error ? err.message : 'Failed to logout',
-      });
+        console.error(err);
+        window.location.reload()
+        dispatch({
+            name: 'setError',
+            payload: err instanceof Error ? err.message : 'Failed to logout',
+        });
     }
   }, []);
 

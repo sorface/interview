@@ -6,6 +6,8 @@ public sealed class QuestionTree : ArchiveEntity
 {
     public required string Name { get; set; }
 
+    public string? ThemeAiDescription { get; set; }
+
     public required Guid RootQuestionSubjectTreeId { get; set; }
 
     public QuestionSubjectTree? RootQuestionSubjectTree { get; set; }

@@ -69,6 +69,7 @@ export const enum LocalizationKey {
   RoomStatusActive,
   RoomStatusReview,
   RoomStatusClose,
+  RoomStatusExpire,
   TagsLoading,
   NoTags,
   BuildHash,
@@ -213,6 +214,7 @@ export const enum LocalizationKey {
   AnswerAgain,
   RoadmapsPageName,
   RoadmapsPageDescription,
+  RoadmapsArchivePageName,
   RoadmapCreatePageName,
   RoadmapYourProgress,
   RoadmapLevel0,
@@ -240,6 +242,7 @@ export const enum LocalizationKey {
   SendAnswer,
   StartInterview,
   Preview,
+  SkipQuestion,
 }
 
 export const LocalizationCaptions: Record<
@@ -324,6 +327,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.RoomStatusActive]: 'Active',
     [LocalizationKey.RoomStatusReview]: 'Review',
     [LocalizationKey.RoomStatusClose]: 'Close',
+    [LocalizationKey.RoomStatusExpire]: 'Expire',
     [LocalizationKey.TagsLoading]: 'Loading tags',
     [LocalizationKey.NoTags]: 'No tags',
     [LocalizationKey.BuildHash]: 'Build',
@@ -487,9 +491,10 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.NoNewNotifications]: 'No new notifications',
     [LocalizationKey.Clear]: 'Clear',
     [LocalizationKey.AnswerAgain]: 'Answer again',
-    [LocalizationKey.RoadmapsPageName]: 'Roadmaps',
+    [LocalizationKey.RoadmapsPageName]: 'Direction',
     [LocalizationKey.RoadmapsPageDescription]:
-      'Structured learning paths to guide your tech journey.',
+      'In what direction do you need to improve?',
+    [LocalizationKey.RoadmapsArchivePageName]: 'Direction Archive',
     [LocalizationKey.RoadmapCreatePageName]: 'Create Roadmap',
     [LocalizationKey.RoadmapYourProgress]: 'Your Progress',
     [LocalizationKey.RoadmapLevel0]: 'Impostor',
@@ -523,6 +528,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.SendAnswer]: 'Send answer',
     [LocalizationKey.StartInterview]: 'Start interview',
     [LocalizationKey.Preview]: 'Preview',
+    [LocalizationKey.SkipQuestion]: 'Skip question',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.HighlightsRoomsPageName]: 'Комнаты',
@@ -599,6 +605,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.RoomStatusActive]: 'Идёт встреча',
     [LocalizationKey.RoomStatusReview]: 'Разбор',
     [LocalizationKey.RoomStatusClose]: 'Закрыта',
+    [LocalizationKey.RoomStatusExpire]: 'Истекла',
     [LocalizationKey.TagsLoading]: 'Загрузка тэгов',
     [LocalizationKey.NoTags]: 'Тэги отсутствуют',
     [LocalizationKey.BuildHash]: 'Сборка',
@@ -766,9 +773,10 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.NoNewNotifications]: 'Новых уведомлений нет',
     [LocalizationKey.Clear]: 'Очистить',
     [LocalizationKey.AnswerAgain]: 'Ответить заново',
-    [LocalizationKey.RoadmapsPageName]: 'Roadmaps',
+    [LocalizationKey.RoadmapsPageName]: 'Направления',
     [LocalizationKey.RoadmapsPageDescription]:
-      'Дорожные карты, которые помогут вам в освоении технологий.',
+      'Какое направление вам нужно прокачать?',
+    [LocalizationKey.RoadmapsArchivePageName]: 'Архив направлений',
     [LocalizationKey.RoadmapCreatePageName]: 'Создать Roadmap',
     [LocalizationKey.RoadmapYourProgress]: 'Ваш прогресс',
     [LocalizationKey.RoadmapLevel0]: 'Самозванец(ка)',
@@ -803,5 +811,6 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.SendAnswer]: 'Отправить ответ',
     [LocalizationKey.StartInterview]: 'Начать собеседование',
     [LocalizationKey.Preview]: 'Предпросмотр',
+    [LocalizationKey.SkipQuestion]: 'Пропустить вопрос',
   },
 };

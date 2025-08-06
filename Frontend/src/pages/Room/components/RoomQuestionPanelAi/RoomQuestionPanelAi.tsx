@@ -276,6 +276,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
     lastWsMessageParsed,
     recognitionEnabled,
     recognitionNotSupported,
+    recognitionNotAllowed,
     sendWsMessage,
     setAiAssistantCurrentScript,
     setRecognitionEnabled,
@@ -373,7 +374,10 @@ export const RoomQuestionPanelAi: FunctionComponent<
       conversationId: `${room?.id}${initialQuestion?.id}${auth?.id}`,
       question: initialQuestion?.value || '',
       questionId: initialQuestion?.id || '',
-      theme: room?.questionTree?.name || '',
+      theme:
+        room?.questionTree?.themeAiDescription ||
+        room?.questionTree?.name ||
+        '',
       userId: auth?.id || '',
       taskDescription: initialQuestion?.value || '',
       code: questionCode || '',
@@ -656,7 +660,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
     handleNextQuestion();
   }, [recognitionCommand, initialQuestion, room, handleNextQuestion]);
 
-  const handleStartReviewRoom = () => {
+  const handleStartReviewRoom = useCallback(() => {
     if (!room?.id) {
       throw new Error('Room id not found');
     }
@@ -668,7 +672,20 @@ export const RoomQuestionPanelAi: FunctionComponent<
       }),
     );
     fetchRoomStartReview({ roomId: room.id });
-  };
+  }, [
+    room?.id,
+    room?.questionTree?.id,
+    roomQuestions.length,
+    fetchRoomStartReview,
+  ]);
+
+  const handleNextQuestionOrReview = useCallback(() => {
+    if (readyToReview) {
+      handleStartReviewRoom();
+      return;
+    }
+    handleNextQuestion();
+  }, [readyToReview, handleStartReviewRoom, handleNextQuestion]);
 
   const handleExecutionResultsSubmit = (
     code: string | undefined,
@@ -813,7 +830,9 @@ export const RoomQuestionPanelAi: FunctionComponent<
                               variant={themedStartAnswerButton}
                               className="w-fit"
                               disabled={
-                                recognitionEnabled || recognitionNotSupported
+                                recognitionEnabled ||
+                                recognitionNotSupported ||
+                                recognitionNotAllowed
                               }
                               onClick={handleStartAnswer}
                             >
@@ -835,6 +854,20 @@ export const RoomQuestionPanelAi: FunctionComponent<
                               <Icon name={IconNames.FileTray} />
                               <Gap sizeRem={0.25} horizontal />
                               {localizationCaptions[LocalizationKey.TextAnswer]}
+                            </Button>
+                            <Gap sizeRem={0.5} horizontal />
+                            <Button
+                              variant="inverted"
+                              className="w-fit"
+                              onClick={handleNextQuestionOrReview}
+                            >
+                              <Icon name={IconNames.ChevronForward} />
+                              <Gap sizeRem={0.25} horizontal />
+                              {
+                                localizationCaptions[
+                                  LocalizationKey.SkipQuestion
+                                ]
+                              }
                             </Button>
                           </div>
                         )}
@@ -862,7 +895,30 @@ export const RoomQuestionPanelAi: FunctionComponent<
                               </Typography>
                             </>
                           )}
-                        {recognitionEnabled && (
+                        {recognitionNotAllowed &&
+                          initialQuestion &&
+                          !textAnswerOpen && (
+                            <>
+                              <Gap sizeRem={0.5} />
+                              <Typography size="s" secondary>
+                                {
+                                  localizationCaptions[
+                                    LocalizationKey.AllowAccessToMicrophone
+                                  ]
+                                }
+                              </Typography>
+                              <Gap sizeRem={0.15} />
+                              <Typography size="s" secondary>
+                                {
+                                  localizationCaptions[
+                                    LocalizationKey
+                                      .AllowAccessToMicrophoneDescription
+                                  ]
+                                }
+                              </Typography>
+                            </>
+                          )}
+                        {recognitionEnabled && !recognitionNotAllowed && (
                           <div className="flex flex-col">
                             <Wave />
                             <Typography size="s" secondary>
@@ -896,7 +952,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                           <Button
                             variant={themedStartAnswerButton}
                             className="w-fit"
-                            onClick={handleNextQuestion}
+                            onClick={handleNextQuestionOrReview}
                           >
                             <Icon name={IconNames.PlayOutline} />
                             <Gap sizeRem={0.25} horizontal />
@@ -924,11 +980,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                         top: 'calc(50% - 1.25rem)',
                       }}
                       disabled={nextQuestionButtonLoading}
-                      onClick={
-                        readyToReview
-                          ? handleStartReviewRoom
-                          : handleNextQuestion
-                      }
+                      onClick={handleNextQuestionOrReview}
                     >
                       {nextQuestionButtonLoading ? (
                         <Loader />
@@ -1055,6 +1107,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                 language={CodeEditorLang.Javascript}
                 visible={!copilotAnswerOpen && questionWithCode}
                 onExecutionResultsSubmit={handleExecutionResultsSubmit}
+                onSkip={handleNextQuestionOrReview}
               />
             </div>
           )}

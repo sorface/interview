@@ -125,8 +125,9 @@ public sealed class RoomService(
             .OrderBy(e => e.Status == SERoomStatus.Active ? 1 :
                 e.Status == SERoomStatus.Review ? 2 :
                 e.Status == SERoomStatus.New ? 3 :
-                4)
-            .ThenBy(e => e.ScheduleStartTime, dateSort);
+                e.Status == SERoomStatus.Expire ? 4 : 5)
+            .ThenBy(e => e.ScheduleStartTime, dateSort)
+            .ThenBy(e => e.Id);
         var filterName = filter.Name?.Trim().ToLower();
         if (!string.IsNullOrWhiteSpace(filterName))
         {
@@ -326,6 +327,7 @@ public sealed class RoomService(
                         Name = e.QuestionTree.Name,
                         RootQuestionSubjectTreeId = e.QuestionTree.RootQuestionSubjectTreeId,
                         Tree = new List<QuestionTreeByIdResponseTree>(),
+                        ThemeAiDescription = e.QuestionTree.ThemeAiDescription,
                     }
                     : null,
             })
@@ -757,6 +759,7 @@ public sealed class RoomService(
                         Name = room.QuestionTree.Name,
                         RootQuestionSubjectTreeId = room.QuestionTree.RootQuestionSubjectTreeId,
                         Tree = new List<QuestionTreeByIdResponseTree>(),
+                        ThemeAiDescription = room.QuestionTree.ThemeAiDescription,
                     }
                     : null,
             })
@@ -1090,7 +1093,7 @@ public sealed class RoomService(
 
     private void EnsureAvailableRoomEdit(Room room)
     {
-        if (room.Status == SERoomStatus.Close || room.Status == SERoomStatus.Review)
+        if (room.Status == SERoomStatus.Review || SERoomStatus.CloseStatuses.Contains(room.Status))
         {
             throw new UserException("The room is in a status where it cannot be changed.");
         }

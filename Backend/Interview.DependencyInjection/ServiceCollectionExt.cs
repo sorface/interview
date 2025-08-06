@@ -97,6 +97,7 @@ public static class ServiceCollectionExt
         self.AddEventServices(option);
         self.AddScoped<EventStorage2DatabaseService>();
         self.AddScoped<RoomCodeEditorChangeEventHandler>();
+        self.AddSingleton(option.RoomExpireSettings);
         return self;
     }
 

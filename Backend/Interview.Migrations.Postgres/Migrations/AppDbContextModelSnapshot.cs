@@ -417,6 +417,10 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.Property<Guid>("RootQuestionSubjectTreeId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("ThemeAiDescription")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("timestamp without time zone");
 
@@ -1688,6 +1692,16 @@ namespace Interview.Migrations.Postgres.Migrations
                     b.HasIndex("CreatedById");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("c560b516-238c-45dd-b394-352757fc6380"),
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ExternalId = "",
+                            Nickname = "Backend",
+                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("PermissionUser", b =>

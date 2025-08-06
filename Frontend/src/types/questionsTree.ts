@@ -3,6 +3,7 @@ import { TreeNodeType } from './tree';
 export interface QuestionsTree {
   id: string;
   name: string;
+  themeAiDescription?: string;
   rootQuestionSubjectTreeId: string;
   tree: QuestionsTreeNode[];
 }
