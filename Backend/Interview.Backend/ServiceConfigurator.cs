@@ -5,16 +5,13 @@ using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Ardalis.SmartEnum.SystemTextJson;
 using Interview.Backend.Auth;
-using Interview.Backend.Auth.Sorface;
 using Interview.Backend.BackgroundServices;
 using Interview.Backend.Swagger;
 using Interview.DependencyInjection;
-using Interview.Domain;
 using Interview.Domain.Rooms.RoomExpireServices;
 using Interview.Domain.Rooms.RoomQuestions;
 using Interview.Infrastructure.WebSocket;
 using Interview.Infrastructure.WebSocket.PubSub;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -67,8 +64,6 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
 
         AddAppServices(serviceCollection);
 
-        serviceCollection.AddSingleton(new OAuthServiceDispatcher(configuration));
-
         serviceCollection.AddWebSocketServices(configuration1 =>
         {
             RedisEnvironmentConfigure.Configure(configuration,
@@ -94,12 +89,7 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
 
     private void AddAppServices(IServiceCollection serviceCollection)
     {
-        var sorfaceAuth = new OAuthServiceDispatcher(configuration).GetAuthService("sorface") ?? throw new UserException("Not found \"sorface\" section");
-
-        serviceCollection.AddSingleton(sorfaceAuth);
         serviceCollection.AddHttpClient();
-        serviceCollection.AddSingleton<SorfacePrincipalValidator>();
-        serviceCollection.AddSingleton<SorfaceTokenService>();
 
         var adminUsers = configuration.GetSection(nameof(AdminUsers))
             .Get<AdminUsers>() ?? throw new ArgumentException($"Not found \"{nameof(AdminUsers)}\" section");
@@ -161,12 +151,8 @@ public class ServiceConfigurator(IHostEnvironment environment, IConfiguration co
 
         serviceCollection.AddAppServices(serviceOption);
 
-        serviceCollection.AddSingleton<IDistributedLockStorage, DistributedLockStorage>();
-
-        serviceCollection
-            .AddSingleton<ITicketStore, DistributedCacheTicketStore>()
-            .AddSession()
-            .AddAppAuth(environment, sorfaceAuth);
+        var openIdConnectOptions = configuration.GetSection(nameof(OpenIdConnectOptions)).Get<OpenIdConnectOptions>()!;
+        serviceCollection.AddAppAuth(environment, openIdConnectOptions);
     }
 
     private void AddRateLimiter(IServiceCollection serviceCollection)
