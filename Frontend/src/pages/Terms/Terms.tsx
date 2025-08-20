@@ -73,7 +73,7 @@ export const Terms: FunctionComponent = () => {
       <Gap sizeRem={0.75} />
       <div className="text-left flex flex-col overflow-auto">
         <Typography size="xxl" bold>
-          {localizationCaptions[LocalizationKey.TermsOfUsage]}
+          {localizationCaptions[LocalizationKey.TermsOfUsagePageTitle]}
         </Typography>
         <Gap sizeRem={1} />
         <Typography size="m">{terms[lang].disclaimer}</Typography>
