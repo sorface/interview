@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer } from 'react';
-import { VITE_GATEWAY_URL } from '../config';
+import {VITE_GATEWAY_URL} from '../config';
 import { clearDevAuthorization } from '../utils/devAuthorization';
 
 interface LogoutState {
