@@ -35,7 +35,9 @@ export const Feedback: FunctionComponent = () => {
         onClick={handleOpenClose}
       >
         <Typography size="m">
-          {localizationCaptions[LocalizationKey.Feedback]}
+          {device === 'Desktop'
+            ? localizationCaptions[LocalizationKey.Feedback]
+            : '💬'}
         </Typography>
         <Gap sizeRem={0.25} horizontal />
         {!open && (

@@ -57,6 +57,7 @@ export const enum LocalizationKey {
   ErrorSendingReaction,
   TermsOfUsageAcceptance,
   TermsOfUsage,
+  TermsOfUsagePageTitle,
   Login,
   CloseRoom,
   CloseRoomWithoutReview,
@@ -312,7 +313,8 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.ErrorSendingReaction]: 'Error sending reaction',
     [LocalizationKey.TermsOfUsageAcceptance]:
       'By login, you acknowledge that you have read,\nunderstood, and agree to ',
-    [LocalizationKey.TermsOfUsage]: 'Terms of usage',
+    [LocalizationKey.TermsOfUsage]: 'terms of usage',
+    [LocalizationKey.TermsOfUsagePageTitle]: 'Terms of usage',
     [LocalizationKey.Login]: 'Login',
     [LocalizationKey.CloseRoom]: 'Close meeting',
     [LocalizationKey.CloseRoomWithoutReview]:
@@ -590,7 +592,8 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.ErrorSendingReaction]: 'Ошибка в отправке реакции',
     [LocalizationKey.TermsOfUsageAcceptance]:
       'Входя, вы подтверждаете, что прочитали,\nпоняли и соглашаетесь с ',
-    [LocalizationKey.TermsOfUsage]: 'Условиями использования',
+    [LocalizationKey.TermsOfUsage]: 'условиями использования',
+    [LocalizationKey.TermsOfUsagePageTitle]: 'Условия использования',
     [LocalizationKey.Login]: 'Войти',
     [LocalizationKey.CloseRoom]: 'Закрыть встречу',
     [LocalizationKey.CloseRoomWithoutReview]:

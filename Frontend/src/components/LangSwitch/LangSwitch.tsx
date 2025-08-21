@@ -90,7 +90,7 @@ export const LangSwitch = ({
         }
       >
         <Typography size="s" semibold>
-          {lang === LocalizationLang.ru ? 'RU' : 'EN'}
+          {lang === LocalizationLang.ru ? 'EN' : 'RU'}
         </Typography>
       </Button>
     );

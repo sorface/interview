@@ -970,38 +970,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                 {copilotAnswerOpen && (
                   <>
                     {device === 'Mobile' && <Gap sizeRem={1} />}
-                    <Button
-                      variant={
-                        device === 'Desktop' ? 'invertedActive' : 'active'
-                      }
-                      className={`${device === 'Desktop' ? ' absolute' : 'w-full'} min-w-[0rem] w-[2.5rem] h-[2.5rem] !p-[0rem] z-1`}
-                      style={{
-                        right: '-1.25rem',
-                        top: 'calc(50% - 1.25rem)',
-                      }}
-                      disabled={nextQuestionButtonLoading}
-                      onClick={handleNextQuestionOrReview}
-                    >
-                      {nextQuestionButtonLoading ? (
-                        <Loader />
-                      ) : (
-                        <>
-                          {device === 'Mobile' && (
-                            <>
-                              <Gap sizeRem={0.25} horizontal />
-                              <Typography size="m">
-                                {
-                                  localizationCaptions[
-                                    LocalizationKey.NextRoomQuestion
-                                  ]
-                                }
-                              </Typography>
-                            </>
-                          )}
-                          <Icon size="s" name={IconNames.ChevronForward} />
-                        </>
-                      )}
-                    </Button>
+
                     <Gap sizeRem={device === 'Desktop' ? 2 : 1} />
                     <div
                       className={`flex flex-1 ${device === 'Mobile' ? 'flex-col' : ''}`}
@@ -1057,6 +1026,7 @@ export const RoomQuestionPanelAi: FunctionComponent<
                             <Loader />
                           )}
                         </Button>
+                        {device === 'Mobile' && <Gap sizeRem={0.75} />}
                       </div>
                       <Gap sizeRem={0.625} horizontal={device === 'Desktop'} />
                       <div
@@ -1094,6 +1064,39 @@ export const RoomQuestionPanelAi: FunctionComponent<
                         <Gap sizeRem={2} />
                       </div>
                     </div>
+                    {device === 'Mobile' && <Gap sizeRem={0.75} />}
+                    <Button
+                      variant={
+                        device === 'Desktop' ? 'invertedActive' : 'active'
+                      }
+                      className={`${device === 'Desktop' ? ' absolute' : 'w-full'} min-w-[0rem] w-[2.5rem] h-[2.5rem] !p-[0rem] z-1`}
+                      style={{
+                        right: '-1.25rem',
+                        top: 'calc(50% - 1.25rem)',
+                      }}
+                      disabled={nextQuestionButtonLoading}
+                      onClick={handleNextQuestionOrReview}
+                    >
+                      {nextQuestionButtonLoading ? (
+                        <Loader />
+                      ) : (
+                        <>
+                          {device === 'Mobile' && (
+                            <>
+                              <Gap sizeRem={0.25} horizontal />
+                              <Typography size="m">
+                                {
+                                  localizationCaptions[
+                                    LocalizationKey.NextRoomQuestion
+                                  ]
+                                }
+                              </Typography>
+                            </>
+                          )}
+                          <Icon size="s" name={IconNames.ChevronForward} />
+                        </>
+                      )}
+                    </Button>
                     <Gap sizeRem={3.125} />
                   </>
                 )}
