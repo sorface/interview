@@ -5,7 +5,7 @@ import React, {
   useContext,
 } from 'react';
 import { matchPath, NavLink } from 'react-router-dom';
-import { pathnames } from '../../constants';
+import { IconNames, pathnames } from '../../constants';
 import { VITE_APP_NAME } from '../../config';
 import { LocalizationCaption } from '../LocalizationCaption/LocalizationCaption';
 import { LocalizationKey } from '../../localization';
@@ -17,6 +17,7 @@ import { useThemeClassName } from '../../hooks/useThemeClassName';
 import { Theme } from '../../context/ThemeContext';
 import { DeviceContext } from '../../context/DeviceContext';
 import { LangSwitch } from '../LangSwitch/LangSwitch';
+import { Icon } from '../../pages/Room/components/Icon/Icon';
 
 interface NavMenu2Props {
   admin: boolean;
@@ -24,7 +25,9 @@ interface NavMenu2Props {
 
 interface MenuItem {
   path: string;
+  target?: string;
   logo?: string;
+  icon?: IconNames;
   caption: ReactNode;
 }
 
@@ -70,6 +73,12 @@ export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
           captionKey={LocalizationKey.HighlightsRoomsPageName}
         />
       ),
+    },
+    {
+      path: 'https://t.me/sorface_event',
+      target: '_blank',
+      icon: IconNames.PaperPlane,
+      caption: <LocalizationCaption captionKey={LocalizationKey.News} />,
     },
     admin
       ? {
@@ -121,8 +130,10 @@ export const NavMenu: FunctionComponent<NavMenu2Props> = ({ admin }) => {
         <NavLink
           key={item.path}
           to={item.path}
+          target={item.target}
           className={`flex items-center no-underline ${firstItem ? 'pr-[2rem]' : 'pr-[2.25rem]'} ${active ? 'underline' : ''}`}
         >
+          {item.icon && <Icon name={item.icon} />}
           {item.logo && (
             <img
               className="w-[1.25rem] h-[1.25rem] rounded-[0.25rem]"

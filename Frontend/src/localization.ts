@@ -244,6 +244,7 @@ export const enum LocalizationKey {
   StartInterview,
   Preview,
   SkipQuestion,
+  News,
 }
 
 export const LocalizationCaptions: Record<
@@ -531,6 +532,7 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.StartInterview]: 'Start interview',
     [LocalizationKey.Preview]: 'Preview',
     [LocalizationKey.SkipQuestion]: 'Skip question',
+    [LocalizationKey.News]: 'News',
   },
   [LocalizationLang.ru]: {
     [LocalizationKey.HighlightsRoomsPageName]: 'Комнаты',
@@ -815,5 +817,6 @@ export const LocalizationCaptions: Record<
     [LocalizationKey.StartInterview]: 'Начать собеседование',
     [LocalizationKey.Preview]: 'Предпросмотр',
     [LocalizationKey.SkipQuestion]: 'Пропустить вопрос',
+    [LocalizationKey.News]: 'Новости',
   },
 };
