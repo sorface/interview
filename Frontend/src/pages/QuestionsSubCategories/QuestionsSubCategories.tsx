@@ -21,6 +21,8 @@ import { Icon } from '../Room/components/Icon/Icon';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Button } from '../../components/Button/Button';
 import { Typography } from '../../components/Typography/Typography';
+import { Theme } from '../../context/ThemeContext';
+import { useThemeClassName } from '../../hooks/useThemeClassName';
 
 const pageSize = 30;
 const initialPageNumber = 1;
@@ -30,6 +32,10 @@ export const QuestionsSubCategories: FunctionComponent = () => {
   const localizationCaptions = useLocalizationCaptions();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const [searchValueInput, setSearchValueInput] = useState('');
+  const categoryItemThemedClassName = useThemeClassName({
+    [Theme.Dark]: 'border-dark-closed hover:bg-dark-history-hover',
+    [Theme.Light]: 'border-grey-active hover:bg-blue-light border-blue-main',
+  });
 
   const { apiMethodState: categoriesState, fetchData: fetchCategories } =
     useApiMethod<Category[], GetCategoriesParams>(
@@ -68,14 +74,16 @@ export const QuestionsSubCategories: FunctionComponent = () => {
       return (
         <li key={category.id}>
           <Link to={path} className="no-underline">
-            <div className="flex items-center bg-wrap p-[1rem] mb-[1rem] rounded-[0.5rem]">
+            <div
+              className={`flex items-center bg-wrap p-[1rem] mb-[1rem] rounded-[0.5rem] ${categoryItemThemedClassName}`}
+            >
               <Typography size="l">{category.name}</Typography>
             </div>
           </Link>
         </li>
       );
     },
-    [rootCategory],
+    [rootCategory, categoryItemThemedClassName],
   );
 
   return (

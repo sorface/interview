@@ -25,6 +25,8 @@ import { Typography } from '../../components/Typography/Typography';
 import { Gap } from '../../components/Gap/Gap';
 import { AuthContext } from '../../context/AuthContext';
 import { checkAdmin } from '../../utils/checkAdmin';
+import { useThemeClassName } from '../../hooks/useThemeClassName';
+import { Theme } from '../../context/ThemeContext';
 
 const pageSize = 30;
 const initialPageNumber = 1;
@@ -35,6 +37,10 @@ export const QuestionsRootCategories: FunctionComponent = () => {
   const localizationCaptions = useLocalizationCaptions();
   const [pageNumber, setPageNumber] = useState(initialPageNumber);
   const [searchValueInput, setSearchValueInput] = useState('');
+  const categoryItemThemedClassName = useThemeClassName({
+    [Theme.Dark]: 'border-dark-closed hover:bg-dark-history-hover',
+    [Theme.Light]: 'border-grey-active hover:bg-blue-light border-blue-main',
+  });
 
   const { apiMethodState: categoriesState, fetchData: fetchCategories } =
     useApiMethod<Category[], GetCategoriesParams>(
@@ -64,20 +70,25 @@ export const QuestionsRootCategories: FunctionComponent = () => {
     setPageNumber(pageNumber + 1);
   }, [pageNumber]);
 
-  const createCategoryItem = useCallback((category: Category) => {
-    const path = generatePath(pathnames.questionsSubCategories, {
-      rootCategory: category.id,
-    });
-    return (
-      <li key={category.id}>
-        <Link to={path} className="no-underline">
-          <div className="flex items-center bg-wrap p-[1rem] mb-[1rem] rounded-[0.5rem]">
-            <Typography size="l">{category.name}</Typography>
-          </div>
-        </Link>
-      </li>
-    );
-  }, []);
+  const createCategoryItem = useCallback(
+    (category: Category) => {
+      const path = generatePath(pathnames.questionsSubCategories, {
+        rootCategory: category.id,
+      });
+      return (
+        <li key={category.id}>
+          <Link to={path} className="no-underline">
+            <div
+              className={`flex items-center bg-wrap p-[1rem] mb-[1rem] rounded-[0.5rem] ${categoryItemThemedClassName}`}
+            >
+              <Typography size="l">{category.name}</Typography>
+            </div>
+          </Link>
+        </li>
+      );
+    },
+    [categoryItemThemedClassName],
+  );
 
   return (
     <MainContentWrapper>
