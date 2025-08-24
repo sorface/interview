@@ -1,7 +1,6 @@
-namespace Interview.Backend.Auth
+namespace Interview.Backend.Auth;
+
+public static class UserClaimConstants
 {
-    public sealed class UserClaimConstants
-    {
-        public const string UserId = "USER_ID";
-    }
+    public const string UserId = "USER_ID";
 }

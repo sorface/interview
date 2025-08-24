@@ -1,8 +1,6 @@
 using System.Net.Http.Headers;
-using System.Security.Authentication;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using Interview.Backend.Auth.Sorface;
 using Interview.Domain;
 using Interview.Domain.Database;
 using Interview.Domain.Users.Service;
@@ -139,14 +137,9 @@ public class DevelopmentAuthenticationHandler(
 
         var res = new List<Claim>
         {
-            new(SorfaceClaimTypes.Claims.Profile.Id, dbUser.ExternalId, ClaimValueTypes.String),
-            new(SorfaceClaimTypes.Claims.Profile.Username, dbUser.Nickname, ClaimValueTypes.String),
+            new(JwtClaimsConstants.ProfileId, dbUser.ExternalId, ClaimValueTypes.String),
+            new(JwtClaimsConstants.Username, dbUser.Nickname, ClaimValueTypes.String),
         };
-
-        if (dbUser.Avatar is not null)
-        {
-            res.Add(new(SorfaceClaimTypes.Claims.Profile.Avatar, dbUser.Avatar, ClaimValueTypes.String));
-        }
 
         if (dbUser.Id != Guid.Empty)
         {
@@ -158,7 +151,7 @@ public class DevelopmentAuthenticationHandler(
         foreach (var role in updatedRoles)
         {
             // ReSharper disable once EntityFramework.NPlusOne.IncompleteDataUsage
-            res.Add(new(SorfaceClaimTypes.Claims.Profile.Authorities, role, ClaimValueTypes.String));
+            res.Add(new(JwtClaimsConstants.Authorities, role, ClaimValueTypes.String));
         }
 
         return res;
