@@ -37,6 +37,7 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
             {
                 AccessDeniedException => (HttpStatusCode.Forbidden, exception.Message),
                 NotFoundException => (HttpStatusCode.NotFound, exception.Message),
+                UnauthorizedAccessException => (HttpStatusCode.Unauthorized, exception.Message),
                 UserException or SmartEnumNotFoundException => (HttpStatusCode.BadRequest, exception.Message),
                 _ => (HttpStatusCode.InternalServerError, "Internal Server Error."),
             };

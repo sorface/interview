@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
+using Interview.Backend.Auth;
 using Interview.Domain.Database;
 using Interview.Domain.Permissions;
 using Interview.Domain.Repository;
@@ -41,8 +42,12 @@ public class UserServiceTest
             new RoomParticipantRepository(appDbContext)
         );
 
+        using var iMemoryCache = new MemoryCache(new MemoryCacheOptions());
+
         var userService = new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext),
-            new PermissionRepository(appDbContext), securityService);
+            new PermissionRepository(appDbContext), securityService, appDbContext, iMemoryCache,
+            new SemaphoreLockProvider<string>(NullLogger<SemaphoreLockProvider<string>>.Instance));
+
         var user = new User("Dima", "1");
         var upsertUser = await userService.UpsertByExternalIdAsync(user);
 
@@ -66,16 +71,23 @@ public class UserServiceTest
             new CachedCurrentUserAccessor(new CurrentUserAccessor(), appDbContext),
             new RoomParticipantRepository(appDbContext)
         );
-        var userService =
-            new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext), new PermissionRepository(appDbContext), securityService);
+        using var iMemoryCache = new MemoryCache(new MemoryCacheOptions());
+
+        var userService = new UserService(
+            new UserRepository(appDbContext), new RoleRepository(appDbContext),
+            new PermissionRepository(appDbContext), securityService, appDbContext,
+            iMemoryCache,
+            new SemaphoreLockProvider<string>(NullLogger<SemaphoreLockProvider<string>>.Instance)
+        );
+
         var user = new User(nickname, "1");
         user.Roles.Add(new Role(expectedRoleName));
 
         var upsertUser = await userService.UpsertByExternalIdAsync(user);
 
-        var savedUser = await appDbContext.Users.SingleAsync(e => e.Id == upsertUser.Id);
+        var savedUser = await appDbContext.Users.SingleAsync(e => e.Id == upsertUser!.Id);
         upsertUser.Should().BeEquivalentTo(savedUser);
-        upsertUser.Roles.Should().ContainSingle(role => role.Name == expectedRoleName);
+        upsertUser?.Roles.Should().ContainSingle(role => role.Name == expectedRoleName);
     }
 
     [Fact(DisplayName = "Inserting a user if there are no roles in the database")]
@@ -90,8 +102,12 @@ public class UserServiceTest
             new CachedCurrentUserAccessor(new CurrentUserAccessor(), appDbContext),
             new RoomParticipantRepository(appDbContext)
         );
+
+        using var iMemoryCache = new MemoryCache(new MemoryCacheOptions());
         var userService = new UserService(new UserRepository(appDbContext), new RoleRepository(appDbContext),
-            new PermissionRepository(appDbContext), securityService);
+            new PermissionRepository(appDbContext), securityService, appDbContext, iMemoryCache,
+            new SemaphoreLockProvider<string>(NullLogger<SemaphoreLockProvider<string>>.Instance));
+
         var user = new User("Dima", "1");
 
         var error = await Assert.ThrowsAsync<Domain.NotFoundException>(async () => await userService.UpsertByExternalIdAsync(user));
